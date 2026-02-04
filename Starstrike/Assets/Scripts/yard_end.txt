@@ -1,0 +1,38 @@
+
+TriggerSound                cutscene4
+
+EnterLocation               receiver
+
+########################### Now in receiver
+
+CamMove                     intro1      60
+
+WaitFade
+
+Say                         yardend_5
+Say                         yardend_6
+Say                         yardend_7
+Say                         yardend_7b
+Say                         yardend_8
+
+WaitSay
+ExitLocation
+
+EnterLocation               pattern_buffer
+
+
+########################### Now in the Pattern Buffer
+
+CamBuildingFocus            1   800     -200
+
+WaitFade
+
+Say                         yardend_11
+Say                         yardend_12
+Say                         yardend_13
+
+WaitSay
+ExitLocation
+
+StopSound                   cutscene4
+CamReset

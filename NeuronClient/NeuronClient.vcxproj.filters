@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Project Files">
+      <UniqueIdentifier>{862098c1-09fd-4a19-b85c-9f5c751c9a53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Canvas">
+      <UniqueIdentifier>{1d5417a4-b5c0-45e3-9b1c-5d0381dd01a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{acd4601f-8cbb-4f5b-a229-9ca9d951a0a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NeuronClient.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="WndProcManager.cpp" />
+    <ClCompile Include="Strings.cpp" />
+    <ClCompile Include="GuiButton.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="GuiWindow.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9TextRenderer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="window_manager_directx.cpp" />
+    <ClCompile Include="bitmap.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ogl_extensions_directx.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_dlist.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_dlist_dev.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_matrix_stack.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_trace.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="rgb_colour.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NeuronClient.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="WndProcManager.h" />
+    <ClInclude Include="Strings.h" />
+    <ClInclude Include="GameMain.h" />
+    <ClInclude Include="GuiButton.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiWindow.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXHelper.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DX9TextRenderer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="universal_include.h" />
+    <ClInclude Include="window_manager.h" />
+    <ClInclude Include="window_manager_win32.h" />
+    <ClInclude Include="bitmap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DDS.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="LoaderHelpers.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ogl_extensions.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist_dev.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_inline.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_internals.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_matrix_stack.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_trace.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="rgb_colour.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>Project Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

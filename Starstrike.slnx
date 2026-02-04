@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="GameLogic/GameLogic.vcxproj" Id="b2d03c75-772a-4380-8aaf-76c12577ba26" />
+  <Project Path="NeuronClient/NeuronClient.vcxproj" Id="5af8687f-83f3-46fb-a357-6465b2c730a7" />
+  <Project Path="NeuronCore/NeuronCore.vcxproj" Id="cf9cee84-c949-4613-8bce-65530b5537c0" />
+  <Project Path="Starstrike/Starstrike.vcxproj" Id="76dced6c-df0e-4692-aa34-2ed0ef7726b5">
+    <Deploy />
+  </Project>
+</Solution>

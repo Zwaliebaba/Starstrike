@@ -1,0 +1,73 @@
+
+TriggerSound            cutscene2
+WaitFade
+
+EnterLocation           mine
+
+
+####################### Bit of text in the mine
+
+Highlight               42
+Highlight               43
+Highlight               44
+Highlight               45
+CamMove                 intro1  20
+
+WaitFade
+
+Say                     containmentend_mine1
+Say                     containmentend_mine1b
+
+WaitSay
+ClearHighlights
+Highlight               90
+CamBuildingFocus        90      400     100
+Say                     containmentend_mine2
+Say                     containmentend_mine3
+Say                     containmentend_mine3b
+Say                     containmentend_mine4
+
+WaitSay
+ClearHighlights
+Highlight               89
+CamBuildingFocus        89      250     75
+Say                     containmentend_mine5
+
+WaitSay
+ClearHighlights
+ExitLocation
+WaitFade
+
+####################### Back to the global world
+
+EnterLocation           generator
+
+
+####################### Bit of text in the Generator
+
+CamMove                 intro1  30
+WaitFade
+
+Say                     containmentend_generator1
+Say                     containmentend_generator1b
+Say                     containmentend_generator2
+WaitSay
+
+CamBuildingFocus        0   300     300
+Say                     containmentend_generator3
+Say                     containmentend_generator3b
+WaitSay
+
+Highlight               23
+Say                     containmentend_generator4
+Say                     containmentend_generator5
+
+WaitSay
+ClearHighlights
+ExitLocation
+
+WaitFade
+
+StopSound               cutscene2
+CamReset
+
