@@ -278,7 +278,7 @@ void Team::Advance(int _slice)
         Entity* ent = m_others[i];
         if (ent->m_enabled)
         {
-          LegacyVector3 oldPos(ent->m_pos);
+          LegacyVector3 oldGridPos(ent->m_gridPos);  // Use tracked grid position
           WorldObjectId myId(m_teamId, -1, i, ent->m_id.GetUniqueId());
 
           auto entityName = Entity::GetTypeName(ent->m_entityType);
@@ -292,14 +292,17 @@ void Team::Advance(int _slice)
 
           if (amIdead)
           {
-            g_app->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
+            g_app->m_location->m_entityGrid->RemoveObject(myId, oldGridPos.x, oldGridPos.z, ent->m_radius);
             m_others.MarkNotUsed(i);
             delete ent;
           }
           else if (!ent->m_enabled)
-            g_app->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
+            g_app->m_location->m_entityGrid->RemoveObject(myId, oldGridPos.x, oldGridPos.z, ent->m_radius);
           else
-            g_app->m_location->m_entityGrid->UpdateObject(myId, oldPos.x, oldPos.z, ent->m_pos.x, ent->m_pos.z, ent->m_radius);
+          {
+            g_app->m_location->m_entityGrid->UpdateObject(myId, oldGridPos.x, oldGridPos.z, ent->m_pos.x, ent->m_pos.z, ent->m_radius);
+            ent->m_gridPos = ent->m_pos;  // Update tracked grid position after successful update
+          }
         }
       }
     }

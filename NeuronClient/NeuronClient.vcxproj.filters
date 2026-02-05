@@ -10,6 +10,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{acd4601f-8cbb-4f5b-a229-9ca9d951a0a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{edfef6ec-e587-4d26-b57d-a1ec1b25997f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeuronClient.cpp" />
@@ -62,6 +65,91 @@
     <ClCompile Include="rgb_colour.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="3d_sprite.cpp" />
+    <ClCompile Include="LegacyTexture.cpp" />
+    <ClCompile Include="PersistentState.cpp" />
+    <ClCompile Include="profiler.cpp" />
+    <ClCompile Include="sample_cache.cpp" />
+    <ClCompile Include="sound_filter.cpp" />
+    <ClCompile Include="sound_instance.cpp" />
+    <ClCompile Include="sound_library_2d.cpp" />
+    <ClCompile Include="sound_library_3d.cpp" />
+    <ClCompile Include="sound_library_3d_dsound.cpp" />
+    <ClCompile Include="sound_parameter.cpp" />
+    <ClCompile Include="sound_stream_decoder.cpp" />
+    <ClCompile Include="soundsystem.cpp" />
+    <ClCompile Include="texture_uv.cpp" />
+    <ClCompile Include="input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_types.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_alias.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_chord.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_conjoin.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_idle.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_invert.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_pipe.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_prefs.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_simple.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_value.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_win32.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_xinput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter_direction.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter_withdelta.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfiltermanager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilterspec.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputspec.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputTransform.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="keynames.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="InputField.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape.cpp" />
+    <ClCompile Include="resource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuronClient.h" />
@@ -135,10 +223,109 @@
     <ClInclude Include="rgb_colour.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="3d_sprite.h" />
+    <ClInclude Include="LegacyTexture.h" />
+    <ClInclude Include="PersistentState.h" />
+    <ClInclude Include="profiler.h" />
+    <ClInclude Include="sample_cache.h" />
+    <ClInclude Include="sound_filter.h" />
+    <ClInclude Include="sound_instance.h" />
+    <ClInclude Include="sound_library_2d.h" />
+    <ClInclude Include="sound_library_3d.h" />
+    <ClInclude Include="sound_library_3d_dsound.h" />
+    <ClInclude Include="sound_parameter.h" />
+    <ClInclude Include="sound_stream_decoder.h" />
+    <ClInclude Include="soundsystem.h" />
+    <ClInclude Include="texture_uv.h" />
+    <ClInclude Include="input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_types.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_alias.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_chord.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_conjoin.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_idle.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_invert.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_pipe.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_prefs.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_simple.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_value.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_win32.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_xinput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter_direction.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter_withdelta.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfiltermanager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilterspec.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputspec.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputspeclist.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputTransform.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="keydefs.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="keynames.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputField.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="Shape.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
       <Filter>Project Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
+      <Filter>Project Files</Filter>
+    </Natvis>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis">
+      <Filter>Project Files</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

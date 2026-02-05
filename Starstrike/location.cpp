@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "location.h"
 #include "GameApp.h"
+#include "NetworkEntityManager.h"
 #include "armour.h"
 #include "camera.h"
 #include "darwinian.h"
@@ -205,6 +206,15 @@ WorldObjectId Location::SpawnEntities(const LegacyVector3& _pos, unsigned char _
     s->Begin();
 
     m_entityGrid->AddObject(s->m_id, s->m_pos.x, s->m_pos.z, s->m_radius);
+    s->m_gridPos = s->m_pos;  // Track the grid position
+
+    // Register entity with network system
+    DebugTrace("[Location] SpawnEntities: entity created, type={}, teamId={}, g_networkEntityManager={}\n",
+        static_cast<int>(s->m_entityType), _teamId, g_networkEntityManager != nullptr ? "valid" : "null");
+    if (g_networkEntityManager)
+    {
+      g_networkEntityManager->RegisterEntity(s, _teamId);
+    }
 
     entityId = s->m_id;
   }
@@ -638,8 +648,6 @@ void Location::Advance(int _slice)
 
   m_lastSliceProcessed = _slice;
 
-#undef for
-#pragma omp parallel for schedule(dynamic)
   for (int step = 0; step <= 3; step++)
   {
     switch (step)

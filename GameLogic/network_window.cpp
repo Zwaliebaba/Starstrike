@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "network_window.h"
 #include "GameApp.h"
-#include "NetworkClient.h"
+#include "AuthoritativeServer.h"
+#include "PredictiveClient.h"
 #include "main.h"
-#include "Server.h"
 #include "DX9TextRenderer.h"
 
 NetworkWindow::NetworkWindow(const char* name)
@@ -26,10 +26,8 @@ void NetworkWindow::Render(bool hasFocus)
     //        g_editorFont.DrawText2D( m_x + 10, m_y + 135, DEF_FONT_SIZE,
     //			"Server RECV  : %4.0f bytes", g_app->m_profiler->GetTotalTime("Server Receive") );
 #endif // PROFILER_ENABLED
-    g_editorFont.DrawText2D(m_x + 10, m_y + 30, DEF_FONT_SIZE, "SERVER SeqID : %d", g_app->m_server->m_sequenceId);
-
-    int diff = g_app->m_server->m_sequenceId - g_lastProcessedSequenceId;
-    g_editorFont.DrawText2D(m_x + 10, m_y + 60, DEF_FONT_SIZE, "Diff         : %d", diff);
+    // Server tick info not directly exposed in new system
+    g_editorFont.DrawText2D(m_x + 10, m_y + 30, DEF_FONT_SIZE, "SERVER (Authoritative)");
   }
 
 #ifdef PROFILER_ENABLED
@@ -38,10 +36,12 @@ void NetworkWindow::Render(bool hasFocus)
   //    g_editorFont.DrawText2D( m_x + 10, m_y + 175, DEF_FONT_SIZE,
   //		"Client RECV  : %4.0f bytes", g_app->m_profiler->GetTotalTime("Client Receive") );
 #endif // PROFILER_ENABLED
-  g_editorFont.DrawText2D(m_x + 10, m_y + 45, DEF_FONT_SIZE, "CLIENT SeqID : %d", g_lastProcessedSequenceId);
 
-  g_editorFont.DrawText2D(m_x + 10, m_y + 80, DEF_FONT_SIZE, "Inbox: %d", g_app->m_networkClient->m_inbox.Size());
-
-  int nextSeqId = g_app->m_networkClient->GetNextLetterSeqID();
-  g_editorFont.DrawText2D(m_x + 10, m_y + 96, DEF_FONT_SIZE, "First Letter SeqID: %d", nextSeqId);
+  if (g_app->m_client)
+  {
+    g_editorFont.DrawText2D(m_x + 10, m_y + 45, DEF_FONT_SIZE, "CLIENT ServerTick : %d", g_app->m_client->GetServerTick());
+    g_editorFont.DrawText2D(m_x + 10, m_y + 60, DEF_FONT_SIZE, "CLIENT LocalTick  : %d", g_app->m_client->GetLocalTick());
+    g_editorFont.DrawText2D(m_x + 10, m_y + 75, DEF_FONT_SIZE, "Interpolation Delay: %.0fms", g_app->m_client->GetInterpolationDelay() * 1000.0f);
+    g_editorFont.DrawText2D(m_x + 10, m_y + 90, DEF_FONT_SIZE, "Connected: %s", g_app->m_client->IsConnected() ? "Yes" : "No");
+  }
 }

@@ -5,6 +5,7 @@
   <Project Path="GameLogic/GameLogic.vcxproj" Id="b2d03c75-772a-4380-8aaf-76c12577ba26" />
   <Project Path="NeuronClient/NeuronClient.vcxproj" Id="5af8687f-83f3-46fb-a357-6465b2c730a7" />
   <Project Path="NeuronCore/NeuronCore.vcxproj" Id="cf9cee84-c949-4613-8bce-65530b5537c0" />
+  <Project Path="Server/Server.vcxproj" Id="91fd0692-07a9-4043-beb6-ea66e127508d" />
   <Project Path="Starstrike/Starstrike.vcxproj" Id="76dced6c-df0e-4692-aa34-2ed0ef7726b5">
     <Deploy />
   </Project>

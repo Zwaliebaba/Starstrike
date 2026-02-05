@@ -5,11 +5,13 @@
 #include "armour.h"
 #include "building.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
+#include "NetworkPackets.h"
 #include "global_world.h"
 #include "input.h"
 #include "insertion_squad.h"
 #include "location.h"
+#include "main.h"
 #include "officer.h"
 #include "radardish.h"
 #include "script.h"
@@ -22,6 +24,21 @@
 #include "DX9TextRenderer.h"
 #include "unit.h"
 #include "user_input.h"
+
+//=============================================================================
+// Local helper to send SelectUnit command
+// Maps the old unit/entity/building selection to the new command system
+//=============================================================================
+static void RequestSelectUnit(uint8_t teamId, int unitId, int entityId, int buildingId)
+{
+  // For now, we track selection locally
+  // In full server-authoritative mode, this would go through CommandPacket
+  if (g_app->m_location && teamId < NUM_TEAMS)
+  {
+    Team& team = g_app->m_location->m_teams[teamId];
+    team.SelectUnit(unitId, entityId, buildingId);
+  }
+}
 
 // *** AdvanceTeleportControl
 void LocationInput::AdvanceRadarDishControl(Building* _building)
@@ -37,13 +54,13 @@ void LocationInput::AdvanceRadarDishControl(Building* _building)
     if (building && building->m_buildingType == BuildingType::TypeRadarDish && building != _building)
     {
       auto dish = static_cast<RadarDish*>(building);
-      g_app->m_networkClient->RequestAimBuilding(g_app->m_globalWorld->m_myTeamId, _building->m_id.GetUniqueId(),
-                                                  dish->GetStartPoint());
+      SendAimBuildingCommand(g_app->m_globalWorld->m_myTeamId, _building->m_id.GetUniqueId(),
+                              dish->GetStartPoint());
     }
     else
     {
-      g_app->m_networkClient->RequestAimBuilding(g_app->m_globalWorld->m_myTeamId, _building->m_id.GetUniqueId(),
-                                                  g_app->m_userInput->GetMousePos3d());
+      SendAimBuildingCommand(g_app->m_globalWorld->m_myTeamId, _building->m_id.GetUniqueId(),
+                              g_app->m_userInput->GetMousePos3d());
     }
   }
 }
@@ -123,12 +140,12 @@ void LocationInput::AdvanceNoSelection()
 
           if (building->m_buildingType == BuildingType::TypeRadarDish)
           {
-            g_app->m_networkClient->RequestSelectUnit(id.GetTeamId(), -1, -1, id.GetUniqueId());
+            RequestSelectUnit(id.GetTeamId(), -1, -1, id.GetUniqueId());
             g_app->m_camera->RequestRadarAimMode(building);
           }
           else if (building->m_buildingType == BuildingType::TypeGunTurret)
           {
-            g_app->m_networkClient->RequestSelectUnit(id.GetTeamId(), -1, -1, id.GetUniqueId());
+            RequestSelectUnit(id.GetTeamId(), -1, -1, id.GetUniqueId());
             g_app->m_camera->RequestTurretAimMode(building);
           }
           else if (building->m_buildingType == BuildingType::TypeFenceSwitch)
@@ -139,7 +156,7 @@ void LocationInput::AdvanceNoSelection()
         }
       }
       else
-        g_app->m_networkClient->RequestSelectUnit(id.GetTeamId(), id.GetUnitId(), id.GetIndex(), -1);
+        RequestSelectUnit(id.GetTeamId(), id.GetUnitId(), id.GetIndex(), -1);
     }
   }
 }
@@ -170,7 +187,7 @@ void LocationInput::AdvanceTeamControl()
     bool objectUnderMouse = GetObjectUnderMouse(id, g_app->m_globalWorld->m_myTeamId);
     if (id.IsValid() && id.GetUnitId() != 255 && id.GetUnitId() != UNIT_BUILDINGS)
     {
-      g_app->m_networkClient->RequestSelectUnit(id.GetTeamId(), id.GetUnitId(), id.GetIndex(), -1);
+      RequestSelectUnit(id.GetTeamId(), id.GetUnitId(), id.GetIndex(), -1);
       return;
     }
   }
@@ -184,7 +201,7 @@ void LocationInput::AdvanceTeamControl()
   {
     if (objectSelected)
     {
-      g_app->m_networkClient->RequestSelectUnit(team->m_teamId, -1, -1, -1);
+      RequestSelectUnit(team->m_teamId, -1, -1, -1);
       g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
       g_app->m_taskManager->m_currentTaskId = -1;
     }
@@ -195,7 +212,7 @@ void LocationInput::AdvanceTeamControl()
     if (g_inputManager->controlEvent(ControlUnitCreate))
     {
       LegacyVector3 mousePos = g_app->m_userInput->GetMousePos3d();
-      g_app->m_networkClient->RequestTargetProgram(g_app->m_globalWorld->m_myTeamId, g_app->m_taskManager->m_currentTaskId,
+      SendTargetProgramCommand(g_app->m_globalWorld->m_myTeamId, g_app->m_taskManager->m_currentTaskId,
                                                     mousePos);
     }
   }
@@ -218,7 +235,7 @@ void LocationInput::AdvanceTeamControl()
           if (g_app->m_taskManagerInterface->ControlEvent(TaskManagerInterface::TMTerminate))
           {
             // Player pressed CTRL-C, so terminate this turret
-            g_app->m_networkClient->RequestSelectUnit(team->m_teamId, -1, -1, -1);
+            RequestSelectUnit(team->m_teamId, -1, -1, -1);
             g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
             building->Damage(-100);
           }
@@ -235,7 +252,7 @@ void LocationInput::AdvanceTeamControl()
         if (g_app->m_taskManagerInterface->ControlEvent(TaskManagerInterface::TMTerminate))
         {
           // Player pressed CTRL-C, so demote this officer
-          g_app->m_networkClient->RequestSelectUnit(team->m_teamId, -1, -1, -1);
+          RequestSelectUnit(team->m_teamId, -1, -1, -1);
           g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
           ent->ChangeHealth(-999);
         }
@@ -314,7 +331,7 @@ void LocationInput::AdvanceTeamControl()
 
             if (oldWeapon != currentWeapon)
             {
-              g_app->m_networkClient->RequestRunProgram(squad->m_teamId, weaponList[currentWeapon]);
+              SendRunProgramCommand(squad->m_teamId, weaponList[currentWeapon]);
               g_app->m_soundSystem->TriggerOtherEvent(nullptr, "Show", SoundSourceBlueprint::TypeInterface);
             }
           }
@@ -323,7 +340,7 @@ void LocationInput::AdvanceTeamControl()
     }
     else
     {
-      g_app->m_networkClient->RequestSelectUnit(team->m_teamId, -1, -1, -1);
+      RequestSelectUnit(team->m_teamId, -1, -1, -1);
       g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
     }
   }

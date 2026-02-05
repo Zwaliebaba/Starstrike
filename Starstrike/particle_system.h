@@ -3,7 +3,6 @@
 
 #include "LegacyVector3.h"
 #include "rgb_colour.h"
-#include "slice_darray.h"
 
 // ****************************************************************************
 // ParticleType
@@ -77,7 +76,7 @@ class Particle
 
 class ParticleSystem
 {
-  SliceDArray<Particle> m_particles;
+  std::vector<Particle> m_particles;
 
   public:
     ParticleSystem();
@@ -85,7 +84,7 @@ class ParticleSystem
     void CreateParticle(const LegacyVector3& _pos, const LegacyVector3& _vel, int _particleTypeId, float _size = -1.0f,
                         RGBAColor col = NULL);
 
-    void Advance(int _slice);
+    void Advance();
     void Render();
     void Empty();
 };

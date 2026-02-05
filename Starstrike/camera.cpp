@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "camera.h"
 #include "GameApp.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 
 #include "Canvas.h"
 #include "global_world.h"

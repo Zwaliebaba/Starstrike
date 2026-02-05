@@ -1704,6 +1704,9 @@
     <ClInclude Include="unit.h" />
     <ClInclude Include="user_input.h" />
   </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="Strings\en-US\Strings.resw" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>

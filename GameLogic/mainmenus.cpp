@@ -22,7 +22,7 @@ class AboutDarwiniaButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("about_darwinia", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("about_darwinia")))
       Canvas::EclRegisterWindow(NEW AboutDarwiniaWindow(), m_parent);
   }
 };
@@ -31,7 +31,7 @@ class MainMenuUserProfileButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_profile", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_profile")))
       Canvas::EclRegisterWindow(NEW UserProfileWindow(), m_parent);
   }
 };
@@ -40,7 +40,7 @@ class OptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_options", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_options")))
       Canvas::EclRegisterWindow(NEW OptionsMenuWindow(), m_parent);
   }
 };
@@ -49,7 +49,7 @@ class ScreenOptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_screenoptions", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_screenoptions")))
       Canvas::EclRegisterWindow(NEW PrefsScreenWindow(), m_parent);
   }
 };
@@ -58,7 +58,7 @@ class GraphicsOptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_graphicsoptions", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_graphicsoptions")))
       Canvas::EclRegisterWindow(NEW PrefsGraphicsWindow(), m_parent);
   }
 };
@@ -67,7 +67,7 @@ class SoundOptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_soundoptions", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_soundoptions")))
       Canvas::EclRegisterWindow(NEW PrefsSoundWindow(), m_parent);
   }
 };
@@ -76,7 +76,7 @@ class OtherOptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_otheroptions", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_otheroptions")))
       Canvas::EclRegisterWindow(NEW PrefsOtherWindow(), m_parent);
   }
 };
@@ -85,13 +85,13 @@ class KeybindingsOptionsButton : public GuiButton
 {
   void MouseUp() override
   {
-    if (!Canvas::EclGetWindow(Strings::Get("dialog_inputoptions", "GameLogic")))
+    if (!Canvas::EclGetWindow(Strings::Get("dialog_inputoptions")))
       Canvas::EclRegisterWindow(NEW PrefsKeybindingsWindow, m_parent);
   }
 };
 
 MainMenuWindow::MainMenuWindow()
-  : GuiWindow(Strings::Get("dialog_mainmenu", "GameLogic"))
+  : GuiWindow(Strings::Get("dialog_mainmenu"))
 {
   int screenW = ClientEngine::OutputSize().Width;
   int screenH = ClientEngine::OutputSize().Height;
@@ -103,7 +103,7 @@ MainMenuWindow::MainMenuWindow()
 void MainMenuWindow::Render(bool _hasFocus) { GuiWindow::Render(_hasFocus); }
 
 OptionsMenuWindow::OptionsMenuWindow()
-  : GuiWindow(Strings::Get("dialog_options", "GameLogic"))
+  : GuiWindow(Strings::Get("dialog_options"))
 {
   SetSize(240, 230);
 }
@@ -120,42 +120,42 @@ void OptionsMenuWindow::Create()
   int h = buttonH + border;
 
   auto screen = NEW ScreenOptionsButton();
-  screen->SetProperties(Strings::Get("dialog_screenoptions", "GameLogic"), border, y += border, buttonW, buttonH);
+  screen->SetProperties(Strings::Get("dialog_screenoptions"), border, y += border, buttonW, buttonH);
   screen->m_fontSize = fontSize;
   screen->m_centered = true;
   RegisterButton(screen);
   m_buttonOrder.PutData(screen);
 
   auto graphics = NEW GraphicsOptionsButton();
-  graphics->SetProperties(Strings::Get("dialog_graphicsoptions", "GameLogic"), border, y += h, buttonW, buttonH);
+  graphics->SetProperties(Strings::Get("dialog_graphicsoptions"), border, y += h, buttonW, buttonH);
   graphics->m_fontSize = fontSize;
   graphics->m_centered = true;
   RegisterButton(graphics);
   m_buttonOrder.PutData(graphics);
 
   auto sound = NEW SoundOptionsButton();
-  sound->SetProperties(Strings::Get("dialog_soundoptions", "GameLogic"), border, y += h, buttonW, buttonH);
+  sound->SetProperties(Strings::Get("dialog_soundoptions"), border, y += h, buttonW, buttonH);
   sound->m_fontSize = fontSize;
   sound->m_centered = true;
   RegisterButton(sound);
   m_buttonOrder.PutData(sound);
 
   auto keys = NEW KeybindingsOptionsButton();
-  keys->SetProperties(Strings::Get("dialog_inputoptions", "GameLogic"), border, y += h, buttonW, buttonH);
+  keys->SetProperties(Strings::Get("dialog_inputoptions"), border, y += h, buttonW, buttonH);
   keys->m_fontSize = fontSize;
   keys->m_centered = true;
   RegisterButton(keys);
   m_buttonOrder.PutData(keys);
 
   auto other = NEW OtherOptionsButton();
-  other->SetProperties(Strings::Get("dialog_otheroptions", "GameLogic"), border, y += h, buttonW, buttonH);
+  other->SetProperties(Strings::Get("dialog_otheroptions"), border, y += h, buttonW, buttonH);
   other->m_fontSize = fontSize;
   other->m_centered = true;
   RegisterButton(other);
   m_buttonOrder.PutData(other);
 
   auto close = NEW CloseButton();
-  close->SetProperties(Strings::Get("dialog_close", "GameLogic"), border, m_h - h, buttonW, buttonH);
+  close->SetProperties(Strings::Get("dialog_close"), border, m_h - h, buttonW, buttonH);
   close->m_fontSize = fontSize;
   close->m_centered = true;
   RegisterButton(close);
@@ -173,7 +173,7 @@ class ExitLevelButton : public GuiButton
 };
 
 LocationWindow::LocationWindow()
-  : GuiWindow(Strings::Get("dialog_locationmenu", "GameLogic"))
+  : GuiWindow(Strings::Get("dialog_locationmenu"))
 {
   int screenW = ClientEngine::OutputSize().Width;
   int screenH = ClientEngine::OutputSize().Height;
@@ -198,21 +198,21 @@ void LocationWindow::Create()
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(g_app->m_locationId);
 
   auto exitLevel = NEW ExitLevelButton();
-  exitLevel->SetProperties(Strings::Get("dialog_leavelocation", "GameLogic"), border, y += gap, buttonW, buttonH);
+  exitLevel->SetProperties(Strings::Get("dialog_leavelocation"), border, y += gap, buttonW, buttonH);
   exitLevel->m_fontSize = fontSize;
   exitLevel->m_centered = true;
   RegisterButton(exitLevel);
   m_buttonOrder.PutData(exitLevel);
 
   auto options = NEW OptionsButton();
-  options->SetProperties(Strings::Get("dialog_options", "GameLogic"), border, y += h, buttonW, buttonH);
+  options->SetProperties(Strings::Get("dialog_options"), border, y += h, buttonW, buttonH);
   options->m_fontSize = fontSize;
   options->m_centered = true;
   RegisterButton(options);
   m_buttonOrder.PutData(options);
 
   auto close = NEW CloseButton();
-  close->SetProperties(Strings::Get("dialog_close", "GameLogic"), border, m_h - h, buttonW, buttonH);
+  close->SetProperties(Strings::Get("dialog_close"), border, m_h - h, buttonW, buttonH);
   close->m_fontSize = fontSize;
   close->m_centered = true;
   RegisterButton(close);
@@ -232,28 +232,28 @@ void MainMenuWindow::Create()
   int fontSize = GetMenuSize(13);
 
   auto profile = NEW MainMenuUserProfileButton();
-  profile->SetProperties(Strings::Get("dialog_profile", "GameLogic"), border, y += border, buttonW, buttonH);
+  profile->SetProperties(Strings::Get("dialog_profile"), border, y += border, buttonW, buttonH);
   profile->m_fontSize = fontSize;
   profile->m_centered = true;
   RegisterButton(profile);
   m_buttonOrder.PutData(profile);
 
   auto options = NEW OptionsButton();
-  options->SetProperties(Strings::Get("dialog_options", "GameLogic"), border, y += h, buttonW, buttonH);
+  options->SetProperties(Strings::Get("dialog_options"), border, y += h, buttonW, buttonH);
   options->m_fontSize = fontSize;
   options->m_centered = true;
   RegisterButton(options);
   m_buttonOrder.PutData(options);
 
   auto exit = NEW GameExitButton();
-  exit->SetProperties(Strings::Get("dialog_leavedarwinia", "GameLogic"), border, y += h, buttonW, buttonH);
+  exit->SetProperties(Strings::Get("dialog_leavedarwinia"), border, y += h, buttonW, buttonH);
   exit->m_fontSize = fontSize;
   exit->m_centered = true;
   RegisterButton(exit);
   m_buttonOrder.PutData(exit);
 
   auto close = NEW CloseButton();
-  close->SetProperties(Strings::Get("dialog_close", "GameLogic"), border, m_h - h, buttonW, buttonH);
+  close->SetProperties(Strings::Get("dialog_close"), border, m_h - h, buttonW, buttonH);
   close->m_fontSize = fontSize;
   close->m_centered = true;
   RegisterButton(close);
@@ -273,7 +273,7 @@ void AboutDarwiniaWindow::Create()
   int fontSize = GetMenuSize(13);
 
   auto close = NEW CloseButton();
-  close->SetProperties(Strings::Get("dialog_close", "GameLogic"), border, m_h - h, buttonW, buttonH);
+  close->SetProperties(Strings::Get("dialog_close"), border, m_h - h, buttonW, buttonH);
   close->m_fontSize = fontSize;
   close->m_centered = true;
   RegisterButton(close);

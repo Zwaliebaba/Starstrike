@@ -3,7 +3,7 @@
 #include "GameApp.h"
 #include "RoutingSystem.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 #include "darwinian.h"
 #include "entity_grid.h"
 #include "gamecursor.h"

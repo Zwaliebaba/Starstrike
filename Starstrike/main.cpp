@@ -5,7 +5,10 @@
 #include "LegacyVector3.h"
 #include "StartSequence.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "AuthoritativeServer.h"
+#include "PredictiveClient.h"
+#include "NetworkPackets.h"
+#include "NetworkEntityManager.h"
 #include "explosion.h"
 #include "file_paths.h"
 #include "game_menu.h"
@@ -25,14 +28,13 @@
 #include "location.h"
 #include "location_input.h"
 #include "mainmenus.h"
+#include "team.h"
 #include "particle_system.h"
 #include "preferences.h"
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
 #include "script.h"
-#include "Server.h"
-#include "ServerToClientLetter.h"
 #include "sound_library_2d.h"
 #include "sound_library_3d_dsound.h"
 #include "soundsystem.h"
@@ -48,14 +50,14 @@
 
 static void Finalise();
 
+
 double g_startTime = DBL_MAX;
 double g_gameTime = 0.0;
 float g_advanceTime;
 double g_lastServerAdvance;
 float g_predictionTime;
 float g_targetFrameRate = 20.0f;
-int g_lastProcessedSequenceId = -1;
-int g_sliceNum;							// Most recently advanced slice
+uint32_t g_lastServerTick = 0;
 
 void UpdateAdvanceTime()
 {
@@ -68,76 +70,119 @@ void UpdateAdvanceTime()
   g_predictionTime = static_cast<float>(realTime - g_lastServerAdvance) - 0.07f;
 }
 
-double GetNetworkTime() { return g_lastProcessedSequenceId * 0.1f; }
+double GetNetworkTime() { return g_lastServerTick * NET_TICK_INTERVAL; }
 
-void UpdateTargetFrameRate(int _currentSlice)
+//=============================================================================
+// Helper to convert TeamControls to ClientInputPacket
+//=============================================================================
+
+ClientInputPacket BuildInputPacket(uint8_t teamId, const TeamControls& teamControls)
 {
-  int numUpdatesToProcess = g_app->m_networkClient->m_lastValidSequenceIdFromServer - g_lastProcessedSequenceId;
-  int numSlicesPending = numUpdatesToProcess * NUM_SLICES_PER_FRAME - _currentSlice;
-  float timeSinceStartOfAdvance = g_gameTime - g_lastServerAdvance;
-  int numSlicesThatShouldBePending = 10 - timeSinceStartOfAdvance * 10.0f;
-
-  // Increase or lower the target frame rate, depending on how far behind schedule
-  // we are
-  //	if( numSlicesPending > NUM_SLICES_PER_FRAME/2 )
-  float amountBehind = numSlicesPending - numSlicesThatShouldBePending;
-  g_targetFrameRate -= 0.1f * amountBehind * TARGET_FRAME_RATE_INCREMENT;
-
-  // Make sure the target frame rate is within sensible bounds
-  if (g_targetFrameRate < 2.0f)
-    g_targetFrameRate = 2.0f;
-  else if (g_targetFrameRate > 85.0f)
-    g_targetFrameRate = 85.0f;
+  ClientInputPacket input;
+  input.teamId = teamId;
+  input.aimPosition = QuantizedPosition(
+    teamControls.m_mousePos.x, 
+    teamControls.m_mousePos.y, 
+    teamControls.m_mousePos.z
+  );
+  input.inputFlags = 0;
+  
+  if (teamControls.m_primaryFireTarget)
+    input.SetFlag(InputFlags::PrimaryAction);
+  if (teamControls.m_secondaryFireDirected)
+    input.SetFlag(InputFlags::SecondaryAction);
+  if (teamControls.m_cameraEntityTracking)
+    input.SetFlag(InputFlags::Modifier);
+  if (teamControls.m_unitMove)
+    input.SetFlag(InputFlags::AltModifier);
+  
+  return input;
 }
 
-int GetNumSlicesToAdvance()
+//=============================================================================
+// Helper to send game commands to server
+//=============================================================================
+
+void SendCreateUnitCommand(uint8_t teamId, EntityType entityType, int count, int buildingId, const LegacyVector3& pos)
 {
-  int numUpdatesToProcess = g_app->m_networkClient->m_lastValidSequenceIdFromServer - g_lastProcessedSequenceId;
-  int numSlicesPending = numUpdatesToProcess * NUM_SLICES_PER_FRAME;
-  if (g_sliceNum != -1)
-    numSlicesPending -= g_sliceNum;
-  else if (g_sliceNum == -1)
-    numSlicesPending -= 10;
-
-  float timeSinceStartOfAdvance = g_gameTime - g_lastServerAdvance;
-  //int numSlicesThatShouldBePending = 10 - timeSinceStartOfAdvance * 10.0f;
-
-  int numSlicesToAdvance = timeSinceStartOfAdvance * 100;
-  if (g_sliceNum != -1)
-    numSlicesToAdvance -= g_sliceNum;
-  if (g_sliceNum == -1)
-    numSlicesToAdvance -= 10;
-
-  //DEBUG_ASSERT( numSlicesToAdvance >= 0 );
-  numSlicesToAdvance = std::max(numSlicesToAdvance, 0);
-  numSlicesToAdvance = std::min(numSlicesToAdvance, 10);
-
-  return numSlicesToAdvance;
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.teamId = teamId;
+  cmd.commandType = CommandPacket::CommandType::CreateUnit;
+  cmd.entityType = static_cast<uint8_t>(entityType);
+  cmd.count = static_cast<uint16_t>(count);
+  cmd.buildingId = buildingId;
+  cmd.targetPosition = QuantizedPosition(pos.x, pos.y, pos.z);
+  
+  g_app->m_client->SendCommand(cmd);
 }
 
-bool ProcessServerLetters(ServerToClientLetter* letter)
+void SendSelectUnitCommand(uint8_t teamId, NetEntityId entityId)
 {
-  switch (letter->m_type)
-  {
-    case ServerToClientLetter::HelloClient:
-      if (letter->m_ip == g_app->m_networkClient->GetOurIP_Int())
-        DebugTrace("CLIENT : Received HelloClient from Server\n");
-      return true;
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.teamId = teamId;
+  cmd.commandType = CommandPacket::CommandType::SelectUnit;
+  cmd.targetEntityId = entityId;
+  
+  g_app->m_client->SendCommand(cmd);
+}
 
-    case ServerToClientLetter::GoodbyeClient:
-      return true;
+void SendAimBuildingCommand(uint8_t teamId, int buildingId, const LegacyVector3& pos)
+{
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.teamId = teamId;
+  cmd.commandType = CommandPacket::CommandType::AimBuilding;
+  cmd.buildingId = buildingId;
+  cmd.targetPosition = QuantizedPosition(pos.x, pos.y, pos.z);
+  
+  g_app->m_client->SendCommand(cmd);
+}
 
-    case ServerToClientLetter::TeamAssign:
+void SendToggleFenceCommand(int buildingId)
+{
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.commandType = CommandPacket::CommandType::ToggleFence;
+  cmd.buildingId = buildingId;
+  
+  g_app->m_client->SendCommand(cmd);
+}
 
-      if (letter->m_ip == g_app->m_networkClient->GetOurIP_Int())
-        g_app->m_location->InitialiseTeam(letter->m_teamId, letter->m_teamType);
-      else
-        g_app->m_location->InitialiseTeam(letter->m_teamId, Team::TeamTypeRemotePlayer);
-      return true;
+void SendRunProgramCommand(uint8_t teamId, uint8_t programId)
+{
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.teamId = teamId;
+  cmd.commandType = CommandPacket::CommandType::RunProgram;
+  cmd.programId = programId;
+  
+  g_app->m_client->SendCommand(cmd);
+}
 
-    default:
-      return false;
-  }
+void SendTargetProgramCommand(uint8_t teamId, uint8_t programId, const LegacyVector3& pos)
+{
+  if (!g_app->m_client || !g_app->m_client->IsConnected())
+    return;
+    
+  CommandPacket cmd;
+  cmd.teamId = teamId;
+  cmd.commandType = CommandPacket::CommandType::TargetProgram;
+  cmd.programId = programId;
+  cmd.targetPosition = QuantizedPosition(pos.x, pos.y, pos.z);
+  
+  g_app->m_client->SendCommand(cmd);
 }
 
 bool WindowsOnScreen() { return Canvas::EclGetWindows()->Size() > 0; }
@@ -163,22 +208,23 @@ bool HandleCommonConditions()
   return false;
 }
 
-unsigned char GenerateSyncValue() { return 255 * syncfrand(); }
-
 void LocationGameLoop()
 {
-  bool iAmAClient = true;
   bool iAmAServer = g_prefsManager->GetInt("IAmAServer") ? true : false;
 
-  double nextServerAdvanceTime = GetHighResTime();
-  double nextIAmAliveMessage = GetHighResTime();
+  double nextServerTickTime = GetHighResTime();
+  double nextInputSendTime = GetHighResTime();
+  constexpr double INPUT_SEND_INTERVAL = 1.0 / 30.0;  // Send input at 30Hz
 
   TeamControls teamControls;
 
-  g_sliceNum = -1;
-
   g_app->m_renderer->StartFadeIn(0.6f);
   g_app->m_soundSystem->TriggerOtherEvent(nullptr, "EnterLocation", SoundSourceBlueprint::TypeAmbience);
+
+  int currentSlice = 0;
+
+  // Note: Server is initialized in EnterLocation(), not here
+  // Client connection is also initiated in EnterLocation()
 
   //
   // Main loop
@@ -199,6 +245,7 @@ void LocationGameLoop()
       if (g_app->m_renderer->IsFadeComplete())
         break;
     }
+
 
     g_inputManager->PollForEvents();
     if (g_inputManager->controlEvent(ControlMenuEscape) && g_app->m_renderer->IsFadeComplete())
@@ -225,28 +272,29 @@ void LocationGameLoop()
     double timeNow = GetHighResTime();
 
     //
-    // Advance the server
-    if (iAmAServer)
+    // Advance the server (if hosting)
+    if (iAmAServer && g_app->m_server)
     {
-      if (timeNow > nextServerAdvanceTime)
+      if (timeNow > nextServerTickTime)
       {
-        g_app->m_server->Advance();
-        nextServerAdvanceTime += SERVER_ADVANCE_PERIOD;
-        if (timeNow > nextServerAdvanceTime)
-          nextServerAdvanceTime = timeNow + SERVER_ADVANCE_PERIOD;
+        g_app->m_server->Tick();
+        g_app->m_server->SendStateUpdates();
+        nextServerTickTime += NET_TICK_INTERVAL;
+        if (timeNow > nextServerTickTime)
+          nextServerTickTime = timeNow + NET_TICK_INTERVAL;
       }
     }
 
     if (!WindowsOnScreen())
       teamControls.Advance();
 
-    if (iAmAClient)
+    // Client logic
     {
       START_PROFILE(g_app->m_profiler, "Client Main Loop");
 
       //
       // Send Client input to Server
-      if (timeNow > nextIAmAliveMessage)
+      if (timeNow > nextInputSendTime)
       {
         // Read the current teamControls from the inputManager
 
@@ -296,62 +344,48 @@ void LocationGameLoop()
         }
 
         if (g_app->m_taskManagerInterface->m_visible || Canvas::EclGetWindows()->Size() != 0 || entityUnderMouse)
-          teamControls.ClearFlags();
+        teamControls.ClearFlags();
 
-        g_app->m_networkClient->SendIAmAlive(g_app->m_globalWorld->m_myTeamId, teamControls);
+        // Send input to server using new packet format
+        ClientInputPacket inputPacket = BuildInputPacket(g_app->m_globalWorld->m_myTeamId, teamControls);
+        g_app->m_client->SendInput(inputPacket);
 
-        nextIAmAliveMessage += IAMALIVE_PERIOD;
-        if (timeNow > nextIAmAliveMessage)
-          nextIAmAliveMessage = timeNow + IAMALIVE_PERIOD;
+        nextInputSendTime += INPUT_SEND_INTERVAL;
+        if (timeNow > nextInputSendTime)
+          nextInputSendTime = timeNow + INPUT_SEND_INTERVAL;
 
         teamControls.Clear();
       }
 
-      g_app->m_networkClient->Advance();
-
-      //UpdateTargetFrameRate(g_sliceNum);
-
-      int slicesToAdvance = GetNumSlicesToAdvance();
+      // Update client interpolation
+      g_app->m_client->UpdateInterpolation(g_advanceTime);
+      
+      // Apply interpolated network state to entities
+      if (g_app->m_networkEntityManager)
+      {
+        g_app->m_networkEntityManager->ApplyNetworkState();
+      }
+      
+      // Track server tick for timing
+      uint32_t newServerTick = g_app->m_client->GetServerTick();
+      if (newServerTick > g_lastServerTick)
+      {
+        g_lastServerAdvance = timeNow;
+        g_lastServerTick = newServerTick;
+      }
 
       END_PROFILE(g_app->m_profiler, "Client Main Loop");
 
-      // Do our heavy weight physics
-      for (int i = 0; i < slicesToAdvance; ++i)
+      // Server runs the authoritative game simulation
+      // Client only advances visual systems and interpolates entity positions
+      if (iAmAServer)
       {
-        if (g_sliceNum == -1)
-        {
-          // Read latest update from Server
-          ServerToClientLetter* letter = g_app->m_networkClient->GetNextLetter();
-
-          if (letter)
-          {
-            DEBUG_ASSERT(letter->GetSequenceId() == g_lastProcessedSequenceId + 1);
-
-            bool handled = ProcessServerLetters(letter);
-            if (handled == false)
-              g_app->m_networkClient->ProcessServerUpdates(letter);
-
-            g_sliceNum = 0;
-            g_lastServerAdvance = static_cast<float>(letter->GetSequenceId()) * SERVER_ADVANCE_PERIOD + g_startTime;
-            g_lastProcessedSequenceId = letter->GetSequenceId();
-            delete letter;
-
-            unsigned char sync = GenerateSyncValue();
-            g_app->m_networkClient->SendSyncronisation(g_lastProcessedSequenceId, sync);
-          }
-        }
-
-        if (g_sliceNum != -1)
-        {
-          g_app->m_location->Advance(g_sliceNum);
-          g_app->m_particleSystem->Advance(g_sliceNum);
-
-          if (g_sliceNum < NUM_SLICES_PER_FRAME - 1)
-            g_sliceNum++;
-          else
-            g_sliceNum = -1;
-        }
+        g_app->m_location->Advance(currentSlice);
+        currentSlice = (currentSlice + 1) % NUM_SLICES_PER_FRAME;
       }
+      
+      // Particles are client-side visual effects, always advance
+      g_app->m_particleSystem->Advance();
 
       // Render
       UpdateAdvanceTime();
@@ -375,6 +409,7 @@ void LocationGameLoop()
       // DELETEME: for debug purposes only
       g_app->m_globalWorld->EvaluateEvents();
 
+
       g_app->m_renderer->Render();
 
       if (g_app->m_renderer->m_fps < 15)
@@ -390,7 +425,17 @@ void LocationGameLoop()
   if (!g_app->m_globalWorld->GetLocationName(g_app->m_locationId).empty())
     g_app->m_globalWorld->TransferSpirits(g_app->m_locationId);
 
-  g_app->m_networkClient->ClientLeave();
+  // Clear network entity manager
+  if (g_app->m_networkEntityManager)
+  {
+    g_app->m_networkEntityManager->Clear();
+    g_app->m_networkEntityManager->SetServer(nullptr);
+  }
+
+  // Disconnect client
+  if (g_app->m_client)
+    g_app->m_client->Disconnect();
+    
   g_app->m_location->Empty();
   g_app->m_particleSystem->Empty();
 
@@ -401,8 +446,13 @@ void LocationGameLoop()
   delete g_app->m_locationInput;
   g_app->m_locationInput = nullptr;
 
-  delete g_app->m_server;
-  g_app->m_server = nullptr;
+  // Clean up server if we were hosting
+  if (g_app->m_server)
+  {
+    g_app->m_server->Shutdown();
+    delete g_app->m_server;
+    g_app->m_server = nullptr;
+  }
 
   g_app->m_taskManager->StopAllTasks();
 
@@ -550,10 +600,25 @@ void RunBootLoaders()
 
 void EnterLocation()
 {
-  g_app->m_server = NEW Server();
-  g_app->m_server->Initialize();
+  // Initialize server if we're hosting
+  bool iAmAServer = g_prefsManager->GetInt("IAmAServer") ? true : false;
+  if (iAmAServer)
+  {
+    g_app->m_server = NEW AuthoritativeServer();
+    g_app->m_server->Initialize();
+    
+    // Hook entity manager to server
+    if (g_app->m_networkEntityManager)
+    {
+      g_app->m_networkEntityManager->SetServer(g_app->m_server);
+    }
+    
+    // Give server socket time to bind before client connects
+    Sleep(100);
+  }
 
-  g_app->m_networkClient->ClientJoin();
+  // Connect to server
+  g_app->m_client->Connect();
 
   g_app->m_location = NEW Location();
   g_app->m_locationInput = NEW LocationInput();
@@ -562,9 +627,11 @@ void EnterLocation()
 
   g_app->m_camera->UpdateEntityTrackingMode();
 
-  g_app->m_networkClient->RequestTeam(Team::TeamTypeCPU, -1);
-  g_app->m_networkClient->RequestTeam(Team::TeamTypeCPU, -1);
-  g_app->m_networkClient->RequestTeam(Team::TeamTypeLocalPlayer, -1);
+  // TODO: Team requests now go through CommandPacket system
+  // For now, initialize teams directly for testing
+  // Team 0 = AI, Team 2 = Player
+  g_app->m_location->InitialiseTeam(0, Team::TeamTypeCPU);      // AI team
+  g_app->m_location->InitialiseTeam(2, Team::TeamTypeLocalPlayer); // Player team
 
   constexpr float borderSize = 200.0f;
   float minX = -borderSize;

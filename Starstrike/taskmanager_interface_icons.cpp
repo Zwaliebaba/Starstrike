@@ -5,7 +5,7 @@
 #include "GameApp.h"
 #include "LegacyVector2.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 #include "engineer.h"
 #include "gamecursor.h"
 #include "global_world.h"
@@ -658,7 +658,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(std::string_view _name, int _data)
 
     if (g_app->m_globalWorld->m_research->HasResearch(_data))
     {
-      g_app->m_networkClient->RequestRunProgram(g_app->m_globalWorld->m_myTeamId, _data);
+      SendRunProgramCommand(g_app->m_globalWorld->m_myTeamId, _data);
       g_app->m_soundSystem->TriggerOtherEvent(nullptr, "Show", SoundSourceBlueprint::TypeInterface);
       if (g_inputManager->getInputMode() == INPUT_MODE_GAMEPAD)
         HideTaskManager();
@@ -702,7 +702,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(std::string_view _name, int _data)
   {
     if (g_app->m_globalWorld->m_research->HasResearch(_data))
     {
-      g_app->m_networkClient->RequestRunProgram(g_app->m_globalWorld->m_myTeamId, _data);
+      SendRunProgramCommand(g_app->m_globalWorld->m_myTeamId, _data);
       g_app->m_soundSystem->TriggerOtherEvent(nullptr, "Show", SoundSourceBlueprint::TypeInterface);
       if (g_inputManager->getInputMode() == INPUT_MODE_GAMEPAD)
         HideTaskManager();
@@ -2366,7 +2366,7 @@ void TaskManagerInterfaceIcons::AdvanceQuickUnit()
       int taskId = GetQuickUnitTask();
       if (taskId != -1)
       {
-        g_app->m_networkClient->RequestRunProgram(g_app->m_location->GetMyTeam()->m_teamId, taskId);
+        SendRunProgramCommand(g_app->m_location->GetMyTeam()->m_teamId, taskId);
         g_app->m_soundSystem->TriggerOtherEvent(nullptr, "Show", SoundSourceBlueprint::TypeInterface);
         DestroyQuickUnitInterface();
       }

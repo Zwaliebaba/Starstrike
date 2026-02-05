@@ -106,6 +106,8 @@ class Entity : public WorldObject
     LegacyVector3 m_centerPos;
     float m_radius;                   // Can be Zero, which means its a sprite
 
+    LegacyVector3 m_gridPos;              // Position used for entity grid tracking
+
     bool m_renderDamaged;
 
     int m_routeId;

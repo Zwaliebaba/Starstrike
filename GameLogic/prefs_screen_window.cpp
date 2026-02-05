@@ -136,7 +136,7 @@ class SetScreenButton : public GuiButton
 };
 
 PrefsScreenWindow::PrefsScreenWindow()
-  : GuiWindow(Strings::Get("dialog_screenoptions", "GameLogic"))
+  : GuiWindow(Strings::Get("dialog_screenoptions"))
 {
   int height = 240;
 

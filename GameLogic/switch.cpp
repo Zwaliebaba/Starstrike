@@ -3,7 +3,7 @@
 #include "GameApp.h"
 #include "building.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 #include "global_world.h"
 #include "laserfence.h"
 #include "location.h"
@@ -307,7 +307,7 @@ void FenceSwitch::RenderLights()
 {
   if (m_id.GetTeamId() != 255 && m_lights.Size() > 0)
   {
-    if ((g_app->m_networkClient->m_lastValidSequenceIdFromServer % 10) / 2 == m_id.GetTeamId())
+    if ((g_app->m_client->GetServerTick() % 10) / 2 == m_id.GetTeamId())
     {
       for (int i = 0; i < m_lights.Size(); ++i)
       {

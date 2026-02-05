@@ -2,7 +2,7 @@
 #include "user_input.h"
 #include "GameApp.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 #include "Canvas.h"
 #include "debugmenu.h"
 #include "global_world.h"
@@ -53,7 +53,7 @@ void UserInput::Advance()
 
   if (m_removeTopLevelMenu)
   {
-    GuiWindow* win = Canvas::EclGetWindow(Strings::Get("dialog_toolsmenu", "GameLogic"));
+    GuiWindow* win = Canvas::EclGetWindow(Strings::Get("dialog_toolsmenu"));
     if (win)
       Canvas::EclRemoveWindow(win->m_name);
     m_removeTopLevelMenu = false;
@@ -62,7 +62,11 @@ void UserInput::Advance()
   AdvanceMenus();
 
   if (g_inputManager->controlEvent(ControlGamePause))
-    g_app->m_networkClient->RequestPause();
+  {
+    // Toggle pause state locally
+    // In server-authoritative mode, pause would be a server command
+    g_app->m_paused = !g_app->m_paused;
+  }
 
 #ifdef CHEATMENU_ENABLED
   if (g_inputManager->controlEvent(ControlToggleCheatMenu))

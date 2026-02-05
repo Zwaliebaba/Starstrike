@@ -171,7 +171,7 @@ const char* BlueprintStore::GetObjectiveCounter()
   for (int i = 0; i < BLUEPRINTSTORE_NUMSEGMENTS; ++i)
     totalInfection += m_segments[i];
 
-  sprintf(result, "%s %d%%", Strings::Get("objective_totalinfection", "GameLogic").c_str(),
+  sprintf(result, "%s %d%%", Strings::Get("objective_totalinfection").c_str(),
           static_cast<int>(100.0f * totalInfection / static_cast<float>(BLUEPRINTSTORE_NUMSEGMENTS * 100.0f)));
 
   return result;

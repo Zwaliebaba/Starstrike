@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "entity.h"
 #include "GameApp.h"
+#include "NetworkEntityManager.h"
 #include "RoutingSystem.h"
 #include "Strings.h"
 #include "ai.h"
@@ -121,6 +122,12 @@ void Entity::ChangeHealth(int amount)
       m_dead = true;
       g_app->m_soundSystem->TriggerEntityEvent(this, "Die");
       g_app->m_location->SpawnSpirit(m_pos, m_vel * 0.5f, m_id.GetTeamId(), m_id);
+      
+      // Unregister from network system when entity dies
+      if (g_networkEntityManager)
+      {
+        g_networkEntityManager->UnregisterEntity(this);
+      }
     }
     else if (m_stats[StatHealth] + amount > 255)
       m_stats[StatHealth] = 255;

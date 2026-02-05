@@ -4,96 +4,74 @@
     <Filter Include="Project Files">
       <UniqueIdentifier>{4d240bc4-d1a0-4823-9a4b-2a35714ee59f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{9dacc314-c8a6-4806-8b63-292a144f837b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="3d_sprite.cpp" />
     <ClCompile Include="binary_stream_readers.cpp" />
-    <ClCompile Include="ClientPeer.cpp" />
     <ClCompile Include="control_bindings.cpp" />
     <ClCompile Include="control_types.cpp" />
     <ClCompile Include="file_paths.cpp" />
     <ClCompile Include="FileSys.cpp" />
     <ClCompile Include="filesys_utils.cpp" />
     <ClCompile Include="hi_res_time.cpp" />
-    <ClCompile Include="input.cpp" />
-    <ClCompile Include="input_types.cpp" />
-    <ClCompile Include="inputdriver.cpp" />
-    <ClCompile Include="inputdriver_alias.cpp" />
-    <ClCompile Include="inputdriver_chord.cpp" />
-    <ClCompile Include="inputdriver_conjoin.cpp" />
-    <ClCompile Include="inputdriver_idle.cpp" />
-    <ClCompile Include="inputdriver_invert.cpp" />
-    <ClCompile Include="inputdriver_pipe.cpp" />
-    <ClCompile Include="inputdriver_prefs.cpp" />
-    <ClCompile Include="inputdriver_simple.cpp" />
-    <ClCompile Include="inputdriver_value.cpp" />
-    <ClCompile Include="inputdriver_win32.cpp" />
-    <ClCompile Include="inputdriver_xinput.cpp" />
-    <ClCompile Include="InputField.cpp" />
-    <ClCompile Include="inputfilter.cpp" />
-    <ClCompile Include="inputfilter_direction.cpp" />
-    <ClCompile Include="inputfilter_withdelta.cpp" />
-    <ClCompile Include="inputfiltermanager.cpp" />
-    <ClCompile Include="inputfilterspec.cpp" />
-    <ClCompile Include="inputspec.cpp" />
-    <ClCompile Include="InputTransform.cpp" />
-    <ClCompile Include="keynames.cpp" />
-    <ClCompile Include="LegacyTexture.cpp" />
     <ClCompile Include="LegacyVector2.cpp" />
     <ClCompile Include="LegacyVector3.cpp" />
     <ClCompile Include="math_utils.cpp" />
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="movement2d.cpp" />
-    <ClCompile Include="NetLib.cpp" />
-    <ClCompile Include="NetSocket.cpp" />
-    <ClCompile Include="NetworkClient.cpp" />
-    <ClCompile Include="networkupdate.cpp" />
     <ClCompile Include="NeuronCore.cpp" />
-    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="PersistentState.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
-    <ClCompile Include="profiler.cpp" />
     <ClCompile Include="random.cpp" />
-    <ClCompile Include="resource.cpp" />
-    <ClCompile Include="sample_cache.cpp" />
-    <ClCompile Include="server.cpp" />
-    <ClCompile Include="servertoclientletter.cpp" />
-    <ClCompile Include="shape.cpp" />
-    <ClCompile Include="sound_filter.cpp" />
-    <ClCompile Include="sound_instance.cpp" />
-    <ClCompile Include="sound_library_2d.cpp" />
-    <ClCompile Include="sound_library_3d.cpp" />
-    <ClCompile Include="sound_library_3d_dsound.cpp" />
-    <ClCompile Include="sound_parameter.cpp" />
-    <ClCompile Include="sound_stream_decoder.cpp" />
-    <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="targetcursor.cpp" />
     <ClCompile Include="TasksCore.cpp" />
     <ClCompile Include="text_stream_readers.cpp" />
-    <ClCompile Include="texture_uv.cpp" />
     <ClCompile Include="user_info.cpp" />
     <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="AOIManager.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="AuthoritativeServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientPeer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetLib.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetSocket.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkEntityManager.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkPackets.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="PredictiveClient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d_array.h" />
     <ClInclude Include="2d_surface_map.h" />
-    <ClInclude Include="3d_sprite.h" />
     <ClInclude Include="ASyncLoader.h" />
     <ClInclude Include="auto_vector.h" />
     <ClInclude Include="binary_stream_readers.h" />
     <ClInclude Include="btree.h" />
-    <ClInclude Include="Checksum.h" />
-    <ClInclude Include="ClientPeer.h" />
     <ClInclude Include="control_bindings.h" />
     <ClInclude Include="control_types.h" />
     <ClInclude Include="darray.h" />
-    <ClInclude Include="DataReader.h" />
-    <ClInclude Include="DataWriter.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DeviceNotify.h" />
     <ClInclude Include="fast_darray.h" />
@@ -103,32 +81,6 @@
     <ClInclude Include="GameMath.h" />
     <ClInclude Include="hash_table.h" />
     <ClInclude Include="hi_res_time.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="input_types.h" />
-    <ClInclude Include="inputdriver.h" />
-    <ClInclude Include="inputdriver_alias.h" />
-    <ClInclude Include="inputdriver_chord.h" />
-    <ClInclude Include="inputdriver_conjoin.h" />
-    <ClInclude Include="inputdriver_idle.h" />
-    <ClInclude Include="inputdriver_invert.h" />
-    <ClInclude Include="inputdriver_pipe.h" />
-    <ClInclude Include="inputdriver_prefs.h" />
-    <ClInclude Include="inputdriver_simple.h" />
-    <ClInclude Include="inputdriver_value.h" />
-    <ClInclude Include="inputdriver_win32.h" />
-    <ClInclude Include="inputdriver_xinput.h" />
-    <ClInclude Include="InputField.h" />
-    <ClInclude Include="inputfilter.h" />
-    <ClInclude Include="inputfilter_direction.h" />
-    <ClInclude Include="inputfilter_withdelta.h" />
-    <ClInclude Include="inputfiltermanager.h" />
-    <ClInclude Include="inputfilterspec.h" />
-    <ClInclude Include="inputspec.h" />
-    <ClInclude Include="inputspeclist.h" />
-    <ClInclude Include="InputTransform.h" />
-    <ClInclude Include="keydefs.h" />
-    <ClInclude Include="keynames.h" />
-    <ClInclude Include="LegacyTexture.h" />
     <ClInclude Include="LegacyVector2.h" />
     <ClInclude Include="LegacyVector3.h" />
     <ClInclude Include="llist.h" />
@@ -137,47 +89,69 @@
     <ClInclude Include="matrix33.h" />
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="movement2d.h" />
-    <ClInclude Include="NetLib.h" />
-    <ClInclude Include="NetSocket.h" />
-    <ClInclude Include="NetworkClient.h" />
-    <ClInclude Include="NetworkConst.h" />
-    <ClInclude Include="networkupdate.h" />
     <ClInclude Include="NeuronCore.h" />
     <ClInclude Include="NeuronHelper.h" />
-    <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="PersistentState.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
     <ClInclude Include="preferences.h" />
-    <ClInclude Include="profiler.h" />
     <ClInclude Include="random.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="sample_cache.h" />
-    <ClInclude Include="server.h" />
-    <ClInclude Include="servertoclientletter.h" />
-    <ClInclude Include="shape.h" />
     <ClInclude Include="slice_darray.h" />
     <ClInclude Include="sorting_hash_table.h" />
-    <ClInclude Include="sound_filter.h" />
-    <ClInclude Include="sound_instance.h" />
-    <ClInclude Include="sound_library_2d.h" />
-    <ClInclude Include="sound_library_3d.h" />
-    <ClInclude Include="sound_library_3d_dsound.h" />
-    <ClInclude Include="sound_parameter.h" />
-    <ClInclude Include="sound_stream_decoder.h" />
-    <ClInclude Include="soundsystem.h" />
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="system_info.h" />
     <ClInclude Include="targetcursor.h" />
     <ClInclude Include="TasksCore.h" />
     <ClInclude Include="text_stream_readers.h" />
-    <ClInclude Include="texture_uv.h" />
     <ClInclude Include="TimerCore.h" />
     <ClInclude Include="user_info.h" />
     <ClInclude Include="Utility.h" />
+    <ClInclude Include="AOIManager.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthoritativeServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientPeer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="DataReader.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="DataWriter.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetLib.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetSocket.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkConst.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkEntityManager.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkPackets.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkTypes.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="PredictiveClient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Checksum.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <Filter>Project Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -336,42 +336,6 @@
   <data name="building_captured" xml:space="preserve">
     <value>The Engineers have finished reprogramming a building</value>
   </data>
-  <data name="containmentend_1" xml:space="preserve">
-    <value>I've been working on a design for a Weapons Platform that the Darwinians can use to fight the Virus.</value>
-  </data>
-  <data name="containmentend_1b" xml:space="preserve">
-    <value>There's still a lot of work to do, but we can manufacture these weapons within Darwinia.</value>
-  </data>
-  <data name="containmentend_2" xml:space="preserve">
-    <value>Darwinia already has a solid engineering system for building things, but like everything else, it's offline.</value>
-  </data>
-  <data name="containmentend_2b" xml:space="preserve">
-    <value>The system is built over three locations - the Mine, the Generator, and the Yard.</value>
-  </data>
-  <data name="containmentend_3" xml:space="preserve">
-    <value>Let me show you the Mines first.</value>
-  </data>
-  <data name="containmentend_5" xml:space="preserve">
-    <value>So the Mines produce refined Primitives and send them to the Yard.</value>
-  </data>
-  <data name="containmentend_5b" xml:space="preserve">
-    <value>The Yard also requires Energy, which comes from the Generator.</value>
-  </data>
-  <data name="containmentend_6" xml:space="preserve">
-    <value>So the Generator produces the Energy.</value>
-  </data>
-  <data name="containmentend_6b" xml:space="preserve">
-    <value>The Yard receives the Energy and the Primitives, and that's where we will be building the new weapons platform.</value>
-  </data>
-  <data name="containmentend_7" xml:space="preserve">
-    <value>If you need help with these tasks, open the Objectives Screen...</value>
-  </data>
-  <data name="containmentend_7b" xml:space="preserve">
-    <value>...There you can click on an objective and I'll do my best to clarify it for you.</value>
-  </data>
-  <data name="containmentend_8" xml:space="preserve">
-    <value>Good luck!</value>
-  </data>
   <data name="containmentend_generator1" xml:space="preserve">
     <value>This is the Generator.  Here the Energy that drives Darwinia is produced and regulated.</value>
   </data>
@@ -746,6 +710,324 @@
   </data>
   <data name="control_up" xml:space="preserve">
     <value>Up</value>
+  </data>
+  <data name="dialog_11khz" xml:space="preserve">
+    <value>11 KHz Low Quality</value>
+  </data>
+  <data name="dialog_16channels" xml:space="preserve">
+    <value>16 Channels</value>
+  </data>
+  <data name="dialog_22khz" xml:space="preserve">
+    <value>22 KHz Medium Quality</value>
+  </data>
+  <data name="dialog_32channels" xml:space="preserve">
+    <value>32 Channels</value>
+  </data>
+  <data name="dialog_44khz" xml:space="preserve">
+    <value>44 KHz High Quality</value>
+  </data>
+  <data name="dialog_64channels" xml:space="preserve">
+    <value>64 Channels</value>
+  </data>
+  <data name="dialog_8channels" xml:space="preserve">
+    <value>8 Channels</value>
+  </data>
+  <data name="dialog_apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="dialog_auto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="dialog_autocam" xml:space="preserve">
+    <value>Automatic Camera</value>
+  </data>
+  <data name="dialog_bootloaders" xml:space="preserve">
+    <value>Boot Loaders</value>
+  </data>
+  <data name="dialog_buildingdetail" xml:space="preserve">
+    <value>Building Detail</value>
+  </data>
+  <data name="dialog_buydarwinia" xml:space="preserve">
+    <value>Buy Darwinia</value>
+  </data>
+  <data name="dialog_buynow" xml:space="preserve">
+    <value>Buy Now</value>
+  </data>
+  <data name="dialog_buynow1" xml:space="preserve">
+    <value>We hope you've enjoyed playing Darwinia!</value>
+  </data>
+  <data name="dialog_buynow2" xml:space="preserve">
+    <value>To carry on playing please buy the game.</value>
+  </data>
+  <data name="dialog_buyonline" xml:space="preserve">
+    <value>Buy Online</value>
+  </data>
+  <data name="dialog_cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="dialog_christmas" xml:space="preserve">
+    <value>Christmas</value>
+  </data>
+  <data name="dialog_close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="dialog_colordepth" xml:space="preserve">
+    <value>Color Depth</value>
+  </data>
+  <data name="dialog_colordepth_16" xml:space="preserve">
+    <value>16 bit</value>
+  </data>
+  <data name="dialog_colordepth_24" xml:space="preserve">
+    <value>24 bit</value>
+  </data>
+  <data name="dialog_colordepth_32" xml:space="preserve">
+    <value>32 bit</value>
+  </data>
+  <data name="dialog_controlhelpsystem" xml:space="preserve">
+    <value>Control Pad Help</value>
+  </data>
+  <data name="dialog_cpuusage" xml:space="preserve">
+    <value>CPU Usage</value>
+  </data>
+  <data name="dialog_cpuusageunknown" xml:space="preserve">
+    <value>CPU Usage unknown</value>
+  </data>
+  <data name="dialog_create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="dialog_createnewmod" xml:space="preserve">
+    <value>Create New Mod</value>
+  </data>
+  <data name="dialog_currentmod" xml:space="preserve">
+    <value>Current Mod</value>
+  </data>
+  <data name="dialog_currentprofilename" xml:space="preserve">
+    <value>Current Profile Name</value>
+  </data>
+  <data name="dialog_difficulty" xml:space="preserve">
+    <value>Difficulty</value>
+  </data>
+  <data name="dialog_directsound" xml:space="preserve">
+    <value>DirectSound</value>
+  </data>
+  <data name="dialog_disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="dialog_enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="dialog_entitydetail" xml:space="preserve">
+    <value>Entity Detail</value>
+  </data>
+  <data name="dialog_full" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="dialog_graphicsoptions" xml:space="preserve">
+    <value>Graphics Options</value>
+  </data>
+  <data name="dialog_hard_difficulty" xml:space="preserve">
+    <value>Hard</value>
+  </data>
+  <data name="dialog_helpsystem" xml:space="preserve">
+    <value>Help System</value>
+  </data>
+  <data name="dialog_high" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="dialog_hw3dsound" xml:space="preserve">
+    <value>Hardware3d Sound</value>
+  </data>
+  <data name="dialog_inputoptions" xml:space="preserve">
+    <value>Control Options</value>
+  </data>
+  <data name="dialog_landscapedetail" xml:space="preserve">
+    <value>Landscape Detail</value>
+  </data>
+  <data name="dialog_language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="dialog_largemenus" xml:space="preserve">
+    <value>Large Menus</value>
+  </data>
+  <data name="dialog_later" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="dialog_leavedarwinia" xml:space="preserve">
+    <value>Leave Darwinia</value>
+  </data>
+  <data name="dialog_leavelocation" xml:space="preserve">
+    <value>Leave Location</value>
+  </data>
+  <data name="dialog_loadmod" xml:space="preserve">
+    <value>Load Mod</value>
+  </data>
+  <data name="dialog_loadprofile" xml:space="preserve">
+    <value>Load Profile</value>
+  </data>
+  <data name="dialog_locationmenu" xml:space="preserve">
+    <value>Location Menu</value>
+  </data>
+  <data name="dialog_low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="dialog_mainmenu" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="dialog_medium" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="dialog_memoryusage" xml:space="preserve">
+    <value>Memory Usage</value>
+  </data>
+  <data name="dialog_mixfrequency" xml:space="preserve">
+    <value>Mix Frequency</value>
+  </data>
+  <data name="dialog_mods" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="dialog_mousebuttons" xml:space="preserve">
+    <value>Mouse Buttons</value>
+  </data>
+  <data name="dialog_multiplefiles" xml:space="preserve">
+    <value>(multiple files selected)</value>
+  </data>
+  <data name="dialog_name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="dialog_newlocationfail1" xml:space="preserve">
+    <value>Failed to create New Location</value>
+  </data>
+  <data name="dialog_newlocationfail2" xml:space="preserve">
+    <value>You cannot create a new location.\nYou must first create a MOD from the main menu\nbefore you can add locations.</value>
+  </data>
+  <data name="dialog_newprofile" xml:space="preserve">
+    <value>Create New Profile</value>
+  </data>
+  <data name="dialog_no" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="dialog_numchannels" xml:space="preserve">
+    <value>Num Channels</value>
+  </data>
+  <data name="dialog_ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="dialog_options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="dialog_otheroptions" xml:space="preserve">
+    <value>Other Options</value>
+  </data>
+  <data name="dialog_partial" xml:space="preserve">
+    <value>Partial</value>
+  </data>
+  <data name="dialog_pixeleffect" xml:space="preserve">
+    <value>Pixel Effect</value>
+  </data>
+  <data name="dialog_playprologue" xml:space="preserve">
+    <value>Play Prologue</value>
+  </data>
+  <data name="dialog_profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="dialog_prologue1" xml:space="preserve">
+    <value>Are you sure you want to stop your game and play the Prologue level?</value>
+  </data>
+  <data name="dialog_realtimeeffects" xml:space="preserve">
+    <value>Realtime Effects</value>
+  </data>
+  <data name="dialog_refreshrate" xml:space="preserve">
+    <value>Refresh Rate</value>
+  </data>
+  <data name="dialog_reset1" xml:space="preserve">
+    <value>Are you sure you wish</value>
+  </data>
+  <data name="dialog_reset2" xml:space="preserve">
+    <value>to reset this location?</value>
+  </data>
+  <data name="dialog_reset3" xml:space="preserve">
+    <value>Your progress on this island</value>
+  </data>
+  <data name="dialog_reset4" xml:space="preserve">
+    <value>will be lost and you will</value>
+  </data>
+  <data name="dialog_reset5" xml:space="preserve">
+    <value>have to begin from scratch.</value>
+  </data>
+  <data name="dialog_resetlocation" xml:space="preserve">
+    <value>Reset Location</value>
+  </data>
+  <data name="dialog_resolution" xml:space="preserve">
+    <value>Resolution</value>
+  </data>
+  <data name="dialog_restoredefaults" xml:space="preserve">
+    <value>Restore Defaults</value>
+  </data>
+  <data name="dialog_savelocationsfail1" xml:space="preserve">
+    <value>Failed to Save</value>
+  </data>
+  <data name="dialog_savelocationsfail2" xml:space="preserve">
+    <value>You cannot save the location data.\nYou must first create a MOD from the main menu\nbefore you can edit and save locations.</value>
+  </data>
+  <data name="dialog_screenoptions" xml:space="preserve">
+    <value>Screen Options</value>
+  </data>
+  <data name="dialog_skip1" xml:space="preserve">
+    <value>Are you sure you wish to skip the Prologue and begin the main game?</value>
+  </data>
+  <data name="dialog_skipprologue" xml:space="preserve">
+    <value>Skip Prologue</value>
+  </data>
+  <data name="dialog_skydetail" xml:space="preserve">
+    <value>Sky Detail</value>
+  </data>
+  <data name="dialog_softwaresound" xml:space="preserve">
+    <value>Software Sound</value>
+  </data>
+  <data name="dialog_soundlibrary" xml:space="preserve">
+    <value>Sound Library</value>
+  </data>
+  <data name="dialog_soundoptions" xml:space="preserve">
+    <value>Sound Options</value>
+  </data>
+  <data name="dialog_standard_difficulty" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="dialog_swapstereo" xml:space="preserve">
+    <value>Swap Stereo</value>
+  </data>
+  <data name="dialog_toolsmenu" xml:space="preserve">
+    <value>Tools Menu</value>
+  </data>
+  <data name="dialog_unavailable" xml:space="preserve">
+    <value>unavailable</value>
+  </data>
+  <data name="dialog_unplugged1" xml:space="preserve">
+    <value>Controller disconnected</value>
+  </data>
+  <data name="dialog_unplugged2" xml:space="preserve">
+    <value>Your controller has been disconnected. Please connect the controller to continue.</value>
+  </data>
+  <data name="dialog_upgrade" xml:space="preserve">
+    <value>I need to upgrade</value>
+  </data>
+  <data name="dialog_visitwebsite" xml:space="preserve">
+    <value>Visit Website</value>
+  </data>
+  <data name="dialog_waterdetail" xml:space="preserve">
+    <value>Water Detail</value>
+  </data>
+  <data name="dialog_windowed" xml:space="preserve">
+    <value>Windowed</value>
+  </data>
+  <data name="dialog_windowedmode" xml:space="preserve">
+    <value>(windowed mode)</value>
+  </data>
+  <data name="dialog_yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="dialog_zbufferdepth" xml:space="preserve">
+    <value>Z Buffer Depth</value>
   </data>
   <data name="editor_worldsizeZ" xml:space="preserve">
     <value>World Size Z</value>
@@ -2084,23 +2366,5 @@
   </data>
   <data name="location_sandbox" xml:space="preserve">
     <value>Sandbox</value>
-  </data>
-  <data name="taskmanager_msg0" xml:space="preserve">
-    <value>RUN PROGRAM</value>
-  </data>
-  <data name="taskmanager_msg1" xml:space="preserve">
-    <value>SYNTAX ERROR</value>
-  </data>
-  <data name="taskmanager_msg2" xml:space="preserve">
-    <value>PROGRAM TERMINATED</value>
-  </data>
-  <data name="taskmanager_msg3" xml:space="preserve">
-    <value>ACQUIRED</value>
-  </data>
-  <data name="taskmanager_msg4" xml:space="preserve">
-    <value>UPGRADED</value>
-  </data>
-  <data name="taskmanager_msg5" xml:space="preserve">
-    <value>OBJECTIVES COMPLETED</value>
   </data>
 </root>

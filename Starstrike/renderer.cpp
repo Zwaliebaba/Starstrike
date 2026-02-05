@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "DX9TextRenderer.h"
 #include "GameApp.h"
+#include "PredictiveClient.h"
 #include "StartSequence.h"
 #include "camera.h"
 #include "explosion.h"
@@ -345,10 +346,13 @@ void Renderer::RenderFrame(bool withFlip)
     g_editorFont.DrawText2D(84, 10, DEF_FONT_SIZE, "InputMode: %s", inmode.c_str());
   }
 
-  if (g_app->m_server)
+  // Show connection status and latency info
+  if (g_app->m_client && g_app->m_client->IsConnected())
   {
-    int latency = g_app->m_server->m_sequenceId - g_lastProcessedSequenceId;
-    if (latency > 10)
+    // In server-authoritative mode, latency is measured differently
+    // The interpolation delay gives us a sense of how far behind we are
+    float interpolationDelay = g_app->m_client->GetInterpolationDelay();
+    if (interpolationDelay > 0.2f) // More than 200ms delay
     {
       glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
       glBegin(GL_QUADS);
@@ -358,8 +362,21 @@ void Renderer::RenderFrame(bool withFlip)
       glVertex2f(m_screenW / 2 - 200, 80);
       glEnd();
       glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-      g_editorFont.DrawText2DCenter(m_screenW / 2, 100, 20, "Client LAG %dms behind Server ", latency * 100);
+      g_editorFont.DrawText2DCenter(m_screenW / 2, 100, 20, "High Latency: %.0fms", interpolationDelay * 1000.0f);
     }
+  }
+  else if (g_app->m_client && !g_app->m_client->IsConnected() && g_app->m_location)
+  {
+    // Show disconnected warning
+    glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
+    glBegin(GL_QUADS);
+    glVertex2f(m_screenW / 2 - 150, 120);
+    glVertex2f(m_screenW / 2 + 150, 120);
+    glVertex2f(m_screenW / 2 + 150, 80);
+    glVertex2f(m_screenW / 2 - 150, 80);
+    glEnd();
+    glColor4f(1.0f, 0.5f, 0.0f, 1.0f);
+    g_editorFont.DrawText2DCenter(m_screenW / 2, 100, 20, "Connecting to server...");
   }
 
   if (g_app->m_startSequence)

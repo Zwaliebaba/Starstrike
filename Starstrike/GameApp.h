@@ -1,7 +1,8 @@
 #pragma once
 
-#include "NetworkClient.h"
-#include "Server.h"
+#include "AuthoritativeServer.h"
+#include "PredictiveClient.h"
+#include "NetworkEntityManager.h"
 #include "StartSequence.h"
 #include "camera.h"
 #include "game_menu.h"
@@ -35,8 +36,9 @@ class GameApp : public GameMain
 
     // Everything else
     Camera* m_camera;
-    Server* m_server;                  
-    NetworkClient* m_networkClient;          
+    AuthoritativeServer* m_server;                  
+    PredictiveClient* m_client;
+    NetworkEntityManager* m_networkEntityManager;
     Renderer* m_renderer;
     LocationInput* m_locationInput;
     TaskManager* m_taskManager;
@@ -52,6 +54,7 @@ class GameApp : public GameMain
 
     // State flags
     bool m_paused;
+
 
     // Requested state flags
     int m_requestedLocationId;		// -1 for global world

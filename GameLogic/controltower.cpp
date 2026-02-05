@@ -2,7 +2,7 @@
 #include "controltower.h"
 #include "GameApp.h"
 #include "camera.h"
-#include "NetworkClient.h"
+#include "PredictiveClient.h"
 #include "global_world.h"
 #include "hi_res_time.h"
 #include "location.h"
@@ -364,9 +364,9 @@ void ControlTower::RenderAlphas(float _predictionTime)
   //
   // Draw our signal flash
 
-  int lastSeqId = g_app->m_networkClient->m_lastValidSequenceIdFromServer;
+  uint32_t lastServerTick = g_app->m_client->GetServerTick();
 
-  if ((m_id.GetTeamId() != 255 && (lastSeqId % 10) / 2 == m_id.GetTeamId()) || m_beingReprogrammed[lastSeqId % 3])
+  if ((m_id.GetTeamId() != 255 && (lastServerTick % 10) / 2 == m_id.GetTeamId()) || m_beingReprogrammed[lastServerTick % 3])
   {
     Matrix34 rootMat(m_front, g_upVector, m_pos);
     Matrix34 worldMat = m_lightPos->GetWorldMatrix(rootMat);

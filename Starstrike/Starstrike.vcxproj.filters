@@ -498,6 +498,12 @@
     <Filter Include="Assets\Textures">
       <UniqueIdentifier>{3b3e866e-7eb1-4719-9f54-22ac732aaf27}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Strings">
+      <UniqueIdentifier>{50c9de30-429b-4ff8-ab00-3acd9ff3ca1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Strings\en-US">
+      <UniqueIdentifier>{b6fd568e-49ac-40bd-82fd-cb5010c65855}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="app.manifest">
@@ -4002,5 +4008,10 @@
     <ClInclude Include="team.h" />
     <ClInclude Include="unit.h" />
     <ClInclude Include="user_input.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="Strings\en-US\Strings.resw">
+      <Filter>Strings\en-US</Filter>
+    </PRIResource>
   </ItemGroup>
 </Project>

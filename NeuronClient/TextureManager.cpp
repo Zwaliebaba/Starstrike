@@ -60,12 +60,16 @@ void TextureManager::LoadTexture(const std::wstring& _name, TextureRef* _texture
 
 void TextureManager::RemoveTexture(const Texture* _texture)
 {
+  std::lock_guard lock(sm_mutex);
   for (auto it = sm_textures.begin(); it != sm_textures.end(); ++it)
   {
-    if (it->second.get() == _texture && --it->second->m_referenceCount == 0)
+    if (it->second.get() == _texture)
     {
-      sm_textures.erase(it);
-      return;
+      if (--it->second->m_referenceCount == 0)
+      {
+        sm_textures.erase(it);
+      }
+      return;  // Always return after finding the texture
     }
   }
 }

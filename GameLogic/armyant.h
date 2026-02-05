@@ -2,7 +2,6 @@
 #define _included_armyant_h
 
 #include "entity.h"
-#include "shape.h"
 
 #define ARMYANT_SEARCHRANGE         10
 

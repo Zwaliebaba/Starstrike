@@ -17,6 +17,7 @@
 using namespace winrt;
 
 #include "Canvas.h"
+#include "DirectXHelper.h"
 #include "GraphicsCore.h"
 #include "Strings.h"
 #include "Utility.h"

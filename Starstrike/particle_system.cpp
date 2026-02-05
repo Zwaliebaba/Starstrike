@@ -275,9 +275,7 @@ void Particle::SetupParticles()
 
 ParticleSystem::ParticleSystem()
 {
-  m_particles.SetSize(1500);
-  m_particles.SetStepSize(200);
-  m_particles.SetTotalNumSlices(NUM_SLICES_PER_FRAME);
+  m_particles.reserve(1500);
 
   Particle::SetupParticles();
 }
@@ -285,26 +283,26 @@ ParticleSystem::ParticleSystem()
 // *** CreateParticle
 void ParticleSystem::CreateParticle(const LegacyVector3& _pos, const LegacyVector3& _vel, int _typeId, float _size, RGBAColor col)
 {
-  Particle* aParticle = m_particles.GetPointer();
-  aParticle->Initialize(_pos, _vel, _typeId, _size);
+  m_particles.emplace_back();
+  Particle& aParticle = m_particles.back();
+  aParticle.Initialize(_pos, _vel, _typeId, _size);
   if (col != NULL)
-    aParticle->m_colour = col;
+    aParticle.m_colour = col;
 }
 
 // *** Advance
-void ParticleSystem::Advance(int _slice)
+void ParticleSystem::Advance()
 {
   START_PROFILE(g_app->m_profiler, "Advance Particles");
 
-  int lower, upper;
-  m_particles.GetNextSliceBounds(_slice, &lower, &upper);
-  for (int i = lower; i <= upper; ++i)
+  // Iterate backwards for safe swap-and-pop removal
+  for (size_t i = m_particles.size(); i-- > 0;)
   {
-    if (m_particles.ValidIndex(i))
+    if (m_particles[i].Advance())
     {
-      Particle* p = m_particles.GetPointer(i);
-      if (p->Advance())
-        m_particles.MarkNotUsed(i);
+      // Swap-and-pop: O(1) removal, order doesn't matter for particles
+      std::swap(m_particles[i], m_particles.back());
+      m_particles.pop_back();
     }
   }
 
@@ -325,21 +323,9 @@ void ParticleSystem::Render()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glDepthMask(false);
 
-  // Render all the particles that are up-to-date with server advances
-  int lastUpdated = m_particles.GetLastUpdated();
-  int size = m_particles.Size();
-
-  for (int i = 0; i < size; i++)
+  for (Particle& p : m_particles)
   {
-    if (m_particles.ValidIndex(i))
-    {
-      Particle* p = m_particles.GetPointer(i);
-
-      if (i <= lastUpdated)
-        p->Render(g_predictionTime);
-      else
-        p->Render(g_predictionTime + SERVER_ADVANCE_PERIOD);
-    }
+    p.Render(g_predictionTime);
   }
 
   glDepthMask(true);
@@ -353,4 +339,4 @@ void ParticleSystem::Render()
 }
 
 // *** Empty
-void ParticleSystem::Empty() { m_particles.Empty(); }
+void ParticleSystem::Empty() { m_particles.clear(); }

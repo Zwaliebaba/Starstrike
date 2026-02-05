@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "GameApp.h"
 #include "DX9TextRenderer.h"
-#include "NetworkClient.h"
+#include "AuthoritativeServer.h"
+#include "PredictiveClient.h"
 #include "camera.h"
 #include "game_menu.h"
 #include "gamecursor.h"
@@ -43,7 +44,8 @@ GameApp::GameApp()
     m_locationId(-1),
     m_camera(nullptr),
     m_server(nullptr),
-    m_networkClient(nullptr),
+    m_client(nullptr),
+    m_networkEntityManager(nullptr),
     m_renderer(nullptr),
     m_locationInput(nullptr),
     m_taskManager(nullptr),
@@ -82,7 +84,17 @@ GameApp::GameApp()
 
   m_gameCursor = NEW GameCursor();
   m_soundSystem = NEW SoundSystem();
-  m_networkClient = NEW NetworkClient();
+  
+  // Initialize client with server address from preferences
+  auto serverAddress = g_prefsManager->GetString("ServerAddress", "127.0.0.1");
+  m_client = NEW PredictiveClient();
+  m_client->Initialize(serverAddress);
+  
+  // Initialize network entity manager
+  m_networkEntityManager = NEW NetworkEntityManager();
+  m_networkEntityManager->SetClient(m_client);
+  g_networkEntityManager = m_networkEntityManager;
+  
   m_userInput = NEW UserInput();
 
   m_camera = NEW Camera();
@@ -122,6 +134,8 @@ GameApp::GameApp()
 
 GameApp::~GameApp()
 {
+  g_networkEntityManager = nullptr;
+  SAFE_DELETE(m_networkEntityManager);
   SAFE_DELETE(m_globalWorld);
   SAFE_DELETE(m_taskManagerInterface);
   SAFE_DELETE(m_script);
@@ -129,7 +143,8 @@ GameApp::~GameApp()
   SAFE_DELETE(m_particleSystem);
   SAFE_DELETE(m_camera);
   SAFE_DELETE(m_userInput);
-  SAFE_DELETE(m_networkClient);
+  SAFE_DELETE(m_client);
+  SAFE_DELETE(m_server);
   SAFE_DELETE(m_soundSystem);
   SAFE_DELETE(m_gameCursor);
   SAFE_DELETE(m_renderer);

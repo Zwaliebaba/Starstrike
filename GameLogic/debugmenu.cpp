@@ -35,7 +35,7 @@ class PrefsScreenButton : public GuiButton
   public:
     void MouseUp() override
     {
-      if (!Canvas::EclGetWindow(Strings::Get("dialog_screenoptions", "GameLogic")))
+      if (!Canvas::EclGetWindow(Strings::Get("dialog_screenoptions")))
         Canvas::EclRegisterWindow(NEW PrefsScreenWindow());
     }
 };
@@ -45,7 +45,7 @@ class PrefsGfxDetailButton : public GuiButton
   public:
     void MouseUp() override
     {
-      if (!Canvas::EclGetWindow(Strings::Get("dialog_graphicsoptions", "GameLogic")))
+      if (!Canvas::EclGetWindow(Strings::Get("dialog_graphicsoptions")))
         Canvas::EclRegisterWindow(NEW PrefsGraphicsWindow());
     }
 };
@@ -55,7 +55,7 @@ class PrefsSoundButton : public GuiButton
   public:
     void MouseUp() override
     {
-      if (!Canvas::EclGetWindow(Strings::Get("dialog_soundoptions", "GameLogic")))
+      if (!Canvas::EclGetWindow(Strings::Get("dialog_soundoptions")))
         Canvas::EclRegisterWindow(NEW PrefsSoundWindow());
     }
 };
@@ -116,7 +116,7 @@ void DebugMenu::Render(bool hasFocus)
 
 void DebugKeyBindings::DebugMenu()
 {
-  std::string debugMenuWindowName = Strings::Get("dialog_toolsmenu", "GameLogic");
+  std::string debugMenuWindowName = Strings::Get("dialog_toolsmenu");
   if (Canvas::EclGetWindow(debugMenuWindowName))
     Canvas::EclRemoveWindow(debugMenuWindowName);
   else

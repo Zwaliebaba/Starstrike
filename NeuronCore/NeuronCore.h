@@ -77,7 +77,6 @@
 #include "Debug.h"
 #include "GameMath.h"
 
-#include "DirectXHelper.h"
 #include "NeuronHelper.h"
 
 using namespace Neuron;

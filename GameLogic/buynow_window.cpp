@@ -17,7 +17,7 @@ class BuyNowButton : public GuiButton
 };
 
 BuyNowWindow::BuyNowWindow()
-  : GuiWindow(Strings::Get("dialog_buydarwinia", "GameLogic"))
+  : GuiWindow(Strings::Get("dialog_buydarwinia"))
 {
   int screenW = ClientEngine::OutputSize().Width;
   int screenH = ClientEngine::OutputSize().Height;
@@ -34,13 +34,13 @@ void BuyNowWindow::Create()
   int h = 30;
 
   GuiButton* close = NEW CloseButton();
-  close->SetProperties(Strings::Get("dialog_later", "GameLogic"), 10, y -= h, m_w - 20, 20);
+  close->SetProperties(Strings::Get("dialog_later"), 10, y -= h, m_w - 20, 20);
   close->m_fontSize = 13;
   close->m_centered = true;
   RegisterButton(close);
 
   GuiButton* buy = NEW BuyNowButton();
-  buy->SetProperties(Strings::Get("dialog_buynow", "GameLogic"), 10, y -= h, m_w - 20, 20);
+  buy->SetProperties(Strings::Get("dialog_buynow"), 10, y -= h, m_w - 20, 20);
   buy->m_fontSize = 13;
   buy->m_centered = true;
   RegisterButton(buy);
@@ -55,6 +55,6 @@ void BuyNowWindow::Render(bool _hasFocus)
   int y = m_y + 25;
   int h = 18;
 
-  for (std::array lines = {Strings::Get("dialog_buynow1", "GameLogic"), Strings::Get("dialog_buynow2", "GameLogic")}; auto& i : lines)
+  for (std::array lines = {Strings::Get("dialog_buynow1"), Strings::Get("dialog_buynow2")}; auto& i : lines)
     g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, 13, i);
 }

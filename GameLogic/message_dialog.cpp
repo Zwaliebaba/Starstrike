@@ -62,7 +62,7 @@ void MessageDialog::Create()
   const int buttonHeight = GetMenuSize(18);
   auto button = NEW OKButton(this);
 
-  button->SetProperties(Strings::Get("dialog_close", "GameLogic"), (m_w - buttonWidth) / 2, m_h - GetMenuSize(30), buttonWidth, buttonHeight);
+  button->SetProperties(Strings::Get("dialog_close"), (m_w - buttonWidth) / 2, m_h - GetMenuSize(30), buttonWidth, buttonHeight);
   button->m_fontSize = GetMenuSize(11);
   RegisterButton(button);
 }
