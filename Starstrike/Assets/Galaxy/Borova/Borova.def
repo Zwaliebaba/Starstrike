@@ -1,0 +1,271 @@
+STARSYSTEM
+
+name:       Borova
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Borova.mag",
+   poly_stars: "stars.mag"
+   haze:       "Janus/Janek/TerrainHaze.mag"
+}
+
+stars:      500
+dust:       200
+
+/*************************************/
+
+ambient:    (10, 10, 15)
+
+star:        {
+   name:    Talantar
+   map:     "Suns/StarF_map.pcx"
+   image:   "Suns/F8.pcx",
+   tscale:  6,
+   radius:  22e8,
+   mass:    3e30,
+   light:   1.9e11,
+   color:   (240, 240, 255),// - blue-white
+   back:    ( 25,  35,  65) // - nebula1
+}
+
+region: {
+   name:    Tulkas,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   5.38e11,
+   inclination: 0.13,
+   asteroids: 70,
+   link:    Navara, // Janus
+   link:    Dawn,   // Jarnell
+   link:    Atlan,  // Paragon
+   link:    Nero,   // Silessia
+}
+
+planet:       {
+   name:    Talistar
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  2.3e6,
+   mass:    1.39e24,
+   orbit:   4.67e10,
+   rotation: 95
+}
+
+region:     {
+   name:    Talistar,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   10.0e6,
+   inclination: 0.6
+}
+
+planet:       {
+   name:     Maraner
+   map:      "Borova\maraner_map.pcx"
+   image:    "Borova\maraner_lo.pcx",
+   high_res: "Borova\maraner_hi.pcx",
+   radius:   3.5e6,
+   mass:     2.18e24,
+   orbit:    8.90e10,
+   rotation: 35
+}
+
+region:     {
+   name:    Maraner,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   11.0e6,
+   inclination: 0.7
+}
+
+planet:     {
+   name:    Borova
+   map:     "Borova\borova_map.pcx"
+   image:   "Borova\borova_lo.pcx",
+   high_res:"Borova\borova_hi.jpg",
+   gloss:   "Borova\borova_gloss.jpg",
+   glow_high_res: "Borova\borova_lights.jpg",
+   radius:  5.9e6,
+   mass:    4.38e24,
+   atmosphere: (120,160,210),
+   orbit:   2.1e11,
+   rotation: 29
+}
+
+terrain: {
+   name:          Vestapol,
+   radius:        480e3,
+   grid:          20e3,
+
+   patch:         "Borova\Vestapol\terrain.pcx",
+   patch_texture: "Borova\Vestapol\terrain_texture.pcx",
+   apron:         "Borova\Vestapol\terrain_apron.pcx",
+   apron_texture: "Borova\Vestapol\terrain_apron_tex.pcx",
+   sky_color:     "Borova\Vestapol\terrain_sky.pcx",
+
+   layer: { tile: "Borova\Vestapol\Layer0.pcx"  height:    0  detail: "Borova\Vestapol\noise0.pcx" }
+   layer: { tile: "Borova\Vestapol\Layer1.pcx"  height:  700  detail: "Borova\Vestapol\noise1.pcx" }
+   layer: { tile: "Borova\Vestapol\Layer2.pcx"  height: 2000  detail: "Borova\Vestapol\noise1.pcx" }
+
+   clouds_high:   "Janus/Janek/terrain_cloud0.pcx",
+   clouds_low:    "Janus/Janek/terrain_cloud1.pcx",
+   shades_low:    "Janus/Janek/terrain_cloud1a.pcx",
+   clouds_alt_high: 17.5e3,
+   clouds_alt_low:  11.2e3,
+
+   scale:         1.6e3,
+   mtnscale:      50,
+   haze_fade:     0.3
+   fog_density:   0.6
+   fog_scale:     5.6
+   
+   weather_period:       655555
+
+   weather_high_clouds:      20,
+   weather_moderate_clouds:  40,
+   weather_overcast:         10,
+   weather_fog:               5,
+   weather_storm:             5,
+}
+
+
+region:     {
+   name:    Borova,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   18.5e6,
+   inclination: 0.3
+}
+
+moon:       {
+   name:    Bolus
+   map:     "Renser/garana_map.pcx"
+   image:   "Renser/garana_lo.pcx",
+   high_res:"Renser/garana_hi.pcx",
+   radius:  1.77e6,
+   mass:    12.2e22,
+   orbit:   51e6
+}
+
+moon:       {
+   name:    Kalan
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  0.77e6,
+   mass:    4.2e22,
+   orbit:   81e6
+}
+
+
+// GAS GIANTS:
+
+planet: {
+   name:    Danova
+   map:     "Giants/GasGiant2_map.pcx"
+   image:   "Giants/GasGiant2.jpg",
+   radius:  17.1e6,
+   mass:    3.6e26,
+   tilt:    0.13,
+   orbit:   3.95e11,
+   rotation: 31.3
+}
+
+region: {
+   name:    Danova,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   49.53e6,
+   inclination: 0.2
+}
+
+moon: {
+   name:    "Dana I"
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  5.3e6,
+   rotation: 16.4,
+   mass:    5.98e24,
+   orbit:   4.11e8
+}
+
+moon: {
+   name:    "Dana II"
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6.1e6,
+   rotation: 28.4,
+   mass:    5.98e24,
+   orbit:   6.24e8
+}
+
+planet: {
+   name:    Zhalisal
+   map:     "Giants/GasGiant3_map.pcx"
+   image:   "Giants/GasGiant3.jpg",
+   radius:  20e6,
+   mass:    4.81e26,
+   orbit:   4.75e11,
+   tscale:  2,
+   tilt:    0.21,
+   rotation: 46.2,
+}
+
+region: {
+   name:    Zhalisal,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   1.2e8,
+   inclination: 0.3,
+}
+
+moon: {
+   name:    Vanna
+   map:     "Moons/rock_map.pcx"
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:  3e6,
+   mass:    3e22,
+   orbit:   5.65e8,
+   rotation: 100
+}
+
+moon: {
+   name:    Mara
+   map:     "Moons/lunar_map.pcx"
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      5.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        6.0e24,
+   orbit:       6.31e8
+}
+
+moon: {
+   name:    Folla,
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6e6,
+   rotation: 18.4,
+   mass:    5.98e24,
+   orbit:   9.14e8
+}
+
+moon: {
+   name:    Amina,
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  4e6,
+   rotation: 32.6,
+   mass:    3.28e24,
+   orbit:   11.14e8
+}
+
+

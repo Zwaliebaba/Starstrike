@@ -1,0 +1,55 @@
+ZONES
+
+zone: {
+   system: Solus,
+   region: Meridian
+}
+
+zone: {
+   system: Solus,
+   region: Solus,
+   region: Telmera,
+   region: Kalon
+}
+
+zone: {
+   system: Solus,
+   region: Jalah
+}
+
+zone: {
+   system: Solus,
+   region: Trellis
+}
+
+
+
+zone: {
+   system: Renser,
+   region: Garana
+}
+
+zone: {
+   system: Renser,
+   region: Rhomindal
+}
+
+zone: {
+   system: Renser,
+   region: Renser
+}
+
+zone: {
+   system: Renser,
+   region: Marisol
+}
+
+zone: {
+   system: Renser,
+   region: Lornas
+}
+
+zone: {
+   system: Renser,
+   region: Khaital
+}

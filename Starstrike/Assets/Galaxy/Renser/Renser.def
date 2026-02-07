@@ -1,0 +1,184 @@
+STARSYSTEM
+
+name:       Renser
+
+/*************************************/
+
+sky: {
+   nebula:     "Nebula-Renser.mag",
+   poly_stars: "stars.mag",
+}
+
+stars:      500
+dust:       220
+
+ambient:    (22, 20, 20)
+
+/*************************************/
+
+star: {
+   name:    Renset
+   map:     "Suns/StarG_map.pcx"
+   image:   "Suns/G3.pcx",
+   tscale:  6,
+   radius:  15.97e8,
+   mass:    2.13e30,
+   light:   1.6e11,
+   color:   (255, 250, 225),
+   back:    ( 50,  52,  55),
+}
+
+region: {
+   name:    Lornas,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   4.78e11,
+   inclination: 0.23,
+   asteroids: 100,
+   link:    Kala,    // Haiche
+   link:    Casalle, // Loris
+   link:    Nero,    // Silessia
+   link:    Trellis, // Solus
+   link:    Solnas,  // Korius
+}
+
+
+planet: {
+   name:    Garana
+   map:     "Renser/garana_map.pcx"
+   image:   "Renser/garana_lo.pcx",
+   high_res:"Renser/garana_hi.pcx",
+   radius:  4.318e6,
+   mass:    3.15e24,
+   orbit:   6.19e10,
+   rotation: 13.19
+}
+
+region: {
+   name:    Garana,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   13.9e6,
+   inclination: 0.62
+}
+
+
+planet: {
+   name:    Rhomindal
+   map:     "Renser/rhomindal_map.pcx"
+   image:   "Renser/rhomindal_lo.pcx",
+   high_res:"Renser/rhomindal_hi.pcx",
+   radius:  5.735e6,
+   mass:    4.95e24,
+   orbit:   11.53e10,
+   rotation: 29.3
+}
+
+region: {
+   name:    Rhomindal,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   22.0e6,
+   inclination: 0.55
+}
+
+planet: {
+   name:    Renser
+   map:     "Renser/renser_map.pcx"
+   image:   "Renser/renser_lo.pcx",
+   high_res:"Renser/renser_hi.jpg",
+   gloss:    "Renser/renser_gloss.jpg",
+   glow_high_res: "Renser/renser_glow.jpg",
+   radius:  6.437e6,
+   mass:    5.98e24,
+   atmosphere: (180,170,200),
+   orbit:   19.64e10,
+   rotation: 17
+}
+
+region: {
+   name:    Renser,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   18e6,
+   inclination: 0.49,
+}
+
+
+planet: {
+   name:    Marisol
+   map:     "Renser/marisol_map.pcx"
+   image:   "Renser/marisol.jpg",
+   radius:  27.489e6,
+   mass:    4.21e26,
+   orbit:   3.75e11,
+   tilt:    0.20,
+   rotation: 39.2,
+}
+
+region: {
+   name:    Marisol,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   0.75e8,
+   inclination: 0.3,
+}
+
+moon: {
+   name:    Asur
+   map:     "Moons/rock_map.pcx"
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:  3.541e6,
+   mass:    3e22,
+   orbit:   2.65e8,
+   rotation: 100
+}
+
+moon: {
+   name:    Malinus,
+   map:     "Moons/lunar_map.pcx"
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      5.211e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        6.0e24,
+   orbit:       3.71e8
+}
+
+moon: {
+   name:    Florina,
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  3.707e6,
+   rotation: 12.1,
+   atmosphere: (180,180,255),
+   mass:    3.98e24,
+   orbit:   6.24e8
+}
+
+
+planet: {
+   name:    Khaital
+   map:     "Renser/khaital_map.pcx"
+   image:   "Renser/khaital_lo.pcx",
+   high_res:"Renser/khaital_hi.jpg",
+   gloss:   "Renser/khaital_gloss.jpg",
+   radius:  3.821e6,
+   mass:    2.87e24,
+   atmosphere: (150,160,190),
+   orbit:   5.78e11,
+   rotation: 28
+}
+
+region: {
+   name:    Khaital,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   18e6,
+   inclination: 0.49,
+   link:    Trellis
+}
+

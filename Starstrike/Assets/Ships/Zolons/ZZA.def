@@ -1,0 +1,146 @@
+SHIP
+
+name:          ZZA
+display_name:  Zolon
+class:         Attack
+abrv:          ZA
+secret:        true
+
+detail_0:   "ZAttack_1.mag"
+feature_0:  1000
+detail_1:   "ZAttack_2.mag"
+feature_1:  20
+
+mass:       21
+integrity:  35e3
+scuttle:    1e3
+vlimit:     320
+agility:    140
+air_factor: 0.25
+roll_rate:  1700
+scale:      0.75
+acs:        1.1
+detet:      50e3
+
+auto_roll:  2
+trans_x:    5e3
+trans_y:    5e3
+trans_z:    5e3
+
+arcade_drag: 0.23
+drag:       5.0e-5
+roll_drag:  10
+pitch_drag: 7.5
+yaw_drag:   7.5
+
+CL:         1.1e-2
+CD:         1.1e-1
+stall:      0.40
+
+prep_time:  15
+avoid_fighter: 7
+
+chase:      (0, -750, 200)
+bridge:     (0,    0,   0)
+
+power: {
+   type:    Fusion,
+   max_output: 1e3,
+   fuel_range: 5,
+   
+   loc:     (0, 0, -40),
+   size:    32,
+   hull_factor: 0.75
+}
+
+drive: {
+   type:    Alien,
+   thrust:  30,
+   augmenter: 60,
+   scale:   0.75,
+   port:    (0, 0, -96),
+
+   loc:     (0, 0, -40),
+   size:    16,
+   hull_factor: 0.85
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   type:             Hyper,
+   loc:              (0, 0, 0),
+   capacity:         10e3,
+   consumption:      1e3,
+   size:             24,
+   hull_factor:      0.3
+}
+
+weapon: {
+   type:    "Zolon Cannon",
+   abrv:    Cannon,
+   muzzle:  (0, 0, 80),
+
+   loc:     (0, 0, 20),
+   size:    16,
+   hull_factor: 0.5
+}
+
+sensor: {
+   pcs:                 25,
+   active_efficiency:   2e9,
+   passive_efficiency:  500,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 50),
+   size:    25,
+   hull_factor: 0.25
+}
+
+computer: {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    8,
+   hull_factor: 0.2
+}
+
+computer: {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+}
+
+
+nav: {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+}
+
+death_spiral: {
+   time:             2.5,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.1,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.5,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+}
+
+map: { sprite: "zmap.pcx" }

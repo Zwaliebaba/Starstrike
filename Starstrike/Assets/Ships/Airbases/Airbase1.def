@@ -1,0 +1,119 @@
+SHIP
+
+name:          Airbase1
+display_name:  Starbase
+class:         STARBASE
+hud_icon:      "hud_icon.pcx"
+
+detail_0:   "Base1-0.mag"
+feature_0:  1000
+detail_1:   "Base1-6.mag"
+feature_1:  6
+
+mass:       5e6
+integrity:  250e3
+scale:      4
+acs:        100e3
+
+splash_radius: 3000
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+degrees:    true
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       10e3,
+
+   loc:              (220, 20, 0),
+   size:             32,
+   hull_factor:      0.6
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:               100e3,
+
+   loc:              (220, 120, 0),
+   size:             16,
+   hull_factor:      0.1
+}
+
+flightdeck: {
+   name:       "Runway 27",
+
+   loc:        (   0,   4,    0),
+   cam:        ( -30,  30, -540),
+   start:      (   0,   4, -580),
+   end:        (   0, 500,  3e3),
+
+   runway:     (   0,   4, -640),
+   runway:     (   0,   4,  640),
+
+   spot:       (  30,   4, -600),
+   spot:       (  30,   4, -640),
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Runway 31",
+   loc:        ( -320,   4,  -128),
+   cam:        (  200, 100,     0),
+   start:      (-2700, 500, -2500),
+   end:        ( -380,   4,  -190),
+
+   approach:   ( -4e3, 750,  -4e3),
+   approach:   ( -5e3, 1e3,  -2e3),
+   approach:   ( -5e3, 1e3,   2e3),
+   approach:   ( -2e3, 1e3,   4e3),
+
+   runway:     ( -660,   4,  -460),
+   runway:     (  256,   4,   448),
+
+   spot:       ( -192,   4,     0),
+   azimuth:    45,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+navlight:  {
+   scale:  1.5,
+   period: 1,
+
+   light:  { loc: (-640, 6, -448), pattern: 0x00030000, type: 1 },
+   light:  { loc: (-512, 6, -320), pattern: 0x000c0000, type: 1 },
+   light:  { loc: (-384, 6, -192), pattern: 0x00300000, type: 1 },
+   light:  { loc: (-256, 6,  -64), pattern: 0x00c00000, type: 1 },
+   light:  { loc: (-128, 6,   64), pattern: 0x03000000, type: 1 },
+   light:  { loc: (   0, 6,  192), pattern: 0x0c000000, type: 1 },
+   light:  { loc: ( 128, 6,  320), pattern: 0x30000000, type: 1 },
+   light:  { loc: ( 256, 6,  448), pattern: 0xc0000000, type: 1 }
+}
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 32, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 64, 0),
+   }
+
+map: { sprite: "map0.pcx" }
+

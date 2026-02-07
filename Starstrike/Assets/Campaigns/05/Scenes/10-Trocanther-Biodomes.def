@@ -1,0 +1,157 @@
+MISSION
+
+name:   "Cmpn05 Brief10 - Trocanther Biodomes"
+type:   Patrol
+system: Trocanther
+region: Volante
+stardate: 1188554433
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   iff:       0
+   player:    1
+   loc:       (100e3, 30e3, 0)
+}
+
+element: {
+    name:   "Cryo Tank",
+    type:   "Factory",
+    design: "Tank00",
+    count:  6,
+    loc:    (-14e3, -16e3, 0),
+    region: "Hell's Kitchen",
+}
+
+element: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    loc:    (-12e3, -17e3, 0),
+    region: "Hell's Kitchen",
+}
+
+element: {
+    name:   "Bio Dome 1",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (0, 20e3, 0)
+}
+
+element: {
+    name:   "Bio Dome 2",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (0, 47e3, 0)
+    head:   90,
+}
+
+element: {
+    name:   "Bio Dome 3",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (13e3, -3e3, 0)
+    head:   60
+}
+
+element: {
+    name:   "Bio Dome 4",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (-27e3, 20e3, 0)
+    head:   30
+}
+
+element: {
+    name:   "Bridge 1",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (0, 33500, 0)
+}
+
+element: {
+    name:   "Bridge 2",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (5500, 8500, 0)
+    head:   30
+}
+
+element: {
+    name:   "Bridge 3",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (-13500, 20e3, 0)
+    head:   90,
+}
+
+element: {
+    name:   "Utility 1",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (5e3, -3e3, 0)
+}
+
+element: {
+    name:   "Utility 2",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (-4e3, 25e3, 0)
+}
+
+element: {
+    name:   "Utility 3",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (-4e3, 29e3, 0)
+}
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Volante",   vec: (2, 0.1, 2.8e7)      }
+event: { event: Camera,                param: 5,                                vec: (-0.11, 0.007, -0.01) }
+
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "FORCE:INTEL BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "*************************************\n*** FLASH CODED +$TIME \n*** TROCANTHER BIODOMES\n*** HELL'S KITCHEN SECTOR\n*** CLASSIFIED: SECRET R3 NTK\n*************************************" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\05/Briefing_10_Trocanther_Biodomes.wav" }
+
+
+event: { event: Camera,     time:  25, param: 3,      target: "Bio Dome 1",  vec: (2, 0.15, 17e3)      }
+event: { event: Camera,                param: 5,                             vec: ( 0.11, 0.01, -0.02) }
+
+
+event: { event: Camera,     time:  35, param: 3,      target: "Utility 1",   vec: (3, 0.19, 17e3)      }
+event: { event: Camera,                param: 5,                             vec: (-0.11, 0.01, -0.02) }
+
+
+event: { event: Camera,     time:  45, param: 3,      target: "Reactor",     vec: (4, 0.10,  5e3)      }
+event: { event: Camera,                param: 5,                             vec: ( 0.13, 0.01, -0.02) }
+
+
+event: { event: Camera,     time:  55, param: 3,      target: "Bio Dome 2",  vec: (5, 0.13, 15e3)      }
+event: { event: Camera,                param: 5,                             vec: (-0.12, 0.01, -0.02) }
+
+
+event: { event: EndScene,   time:  65, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

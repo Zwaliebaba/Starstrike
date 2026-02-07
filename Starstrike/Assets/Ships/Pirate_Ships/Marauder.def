@@ -1,0 +1,270 @@
+SHIP
+
+name:          Marauder
+display_name:  Marauder
+class:         Frigate
+description:   "The MARAUDER is a small frigate-class vessel commonly used by the Brotherhood of Iron criminal organization as a commerce raider.  The Marauder ships are no match for most military warships, but they make up for their limitations with enhanced stealth capabilities.  Starship captains usually find the Marauder to be a fiendishly difficult type of ship to lock onto."
+
+hud_icon:      "MarauderHud.pcx"
+
+detail_0:   "Marauder_2opt.mag"
+feature_0:  32
+detail_1:   "Marauder_3opt.mag"
+feature_1:  16
+
+mass:       7.9e3
+agility:    5
+vlimit:     280
+roll_rate:  60
+integrity:  22e3
+scale:      2.5
+acs:        1
+degrees:    true
+detet:      30e3
+
+trans_x:    75e3
+trans_y:    25e3
+trans_z:    75e3
+
+arcade_drag:2e-2
+drag:       1e-6
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1e3, 200)
+bridge:     (0, 216,   34)
+
+power: {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       3e3,
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.6,
+   explosion:        7
+}
+
+drive: {
+   type:             Red
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           800,
+   scale:            4,
+   port:             (-44,12,-252),
+   port:             ( 45,12,-252),
+
+   loc:              (0,0,-200),
+   size:             32,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 64),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum:     {
+   design:           "Quantum Drive",
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   factor:           0.05,
+   consumption:      2000,
+
+   pcs:              100,
+   loc:              (0, 20, -80),
+   size:             16,
+   hull_factor:      0.5,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+}
+
+weapon:     {
+   type:             "Plasma Cannon",
+   design:           "Plasma Weapon",
+   name:             "Port Cannon",
+   abrv:             "Plasma 2",
+   muzzle:           (-260, -32, 194),
+   azimuth:          0,
+
+   loc:              (-260, -32,  60),
+   size:             24,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Plasma Cannon",
+   design:           "Plasma Weapon",
+   name:             "Starboard Cannon",
+   abrv:             "Plasma 3",
+   muzzle:           ( 260, -32, 194),
+   azimuth:          0,
+
+   loc:              ( 260, -32,  60),
+   size:             24,
+   hull_factor:      0.3
+}
+
+weapon: {
+   type:             "Light-PDB"
+   design:           "Plasma Weapon"
+   name:             "PDB-1"
+
+   azimuth:           60
+   aim_az_max:        90
+   aim_az_min:       -60
+   aim_az_rest:      -60
+
+   muzzle:           (0, 0, 71)
+   loc:              (-110, 26, 20)
+   size:             32
+   hull_factor:      0.3
+}
+
+weapon: {
+   type:             "Light-PDB"
+   design:           "Plasma Weapon"
+   name:             "PDB-2"
+
+   azimuth:          -60
+   aim_az_max:       -90
+   aim_az_min:        60
+   aim_az_rest:       60
+
+   muzzle:           (0, 0, 71)
+   loc:              (110, 26, 20)
+   size:             32
+   hull_factor:      0.3
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -10, 64),
+
+   loc:     (0, -10, 50),
+   size:    16,
+   hull_factor: 0.2
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       250
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 180),
+   size:             16,
+   hull_factor:      0.1
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "Debris5.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     15,
+   debris_life:      15,
+
+   debris:           "Debris6.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     15,
+   debris_life:      15,
+
+   debris:           "Debris7.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     10,
+   debris_life:      15,
+
+   }
+
+map: {
+   sprite: "m_map0.pcx",
+   sprite: "m_map1.pcx",
+   sprite: "m_map2.pcx",
+   sprite: "m_map3.pcx",
+   sprite: "m_map4.pcx",
+   sprite: "m_map5.pcx",
+   sprite: "m_map6.pcx",
+   sprite: "m_map7.pcx"
+}
+
+

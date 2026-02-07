@@ -1,0 +1,332 @@
+SHIP
+
+name:          Cobra
+display_name:  Cobra
+class:         Attack
+abrv:          "F-MK3"
+description:   "The MARK-3 COBRA is a mid-wing configuration multi-role fighter spacecraft that was once commonly used by the Marakan Hegemony but now is mainly used by its client states. The Cobra is a tough and effective single-engine spacecraft that is frequently employed against all types of hardened ground targets, and may also fulfill a secondary role killing spaceborne platforms and starships. The Cobra is armed with twin nose-mounted Alpha particle cannon, along with eight underwing hard points capable of mounting several types of anti-fighter, antiship, and ground-attack weapon systems."
+
+
+hud_icon:      "CobraHud.pcx"
+
+detail_0:   "Cobra_0opt.mag"
+feature_0:  0.1
+detail_1:   "Cobra_2opt.mag"
+feature_1:  1.5
+
+mass:       19.3
+integrity:  2800
+vlimit:     280
+agility:    70
+roll_rate:  600
+scale:      0.26
+acs:        1
+detet:      55e3
+
+trans_x:    2000
+trans_y:    2000
+trans_z:    2000
+
+arcade_drag: 0.16
+drag:       5.5e-5
+roll_drag:  5
+pitch_drag: 4
+yaw_drag:   4
+
+CL:         8.0e-3
+CD:         1.1e-1
+stall:      0.40
+
+avoid_fighter: 7
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 50,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+   }
+
+drive:      {
+   type:    Yellow
+   thrust:  15,
+   augmenter: 25,
+   scale:   0.33,
+   port:    (0, 0, -203),
+
+   loc:     (0, 0, -190),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+
+weapon:     {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-7, 8, 175),
+   muzzle:  ( 7, 8, 175),
+
+   loc:     (0, 0, -32),
+   size:    32,
+   hull_factor: 0.5
+}
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-1",
+   muzzle:  ( 129, -21, -70),
+   loc:     ( 129, -21, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-2",
+   muzzle:  ( 105, -18, -70),
+   loc:     ( 105, -18, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-3",
+   muzzle:  (  65, -16, -70),
+   loc:     (  65, -16, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-4",
+   muzzle:  ( 40, -14, -70),
+   loc:     ( 40, -14, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-5",
+   muzzle:  (-40, -14, -70),
+   loc:     (-40, -14, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-6",
+   muzzle:  ( -65, -16, -70),
+   loc:     ( -65, -16, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-7",
+   muzzle:  (-105, -18, -70),
+   loc:     (-105, -18, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-8",
+   muzzle:  (-128, -21, -70),
+   loc:     (-128, -21, -30),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1, -1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: (-1,  0,  0, -1, -1,  0,  0, -1) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0,  0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  0,  0,  0,  0,  0,  0,  0) }
+loadout: { name: "Ground Strike",    stations: ( 0,  0,  2,  2,  2,  2,  0,  0) }
+loadout: { name: "Ship Strike",      stations: (-1,  0,  0,  1,  1,  0,  0, -1) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 0,  0,  1,  1,  1,  1,  0,  0) }
+
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -24, 0),
+
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.2
+   }
+
+sensor:     {
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    32,
+   hull_factor: 0.1
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose0.mag",
+      start: (0, -15, 104),
+      end:   (0, -42, 118)
+   },
+
+   gear: {
+      model: "GearLeft0.mag",
+      start: (-28, -22, -48),
+      end:   (-42, -42, -48)
+   },
+
+   gear: {
+      model: "GearRight0.mag",
+      start: ( 28, -22, -48),
+      end:   ( 42, -42, -48)
+   },
+}
+thruster: {
+   design:           Thruster,
+   type:             Yellow
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+   scale:            0.12,
+
+   port_fore:   {loc:(-166, -15, -10), fire: 0x0044}
+   port_fore:   {loc:( 167, -15, -10), fire: 0x0084}
+
+   port_aft:    {loc:(-166, -15, -70), fire: 0x0088}
+   port_aft:    {loc:( 167, -15, -70), fire: 0x0048}
+
+   port_top:    {loc:( -29,   2,-117), fire: 0x0110}
+   port_top:    {loc:(  29,   2,-117), fire: 0x0110}
+
+   port_top:    {loc:( -24,   2,  65), fire: 0x0210}
+   port_top:    {loc:(  24,   2,  65), fire: 0x0210}
+
+   port_bottom: {loc:( -29,  -8,-117), fire: 0x0120}
+   port_bottom: {loc:(  29,  -8,-117), fire: 0x0120}
+
+   port_bottom: {loc:( -24,  -8,  65), fire: 0x0120}
+   port_bottom: {loc:(  24,  -8,  65), fire: 0x0120}
+
+   port_top:    {loc:(-166,  -9, -23), fire: 0x0410}
+   port_top:    {loc:(-166,  -9, -56), fire: 0x0410}
+
+   port_top:    {loc:( 167,  -9, -23), fire: 0x0810}
+   port_top:    {loc:( 167,  -9, -56), fire: 0x0810}
+
+   port_bottom: {loc:(-166, -20, -23), fire: 0x0820}
+   port_bottom: {loc:(-166, -20, -56), fire: 0x0820}
+
+   port_bottom: {loc:( 167, -20, -23), fire: 0x0420}
+   port_bottom: {loc:( 167, -20, -56), fire: 0x0420}
+}
+
+
+death_spiral: {
+   time:             2.8,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (0, 0, -28),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.3,
+   explosion_loc:    (-10, 10, 30),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -12),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -12),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (2,0,-3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      1.9
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     190
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,6)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     220
+}
+
+
+map: {
+   sprite: "CobraMap0.pcx",
+   sprite: "CobraMap1.pcx",
+   sprite: "CobraMap2.pcx",
+   sprite: "CobraMap3.pcx",
+   sprite: "CobraMap4.pcx",
+   sprite: "CobraMap5.pcx",
+   sprite: "CobraMap6.pcx",
+   sprite: "CobraMap7.pcx",
+}
+

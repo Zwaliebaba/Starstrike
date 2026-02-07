@@ -1,0 +1,76 @@
+MISSION
+
+name:   "Cmpn 04 Defeat 01"
+type:   "Patrol"
+system: "Ostara"
+region: "Aram"
+stardate: 1177998877
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (50e3, 0, 0)
+}
+
+element: {
+   name:      Volnaris
+   design:    Volnaris
+   iff:       2
+   loc:       (8e3,2e3,0)
+   rgn:       Aram
+   navpt:     { cmd: Vector, loc: (9e3,-100e3, 0), rgn: Aram, speed: 500 }
+}
+
+element: {
+   name:      Avenger
+   design:    Avenger
+   count:     4
+   iff:       2
+   loc:       (34e3,6e3,200)
+   rgn:       Aram
+   navpt:     { cmd: Vector, loc: (35e3,-100e3,300), rgn: Aram, speed: 1000 }
+   loadout:   { ship: -1, name: "ACM Medium Range" }
+}
+
+element: {
+   name:      Vendetta
+   design:    Vendetta
+   count:     1
+   command_ai:1
+   iff:       2
+   loc:       (-20e3,-100e3,0)
+   rgn:       Aram
+   navpt:     { cmd: Vector, loc: (-20e3, 100e3,0), rgn: Aram, speed: 500 }
+   head:      180
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Aram",    vec: (1,0.3,1.2e6) }
+event: { event: Camera,                param: 5,                         vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Firestorm", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 600,100) }
+event: { event: Display,    message: "Defeat",             font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 600,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\04\End_02_Defeat.wav"
+}
+
+event: { event: Camera,     time:  10, param: (6,22), target: Volnaris    }
+
+event: { event: Camera,     time:  20, param: (6,15), target: "Avenger 1" }
+
+event: { event: Camera,     time:  30, param: (6,32), target: Vendetta    }
+
+event: { event: Display,    time:  38, image: "Campaigns\04\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+
+event: { event: EndScene,   time:  40, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

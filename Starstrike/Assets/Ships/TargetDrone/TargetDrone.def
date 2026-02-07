@@ -1,0 +1,105 @@
+SHIP
+
+name:       TargetDrone
+display_name:       TargetDrone
+class:      Fighter
+
+model:      "drone2b6.mag"
+description: "The Class 2 TARGET DRONE is a high midwing monoplane of conventional design with an inverted-Y empennage. The spaceframe is a modified monocoque structure made of a titanium alloy-reinforced ceramic composite. The Target is powered by a FP387/403 variable speed fusion drive, which produces a maximum of 4T static thrust under normal operating conditions.  The Target is equipped with a fighter-style sensor package and onboard AI pilot capability, but is otherwise unarmed."
+
+mass:       5
+integrity:  500
+vlimit:     250
+agility:    50
+air_factor: 0.25
+roll_rate:  500
+scale:      0.08
+acs:        5
+
+trans_x:    1000
+trans_y:    1000
+trans_z:    1000
+
+drag:       4e-6
+roll_drag:  5
+pitch_drag: 4
+yaw_drag:   4
+
+CL:         2e-2
+CD:         2e-5
+stall:      0.40
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 30,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+}
+
+drive:      {
+   type:    Plasma,
+   thrust:  4,
+   scale:   0.8,
+   port:    (0, -58, -292)
+
+   loc:     (0, 0, -180)
+   size:    16,
+   hull_factor: 0.5
+}
+
+sensor:     {
+   pcs:                 25,
+   active_efficiency:   2e9,
+   passive_efficiency:  500,
+
+   loc:     (0, 0, 100),
+   size:    32,
+   hull_factor: 0.1
+}
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+}
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.2
+}
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+}
+
+death_spiral: {
+   time:             1.4,
+
+   explosion_type:   22,   // CUSTOM 2
+   explosion_time:   0.8,
+   explosion_loc:    (0, 0, -28),
+
+   final_type:       21,   // CUSTOM 1
+   final_loc:        (0, 0, -12),
+
+   final_type:       24,   // CUSTOM LARGE BURST VARIATION
+   final_loc:        (0, 0, -12),
+}
+
+

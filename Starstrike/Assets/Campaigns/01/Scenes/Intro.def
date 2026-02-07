@@ -1,0 +1,153 @@
+MISSION
+
+name:   "Campaign 01 - Intro"
+type:   "Patrol"
+system: Borova
+region: Borova
+stardate: 1001994001
+
+degrees: true
+
+element: {
+   name:      "Archon"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   player:    1
+   playable:  true
+   region:    "Borova"
+   loc:       (0, 0, 0)
+   navpt:     { cmd: Vector, loc: (0, -80e3, 0), speed: 500 }
+}
+
+element: {
+   name:      "Stalwart"
+   design:    "Courageous"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (-6e3, 10e3, 0)
+   navpt:     { cmd: Vector, loc: (-6e3, -80e3, 0), speed: 500 }
+}
+
+element: {
+   name:      "Gerson"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (12e3, 14e3, 0)
+   navpt:     { cmd: Vector, loc: (12e3, -80e3, 0), speed: 500 }
+}
+
+element: {
+   name:      "Simmons"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (-14e3, -12e3, 0)
+   navpt:     { cmd: Vector, loc: (-14e3, -80e3, 0), speed: 500 }
+}
+
+element: {
+   name:      "Lifters"
+   design:    "Zodiac"
+   carrier:   "Archon"
+   commander: "Archon"
+   mission:   "Misc"
+
+   intel:     "Secret"
+   count:     8
+   iff:       1
+   region:    "Borova"
+   loc:       (17e3, 18e3, 0)
+}
+
+element: {
+   name:      "Proteus"
+   design:    "Zodiac"
+   squadron:  "Lifters"
+   commander: "Archon"
+   mission:   "Transport"
+   head:      -30
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (15e3, 29e3, 0)
+
+   navpt:     { cmd: Vector, loc: (7e3, 17e3, 0), speed: 500 }
+   navpt:     { cmd: RTB,    loc: (4e3,  9e3, 0), speed: 350 }
+}
+
+event: { id: 100, event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Hold,       param: 99, ship: Archon     }
+event: { event: Hold,       param: 99, ship: Stalwart   }
+event: { event: Hold,       param: 99, ship: Gerson     }
+event: { event: Hold,       param: 99, ship: Simmons    }
+
+event: { event: Camera,     param:  3, target: Proteus,  vec: (1,-0.1,1500) }
+event: { event: Camera,     param:  5,                   vec: (0.10, 0.002, -0.01) }
+
+event: { event: Display,    time:   1, message: "Training Shuttle 'Proteus'", font: Limerick18,   color: 0xffffff80, fade: (1,15,1), rect: (20,20, 400,100) }
+event: { event: Display,    time:   3, message: "Borova Orbit",               font: Limerick12,   color: 0xffffff80, fade: (1,13,1), rect: (20,40, 400,100) }
+
+event: { id: 1, time:  5,   sound: "Vox\Scenes\01\Intro-1.wav" }
+event: { id: 2, time: 15,   sound: "Vox\Scenes\01\Intro-2.wav" }
+event: { id: 3, time: 52,   sound: "Vox\Scenes\01\Intro-3.wav" }
+event: { id: 4,             sound: "Vox\Scenes\01\Intro-4.wav", trigger: Dock, trigger_ship: Proteus }
+
+event: { event: Hold,       param:  0, ship: Archon,     trigger: Event, trigger_param: 4 }
+event: { event: Hold,       param:  0, ship: Stalwart,   trigger: Event, trigger_param: 4 }
+event: { event: Hold,       param:  0, ship: Gerson,     trigger: Event, trigger_param: 4 }
+event: { event: Hold,       param:  0, ship: Simmons,    trigger: Event, trigger_param: 4 }
+
+event: { event: Camera,     param:  3, target: Archon,   vec: (2,0,2700),           trigger: Event, trigger_param: 4 }
+event: { event: Camera,     param:  5,                   vec: (0.12, 0.006, -0.02), trigger: Event, trigger_param: 4 }
+
+event: { event: Display,    message: "Task Force 3.7",     font: Limerick18,   color: 0xffffff80, fade: (1,10,1), rect: (20,20, 400,100), trigger: Event, trigger_param: 4 }
+event: { event: Display,    message: "CV-71 'Archon'",     font: Limerick12,   color: 0xffffff80, fade: (1,1,1),  rect: (20,40, 200,100), trigger: Event, trigger_param: 4 }
+event: { event: Display,    message: "CA-524 'Stalwart'",  font: Limerick12,   color: 0xffffff80, fade: (1,1,1),  rect: (20,40, 200,100), trigger: Event, trigger_param: 4, delay: 3 }
+event: { event: Display,    message: "DD/E-682 'Gerson'",  font: Limerick12,   color: 0xffffff80, fade: (1,1,1),  rect: (20,40, 200,100), trigger: Event, trigger_param: 4, delay: 6 }
+event: { event: Display,    message: "DD/E-687 'Simmons'", font: Limerick12,   color: 0xffffff80, fade: (1,1,1),  rect: (20,40, 200,100), trigger: Event, trigger_param: 4, delay: 9 }
+
+event: { event: Jump,       ship: Archon,                  target: Tulkas, trigger: Event, trigger_param: 4, delay: 20 }
+event: { event: Jump,       ship: Stalwart,                target: Tulkas, trigger: Event, trigger_param: 4, delay: 19 }
+event: { event: Jump,       ship: Gerson,                  target: Tulkas, trigger: Event, trigger_param: 4, delay: 18 }
+event: { event: Jump,       ship: Simmons,                 target: Tulkas, trigger: Event, trigger_param: 4, delay: 16 }
+
+event: { event: Display,               image: "Campaigns\01/Scenes\Black.pcx",              color: 0xffffffff, fade: (1,30,1), rect: (0,0,0,0)         , trigger: Event, trigger_param: 4, delay: 21 }
+event: { event: Display,               image: "Campaigns\01/Scenes\Starshatter.pcx",        color: 0xffffffff, fade: (1,10,1), rect: (0,0, -1024,-256) , trigger: Event, trigger_param: 4, delay: 22 }
+event: { event: Display,               image: "Campaigns\01/Scenes\TheGatheringStorm.pcx",  color: 0xffffffff, fade: (1, 7,1), rect: (0,0, -1024,-256) , trigger: Event, trigger_param: 4, delay: 25 }
+
+event: { id: 200, event: EndScene,   message: "Scene 1", delay: 35, trigger: Event, trigger_param: 4 }
+event: { id: 201, event: Exit,                           delay: 35, trigger: Event, trigger_param: 4 }
+
+// EOF

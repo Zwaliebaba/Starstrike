@@ -1,0 +1,106 @@
+MISSION
+
+name:   "Advanced Starship Combat"
+type:   "Training"
+system: "Janus"
+region: "Dante"
+
+objective:
+         "Training - "
+         "Practice advanced starship combat maneuvers."
+
+sitrep:  "The Third Fleet is participating in wargame "
+         "exercises in the Janus system. "
+         "You will be in command of the Destroyer Mahan "
+         "in Dante sector. You have been tasked with finding "
+         "and destroying the enemy Wolf-class starship Shannon. "
+         "You have one hour to complete this exercise.  Good luck!"
+
+start:   "04/11:00:00"
+
+degrees: true
+
+/*************************/
+
+element: {
+   name:      Mahan
+   design:    Asher
+   mission:   Training
+
+   intel:     Secret
+   count:     1
+   command_ai:1
+   iff:       1
+   player:    1
+   playable:  false
+   region:    Dante
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      Tarkis
+   design:    Wolf
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   command_ai:1
+   iff:       2
+   playable:  false
+   region:    Dante
+   loc:       (-258e3, -47e3, 0)
+
+   navpt:     { cmd: Vector, loc: (-132e3, -175e3, 0), speed: 500 }
+}
+
+element: {
+   name:      "DTS Equinox"
+   design:    IM4300
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    Dante
+   loc:       (5e3, -195e3, 0)
+
+   navpt:     { cmd: Vector, loc: (-190e3, -125e3, 0), speed: 400 }
+}
+
+/*************************/
+
+// VOICE-OVER
+
+event: { id:  1, time:    2, sound: "Vox\Train\Train-06-01.wav" }
+event: { id:  2, delay:  22, sound: "Vox\Train\Train-06-02.wav", trigger: Event,  trigger_param:  1 }
+event: { id:  3, delay:  16, sound: "Vox\Train\Train-06-03.wav", trigger: Event,  trigger_param:  2 }
+
+event: { id:  4, delay:   2, sound: "Vox\Train\Train-06-04.wav", trigger: Event,  trigger_param: 50 }
+event: { id:  5, delay:  17, sound: "Vox\Train\Train-06-05.wav", trigger: Event,  trigger_param:  4 }
+event: { id:  6, delay:  17, sound: "Vox\Train\Train-06-06.wav", trigger: Event,  trigger_param:  5 }
+event: { id:  7, delay:  25, sound: "Vox\Train\Train-06-07.wav", trigger: Event,  trigger_param:  6 }
+event: { id:  8, delay:  30, sound: "Vox\Train\Train-06-08.wav", trigger: Event,  trigger_param:  7 }
+event: { id:  9, delay:  25, sound: "Vox\Train\Train-06-09.wav", trigger: Event,  trigger_param:  8 }
+
+event: { id: 13, delay:   0, sound: "Vox\Train\Train-06-10.wav", trigger: Event,  trigger_param: 51 }
+event: { id: 14, delay:  30, sound: "Vox\Train\Train-06-11.wav", trigger: Event,  trigger_param: 13 }
+event: { id: 15, delay:  17, sound: "Vox\Train\Train-06-12.wav", trigger: Event,  trigger_param: 14 }
+event: { id: 16, delay:  30, sound: "Vox\Train\Train-06-13.wav", trigger: Event,  trigger_param: 15 }
+
+event: { id: 20, delay:   0, sound: "Vox\Train\Train-06-14.wav", trigger: Destroyed, trigger_ship: Tarkis }
+
+event: { id: 50, delay:   0, message: "Tarkis Detected",                trigger: Detect, trigger_ship: Mahan, trigger_target: Tarkis }
+event: { id: 51, delay:   0, message: "Tarkis Locked",                  trigger: Target, trigger_ship: Mahan, trigger_target: Tarkis }
+
+event: { id: 80, event: Skip, param: ( 1, 2, 3),                        trigger: Event, trigger_param: 50 }
+event: { id: 81, event: Skip, param: ( 1, 2, 3, 4, 5),                  trigger: Event, trigger_param: 51 }
+event: { id: 82, event: Skip, param: ( 5, 6, 7, 8, 9),                  trigger: Event, trigger_param: 13 }
+event: { id: 83, event: Skip, param: (13,14,15,16),                     trigger: Event, trigger_param: 20 }
+
+event: { id: 100, event: EXIT, delay: 10, trigger: Event, trigger_param: 20 }
+
+/*************************/
+
+// EOF

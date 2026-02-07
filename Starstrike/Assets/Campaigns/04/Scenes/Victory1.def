@@ -1,0 +1,89 @@
+MISSION
+
+name:   "Cmpn 04 Victory"
+type:   "Patrol"
+system: "Korius"
+region: "Adantar"
+stardate: 1177998877
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Heracles"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Adantar
+   loc:       (-140e3, 160e3, 0)
+   navpt:     { cmd: Vector, loc: (-140,-50e3,0), speed: 350, rgn: Adantar }
+}
+
+element: {
+   name:      "Forthright"
+   design:    "Courageous"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Adantar
+   loc:       (-135e3, 158e3, -550)
+   navpt:     { cmd: Vector, loc: (-132e3,-50e3,-550), speed: 450, rgn: Adantar }
+}
+
+element: {
+   name:      "Arthur"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Adantar
+   loc:       (-145e3, 162e3, -1e3)
+   navpt:     { cmd: Vector, loc: (-147,-50e3,-1e3), speed: 350, rgn: Adantar }
+}
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Adantar",   vec: (1,0,1.3e7) }
+event: { event: Camera,                param: 5,                           vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Firestorm", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 600,100) }
+event: { event: Display,    message: "Victory",            font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 600,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\04\End_01_Victory.wav"
+}
+
+event: { event: Camera,     time:  15, param: (6,30), target: Heracles }
+
+event: { event: Display,    time:  38, image: "Campaigns\04\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+event: { event: EndScene,   time:  40, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

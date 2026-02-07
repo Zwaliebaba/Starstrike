@@ -1,0 +1,254 @@
+SHIP
+
+name:          Saber
+display_name:  Saber
+class:         Fighter
+abrv:          "F-22"
+
+hud_icon:      "SaberHud.pcx"
+
+model:      "Saber_2opt.mag"
+
+mass:       15
+integrity:  2500
+scuttle:    1e3
+vlimit:     250
+agility:    137
+air_factor: 0.25
+roll_rate:  1900
+scale:      0.2
+acs:        0.2
+detet:      15e3
+
+trans_x:    2e3
+trans_y:    1e3
+trans_z:    2e3
+
+arcade_drag: 0.22
+drag:       5.0e-5
+roll_drag:  10
+pitch_drag: 10
+yaw_drag:   10
+
+CL:         1.2e-2
+CD:         0.9e-1
+stall:      0.40
+
+prep_time:  15
+avoid_fighter: 7
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 60,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+}
+
+drive: {
+   type:       Red
+   thrust:     19,
+   augmenter:  35,
+   scale:      0.6,
+   port:       (0, -2, -228)
+
+   loc:        (0, 0, -180),
+   size:       16,
+   hull_factor: 0.5
+}
+
+
+weapon: {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-190, 15, 55),
+   muzzle:  ( 190, 15, 55),
+
+   loc:     (0, 0, 32),
+   size:    32,
+   hull_factor: 0.5
+}
+
+hardpoint: {
+   type:    "Javelin",
+   type:    "Vector",
+   abrv:    "STA-1",
+   muzzle:  (-101, 11, -85)
+
+   loc:     (-101, 11, -10)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint: {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Rockets",
+   abrv:    "STA-2",
+   muzzle:  (-74,  1, -75)
+
+   loc:     (-74,  1, -10)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint: {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Rockets",
+   abrv:    "STA-3",
+   muzzle:  ( 74,  1, -75)
+
+   loc:     ( 74,  1, -10)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint: {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-4",
+   muzzle:  (101, 11, -85)
+
+   loc:     (101, 11, -10)
+   size:    16,
+   hull_factor: 0.2
+}
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: ( 0, -1, -1,  0) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  1,  1,  0) }
+loadout: { name: "Ground Strike",    stations: ( 1,  3,  3,  1) }
+loadout: { name: "Ship Strike",      stations: ( 1,  2,  2,  1) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 1,  2,  2,  1) }
+loadout: { name: "Rockets",          stations: ( 0,  3,  3,  0) }
+loadout: { name: "Scout/Recon",      stations: ( 0, -1, -1,  0) }
+
+
+decoy: {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -32, 0),
+
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5
+}
+
+sensor: {
+   pcs:                 25,
+   active_efficiency:   2e9,
+   passive_efficiency:  500,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    25,
+   hull_factor: 0.25
+}
+
+computer: {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    8,
+   hull_factor: 0.2
+}
+
+computer: {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+}
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "LeftSkid.mag",
+      start: (-40, -36, 0),
+      end:   (-58, -54, 0),
+      },
+
+   gear: {
+      model: "RightSkid.mag",
+      start: ( 40, -36, 0),
+      end:   ( 58, -54, 0),
+      },
+}
+
+nav: {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+}
+
+death_spiral: {
+   time:             2.5,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.1,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.5,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     190
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     220
+}
+
+
+map: {
+   sprite: "smap0.pcx",
+   sprite: "smap1.pcx",
+   sprite: "smap2.pcx",
+   sprite: "smap3.pcx",
+   sprite: "smap4.pcx",
+   sprite: "smap5.pcx",
+   sprite: "smap6.pcx",
+   sprite: "smap7.pcx"
+}
+

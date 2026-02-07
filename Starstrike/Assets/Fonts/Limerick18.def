@@ -1,0 +1,42 @@
+FONT
+
+height:    16
+baseline:  14
+flags:     ALL_CAPS
+spacewidth: 6
+expansion: 3
+
+kern: { a: "H", b: "E", k:  0 }
+kern: { a: "H", b: "e", k:  0 }
+kern: { a: "h", b: "e", k:  0 }
+kern: { a: "h", b: "E", k:  0 }
+
+kern: { a: "R", b: "E", k:  0 }
+kern: { a: "R", b: "e", k:  0 }
+kern: { a: "r", b: "e", k:  0 }
+kern: { a: "r", b: "E", k:  0 }
+
+kern: { a: "R", b: "T", k: -1 }
+kern: { a: "R", b: "t", k: -1 }
+kern: { a: "r", b: "t", k: -1 }
+kern: { a: "r", b: "T", k: -1 }
+
+kern: { a: "P", b: "A", k: -1 }
+kern: { a: "P", b: "a", k: -1 }
+kern: { a: "p", b: "a", k: -1 }
+kern: { a: "p", b: "A", k: -1 }
+
+kern: { a: "L", b: "O", k: -1 }
+kern: { a: "L", b: "o", k: -1 }
+kern: { a: "l", b: "o", k: -1 }
+kern: { a: "l", b: "O", k: -1 }
+
+kern: { a: "L", b: "T", k: -1 }
+kern: { a: "L", b: "t", k: -1 }
+kern: { a: "l", b: "t", k: -1 }
+kern: { a: "l", b: "T", k: -1 }
+
+kern: { a: "M", b: "I", k:  1 }
+kern: { a: "M", b: "i", k:  1 }
+kern: { a: "m", b: "i", k:  1 }
+kern: { a: "m", b: "I", k:  1 }

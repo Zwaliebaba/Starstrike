@@ -1,0 +1,210 @@
+SHIP
+
+name:          Jackal
+display_name:  Jackal
+class:         LCA
+abrv:          LCA
+description:   "The JACKAL armored landing craft (LCA) is the mainstay of Hegemony heavy-lift capacity, and the only Marakan craft capable of atmospheric VTOL.  The Jackal is commonly used to ferry personnel and equipment between groundside bases and spaceborne platforms, and also serves a secondary role in heavy assault profiles.  The Jackal is armed with twin heavy Vulcan cannon, but is limited to standard decoy launchers for self-defense."
+
+hud_icon:   "JackalHud.pcx"
+
+detail_0:   "LCA_1opt.mag"
+feature_0:  100
+detail_1:   "LCA_2opt.mag"
+feature_1:  3
+
+
+mass:       92
+integrity:  5250
+vlimit:     220
+agility:    25
+roll_rate:  350
+scale:      0.275
+acs:        1
+
+trans_x:    2500
+trans_y:    2500
+trans_z:    2500
+
+arcade_drag: 0.2
+drag:       4e-5
+roll_drag:  5
+pitch_drag: 4
+yaw_drag:   4
+
+CL:         5e-3
+CD:         1e-4
+stall:      0.40
+
+avoid_fighter: 7
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 50,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+   }
+
+drive:      {
+   type:    Yellow
+   thrust:  75,
+   scale:   0.55,
+   port:    (-147, 32, -160),
+   port:    (-147,-32, -160),
+   port:    ( 147, 32, -160),
+   port:    ( 147,-32, -160),
+
+   loc:     (0, 0, -80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+thruster: {
+   design:           Thruster
+   scale:   0.35
+   port:    (-34, -32,  -10)
+   port:    ( 34, -32,  -10)
+   port:    (-34, -32, -128)
+   port:    ( 34, -32, -128)
+
+   loc:         (0, -32, -128)
+   size:        24
+   hull_factor: 0.3
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "zgear_r.mag",
+      start: ( 34, -30,  -10)
+      end:   ( 74, -60,  -10)
+      },
+
+   gear: {
+      model: "zgear_l.mag",
+      start: (-34, -30,  -10)
+      end:   (-74, -60,  -10)
+      },
+
+   gear: {
+      model: "zgear_r.mag",
+      start: ( 34, -30, -140),
+      end:   ( 74, -60, -140)
+      },
+
+   gear: {
+      model: "zgear_l.mag",
+      start: (-34, -30, -140),
+      end:   (-74, -60, -140)
+      },
+}
+
+weapon:     {
+   type:             "Vulcan Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Cannon",
+   abrv:             "Gun-1",
+   muzzle:           (-8, -26, 182),
+
+   loc:              (-8, -26, 160),
+   size:             24,
+   hull_factor:      0.3
+   }
+
+weapon:     {
+   type:             "Vulcan Cannon",
+   design:           "Bolt Weapon",
+   name:             "Starboard Cannon",
+   abrv:             "Gun-2",
+   muzzle:           ( 8, -26, 182),
+
+   loc:              ( 8, -26, 160),
+   size:             24,
+   hull_factor:      0.3
+   }
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -24, 0),
+
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.2
+   }
+
+sensor:     {
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    32,
+   hull_factor: 0.1
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+death_spiral: {
+   time:             1.2,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (0, 0, -28),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1.0,
+   explosion_loc:    (-10, 10, 30),
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -12),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -12),
+   }
+
+map: {
+   sprite: "JackalMap0.pcx",
+   sprite: "JackalMap1.pcx",
+   sprite: "JackalMap2.pcx",
+   sprite: "JackalMap3.pcx",
+   sprite: "JackalMap4.pcx",
+   sprite: "JackalMap5.pcx",
+   sprite: "JackalMap6.pcx",
+   sprite: "JackalMap7.pcx",
+}
+

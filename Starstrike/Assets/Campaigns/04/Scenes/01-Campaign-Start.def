@@ -1,0 +1,198 @@
+MISSION
+
+name:   "Cmpn04 News01 - Campaign Start"
+type:   "Patrol"
+system: "Ostara"
+system: "Paragon"
+system: "Jarnell"
+region: "Jarnell"
+stardate: 1188000000.0
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+   rgn:       Jarnell
+}
+
+element: {
+   name:      "Aram Station"
+   design:    Station4
+   intel:     Secret
+   iff:       0
+   count:     1
+   region:    Aram
+   loc:       (0,0,0)
+}
+
+
+element: {
+   name:      Atlas
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    "Aram"
+   loc:       (100e3, 300e3, 0)
+   navpt:     { cmd: Vector, loc: (100e3, -70e3, 0), rgn: "Aram", speed: 300 }
+}
+
+element: {
+   name:      "Stalwart"
+   design:    "Courageous"
+   commander: Atlas
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Aram
+   loc:       (98e3, 311e3, 0)
+   navpt:     { cmd: Vector, loc: (90e3, -70e3, 0), rgn: "Aram", speed: 600 }
+}
+
+element: {
+   name:      "Gerson"
+   design:    "Asher"
+   commander: Atlas
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Aram
+   loc:       (112e3, 314e3, 0)
+   navpt:     { cmd: Vector, loc: (122e3, -70e3, 0), rgn: "Aram", speed: 600 }
+}
+
+element: {
+   name:      "Simmons"
+   design:    "Asher"
+   commander: Atlas
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Aram
+   loc:       (94e3, 292e3, 0)
+   navpt:     { cmd: Vector, loc: (84e3, -70e3, 0), rgn: "Aram", speed: 600 }
+}
+
+
+
+
+
+element: {
+   name:      "Heracles"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Paragon
+   loc:       (100e3, 100e3, 0)
+   navpt:     { cmd: Vector, loc: (100e3, -70e3, 0), rgn: "Paragon", speed: 300 }
+}
+
+element: {
+   name:      "Forthright"
+   design:    "Courageous"
+   commander: "Heracles"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Paragon
+   loc:       (106e3, 101e3, 0)
+   navpt:     { cmd: Vector, loc: (110e3, -70e3, 0), rgn: "Paragon", speed: 600 }
+}
+
+element: {
+   name:      "Arthur",
+   design:    "Asher"
+   commander: "Heracles"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Paragon
+   loc:       (116e3, 94e3, 0)
+   navpt:     { cmd: Vector, loc: (122e3, -70e3, 0), rgn: "Paragon", speed: 600 }
+}
+
+element: {
+   name:      "Smith"
+   design:    "Asher"
+   commander: "Heracles"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    Paragon
+   loc:       (97e3, 97e3, 0)
+   navpt:     { cmd: Vector, loc: (94e3, -70e3, 0), rgn: "Paragon", speed: 600 }
+}
+
+
+
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Display,               image: "Campaigns\04/Scenes\Black.pcx", color: 0xffffffff, fade: (0,5,1), rect: (0,0,0,0) }
+event: { event: Display,               image: "Campaigns\04/Scenes\News.pcx",  color: 0xffffffff, fade: (1,4,1), rect: (0,0, -512,-128) }
+
+event: { event: Camera,                param: 3,  target: "body:Jarnell", vec: (1,0,1.8e7)           }
+event: { event: Camera,                param: 5,                          vec: (0.11, 0.015, 0.05)   }
+
+event: { event: Display,    time:   5, message: "Jarnell System", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Alliance Capitol",      font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+event: { event: Messasge,              sound: "Vox\Scenes\04/News_01_Campaign_Start.wav" }
+
+
+event: { event: Display,    time:  15, image: "Campaigns\04/Scenes\Map.pcx", color: 0xffffffff, fade: (1,12,1), rect: (-280,-280,256,256) }
+
+
+event: { event: Camera,     time:  30, param: 3,      target: "Aram Station", vec: (0.7,0.1,38e3)   }
+event: { event: Camera,                param: 5,                              vec: (0.12, -0.01, -0.01)  }
+
+
+event: { event: Camera,     time:  45, param: (6, 30),  target: "Atlas" }
+event: { event: Display,               message: "Force:Space Sixth Fleet",   font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "9th Carrier Group 'Atlas'", font: Limerick12,  color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+
+
+event: { event: Camera,     time:  65, param: (6, 35),  target: "Forthright" }
+event: { event: Display,               message: "Force:Space Seventh Fleet",   font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "11th Carrier Group 'Heracles'", font: Limerick12,  color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+
+event: { event: EndScene,   time:  92, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

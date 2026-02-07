@@ -1,0 +1,133 @@
+MISSION
+
+name:   "Cmpn05 Brief15 - Disappearance"
+type:   Patrol
+system: Marak
+region: Marak
+stardate: 1188999999
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   iff:       0
+   player:    1
+   loc:       (100e3, 30e3, 0)
+}
+
+
+element: {
+   name:      Orion
+   design:    Orion
+   iff:       1
+   region:    Marak
+   loc:       (100e3, 300e3, 0)
+   navpt:     { cmd: Vector, loc: (100e3, -70e3, 0), rgn: Marak, speed: 100 }
+}
+
+element: {
+   name:      Courageous
+   design:    Courageous
+   commander: Orion
+   iff:       1
+   region:    Marak
+   loc:       (93e3, 311e3, 500)
+   navpt:     { cmd: Vector, loc: (93e3, -70e3, 500), rgn: Marak, speed: 100 }
+}
+
+element: {
+   name:      Asher
+   design:    Asher
+   commander: Orion
+   iff:       1
+   region:    Marak
+   loc:       (118e3, 314e3, -1000)
+   navpt:     { cmd: Vector, loc: (118e3, -70e3, -1000), rgn: Marak, speed: 100 }
+}
+
+element: {
+   name:      Shaw
+   design:    Asher
+   commander: Orion
+   iff:       1
+   region:    Marak
+   loc:       (90e3, 292e3, 800)
+   navpt:     { cmd: Vector, loc: (90e3, -70e3, 800), rgn: Marak, speed: 100 }
+}
+
+
+element: {
+   name:      Dragon
+   design:    "Hulk-Dragon"
+   iff:       0
+   loc:       (20e3, 0, 0)
+   rgn:       Xanthe
+}
+
+element: {
+   name:      Broadsword
+   design:    "Hulk-Broadsword"
+   iff:       0
+   loc:       (53e3, 0, 10e3)
+   rgn:       Xanthe
+}
+
+element: {
+   name:      Volnaris
+   design:    "Hulk-Volnaris"
+   iff:       0
+   loc:       (16e3, 0, -2e3)
+   rgn:       Marak
+}
+
+
+element: {
+   name:      Imperial
+   design:    "Hulk-Imperial"
+   iff:       0
+   loc:       (20e3, 0, 0)
+   rgn:       Marak
+}
+
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Marak", vec: (2, 0.1, 5e7)         }
+event: { event: Camera,                param: 5,                           vec: (-0.05, 0.007, -0.04) }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: $TIME\nSubject: Status of Marak Prime\nClassified: TOP SECRET R7 NTK/EO" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\05/Briefing_15.wav" }
+
+
+event: { event: Camera,     time:  10, param: 3,      target: "Dragon",     vec: (2, -0.1, 8e3)        }
+event: { event: Camera,                param: 5,                            vec: (-0.05, 0.007, 0.02)  }
+
+
+event: { event: Camera,     time:  22, param: 3,      target: "Broadsword", vec: (3,  0.2, 6e3)        }
+event: { event: Camera,                param: 5,                            vec: ( 0.06, -0.01, 0.02)  }
+
+
+event: { event: Camera,     time:  34, param: 3,      target: "Imperial",   vec: (4, -0.1, 9e3)        }
+event: { event: Camera,                param: 5,                            vec: (-0.07, 0.007, 0.02)  }
+
+
+event: { event: Camera,     time:  50, param: 3,      target: "Orion", vec: (2, -0.1, 8e3)        }
+event: { event: Camera,                param: 5,                       vec: (-0.05, 0.007, 0.02)  }
+
+
+event: { event: Camera,     time:  80, param: 3,      target: "body:Marak", vec: (5, -0.1, 3e7)        }
+event: { event: Camera,                param: 5,                            vec: (-0.085, 0.002, 0.03) }
+
+
+event: { event: EndScene,   time: 105, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

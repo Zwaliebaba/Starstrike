@@ -1,0 +1,415 @@
+SHIP
+
+name:          Spectre
+display_name:  Spectre
+class:         Destroyer
+description:   "The DD-350 SPECTRE class of destroyers represent the largest and most successful of all Force:Space destroyer acquisitions: fast, roomy, capable of absorbing enormous punishment, and yet fighting on.  The Spectre class ships are forty percent heavier than their Asher class cousins, and they use the extra mass to great effect.  The Spectre class features four nose-mounted XRay Laser batteries, and a pair of wing-mounted fusion torpedo launchers in addition to four Phalanx point defense guns."
+
+degrees:    true
+beauty:     (-16, 4, 1.3)
+hud_icon:   "SpectreHud.pcx"
+
+detail_0:   "Spectre_0opt.mag"
+feature_0:  1000
+detail_1:   "Spectre_1opt.mag"
+feature_1:  40
+detail_2:   "Spectre_3opt.mag"
+feature_2:  20
+
+mass:       22.5e3
+agility:    3
+vlimit:     300
+roll_rate:  7
+integrity:  25e3
+scale:      2.5
+acs:        1.2
+
+trans_x:     300e3
+trans_y:     100e3
+trans_z:     300e3
+
+arcade_drag: 3e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power: {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   name:             "Reactor One",
+   max_output:       8000,
+
+   loc:              (0, -48, -180),
+   size:             48,
+   hull_factor:      0.6,
+   explosion:        7
+}
+
+drive: {
+   type:             Plasma,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           4000,
+   scale:            4,
+   port:             (-23,  -6, -630)
+   port:             (-23, -31, -630)
+   port:             ( 23,  -6, -630)
+   port:             ( 23, -31, -630)
+
+   loc:              (0, -20, -480),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+   scale:            1.5
+
+   port_left:   {loc:( -74,   0,-402), fire: 0x0041}
+   port_left:   {loc:( -74,   0,-366), fire: 0x0041}
+   port_left:   {loc:( -49,  34, 391), fire: 0x0081}
+   port_left:   {loc:( -49,  34, 404), fire: 0x0081}
+
+   port_right:  {loc:(  74,   0,-402), fire: 0x0082}
+   port_right:  {loc:(  74,   0,-366), fire: 0x0082}
+   port_right:  {loc:(  49,  34, 391), fire: 0x0042}
+   port_right:  {loc:(  49,  34, 404), fire: 0x0042}
+
+   port_fore:   {loc:(-220, -15, -20), fire: 0x0044}
+   port_fore:   {loc:(-205, -15, -20), fire: 0x0044}
+   port_fore:   {loc:( 204, -15, -20), fire: 0x0084}
+   port_fore:   {loc:( 219, -15, -20), fire: 0x0084}
+
+   port_aft:    {loc:(-220, -15,-338), fire: 0x0088}
+   port_aft:    {loc:(-205, -15,-338), fire: 0x0088}
+   port_aft:    {loc:( 204, -15,-338), fire: 0x0048}
+   port_aft:    {loc:( 219, -15,-338), fire: 0x0048}
+
+   port_top:    {loc:( -20,  32,-492), fire: 0x0110}
+   port_top:    {loc:(  20,  32,-492), fire: 0x0110}
+
+   port_bottom: {loc:( -20,-104,-492), fire: 0x0220}
+   port_bottom: {loc:(  20,-104,-492), fire: 0x0220}
+
+   port_top:    {loc:(-212,  15,-125), fire: 0x0410}
+   port_top:    {loc:(-212,  15,-233), fire: 0x0410}
+   port_top:    {loc:( 212,  15,-125), fire: 0x0810}
+   port_top:    {loc:( 212,  15,-233), fire: 0x0810}
+
+   port_bottom: {loc:(-212, -73,-125), fire: 0x0820}
+   port_bottom: {loc:(-212, -73,-233), fire: 0x0820}
+   port_bottom: {loc:( 212, -73,-125), fire: 0x0420}
+   port_bottom: {loc:( 212, -73,-233), fire: 0x0420}
+
+   port_top:    {loc:( -32,  63, 383), fire: 0x0210}
+   port_top:    {loc:(  31,  63, 383), fire: 0x0210}
+
+   port_bottom: {loc:( -32, -72, 383), fire: 0x0120}
+   port_bottom: {loc:(  31, -72, 383), fire: 0x0120}
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   model:            "Spectre_Shield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, 0),
+   size:             32,
+   hull_factor:      0.7
+}
+
+power: {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   name:             "Reactor Two",
+   max_output:       1500
+}
+
+weapon: {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-36, -9, 467),
+
+   loc:              (-36, -9, 400),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 36, -9, 467),
+
+   loc:              ( 36, -9, 400),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 3",
+   abrv:             "Laser-3",
+   muzzle:           (-14, -23, 467),
+
+   loc:              (-14, -23, 400),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 4",
+   abrv:             "Laser-4",
+   muzzle:           ( 14, -23, 467),
+
+   loc:              ( 14, -23, 400),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Starboard Torpedo",
+   abrv:             "Torp-1",
+   muzzle:           (192, -32, -120),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Port Torpedo",
+   abrv:             "Torp-2",
+   muzzle:           (-192, -32, -120),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port/Fwd Phalanx",
+   abrv:             "Fwd PDB 1",
+   group:            "FWD PDB",
+   loc:              (-211, -50, -106),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Stbd/Fwd Phalanx",
+   abrv:             "Fwd PDB 2",
+   group:            "FWD PDB",
+   loc:              ( 211, -50, -106),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port/Aft Phalanx",
+   abrv:             "Aft PDB 1",
+   group:            "AFT PDB",
+   loc:              (-211, -50, -255),
+   azimuth:          180
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Stbd/Aft Phalanx",
+   abrv:             "Aft PDB 2",
+   group:            "AFT PDB",
+   loc:              ( 211, -50, -255),
+   azimuth:          180
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+sensor: {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+probe: {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+navlight: {
+   scale:  0.35,
+   period: 2.4,
+
+   light:  { loc: ( 245,-12,-180), pattern: 0x12000000, type: 3 },
+   light:  { loc: (-245,-12,-180), pattern: 0x00120000, type: 2 },
+   light:  { loc: (   0, 65, 320), pattern: 0x03000300, type: 1 },
+   light:  { loc: (   0, 55,-320), pattern: 0x00030003, type: 1 }
+}
+
+power: {
+   type:             Battery,
+   design:           Battery,
+   max_output:       250
+}
+
+computer: {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer: {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav: {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+
+   debris:           "Debris1A.mag",
+   debris_loc:       (0,0,-450),
+   debris_mass:      17e3,
+   debris_count:     1,
+   debris_life:      350,
+
+   debris:           "Debris1B.mag",
+   debris_loc:       (220,0,10),
+   debris_mass:      13e3,
+   debris_count:     1,
+   debris_life:      380,
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      54,
+   debris_count:     25,
+   debris_life:      45,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      43,
+   debris_count:     20,
+   debris_life:      25,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      32,
+   debris_count:     10,
+   debris_life:      35,
+}
+
+
+map: {
+   sprite: "SpectreMap0.pcx",
+   sprite: "SpectreMap1.pcx",
+   sprite: "SpectreMap2.pcx",
+   sprite: "SpectreMap3.pcx",
+   sprite: "SpectreMap4.pcx",
+   sprite: "SpectreMap5.pcx",
+   sprite: "SpectreMap6.pcx",
+   sprite: "SpectreMap7.pcx"
+}
+
+
+
+
+

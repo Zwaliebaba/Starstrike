@@ -1,0 +1,116 @@
+MISSION
+
+name:   "Cmpn 05 Victory"
+type:   "Patrol"
+system: "Jarnell"
+system: "Athenar"
+system: "Paragon"
+system: "Thralis"
+system: "Borova"
+system: "Marak"
+region: "Marak"
+stardate: 1177998877
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Orion"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Marak
+   loc:       (-140e3, 160e3, 0)
+   navpt:     { cmd: Vector, loc: (-140,-50e3,0), speed: 350, rgn: Marak }
+}
+
+element: {
+   name:      "Courageous"
+   design:    "Courageous"
+   commander: "Orion"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Marak
+   loc:       (-132e3, 158e3, -550)
+   navpt:     { cmd: Vector, loc: (-131e3,-50e3,-550), speed: 450, rgn: Marak }
+}
+
+element: {
+   name:      "Asher"
+   design:    "Asher"
+   commander: "Orion"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    Marak
+   loc:       (-148e3, 162e3, -1e3)
+   navpt:     { cmd: Vector, loc: (-148,-50e3,-1e3), speed: 350, rgn: Marak }
+}
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Marak", vec: (5, -0.1, 3e7)        }
+event: { event: Camera,                param: 5,                            vec: (-0.085, 0.002, 0.03) }
+
+
+event: { event: Display,    message: "Operation Nightfall", font: Limerick18, color: 0xffffff80, fade: (0,15,1), rect: (20,20, 600,100) }
+event: { event: Display,    message: "Victory",            font: Limerick18, color: 0xffffff80, fade: (0,15,1), rect: (20,42, 600,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\05/End_01_Victory.wav"
+}
+
+event: { event: Camera,     time:  10, param: 3,      target: Orion, vec: (2,0,8e3) }
+event: { event: Camera,                param: 5,                            vec: ( 0.09, 0.002, 0.01)   }
+
+event: { event: Camera,     time:  20, param: 3,      target: "body:Borova", vec: (1, -0.1, 2.5e7)      }
+event: { event: Camera,                param: 5,                            vec: (-0.09, 0.002, 0.03)   }
+event: { event: Display,    message: "Borova", font: Limerick18, color: 0xffffff80, fade: (1,4,1), rect: (20,20, 600,100) }
+
+event: { event: Camera,     time:  25, param: 3,      target: "body:Thrale", vec: (0, -0.1, 2.5e7)      }
+event: { event: Camera,                param: 5,                            vec: (-0.09, 0.002, 0.01)   }
+event: { event: Display,    message: "Thralis", font: Limerick18, color: 0xffffff80, fade: (1,4,1), rect: (20,20, 600,100) }
+
+event: { event: Camera,     time:  30, param: 3,      target: "body:Paragon", vec: (1, -0.1, 2.5e7)     }
+event: { event: Camera,                param: 5,                            vec: (-0.09, 0.002, 0.01)   }
+event: { event: Display,    message: "Paragon", font: Limerick18, color: 0xffffff80, fade: (1,4,1), rect: (20,20, 600,100) }
+
+event: { event: Camera,     time:  35, param: 3,      target: "body:Athenar", vec: (1, -0.1, 2.5e7)     }
+event: { event: Camera,                param: 5,                            vec: (-0.09, 0.002, 0.01)   }
+event: { event: Display,    message: "Athenar", font: Limerick18, color: 0xffffff80, fade: (1,4,1), rect: (20,20, 600,100) }
+
+event: { event: Camera,     time:  40, param: 3,      target: "body:Jarnell", vec: (1, -0.1, 2.5e7)     }
+event: { event: Camera,                param: 5,                            vec: (-0.09, 0.002, 0.01)   }
+event: { event: Display,    message: "Jarnell", font: Limerick18, color: 0xffffff80, fade: (1,4,1), rect: (20,20, 600,100) }
+
+
+event: { event: Display,    time:  45, image: "Campaigns\05\Scenes\Black.pcx", color: 0xffffffff, fade: (1,20,0), rect: (0,0,0,0) }
+event: { event: Display,    time:  48, image: "Campaigns\05\Scenes\Alliance.pcx",  color: 0xffffffff, fade: (1,7,1), rect: (0,0, -256,-256) }
+
+
+event: { event: EndScene,   time:  60, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

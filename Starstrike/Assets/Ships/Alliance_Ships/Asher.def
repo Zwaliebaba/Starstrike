@@ -1,0 +1,398 @@
+SHIP
+
+name:          Asher
+display_name:  Asher
+class:         Destroyer
+description:   "The DD/E-708 ASHER class of destroyer/escorts represents a lighter, more maneuverable alternative to the heavy Spectre class destroyers that make up the majority of Alliance destroyer squadrons.  The Asher class is armed with a trio of nose-mounted XRay Laser batteries, and a pair of wing-mounted fusion torpedo launchers, as well as the usual complement of point defense turrets.  This combination of power and agility makes the Asher class well suited to the fleet carrier escort role they are asked to fulfill"
+
+degrees:    true
+beauty:     (-15, 6, 1.2)
+hud_icon:   "AsherHud.pcx"
+
+detail_0:   "Destroyer_0opt.mag"
+feature_0:  1000
+detail_1:   "Destroyer_1opt.mag"
+feature_1:  40
+detail_2:   "Destroyer_2opt.mag"
+feature_2:  20
+
+mass:       15.5e3
+agility:    3.5
+vlimit:     300
+roll_rate:  7
+integrity:  22e3
+scale:      2.5
+acs:        1.2
+
+trans_x:     300e3
+trans_y:     100e3
+trans_z:     300e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   name:             "Reactor One",
+   max_output:       7500,
+
+   loc:              (0, -20, -220),
+   size:             48,
+   hull_factor:      0.75,
+   explosion:        7
+}
+
+drive: {
+   type:             Plasma,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           2500,
+   scale:            4,
+   port:             (-23,  -6, -595),
+   port:             (-23, -31, -595),
+   port:             ( 23,  -6, -595),
+   port:             ( 23, -31, -595),
+
+   loc:              (0, -20, -480),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+   scale:            1.5
+
+   port_left:   {loc:( -74,   0,-363), fire: 0x0041}
+   port_left:   {loc:( -74,   0,-323), fire: 0x0041}
+   port_left:   {loc:( -35,  34, 349), fire: 0x0081}
+   port_left:   {loc:( -35,  34, 362), fire: 0x0081}
+
+   port_right:  {loc:(  74,   0,-363), fire: 0x0082}
+   port_right:  {loc:(  74,   0,-323), fire: 0x0082}
+   port_right:  {loc:(  35,  34, 349), fire: 0x0042}
+   port_right:  {loc:(  35,  34, 362), fire: 0x0042}
+
+   port_fore:   {loc:(-116,  -9,  37), fire: 0x0044}
+   port_fore:   {loc:(-100,  -9,  37), fire: 0x0044}
+   port_fore:   {loc:( 100,  -9,  37), fire: 0x0084}
+   port_fore:   {loc:( 116,  -9,  37), fire: 0x0084}
+
+   port_aft:    {loc:(-116,  -9,-280), fire: 0x0088}
+   port_aft:    {loc:(-100,  -9,-280), fire: 0x0088}
+   port_aft:    {loc:( 100,  -9,-280), fire: 0x0048}
+   port_aft:    {loc:( 116,  -9,-280), fire: 0x0048}
+
+   port_top:    {loc:( -20,  32,-458), fire: 0x0110}
+   port_top:    {loc:(  20,  32,-458), fire: 0x0110}
+
+   port_bottom: {loc:( -20,-104,-458), fire: 0x0220}
+   port_bottom: {loc:(  20,-104,-458), fire: 0x0220}
+
+   port_top:    {loc:(-108,  20, -35), fire: 0x0410}
+   port_top:    {loc:(-108,  20,-207), fire: 0x0410}
+   port_top:    {loc:( 107,  20, -35), fire: 0x0810}
+   port_top:    {loc:( 107,  20,-207), fire: 0x0810}
+
+   port_bottom: {loc:(-108, -32, -35), fire: 0x0820}
+   port_bottom: {loc:(-108, -32,-207), fire: 0x0820}
+   port_bottom: {loc:( 107, -32, -35), fire: 0x0420}
+   port_bottom: {loc:( 107, -32,-207), fire: 0x0420}
+
+   port_top:    {loc:( -18,  62, 341), fire: 0x0210}
+   port_top:    {loc:(  16,  62, 341), fire: 0x0210}
+
+   port_bottom: {loc:( -18  -71, 341), fire: 0x0120}
+   port_bottom: {loc:(  16, -71, 341), fire: 0x0120}
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   model:            "Destroyer_Shield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, -20, 0),
+   size:             48,
+   hull_factor:      0.7
+}
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   name:             "Reactor Two",
+   max_output:       1000,
+
+   loc:              (0, 0, -180),
+   size:             20,
+   hull_factor:      0.8
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-22, -9, 425),
+
+   loc:              (-22, -9, 400),
+   size:             32,
+   hull_factor:      0.4,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           (  0, -22, 425),
+
+   loc:              (  0, -22, 420),
+   size:             32,
+   hull_factor:      0.4,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 3",
+   abrv:             "Laser-3",
+   muzzle:           ( 22, -9, 425),
+
+   loc:              ( 22, -9, 420),
+   size:             32,
+   hull_factor:      0.4,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Starboard Torpedo",
+   abrv:             "Torp-1",
+   muzzle:           ( 106, -12,  60),
+
+   loc:              ( 100, -12,   0),
+
+   size:             32,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Port Torpedo",
+   abrv:             "Torp-2",
+   muzzle:           (-106, -12,  60),
+
+   loc:              (-100, -12,   0),
+
+   size:             32,
+   hull_factor:      0.3
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx",
+   abrv:             "PDB-1",
+   group:            "PDB",
+   loc:              (-110, 15, -128),
+   azimuth:          -90
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Starboard Phalanx",
+   abrv:             "PDB-2",
+   group:            "PDB",
+
+   loc:              ( 110, 15, -128),
+   azimuth:          90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Aft Phalanx",
+   abrv:             "PDB-3",
+   group:            "PDB",
+
+   loc:              (  0,  56, -190)
+   azimuth:          180
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             20,
+   hull_factor:      0.2
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+navlight:  {
+   scale:  0.3,
+   period: 2.2,
+
+   light:  { loc: ( 140,-10, -80), pattern: 0x11000000, type: 3 },
+   light:  { loc: (-140,-10, -80), pattern: 0x00110000, type: 2 },
+   light:  { loc: (   0, 55,-320), pattern: 0x00001100, type: 1 },
+   light:  { loc: (   0,-94,-320), pattern: 0x00001100, type: 1 },
+   light:  { loc: (   0, 64, 320), pattern: 0x00001100, type: 1 },
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "Debris1A.mag",
+   debris_loc:       (0,0,-450),
+   debris_mass:      15e3,
+   debris_count:     1,
+   debris_life:      150,
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     25,
+   debris_life:      15,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     20,
+   debris_life:      22,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     10,
+   debris_life:      25,
+
+}
+
+map: {
+   sprite: "AsherMap0.pcx",
+   sprite: "AsherMap1.pcx",
+   sprite: "AsherMap2.pcx",
+   sprite: "AsherMap3.pcx",
+   sprite: "AsherMap4.pcx",
+   sprite: "AsherMap5.pcx",
+   sprite: "AsherMap6.pcx",
+   sprite: "AsherMap7.pcx"
+}
+
+
+
+
+

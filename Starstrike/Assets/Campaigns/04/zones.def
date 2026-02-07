@@ -1,0 +1,100 @@
+ZONES
+
+// OSTARA
+
+zone: {
+   system: Ostara,
+   region: Aram,
+}
+
+
+// TARSUS
+
+zone: {
+   system: Tarsus,
+   region: Tarsus,
+}
+
+zone: {
+   system: Tarsus,
+   region: Sintar,
+}
+
+zone: {
+   system: Tarsus,
+   region: Theramin,
+}
+
+
+// KOLCHEV
+
+zone: {
+   system: Kolchev,
+   region: Ilya,
+}
+
+zone: {
+   system: Kolchev,
+   region: Kolchev,
+   region: Lovo,
+}
+
+zone: {
+   system: Kolchev,
+   region: Anatoly,
+}
+
+zone: {
+   system: Kolchev,
+   region: Volova,
+}
+
+
+// KORIUS
+
+zone: {
+   system: Korius,
+   region: Moneta,
+}
+
+zone: {
+   system: Korius,
+   region: Korius,
+}
+
+zone: {
+   system: Korius,
+   region: Adantar,
+   region: Tanis,
+}
+
+zone: {
+   system: Korius,
+   region: Solnas,
+}
+
+
+// LORIS
+   
+zone: {
+   system: Loris,
+   region: Duna,
+}
+
+zone: {
+   system: Loris,
+   region: Loris
+}
+   
+zone: {
+   system: Loris,
+   region: Casalle
+}
+
+
+// NEPHRYS
+
+zone: {
+   system: Nephrys,
+   region: Nergal,
+}

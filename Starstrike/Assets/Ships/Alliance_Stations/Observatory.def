@@ -1,0 +1,98 @@
+SHIP
+
+name:          Observatory
+display_name:  Observatory
+class:         STATION
+hud_icon:      "Obs_hud.pcx"
+
+model:      "S0opt.mag"
+
+mass:       5e6
+integrity:  2e6
+scale:      5
+acs:        3e6
+degrees:    true
+
+chase:      (0, -800, 50)
+bridge:     (0,    0,  0)
+
+degrees:    true
+
+flightdeck: {
+   name:       "Launch Bay",
+
+   loc:        ( 380,   0,  360),
+   cam:        ( 390,   8,  332),
+   start:      ( 380,  -8,  360),
+   end:        ( 2e3,  -8,  360),
+
+   spot:       ( 380,  -8,  360),
+
+   light:      250,
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Docking Bay",
+   loc:        (-380,   0,   360),
+   cam:        (-380,   8,   332),
+   start:      (-2e3,  -8,   360),
+   end:        (-380,  -8,   360),
+
+   spot:       (-380,  -8,   360),
+
+   light:      250,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+navlight: {
+   scale:  2,
+   period: 2.5,
+
+   light:  { loc: (  13, 300,  342), pattern: 0xc0100000, type: 1 }
+   light:  { loc: (  -8,   0,-1120), pattern: 0xc0100000, type: 1 }
+   light:  { loc: (   0,  64,  770), pattern: 0x0000c010, type: 3 }
+   light:  { loc: ( 400,  64,  360), pattern: 0x0000c010, type: 3 }
+   light:  { loc: (-400,  64,  360), pattern: 0x0000c010, type: 3 }
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+   }
+
+map: {
+   sprite: "Obs_map.pcx"
+}
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+}
+

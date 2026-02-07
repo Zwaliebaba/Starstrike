@@ -1,0 +1,5190 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Marakan Hegemony",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   fleet,
+  id:     1,
+  name:   "Dragon",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (130e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     1,
+  name:   "Dragon",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Dragon",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A1",
+    },
+
+  unit: {
+    name:   "Alin Volnaris",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D01",
+    },
+
+  unit: {
+    name:   "Pav Enke",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D05",
+    },
+
+  unit: {
+    name:   "Tiger Bay",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E01",
+    },
+
+  unit: {
+    name:   "Falkridge",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E08",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     1,
+  name:   "",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (130e3, -180e3, 6e3),
+  parent_type: carrier_group,
+  parent_id:   1,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     90,
+  name:   "Scorpions",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (179e3, -300e3, 0),
+  parent_type: wing,
+  parent_id:   1,
+
+  unit: {
+    name:   "Scorpion",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     28,
+  name:   "Raptors",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (125e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   1,
+
+  unit: {
+    name:   "Raptor",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     41,
+  name:   "Avengers",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (246e3, -379e3, 0),
+  parent_type: wing,
+  parent_id:   1,
+
+  unit: {
+    name:   "Avenger",
+    type:   "Attack",
+    design: "Avenger",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     100,
+  name:   "Ares",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (195e3, -400e3, 0),
+  parent_type: wing,
+  parent_id:   1,
+
+  unit: {
+    name:   "Ares",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     4,
+  name:   "Vendetta",
+  intel:  reserve,
+  iff:    2,
+  region: "Marak",
+  loc:    (-230e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Vendetta",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D15",
+    },
+
+  unit: {
+    name:   "Risk",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D22",
+    },
+
+  unit: {
+    name:   "Scepter",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C49",
+    },
+
+  unit: {
+    name:   "Hellas Point",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E15",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     5,
+  name:   "Assailant",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (240e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Assailant",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D29",
+    },
+
+  unit: {
+    name:   "Silencer",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D36",
+    },
+
+  unit: {
+    name:   "Pol Basilus",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D09",
+    },
+
+  unit: {
+    name:   "Shadow Canyon",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E22",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     28,
+  name:   "Hal Rifa",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (-180e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Hal Rifa",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D13",
+    },
+
+  unit: {
+    name:   "Kalas Gannet",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D17",
+    },
+
+  unit: {
+    name:   "Mount Teras",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E29",
+    },
+
+  unit: {
+    name:   "Black River",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E36",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     30,
+  name:   "Broadsword",
+  intel:  known,
+  iff:    2,
+  region: "Marak",
+  loc:    (30e3, 320e3, -3e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Broadsword",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C21",
+    },
+
+  unit: {
+    name:   "Truncheon",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C28",
+    },
+
+  unit: {
+    name:   "Guard Hills",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E43",
+    },
+
+  unit: {
+    name:   "Gulf of Kirt",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E50",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     49,
+  name:   "Warsign",
+  intel:  reserve,
+  iff:    2,
+  region: "Marak",
+  loc:    (-260e3, -130e3, -7e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Warsign",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C35",
+    },
+
+  unit: {
+    name:   "Quickbolt",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C42",
+    },
+
+  unit: {
+    name:   "Star Island",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E57",
+    },
+
+  unit: {
+    name:   "Radix Station",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E64",
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     2,
+  name:   "Serpent",
+  intel:  known,
+  iff:    2,
+  region: "Volante",
+  loc:    (-390e3, 10e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     2,
+  name:   "Serpent",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Serpent",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A2",
+    },
+
+  unit: {
+    name:   "Senn Alon",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D21",
+    },
+
+  unit: {
+    name:   "Jan Boma",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D25",
+    },
+
+  unit: {
+    name:   "Tarsus Pride",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E02",
+    },
+
+  unit: {
+    name:   "Eternal City",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E09",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     2,
+  name:   "",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: carrier_group,
+  parent_id:   2,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     91,
+  name:   "Dragons",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: wing,
+  parent_id:   2,
+
+  unit: {
+    name:   "Dragon",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     30,
+  name:   "Vultures",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: wing,
+  parent_id:   2,
+
+  unit: {
+    name:   "Vulture",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     45,
+  name:   "Vampires",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: wing,
+  parent_id:   2,
+
+  unit: {
+    name:   "Vampire",
+    type:   "Attack",
+    design: "Avenger",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Deimos",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (207e3, -362e3, 0),
+  parent_type: wing,
+  parent_id:   2,
+
+  unit: {
+    name:   "Deimos",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     7,
+  name:   "Malice",
+  intel:  known,
+  iff:    2,
+  region: "Narcissus",
+  loc:    (330e3, -80e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Malice",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D16",
+    },
+
+  unit: {
+    name:   "Hazard",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D23",
+    },
+
+  unit: {
+    name:   "Icefang",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "4D50",
+    },
+
+  unit: {
+    name:   "Kala Docks",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E16",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     8,
+  name:   "Coronation"
+  intel:  reserve,
+  iff:    2,
+  region: "Volante",
+  loc:    (-280e3, -140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Coronation"
+    type:   "Cruiser",
+    design: "Imperial"
+    regnum: "5C60",
+    },
+
+  unit: {
+    name:   "Bennet",
+    type:   "Cruiser",
+    design: "Imperial"
+    regnum: "5C77",
+    },
+
+  unit: {
+    name:   "Tremel Isa",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D29",
+    },
+
+  unit: {
+    name:   "Outer Rim",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E23",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     15,
+  name:   "Starknight",
+  intel:  known,
+  iff:    2,
+  region: "Volante",
+  loc:    (-280e3, -310e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Starknight",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C22",
+    },
+
+  unit: {
+    name:   "Poleaxe",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C29",
+    },
+
+  unit: {
+    name:   "Kolchev",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E30",
+    },
+
+  unit: {
+    name:   "Rock Ridge",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E37",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     16,
+  name:   "Warhammer",
+  intel:  known,
+  iff:    2,
+  region: "Volante",
+  loc:    (0, -290e3, -3e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Warhammer",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C36",
+    },
+
+  unit: {
+    name:   "Kindjal",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C43",
+    },
+
+  unit: {
+    name:   "Aenia",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E44",
+    },
+
+  unit: {
+    name:   "Boma Beach",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E51",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     51,
+  name:   "Joran Kas",
+  intel:  reserve,
+  iff:    2,
+  region: "Volante",
+  loc:    (-260e3, -180e3, -7e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Joran Kas",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D33",
+    },
+
+  unit: {
+    name:   "Ambassador Ston",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D37",
+    },
+
+  unit: {
+    name:   "Arcrest",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E58",
+    },
+
+  unit: {
+    name:   "Angel Shore",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E65",
+    },
+}
+
+
+
+
+group: {
+  type:   fleet,
+  id:     9,
+  name:   "Black",
+  intel:  secret,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (130e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     9,
+  name:   "Blackwing",
+  intel:  secret,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   9,
+
+  unit: {
+    name:   "Blackwing",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A9",
+    },
+
+  unit: {
+    name:   "Variak",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D51",
+    },
+
+  unit: {
+    name:   "Talus",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D53",
+    },
+
+  unit: {
+    name:   "Ramek",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E80",
+    },
+
+  unit: {
+    name:   "Senna",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E83",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     19,
+  name:   "",
+  intel:  known,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (130e3, -180e3, 6e3),
+  parent_type: carrier_group,
+  parent_id:   9,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     90,
+  name:   "Assassins",
+  intel:  known,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (179e3, -300e3, 0),
+  parent_type: wing,
+  parent_id:   19,
+
+  unit: {
+    name:   "Assassin",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     28,
+  name:   "Midnight",
+  intel:  known,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (125e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   19,
+
+  unit: {
+    name:   "Midnight",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     41,
+  name:   "Rogue",
+  intel:  known,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (246e3, -379e3, 0),
+  parent_type: wing,
+  parent_id:   19,
+
+  unit: {
+    name:   "Rogue",
+    type:   "Attack",
+    design: "Avenger",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     100,
+  name:   "Callas",
+  intel:  known,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (195e3, -400e3, 0),
+  parent_type: wing,
+  parent_id:   19,
+
+  unit: {
+    name:   "Callas",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     14,
+  name:   "Marak IV",
+  intel:  reserve,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (-230e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   9,
+
+  unit: {
+    name:   "Marak IV",
+    type:   "Cruiser",
+    design: "Imperial",
+    regnum: "5C83",
+    },
+
+  unit: {
+    name:   "Glorius",
+    type:   "Cruiser",
+    design: "Imperial"
+    regnum: "5C72",
+    },
+
+  unit: {
+    name:   "Firebolt",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C56",
+    },
+
+  unit: {
+    name:   "Radelix",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E83",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     15,
+  name:   "Omega",
+  intel:  secret,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (240e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   9,
+
+  unit: {
+    name:   "Omega",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D45",
+    },
+
+  unit: {
+    name:   "Hephaestus",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D56",
+    },
+
+  unit: {
+    name:   "Mindalante",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D59",
+    },
+
+  unit: {
+    name:   "Arcturus",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E72",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     58,
+  name:   "Velan",
+  intel:  secret,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (-180e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   9,
+
+  unit: {
+    name:   "Velan",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D63",
+    },
+
+  unit: {
+    name:   "Manarkan",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D67",
+    },
+
+  unit: {
+    name:   "Pelius",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E69",
+    },
+
+  unit: {
+    name:   "Matrix",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E76",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     56,
+  name:   "Attack",
+  intel:  secret,
+  iff:    2,
+  region: "Trocanther",
+  loc:    (30e3, 320e3, -3e3),
+  parent_type: fleet,
+  parent_id:   9,
+
+  unit: {
+    name:   "Attack",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C71",
+    },
+
+  unit: {
+    name:   "Shortsword",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C78",
+    },
+
+  unit: {
+    name:   "Nerdan",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E83",
+    },
+
+  unit: {
+    name:   "Clavius",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E90",
+    },
+}
+
+
+
+
+
+group: {
+  type:   fleet,
+  id:     10,
+  name:   "Ghost",
+  intel:  reserve,
+  iff:    2,
+  region: "Marak",
+  loc:    (130e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   non_com,
+  id:     110,
+  name:   "Unknown",
+  intel:  secret,
+  iff:    2,
+  region: "Marak",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   10,
+
+  unit: {
+    name:   "Unknown",
+    type:   "Carrier",
+    design: "Hulk-Dragon",
+    regnum: "7A9",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Volnaris",
+    regnum: "4D51",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Volnaris",
+    regnum: "4D53",
+    },
+}
+
+group: {
+  type:   non_com,
+  id:     114,
+  name:   "Unknown",
+  intel:  secret,
+  iff:    2,
+  region: "Marak",
+  loc:    (-230e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   10,
+
+  unit: {
+    name:   "Unknown",
+    type:   "Cruiser",
+    design: "Hulk-Vendetta",
+    regnum: "5D53",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Cruiser",
+    design: "Hulk-Imperial",
+    regnum: "5D52",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Broadsword",
+    regnum: "3C56",
+    },
+}
+
+group: {
+  type:   non_com,
+  id:     115,
+  name:   "Unknown",
+  intel:  secret,
+  iff:    2,
+  region: "Xanthe",
+  loc:    (240e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   10,
+
+  unit: {
+    name:   "Unknown",
+    type:   "Cruiser",
+    design: "Hulk-Vendetta",
+    regnum: "5D45",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Cruiser",
+    design: "Hulk-Imperial",
+    regnum: "5D56",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Volnaris",
+    regnum: "4D59",
+    },
+}
+
+group: {
+  type:   non_com,
+  id:     158,
+  name:   "Unknown",
+  intel:  Secret,
+  iff:    2,
+  region: "Marak",
+  loc:    (-180e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   10,
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Volnaris",
+    regnum: "4D63",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Destroyer",
+    design: "Hulk-Volnaris",
+    regnum: "4D67",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Frigate",
+    design: "Hulk-Frigate",
+    regnum: "XF227",
+    },
+
+  unit: {
+    name:   "Unknown",
+    type:   "Frigate",
+    design: "Hulk-Frigate",
+    regnum: "XF237",
+    },
+}
+
+
+
+group: {
+  type:   fleet,
+  id:     3,
+  name:   "Gryphon",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     3,
+  name:   "Gryphon",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-122e3, 280e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Gryphon",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A3",
+    },
+
+  unit: {
+    name:   "Tol Branta",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D02",
+    },
+
+  unit: {
+    name:   "Gol Duvain",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D06",
+    },
+
+  unit: {
+    name:   "Valley of Flame",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E03",
+    },
+
+  unit: {
+    name:   "Port Renas",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E10",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     92,
+  name:   "Hornets",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-122e3, 280e3, 0),
+  parent_type: carrier_group,
+  parent_id:   3,
+
+  unit: {
+    name:   "Hornet",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     36,
+  name:   "Cougars",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-122e3, 280e3, 0),
+  parent_type: carrier_group,
+  parent_id:   3,
+
+  unit: {
+    name:   "Cougar",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     47,
+  name:   "Lions",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-122e3, 280e3, 0),
+  parent_type: carrier_group,
+  parent_id:   3,
+
+  unit: {
+    name:   "Lion",
+    type:   "Attack",
+    design: "Avenger",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Hades",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-122e3, 280e3, 0),
+  parent_type: carrier_group,
+  parent_id:   3,
+
+  unit: {
+    name:   "Hades",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     9,
+  name:   "Wrath",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-230e3, -180e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Wrath",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D17",
+    },
+
+  unit: {
+    name:   "Peril",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D24",
+    },
+
+  unit: {
+    name:   "Jiri Sutton",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D10",
+    },
+
+  unit: {
+    name:   "Kalis Basin",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E17",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     10,
+  name:   Clavius
+  intel:  reserve,
+  iff:    2,
+  region: "Garrison",
+  loc:    (66e3, 180e3, -10e3),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   Clavius
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C91",
+    },
+
+  unit: {
+    name:   Overlord
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5C98",
+    },
+
+  unit: {
+    name:   "Famis Tett",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D14",
+    },
+
+  unit: {
+    name:   "Cape Nor",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E24",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     18,
+  name:   "Battleaxe",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (-109e3, 51e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Battleaxe",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C23",
+    },
+
+  unit: {
+    name:   "Clovis",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C30",
+    },
+
+  unit: {
+    name:   "Black Forest",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E31",
+    },
+
+  unit: {
+    name:   "Landfall",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E38",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     19,
+  name:   "Longbow",
+  intel:  reserve,
+  iff:    2,
+  region: "Garrison",
+  loc:    (93e3, -101e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Longbow",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C37",
+    },
+
+  unit: {
+    name:   "Siege",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C44",
+    },
+
+  unit: {
+    name:   "Lake Orsan",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E45",
+    },
+
+  unit: {
+    name:   "Wind River",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E52",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     52,
+  name:   "Galinas",
+  intel:  known,
+  iff:    2,
+  region: "Garrison",
+  loc:    (55e3, 71e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Hett Galinas",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D18",
+    },
+
+  unit: {
+    name:   "Nova Sem",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D22",
+    },
+
+  unit: {
+    name:   "Tolan Locks",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E59",
+    },
+
+  unit: {
+    name:   "Mount Zoare",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E66",
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     4,
+  name:   "Manticore",
+  intel:  known,
+  iff:    2,
+  region: "Lornas",
+  loc:    (-390e3, 10e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     4,
+  name:   "Manticore",
+  intel:  reserve,
+  iff:    2,
+  region: "Lornas",
+  loc:    (130e3, -380e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Manticore",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A4",
+    },
+
+  unit: {
+    name:   "Rapier",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C52",
+    },
+
+  unit: {
+    name:   "Silas Cave",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E04",
+    },
+
+  unit: {
+    name:   "River Ceres",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E11",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     93,
+  name:   "Sharks",
+  intel:  known,
+  iff:    2,
+  region: "Lornas",
+  loc:    (179e3, -300e3, 0),
+  parent_type: carrier_group,
+  parent_id:   4,
+
+  unit: {
+    name:   "Shark",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     33,
+  name:   "Vandals",
+  intel:  known,
+  iff:    2,
+  region: "Lornas",
+  loc:    (125e3, -318e3, 0),
+  parent_type: carrier_group,
+  parent_id:   4,
+
+  unit: {
+    name:   "Vandal",
+    type:   "Fighter",
+    design: "Razor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     49,
+  name:   "Demons",
+  intel:  known,
+  iff:    2,
+  region: "Lornas",
+  loc:    (246e3, -379e3, 0),
+  parent_type: carrier_group,
+  parent_id:   4,
+
+  unit: {
+    name:   "Demon",
+    type:   "Attack",
+    design: "Cobra",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     103,
+  name:   "Wasp",
+  intel:  known,
+  iff:    2,
+  region: "Lornas",
+  loc:    (195e3, -400e3, 0),
+  parent_type: carrier_group,
+  parent_id:   4,
+
+  unit: {
+    name:   "Wasp",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     25,
+  name:   "Claymore",
+  intel:  reserve,
+  iff:    2,
+  region: "Jalah",
+  loc:    (-110e3, 325e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Claymore",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C24",
+    },
+
+  unit: {
+    name:   "Gladius",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C31",
+    },
+
+  unit: {
+    name:   "Elkhorn Pass",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E18",
+    },
+
+  unit: {
+    name:   "Port Hanson",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E25",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     26,
+  name:   "Ironhelm",
+  intel:  reserve,
+  iff:    2,
+  region: "Khaital",
+  loc:    (275e3, -210e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Ironhelm",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C38",
+    },
+
+  unit: {
+    name:   "Mattock",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C45",
+    },
+
+  unit: {
+    name:   "Oak Hall",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E32",
+    },
+
+  unit: {
+    name:   "North Point",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E39",
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     5,
+  name:   "Baldread",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     5,
+  name:   "Baldread",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (-350e3, 120e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Baldread",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A5",
+    },
+
+  unit: {
+    name:   "Mos Antares",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D11",
+    },
+
+  unit: {
+    name:   "Vin Silas",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D15",
+    },
+
+  unit: {
+    name:   "Khaital",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E05",
+    },
+
+  unit: {
+    name:   "Ash Hills",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E12",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     94,
+  name:   "Demons",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (-344e3, 145e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Demon",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     37,
+  name:   "Vigilantes",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (-329e3, 160e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Vigilante",
+    type:   "Fighter",
+    design: "Razor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     42,
+  name:   "Ravens",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (-333e3, 117e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Raven",
+    type:   "Attack",
+    design: "Cobra",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Ariadne",
+  intel:  known,
+  iff:    2,
+  region: "Garden",
+  loc:    (-371e3, 136e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Ariadne",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     15,
+  name:   "Fury",
+  intel:  known,
+  iff:    2,
+  region: "Senesca",
+  loc:    (400e3, -75e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Fury",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D19",
+    },
+
+  unit: {
+    name:   "Exigency",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D26",
+    },
+
+  unit: {
+    name:   "Lieut. Bolis",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D19",
+    },
+
+  unit: {
+    name:   "Albus Gulf",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E19",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     16,
+  name:   Imperial
+  intel:  known,
+  iff:    2,
+  region: "Relay",
+  loc:    (350e3, 380e3, -6e3),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   Imperial
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C44",
+    },
+
+  unit: {
+    name:   Excellence
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C51",
+    },
+
+  unit: {
+    name:   "Telen Setana",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D23",
+    },
+
+  unit: {
+    name:   "Siren Island",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E26",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     32,
+  name:   "Scimitar",
+  intel:  known,
+  iff:    2,
+  region: "Senesca",
+  loc:    (-259e3, 251e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Scimitar",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C25",
+    },
+
+  unit: {
+    name:   "Trident",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C32",
+    },
+
+  unit: {
+    name:   "Neptune Station",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E33",
+    },
+
+  unit: {
+    name:   "Trocanther",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E40",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     33,
+  name:   "Boneclaw",
+  intel:  known,
+  iff:    2,
+  region: "Relay",
+  loc:    (293e3, -301e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Boneclaw",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C39",
+    },
+
+  unit: {
+    name:   "Runesword",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C46",
+    },
+
+  unit: {
+    name:   "Night City",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E47",
+    },
+
+  unit: {
+    name:   "Joran Docks",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E54",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     55,
+  name:   "Galen Teras",
+  intel:  known,
+  iff:    2,
+  region: "Relay",
+  loc:    (255e3, -171e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Galen Teras",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D27",
+    },
+
+  unit: {
+    name:   "Ro Hollis",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D31",
+    },
+
+  unit: {
+    name:   "Hunter Coast",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E61",
+    },
+
+  unit: {
+    name:   "Nephrys",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E68",
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     6,
+  name:   "Cyclops",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     6,
+  name:   "Cyclops",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-334e3, 285e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Cyclops",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A6",
+    },
+
+  unit: {
+    name:   "Tor Palver",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D35",
+    },
+
+  unit: {
+    name:   "Rath Karalan",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D39",
+    },
+
+  unit: {
+    name:   "Storm Island",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E06",
+    },
+
+  unit: {
+    name:   "Orinoco",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E13",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     95,
+  name:   "Vipers",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-344e3, 275e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Viper",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     39,
+  name:   "Wolfpack",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-324e3, 295e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Wolf",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     48,
+  name:   "Bounty Hunters",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-324e3, 285e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Hunter",
+    type:   "Attack",
+    design: "Cobra",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Arachne",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-334e3, 295e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Arachne",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     19,
+  name:   "Ascendance",
+  intel:  known,
+  iff:    2,
+  region: "Ilya",
+  loc:    (-204e3, 245e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Ascendance",
+    type:   "Cruiser",
+    design: "Imperial",
+    regnum: "5C47",
+    },
+
+  unit: {
+    name:   "Throne",
+    type:   "Cruiser",
+    design: "Imperial",
+    regnum: "5C54",
+    },
+
+  unit: {
+    name:   "Nels Berens",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D04",
+    },
+
+  unit: {
+    name:   "Sirocco",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E20",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     20,
+  name:   "Eminence",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (-288e3, 175e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   Eminence
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C64",
+    },
+
+  unit: {
+    name:   Viceroy
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C71"
+    },
+
+  unit: {
+    name:   "Masil Korius",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D08",
+    },
+
+  unit: {
+    name:   "Knife Ridge",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E27",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     35,
+  name:   "Sabre",
+  intel:  known,
+  iff:    2,
+  region: "Kolchev",
+  loc:    (314e3, -285e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Sabre",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C26",
+    },
+
+  unit: {
+    name:   "Lance",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C33",
+    },
+
+  unit: {
+    name:   "Secret Shore",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E34",
+    },
+
+  unit: {
+    name:   "Crown of Fire",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E41",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     37,
+  name:   "Shield",
+  intel:  known,
+  iff:    2,
+  region: "Volova",
+  loc:    (24e3, -435e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Shield",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C40",
+    },
+
+  unit: {
+    name:   "Blacknife",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C47",
+    },
+
+  unit: {
+    name:   "Hilger Coast",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E48",
+    },
+
+  unit: {
+    name:   "Sword Cliffs",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E55",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     62,
+  name:   "Elos",
+  intel:  known,
+  iff:    2,
+  region: "Volova",
+  loc:    (-34e3, 385e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Toran Elos",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D12",
+    },
+
+  unit: {
+    name:   "Thule Arven",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D16",
+    },
+
+  unit: {
+    name:   "Capetown",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E62",
+    },
+
+  unit: {
+    name:   "Beacon Bay",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E69",
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     7,
+  name:   "Argus",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     7,
+  name:   "Argus",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-182e3, 290e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Argus",
+    type:   "Carrier",
+    design: "Dragon",
+    regnum: "7A7",
+    },
+
+  unit: {
+    name:   "Jes Kirta",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D20",
+    },
+
+  unit: {
+    name:   "Loma Alta",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D24",
+    },
+
+  unit: {
+    name:   "Blackrock",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E07",
+    },
+
+  unit: {
+    name:   "Sutton Lake",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E14",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     96,
+  name:   "Black Widows",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-182e3, 340e3, 0),
+  parent_type: carrier_group,
+  parent_id:   7,
+
+  unit: {
+    name:   "Black Widow",
+    type:   "Fighter",
+    design: "Viper",
+    count:  40,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     31,
+  name:   "Black Diamonds",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-172e3, 320e3, 0),
+  parent_type: carrier_group,
+  parent_id:   7,
+
+  unit: {
+    name:   "Black Diamond",
+    type:   "Fighter",
+    design: "Razor",
+    count:  40,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     44,
+  name:   "Panthers",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-192e3, 250e3, 0),
+  parent_type: carrier_group,
+  parent_id:   7,
+
+  unit: {
+    name:   "Panther",
+    type:   "Attack",
+    design: "Cobra",
+    count:  24,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Apollo",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-282e3, 180e3, 0),
+  parent_type: carrier_group,
+  parent_id:   7,
+
+  unit: {
+    name:   "Apollo",
+    type:   "LCA",
+    design: "Jackal",
+    count:  12,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     17,
+  name:   Intruder
+  intel:  known,
+  iff:    2,
+  region: "Duna",
+  loc:    (-209e3, -297e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Intruder",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D21",
+    },
+
+  unit: {
+    name:   "Avalanche",
+    type:   "Cruiser",
+    design: "Vendetta",
+    regnum: "5D28",
+    },
+
+  unit: {
+    name:   "Merin Asgar",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D28",
+    },
+
+  unit: {
+    name:   "Fourth Sector",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E21",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     18,
+  name:   Imperator
+  intel:  known,
+  iff:    2,
+  region: "Casalle",
+  loc:    (230e3, -250e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   Imperator
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C55",
+    },
+
+  unit: {
+    name:   "Cleon I",
+    type:   "Cruiser",
+    design: Imperial
+    regnum: "5C72",
+    },
+
+  unit: {
+    name:   "Dian Soma",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D32",
+    },
+
+  unit: {
+    name:   "Kans Ferry",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E28",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     24,
+  name:   "Morningstar",
+  intel:  known,
+  iff:    2,
+  region: "Loris",
+  loc:    (-189e3, 301e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Morningstar",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C27",
+    },
+
+  unit: {
+    name:   "Crossbow",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C34",
+    },
+
+  unit: {
+    name:   "Tol Harbor",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E35",
+    },
+
+  unit: {
+    name:   "Gunston",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E42",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     25,
+  name:   "Longsword",
+  intel:  known,
+  iff:    2,
+  region: "Duna",
+  loc:    (293e3, -201e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Longsword",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C41",
+    },
+
+  unit: {
+    name:   "Pike",
+    type:   "Destroyer",
+    design: "Broadsword",
+    regnum: "3C48",
+    },
+
+  unit: {
+    name:   "Fort Hollis",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E49",
+    },
+
+  unit: {
+    name:   "Firenze",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E56",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     63,
+  name:   "Commander Sumas",
+  intel:  known,
+  iff:    2,
+  region: "Casalle",
+  loc:    (225e3, -271e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Commander Sumas",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D36",
+    },
+
+  unit: {
+    name:   "Bail Ennis",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D40",
+    },
+
+  unit: {
+    name:   "Corinth",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E63",
+    },
+
+  unit: {
+    name:   "Tannis",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E70",
+    },
+}
+
+group: {
+  type:   battalion,
+  id:     8,
+  name:   "The Mighty Eighth",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (0, -100e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   battery,
+  id:     41,
+  name:   "",
+  intel:  secret,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (40e3, -42e3, 0),
+  parent_type: battalion,
+  parent_id:   8,
+
+  unit: {
+    name:   "",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+
+  unit: {
+    name:   "",
+    type:   "SAM",
+    design: "AAA 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     42,
+  name:   "",
+  intel:  secret,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (-39e3, 33e3, 0),
+  parent_type: battalion,
+  parent_id:   8,
+
+  unit: {
+    name:   "",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+group: {
+  type:   battery,
+  id:     43,
+  name:   "",
+  intel:  secret,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (45e3, 62e3, 0),
+  parent_type: battalion,
+  parent_id:   8,
+
+  unit: {
+    name:   "",
+    type:   "SAM",
+    design: "SAM 1",
+    count:  2,
+    },
+}
+
+group: {
+  type:   battalion,
+  id:     9,
+  name:   "Ostara Outpost",
+  intel:  known,
+  iff:    2,
+  region: "Aram",
+  loc:    (0, -80e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   station,
+  id:     10,
+  name:   "Aram Station",
+  intel:  known,
+  iff:    2,
+  region: "Aram",
+  loc:    (0, 0, 0),
+  parent_type: battalion,
+  parent_id:   9,
+
+  unit: {
+    name:   "Aram Station",
+    type:   "Station",
+    design: "Station4",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     211,
+  name:   "Piranhas",
+  intel:  known,
+  iff:    2,
+  region: "Aram",
+  loc:    (150e3, -30e3, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Piranha",
+    type:   "Fighter",
+    design: "Viper",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     175,
+  name:   "Werewolves",
+  intel:  known,
+  iff:    2,
+  region: "Aram",
+  loc:    (150e3, 0, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Werewolf",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     187,
+  name:   "Kodiaks",
+  intel:  secret,
+  iff:    2,
+  region: "Aram",
+  loc:    (150e3, 30e3, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Kodiak",
+    type:   "Attack",
+    design: "Cobra",
+    count:  12,
+    },
+}
+
+group: {
+  type:   minefield,
+  id:     11,
+  name:   "Minefield A",
+  intel:  secret,
+  iff:    2,
+  region: "Aram",
+  loc:    (30e3, 30e3, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Minefield A",
+    type:   "Mine",
+    design: "Blockade Mine",
+    count:  8,
+    },
+}
+
+group: {
+  type:   minefield,
+  id:     12,
+  name:   "Minefield B",
+  intel:  secret,
+  iff:    2,
+  region: "Aram",
+  loc:    (-50e3, 0, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Minefield B",
+    type:   "Mine",
+    design: "Blockade Mine",
+    count:  8,
+    },
+}
+
+group: {
+  type:   minefield,
+  id:     13,
+  name:   "Minefield C",
+  intel:  secret,
+  iff:    2,
+  region: "Aram",
+  loc:    (30e3, -30e3, 0),
+  parent_type: station,
+  parent_id:   10,
+
+  unit: {
+    name:   "Minefield C",
+    type:   "Mine",
+    design: "Blockade Mine",
+    count:  8,
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     65,
+  name:   "Eranes",
+  intel:  secret,
+  iff:    2,
+  region: "Aram",
+  loc:    (400e3, 180e3, 0),
+  parent_type: battalion,
+  parent_id:   9,
+
+  unit: {
+    name:   "Rik Eranes",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D45",
+    },
+
+  unit: {
+    name:   "Senator Hasla",
+    type:   "Destroyer",
+    design: "Volnaris",
+    regnum: "4D49",
+    },
+
+  unit: {
+    name:   "Loris Dunes",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E46",
+    },
+
+  unit: {
+    name:   "Port Barron",
+    type:   "Frigate",
+    design: "Tiger",
+    regnum: "2E53",
+    },
+}
+
+
+
+group: {
+  type:   battalion,
+  id:     10,
+  name:   "Silent Fortress",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (20e3, 20e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   starbase,
+  id:     1,
+  name:   "Lovo Base",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (25e3, 25e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "Lovo Base",
+    type:   "Starbase",
+    design: "Airbase2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     3,
+  name:   "Kurgans",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (26e3, 28e3, 0),
+  parent_type: starbase,
+  parent_id:   1,
+
+  unit: {
+    name:   "Kurgan",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     4,
+  name:   "Korbas",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (26e3, 25e3, 0),
+  parent_type: starbase,
+  parent_id:   1,
+
+  unit: {
+    name:   "Korba",
+    type:   "Attack",
+    design: "Avenger",
+    count:  20,
+    },
+}
+
+group: {
+  type:   FWD_CONTROL_CTR,
+  id:     1,
+  name:   "Lovo Control",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (24e3, 27e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "Lovo Control",
+    type:   "Building",
+    design: "Bldg05",
+    regnum: "",
+    },
+}
+
+
+group: {
+  type:   SUPPORT,
+  id:     1,
+  name:   "Lovo Barracks",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (27e3, 27e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "Lovo Barracks",
+    type:   "Building",
+    design: "Barracks",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     1,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Lovo",
+  loc:    (22e3, 26e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     2,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Lovo",
+  loc:    (20e3, 12e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+group: {
+  type:   battery,
+  id:     3,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-25e3, -12e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     4,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-15e3, -10e3, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+
+
+
+
+
+group: {
+  type:   battalion,
+  id:     15,
+  name:   "Shore Watch",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (20e3, 20e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   starbase,
+  id:     15,
+  name:   "Tiger Base",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (55000, -8000, 0),
+  parent_type: battalion,
+  parent_id:   15,
+
+  unit: {
+    name:   "Tiger Base",
+    type:   "Starbase",
+    design: "Airbase2",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:     (55000, -8000, 0),
+    heading: 90,
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     13,
+  name:   "Osprey",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (55000, -8000, 0),
+  parent_type: starbase,
+  parent_id:   15,
+
+  unit: {
+    name:   "Osprey",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     14,
+  name:   "Heron",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (55000, -8000, 0),
+  parent_type: starbase,
+  parent_id:   15,
+
+  unit: {
+    name:   "Heron",
+    type:   "Attack",
+    design: "Avenger",
+    count:  20,
+    },
+}
+
+
+group: {
+  type:   SUPPORT,
+  id:     15,
+  name:   "Tiger Barracks",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (57000, -6000, 0),
+  parent_type: battalion,
+  parent_id:   15,
+
+  unit: {
+    name:   "Tiger Barracks",
+    type:   "Building",
+    design: "Barracks",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     11,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (55000, -10000, 0),
+  parent_type: battalion,
+  parent_id:   15,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (55e3, -10e3, 0),
+    },
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (55e3, -11e3, 0),
+    },
+}
+
+group: {
+  type:   battery,
+  id:     12,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (-43000, 65000, 0),
+  parent_type: battalion,
+  parent_id:   15,
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+group: {
+  type:   battery,
+  id:     13,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (-45000, 63000, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     14,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (3000, -15000, 0),
+  parent_type: battalion,
+  parent_id:   10,
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+
+
+group: {
+  type:   battalion,
+  id:     4,
+  name:   "Ramek Station",
+  intel:  secret,
+  iff:    2,
+  region: "Ramek",
+  loc:    (0, -80e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   station,
+  id:     44,
+  name:   "Ramek Station",
+  intel:  secret,
+  iff:    2,
+  region: "Ramek",
+  loc:    (0, 0, 0),
+  parent_type: battalion,
+  parent_id:   4,
+
+  unit: {
+    name:   "Ramek Station",
+    type:   "Station",
+    design: "Station4",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     215,
+  name:   "Warthogs",
+  intel:  secret,
+  iff:    2,
+  region: "Ramek",
+  loc:    (150e3, 0, 0),
+  parent_type: station,
+  parent_id:   44,
+
+  unit: {
+    name:   "Warthog",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  12,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     67,
+  name:   "Rhinos",
+  intel:  secret,
+  iff:    2,
+  region: "Ramek",
+  loc:    (150e3, 30e3, 0),
+  parent_type: station,
+  parent_id:   44,
+
+  unit: {
+    name:   "Rhino",
+    type:   "Attack",
+    design: "Avenger",
+    count:  12,
+    },
+}
+
+
+group: {
+  type:   battalion,
+  id:     19,
+  name:   "Deadman's Alley",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   starbase,
+  id:     19,
+  name:   "Radix Base",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-40e3, -90e3, 0),
+  parent_type: battalion,
+  parent_id:   19,
+
+  unit: {
+    name:   "Radix Base",
+    type:   "Starbase",
+    design: "Airbase2",
+    regnum: "",
+    loc:    (-40e3, -90e3, 0),
+    heading: 90,
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     13,
+  name:   "Rattlers",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-40e3, -90e3, 0),
+  parent_type: starbase,
+  parent_id:   19,
+
+  unit: {
+    name:   "Rattler",
+    type:   "Fighter",
+    design: "Raptor",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     14,
+  name:   "Dragons",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-40e3, -90e3, 0),
+  parent_type: starbase,
+  parent_id:   19,
+
+  unit: {
+    name:   "Dragon",
+    type:   "Attack",
+    design: "Avenger",
+    count:  12,
+    },
+}
+
+
+group: {
+  type:   SUPPORT,
+  id:     15,
+  name:   "Radix Barracks",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-30e3, -90e3, 0),
+  parent_type: battalion,
+  parent_id:   19,
+
+  unit: {
+    name:   "Barracks 1",
+    type:   "Building",
+    design: "Barracks",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-37e3, -92e3, 0),
+    },
+
+  unit: {
+    name:   "Barracks 2",
+    type:   "Building",
+    design: "Barracks",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-38e3, -94e3, 0),
+    },
+
+  unit: {
+    name:   "Barracks 3",
+    type:   "Building",
+    design: "Barracks",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-39e3, -96e3, 0),
+    },
+}
+
+group: {
+  type:   battery,
+  id:     11,
+  name:   "AAA Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-62e3, -82e3, 0),
+  parent_type: battalion,
+  parent_id:   19,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-62e3, -82e3, 0),
+    },
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-60e3, -82e3, 0),
+    },
+}
+
+group: {
+  type:   battery,
+  id:     13,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (-75e3, -68e3, 0),
+  parent_type: battalion,
+  parent_id:   19,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   resource,
+  id:     19000,
+  name:   "Reactor",
+  intel:  known,
+  iff:    2,
+  region: "Shadow Canyon",
+  loc:    (0, 0, 0),
+  parent_type: battalion,
+  parent_id:   19,
+
+  unit: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    regnum: "",
+    region: "Shadow Canyon",
+    loc:    (-77e3, -56e3, 0),
+    },
+
+  unit: {
+    name:   "Cooling Tower",
+    type:   "Building",
+    design: "Cool00",
+    count:  3,
+    region: "Shadow Canyon",
+    loc:    (-77e3, -58e3, 0),
+    },
+
+  unit: {
+    name:   "Cryo Tank",
+    type:   "Factory",
+    design: "Tank00",
+    count:  2,
+    region: "Shadow Canyon",
+    loc:    (-75e3, -58e3, 0),
+    },
+}
+
+
+
+group: {
+  type:   battalion,
+  id:     12,
+  name:   "Garrison Station",
+  intel:  secret,
+  iff:    2,
+  region: "Garrison",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   station,
+  id:     3,
+  name:   "Garrison Laboratory",
+  intel:  secret,
+  iff:    2,
+  region: "Garrison",
+  loc:    (0, 0, 0),
+  parent_type: battalion,
+  parent_id:   12,
+
+  unit: {
+    name:   "Garrison Laboratory",
+    type:   "Station",
+    design: "Station7",
+    },
+}
+
+
+
+
+
+group: {
+  type:   civilian,
+  id:     1,
+  name:   "Civilian Infrastructure",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2000,
+  name:   "Renser Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Renser",
+  loc:    (4e3, -1e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2001,
+  name:   "Khaital-Lornas",
+  intel:  located,
+  iff:    0,
+  region: "Khaital",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Khaital-Lornas",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2002,
+  name:   "Lornas-Khaital",
+  intel:  located,
+  iff:    0,
+  region: "Lornas",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Lornas-Khaital",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2003,
+  name:   "Lornas-Renser",
+  intel:  located,
+  iff:    0,
+  region: "Lornas",
+  loc:    (50e3, -90e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Lornas-Renser",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2004,
+  name:   "Renser-Lornas",
+  intel:  located,
+  iff:    0,
+  region: "Renser",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Renser-Lornas",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2005,
+  name:   "Renser-Rhomindal",
+  intel:  located,
+  iff:    0,
+  region: "Renser",
+  loc:    (80e3, -120e3, 7e3),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Renser-Rhomindal",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2006,
+  name:   "Renser-Garana",
+  intel:  located,
+  iff:    0,
+  region: "Renser",
+  loc:    (-50e3, 110e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Renser-Garana",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2007,
+  name:   "Rhomindal-Renser",
+  intel:  located,
+  iff:    0,
+  region: "Rhomindal",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Rhomindal-Renser",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2008,
+  name:   "Garana-Renser",
+  intel:  located,
+  iff:    0,
+  region: "Garana",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Garana-Renser",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3000,
+  name:   "Kolchev Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Kolchev",
+  loc:    (4e3, -1e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     3001,
+  name:   "Anatoly-Volova",
+  intel:  located,
+  iff:    0,
+  region: "Anatoly",
+  loc:    (120e3, -60e3, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Anatoly-Volova",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3002,
+  name:   "Volova-Anatoly",
+  intel:  located,
+  iff:    0,
+  region: "Volova",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Volova-Anatoly",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3003,
+  name:   "Volova-Kolchev",
+  intel:  located,
+  iff:    0,
+  region: "Volova",
+  loc:    (50e3, -90e3, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Volova-Kolchev",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3004,
+  name:   "Kolchev-Volova",
+  intel:  located,
+  iff:    0,
+  region: "Kolchev",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Kolchev-Volova",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3005,
+  name:   "Kolchev-Ilya",
+  intel:  located,
+  iff:    0,
+  region: "Kolchev",
+  loc:    (80e3, -120e3, 7e3),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Kolchev-Ilya",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3006,
+  name:   "Kolchev-Anatoly",
+  intel:  located,
+  iff:    0,
+  region: "Kolchev",
+  loc:    (-50e3, 110e3, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Kolchev-Anatoly",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3007,
+  name:   "Ilya-Kolchev",
+  intel:  located,
+  iff:    0,
+  region: "Ilya",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Ilya-Kolchev",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     3008,
+  name:   "Anatoly-Kolchev",
+  intel:  located,
+  iff:    0,
+  region: "Anatoly",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Anatoly-Kolchev",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4000,
+  name:   "Korius Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Korius",
+  loc:    (4e3, -1e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     4001,
+  name:   "Moneta-Solnas",
+  intel:  located,
+  iff:    0,
+  region: "Moneta",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Moneta-Solnas",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4002,
+  name:   "Solnas-Moneta",
+  intel:  located,
+  iff:    0,
+  region: "Solnas",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Solnas-Moneta",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4003,
+  name:   "Solnas-Korius",
+  intel:  located,
+  iff:    0,
+  region: "Solnas",
+  loc:    (50e3, -90e3, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Solnas-Korius",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4004,
+  name:   "Korius-Solnas",
+  intel:  located,
+  iff:    0,
+  region: "Korius",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Korius-Solnas",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4005,
+  name:   "Korius-Adantar",
+  intel:  located,
+  iff:    0,
+  region: "Korius",
+  loc:    (80e3, -120e3, 7e3),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Korius-Adantar",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4006,
+  name:   "Korius-Moneta",
+  intel:  located,
+  iff:    0,
+  region: "Korius",
+  loc:    (-50e3, 110e3, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Korius-Moneta",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4007,
+  name:   "Adantar-Korius",
+  intel:  located,
+  iff:    0,
+  region: "Adantar",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Adantar-Korius",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     4008,
+  name:   "Moneta-Korius",
+  intel:  located,
+  iff:    0,
+  region: "Moneta",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Moneta-Korius",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5000,
+  name:   "Loris Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Loris",
+  loc:    (4e3, -1e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     5001,
+  name:   "Casalle-Loris",
+  intel:  located,
+  iff:    0,
+  region: "Casalle",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Casalle-Loris",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5002,
+  name:   "Loris-Casalle",
+  intel:  located,
+  iff:    0,
+  region: "Loris",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Loris-Casalle",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5003,
+  name:   "Duna-Loris",
+  intel:  located,
+  iff:    0,
+  region: "Duna",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Duna-Loris",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5004,
+  name:   "Loris-Duna",
+  intel:  located,
+  iff:    0,
+  region: "Loris",
+  loc:    (50e3, -90e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Loris-Duna",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+
+
+
+
+group: {
+  type:   war_production,
+  id:     3000,
+  name:   "War Production - Haiche",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   resource,
+  id:     3000,
+  name:   "Tantalus Mining Station",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (0, 0, 0),
+  parent_type: war_production,
+  parent_id:   3000,
+}
+
+group: {
+  type:   resource,
+  id:     3001,
+  name:   "Mining Station",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (0, 0, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Mining Station",
+    type:   "Building",
+    design: "Dsrt05",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   resource,
+  id:     3002,
+  name:   "Administration",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (-3e3, 2e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Administration",
+    type:   "Building",
+    design: "Dsrt01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   refinery,
+  id:     3003,
+  name:   "Refinery",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (-4e3, 3e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Refinery"
+    type:   "Building"
+    design: "Dsrt00"
+    loc:    (-4e3, 3e3, 0)
+  }
+
+  unit: {
+    name:   "Cooling Tower A"
+    type:   Building
+    design: Cool00
+    loc:    (-5e3, 2200, 0)
+  }
+
+  unit: {
+    name:   "Cooling Tower B"
+    type:   Building
+    design: Cool00
+    loc:    (-5e3, 3000, 0)
+  }
+
+  unit: {
+    name:   "Cooling Tower C"
+    type:   Building
+    design: Cool00
+    loc:    (-5e3, 3800, 0)
+  }
+
+  unit: {
+    name:   "Cryo Tank A",
+    type:   Factory
+    design: Tank00
+    loc:    (-5.5e3, 2200, 0)
+  }
+
+  unit: {
+    name:   "Cryo Tank B"
+    type:   Factory
+    design: Tank00
+    loc:    (-5.5e3, 3000, 0)
+  }
+
+  unit: {
+    name:   "Cryo Tank C"
+    type:   Factory
+    design: Tank00
+    loc:    (-4.5e3, 3800, 0)
+  }
+}
+
+group: {
+  type:   resource,
+  id:     3004,
+  name:   "Reactor",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (2e3, 0, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   habitat,
+  id:     3005,
+  name:   "Downtown",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (-6e3, -2e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Downtown",
+    type:   "Building",
+    design: "Dsrt04",
+    loc:    (-6e3, -2e3, 0)
+  }
+
+  unit: {
+    name:   "Downtown",
+    type:   "Building",
+    design: "Dsrt04",
+    loc:    (-5e3, -1.5e3, 0)
+  }
+}
+
+group: {
+  type:   habitat,
+  id:     3006,
+  name:   "Outpost",
+  intel:  known,
+  iff:    2,
+  region: "Tantalus",
+  loc:    (15e3, 2e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Mining Outpost",
+    type:   "Building",
+    design: "Dsrt04",
+    regnum: "",
+    },
+}
+
+
+
+
+group: {
+  type:   war_production,
+  id:     4000,
+  name:   "War Production - Lovo",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   resource,
+  id:     4000,
+  name:   "Lovo Factory Zone",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (0, 0, 0),
+  parent_type: war_production,
+  parent_id:   4000,
+}
+
+group: {
+  type:   resource,
+  id:     4001,
+  name:   "Fabrication",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-20e3, -10e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Fabrication",
+    type:   "Factory",
+    design: "Fact04",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   resource,
+  id:     4002,
+  name:   "Administration",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-13e3, -18e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Administration",
+    type:   "Building",
+    design: "Bldg01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   refinery,
+  id:     4003,
+  name:   "Refinery",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-17e3, -10e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Refinery",
+    type:   "Factory",
+    design: "Fact02",
+    regnum: "",
+    loc:    (-17e3, -10e3, 0),
+    },
+
+  unit: {
+    name:   "Cooling Tower",
+    type:   "Building",
+    design: "Cool00",
+    count:  3,
+    loc:    (-17e3, -11e3, 0),
+    },
+
+  unit: {
+    name:   "Cryo Tank",
+    type:   "Factory",
+    design: "Tank00",
+    count:  2,
+    loc:    (-18e3, -9e3, 0),
+    },
+}
+
+group: {
+  type:   resource,
+  id:     4004,
+  name:   "Reactor",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-12e3, -17e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   resource,
+  id:     4011,
+  name:   "Factory",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-15e3, -14e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Alloys Foundery",
+    type:   "Factory",
+    design: "Fact04",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   resource,
+  id:     4012,
+  name:   "Factory",
+  intel:  known,
+  iff:    2,
+  region: "Lovo",
+  loc:    (-15e3, -16e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Ceramics Fab",
+    type:   "Factory",
+    design: "Fact02",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     4015,
+  name:   "Downtown",
+  intel:  known,
+  iff:    0,
+  region: "Lovo",
+  loc:    (-18e3, -20e3, 0),
+  parent_type: resource,
+  parent_id:   4000,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    },
+}
+
+
+
+
+
+group: {
+  type:   war_production,
+  id:     5000,
+  name:   "War Production - Garden",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   resource,
+  id:     5000,
+  name:   "Tiger Bay Colony",
+  intel:  known,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (0, 0, 0),
+  parent_type: war_production,
+  parent_id:   5000,
+}
+
+group: {
+  type:   civilian,
+  id:     5015,
+  name:   "Central",
+  intel:  known,
+  iff:    0,
+  region: "Tiger Bay",
+  loc:    (5e3, -11e3, 0),
+  parent_type: resource,
+  parent_id:   5000,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    loc:    (5e3, -11e3, 0),
+    },
+
+  unit: {
+    name:   "Building C1",
+    type:   "Building",
+    design: "Bldg00",
+    regnum: "",
+    loc:    (7e3, -12e3, 0),
+    },
+}
+
+
+group: {
+  type:   civilian,
+  id:     5020,
+  name:   "Western",
+  intel:  known,
+  iff:    0,
+  region: "Tiger Bay",
+  loc:    (-45e3, -14e3, 0),
+  parent_type: resource,
+  parent_id:   5000,
+
+  unit: {
+    name:   "City Block 1",
+    type:   "Building",
+    design: "City01",
+    regnum: "",
+    loc:    (-46e3, -15e3, 0)
+    },
+
+  unit: {
+    name:   "City Block 2",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    loc:    (-47e3, -10e3, 0),
+    },
+
+  unit: {
+    name:   "Building W1",
+    type:   "Building",
+    design: "Bldg01",
+    regnum: "",
+    loc:    (-48e3, -11e3, 0),
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     5025,
+  name:   "Eastern",
+  intel:  known,
+  iff:    0,
+  region: "Tiger Bay",
+  loc:    (54000, -3000, 0),
+  parent_type: resource,
+  parent_id:   5000,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City01",
+    regnum: "",
+    loc:    (54000, -3000, 0),
+    },
+
+  unit: {
+    name:   "Building E1",
+    type:   "Building",
+    design: "Bldg03",
+    regnum: "",
+    loc:    (52000, -6000, 0),
+    },
+
+  unit: {
+    name:   "Building E2",
+    type:   "Building",
+    design: "Bldg04",
+    regnum: "",
+    loc:    (52000, 0, 0),
+    },
+}
+
+group: {
+  type:   resource,
+  id:     5050,
+  name:   "Platforms",
+  intel:  known,
+  iff:    0,
+  region: "Tiger Bay",
+  loc:    (0, 0, 0),
+  parent_type: resource,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Platform 1",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (-25e3, 5e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 2",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (-60e3, 32e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 3",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (15e3, 10e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 4",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (35e3, 60e3, 0),
+    },
+}
+
+
+group: {
+  type:   resource,
+  id:     5051,
+  name:   "Platforms",
+  intel:  reserve,
+  iff:    2,
+  region: "Tiger Bay",
+  loc:    (0, 0, 0),
+  parent_type: resource,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Platform 1",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (-25e3, 5e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 2",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (-60e3, 32e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 3",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (15e3, 10e3, 0),
+    },
+
+  unit: {
+    name:   "Platform 4",
+    type:   "Factory",
+    design: "Platform",
+    regnum: "",
+    region: "Tiger Bay",
+    loc:    (35e3, 60e3, 0),
+    },
+}
+
+
+
+
+
+
+group: {
+  type:   war_production,
+  id:     6000,
+  name:   "War Production - Volante",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   resource,
+  id:     6000,
+  name:   "Hell's Kitchen Factory Zone",
+  intel:  known,
+  iff:    2,
+  region: "Hell's Kitchen",
+  loc:    (0, 0, 0),
+  parent_type: war_production,
+  parent_id:   6000,
+}
+
+group: {
+  type:   resource,
+  id:     6003,
+  name:   "Tanks",
+  intel:  known,
+  iff:    2,
+  region: "Hell's Kitchen",
+  loc:    (-14e3, -16e3, 0),
+  parent_type: resource,
+  parent_id:   6000,
+
+  unit: {
+    name:   "Cryo Tank",
+    type:   "Factory",
+    design: "Tank00",
+    count:  6,
+    },
+}
+
+group: {
+  type:   resource,
+  id:     6004,
+  name:   "Reactor",
+  intel:  known,
+  iff:    2,
+  region: "Hell's Kitchen",
+  loc:    (-12e3, -17e3, 0),
+  parent_type: resource,
+  parent_id:   6000,
+
+  unit: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     6015,
+  name:   "Downtown",
+  intel:  known,
+  iff:    0,
+  region: "Hell's Kitchen",
+  loc:    (0, 20e3, 0)
+  parent_type: resource,
+  parent_id:   6000,
+
+  unit: {
+    name:   "Bio Dome 1",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (0, 20e3, 0)
+    },
+
+  unit: {
+    name:   "Bio Dome 2",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (0, 47e3, 0)
+    heading: 90,
+    },
+
+  unit: {
+    name:   "Bio Dome 3",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (13e3, -3e3, 0)
+    heading: 60
+    },
+
+  unit: {
+    name:   "Bio Dome 4",
+    type:   "Building",
+    design: "BioDome",
+    region: "Hell's Kitchen",
+    loc:    (-27e3, 20e3, 0)
+    heading: 30
+    },
+
+  unit: {
+    name:   "Bridge 1",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (0, 33500, 0)
+    },
+
+  unit: {
+    name:   "Bridge 2",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (5500, 8500, 0)
+    heading: 30
+    },
+
+  unit: {
+    name:   "Bridge 3",
+    type:   "Building",
+    design: "BioTrail",
+    region: "Hell's Kitchen",
+    loc:    (-13500, 20e3, 0)
+    heading: 90
+    },
+
+  unit: {
+    name:   "Utility 1",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (5e3, -3e3, 0)
+    },
+
+  unit: {
+    name:   "Utility 2",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (-4e3, 25e3, 0)
+    },
+
+  unit: {
+    name:   "Utility 3",
+    type:   "Building",
+    design: "BioDome2",
+    region: "Hell's Kitchen",
+    loc:    (-4e3, 29e3, 0)
+    },
+}
+
+
+
+
+group: {
+  type:   infrastructure,
+  id:     5000,
+  name:   "Isham Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Garden",
+  loc:    (54e3, -51e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     5001,
+  name:   "Garden-Senesca",
+  intel:  located,
+  iff:    0,
+  region: "Garden",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Garden-Senesca",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5002,
+  name:   "Senesca-Garden",
+  intel:  located,
+  iff:    0,
+  region: "Senesca",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Senesca-Garden",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5001,
+  name:   "Garden-Relay",
+  intel:  located,
+  iff:    0,
+  region: "Garden",
+  loc:    (110e3, -60e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Garden-Relay",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5002,
+  name:   "Relay-Garden",
+  intel:  located,
+  iff:    0,
+  region: "Relay",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Relay-Garden",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+
+group: {
+  type:   infrastructure,
+  id:     7000,
+  name:   "Radix Farcaster Network",
+  intel:  located,
+  iff:    0,
+  region: "Radix",
+  loc:    (40e3, -10e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     7001,
+  name:   "Radix-Senna",
+  intel:  located,
+  iff:    0,
+  region: "Radix",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   7000,
+
+  unit: {
+    name:   "Radix-Senna",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     7002,
+  name:   "Senna-Radix",
+  intel:  located,
+  iff:    0,
+  region: "Senna",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   7000,
+
+  unit: {
+    name:   "Senna-Radix",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     7001,
+  name:   "Radix-Cavenda",
+  intel:  located,
+  iff:    0,
+  region: "Radix",
+  loc:    (-110e3, -20e3, 0),
+  parent_type: infrastructure,
+  parent_id:   7000,
+
+  unit: {
+    name:   "Radix-Cavenda",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     7002,
+  name:   "Cavenda-Radix",
+  intel:  located,
+  iff:    0,
+  region: "Cavenda",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   7000,
+
+  unit: {
+    name:   "Cavenda-Radix",
+    type:   "Farcaster",
+    design: "Farcaster2",
+    regnum: "",
+    },
+}
+

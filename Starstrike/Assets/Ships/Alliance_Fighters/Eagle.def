@@ -1,0 +1,366 @@
+SHIP
+
+name:          Eagle
+display_name:  Eagle
+class:         Fighter
+abrv:          "F-34D"
+
+hud_icon:      "EagleHud.pcx"
+description:   "The F-34D EAGLE is a compact, multi-role fighter spacecraft. It is highly maneuverable and has proven itself in spaceborne and airborne combat as well as in surface attack missions. It provides a relatively low-cost, high-performance weapon system for Alliance forces.   Like the F-32 Falcon, the Eagle is armed with twin Delta particle cannon, along with four underwing hard points capable of mounting a variety of anti-fighter ordnance.  The Eagle's heavier structure also provides support for air-to-ground and antiship weapons and increased survivability at some cost in overall maneuverability."
+
+detail_0:   "Eagle_0.mag"
+feature_0:  25
+detail_1:   "Eagle_1b.mag"
+feature_1:  1
+
+cockpit_model: "EaglePit2t.mag"
+cockpit_scale: 0.02
+
+mass:       17.3
+integrity:  6e3
+scuttle:    2e3
+vlimit:     300
+agility:    130
+air_factor: 0.25
+roll_rate:  1700
+scale:      0.25
+acs:        1.1
+detet:      50e3
+
+trans_x:    3e3
+trans_y:    3e3
+trans_z:    3e3
+
+arcade_drag: 0.13
+drag:       3.0e-5
+roll_drag:  10
+pitch_drag: 7.5
+yaw_drag:   7.5
+
+CL:         1.8e-2 //1.1e-2
+CD:         5.1e-2 //1.1e-1
+stall:      0.45
+
+prep_time:  15
+avoid_fighter: 7
+
+chase:      (0, -770,  80)
+bridge:     (0,  102,  23)
+
+power:      {
+   type:    Fusion,
+   max_output: 75,
+   fuel_range: 1.0,
+   
+   loc:     (0, 0, -40),
+   size:    32,
+   hull_factor: 0.75
+   }
+
+drive:      {
+   type:    Plasma,
+   thrust:  20,
+   augmenter: 60,
+   scale:   0.35,
+   port:    (-8, 1, -188),
+   port:    ( 8, 1, -188),
+
+   loc:     (0, 0, -150),
+   size:    16,
+   hull_factor: 0.85
+   }
+
+
+weapon:     {
+   type:    "Delta Cannon",
+   abrv:    Cannon,
+   muzzle:  (-19, -3, 177),
+   muzzle:  ( 19, -3, 177),
+
+   loc:     (  0,  0,  32),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-1",
+   muzzle:  (-69, -22, -75)
+
+   loc:     (-69, -22, -60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   type:    "Rockets",
+   abrv:    "STA-2",
+   muzzle:  (-48, -17,  -75)
+
+   loc:     (-48, -17,  -60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-3",
+   muzzle:  (-20, -13,  -25)
+
+   loc:     (-20, -13,  -15)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-4",
+   muzzle:  (-14, -14,   52)
+
+   loc:     (-14, -14,   60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-5",
+   muzzle:  ( 15, -14,   52)
+
+   loc:     ( 15, -14,   60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-6",
+   muzzle:  ( 20, -13,  -25)
+
+   loc:     ( 20, -13,  -15)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   type:    "Rockets",
+   abrv:    "STA-7",
+   muzzle:  ( 48, -17,  -75)
+
+   loc:     ( 48, -17,  -60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-8",
+   muzzle:  ( 70, -22, -75)
+
+   loc:     ( 70, -22, -60)
+   size:    16,
+   hull_factor: 0.2
+}
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -32, 0),
+
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+sensor:     {
+   pcs:                 25,
+   active_efficiency:   2e9,
+   passive_efficiency:  500,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    25,
+   hull_factor: 0.25
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    8,
+   hull_factor: 0.2
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose1.mag",
+      start: (0, -18, 100),
+      end:   (0, -38, 130)
+      },
+
+   gear: {
+      model: "GearLeft1.mag",
+      start: (-20, -20, -74),
+      end:   (-40, -50, -70)
+      },
+
+   gear: {
+      model: "GearRight1.mag",
+      start: ( 20, -20, -74),
+      end:   ( 40, -50, -70)
+      },
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+
+thruster: {
+   design:           Thruster,
+   type:             Plasma,
+   scale:            0.12,
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+
+   port_fore:   {loc:( -40,   5,  28), fire: 0x0044},
+   port_fore:   {loc:( -40,  -9,  28), fire: 0x0044},
+   port_fore:   {loc:(  40,  -9,  28), fire: 0x0084},
+   port_fore:   {loc:(  40,   5,  28), fire: 0x0084},
+
+   port_aft:    {loc:(  -3,  -8,-188), fire: 0x0008},
+   port_aft:    {loc:(   3,  -8,-188), fire: 0x0008},
+
+   port_top:    {loc:(  -3,  17,-145), fire: 0x0210},
+   port_top:    {loc:(   3,  17,-145), fire: 0x0210},
+
+   port_bottom: {loc:(  -3, -17,-145), fire: 0x0120},
+   port_bottom: {loc:(   3, -17,-145), fire: 0x0120},
+
+   port_top:    {loc:( -19,   6,  98), fire: 0x0510},
+   port_top:    {loc:(  19,   6,  98), fire: 0x0910},
+
+   port_bottom: {loc:( -19,  -9,  98), fire: 0x0A20},
+   port_bottom: {loc:(  19,  -9,  98), fire: 0x0620},
+}
+
+/*
+0x0001 = Translate Right
+0x0002 = "" Left
+0x0004 = "" Backwards
+0x0008 = "" Forewards
+0x0010 = "" Down
+0x0020 = "" Up
+0x0040 = Yaw Left
+0x0080 = Yaw Right
+0x0100 = Pitch Up
+0x0200 = Pitch Down
+0x0400 = Roll Left
+0x0800 = Roll Right
+*/
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1, -1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: (-1, -1,  0,  0,  0,  0, -1, -1) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  1,  1,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  1,  1,  1,  1,  1,  1,  0) }
+loadout: { name: "Ground Strike",    stations: ( 3,  3,  0,  1,  1,  0,  3,  3) }
+loadout: { name: "Ship Strike",      stations: ( 2,  2,  0,  1,  1,  0,  2,  2) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 2,  2,  0,  1,  1,  0,  2,  2) }
+loadout: { name: "Rockets",          stations: ( 0,  4,  1,  1,  1,  1,  4,  0) }
+loadout: { name: "Scout/Recon",      stations: (-1, -1,  0,  0,  0,  0, -1, -1) }
+
+death_spiral: {
+   time:             3.2,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.1,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.9,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.2
+   debris_speed:     160
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.25
+   debris_speed:     180
+}
+
+map: {
+   sprite: "e_map0.pcx",
+   sprite: "e_map1.pcx",
+   sprite: "e_map2.pcx",
+   sprite: "e_map3.pcx",
+   sprite: "e_map4.pcx",
+   sprite: "e_map5.pcx",
+   sprite: "e_map6.pcx",
+   sprite: "e_map7.pcx"
+}
+

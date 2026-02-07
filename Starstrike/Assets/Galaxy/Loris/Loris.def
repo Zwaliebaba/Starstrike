@@ -1,0 +1,173 @@
+STARSYSTEM
+
+name:       Loris
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Loris.mag",
+   poly_stars: "stars.mag"
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (21, 18, 11)
+
+star:        {
+   name:    Lorset
+   map:     "Suns/StarG_map.pcx"
+   image:   "Suns/G3.pcx",
+   tscale:  6,
+   radius:  15e8,
+   mass:    1.8e30,
+   light:   1.1e11,
+   color:   (255, 250, 240), // - G Yellow
+   back:    (100,  60,  30), // - nebula16
+}
+
+planet:     {
+   name:    Duna,
+   map:     "Loris/duna_map.pcx"
+   image:   "Loris/duna.jpg",
+   radius:  25.1e6,
+   mass:    1.38e25,
+   tilt:    0.125,
+   tscale:  2,
+   orbit:   0.81e11,
+   rotation: 36.3
+}
+
+region:     {
+   name:    Duna,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   65e6,
+   inclination: 0.6
+}
+
+moon: {
+   name:    Ansel
+   map:     "Paragon/bryn_map.pcx"
+   image:   "Paragon/bryn_hi.jpg",
+   radius:  2.4e6,
+   mass:    1.2e22,
+   orbit:   0.84e8,
+   rotation: 30
+}
+
+moon: {
+   name:    Kaius
+   map:     "Thralis/benares_map.pcx"
+   image:   "Thralis/benares_lo.pcx",
+   high_res:"Thralis/benares_hi.pcx",
+   radius:      3.1e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        1.6e24,
+   orbit:       1.301e8
+}
+
+
+
+
+planet:     {
+   name:    Loris,
+   map:     "Loris/loris_map.pcx",
+   image:   "Loris/loris_lo.pcx",
+   high_res:"Loris/loris_hi.jpg",
+   gloss:   "Loris/loris_gloss.jpg",
+   radius:  5.1e6,
+   mass:    3.88e24,
+   tilt:    0.125,
+   atmosphere: (200,180,160),
+   orbit:   1.54e11,
+   rotation: 26.3
+}
+
+region:     {
+   name:    Loris,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   15e6,
+   inclination: 0.4
+}
+
+moon: {
+   name:    "Loris I",
+   map:     "Moons/rock_map.pcx",
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:  0.4e6,
+   mass:    4.3e23,
+   orbit:   35e6,
+   rotation: 9.2
+}
+
+moon: {
+   name:    "Loris II",
+   map:     "Moons/rock_map.pcx",
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:      0.25e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        0.6e24,
+   orbit:       61e6
+}
+
+
+
+planet:     {
+   name:    Casalle
+   map:     "Giants/GasGiant5_map.pcx"
+   image:   "Giants/GasGiant5.jpg",
+   radius:  38.2e6,
+   mass:    4.0e26,
+   orbit:   2.95e11,
+   tilt:    0.1,
+   tscale:  2,
+   ring:    "Giants/Ring3.pcx",
+   minrad:  1.4,
+   maxrad:  1.7,
+   rotation: 36.3
+}
+
+region:     {
+   name:    Casalle,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   175e6,
+   inclination: 0.6,
+   link:    Nero,   // Silessia
+   link:    Lornas, // Renser
+   link:    Nergal, // Nephrys
+   link:    Solnas, // Korius
+}
+
+moon: {
+   name:    Demeter
+   map:     "Haiche/kala_map.pcx"
+   image:   "Haiche/kala_lo.pcx",
+   high_res:"Haiche/kala_hi.pcx",
+   radius:  2.2e6,
+   mass:    1.9e22,
+   orbit:   1.44e8,
+   rotation: 30
+}
+
+moon: {
+   name:    Thoraine,
+   map:     "Moons/lunar_map.pcx",
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      3.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        1.7e24,
+   orbit:       2.251e8
+}
+
+

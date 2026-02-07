@@ -1,0 +1,268 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "OPFOR",
+  intel:  known,
+  iff:    2,
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   fleet,
+  id:     2,
+  name:   "Thralis",
+  intel:  known,
+  iff:    2,
+  region: "Vail",
+  loc:    (-390e3, 10e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     5,
+  name:   "Antares",
+  intel:  known,
+  iff:    2,
+  region: "Janek",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Antares",
+    design: "Orion",
+    regnum: "72" },
+
+  unit: {
+    name:   "Ryan",
+    design: "Spectre",
+    regnum: "681" },
+
+  unit: {
+    name:   "Card",
+    design: "Spectre",
+    regnum: "686" },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     91,
+  name:   "Bearcats",
+  intel:  known,
+  iff:    2,
+  region: "Janek",
+  loc:    (179e3, -300e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Bearcat",
+    design: "Viper",
+    count:  20 },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     30,
+  name:   "Mustangs",
+  intel:  known,
+  iff:    2,
+  region: "Janek",
+  loc:    (125e3, -318e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Mustang",
+    design: "Viper",
+    count:  20 },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     45,
+  name:   "Lancers",
+  intel:  known,
+  iff:    2,
+  region: "Janek",
+  loc:    (246e3, -379e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Lancer",
+    design: "Cobra",
+    count:  20 },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Ares",
+  intel:  known,
+  iff:    2,
+  region: "Janek",
+  loc:    (195e3, -400e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+
+  unit: {
+    name:   "Ares",
+    design: "Zodiac",
+    count:  8 },
+}
+
+group: {
+  type:   battle_group,
+  id:     7,
+  name:   "Annihilator",
+  intel:  known,
+  iff:    2,
+  region: "Alystra",
+  loc:    (30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Annihilator",
+    design: "Spectre",
+    regnum: "405" },
+
+  unit: {
+    name:   "Vanguard",
+    design: "Courageous",
+    regnum: "533" },
+
+  unit: {
+    name:   "Gibson",
+    design: "Spectre",
+    regnum: "691" },
+
+  unit: {
+    name:   "Leyte",
+    design: "Berents",
+    regnum: "922" },
+}
+
+group: {
+  type:   battle_group,
+  id:     8,
+  name:   "Vortex",
+  intel:  known,
+  iff:    2,
+  region: "Dante",
+  loc:    (80e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Vortex",
+    design: "Spectre",
+    regnum: "410" },
+
+  unit: {
+    name:   "Defiant",
+    design: "Courageous",
+    regnum: "538" },
+
+  unit: {
+    name:   "Mahan",
+    design: "Spectre",
+    regnum: "696" },
+
+  unit: {
+    name:   "Argiles",
+    design: "Berents",
+    regnum: "927" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     40,
+  name:   "Wraith",
+  intel:  known,
+  iff:    2,
+  region: "Navara",
+  loc:    (80e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Wraith",
+    design: "Spectre",
+    regnum: "351" },
+
+  unit: {
+    name:   "Nemesis",
+    design: "Spectre",
+    regnum: "356" },
+
+  unit: {
+    name:   "Bosporus",
+    design: "Berents",
+    regnum: "912" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     41,
+  name:   "Demon",
+  intel:  known,
+  iff:    2,
+  region: "Alystra",
+  loc:    (0, -90e3, -3e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Demon",
+    design: "Spectre",
+    regnum: "361" },
+
+  unit: {
+    name:   "Revenant",
+    design: "Spectre",
+    regnum: "366" },
+
+  unit: {
+    name:   "Carlisle",
+    design: "Berents",
+    regnum: "917" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     59,
+  name:   "Clarke",
+  intel:  known,
+  iff:    2,
+  region: "Dante",
+  loc:    (-60e3, -180e3, -7e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Clarke",
+    design: "Spectre",
+    regnum: "701" },
+
+  unit: {
+    name:   "Jackson",
+    design: "Spectre",
+    regnum: "706" },
+
+  unit: {
+    name:   "Parker",
+    design: "Berents",
+    regnum: "932" },
+
+  unit: {
+    name:   "Suffolk",
+    design: "Berents",
+    regnum: "937" },
+}
+

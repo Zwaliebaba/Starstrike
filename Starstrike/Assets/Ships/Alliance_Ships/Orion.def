@@ -1,0 +1,515 @@
+SHIP
+
+name:          Orion
+display_name:  Orion
+class:         Carrier
+description:   "The CV-69 ORION class carriers are essentially spaceborne starports, capable of launching as many as four fighter craft every minute. The Orion's two launch rails and two arresting gear engines enable her to launch and recover ships both rapidly and simultaneously. The Orion class ship's embarked tactical fighter wing includes four different types of fighter and attack craft in addition to armored landing craft for a total complement of almost 80 ships."
+
+degrees:    true
+beauty:     (-9, 5, 1.33)
+hud_icon:   "OrionHud.pcx"
+
+detail_0:   "Orion0z.mag"
+feature_0:  1000
+detail_1:   "Orion1z.mag"
+feature_1:  40
+detail_2:   "Orion2z.mag"
+feature_2:  25
+
+mass:       957e3
+agility:    1
+vlimit:     220
+roll_rate:  7
+integrity:  75e3
+scale:      4
+acs:        1.5
+
+trans_x:    3e6
+trans_y:    3e6
+trans_z:    3e6
+
+arcade_drag: 4.5e-2
+drag:       1e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   600, 100)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       90e3,
+
+   loc:              (0, -48, -180),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+   }
+
+drive:      {
+   type:             Plasma,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           40e3,
+   scale:            10,
+
+   port:             ( 75,  31, -1160)
+   port:             ( 75, -10, -1160)
+   port:             (  0,  31, -1160)
+   port:             (  0, -10, -1160)
+   port:             (-75,  31, -1160)
+   port:             (-75, -10, -1160)
+
+   loc:              (0, 48, -1240),
+   size:             120
+   hull_factor:      0.3,
+   explosion:        7
+   }
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+   scale:            4
+
+   port_left:   {loc:(-176,   0,-819), fire: 0x0041}
+   port_left:   {loc:(-405,  -5,-362), fire: 0x0041}
+   port_left:   {loc:(-239,  -5, 717), fire: 0x0081}
+
+   port_right:  {loc:( 175,   0,-819), fire: 0x0082}
+   port_right:  {loc:( 405,  -5,-362), fire: 0x0082}
+   port_right:  {loc:( 238,  -5, 717), fire: 0x0042}
+
+   port_fore:   {loc:(-368,  35,-308), fire: 0x0044}
+   port_fore:   {loc:(-368, -43,-308), fire: 0x0044}
+   port_fore:   {loc:( 367,  35,-308), fire: 0x0084}
+   port_fore:   {loc:( 367, -43,-308), fire: 0x0084}
+
+   port_aft:    {loc:(-76, -66,-1047), fire: 0x0008}
+   port_aft:    {loc:(  0, -66,-1047), fire: 0x0008}
+   port_aft:    {loc:( 76, -66,-1047), fire: 0x0008}
+
+   port_top:    {loc:(-368,  73,-358), fire: 0x0410}
+   port_top:    {loc:(-368,  73,-617), fire: 0x0410}
+   port_top:    {loc:( 367,  73,-358), fire: 0x0810}
+   port_top:    {loc:( 367,  73,-617), fire: 0x0810}
+
+   port_bottom: {loc:(-368, -79,-358), fire: 0x0820}
+   port_bottom: {loc:(-368, -79,-617), fire: 0x0820}
+   port_bottom: {loc:( 367, -79,-358), fire: 0x0420}
+   port_bottom: {loc:( 367, -79,-617), fire: 0x0420}
+
+   port_top:    {loc:(-191,  83, 716), fire: 0x0210}
+   port_top:    {loc:( 191,  83, 716), fire: 0x0210}
+
+   port_bottom: {loc:(-191, -93, 716), fire: 0x0120}
+   port_bottom: {loc:( 191, -93, 716), fire: 0x0120}
+}
+
+quantum:     {
+   design:           "Quantum Drive",
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3
+   }
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   model:            "OShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+   }
+
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 1",
+   abrv:             "GUN 1",
+   loc:              (128, 95, 704),
+
+   azimuth:           60,
+   aim_az_max:        90,
+   aim_az_min:       -60,
+   aim_az_rest:      -60,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 2",
+   abrv:             "GUN 2",
+   loc:              (-128,95, 704),
+
+   azimuth:          -60,
+   aim_az_max:       -90,
+   aim_az_min:        60,
+   aim_az_rest:       60,
+
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 3",
+   abrv:             "GUN 3",
+   loc:              (128, 95, 228),
+
+   azimuth:           90,
+   aim_az_max:        75,
+   aim_az_min:       -75,
+   aim_az_rest:       90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 4",
+   abrv:             "GUN 4",
+   loc:              (-128,95, 228),
+
+   azimuth:          -90,
+   aim_az_max:       -75,
+   aim_az_min:        75,
+   aim_az_rest:      -90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 5",
+   abrv:             "GUN 5",
+   loc:              (64, 103, -830),
+
+   azimuth:          180,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Vanguard 6",
+   abrv:             "GUN 6",
+   loc:              (-64, 103, -830),
+
+   azimuth:          180,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx",
+   abrv:             "PDB 1",
+   group:            "PDB",
+   loc:              (  0,  70,  960),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx",
+   abrv:             "PDB 2",
+   group:            "PDB",
+   loc:              (  0, -75,  960),
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx",
+   abrv:             "PDB 3",
+   group:            "PDB",
+   loc:              ( 64,-132, -830),
+   azimuth:          180
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+weapon:     {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx",
+   abrv:             "PDB 4",
+   group:            "PDB",
+   loc:              (-64,-132, -830),
+   azimuth:          180
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+flightdeck: {
+   name:       "Deck 1",
+   abrv:       "Deck 1",
+   design:     "Flight Deck",
+   loc:        ( 10,    0,  920)
+   cam:        (  0,    0,  885)
+   start:      ( 60,  -20,  850)
+   end:        (2e3,   15, 3500),
+
+   spot:       { loc: ( 45, -20, 825), filter: 0x7 },
+   spot:       { loc: ( 75, -20, 825), filter: 0x7 },
+   spot:       { loc: ( 60, -20, 825), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       170,
+   hull_factor: 0.5,
+   }
+
+flightdeck: {
+   name:       "Deck 2",
+   abrv:       "Deck 2",
+   design:     "Flight Deck",
+   loc:        ( -10,    0,  920)
+   cam:        (   0,    0,  885)
+   start:      ( -60,  -20,  850)
+   end:        (-2e3,   15, 3500),
+
+   spot:       { loc: (-45, -20, 825), filter: 0x7 },
+   spot:       { loc: (-75, -20, 825), filter: 0x7 },
+   spot:       { loc: (-60, -20, 825), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       170,
+   hull_factor: 0.5,
+   }
+
+flightdeck: {
+   name:       "Deck 3",
+   abrv:       "Deck 3",
+   design:     "Flight Deck",
+   loc:        ( 305,   0,  -550)
+   cam:        ( 340,  10,  -475)
+   start:      ( 305,   0, -1950)
+   end:        ( 305, -12,  -500)
+
+   approach:   ( 280,   0, -2300)
+   approach:   (1500,   0, -1000)
+   approach:   (1500,   0,  1000)
+   approach:   ( 250,   0,  2500)
+
+   spot:       ( 305, -12,  -500)
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 12,
+
+   size:       120,
+   hull_factor: 0.5,
+   }
+
+flightdeck: {
+   name:       "Deck 4",
+   abrv:       "Deck 4",
+   design:     "Flight Deck",
+   loc:        ( -305,   0,  -550)
+   cam:        ( -340,  10,  -475)
+   start:      ( -305,   0, -1950)
+   end:        ( -305, -12,  -500)
+
+   approach:   ( -280,   0, -2300)
+   approach:   (-1500,   0, -1000)
+   approach:   (-1500,   0,  1000)
+   approach:   ( -250,   0,  2500)
+
+   spot:       ( -305, -12,  -500)
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 12,
+
+   size:       120,
+   hull_factor: 0.5,
+   }
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       10e3,
+
+   loc:              (0, 0, -150),
+   hull_factor:      0.8
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+   }
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       1000
+   }
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+   }
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+   }
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+   }
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   20,   // LARGE_BURST (custom)
+   explosion_time:   0.1,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.3,
+   explosion_loc:    (20, 80, -190),
+
+   explosion_type:   20,   // LARGE_BURST (custom)
+   explosion_time:   0.1,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 120),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, -120),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "OrionDebris1.mag",
+   debris_loc:       (0,0,650),
+   debris_mass:      40e3,
+   debris_count:     1,
+   debris_life:      550,
+   debris_fire:      (-130, 0,-420),
+   debris_fire:      ( 135,50,   0),
+
+   debris:           "OrionDebris2.mag",
+   debris_loc:       (-20,20,-500),
+   debris_mass:      40e3,
+   debris_count:     1,
+   debris_life:      500,
+   debris_fire:      ( 124,  0, 120)
+   debris_fire:      ( 105, 90,   0)
+   debris_fire:      (-125,-10,-360)
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,120),
+   debris_mass:      33,
+   debris_count:     25,
+   debris_life:      35,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (130,0,0),
+   debris_mass:      34,
+   debris_count:     22,
+   debris_life:      25,
+   }
+
+map: {
+   sprite: "OrionMap0.pcx",
+   sprite: "OrionMap1.pcx",
+   sprite: "OrionMap2.pcx",
+   sprite: "OrionMap3.pcx",
+   sprite: "OrionMap4.pcx",
+   sprite: "OrionMap5.pcx",
+   sprite: "OrionMap6.pcx",
+   sprite: "OrionMap7.pcx"
+}
+
+
+
+

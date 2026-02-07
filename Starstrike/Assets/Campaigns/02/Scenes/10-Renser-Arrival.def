@@ -1,0 +1,161 @@
+MISSION
+
+name:   "Cmpn02 Brief10 Jalah"
+type:   "Patrol"
+
+system:   Solus
+region:   Solus
+
+objective: "Unspecified"
+
+sitrep: "Unknown"
+
+start: "33:00:00"
+
+degrees: true
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+element: {
+   name:      "Solus-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (150000, -180000, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Solus" }
+}
+
+element: {
+   name:      "Fort Talas"
+   design:    "Station3"
+   mission:   "Flight Ops"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (-150e3, -150e3, 0)
+}
+
+element: {
+   name:      "Jalah-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (0, 0, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Jalah" }
+}
+
+
+element: {
+   name:      Manticore
+   design:    Dragon
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (-120e3, -50e3, 0)
+   region:    Jalah
+}
+
+
+element: {
+   name:      Ironhelm
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (-127e3, -52e3, 0)
+   region:    Jalah
+}
+
+element: {
+   name:      Mattock
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       ( 110e3, 105e3, 0)
+   region:    Jalah
+   navpt:     { cmd: Vector, loc: ( 110e3,-170e3,0), speed: 750, rgn: Jalah }
+}
+
+
+element: {
+   name:      Martak
+   design:    Razor
+   mission:   Misc
+
+   intel:     Secret
+   count:     2
+   iff:       2
+   loc:       (-51e3, -45e3, 0)
+   region:    Jalah
+
+   loadout:   { ship: -1, name: "ACM Short Range" }
+   navpt:     { cmd: Vector, loc: (-110e3,-170e3,0), speed: 750, rgn: Jalah }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Display,               image: "Campaigns\02/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+event: { event: Camera,                param: 3, target: "body:Jalah",     vec: (3,0,2e8) }
+event: { event: Camera,                param: 5,                           vec: (0.13, 0.01, 0.01) }
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: $TIME\nSubject: Hegemony Task Force TF4.3\nClassified: CONFIDENTIAL DND/CRYPTO" }
+
+event: { event: Message,    time:  2,  sound: "Vox\Scenes\02/Briefing_10-OK.wav" }
+
+event: { event: Camera,     time:  15, param: 3,  target: Manticore,     vec: (-1,-0.1,15e3) }
+event: { event: Camera,                param: 5,  target: Manticore,     vec: (-0.16, 0.01, 0.01) }
+event: { event: Display,               message: "Hegemony Carrier Group 'Manticore'",    font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 400,100) }
+event: { event: Display,               message: "Jalah Orbit",                           font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: Camera,     time:  30, param: (6,16),  target: Martak,  vec: (-1,-0.1,8e3) }
+
+event: { event: Camera,     time:  45, param: 3,  target: Mattock,       vec: (-1,-0.1,15e3) }
+event: { event: Camera,                param: 5,                         vec: (-0.16, 0.01, 0.01) }
+
+event: { event: Camera,     time:  60, param: 3,  target: "Fort Talas",  vec: (-1,-0.1,15e3) }
+event: { event: Camera,                param: 5,                         vec: (-0.16, 0.01, 0.01) }
+event: { event: Display,               message: "Fort Talas Station",                    font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Jalah Orbit",                           font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: EndScene,   time:  80, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

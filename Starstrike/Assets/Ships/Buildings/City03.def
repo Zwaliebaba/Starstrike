@@ -1,0 +1,21 @@
+SHIP
+
+name:       City03
+class:      Building
+display_name: "City Block"
+hud_icon:     "hud_bldg01.pcx"
+
+detail_0:   "Vesta02-0.mag"
+feature_0:  1000
+detail_1:   "Vesta02-6.mag"
+feature_1:  6
+
+mass:       950e3
+integrity:  500e3
+scale:      2.7
+acs:        0
+pcs:        0
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+

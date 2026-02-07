@@ -1,0 +1,150 @@
+MISSION
+
+name:   "Cmpn05 Brief06 - Geothermal Platforms"
+type:   Patrol
+system: Isham
+region: Garden
+stardate: 1187981234
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (100e3, 30e3, 0)
+}
+
+
+
+element: {
+   name:   "Tiger Base",
+   design: "Airbase2",
+   region: "Tiger Bay",
+   loc:     (55000, -8000, 0),
+   heading: 90,
+}
+
+element: {
+    name:   "Tiger Barracks",
+    design: "Barracks",
+    region: "Tiger Bay",
+    loc:    (57000, -6000, 0),
+}
+
+element: {
+    name:   "City Block",
+    design: "City00",
+    region: "Tiger Bay",
+    loc:    (5e3, -11e3, 0),
+}
+
+element: {
+    name:   "Building C1",
+    design: "Bldg00",
+    region: "Tiger Bay",
+    loc:    (7e3, -12e3, 0),
+}
+
+element: {
+    name:   "City Block 1",
+    design: "City01",
+    region: "Tiger Bay",
+    loc:    (-46e3, -15e3, 0),
+}
+
+element: {
+    name:   "City Block 2",
+    design: "City00",
+    region: "Tiger Bay",
+    loc:    (-47e3, -10e3, 0),
+}
+
+element: {
+    name:   "Building W1",
+    design: "Bldg01",
+    region: "Tiger Bay",
+    loc:    (-48e3, -11e3, 0),
+}
+
+element: {
+    name:   "City Block",
+    design: "City01",
+    region: "Tiger Bay",
+    loc:    (54e3, -3e3, 0),
+}
+
+element: {
+    name:   "Building E1",
+    design: "Bldg03",
+    region: "Tiger Bay",
+    loc:    (52e3, -6e3, 0),
+}
+
+element: {
+    name:   "Building E2",
+    design: "Bldg04",
+    region: "Tiger Bay",
+    loc:    (52e3, 0, 0),
+}
+
+element: {
+    name:   "Platform 1",
+    design: "Platform",
+    region: "Tiger Bay",
+    loc:    (-25e3, 5e3, 0),
+}
+
+element: {
+    name:   "Platform 2",
+    design: "Platform",
+    region: "Tiger Bay",
+    loc:    (-60e3, 32e3, 0),
+}
+
+element: {
+    name:   "Platform 3",
+    design: "Platform",
+    region: "Tiger Bay",
+    loc:    (15e3, 10e3, 0),
+}
+
+element: {
+    name:   "Platform 4",
+    design: "Platform",
+    region: "Tiger Bay",
+    loc:    (35e3, 60e3, 0),
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Garden", vec: (2, 0.1, 4e7)         }
+event: { event: Camera,                param: 5,                              vec: (-0.05, 0.007, -0.01) }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: 03/21:00:00\nSubject: Tiger Bay Geothermal Platforms\nClassified: SECRET R2 NTK" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\05/Briefing_06_Tiger_Bay.wav" }
+
+event: { event: Camera,     time:  15, param: 3,  target: "Platform 1", vec: ( 0.77, 0.05, 4e3) }
+event: { event: Camera,                param: 5,                        vec: (-0.07, 0.01, -0.01) }
+
+event: { event: Display,               message: "Offshore Power Rig",  font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+
+event: { event: Camera,     time:  30, param: 3,  target: "Platform 2", vec: ( 0.77, 0.05, 4e3) }
+event: { event: Camera,                param: 5,                        vec: ( 0.09, 0.01, -0.01) }
+
+
+event: { event: EndScene,   time:  45, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

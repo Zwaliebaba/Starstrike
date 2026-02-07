@@ -1,0 +1,182 @@
+MISSION
+
+id:     1
+name:   "Hawk Match"
+desc:   "Four-way deathmatch with Stormhawk fighters in Borova Sector."
+type:   Patrol
+system: Borova 
+region: Borova 
+
+degrees: true
+
+objective: "Kill or be killed!"
+
+sitrep: "Four-way deathmatch with Stormhawk fighters in Borova Sector.  "
+        "Each fighter has three lives.  You will be rearmed with missiles "
+        "and decoys after each respawn.\n \n Good Luck!"
+
+start: "33:00:00"
+
+element: {
+   name:      "Hawk",
+   design:    "Stormhawk",
+   mission:   "Patrol",
+
+   intel:     "Tracked",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   player:    1,
+   playable:  true,
+   region:    Borova,
+   loc:       (0, 15000, 0),
+   head:      0,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Short Range" },
+}
+
+element: {
+   name:      "Falcon",
+   design:    "Stormhawk",
+   mission:   "Patrol",
+
+   intel:     "Tracked",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    Borova,
+   loc:       (15000, 0, 0),
+   head:      271,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Short Range" },
+}
+
+element: {
+   name:      "Raptor",
+   design:    "Stormhawk",
+   mission:   "Patrol",
+
+   intel:     "Tracked",
+   count:     1,
+   command_ai:1,
+   iff:       3,
+   playable:  true,
+   region:    Borova,
+   loc:       (0, -15000, 0),
+   head:      180,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Short Range" },
+}
+
+element: {
+   name:      "Condor",
+   design:    "Stormhawk",
+   mission:   "Patrol",
+
+   intel:     "Tracked",
+   count:     1,
+   command_ai:1,
+   iff:       4,
+   playable:  true,
+   region:    Borova,
+   loc:       (-15000, 0, 0),
+   head:      90,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Short Range" },
+}
+
+// teams dead:
+
+event: {
+   id:              1
+   event:           Message
+   trigger:         "Ships Left"
+   trigger_param:   (0, 1)
+}
+
+event: {
+   id:              2
+   event:           Message
+   trigger:         "Ships Left"
+   trigger_param:   (0, 2)
+}
+
+event: {
+   id:              3
+   event:           Message
+   trigger:         "Ships Left"
+   trigger_param:   (0, 3)
+}
+
+event: {
+   id:              4
+   event:           Message
+   trigger:         "Ships Left"
+   trigger_param:   (0, 4)
+}
+
+// victory combinations:
+
+event: {
+   id:               10
+   delay:            1
+   event:            Message
+   event_message:    "HAWK WINS!"
+   trigger:          "Event (ALL)"
+   trigger_param:    (2,3,4)
+}
+
+event: {
+   id:               20
+   delay:            1
+   event:            Message
+   event_message:    "FALCON WINS!"
+   trigger:          "Event (ALL)"
+   trigger_param:    (1,3,4)
+}
+
+event: {
+   id:               30
+   delay:            1
+   event:            Message
+   event_message:    "RAPTOR WINS!"
+   trigger:          "Event (ALL)"
+   trigger_param:    (1,2,4)
+}
+
+event: {
+   id:               40
+   delay:            1
+   event:            Message
+   event_message:    "CONDOR WINS!"
+   trigger:          "Event (ALL)"
+   trigger_param:    (1,2,3)
+}
+
+// exit conditions:
+
+
+event: {
+   id:               50
+   event:            Exit
+   delay:            10
+   trigger:          "Event (ANY)"
+   trigger_param:    (10,20,30,40)
+   event_target:     "Thrash.def"
+}
+
+event: {
+   id:               90
+   time:             900.0 // fifteen minute time limit
+   event:            Exit
+   trigger:          "Time"
+   event_target:     "Thrash.def"
+}
+
+
+// EOF

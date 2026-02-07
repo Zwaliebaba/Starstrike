@@ -1,0 +1,290 @@
+MISSION
+
+name:       "04. A Line in the Sand"
+desc:       "Air-to-ground action.  Destroy enemy mining operation on Haiche."
+type:       Strike
+system:     Haiche
+region:     Haiche
+
+start:      "05/09:05:00"
+stardate:   1079225678
+degrees:    true
+
+sitrep:     "The Hegemony is operating an illegal mining operation in the "
+            "Tantalus sector of Haiche.  Force:Command is planning an effort "
+            "to gain air and ground control of the sector.  As part of the "
+            "effort, you have been tasked with destroying the support "
+            "facilities for the mine."
+
+objective:  "* Destroy enemy mining operation\n"
+            "* Return safely to base"
+
+
+element: {
+   name:      "Archon",
+   design:    "Orion",
+   mission:   "FLIGHT_OPS",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Haiche",
+   loc:       (-25000, 0, 0),
+   head:      0,
+
+}
+
+element: {
+   name:      "Desperados",
+   design:    "Stormhawk",
+   carrier:   "Archon",
+   mission:   "Misc",
+   intel:     "Secret",
+   count:     20,
+   maint_count: 5,
+   dead_count:  5,
+   iff:       1,
+   playable:  false,
+   region:    "Haiche",
+   loc:       (0, 0, 0),
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+
+}
+
+element: {
+   name:      "Alpha",
+   design:    "Stormhawk",
+   squadron:  "Desperados",
+   mission:   "Strike",
+   intel:     "Secret",
+   count:     2,
+   alert:     true,
+   iff:       1,
+   player:    1,
+   playable:  true,
+   region:    "Haiche",
+   loc:       (5000, 2500, 0),
+
+   loadout:   { ship: -1, name: "Ground Strike" },
+
+   objective: { cmd: Strike, tgt: "Cooling Tower 1" },
+   objective: { cmd: Strike, tgt: "Cooling Tower 2" },
+   objective: { cmd: Strike, tgt: "Cooling Tower 3" },
+   objective: { cmd: Strike, tgt: "Cooling Tower 4" },
+
+   navpt:     { cmd: Vector,                       loc: (   0, -10e3,   0), speed: 500, rgn: "Haiche"   },
+   navpt:     { cmd: Vector,                       loc: (10e3,   5e3, 3e3), speed: 500, rgn: "Tantalus" },
+   navpt:     { cmd: Strike, tgt: "Cooling Tower", loc: (-1e3,   7e3, 3e3), speed: 500, rgn: "Tantalus" },
+   navpt:     { cmd: Vector,                       loc: (24e3,  -5e3, 3e3), speed: 500, rgn: "Tantalus" },
+   navpt:     { cmd: RTB,                          loc: (   0,  25e3,   0), speed: 500, rgn: "Haiche"   },
+}
+
+element: {
+   name:      "SAM-1",
+   design:    "SAM 1",
+   mission:   "Misc",
+   intel:     "Secret",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (75e3, -72e3, 0),
+   head:      3.142,
+
+}
+
+element: {
+   name:      "AAA-1",
+   design:    "AAA 2",
+   mission:   "Misc",
+   intel:     "Secret",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (65e3, 25e3, 0),
+   head:      1.571,
+
+}
+
+degrees: true
+
+element: {
+   name:      "Tantalus Mining Station",
+   design:    "Dsrt01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (0, 0, 0),
+}
+
+element: {
+   name:      "Administration",
+   design:    "Dsrt01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (3e3, 2e3, 0),
+}
+
+element: {
+   name:      "Refinery",
+   design:    "Dsrt00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-4e3, 3e3, 0),
+}
+
+element: {
+   name:      "Cooling Tower A",
+   design:    "Cool00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5e3, 2200, 0)
+}
+
+element: {
+   name:      "Cooling Tower B",
+   design:    "Cool00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5e3, 3000, 0)
+}
+
+element: {
+   name:      "Cooling Tower C",
+   design:    "Cool00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5e3, 3800, 0)
+}
+
+element: {
+   name:      "Cryo Tank A",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5.5e3, 2200, 0)
+}
+
+element: {
+   name:      "Cryo Tank B",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5.5e3, 3000, 0)
+}
+
+element: {
+   name:      "Cryo Tank C",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5.5e3, 3800, 0)
+}
+
+element: {
+   name:      "Reactor",
+   design:    "Reac01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (2e3, 1e3, 0),
+}
+
+element: {
+   name:      "Downtown",
+   design:    "Dsrt04",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-5e3, -2e3, 0),
+}
+
+element: {
+   name:      "Outpost",
+   design:    "Dsrt04",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (15e3, 2e3, 0),
+}
+
+element: {
+   name:      "Processing Plant",
+   design:    "Fact01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (5e3, 4e3, 0),
+}
+
+element: {
+   name:      "Valag",
+   design:    "Viper",
+   mission:   "Intercept",
+   intel:     "Secret",
+   count:     2,
+   iff:       2,
+   playable:  false,
+   region:    "Tantalus",
+   loc:       (-100e3, -110e3, 2e3),
+   head:      180,
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+
+   objective: { cmd: Intercept, tgt: "Alpha" },
+
+   navpt:     { cmd: Vector, loc: (-40e3, -41e3, 5e3), speed: 450, rgn: "Tantalus" },
+   navpt:     { cmd: Intercept, tgt: "Alpha", loc: (2e3, -21e3, 5e3), speed: 600, rgn: "Tantalus" },
+
+}
+
+// EOF

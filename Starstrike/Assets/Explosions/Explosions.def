@@ -1,0 +1,376 @@
+EXPLOSION
+
+explosion: {
+   type:             SHIELD_FLASH,
+   lifetime:         0.3,
+   light_level:      1e3,
+   light_decay:      0.5,
+   light_color:      (80,80,255),
+
+   num_parts:        8,
+   particles:        "Blast_pt3.pcx",
+   part_speed:       70,
+   part_drag:        1.5,
+   part_trail:       false,
+   part_decay:       150,
+   part_scale:       0,
+   part_bloom:       12,
+}
+
+explosion: {
+   type:             HULL_FLASH,
+   lifetime:         0.12,
+   length:           1,
+   scale:            12,
+   bitmap:           "flash2.pcx",
+   light_level:      1e3,
+   light_decay:      0.5,
+   light_color:      (255,180,96),
+   sound:            "Bang-87-01.wav",
+   sound_min_dist:   1e3,
+   sound_max_dist:   20e3
+}
+
+explosion: {
+   type:             BEAM_FLASH,
+   lifetime:         0.1,
+   length:           1,
+   scale:            4,
+   bitmap:           "flash2.pcx",
+   light_level:      1e3,
+   light_decay:      0.5,
+   light_color:      (255,180,96)
+}
+
+explosion: {
+   type:             HULL_BURST,
+   lifetime:         8,
+   light_level:      1e3,
+   light_decay:      0.5,
+   light_color:      (255,180,96),
+   num_parts:        32,
+   particles:        "blast_pt0.pcx",
+   part_speed:       150,
+   part_scale:       0.8,
+   part_decay:       80,
+   part_drag:        0.65,
+   sound:            "Bang-71-03.wav",
+   sound_min_dist:   1e3,
+   sound_max_dist:   20e3
+}
+
+explosion: {
+   type:             LARGE_BURST,
+   lifetime:         6,
+   light_level:      500,
+   light_decay:      0.65,
+   light_color:      (255,180,96),
+   num_parts:        100,
+   particles:        "blast_pt.pcx"
+   part_speed:       -500,
+   part_rate:        0.6,
+   part_scale:       1.5,
+   part_drag:        0.3,
+}
+
+explosion: {
+   type:             PLASMA_LEAK,
+   lifetime:         30,
+   light_level:      1e3,
+   light_decay:      0.5,
+   light_color:      (180,200,255),
+   num_parts:        250,
+   particles:        "plasma.pcx",
+   part_speed:       40,
+   part_scale:       0.75,
+   part_rate:        0.25,
+   continuous:       true
+}
+
+explosion: {
+   type:             SMOKE_TRAIL,
+   lifetime:         120,
+   light_level:      0,
+   light_decay:      0,
+   num_parts:        350,
+   particles:        smoke,
+   part_frames:      5,
+   part_speed:       40,
+   part_scale:       0.7,
+   part_rate:        0.2,
+   part_drag:        0.4,
+   part_bloom:       1.5,
+   part_decay:       60,
+   part_alpha:       2,
+   continuous:       true,
+}
+
+explosion: {
+   type:             HULL_FIRE,
+   lifetime:         100,
+   light_level:      500,
+   light_decay:      0.99,
+   light_color:      (255,200,100),
+   num_parts:        160,
+   particles:        "HullFire.pcx",
+   part_speed:       40,
+   part_scale:       0.2,
+   part_bloom:       1.7
+   part_decay:       120,
+   part_rate:        0.20,
+   part_trail:       true,
+   continuous:       true,
+}
+
+explosion: {
+   type:             SMALL_FIRE,
+   lifetime:         100,
+   light_level:      400,
+   light_decay:      0.95,
+   light_color:      (255,200,100),
+   num_parts:        50,
+   particles:        "HullFire.pcx",
+   part_speed:       30,
+   part_scale:       0.1,
+   part_bloom:       1.5,
+   part_decay:       170,
+   part_rate:        0.30,
+   part_trail:       false,
+   continuous:       true,
+}
+
+explosion: {
+   type:             SHOT_BLAST,
+   lifetime:         5,
+
+   light_level:      1e3,
+   light_decay:      0.8,
+   light_color:      (255,255,255),
+
+   num_parts:        150,
+   particles:        "blast_pt.pcx",
+   part_speed:       150,
+   part_trail:       false,
+   part_rate:        1,
+   part_decay:       255,
+   part_scale:       2,
+   part_bloom:       8,
+   sound:            "Blast-87-03.wav",
+   sound_min_dist:   5e3,
+   sound_max_dist:   20e3
+}
+
+
+explosion: {
+   type:             SMALL_EXPLOSION,
+   lifetime:         3,
+
+   light_level:      2e3,
+   light_decay:      0.8,
+   light_color:      (255,255,255),
+
+   num_parts:        100,
+   particles:        "Fire1.pcx",
+   part_speed:       90,
+   part_drag:        1.9,
+   part_trail:       true,
+   part_rate:        0.25,
+   part_decay:       185,
+   part_scale:       0,
+   part_bloom:       4,
+   sound:            "SmallExplosion.wav",
+   sound_min_dist:   1e3,
+   sound_min_dist:   20e3
+}
+
+
+explosion: {
+   type:             LARGE_EXPLOSION,
+   lifetime:         3,
+
+   light_level:      2e3,
+   light_decay:      0.8,
+   light_color:      (255,255,255),
+
+   num_parts:        140,
+   particles:        "Fire3.pcx",
+   part_speed:       270,
+   part_drag:        4,
+   part_trail:       false,
+   part_decay:       200,
+   part_rate:        0.3,
+   part_scale:       0,
+   part_bloom:       9,
+
+   sound:            "Explosion-72-04.wav",
+   sound_min_dist:   5e3,
+   sound_max_dist:   25e3
+}
+
+
+explosion: {
+   type:             NUKE_EXPLOSION,
+   lifetime:         10,
+
+   light_level:      5e3,
+   light_decay:      0.8,
+   light_color:      (255,255,255),
+
+   num_parts:        15,
+   particles:        "Blast_pt2.pcx",
+   part_speed:       350,
+   part_drag:        1.25,
+   part_trail:       false,
+   part_decay:       50,
+   part_rate:        0.25,
+   part_scale:       1,
+   part_bloom:       75,
+   sound:            "Distant-68-02big.wav",
+   sound_min_dist:   20e3,
+   sound_max_dist:   75e3
+}
+
+explosion: {
+   type:             QUANTUM_FLASH,
+   lifetime:         4,
+   light_level:      1e9,
+   light_decay:      0.5,
+   light_color:      (100,180,255),
+   sound:            "quantum.wav",
+   sound_min_dist:   5e3,
+   sound_max_dist:   30e3
+}
+
+explosion: {
+   type:             HYPER_FLASH,
+   lifetime:         4,
+
+   num_parts:        6,
+   particles:        "hyperball.pcx",
+   part_speed:       0,
+   part_trail:       false,
+   part_decay:       660,
+   part_rate:        4,
+   part_scale:       0.01,
+   part_bloom:       150,
+
+   light_level:      1e9,
+   light_decay:      0.33,
+   light_color:      (40,120,255),
+   sound:            "quantum.wav",
+   sound_min_dist:   5e3,
+   sound_max_dist:   30e3
+}
+
+explosion: {
+   type:             20,
+   lifetime:         8,
+   light_level:      300,
+   light_decay:      0.5,
+   light_color:      (255,180,96),
+   num_parts:        500,
+   particles:        "blast_pt.pcx",
+   part_speed:       250,
+   part_rate:        0.5,
+   part_decay:       80,
+   part_scale:       1.2
+   sound:            "Atomic-57-01.wav",
+   sound_min_dist:   10e3,
+   sound_max_dist:   30e3
+}
+
+
+explosion: {
+   type:             21, // drone destroyed by weapons fire
+   lifetime:         1.5,
+
+   light_level:      2e3,
+   light_decay:      0.8,
+   light_color:      (255,240,200),
+
+   num_parts:        40,
+   particles:        "Fire3.pcx",
+   part_speed:       250,
+   part_drag:        3,
+   part_trail:       false,
+   part_decay:       255,
+   part_rate:        0.5,
+   part_scale:       0,
+   part_bloom:       6,
+
+   sound:            "Explosion-72-05.wav",
+   sound_min_dist:   8e3,
+   sound_max_dist:   25e3
+}
+
+explosion: {
+   type:             22, // small fighter explosion
+   lifetime:         3,
+
+   light_level:      2e3,
+   light_decay:      0.3,
+   light_color:      (255,250,235),
+
+   num_parts:        75,
+   particles:        "Fire1.pcx",
+   part_speed:       -275,
+   part_drag:        1.9,
+   part_trail:       true,
+   part_rate:        0.5,
+   part_decay:       185,
+   part_scale:       0,
+   part_bloom:       5,
+   sound:            "Blast-87-02.wav",
+   sound_min_dist:   1e3,
+   sound_max_dist:   18e3
+}
+
+explosion: {
+   type:             23, // big fighter explosion
+   lifetime:         5,
+
+   light_level:      2e3,
+   light_decay:      0.5,
+   light_color:      (255,245,235),
+
+   num_parts:        100,
+   particles:        "Fire3.pcx",
+   part_speed:       -350,
+   part_drag:        2,
+   part_trail:       false,
+   part_decay:       230,
+   part_rate:        1.0,
+   part_scale:       0,
+   part_bloom:       6,
+
+   sound:            "Explosion-72-02mix.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   20e3
+}
+
+explosion: {
+   type:             24, // drone large burst variation
+   lifetime:         4,
+   light_level:      300,
+   light_decay:      0.65,
+   light_color:      (255,180,96),
+   num_parts:        80,
+   particles:        "blast_pt.pcx",
+   part_speed:       400,
+   part_rate:        1.0,
+   part_scale:       1.0,
+   part_drag:        0.3,
+}
+
+explosion: {
+   type:             25  // debris fire trail
+   lifetime:         3.5
+   num_parts:        360
+   particles:        "Fire1.pcx"
+   part_decay:       150
+   part_speed:       25
+   part_scale:       0.25
+   part_bloom:       0.75
+   part_rate:        0.4
+   continuous:       false
+}

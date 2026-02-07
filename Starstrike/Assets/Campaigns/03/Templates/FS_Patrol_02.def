@@ -1,0 +1,118 @@
+MISSION_TEMPLATE
+
+name:       "Fighter Patrol 2"
+type:       PATROL
+degrees:    true
+
+alias:      { name: A1, code: player_carrier    }
+alias:      { name: A2, code: player_squadron   }
+
+callsign:   { name: Player,  iff: 1 }
+callsign:   { name: Helper,  iff: 1 }
+callsign:   { name: Alpha,   iff: 2 }
+callsign:   { name: Bravo,   iff: 2 }
+callsign:   { name: Charlie, iff: 2 }
+callsign:   { name: Echo,    iff: 2 }
+
+element: {
+   name:    Player,
+   design:  Stormhawk,
+   squadron: A2,
+   commander: A1,
+   rloc:    { ref: A1, dex: 20e3, dex_var: 1e3 },
+   mission: patrol,
+
+   player:  1,
+   alert:   true,
+   count:   2,
+   iff:     1,
+
+   navpt:   { cmd: patrol, rloc: { ref: A1,       dex: 130e3, dex_var: 35e3, az:   0, az_var: 20 }, speed: 750 },
+   navpt:   { cmd: patrol, rloc: { ref: "this:1", dex: 150e3, dex_var: 25e3, az:  90, az_var: 20 }, speed: 750 },
+   navpt:   { cmd: patrol, rloc: { ref: "this:2", dex: 110e3, dex_var: 15e3, az: 170, az_var: 20 }, speed: 750 },
+   navpt:   { cmd: vector, rloc: { ref: A1,       dex: 40e3,                 az: 140, az_var: 10 }, speed: 500 },
+   navpt:   { cmd: rtb,    rloc: { ref: A1,       dex: 20e3,                 az: 180, az_var:  0 }, speed: 250 },
+ 
+   objective: { cmd: patrol,            tgt_desc: "inbound enemy units" },
+   objective: { cmd: rtb },
+
+   loadout: { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:    Helper,
+   design:  Falcon,
+   squadron: A2,
+   commander: A1,
+   rloc:    { ref: A1, dex: 55e3, dex_var: 25e3, az: -20, az_var: 10 },
+   mission: patrol,
+   count:   2,
+   iff:     1,
+}
+
+optional: {
+    min: 0,
+    max: 1,
+
+    element: {
+       name:    Test,
+       design:  IM2800,
+       rloc:    { ref: "Player:1", dex: 40e3, dex_var: 17e3 },
+       count:   1,
+       iff:     2,
+       intel:   secret,
+       navpt:   { cmd: vector, rloc: { ref: "Player:3", dex: 50e3, dex_var: 10e3 }, speed: 350 },
+    },
+
+    element: {
+       name:    Test,
+       design:  IM2800,
+       rloc:    { ref: "Player:3", dex: 40e3, dex_var: 17e3 },
+       count:   1,
+       iff:     2,
+       intel:   secret,
+       navpt:   { cmd: vector, rloc: { ref: "Player:1", dex: 50e3, dex_var: 10e3 }, speed: 350 },
+    },
+}
+
+ element: {
+    name:    Alpha,
+    design:  Razor,
+    rloc:    { ref: "Player:1", dex: 20e3, dex_var: 7e3 },
+    count:   2,
+    iff:     2,
+    loadout: { ship: -1, name: "ACM Medium Range" },
+    intel:   known,
+ }
+
+ element: {
+    name:    Bravo,
+    design:  Viper,
+    rloc:    { ref: "Player:2", dex: 25e3, dex_var: 5e3 },
+    count:   4,
+    iff:     2,
+    loadout: { ship: -1, name: "ACM Medium Range" },
+    intel:   secret,
+ }
+
+ optional: { min: 1, max: 2,
+     element: {
+        name:    Charlie,
+        design:  Cobra,
+        rloc:    { ref: "Player:3", dex: 25e3, dex_var: 5e3 },
+        count:   2,
+        iff:     2,
+        loadout: { ship: -1, name: "Ship Strike" },
+        intel:   secret,
+     },
+
+     element: {
+        name:    Echo,
+        design:  Viper,
+        rloc:    { ref: Charlie, dex: 18e3, dex_var: 2e3 },
+        count:   4,
+        iff:     2,
+        loadout: { ship: -1, name: "ACM Short Range" },
+        intel:   secret,
+     },
+ }

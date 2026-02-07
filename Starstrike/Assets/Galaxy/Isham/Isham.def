@@ -1,0 +1,223 @@
+STARSYSTEM
+
+name:       Isham
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Isham.mag",
+   poly_stars: "stars.mag",
+   haze:       "Isham/Garden/TerrainHaze.mag"
+   }
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (10,  8,  8)
+
+star:        {
+   name:    Isham,
+   map:     "Suns/StarK_map.pcx"
+   image:   "Suns/K1.pcx",
+   tscale:  6,
+   radius:  16e8,
+   mass:    2e30,
+   light:   1.6e11,
+   color:   (255, 250, 230),// - K
+   back:    ( 30,  18,  12) // - nebula25
+}
+
+planet:     {
+   name:    Garden
+   map:     "Isham/garden_map.pcx"
+   image:   "Isham/garden_lo.pcx",
+   high_res:"Isham/garden_hi.jpg",
+   gloss:   "Isham/garden_gloss.jpg",
+   radius:  3.75e6,
+   mass:    5.6e23,
+   atmosphere: (145,170,190),
+   orbit:   1.8e11,
+   rotation: 26.3
+}
+
+terrain: {
+   name:          "Tiger Bay",
+   radius:        480e3,
+   grid:          20e3,
+
+   patch:         "Isham/Garden/terrain.pcx"
+   patch_texture: "Isham/Garden/terrain_big.pcx"
+   apron:         "Isham/Garden/terrain_apron.pcx"
+   apron_texture: "Isham/Garden/terrain_apron_tex.pcx"
+   sky_color:     "Isham/Garden/terrain_sky.pcx"
+
+   water_texture: "Isham/Garden/Water.pcx"
+
+   layer: { tile: "Isham/Garden/Sand.pcx"   height:    0  detail: "Haiche/Tantalus/noise0.pcx" }
+   layer: { tile: "Isham/Garden/Forest.pcx" height: 3000  detail: "Isham/Garden/noise1.pcx" }
+   layer: { tile: "Isham/Garden/Rock.pcx"   height: 9500  detail: "Isham/Garden/noise1.pcx" }
+
+   clouds_high:   "Isham/Garden/terrain_cloud0.pcx",
+   clouds_low:    "Isham/Garden/terrain_cloud1.pcx",
+   shades_low:    "Isham/Garden/terrain_cloud1a.pcx",
+   clouds_alt_high: 17.5e3,
+   clouds_alt_low:  12.1e3,
+
+   scale:         1.5e3,
+   mtnscale:      65,
+   haze_fade:     0.4,
+   fog_density:   0.4,
+   fog_scale:     5,
+   
+   weather_period:        659876,
+
+   weather_high_clouds:      25,
+   weather_moderate_clouds:  40,
+   weather_overcast:          0,
+   weather_fog:               0,
+   weather_storm:             0,
+}
+
+region:     {
+   name:    Garden,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   17e6,
+   inclination: 0.4
+}
+
+
+// GAS GIANTS:
+
+planet: {
+   name:    Senesca,
+   map:     "Giants/GasGiant10_map.pcx"
+   image:   "Giants/GasGiant10.jpg",
+   radius:  14.1e6,
+   mass:    3.6e26,
+   tilt:    0.2,
+   ring:    "Giants/Ring2.pcx",
+   minrad:  1.5,
+   maxrad:  1.8,
+   orbit:   2.65e11,
+   rotation: 61.3
+}
+
+region: {
+   name:    Senesca,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   55.53e6,
+   inclination: 0.3
+}
+
+moon: {
+   name:    Tarawa
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  2.3e6,
+   rotation: 16.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   4.11e8
+}
+
+moon: {
+   name:    Maia,
+   map:     "Jarnell/lanos_map.pcx",
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  4.2e6,
+   rotation: 18.4,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   6.24e8
+}
+
+
+planet: {
+   name:    Ramek,
+   map:     "Giants/GasGiant9_map.pcx",
+   image:   "Giants/GasGiant9.jpg",
+   radius:  18.1e6,
+   mass:    3.6e26,
+   tscale:  2,
+   tilt:    0.13,
+   orbit:   3.35e11,
+   rotation: 31.3
+}
+
+region: {
+   name:    Ramek,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   65.3e6,
+   inclination: 0.3
+}
+
+moon: {
+   name:    Alin
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  5.3e6,
+   rotation: 16.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   4.11e8
+}
+
+moon: {
+   name:    Orpheus
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  3.1e6,
+   rotation: 18.4,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   6.24e8
+}
+
+moon: {
+   name:    Tenebrus,
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6.1e6,
+   rotation: 38.4,
+   mass:    5.98e24,
+   orbit:   13.24e8
+}
+
+
+
+planet:     {
+   name:    Relay,
+   map:     "Isham/relay_map.pcx",
+   image:   "Isham/relay_lo.pcx",
+   high_res:"Isham/relay_hi.jpg",
+   gloss:   "Isham/relay_gloss.jpg",
+   radius:  3.15e6,
+   mass:    4.6e23,
+   atmosphere: (130,120,110),
+   orbit:   4.18e11,
+   rotation: 14.3
+}
+
+region:     {
+   name:    Relay,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   14e6,
+   inclination: 0.3,
+   link:    Solnas,   // Korius
+   link:    Volova,   // Kolchev
+   link:    Cavenda,  // Radix
+   link:    Nerasil,  // Garrison
+   link:    Path,     // Trocanther
+}
+

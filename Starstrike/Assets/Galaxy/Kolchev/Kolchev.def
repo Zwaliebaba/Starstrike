@@ -1,0 +1,217 @@
+STARSYSTEM
+
+name:       Kolchev
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Kolchev.mag",
+   poly_stars: "stars.mag",
+   haze:       "Kolchev/Lovo/TerrainHaze.mag"
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (13, 10, 8)
+
+star:        {
+   name:    Kurset
+   map:     "Suns/StarG_map.pcx"
+   image:   "Suns/G3.pcx",
+   tscale:  6,
+   radius:  16e8,
+   mass:    2e30,
+   light:   1.6e11,
+   color:   (255, 252, 250),// - G White
+   back:    ( 50,  45,  35) // - nebula3
+}
+
+planet:     {
+   name:    Ilya
+   map:     "Kolchev/ilya_map.pcx"
+   image:   "Kolchev/ilya_lo.pcx",
+   high_res:"Kolchev/ilya_hi.pcx",
+   radius:  3.6e6,
+   mass:    4.1e26,
+   orbit:   1.03e11,
+   rotation: 19.3
+}
+
+region:     {
+   name:    Ilya,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   18e6,
+   inclination: 0.5
+}
+
+
+planet:     {
+   name:    Kolchev
+   map:     "Kolchev/kolchev_map.pcx"
+   image:   "Kolchev/kolchev_lo.pcx"
+   high_res:"Kolchev/kolchev_hi.jpg"
+   gloss:   "Kolchev/kolchev_gloss.jpg"
+   glow_high_res: "Kolchev/kolchev_lights.jpg"
+   atmosphere: (130,130,150)
+   radius:  4.8e6,
+   mass:    3.9e24,
+   orbit:   1.95e11,
+   rotation: 23.3
+}
+
+terrain: {
+   name:          Lovo,
+   radius:        480e3,
+   grid:          20e3,
+
+   patch:         "Kolchev/Lovo/terrain.pcx",
+   patch_texture: "Kolchev/Lovo/terrain_big.pcx",
+   apron:         "Kolchev/Lovo/terrain_apron.pcx",
+   apron_texture: "Kolchev/Lovo/terrain_apron_tex.pcx",
+   sky_color:     "Kolchev/Lovo/terrain_sky.pcx",
+
+   layer: { tile: "Kolchev/Lovo/Layer0.pcx"  height:     0  detail: "Kolchev/Lovo/noise0.pcx" }
+   layer: { tile: "Kolchev/Lovo/Layer1.pcx"  height:  4500  detail: "Kolchev/Lovo/noise0.pcx" }
+   layer: { tile: "Kolchev/Lovo/Layer2.pcx"  height: 11500  detail: "Kolchev/Lovo/noise0.pcx" }
+
+   clouds_high:   "Kolchev/Lovo/terrain_cloud0.pcx",
+   clouds_low:    "Kolchev/Lovo/terrain_cloud1.pcx",
+   shades_low:    "Kolchev/Lovo/terrain_cloud1a.pcx",
+   clouds_alt_high: 18.3e3,
+   clouds_alt_low:  15.1e3,
+
+   scale:         1.75e3,
+   mtnscale:      75,
+   haze_fade:     0.35,
+   fog_density:   0.45,
+   fog_scale:     4.5,
+   
+   weather_period:        49876,
+
+   weather_high_clouds:     100,
+   weather_moderate_clouds:   0,
+   weather_overcast:          0,
+   weather_fog:               0,
+   weather_storm:             0,
+}
+
+region:     {
+   name:    Kolchev,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   21e6,
+   inclination: 0.4
+}
+
+moon: {
+   name:    "Odin"
+   map:     "Borova/maraner_map.pcx"
+   image:   "Borova/maraner_lo.pcx",
+   high_res:"Borova/maraner_hi.pcx",
+   radius:  1.4e6,
+   mass:    4.3e23,
+   orbit:   40e6,
+   rotation: 9.2
+}
+
+moon: {
+   name:    "Dva"
+   map:     "Moons/Moon2_map.pcx"
+   high_res:"Moons/Moon2.jpg",
+   radius:      0.85e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        0.6e24,
+   orbit:       71e6
+}
+
+
+
+planet: {
+   name:    Anatoly
+   map:     "Giants/GasGiant6_map.pcx"
+   image:   "Giants/GasGiant6.jpg",
+   radius:  29.1e6,
+   mass:    3.6e26,
+   tscale:  2,
+   tilt:    0.13,
+   orbit:   2.95e11,
+   rotation: 29.3
+}
+
+region: {
+   name:    Anatoly,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   79.53e6,
+   inclination: 0.2
+}
+
+planet: {
+   name:    Volova,
+   map:     "Giants/GasGiant9_map.pcx"
+   image:   "Giants/GasGiant9.jpg",
+   radius:  20e6,
+   mass:    5.42e26,
+   orbit:   3.75e11,
+   tilt:    0.25,
+   ring:    "Giants/Ring2.pcx",
+   minrad:  1.2,
+   maxrad:  1.9,
+   rotation: 19.5,
+}
+
+region: {
+   name:    Volova,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   1.2e8,
+   inclination: 0.3,
+   link:    Kala,     // Haiche
+   link:    Aram,     // Ostara
+   link:    Solnas,   // Kolchev
+   link:    Relay,    // Isham
+   link:    Theramin, // Tarsus
+   link:    Cavenda,  // Radix
+}
+
+moon: {
+   name:    Anya
+   map:     "Silessia/nero_map.pcx"
+   image:   "Silessia/nero_lo.pcx",
+   high_res:"Silessia/nero_hi.jpg",
+   radius:  3e6,
+   mass:    3e22,
+   orbit:   2.65e8,
+   rotation: 100
+}
+
+moon: {
+   name:    Vlad
+   map:     "Moons/Moon1_map.pcx"
+   image:   "Moons/Moon1_lo.pcx",
+   high_res:"Moons/Moon1.jpg",
+   radius:      5.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        6.0e24,
+   orbit:       4.31e8
+}
+
+moon: {
+   name:    Dmitri,
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6e6,
+   rotation: 18.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   8.14e8
+}
+
+

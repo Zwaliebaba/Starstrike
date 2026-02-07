@@ -1,0 +1,146 @@
+MISSION
+
+name:   "Cmpn04 Brief07 - Loris"
+type:   "Patrol"
+system: Loris
+region: Loris
+stardate: 1177553311.0
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (1e3, 30e3, 0)
+}
+
+
+// HEGEMONY 17TH BATTLE GROUP 'INTRUDER'
+
+element: {
+   name:      Royale
+   design:    Imperial
+   mission:   Fleet
+
+   intel:     Secret
+   count:     1
+   command_ai:1
+   iff:       0
+   region:    Loris
+   loc:       (12e3, 15e3, 2e3)
+   head:      90
+   navpt:     { cmd: Vector, loc: (78e3, -70e3, 2e3), rgn: Loris, speed: 600 }
+}
+
+
+element: {
+   name:      "Merin Asgar"
+   design:    Volnaris
+   mission:   Fleet
+
+   intel:     Secret
+   count:     1
+   command_ai:1
+   iff:       0
+   region:    Loris
+   loc:       (25e3, 13e3, -1e3)
+   head:      90
+   navpt:     { cmd: Vector, loc: (87e3, -90e3, -1e3), rgn: Loris, speed: 600 }
+}
+
+
+// CIVILIAN FREIGHT TRAFFIC
+
+element: {
+   name:      Cargo
+   design:    IM3500
+   mission:   Misc
+
+   count:     1
+   iff:       0
+   loc:       (23e3, 50e3, 0)
+   rgn:       Casalle
+   navpt:     { cmd: Vector, loc: (23e3,-50e3,0), rgn: Casalle, speed: 500 }
+}
+
+
+element: {
+   name:      Tanker
+   design:    IM1912
+   mission:   Misc
+
+   count:     1
+   iff:       0
+   loc:       (21e3, 51e3, 60)
+   rgn:       Casalle
+   navpt:     { cmd: Vector, loc: (20e3,-50e3,60), rgn: Casalle, speed: 500 }
+}
+
+element: {
+   name:      Cutlass
+   design:    Cutlass
+   iff:       3
+   count:     4
+   intel:     Secret
+   loc:       (10e3,20e3,0)
+   rgn:       Casalle
+   navpt:     { cmd: Assault, tgt: Tanker, loc: (20e3, 45e3, 0), rgn: Casalle, speed: 1000 }
+}
+
+element: {
+   name:      Marauder
+   design:    Marauder
+   iff:       3
+   count:     1
+   intel:     Secret
+   loc:       (-30e3, -40e3, 2e3)
+   navpt:     { cmd: Vector, loc: (20e3, 40e3,0), rgn: Casalle, speed: 500 }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Display,               image: "Campaigns\04/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+
+event: { event: Camera,                param: 3,  target: "body:Loris", vec: (5, -0.15, 2.2e7)   }
+event: { event: Camera,                param: 5,                           vec: (-0.11, 0.015, -0.015)  }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "FORCE:INTEL BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "*************************************\n*** FLASH CODED +$TIME\n*** LORIS GOVERNMENT COLLAPSE\n*** LORIS SECTOR\n*** CLASSIFIED: SECRET R3 NTK\n*************************************" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\04/Briefing_07_Loris_Collapse.wav" }
+
+
+event: { event: Camera,     time:  10, param: 3,  target: "body:Casalle",  vec: (0, -0.1, 5e7)   }
+event: { event: Camera,                param: 5,                           vec: (-0.15, 0.01, 0.02)  }
+event: { event: Display,    fade:  (1,3,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Casalle Sector" }
+
+event: { event: Camera,     time:  15, param: (6,90), target: "Tanker"   }
+event: { event: Display,    fade:  (1,7,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Civilian Freight Traffic" }
+
+
+event: { event: Camera,     time:  25, param: (6,25), target: "Cutlass 1"   }
+event: { event: Display,    fade:  (1,7,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Brotherhood of Iron Fighters" }
+
+
+event: { event: Camera,     time:  37, param: (6,17), target: "Marauder"   }
+
+
+event: { event: Camera,     time:  50, param: (6,30), target: "Royale"   }
+
+event: { event: EndScene,   time:  77, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

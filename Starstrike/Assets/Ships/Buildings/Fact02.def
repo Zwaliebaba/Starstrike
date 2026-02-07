@@ -1,0 +1,35 @@
+SHIP
+
+name:         Fact02
+class:        Building
+display_name: "Factory"
+hud_icon:     "hud_fact02.pcx"
+
+detail_0:   "Fact02-0.mag"
+feature_0:  1000
+detail_1:   "Fact02-6.mag"
+feature_1:  6
+
+mass:       5e3
+integrity:  10e3
+scale:      2
+acs:        50e3
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       10,   // SMALL_EXPLOSION
+   final_loc:        (0, 32, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 64, 0),
+
+   final_type:       8,    // smoke trail
+   final_loc:        (0,  0, 0),
+   }
+
+
+

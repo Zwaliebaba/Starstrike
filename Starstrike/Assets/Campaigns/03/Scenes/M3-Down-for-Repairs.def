@@ -1,0 +1,48 @@
+MISSION
+
+name:   "Cmpn 03 Mail 03"
+type:   "Patrol"
+system: Thralis
+region: Thrale
+
+element: {
+   name:      "Magellan IV"
+   design:    IM2800
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Hold,                  param: 90, event_ship:  "Magellan IV" }
+event: { event: Camera,     time:   0, param: (6, 90), target: "Magellan IV" }
+
+event: { event: Display,    message: "MAIL", font: Limerick18, color: 0xffffffff, fade: (0,90,0), rect: (20,20, 300,100) }
+
+event: { event: Display,    time:   1, message: "Decoding Path...",    fade: (0,2,0), rect: (20, 40, 600,150), font: OCRB, color: 0xff33ff44, sound: "Bleep6.wav" }
+
+event: { event: Display,    time:   3, message: "Decoding Content...", fade: (0,2,0), rect: (20,190, 600,800), font: OCRB, color: 0xff33ff44, sound: "Bleep12.wav" }
+
+event: { event: Display,               fade: (0,90,0), rect: (20,40, 600,150), font: OCRB, color: 0xff33ff44,
+         message: "TO: $RANK $NAME\nCO: $GROUP\nFM: Capt. Jonas Devlin - Magellan IV\nRE: DOWN FOR REPAIRS\n-----\nPATH: Magellan IV Shipboard | Organon Motives | Thralis Relay | Force Command Transceiver | 4TH FLEET HQ | $GROUP\n-----" }
+
+event: { event: Display,    time:   5, fade: (0,90,0), rect: (20,190, 600,800), font: OCRB, color: 0xff33ff44,
+         message: "Hey Mate\n\nWell, Maggie is in the shop.  We made it into Thralis just in time to lose the quantum drive.  We're sitting in the Organon Motives repair yard waiting on parts for a drive overhaul while I try to call in every favor I have left in the system.  I'm just about ready to steal the whole drive system from the next Force Cruiser that passes by just so that we can get back underway.\n\nAt least I've had a chance to get caught up on the local nets.  This war of yours is big news out here mate, and Thralis isn't exactly on the front lines.  The Thracian Titans even canceled their season ending match against Sparta in honor of the lost crew of the CV-72.  Really though, I think Thrace just needed an excuse to avoid the match.  Hollis is the worst manager they've had in a decade.  Anyway, I was glad to see your name wasn't on the missing in action list.\n\nHey, did you see the news interview with Sara the first night of the fighting in Vestapol?  Strange coincidence that she would happen to be on the ground just when a squad of Hegemony goons shows up to knock over the museum.  Glad she's all right.  Good thing that guardian angel of hers was working over time.\n\nStay sharp out there.  I don't think anyone is looking out for your welfare except you!\n\n--Jonas" }
+
+
+event: {
+   event: Message
+   time:  5
+   sound: "Vox\Scenes\03/Mail_03_Down_for_Repairs.wav"
+}
+
+
+event: { event: EndScene,   time: 83, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

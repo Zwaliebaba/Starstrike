@@ -1,303 +1,593 @@
 #include "pch.h"
-#include "explosion.h"
-#include "GameApp.h"
-#include "fast_darray.h"
-#include "globals.h"
-#include "main.h"
-#include "math_utils.h"
-#include "profiler.h"
-#include "renderer.h"
-#include "resource.h"
+#include "Explosion.h"
+#include "AudioConfig.h"
+#include "Bitmap.h"
+#include "CameraDirector.h"
+#include "DataLoader.h"
+#include "Light.h"
+#include "ParseUtil.h"
+#include "Particles.h"
+#include "QuantumFlash.h"
+#include "Reader.h"
+#include "Scene.h"
+#include "Ship.h"
+#include "Sim.h"
+#include "Sound.h"
+#include "Sprite.h"
 
-#define EXPLOSION_LIFETIME		5.0f
-#define MAX_INITIAL_SPEED		3.0f
-#define MAX_ANG_VEL				4.0f
-#define ACCEL_DUE_TO_GRAV		(-GRAVITY)
-#define INITIAL_VERTICAL_SPEED	10.0f
-#define MIN_FRAG_LIFE			0.0f			// As a fraction of EXPLOSION_LIFETIME
-#define FRICTION_COEF			0.05f			// Bigger means more friction
-#define ROT_FRICTION_COEF		0.2f			// Bigger means more rotational friction
-#define NUM_TUMBLERS			5
+constexpr int MAX_EXPLOSION_TYPES = 32;
 
-//*****************************************************************************
-// Class Tumbler
-//*****************************************************************************
+static float lifetimes[MAX_EXPLOSION_TYPES];
+static float scales[MAX_EXPLOSION_TYPES];
+static Bitmap* bitmaps[MAX_EXPLOSION_TYPES];
+static Bitmap* particle_bitmaps[MAX_EXPLOSION_TYPES];
+static int part_frames[MAX_EXPLOSION_TYPES];
+static int lengths[MAX_EXPLOSION_TYPES];
+static float light_levels[MAX_EXPLOSION_TYPES];
+static float light_decays[MAX_EXPLOSION_TYPES];
+static Color light_colors[MAX_EXPLOSION_TYPES];
+static int num_parts[MAX_EXPLOSION_TYPES];
+static int part_types[MAX_EXPLOSION_TYPES];
+static float part_speeds[MAX_EXPLOSION_TYPES];
+static float part_drags[MAX_EXPLOSION_TYPES];
+static float part_scales[MAX_EXPLOSION_TYPES];
+static float part_blooms[MAX_EXPLOSION_TYPES];
+static float part_rates[MAX_EXPLOSION_TYPES];
+static float part_decays[MAX_EXPLOSION_TYPES];
+static bool part_trails[MAX_EXPLOSION_TYPES];
+static int part_alphas[MAX_EXPLOSION_TYPES];
+static Sound* sounds[MAX_EXPLOSION_TYPES];
+static bool recycles[MAX_EXPLOSION_TYPES];
 
-Tumbler::Tumbler()
+Explosion::Explosion(int t, const Vec3& pos, const Vec3& vel, float exp_scale, float part_scale, SimRegion* rgn,
+                     SimObject* src)
+  : SimObject("Explosion", t),
+    type(t),
+    particles(nullptr),
+    source(src)
 {
-  m_rotMat.SetToIdentity();
-  m_angVel.x = sfrand(MAX_ANG_VEL);
-  m_angVel.y = sfrand(MAX_ANG_VEL);
-  m_angVel.z = sfrand(MAX_ANG_VEL);
-}
+  SimObserver::Observe(source);
 
-void Tumbler::Advance()
-{
-  Matrix33 rotIncrement(m_angVel.x * g_advanceTime, m_angVel.y * g_advanceTime, m_angVel.z * g_advanceTime);
-  m_rotMat *= rotIncrement;
+  Physical::MoveTo(pos);
+  velocity = vel;
+  drag = 0.3f;
+  rep = nullptr;
+  light = nullptr;
+  life = 0;
 
-  // Rotational Friction
-  m_angVel *= 1.0f - (g_advanceTime * ROT_FRICTION_COEF);
-}
-
-Explosion::Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fraction)
-  : m_numTumblers(NUM_TUMBLERS),
-    m_tris(nullptr),
-    m_numTris(0)
-{
-  m_tumblers = NEW Tumbler[m_numTumblers];
-
-  m_timeToDie = g_gameTime + EXPLOSION_LIFETIME;
-
-  FastDArray<ExplodingTri> triangles;
-
-  Matrix34 totalTransform = _frag->m_transform * _transform;
-  LegacyVector3 transformedFragCenter = totalTransform * _frag->m_center;
-
-  for (int j = 0; j < _frag->m_numTriangles; ++j)
+  if (type == QUANTUM_FLASH)
   {
-    if (_fraction < 1.0f && frand(1.0f) > _fraction)
-      continue;
+    life = 1.1;
 
-    const ShapeTriangle& shapeTri = _frag->m_triangles[j];
-    const VertexPosCol& v1 = _frag->m_vertices[shapeTri.v1];
-    const VertexPosCol& v2 = _frag->m_vertices[shapeTri.v2];
-    const VertexPosCol& v3 = _frag->m_vertices[shapeTri.v3];
+    auto q = NEW QuantumFlash();
+    rep = q;
 
-    ExplodingTri tri;
-    tri.m_colour = _frag->m_colours[v1.m_colId];
-    tri.m_v1 = _frag->m_positions[v1.m_posId] * totalTransform;
-    tri.m_v2 = _frag->m_positions[v2.m_posId] * totalTransform;
-    tri.m_v3 = _frag->m_positions[v3.m_posId] * totalTransform;
+    light = NEW Light(1e9, 0.66f);
+    light->SetColor(Color(180, 200, 255));
+  }
 
-    if (tri.m_v1 == tri.m_v2 || tri.m_v2 == tri.m_v3 || tri.m_v1 == tri.m_v3)
-      continue;
+  else if (type >= 0 && type < MAX_EXPLOSION_TYPES)
+  {
+    life = lifetimes[type];
 
-    float circum = (tri.m_v1 - tri.m_v2).Mag() + (tri.m_v2 - tri.m_v3).Mag() + (tri.m_v3 - tri.m_v1).Mag();
-
-    if (circum < 6.0f)
+    if (source)
     {
-      // Too small to care about
-      continue;
+      Matrix src_orient = source->Cam().Orientation();
+      src_orient.Transpose();
+      mount_rel = (pos - source->Location()) * src_orient;
     }
 
-    LegacyVector3 center = (tri.m_v1 + tri.m_v2 + tri.m_v3) * 0.3333f;
+    if (lengths[type] > 0)
+    {
+      int repeat = (lengths[type] == 1);
+      auto s = NEW Sprite(bitmaps[type], lengths[type], repeat);
+      s->Scale(exp_scale * scales[type]);
+      s->SetAngle(PI * rand() / 16384.0);
+      s->SetLuminous(true);
+      rep = s;
+    }
 
-    tri.m_v1 -= center;
-    tri.m_v2 -= center;
-    tri.m_v3 -= center;
+    if (light_levels[type] > 0)
+    {
+      light = NEW Light(light_levels[type], light_decays[type]);
+      light->SetColor(light_colors[type]);
+    }
 
-    LegacyVector3 a = tri.m_v1 - tri.m_v2;
-    LegacyVector3 b = tri.m_v2 - tri.m_v3;
-    tri.m_norm = (a ^ b).Normalize();
-    if (j & 1)
-      tri.m_norm = -tri.m_norm;
-
-    tri.m_vel = (center - transformedFragCenter) * (MAX_INITIAL_SPEED);
-    tri.m_vel.y += INITIAL_VERTICAL_SPEED;
-    tri.m_pos = center;
-    tri.m_tumbler = &m_tumblers[darwiniaRandom() % NUM_TUMBLERS];
-    tri.m_timeToDie = g_gameTime + EXPLOSION_LIFETIME;
-
-    triangles.PutData(tri);
+    if (num_parts[type] > 0)
+    {
+      particles = NEW Particles(particle_bitmaps[type], num_parts[type], pos, Vec3(0.0f, 0.0f, 0.0f),
+                                part_speeds[type] * part_scale, part_drags[type], part_scales[type] * part_scale,
+                                part_blooms[type] * part_scale, part_decays[type], part_rates[type], recycles[type],
+                                part_trails[type], (rgn && rgn->IsAirSpace()), part_alphas[type], part_frames[type]);
+    }
   }
 
-  m_numTris = triangles.Size();
-  if (m_numTris > 0)
+  if (rep)
+    rep->MoveTo(pos);
+
+  if (light)
+    light->MoveTo(pos);
+}
+
+Explosion::~Explosion() { GRAPHIC_DESTROY(particles); }
+
+bool Explosion::Update(SimObject* obj)
+{
+  if (obj == source)
   {
-    m_tris = NEW ExplodingTri[m_numTris];
-    memcpy(m_tris, triangles.GetPointer(0), sizeof(ExplodingTri) * m_numTris);
-  }
-}
+    source = nullptr;
 
-Explosion::~Explosion()
-{
-  m_numTumblers = 0;
-  delete [] m_tumblers;
-  m_tumblers = nullptr;
+    if (life < 0 || life > 4)
+      life = 4;
 
-  m_numTris = 0;
-  delete [] m_tris;
-  m_tris = nullptr;
-}
-
-bool Explosion::Advance()
-{
-  float deltaVelY = ACCEL_DUE_TO_GRAV * g_advanceTime;
-
-  // Advance all tumblers
-  for (int i = 0; i < m_numTumblers; ++i)
-    m_tumblers[i].Advance();
-
-  // Advance all ExplodingTriangles
-  for (int i = 0; i < m_numTris; ++i)
-  {
-    if (g_gameTime > m_tris[i].m_timeToDie)
-      continue;
-
-    m_tris[i].m_pos += m_tris[i].m_vel * g_advanceTime;
-
-    // Friction
-    float speed = m_tris[i].m_vel.Mag();
-    float friction = speed * FRICTION_COEF * g_advanceTime;
-    if (friction > 1.0f)
-      friction = 1.0f;
-    m_tris[i].m_vel *= 1.0f - friction;
-
-    // Gravity
-    m_tris[i].m_vel.y += deltaVelY;
+    if (particles)
+      particles->StopEmitting();
   }
 
-  if (g_gameTime > m_timeToDie)
-    return true;
-
-  return false;
+  return SimObserver::Update(obj);
 }
 
-void Explosion::Render()
+std::string Explosion::GetObserverName() const
 {
-  // someone tries to render explosion with 0 tris
-  // happens at "kill all enemies"
-  if (!m_numTris)
+  static char name[128];
+  if (source)
+    sprintf_s(name, "Explosion(%s)", source->Name().c_str());
+  else
+    sprintf_s(name, "Explosion");
+  return name;
+}
+
+void Explosion::Initialize()
+{
+  static int initialized = 0;
+  if (initialized)
     return;
 
-  float age = (EXPLOSION_LIFETIME + (g_gameTime - m_timeToDie)) / EXPLOSION_LIFETIME;
+  ZeroMemory(lifetimes, sizeof(lifetimes));
+  ZeroMemory(scales, sizeof(scales));
+  ZeroMemory(bitmaps, sizeof(bitmaps));
+  ZeroMemory(particle_bitmaps, sizeof(particle_bitmaps));
+  ZeroMemory(lengths, sizeof(lengths));
+  ZeroMemory(light_levels, sizeof(light_levels));
+  ZeroMemory(light_decays, sizeof(light_decays));
+  ZeroMemory(light_colors, sizeof(light_colors));
+  ZeroMemory(num_parts, sizeof(num_parts));
+  ZeroMemory(part_types, sizeof(part_types));
+  ZeroMemory(part_speeds, sizeof(part_speeds));
+  ZeroMemory(part_drags, sizeof(part_drags));
+  ZeroMemory(part_scales, sizeof(part_scales));
+  ZeroMemory(part_blooms, sizeof(part_blooms));
+  ZeroMemory(part_decays, sizeof(part_decays));
+  ZeroMemory(part_rates, sizeof(part_rates));
+  ZeroMemory(part_trails, sizeof(part_trails));
+  ZeroMemory(part_alphas, sizeof(part_alphas));
+  ZeroMemory(sounds, sizeof(sounds));
+  ZeroMemory(recycles, sizeof(recycles));
 
-  glBegin(GL_TRIANGLES);
-  for (int i = 0; i < m_numTris; ++i)
+  auto filename = "Explosions.def";
+  DebugTrace("Loading Explosion Defs '{}'\n", filename);
+
+  // Load Design File:
+  DataLoader* loader = DataLoader::GetLoader();
+  BYTE* block;
+
+  loader->SetDataPath("Explosions\\");
+  int blocklen = loader->LoadBuffer(filename, block, true);
+  Parser parser(NEW BlockReader((const char*)block));
+  Term* term = parser.ParseTerm();
+
+  if (!term)
   {
-    if (g_gameTime > m_tris[i].m_timeToDie)
-      continue;
-
-    const LegacyVector3 norm(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_norm);
-    const LegacyVector3 v1(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_v1 + m_tris[i].m_pos);
-    const LegacyVector3 v2(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_v2 + m_tris[i].m_pos);
-    const LegacyVector3 v3(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_v3 + m_tris[i].m_pos);
-
-    glColor4ub(m_tris[i].m_colour.r, m_tris[i].m_colour.g, m_tris[i].m_colour.b, (1.0f - age) * 255);
-
-    glNormal3fv(norm.GetDataConst());
-
-    glTexCoord2i(0, 0);
-    glVertex3fv(v1.GetDataConst());
-    glTexCoord2i(0, 1);
-    glVertex3fv(v2.GetDataConst());
-    glTexCoord2i(1, 1);
-    glVertex3fv(v3.GetDataConst());
+    DebugTrace("ERROR: could not parse '{}'\n", filename);
+    exit(-3);
   }
-  glEnd();
-}
-
-LegacyVector3 Explosion::GetCenter() const
-{
-  auto sum = LegacyVector3(0, 0, 0);
-  unsigned summed = 0;
-  for (int i = 0; i < m_numTris; ++i)
+  TermText* file_type = term->isText();
+  if (!file_type || file_type->value() != "EXPLOSION")
   {
-    if (g_gameTime > m_tris[i].m_timeToDie)
-      continue;
-    sum += m_tris[i].m_pos;
-    summed++;
-  }
-  if (summed)
-    return sum / summed;
-  DEBUG_ASSERT(0);
-  return sum;
-}
-
-//*****************************************************************************
-// Class ExplosionManager
-//*****************************************************************************
-
-ExplosionManager g_explosionManager;
-
-ExplosionManager::ExplosionManager() {}
-
-ExplosionManager::~ExplosionManager() { m_explosions.EmptyAndDelete(); }
-
-void ExplosionManager::AddExplosion(ShapeFragment* _frag, const Matrix34& _transform, bool _recurse, float _fraction)
-{
-  if (_fraction <= 0.0f)
-    return;
-
-  if (_frag->m_numTriangles > 0)
-  {
-    auto explosion = NEW Explosion(_frag, _transform, _fraction);
-    m_explosions.PutData(explosion);
+    DebugTrace("ERROR: invalid explosion def file '{}'\n", filename);
+    exit(-4);
   }
 
-  if (_recurse)
+  do
   {
-    Matrix34 totalMatrix = _frag->m_transform * _transform;
+    delete term;
 
-    for (unsigned int i = 0; i < _frag->m_childFragments.Size(); ++i)
+    term = parser.ParseTerm();
+
+    if (term)
     {
-      ShapeFragment* child = _frag->m_childFragments[i];
-      AddExplosion(child, totalMatrix, true, _fraction);
+      TermDef* def = term->isDef();
+      if (def)
+      {
+        if (def->name()->value() == "explosion")
+        {
+          if (!def->term() || !def->term()->isStruct())
+            DebugTrace("WARNING: explosion structure missing in '%s'\n", filename);
+          else
+          {
+            TermStruct* val = def->term()->isStruct();
+            int type = -1;
+            std::string type_name;
+            std::string bitmap;
+            std::string particle_bitmap;
+            std::string sound_file;
+            float lifetime = 0.0f;
+            float scale = 1.0f;
+            int length = 0;
+            float light_level = 0.0f;
+            float light_decay = 1.0f;
+            Color light_color;
+            int num_part = 0;
+            int part_type = 0;
+            float part_speed = 0.0f;
+            float part_drag = 1.0f;
+            float part_scale = 1.0f;
+            float part_bloom = 0.0f;
+            float part_decay = 100.0f;
+            float part_rate = 1.0f;
+            bool part_trail = true;
+            bool continuous = false;
+            int part_alpha = 4;
+            int part_nframes = 1;
+            float sound_min_dist = 1.0f;
+            float sound_max_dist = 1.0e5f;
+
+            for (int i = 0; i < val->elements()->size(); i++)
+            {
+              TermDef* pdef = val->elements()->at(i)->isDef();
+              if (pdef)
+              {
+                if (pdef->name()->value() == "type")
+                {
+                  if (pdef->term()->isText())
+                  {
+                    GetDefText(type_name, pdef, filename);
+
+                    const char* names[15] = {
+                      "SHIELD_FLASH",
+                      "HULL_FLASH",
+                      "BEAM_FLASH",
+                      "SHOT_BLAST",
+                      "HULL_BURST",
+                      "HULL_FIRE",
+                      "PLASMA_LEAK",
+                      "SMOKE_TRAIL",
+                      "SMALL_FIRE",
+                      "SMALL_EXPLOSION",
+                      "LARGE_EXPLOSION",
+                      "LARGE_BURST",
+                      "NUKE_EXPLOSION",
+                      "QUANTUM_FLASH",
+                      "HYPER_FLASH"
+                    };
+
+                    for (int n = 0; n < 15; n++)
+                    {
+                      if (type_name == names[n])
+                        type = n + 1;
+                    }
+                  }
+
+                  else if (pdef->term()->isNumber())
+                  {
+                    GetDefNumber(type, pdef, filename);
+
+                    if (type < 0 || type >= MAX_EXPLOSION_TYPES)
+                      DebugTrace("Warning - invalid explosion type %d ignored\n", type);
+                  }
+
+                  else
+                  {
+                    DebugTrace("Warning - weird explosion type:\n");
+                    pdef->print();
+                  }
+                }
+
+                else if (pdef->name()->value() == "image" || pdef->name()->value() == "bitmap")
+                  GetDefText(bitmap, pdef, filename);
+
+                else if (pdef->name()->value() == "particles" || pdef->name()->value() == "particle_bitmap")
+                  GetDefText(particle_bitmap, pdef, filename);
+
+                else if (pdef->name()->value() == "sound")
+                  GetDefText(sound_file, pdef, filename);
+
+                else if (pdef->name()->value() == "lifetime")
+                  GetDefNumber(lifetime, pdef, filename);
+
+                else if (pdef->name()->value() == "scale")
+                  GetDefNumber(scale, pdef, filename);
+
+                else if (pdef->name()->value() == "length")
+                  GetDefNumber(length, pdef, filename);
+
+                else if (pdef->name()->value() == "light_level")
+                  GetDefNumber(light_level, pdef, filename);
+
+                else if (pdef->name()->value() == "light_decay")
+                  GetDefNumber(light_decay, pdef, filename);
+
+                else if (pdef->name()->value() == "light_color")
+                  GetDefColor(light_color, pdef, filename);
+
+                else if (pdef->name()->value() == "num_parts")
+                  GetDefNumber(num_part, pdef, filename);
+
+                else if (pdef->name()->value() == "part_frames")
+                  GetDefNumber(part_nframes, pdef, filename);
+
+                else if (pdef->name()->value() == "part_type")
+                  GetDefNumber(part_type, pdef, filename);
+
+                else if (pdef->name()->value() == "part_speed")
+                  GetDefNumber(part_speed, pdef, filename);
+
+                else if (pdef->name()->value() == "part_drag")
+                  GetDefNumber(part_drag, pdef, filename);
+
+                else if (pdef->name()->value() == "part_scale")
+                  GetDefNumber(part_scale, pdef, filename);
+
+                else if (pdef->name()->value() == "part_bloom")
+                  GetDefNumber(part_bloom, pdef, filename);
+
+                else if (pdef->name()->value() == "part_decay")
+                  GetDefNumber(part_decay, pdef, filename);
+
+                else if (pdef->name()->value() == "part_rate")
+                  GetDefNumber(part_rate, pdef, filename);
+
+                else if (pdef->name()->value() == "part_trail")
+                  GetDefBool(part_trail, pdef, filename);
+
+                else if (pdef->name()->value() == "part_alpha")
+                  GetDefNumber(part_alpha, pdef, filename);
+
+                else if (pdef->name()->value() == "continuous")
+                  GetDefBool(continuous, pdef, filename);
+
+                else if (pdef->name()->value() == "sound_min_dist")
+                  GetDefNumber(sound_min_dist, pdef, filename);
+
+                else if (pdef->name()->value() == "sound_max_dist")
+                  GetDefNumber(sound_max_dist, pdef, filename);
+
+                else
+                {
+                  DebugTrace("WARNING: parameter '%s' ignored in '%s'\n", pdef->name()->value().data(), filename);
+                }
+              }
+              else
+              {
+                DebugTrace("WARNING: term ignored in '%s'\n", filename);
+                val->elements()->at(i)->print();
+              }
+            }
+
+            if (type >= 0 && type < MAX_EXPLOSION_TYPES)
+            {
+              if (part_alpha > 2)
+                part_alpha = 4;
+
+              lengths[type] = length;
+              lifetimes[type] = lifetime;
+              scales[type] = scale;
+              light_levels[type] = light_level;
+              light_decays[type] = light_decay;
+              light_colors[type] = light_color;
+              num_parts[type] = num_part;
+              part_types[type] = part_type;
+              part_speeds[type] = part_speed;
+              part_drags[type] = part_drag;
+              part_scales[type] = part_scale;
+              part_blooms[type] = part_bloom;
+              part_frames[type] = part_nframes;
+              part_decays[type] = part_decay;
+              part_rates[type] = part_rate;
+              part_trails[type] = part_trail;
+              part_alphas[type] = part_alpha;
+              recycles[type] = continuous;
+
+              if (length > 0)
+              {
+                bitmaps[type] = NEW Bitmap[length];
+
+                if (length > 1)
+                {
+                  for (int n = 0; n < length; n++)
+                  {
+                    char img_name[64];
+                    sprintf_s(img_name, "%s%02d.pcx", bitmap.c_str(), n);
+                    loader->LoadBitmap(img_name, bitmaps[type][n], Bitmap::BMP_TRANSLUCENT);
+                  }
+                }
+
+                else
+                  loader->LoadBitmap(bitmap, bitmaps[type][0], Bitmap::BMP_TRANSLUCENT);
+              }
+
+              if (particle_bitmap[0])
+              {
+                particle_bitmaps[type] = NEW Bitmap[part_nframes];
+
+                if (part_nframes > 1)
+                {
+                  for (int i = 0; i < part_nframes; i++)
+                  {
+                    char fname[64];
+                    sprintf_s(fname, "%s%02d.pcx", particle_bitmap.c_str(), i);
+                    loader->LoadBitmap(fname, particle_bitmaps[type][i], Bitmap::BMP_TRANSLUCENT);
+                    particle_bitmaps[type][i].MakeTexture();
+                  }
+                }
+
+                else
+                {
+                  loader->LoadBitmap(particle_bitmap, particle_bitmaps[type][0], Bitmap::BMP_TRANSLUCENT);
+                  particle_bitmaps[type][0].MakeTexture();
+                }
+              }
+
+              if (sound_file[0])
+              {
+                loader->SetDataPath("Sounds/");
+                loader->LoadSound(sound_file, sounds[type], Sound::LOCALIZED | Sound::LOC_3D);
+                loader->SetDataPath("Explosions/");
+
+                if (sounds[type])
+                {
+                  sounds[type]->SetMinDistance(sound_min_dist);
+                  sounds[type]->SetMaxDistance(sound_max_dist);
+                }
+              }
+            }
+          }
+        }
+
+        else { DebugTrace("WARNING: unknown definition '%s' in '%s'\n", def->name()->value().data(), filename); }
+      }
+      else
+      {
+        DebugTrace("WARNING: term ignored in '%s'\n", filename);
+        term->print();
+      }
     }
   }
+  while (term);
+
+  loader->ReleaseBuffer(block);
+  loader->SetDataPath();
+  initialized = 1;
 }
 
-void ExplosionManager::AddExplosion(Shape* _shape, const Matrix34& _transform, float _fraction)
+void Explosion::Close()
 {
-  if (_fraction > 0.0f)
-    AddExplosion(_shape->m_rootFragment, _transform, true, _fraction);
-}
-
-void ExplosionManager::Reset() { m_explosions.EmptyAndDelete(); }
-
-void ExplosionManager::Advance()
-{
-  START_PROFILE(g_app->m_profiler, "Advance Explosions");
-
-  for (unsigned int i = 0; i < m_explosions.Size(); ++i)
+  for (int t = 0; t < MAX_EXPLOSION_TYPES; t++)
   {
-    if (m_explosions[i]->Advance())
+    if (lengths[t] && bitmaps[t])
     {
-      Explosion* explosion = m_explosions[i];
-      m_explosions.RemoveData(i);
-      delete explosion;
-      --i;
+      for (int i = 0; i < lengths[t]; i++)
+        bitmaps[t][i].ClearImage();
+      delete [] bitmaps[t];
+    }
+
+    if (particle_bitmaps[t])
+    {
+      for (int i = 0; i < part_frames[t]; i++)
+        particle_bitmaps[t][i].ClearImage();
+      delete [] particle_bitmaps[t];
+    }
+
+    delete sounds[t];
+  }
+}
+
+void Explosion::ExecFrame(double seconds)
+{
+  if (source)
+  {
+    const Matrix& orientation = source->Cam().Orientation();
+    MoveTo((mount_rel * orientation) + source->Location());
+
+    if (rep)
+      rep->Show();
+
+    if (particles)
+      particles->Show();
+
+    if (source == Sim::GetSim()->GetPlayerShip())
+    {
+      auto ship = static_cast<Ship*>(source);
+      if (CameraDirector::GetCameraMode() == CameraDirector::MODE_COCKPIT && !ship->IsDying())
+      {
+        if (rep)
+          rep->Hide();
+        if (particles)
+          particles->Hide();
+      }
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "Advance Explosions");
-}
+  life -= seconds;
 
-void ExplosionManager::Render()
-{
-  START_PROFILE(g_app->m_profiler, "Render Explosions");
-
-  int numExplosions = m_explosions.Size();
-
-  if (numExplosions > 0)
+  if (rep)
   {
-    CHECK_OPENGL_STATE();
+    rep->MoveTo(Location());
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures\\shapewireframe.bmp"));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    if (rep->Life() == 0)
+      rep = nullptr; // about to be GC'd
 
-    g_app->m_renderer->SetObjectLighting();
+    else if (rep->IsSprite())
+    {
+      auto s = static_cast<Sprite*>(rep);
+      s->SetAngle(s->Angle() + seconds * 0.5);
+    }
 
-    glEnable(GL_COLOR_MATERIAL);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-
-    for (unsigned int i = 0; i < numExplosions; ++i)
-      m_explosions[i]->Render();
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_COLOR_MATERIAL);
-    g_app->m_renderer->UnsetObjectLighting();
-
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glDisable(GL_TEXTURE_2D);
+    else if (type == QUANTUM_FLASH)
+    {
+      auto q = static_cast<QuantumFlash*>(rep);
+      q->SetShade(q->Shade() - seconds);
+    }
   }
 
-  END_PROFILE(g_app->m_profiler, "Render Explosions");
+  if (light)
+  {
+    light->Update();
+
+    if (light->Life() == 0)
+      light = nullptr; // about to be GC'd
+  }
+
+  if (particles)
+  {
+    particles->MoveTo(Location());
+    particles->ExecFrame(seconds);
+  }
+
+  if (source && source->Life() == 0)
+    life = 0;
+}
+
+void Explosion::Activate(Scene& scene)
+{
+  bool filter = false;
+
+  CameraDirector* cam_dir = CameraDirector::GetInstance();
+  if (cam_dir && cam_dir->GetCamera())
+  {
+    if (Point(cam_dir->GetCamera()->Pos() - Location()).length() < 100)
+      filter = true;
+  }
+
+  if (rep && !filter)
+    scene.AddGraphic(rep);
+
+  if (light)
+    scene.AddLight(light);
+
+  if (particles && !filter)
+    scene.AddGraphic(particles);
+
+  if (sounds[obj_type])
+  {
+    Sound* sound = sounds[obj_type]->Duplicate();
+
+    // fire and forget:
+    if (sound)
+    {
+      sound->SetLocation(Location());
+      sound->SetVolume(AudioConfig::EfxVolume());
+      sound->Play();
+    }
+  }
+
+  active = true;
+}
+
+void Explosion::Deactivate(Scene& scene)
+{
+  SimObject::Deactivate(scene);
+
+  if (particles)
+    scene.DelGraphic(particles);
 }

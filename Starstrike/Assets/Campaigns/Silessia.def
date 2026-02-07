@@ -1,0 +1,559 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Silessian Confederacy",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   civilian,
+  id:     1,
+  name:   "Civilian Infrastructure",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2000,
+  name:   "Silessian Farcaster Network",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2001,
+  name:   "Silessia-Prosenar",
+  intel:  located,
+  iff:    0,
+  region: "Silessia",
+  loc:    (131e3, 60e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Silessia-Prosenar",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2002,
+  name:   "Prosenar-Silessia",
+  intel:  located,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Prosenar-Silessia",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2003,
+  name:   "Prosenar-Vesta",
+  intel:  located,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (-176e3, 71e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Prosenar-Vesta",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2004,
+  name:   "Vesta-Prosenar",
+  intel:  located,
+  iff:    0,
+  region: "Vesta",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Vesta-Prosenar",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2005,
+  name:   "Silessia-Nero",
+  intel:  located,
+  iff:    0,
+  region: "Silessia",
+  loc:    (-163e3, -63e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Silessia-Nero",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   transport,
+  id:     2006,
+  name:   "Nero-Silessia",
+  intel:  located,
+  iff:    0,
+  region: "Nero",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Nero-Silessia",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2007,
+  name:   "Vesta-Nero",
+  intel:  located,
+  iff:    0,
+  region: "Vesta",
+  loc:    (-150e3, -50e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Vesta-Nero",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   transport,
+  id:     2008,
+  name:   "Nero-Vesta",
+  intel:  located,
+  iff:    0,
+  region: "Nero",
+  loc:    (-120e3, 170e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Nero-Vesta",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4000,
+  name:   "COMNET",
+  intel:  located,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (0, 30e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   network,
+  id:     4001,
+  name:   "Relay 105/AX",
+  intel:  located,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (80e3, -120e3, 7e3),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 105/AX",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4002,
+  name:   "Relay 208/HB",
+  intel:  located,
+  iff:    0,
+  region: "Vesta",
+  loc:    (-40e3, 60e3, 0),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 208/HB",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4003,
+  name:   "Relay 038/AZ",
+  intel:  located,
+  iff:    0,
+  region: "Nero",
+  loc:    (-60e3, -180e3, 0),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 038/AZ",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4004,
+  name:   "Relay 530/UN",
+  intel:  located,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (-160e3, -140e3, 0),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 530/UN",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4005,
+  name:   "Relay 573/JD",
+  intel:  located,
+  iff:    0,
+  region: "Vesta",
+  loc:    (130e3, -180e3, 0),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 573/JD",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   network,
+  id:     4006,
+  name:   "Relay 831/UN",
+  intel:  located,
+  iff:    0,
+  region: "Nero",
+  loc:    (210e3, 50e3, 0),
+  parent_type: network,
+  parent_id:   4000,
+
+  unit: {
+    name:   "Relay 831/UN",
+    type:   "COMSAT",
+    design: "Relay1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   non_com,
+  id:     2300,
+  name:   "Freight",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, -20e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   freight,
+  id:     3000,
+  name:   "Independent Shipping",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (80e3, -120e3, 0),
+  parent_type: non_com,
+  parent_id:   2300,
+}
+
+group: {
+  type:   freight,
+  id:     3798,
+  name:   "ISS White Dawn",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (90e3, -130e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS White Dawn",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "798",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3780,
+  name:   "ISS Fairlight",
+  intel:  known,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (110e3, -120e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Fairlight",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "780",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3354,
+  name:   "ISS Turimo",
+  intel:  known,
+  iff:    0,
+  region: "Vesta",
+  loc:    (175e3, 200e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Turimo",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "354",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3843,
+  name:   "ISS Farlook",
+  intel:  known,
+  iff:    0,
+  region: "Nero",
+  loc:    (160e3, 211e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Farlook",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "843",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3235,
+  name:   "ISS Grayhawke",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (-20e3, 228e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Grayhawke",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "235",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3493,
+  name:   "ISS Ulmo",
+  intel:  known,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (-90e3, 160e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Ulmo",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "493",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3219,
+  name:   "ISS Wayward",
+  intel:  known,
+  iff:    0,
+  region: "Vesta",
+  loc:    (-102e3, 138e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Wayward",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "219",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3381,
+  name:   "ISS Sutter",
+  intel:  known,
+  iff:    0,
+  region: "Vesta",
+  loc:    (99e3, -128e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Sutter",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "381",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3521,
+  name:   "ISS Alen Carl",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (79e3, 228e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Alen Carl",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "521",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3617,
+  name:   "ISS Hal Bennet",
+  intel:  known,
+  iff:    0,
+  region: "Prosenar",
+  loc:    (75e3, -150e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Hal Bennet",
+    type:   "Cargo",
+    design: "IM2800",
+    regnum: "617",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     5000,
+  name:   "Colonial Authority",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   passenger,
+  id:     5001,
+  name:   "Far Horizon",
+  intel:  known,
+  iff:    0,
+  region: "Silessia",
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Far Horizon",
+    type:   "Station",
+    design: "Colony",
+    regnum: "XJ-1",
+    },
+}
+

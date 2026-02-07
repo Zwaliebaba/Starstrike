@@ -1,0 +1,23 @@
+SHIP
+
+name:          BioDome
+class:         Building
+display_name: "BioDome"
+hud_icon:     "hud_dome.pcx"
+secret:        false
+
+detail_0:   "A1-0.mag"
+feature_0:  1000
+detail_1:   "A1-6.mag"
+feature_1:  6
+
+
+mass:       950e3
+integrity:  700e3
+scale:      10
+acs:        0
+pcs:        0
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+

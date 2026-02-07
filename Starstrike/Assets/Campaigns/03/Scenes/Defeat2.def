@@ -1,0 +1,72 @@
+MISSION
+
+name:   "Cmpn 03 Defeat 02"
+type:   "Patrol"
+system: Haiche
+region: Haiche
+stardate: 1177889900
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (50e3, 0, 0)
+}
+
+element: {
+   name:      Vendetta
+   design:    Vendetta
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   loc:       (0,0,0)
+   navpt:     { cmd: Vector, loc: (0,-100e3,0), speed: 500 }
+}
+
+element: {
+   name:      Broadsword
+   design:    Broadsword
+   commander: Vendetta
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   loc:       (5e3,0,-300)
+   navpt:     { cmd: Vector, loc: (7e3,-100e3,-300), speed: 500 }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Haiche",    vec: (1,0,2e7) }
+event: { event: Camera,                param: 5,                           vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Shining Fortress", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 600,100) }
+event: { event: Display,    message: "Stalemate",                  font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 600,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\03\End_03_Defeat.wav"
+}
+
+event: { event: Camera,     time:  15, param: (6,40), target: Vendetta }
+
+event: { event: Display,    time:  43, image: "Campaigns\03\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+
+event: { event: EndScene,   time:  45, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

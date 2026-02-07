@@ -1,0 +1,23 @@
+SHIP
+
+name:          BioDome2
+class:         Building
+display_name: "Utility Dome"
+hud_icon:     "hud_util.pcx"
+secret:        true
+
+detail_0:   "A3-0.mag"
+feature_0:  1000
+detail_1:   "A3-6.mag"
+feature_1:  6
+
+
+mass:       150e3
+integrity:  100e3
+scale:      6
+acs:        0
+pcs:        0
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+

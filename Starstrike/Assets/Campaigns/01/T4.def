@@ -1,0 +1,273 @@
+MISSION
+
+name:    "Ground Strike"
+type:    "Training"
+system:  "Janus"
+region:  "Janek Station"
+
+objective:
+         "Training Strike - "
+         "Destroy simulated mining operation."
+
+sitrep:  "The Third Fleet is participating in wargame "
+         "exercises in the Janus system. "
+         "Your squadron, the Stallions, are on temporary "
+         "detached duty to Janek Station.  "
+         "As part of the exercise, you have "
+         "been tasked with destroying support "
+         "facilities for a simulated mining operation."
+
+start:   "02/05:35:00"
+stardate: 1084170240
+
+degrees: true
+
+element: {
+   name:       "Janek Station",
+   design:     Airbase1,
+   loc:        (25e3, 0, 0),
+   head:       -90,
+   iff:        1,
+   command_ai: 0,
+}
+
+element: {
+   name:    Stallions,
+   design:  Stormhawk,
+   count:   20,
+   maint_count: 5,
+   dead_count: 5,
+   carrier: "Janek Station",
+   iff:     1,
+   loadout: { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:    Alpha,
+   design:  Stormhawk,
+   squadron: Stallions,
+   player:  1,
+   alert:   true,
+   loc:     (15e3, -5e3, 5e3),
+   count:   2,
+   iff:     1,
+   head:    -90,
+
+   loadout: { ship: -1, name: "Ground Strike" },
+
+   mission: strike,
+   objective: { cmd: strike, tgt: "Cooling Tower" },
+   navpt:   { cmd: vector, loc: (   0, -40e3, 5e3), speed: 500, formation: 0 },
+   navpt:   { cmd: strike, loc: (30e3, -15e3, 7e3), speed: 500, formation: 3 },
+   navpt:   { cmd: rtb,    loc: (50e3,     0, 5e3), speed: 400 },
+}
+
+
+element: {
+   name:      "Building",
+   design:    "Bldg00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-19e3, 28e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Building",
+   design:    "Bldg00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-21e3, 29e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Office Block",
+   design:    "Bldg01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-16e3, 32e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Dome",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-19e3, 31e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Office Block",
+   design:    "Bldg01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-18e3, 30e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Building",
+   design:    "Fact03",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-17e3, 29e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Cooling Tower",
+   design:    "Cool00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     4,
+   iff:       2,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (70000, -10000, 0),
+
+}
+
+
+event: {
+   id:              101,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Cooling Tower 1",
+}
+
+event: {
+   id:              102,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Cooling Tower 2",
+}
+
+event: {
+   id:              103,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Cooling Tower 3",
+}
+
+event: {
+   id:              104,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Cooling Tower 4",
+}
+
+
+// VOICE-OVER
+
+
+event: { id: 200, event: Message, time:   2, sound: "Vox\Train\Train-04-01.wav", message: "Please wait" }
+event: { id: 210, event: Message, time:  20, sound: "Vox\Train\Train-04-02.wav", message: "Taking off" }
+event: { id: 220, event: Message, time:  40, sound: "Vox\Train\Train-04-03.wav", message: "Raise your langing gear" }
+event: { id: 230, event: Message, time:  60, sound: "Vox\Train\Train-04-04.wav", message: "Set sensor display to HSD mode" }
+
+/**
+ ** THIS MESSAGE IS NONSENSE!
+ **
+event: {
+    id:             240,
+    event:          Message,
+    message:        "Steer towards ground targets"
+    sound:          "Vox\Train\Train-04-05.wav",
+    trigger:        Navpoint,
+    trigger_param:  2,
+    trigger_ship:   Alpha
+}
+ **
+ **/
+
+event: {
+    id:             250,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-06.wav",
+    message:        "Air-to-ground combat skills",
+    trigger:        Navpoint,
+    trigger_param:  2,
+    trigger_ship:   Alpha
+    delay:          5
+}
+
+event: {
+    id:             260,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-07.wav",
+    message:        "Sort targets with your wingman",
+    trigger:        Event,
+    trigger_param:  250,
+    delay:          15
+}
+
+event: { 
+    id:             270,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-08.wav",
+    message:        "Engage your target",
+    trigger:        Event,
+    trigger_param:  260,
+    delay:          12
+}
+
+event: { 
+    id:             300,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-09.wav",
+    message:        "Engage a second target",
+    trigger:        Event,
+    trigger_param:  270,
+    delay:          12
+}
+
+
+event: {
+    id:             310,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-10.wav",
+    message:        "Resume nav route",
+    trigger:        "Event (ALL)",
+    trigger_param:   (101, 102, 103, 104), 
+    delay:           1
+}
+
+event: {
+    id:             311,
+    event:          Message,
+    sound:          "Vox\Train\Train-04-11.wav",
+    message:        "Return to base",
+    trigger:        Event,
+    trigger_param:  310,
+    delay:          20
+}
+
+
+/***/

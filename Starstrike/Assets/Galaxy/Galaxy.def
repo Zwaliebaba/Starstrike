@@ -1,0 +1,50 @@
+GALAXY
+
+// TERRELIAN ALLIANCE
+system: { loc: ( 6.2,  0.3,  1.0), class: G, iff: 1, name: Jarnell      }
+system: { loc: ( 4.7, -1.9,  1.0), class: F, iff: 1, name: Borova       }
+system: { loc: ( 4.1,  1.7,  1.0), class: G, iff: 1, name: Athenar      }
+system: { loc: ( 6.8, -2.5,  1.0), class: G, iff: 1, name: Paragon      }
+system: { loc: ( 7.8,  2.3,  1.0), class: K, iff: 1, name: Thralis      }
+system: { loc: ( 2.8, -0.3,  0.0), class: G, iff: 1, name: Janus        }
+
+// INDEPENDENT SYSTEMS
+system: { loc: ( 1.0, -1.8,  0.0), class: G, iff: 0, name: Solus        }
+system: { loc: ( 1.8, -3.1,  1.0), class: K, iff: 0, name: Silessia     }
+system: { loc: ( 0.0,  1.0,  1.0), class: K, iff: 0, name: Haiche       }
+
+// MARAKAN HEGEMONY
+system: { loc: (-0.8, -1.5,  1.0), class: G, iff: 2, name: Renser       }
+system: { loc: (-1.2, -3.4,  1.0), class: G, iff: 2, name: Loris        }
+system: { loc: (-1.4,  2.8,  1.0), class: M, iff: 2, name: Ostara       }
+system: { loc: (-2.7,  1.1,  1.0), class: G, iff: 2, name: Kolchev      }
+system: { loc: (-2.5, -1.0,  1.0), class: G, iff: 2, name: Korius       }
+system: { loc: (-2.9,  2.6,  1.0), class: K, iff: 2, name: Tarsus       }
+system: { loc: (-4.0, -3.1,  1.0), class: A, iff: 2, name: Nephrys      }
+
+system: { loc: (-4.6,  2.1,  1.0), class: G, iff: 2, name: Radix        }
+system: { loc: (-5.1,  0.5,  1.0), class: K, iff: 2, name: Isham        }
+system: { loc: (-6.5,  2.5,  1.0), class: G, iff: 2, name: Garrison     }
+system: { loc: (-7.2, -1.2,  1.0), class: K, iff: 2, name: Trocanther   }
+system: { loc: (-8.0, -2.6,  1.0), class: F, iff: 2, name: Marak        }
+
+// for screenshots only!
+system: { loc: ( 102,  101,  0.0), class: O, iff: 100, name: Black      }
+system: { loc: ( 106,  107,  0.0), class: O, iff: 100, name: Museum     }
+
+star:   { loc: ( 6.0,  6.0,  1.0), class: M, name: "GSC-3082" }
+star:   { loc: (-3.5,  5.0,  1.0), class: M, name: "GSC-0541" }
+star:   { loc: (-7.1, -7.5,  1.5), class: O, name: "GSC-2054" }
+star:   { loc: ( 4.2,  5.6,  2.1), class: M, name: "GSC-1027" }
+star:   { loc: (-5.1,  4.6, -1.8), class: M, name: "GSC-1311" }
+star:   { loc: ( 5.4, -4.6, -0.8), class: K, name: "GSC-1245" }
+
+star:   { loc: ( 4.3,  6.2,  3.0), class: M, name: "GSC-1952" }
+star:   { loc: (-7.7,  4.3,  3.0), class: M, name: "GSC-0163" }
+star:   { loc: (-2.1, -6.5,  2.5), class: M, name: "GSC-2690" }
+star:   { loc: ( 1.9,  4.6,  1.1), class: A, name: "GSC-0536" }
+star:   { loc: (-3.5, -7.6, -3.8), class: K, name: "GSC-1208" }
+star:   { loc: (-4.4, -5.2, -3.8), class: K, name: "GSC-0719" }
+
+
+

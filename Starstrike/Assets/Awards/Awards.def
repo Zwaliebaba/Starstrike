@@ -1,0 +1,555 @@
+AWARDS
+
+//
+// *** R A N K   T A B L E ***
+//
+
+award: {
+   type:          rank,
+   id:            0,
+   name:          Cadet,
+   abrv:          CDT,
+   desc:          "This is the entry level rank for Force:Space trainees. Cadets are "
+                  "authorized to fly training missions for fighter combat under appropriate trainer supervision.",
+   award:         "Congratulations, Cadet!  Welcome to Force:Space!  "
+                  "During your initial training tours, we will be observing your conduct and performance at all times. "
+                  "Perform your duties to the best of your ability, and you will find the stars soon within your grasp.",
+
+   award_sound:   "Awards/Rank0.wav"
+   small:         Rank00,
+   large:         Rank01,
+   grant:         0x7,
+   total_points:  0,
+}
+
+award: {
+   type:          rank,
+   id:            1,
+   name:          Ensign,
+   abrv:          ENS,
+   desc:          "This is the first rank of Force commissioned officers. As an Ensign, "
+                  "you will be expected to fly fighter combat missions on a daily basis.",
+   award:         "Congratulations on your commission, Ensign!  You are in officer's country now. "
+                  "Based on your new rank, you have authorization to undertake all fighter missions assigned to your unit. "
+                  "You will be expected to serve Force with courage, honor, and commitment at all times.",
+
+   award_sound:   "Awards/Rank1.wav"
+   small:         Rank10,
+   large:         Rank11,
+   grant:         0x7,
+   total_points:  500,
+}
+
+award: {
+   type:          rank,
+   id:            2,
+   name:          Lieutenant,
+   abrv:          LT,
+   desc:          "This is the second rank of Force commissioned officers. As a Lieutenant, "
+                  "you will be expected to fly fighter combat missions on a daily basis.",
+   award:         "Congratulations, Lieutenant!  You've earned your first bar. "
+                  "Don't spend so much time polishing it that you forget how to fly. "
+                  "Keep your head about you, it only gets harder from here.",
+
+   award_sound:   "Awards/Rank2.wav"
+   small:         Rank20,
+   large:         Rank21,
+   grant:         0x7,
+   total_points:  2000,
+}
+
+award: {
+   type:          rank,
+   id:            3,
+   name:          "Lt. Commander",
+   abrv:          LCDR,
+   desc:          "This is the third rank of Force commissioned officers, and the first Command Rank. "
+                  "As a Lt. Commander, you may continue to fly fighter missions, or you may "
+                  "request transfer to a starship command.",
+   award:         "Congratulations, Lt. Commander!  Welcome to the Command Ranks.  Based on your record, "
+                  "I'm sure that your immediate supervisors will support your transfer to "
+                  "a Destroyer Squadron command, whenever you choose to request one.",
+
+   award_sound:   "Awards/Rank3.wav"
+   small:         Rank30,
+   large:         Rank31,
+   grant:         0x03ff,
+   total_points:  5000,
+}
+
+award: {
+   type:          rank,
+   id:            4,
+   name:          Commander,
+   abrv:          CDR,
+   desc:          "Commander is the fourth rank of Force commissioned officers. As a Commander, "
+                  "you are eligible for a Destroyer Command, or you may wish to head up a Fighter Wing.",
+   award:         "Congratulations, Commander!  Force:Command is very pleased to see the progress "
+                  "of your career.  Keep up the good work, and you will make Captain in no time.",
+
+   award_sound:   "Awards/Rank4.wav"
+   small:         Rank40,
+   large:         Rank41,
+   grant:         0x03ff,
+   total_points:  10e3,
+}
+
+award: {
+   type:          rank,
+   id:            5,
+   name:          Captain,
+   abrv:          CAPT,
+   desc:          "Captain is the fifth rank of Force commissioned officers. As a Captain, "
+                  "you are eligible to command any starship squadron less than a full fleet carrier.",
+   award:         "Captain on deck!  On behalf of Force:Command, let me extend my sincere "
+                  "congratulations for a job well done.  When you are ready to move up to a "
+                  "Cruiser command, just put in the transfer request.  A spot will be waiting for you.",
+
+   award_sound:   "Awards/Rank5.wav"
+   small:         Rank50,
+   large:         Rank51,
+   grant:         0x0fff,
+   total_points:  20e3,
+}
+
+award: {
+   type:          rank,
+   id:            6,
+   name:          Commodore,
+   abrv:          COMM,
+   desc:          "Commodore is the sixth rank of Force commissioned officers, and the lowest rank of "
+                  "the Admiralty. As a Commodore, you may command any starship squadron in the fleet.",
+   award:         "Very well done, Commodore!  Welcome to the Admiral's Club.  Now that you are becoming "
+                  "one of the 'old gray hairs' of the fleet, you should start thinking about taking on "
+                  "some bigger challenges.  A fleet carrier battle group may be just the opportunity you need.",
+
+   award_sound:   "Awards/Rank6.wav"
+   small:         Rank60,
+   large:         Rank61,
+   grant:         0xffff,
+   total_points:  40e3,
+}
+
+award: {
+   type:          rank,
+   id:            7,
+   name:          "Vice Admiral",
+   abrv:          VADM,
+   desc:          "Vice Admiral is the seventh rank of Force commissioned officers, and the second rank of "
+                  "the Admiralty. As a Vice Admiral, you may command any starship squadron in the fleet.",
+   award:         "Congratulations, Vice Admiral!  Force:Command is very pleased to see the progress "
+                  "of your career.  SECNAV and the Executive Board will be looking for great things from "
+                  "you.  Your leadership will be a great asset to your assigned command.",
+
+   award_sound:   "Awards/Rank7.wav"
+   small:         Rank70,
+   large:         Rank71,
+   grant:         0xffff,
+   total_points:  100e3,
+}
+
+award: {
+   type:          rank,
+   id:            8,
+   name:          "Admiral",
+   abrv:          ADM,
+   desc:          "Admiral is the eighth rank of Force commissioned officers, and the third rank of "
+                  "the Admiralty. As an Admiral, you may command any starship squadron in the fleet.",
+   award:         "Congratulations, Admiral!  In recognition of your continued excellence and dedication, "
+                  "Force:Command is very pleased to grant you this promotion.  Your service record is "
+                  "an honor to your command.  Thank you for all the hard work you have been doing.",
+
+   award_sound:   "Awards/Rank8.wav"
+   small:         Rank80,
+   large:         Rank81,
+   grant:         0xffff,
+   total_points:  150e3,
+}
+
+award: {
+   type:          rank,
+   id:            9,
+   name:          "Fleet Admiral",
+   abrv:          FADM,
+   desc:          "Fleet Admiral is the ninth rank of Force commissioned officers, and the second highest rank of "
+                  "the Admiralty. As a Fleet Admiral, you may command any starship squadron in the fleet.",
+   award:         "Congratulations, Fleet Admiral!  In recognition of your continued excellence and dedication, "
+                  "Force:Command is very pleased to grant you this promotion.  Your service record is "
+                  "an honor to your command.  Thank you for all the hard work you have been doing.",
+
+   award_sound:   "Awards/Rank9.wav"
+   small:         Rank90,
+   large:         Rank91,
+   grant:         0xffff,
+   total_points:  200e3,
+}
+
+award: {
+   type:          rank,
+   id:            10,
+   name:          "Grand Admiral",
+   abrv:          GADM,
+   desc:          "Grand Admiral is the tenth and highest rank of all Force commissioned officers, reporting "
+                  "directly to SECNAV.  Only one officer in the entire fleet is awarded this supreme rank at any one time.",
+   award:         "Congratulations, Grand Admiral!  On behalf of the Alliance President, with the full authorization of the "
+                  "Combined Senate, SECNAV is proud to grant you this promotion.  "
+                  "Your leadership and dedication has been an inspiration to us all.  "
+                  "You will hold this honorary rank award for life.",
+
+   award_sound:   "Awards/RankA.wav"
+   small:         RankA0,
+   large:         RankA1,
+   grant:         0xffff,
+   total_points:  250e3,
+}
+
+//
+// *** M E D A L   T A B L E ***
+//
+
+award: {
+   type:          medal,
+   id:            0x0001,
+   name:          "Operation Nightfall",
+
+   desc:          "The Operation Nightfall Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the Marakan Core Theater.",
+
+   award:         "The Operation Nightfall Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the Marakan Core Theater.",
+
+   small:         Ribbon05,
+   large:         Medal05,
+
+   campaign_id:         5,
+   campaign_complete:   true,
+   dynamic_campaign:    true,
+   ceremony:            false,
+}
+
+award: {
+   type:          medal,
+   id:            0x0002,
+   name:          "Operation Firestorm",
+
+   desc:          "The Operation Firestorm Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in either the Ostara-Tarsus-Kolchev or the Loris-Korian Theaters.",
+
+   award:         "The Operation Firestorm Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in either the Ostara-Tarsus-Kolchev or the Loris-Korian Theaters.",
+
+   small:         Ribbon04,
+   large:         Medal04,
+
+   campaign_id:         4,
+   campaign_complete:   true,
+   dynamic_campaign:    true,
+   ceremony:            false,
+}
+
+award: {
+   type:          medal,
+   id:            0x0004,
+   name:          "Operation Shining Fortress",
+
+   desc:          "The Operation Shining Fortress Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the defense of the Jarnell, Borova, and Athenar systems.",
+
+   award:         "The Operation Shining Fortress Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the defense of the Jarnell, Borova, and Athenar systems.",
+
+   small:         Ribbon03,
+   large:         Medal03,
+
+   campaign_id:         3,
+   campaign_complete:   true,
+   dynamic_campaign:    true,
+   ceremony:            false,
+}
+
+award: {
+   type:          medal,
+   id:            0x0010,
+   name:          "Operation Highland",
+
+   desc:          "The Operation Highland Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the Solus-Renser Theater of Operations.",
+
+   award:         "The Operation Highland Campaign medal is awarded to any member of any branch of Force who "
+                  "participated in combat action in the Solus-Renser Theater of Operations.",
+
+   small:         Ribbon01,
+   large:         Medal01,
+
+   campaign_id:         2,
+   campaign_complete:   true,
+   dynamic_campaign:    true,
+   ceremony:            false,
+}
+
+award: {
+   type:          medal,
+   id:            0x0020,
+   name:          "Order of the Red Flame",
+
+   desc:          "The Order of the Red Flame is awarded to any member of any branch of Force "
+                  "who is killed or wounded during combat action, either in hostile, neutral, "
+                  "or friendly territory.",
+
+   award:         "For meritorious service during combat action, it is my honor to bestow upon "
+                  "you this Order of the Red Flame "
+                  "in the name of the Chief Executive Officer of the Terellian Alliance. "
+                  "May this small token speed the healing of your injuries and return you swiftly "
+                  "to your unit.",
+
+   small:         Ribbon06,
+   large:         Medal06,
+   lost:          1,
+   min_rank:      1,
+   max_rank:      6,
+   lottery:       2,
+}
+
+award: {
+   type:          medal,
+   id:            0x0040,
+   name:          "Flight Medal",
+
+   desc:          "The Flight Medal is awarded to any member of any branch of Force "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in aerial or orbital flight. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   award:         "The Flight Medal is awarded to any member of any branch of Force "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in aerial or orbital flight. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   small:         Ribbon07,
+   large:         Medal07,
+   lost:          -1,
+   kills:         3,
+   min_rank:      1,
+   max_rank:      6,
+   max_ship_class: attack,
+   lottery:       10,
+   total_missions:   15,
+}
+
+award: {
+   type:          medal,
+   id:            0x0080,
+   name:          "Command Medal",
+
+   desc:          "The Command Medal is awarded to any member of any branch of Force "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in a command role aboard an Alliance Fleet Starship. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   award:         "The Command Medal is awarded to any member of any branch of Force "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in a command role aboard an Alliance Fleet Starship. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   small:         Ribbon08,
+   large:         Medal08,
+   lost:          -1,
+   kills:         3,
+   min_rank:      3,
+   max_rank:      6,
+   min_ship_class: corvette,
+   lottery:       10,
+}
+
+award: {
+   type:          medal,
+   id:            0x0100,
+   name:          "Distinguished Service Cross",
+
+   desc:          "The Distinguished Service Cross is awarded to any person who, while serving with any branch of Force, "
+                  "distinguishes him or herself by extraordinary heroism "
+                  "while engaged in action against an enemy of the Alliance. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   award:         "The Distinguished Service Cross is awarded to any person who, while serving with any branch of Force, "
+                  "distinguishes him or herself by extraordinary heroism "
+                  "while engaged in action against an enemy of the Alliance. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+   
+   small:         Ribbon09,
+   large:         Medal09,
+
+   kills:            1,
+   min_rank:         3,
+   lottery:          20,
+   total_missions:   100,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x0200,
+   name:          "Gold Star",
+
+   desc:          "The Gold Star Medal is awarded to any person who, while serving in any capacity in or with Force, "
+                  "has distinguished him or herself by heroic or meritorious achievement or "
+                  "service while engaged in an action against an enemy of the Terellian Alliance.",
+
+   award:         "The Gold Star Medal is awarded to any person who, while serving in any capacity in or with Force, "
+                  "has distinguished him or herself by heroic or meritorious achievement or "
+                  "service while engaged in an action against an enemy of the Terellian Alliance.",
+
+   small:         Ribbon0A,
+   large:         Medal0A,
+
+   lost:             -1,
+   kills:            3,
+   min_rank:         4,
+   max_rank:         7,
+   lottery:          20,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x0400,
+   name:          "Order of the Wounded Lion",
+   desc:          "The Order of the Wounded Lion is awarded to any member of any branch of Force "
+                  "who is killed or wounded during combat action, either in hostile, neutral, "
+                  "or friendly territory.",
+
+   award:         "For meritorious service during combat action, it is my honor to bestow upon "
+                  "you this Order of the Wounded Lion "
+                  "in the name of the Chief Executive Officer of the Terellian Alliance. "
+                  "May this small token speed the healing of your injuries and return you swiftly "
+                  "to your unit.",
+
+   small:         Ribbon0B,
+   large:         Medal0B,
+
+   lost:             1,
+   kills:            5,
+   required_awards:  0x0020,
+   lottery:          2,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x0800,
+   name:          "Command Shield",
+   desc:          "The Command Shield is awarded to any member of Force:Space "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in a command role aboard an Alliance Fleet Starship. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   award:         "The Command Shield is awarded to any member of Force:Space "
+                  "who distinguishes him or herself by heroism or extraordinary achievement "
+                  "while participating in a command role aboard an Alliance Fleet Starship. "
+                  "The performance of the act of heroism must be evidenced by voluntary action "
+                  "above and beyond the call of duty. ",
+
+   small:         Ribbon0C,
+   large:         Medal0C,
+
+   lost:             -1,
+   kills:            2,
+   min_ship_class:   destroyer,
+   required_awards:  0x0080,
+   lottery:          20,
+   total_missions:   50,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x1000,
+   name:          "Silver Comet",
+
+   desc:          "The Silver Comet Medal is awarded to a person who, while serving in any capacity with Force, "
+                  "distinguishes him or herself by extraordinary heroism while engaged in an action against "
+                  "an enemy of the Terellian Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The act or acts of heroism must have been so notable and have "
+                  "involved risk of life so extraordinary as to set the individual apart from his or her comrades.",
+
+   award:         "The Silver Comet Medal is awarded to a person who, while serving in any capacity with Force, "
+                  "distinguishes him or herself by extraordinary heroism while engaged in an action against "
+                  "an enemy of the Terellian Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The act or acts of heroism must have been so notable and have "
+                  "involved risk of life so extraordinary as to set the individual apart from his or her comrades.",
+
+   small:         Ribbon0D,
+   large:         Medal0D,
+
+   kills:            8,
+   required_awards:  0x0400,
+   lottery:          3,
+   total_missions:   100,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x2000,
+   name:          "White Star",
+
+   desc:          "The White Star Medal is awarded to a person who, while serving in any capacity with Force, "
+                  "distinguishes him or herself by exceptional gallantry in space while engaged in an action against "
+                  "an enemy of the Terellian Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The deed performed must have been so notable and have "
+                  "involved risk of life so extraordinary as to set the individual apart from his or her comrades.",
+
+   award:         "The White Star Medal is awarded to a person who, while serving in any capacity with Force, "
+                  "distinguishes him or herself by exceptional gallantry in space while engaged in an action against "
+                  "an enemy of the Terellian Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The deed performed must have been so notable and have "
+                  "involved risk of life so extraordinary as to set the individual apart from his or her comrades.",
+
+   small:         Ribbon0E,
+   large:         Medal0E,
+
+   kills:            8,
+   required_awards:  0x0400,
+   lottery:          3,
+   total_missions:   150,
+   dynamic_campaign: true
+}
+
+award: {
+   type:          medal,
+   id:            0x4000,
+   name:          "Golden Meteor",
+
+   desc:          "The Golden Meteor is awarded by the Alliance President, in the name of the Combined Senate, "
+                  "to a person who, while an active member of Force, distinguishes him or herself conspicuously "
+                  "by exceptional gallantry at the risk of his or her life above and beyond the call of duty while "
+                  "engaged in action against an enemy of the Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The deed performed must have been one of personal bravery or self-sacrifice "
+                  "so conspicuous as to clearly distinguish the individual above his or her comrades. " 
+                  "The Golden Meteor is the highest honor that may be bestowed upon any citizen of the Alliance.",
+
+   award:         "The Golden Meteor is awarded by the Alliance President, in the name of the Combined Senate, "
+                  "to a person who, while an active member of Force, distinguishes him or herself conspicuously "
+                  "by exceptional gallantry at the risk of his or her life above and beyond the call of duty while "
+                  "engaged in action against an enemy of the Alliance, or while engaged in military operations involving conflict "
+                  "with an opposing force. The deed performed must have been one of personal bravery or self-sacrifice "
+                  "so conspicuous as to clearly distinguish the individual above his or her comrades. " 
+                  "The Golden Meteor is the highest honor that may be bestowed upon any citizen of the Alliance.",
+
+   small:         Ribbon0F,
+   large:         Medal0F,
+
+   kills:            10,
+   required_awards:  0x3400,
+   total_missions:   200,
+   dynamic_campaign: true
+}
+
+

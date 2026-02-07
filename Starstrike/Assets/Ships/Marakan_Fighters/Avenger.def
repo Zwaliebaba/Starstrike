@@ -1,0 +1,360 @@
+SHIP
+
+name:           Avenger
+display_name:   Avenger
+class:          attack
+abrv:           "F6F"
+description:    "The F6F AVENGER attack fighter is a highly competent assault platform, capable of meeting most any opponent on even ground and providing an edge over the majority of enemy starfighters in service.  The Avenger is the only Hegemony craft in current service that is optimized for the ground attack role in addition to supporting antiship mission profiles.  The Avenger features a four-barrel Alpha cannon and eight (8) missile hardpoints.  However, unlike the Alliance Thunderbolt, the Avenger does not have a gun turret for rear-quarter protection."
+
+hud_icon:       "AvengerHud.pcx"
+
+detail_0:       "Avenger_1opt.mag"
+feature_0:      25
+detail_1:       "Avenger_2opt.mag"
+feature_1:      0.5
+
+mass:        	27.4
+integrity:   	3500
+vlimit:      	250
+agility:     	72
+air_factor:  	0.25
+roll_rate:   	600
+scale:       	0.27
+acs:         	1.0
+detet:	 	50e3
+
+trans_x:     	2200
+trans_y:     	2200
+trans_z:     	2200
+
+arcade_drag:    0.18
+drag:           5.5e-5
+roll_drag:      5
+pitch_drag:     4
+yaw_drag:       4
+
+CL:             8.0e-3
+CD:             1.1e-1
+stall:          0.40
+
+prep_time:     	15
+avoid_fighter: 	7
+
+chase:          (0, -1200, 250)
+bridge:		(0,   256,   0)
+
+power: {
+   type:        Fusion,
+   name:        "Fusion Reactor",
+   design:      "Fusion Reactor",
+   max_output:  75,
+
+   loc:         (0, 0, 0),
+   size:        10,
+   hull_factor: 0.5,
+}
+
+drive: {
+   type:        Yellow
+   design:      "Plasma Drive",
+   thrust:      17,
+   augmenter:	50,
+   scale:       0.3,
+   port:        ( 39,  7, -176),
+   port:        (  0, 25, -185),
+   port:        (-39,  7, -176),
+   loc:         (  0,  0, -120),
+   size:        24,
+   hull_factor: 0.5,
+}
+
+weapon:     {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-33, -21, 205),
+   muzzle:  (-17, -24, 180),
+   muzzle:  ( 17, -24, 180),
+   muzzle:  ( 31, -21, 205),
+
+   loc:     (0, 0, 160),
+   size:    32,
+   hull_factor: 0.5
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   abrv:    "STA-1",
+   muzzle:  (-111, -35, -135),
+
+   loc:     (-111, -35, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-2",
+   muzzle:  ( -93, -34, -130),
+
+   loc:     ( -93, -34, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-3",
+   muzzle:  ( -76, -33, -125),
+
+   loc:     ( -76, -33, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   type:    "Rockets",
+   abrv:    "STA-4",
+   muzzle:  ( -58, -32, -120),
+
+   loc:     ( -58, -32, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   type:    "Rockets",
+   abrv:    "STA-5",
+   muzzle:  (  58, -32, -120),
+
+   loc:     (  58, -32, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-6",
+   muzzle:  (  76, -33, -125),
+
+   loc:     (  76, -33, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-7",
+   muzzle:  (  93, -34, -130),
+
+   loc:     (  93, -34, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   abrv:    "STA-8",
+   muzzle:  ( 111, -35, -135),
+
+   loc:     ( 111, -35, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1, -1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: (-1,  0,  0, -1, -1,  0,  0, -1) }
+loadout: { name: "ACM Short Range",  stations: (-1,  0,  0,  1,  1,  0,  0, -1) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  0,  1,  1,  1,  1,  0,  0) }
+loadout: { name: "Ground Strike",    stations: ( 0,  1,  3,  3,  3,  3,  1,  0) }
+loadout: { name: "Ship Strike",      stations: ( 0,  1,  2,  2,  2,  2,  1,  0) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 0,  2,  2,  2,  2,  2,  2,  0) }
+loadout: { name: "Rockets",          stations: ( 0,  0,  1,  4,  4,  1,  0,  0) }
+loadout: { name: "Scout/Recon",      stations: (-1,  0,  1, -1, -1,  1,  0, -1) }
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -32, 0),
+
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5
+}
+
+sensor: {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:               25e3,
+   range:               50e3,
+   range:               75e3,
+
+   loc:                 (0, 0, 30),
+   size:                16,
+   hull_factor:         0.1
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (0, 0, 40),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+   loc:              (0, 0, 90),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 0, -10),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose0.mag",
+      start: (0, -25, 144),
+      end:   (0, -45, 155)
+   },
+
+   gear: {
+      model: "GearLeft0.mag",
+      start: (-20, -25, -64),
+      end:   (-42, -50, -64),
+   },
+
+   gear: {
+      model: "GearRight0.mag",
+      start: ( 20, -25, -64),
+      end:   ( 42, -50, -64),
+   },
+}
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+   scale:            0.12,
+
+   port_fore:   {loc:(-161, -30, -67), fire: 0x0044}
+   port_fore:   {loc:( 161, -30, -67), fire: 0x0084}
+
+   port_aft:    {loc:(-161, -30,-134), fire: 0x0088}
+   port_aft:    {loc:( 161, -30,-134), fire: 0x0048}
+
+   port_top:    {loc:(  -6,  11,  54), fire: 0x0210}
+   port_top:    {loc:(   5,  11,  54), fire: 0x0210}
+
+   port_bottom: {loc:( -14, -24,  59), fire: 0x0120}
+   port_bottom: {loc:(  14, -24,  59), fire: 0x0120}
+
+   port_top:    {loc:(-161, -25, -81), fire: 0x0410}
+   port_top:    {loc:(-161, -25,-121), fire: 0x0410}
+
+   port_top:    {loc:( 161, -25, -81), fire: 0x0810}
+   port_top:    {loc:( 161, -25,-121), fire: 0x0810}
+
+   port_bottom: {loc:(-161, -35, -81), fire: 0x0820}
+   port_bottom: {loc:(-161, -35,-121), fire: 0x0A20}
+
+   port_bottom: {loc:( 161, -35, -81), fire: 0x0420}
+   port_bottom: {loc:( 161, -35,-121), fire: 0x0620}
+
+   port_left:   {loc:( -25,  -9, 173), fire: 0x0081}
+   port_right:  {loc:(  25,  -9, 173), fire: 0x0042}
+}
+
+
+death_spiral: {
+   time:             3.2,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   0.8,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.7,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     195
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     225
+}
+
+
+
+map: {
+   sprite: "AvengerMap0.pcx",
+   sprite: "AvengerMap1.pcx",
+   sprite: "AvengerMap2.pcx",
+   sprite: "AvengerMap3.pcx",
+   sprite: "AvengerMap4.pcx",
+   sprite: "AvengerMap5.pcx",
+   sprite: "AvengerMap6.pcx",
+   sprite: "AvengerMap7.pcx",
+}
+
+

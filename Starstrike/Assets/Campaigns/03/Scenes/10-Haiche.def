@@ -1,0 +1,59 @@
+MISSION
+
+name:   "Cmpn03 Brief 10 Haiche"
+type:   "Patrol"
+system: Haiche
+region: Haiche
+stardate: 1177883344.0
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (1e3, 30e3, 0)
+}
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Display,               image: "Campaigns\03/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+
+event: { event: Camera,                param: 3,  target: "body:Haiche",   vec: (2, -0.15, 2.7e7)   }
+event: { event: Camera,                param: 5,                           vec: (-0.11, 0.015, -0.015)  }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: $TIME\nSubject: Haiche Protectorate\nClassified: CONFIDENTIAL DND/CRYPTO" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\03/C3-B10-OK.wav" }
+
+
+
+event: { event: Camera,     time:  38, param: 3,  target: "body:Cygnus", vec: (1, -0.1, 7e7)   }
+event: { event: Camera,                param: 5,                           vec: (-0.12, 0.01, 0.02)  }
+event: { event: Display,    fade:  (1,7,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Cygnus Sector" }
+
+
+
+event: { event: Camera,     time:  50, param: 3,  target: "body:Tal Amin", vec: (3, 0.2, 8e7)   }
+event: { event: Camera,                param: 5,                           vec: (0.14, -0.02, -0.01)  }
+event: { event: Display,    fade:  (1,7,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Tal Amin Sector" }
+
+
+
+event: { event: EndScene,   time:  62, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

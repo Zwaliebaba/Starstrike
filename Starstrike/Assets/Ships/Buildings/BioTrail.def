@@ -1,0 +1,22 @@
+SHIP
+
+name:       BioTrail
+class:      Building
+display_name: "Elevated Bridge"
+hud_icon:     "hud_trail.pcx"
+secret:        false
+
+detail_0:   "A2-0.mag"
+feature_0:  1000
+detail_1:   "A2-6.mag"
+feature_1:  6
+
+mass:       10e3
+integrity:  10e3
+scale:      7
+acs:        0
+pcs:        0
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+

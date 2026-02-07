@@ -1,0 +1,172 @@
+MISSION
+
+name:   "Cmpn02 News13 Invasion"
+type:   "Patrol"
+
+system:   Jarnell
+system:   Renser
+region:   Khaital
+
+objective: "Unspecified"
+sitrep:    "Unknown"
+start:     "00:00:00"
+stardate:  1147400000.0
+
+degrees: true
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+element: {
+   name:      "Archon"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   loc:       (-140e3, -160e3, 0)
+}
+
+element: {
+   name:      "Stalwart"
+   design:    "Courageous"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   loc:       (-125e3, -155e3, 0)
+}
+
+element: {
+   name:      "Gerson"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   loc:       (-154e3, -174e3, 0)
+}
+
+element: {
+   name:      "Simmons"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   loc:       (-162e3, -143e3, 0)
+}
+
+
+
+element: {
+   name:      Ironhelm
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (0, 0, 0)
+   region:    Lornas
+   navpt:     { cmd: Vector, loc: (0,-50e3,0), speed: 750, rgn: Lornas }
+}
+
+element: {
+   name:      Mattock
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (10e3, 2e3, 0)
+   region:    Lornas
+   navpt:     { cmd: Vector, loc: (-10e3,-50e3,0), speed: 750, rgn: Lornas }
+}
+
+element: {
+   name:      "Oak Hall"
+   design:    Tiger
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (5e3, 6e3, 0)
+   region:    Lornas
+   navpt:     { cmd: Vector, loc: (-2e3,-50e3,0), speed: 750, rgn: Lornas }
+}
+
+element: {
+   name:      "North Point"
+   design:    Tiger
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (-5e3, -4e3, 0)
+   region:    Lornas
+   navpt:     { cmd: Vector, loc: (11e3,-50e3,0), speed: 750, rgn: Lornas }
+}
+
+
+
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Display,               image: "Campaigns\02/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+
+event: { event: Camera,                param: 3, target: "body:Jarnell",   vec: (2, 0, 1.7e7) }
+event: { event: Camera,                param: 5,                           vec: (-0.12, 0.01, 0.01) }
+event: { event: Display,    time:   1, message: "The PRESIDENT of the TERELLIAN ALLIANCE",            font: Limerick18,     color: 0xffffff80, fade: (1,9,1), rect: (20,20, 300,300) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\02/News_13_Renser_Invasion.wav"
+}
+
+event: { event: Camera,     time:  20, param: 3, target: "Archon",         vec: (4,0,5e3) }
+event: { event: Camera,                param: 5,                           vec: (0.15,0.01, 0.01) }
+event: { event: Display,               message: "Archon Carrier Group",    font: Limerick18,     color: 0xffffff80, fade: (1,9,1), rect: (20,20, 300,300) }
+
+
+event: { event: Camera,     time:  45, param: 3, target: "Ironhelm",       vec: (4,0.2,5e3) }
+event: { event: Camera,                param: 5,                           vec: (-0.15, -0.01, 0.01) }
+event: { event: Display,               message: "",            font: Limerick18,     color: 0xffffff80, fade: (1,9,1), rect: (20,20, 300,300) }
+
+
+event: { event: Camera,     time:  70, param: 3, target: "Archon",         vec: (2,0,7e3) }
+event: { event: Camera,                param: 5,                           vec: (0.15,-0.01, -0.01) }
+
+event: { event: EndScene,   time: 100, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

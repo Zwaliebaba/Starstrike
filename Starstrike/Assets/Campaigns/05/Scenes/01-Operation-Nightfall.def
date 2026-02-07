@@ -1,0 +1,137 @@
+MISSION
+
+name:   "Cmpn05 Brief01 - Operation Nightfall"
+type:   Patrol
+system: Garrison
+system: Radix
+system: Isham
+system: Kolchev
+region: Volova
+stardate: 1188000000
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (100e3, 30e3, 0)
+}
+
+
+
+
+element: {
+   name:      Orion
+   design:    Orion
+   iff:       1
+   region:    Volova
+   loc:       (100e3, 300e3, 0)
+}
+
+element: {
+   name:      Courageous
+   design:    Courageous
+   commander: Orion
+   iff:       1
+   region:    Volova
+   loc:       (98e3, 311e3, 500)
+}
+
+element: {
+   name:      Asher
+   design:    Asher
+   commander: Orion
+   iff:       1
+   region:    Volova
+   loc:       (112e3, 314e3, -1000)
+   navpt:     { cmd: Vector, loc: (112e3, -70e3, -1000), rgn: Volova, speed: 100 }
+}
+
+element: {
+   name:      Shaw
+   design:    Asher
+   commander: Orion
+   iff:       1
+   region:    Volova
+   loc:       (94e3, 292e3, 800)
+   navpt:     { cmd: Vector, loc: (94e3, -70e3, 800), rgn: Volova, speed: 100 }
+}
+
+
+element: {
+   name:      Customs
+   design:    Station4
+   iff:       0
+   region:    Volova
+   loc:       (0,0,0)
+   head:      20
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Kolchev", vec: (2, 0.1, 4e7)         }
+event: { event: Camera,                param: 5,                              vec: (-0.05, 0.007, -0.01) }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: 01/00:00:00\nSubject: Operation Nightfall\nClassified: TOP SECRET R7 NTK/EO" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\05\Briefing_01_Nightfall.wav" }
+
+
+event: { event: Camera,     time:  10, param: 3,      target: "Orion",  vec: (-2, -0.1, 8e3)      }
+event: { event: Camera,                param: 5,                        vec: (0.09, 0.017, -0.01) }
+event: { event: Display,               font: Limerick18, color: 0xffffff80, fade: (1,5,1), rect: (20,20, 300,100)
+         message: "Force:Space First Fleet" }
+event: { event: Display,               font: Limerick12, color: 0xffffff80, fade: (1,5,1), rect: (20,40, 300,100)
+         message: "Volova Sector" }
+
+
+event: { event: Camera,     time:  40, param: 3,      target: "Customs",  vec: (3, 0.1, 15e3)     }
+event: { event: Camera,                param: 5,                        vec: (0.05, -0.01, -0.02) }
+event: { event: Display,               font: Limerick18, color: 0xffffff80, fade: (1,5,1), rect: (20,20, 300,100)
+         message: "Hegemony Customs Depot" }
+event: { event: Display,               font: Limerick12, color: 0xffffff80, fade: (1,5,1), rect: (20,40, 300,100)
+         message: "Volova Sector" }
+
+
+event: { event: Camera,     time:  60, param: 3,      target: "body:Garrison",  vec: (2, 0.1, 2.7e7)      }
+event: { event: Camera,                param: 5,                              vec: (-0.09, -0.007, -0.01) }
+event: { event: Display,               font: Limerick18, color: 0xffffff80, fade: (1,5,1), rect: (20,20, 300,100)
+         message: "Garrison System" }
+event: { event: Display,               font: Limerick12, color: 0xffffff80, fade: (1,5,1), rect: (20,40, 300,100)
+         message: "Hegemony Starbase" }
+
+
+event: { event: Display,    time:  75, image: "Campaigns\05/Scenes\Nightfall.pcx", color: 0xffffffff, fade: (1,20,1), rect: (-280,-280,256,256) }
+
+
+event: { event: Camera,     time:  80, param: 3,      target: "body:Garden",  vec: (-1, 0.1, 1.4e7)      }
+event: { event: Camera,                param: 5,                              vec: (-0.07, 0.007, -0.01) }
+event: { event: Display,               font: Limerick18, color: 0xffffff80, fade: (1,5,1), rect: (20,20, 300,100)
+         message: "Isham System" }
+event: { event: Display,               font: Limerick12, color: 0xffffff80, fade: (1,5,1), rect: (20,40, 300,100)
+         message: "Garden" }
+
+
+event: { event: Camera,     time:  95, param: 3,      target: "body:Radix",  vec: (-2, -0.15, 2e7)      }
+event: { event: Camera,                param: 5,                              vec: (0.07, 0.01, -0.015) }
+event: { event: Display,               font: Limerick18, color: 0xffffff80, fade: (1,5,1), rect: (20,20, 300,100)
+         message: "Radix System" }
+event: { event: Display,               font: Limerick12, color: 0xffffff80, fade: (1,5,1), rect: (20,40, 300,100)
+         message: "Capitol Planet" }
+
+
+event: { event: EndScene,   time: 110, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

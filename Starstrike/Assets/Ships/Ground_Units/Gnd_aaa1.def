@@ -1,0 +1,64 @@
+SHIP
+
+name:         "AAA 1"
+display_name: "AAA Gun"
+class:        SAM
+hud_icon:     "hud_aaa2.pcx"
+
+model:      "Tower3-6.mag"
+
+mass:       5e3
+integrity:  5e3
+scale:      2
+acs:        1e6
+
+chase:      (0,  -200, 250)
+bridge:     (0,     0,  32)
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       50e3
+   }
+
+weapon:     {
+   type:    "AAA Cannon",
+   abrv:    Cannon,
+   muzzle:  (-20, 0, 70),
+   muzzle:  ( 20, 0, 70),
+
+   loc:     (0, 160, 0),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   20e3,
+   range:   50e3,
+   range:   100e3,
+
+   loc:              (0, -16, 40),
+   size:             16,
+   hull_factor:      0.1
+   }
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       8,    // SMOKE_TRAIL
+   final_loc:        (0, 32, 0),
+
+   final_type:       10,   // SMALL_EXPLOSION
+   final_loc:        (0, 32, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 64, 0),
+   }
+
+map: { sprite: "map_aaa1.pcx" }
+

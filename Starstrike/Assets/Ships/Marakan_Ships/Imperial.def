@@ -1,0 +1,418 @@
+SHIP
+
+name:          Imperial
+display_name:  Imperial
+class:         Cruiser
+description:   "Marakan Hegemony guided missile cruisers such as the CA-5C44 IMPERIAL class are most often found leading small cruiser battle groups. These ships are devastating attack platforms, equally at home either support or leading space action groups. The Imperial class features a pair of Rostov high-speed missile turrets, which combined with a full battery of magnetic rail launchers, gives them excellent long range assault capability."
+
+hud_icon:   "ImperialHud.pcx"
+
+detail_0:   "Musson_0opt.mag"
+feature_0:  1000
+detail_1:   "Musson_1opt.mag"
+feature_1:  32
+detail_2:   "Musson_2opt.mag"
+feature_2:  16
+
+mass:       348.1e3
+agility:    2
+vlimit:     230
+roll_rate:  7
+integrity:  60e3
+scale:      4
+acs:        1.2
+
+trans_x:     450e3
+trans_y:     300e3
+trans_z:     450e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   640, 100)
+
+degrees:    true
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       40e3,
+
+   loc:              (0, -45, -150),
+   size:             96,
+   hull_factor:      0.75,
+   explosion:        7
+}
+
+drive: {
+   type:             Yellow,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           30e3,
+   scale:            9,
+   port:             ( 137, 30, -340),
+   port:             (-137, 30, -340),
+
+   loc:              (0, 10, -200),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, 0),
+   size:             48,
+   hull_factor:      0.5
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       3500,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 1",
+   abrv:             "Graser-1",
+   muzzle:           (-42, -9, 640),
+
+   loc:              (-42, -9, 620),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 2",
+   abrv:             "Graser-2",
+   muzzle:           ( 42, -9, 640),
+
+   loc:              ( 42, -9, 620),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Rostov",
+   design:           "Missile Weapon",
+   name:             "Missile 1",
+   abrv:             "MISL-1",
+
+   muzzle:           (   0,  0,  90)
+   loc:              (-183, 29,-159)
+   size:             64
+   hull_factor:      0.8
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rostov-Starboard",
+   design:           "Missile Weapon",
+   name:             "Missile 2",
+   abrv:             "MISL-2",
+
+   muzzle:           (   0,  0,  90)
+   loc:              ( 183, 29,-159)
+   size:             64
+   hull_factor:      0.8
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           130.0,
+   aim_az_min:          -130.0,
+   aim_el_max:           80.0,
+   aim_el_min:           -1.0,
+
+   loc:            (0, 68,153),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   azimuth:           180.0, 
+   elevation:	      -180.0,
+
+   aim_az_max:           130.0,
+   aim_az_min:          -5.0,
+   aim_el_max:           80.0,
+   aim_el_min:           -1.0,
+
+   loc:            (-91, -47,313),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   azimuth:           180.0, 
+   elevation:	      180.0,
+
+   aim_az_max:           5.0,
+   aim_az_min:          -135.0,
+   aim_el_max:           80.0,
+   aim_el_min:           -1.0,
+
+   loc:            (91, -47,313),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   azimuth:           180.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           130.0,
+   aim_az_min:          -130.0,
+   aim_el_max:           80.0,
+   aim_el_min:           -1.0,
+
+   loc:            (0, 92,-228),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "RAIL12",
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           1.0,
+   aim_az_min:          -180.0,
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+   loc:            (-139, 72,-172),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "RAIL12",
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           1.0,
+   aim_az_min:          -180.0,
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+   loc:            (139, 72,-172),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "RAIL12",
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           1.0,
+   aim_az_min:          -180.0,
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+   loc:            (139, -12,-172),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "RAIL12",
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           1.0,
+   aim_az_min:          -180.0,
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+   loc:            (-139, -12,-172),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "ImperialMap0.pcx",
+   sprite: "ImperialMap1.pcx",
+   sprite: "ImperialMap2.pcx",
+   sprite: "ImperialMap3.pcx",
+   sprite: "ImperialMap4.pcx",
+   sprite: "ImperialMap5.pcx",
+   sprite: "ImperialMap6.pcx",
+   sprite: "ImperialMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5
+
+   explosion: { type: 10, time: 2.0, loc: (-50,  10,    0) }
+   explosion: { type: 10, time: 0.7, loc: ( 60,  20,  260) }
+   explosion: { type: 10, time: 0.5, loc: (-20, -18, -240) }
+   explosion: { type: 10, time: 0.3, loc: ( 20,  20, -120) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+   debris:    { model: "MussonDebris1.mag", loc: (0,0,400), mass: 98e3, count:  1, life: 380,
+                fire:  (60,0,-200), fire:  (100,20,80) }
+   debris:    { model: "MussonDebris2.mag", loc: (140,-120,0), mass: 38e3, count:  1, life: 360 }
+   debris:    { model: "Debris0A.mag",      loc: (0,0,-50), mass:   95, count: 20, life:  20 }
+   debris:    { model: "Debris0B.mag",      loc: (0,0,-50), mass:   44, count: 15, life:  35 }
+   debris:    { model: "Debris0C.mag",      loc: (0,0,0),   mass:   23, count: 10, life:  30 }
+
+}
+
+
+
+
+
+

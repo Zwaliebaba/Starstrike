@@ -1,0 +1,2135 @@
+WEAPON
+
+primary: {
+   name:             "Alpha Cannon"
+   group:            GUNS
+   beauty:           "Alpha_Beauty.pcx"
+   description:      "The ALPHA CANNON is the high-energy particle weapon in use on most Hegemony fighter craft. Analysts believe that this weapon is nearing end-of-life phase out, but remains in service because it is cheap and reliable.  The Alpha Cannon tends to be low in effective damage and penetration, but makes up for those limitations with a high refire rate."
+   target_type:      0x000f00ff
+   value:            1
+   recharge_rate:    20
+   refire_delay:     0.3
+   capacity:         150
+   charge:           5
+   min_charge:       5
+   damage:           12
+   speed:            6.0e3
+   life:             2
+
+   syncro:           true
+   self_aiming:      true
+   aim_az_max:       0.03
+   aim_el_max:       0.03
+
+   graphic_type:     3	// bolt
+   width:            2.0
+   length:           80.0
+   light:            100
+   bitmap:           "shot0.pcx"
+   flash:            "flash0.pcx"
+   flash_scale:      0.5
+   sound:            "Shot1.wav"
+   sound_min_dist:   100
+   sound_max_dist:   15e3
+}
+
+primary: {
+   name:             "Delta Cannon"
+   group:            GUNS
+   beauty:           "Delta_Beauty.pcx"
+   description:      "The DELTA CANNON is the current generation standard high-energy particle weapon in use on most Alliance fighters.  Notorious for reliablity problems in its early years of service, the Delta Cannon is now considered one of the most potent and effective small energy weapons ever fielded by Force:Space.  The Delta Cannon has improved focus and high bolt velocity that contribute to its accuracy at ranges up to 10 km."
+   target_type:      0x000f00ff
+   value:            1
+   recharge_rate:    20
+   refire_delay:     0.25
+   capacity:         200
+   charge:           5
+   min_charge:       5
+   damage:           20
+   speed:            8.0e3
+   life:             1.6
+
+   syncro:           true
+   self_aiming:      true
+   aim_az_max:       0.03
+   aim_el_max:       0.03
+
+   graphic_type:     3	// bolt
+   width:            2.0
+   length:           80.0
+   light:            100
+   bitmap:           "shot1.pcx"
+   flash:            "flash1.pcx"
+   flash_scale:      0.5
+   sound:            "Zap8.wav"
+   sound_min_dist:   100
+   sound_max_dist:   15e3
+}
+
+primary: {
+   name:             "Heavy Cannon"
+   group:            GUNS
+   beauty:           "Heavy_Beauty.pcx"
+   description:      "The HEAVY ENERGY CANNON has recently been fitted on the F/A-38D Thunderbolt series of attack fighters.  The Heavy is a slimmed down version of the retired 'Chain Lightning' cannon used on early model LCAs for mine sweeping and antiship warfare.  This is the first time a weapon of this caliber has been fitted on a single seat fighter.  The Heavy is too slow and unweildy to be effective against maneuvering fighters, but the high damage potential makes this weapon a first-rate ship killer."
+   target_type:      0x000fffff
+   value:            1
+   recharge_rate:    30
+   refire_delay:     0.30
+   capacity:         300
+   charge:           10
+   min_charge:       10
+   damage:           15
+   speed:            7.0e3
+   life:             2.0
+
+   syncro:           true
+   self_aiming:      true
+   aim_az_max:       0.03
+   aim_el_max:       0.03
+
+   graphic_type:     3	// bolt
+   width:            3.0
+   length:           70.0
+   light:            100
+   bitmap:           "shot4.pcx"
+   flash:            "flash4.pcx"
+   flash_scale:      0.5
+   sound:            "blockade_cannon.wav"
+   sound_min_dist:   500
+   sound_max_dist:   17e3
+}
+
+primary: {
+   name:             "Fighter Turret"
+   group:            TURRET
+   beauty:           "Turret1_Beauty.pcx"
+   description:      "This automated FIGHTER TURRET provides rear quarter protection for the F/A-38D Thunderbolt series of attack fighters.  The turret is tied into the Alliance sensor network and will automatically engage any threat that comes within its range.  Even though it is not the most accurate platform in the fleet, the Fighter Turret is an effective deterrent to any fighters attempting a tail chase on the 'Bolt."
+   target_type:      0x000fffff
+   value:            1
+   capacity:         100
+   recharge_rate:    25
+   refire_delay:     0.15
+   charge:           10
+   min_charge:       10
+   damage:           10
+   speed:            8.0e3
+   life:             1.6
+
+   min_range:          3.0e3
+   max_range:         12.5e3
+   max_track:         25.0e3
+
+   self_aiming:      true
+   aim_az_max:       0.75
+   aim_el_max:       0.50
+
+   turret:           "turret.mag"
+   scale:            0.22
+
+   graphic_type:     3	// bolt
+   width:            2
+   length:           40
+   bitmap:           "shot1.pcx"
+   flash:            "flash1.pcx"
+   flash_scale:      0.5
+   sound:            "Zap8.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+primary: {
+   name:             "LCA Turret"
+   group:            TURRET
+   secret:           true
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         100
+   recharge_rate:    80
+   refire_delay:     0.18
+   charge:           15
+   min_charge:       10
+   damage:           15
+   speed:            8.0e3
+   life:             1.6
+
+   min_range:          3.0e3
+   max_range:         12.5e3
+   max_track:         25.0e3
+
+   self_aiming:      true
+   aim_az_max:       1.50
+   aim_el_max:       0.80
+   aim_el_min:       0.00
+
+   turret:           "Alliance/LCATurretGuns.mag"
+   turret_base:      "Alliance/LCaTurretBase.mag"
+   scale:            0.12
+
+   graphic_type:     3	// bolt
+   width:            2
+   length:           30
+   bitmap:           "shot4.pcx"
+   flash:            "flash4.pcx"
+   flash_scale:      0.5
+   sound:            "Zap8.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+
+missile: {
+   name:             Archer
+   group:            SRM
+   beauty:           "Javelin_Beauty.pcx"
+   description:      "The ARCHER SRM is the standard Hegemony anti-fighter munition.  Although not very fast, the Archer is very maneuverable, which makes it deadly accurate in short range engagements.  The Archer's main weakness is its low-quality seeker head.  The Archer can be defeated by releasing a decoy and performing a break turn at low power.  Each Archer hardpoint carries two weapons."
+   target_type:      0x000f00ff
+   value:            2
+   ammo:             1
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      2
+   charge:           1
+   min_charge:       1
+   damage:           1e3
+   lethal_radius:    200
+   speed:            5e3
+   life:             10
+   visible_stores:   true
+
+   attachment:       (-1, 0, 0)
+   attachment:       ( 1, 0, 0)
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:         5e3
+   max_range:        20e3
+   max_track:        60e3
+   
+   carry_mass:       0.5
+   carry_resist:     2
+   
+   guided:           1
+   mass:             0.5
+   thrust:           3e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       4
+   yaw_rate:         4
+
+   graphic_type:     1	// solid
+   scale:            0.12
+   light:            200
+   model:            "missile03.mag"
+   trail:            "smoke.pcx"
+   trail_width:      1.5
+   trail_dim:        7
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "missile.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+missile: {
+   name:             Javelin
+   group:            SRM
+   beauty:           "Javelin_Beauty.pcx"
+   description:      "The JAVELIN SRM is the standard Alliance short range anti-fighter munition.  The Javelin is quite similar to the Hegemony Archer SRM, although it is carries more fuel and has an increased effective range as a result.  Unfortunately, it is not much faster than the Archer, and enemy fighters can still defeat the shot with a decoy if given sufficient warning.  The Javelin is best employed at short ranges from low aspect to minimize the enemy's chance of escape.  Each Javelin hardpoint carries three weapons."
+   target_type:      0x000f00ff
+   value:            2
+   ammo:             2
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      2
+   charge:           1
+   min_charge:       1
+   damage:           1.2e3
+   lethal_radius:    200
+   speed:            5e3
+   life:             10
+   visible_stores:   true
+
+   attachment:       (-1, 0, 0)
+   attachment:       ( 1, 0, 0)
+   attachment:       ( 0,-1, 0)
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:         5e3
+   max_range:        25e3
+   max_track:        60e3
+   
+   carry_mass:       0.54
+   carry_resist:     2
+   
+   guided:           1
+   mass:             0.5
+   thrust:           3.3e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       4
+   yaw_rate:         4
+
+   graphic_type:     1	// solid
+   scale:            0.15
+   light:            200
+   model:            "missile03.mag"
+   trail:            "smoke.pcx"
+   trail_width:      2
+   trail_dim:        7
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "missile.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+missile: {
+   name:             Vector
+   group:            MRM
+   description:      "The VECTOR MRM is a medium-range general purpose guided munition.  The Vector is a high-speed weapon that is suitable for engaging small to medium-size maneuvering targets at ranges from 15 to 35 km.  Hegemony forces field an almost identical munition known as the Longbow."
+   beauty:           "Vector_Beauty.pcx"
+   target_type:      0x000f00ff
+   value:            3
+   ammo:             1
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      2
+   charge:           1
+   min_charge:       1
+   damage:           1.2e3
+   lethal_radius:    250
+   speed:            5e3
+   life:             15
+   visible_stores:   true
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:        10e3
+   max_range:        40e3
+   max_track:        80e3
+   
+   carry_mass:       0.6
+   carry_resist:     2
+   
+   guided:           2
+   mass:             0.5
+   thrust:           8e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       4
+   yaw_rate:         4
+
+   graphic_type:     1	// solid
+   scale:            0.15
+   light:            200
+   model:            "missile02.mag"
+   trail:            "smoke.pcx"
+   trail_width:      2
+   trail_dim:        6
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "missile.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+missile: {
+   name:             Hammer
+   group:            AGM
+   beauty:           "Hammer_Beauty.pcx"
+   description:      "The HAMMER AGM is a medium-range passive-guided air to ground munition.  The Hammer is a low-speed but very powerful weapon that is suitable for engaging hardened ground targets at ranges up to 50 km.  Recommended procedure is to employ the Hammer from its maximum range to avoid subjecting your fighter to ground fire."
+   target_type:      0xffff0000
+   value:            3
+   ammo:             1
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      2
+   charge:           1
+   min_charge:       1
+   damage:           5e3
+   speed:            5e3
+   life:             20
+   visible_stores:   true
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:        10e3
+   max_range:        50e3
+   max_track:        90e3
+   
+   carry_mass:       2.103
+   carry_resist:     3
+   
+   guided:           1
+   mass:             2
+   thrust:           10e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       2
+   yaw_rate:         2
+
+   graphic_type:     1	// solid
+   scale:            0.15
+   light:            200
+   model:            "missile04.mag"
+   trail:            "smoke.pcx"
+   trail_width:      2.5
+   trail_dim:        5
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "missile.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+missile: {
+   name:             Harpoon
+   group:            ASM
+   beauty:           "Vector_Beauty.pcx"
+   description:      "The HARPOON ASM is a long-range passive-guided antiship munition.  The Harpoon is a high-speed weapon that is suitable for engaging small to medium-size starships at ranges up to 50 km.  The Harpoon is not easily spoofed or intercepted and has excellent shield penetration capabilities.  Recommended procedure is to employ this weapon from its maximum range to avoid subjecting your fighter to enemy PDB fire. Hegemony forces field a similar fighter-launched antiship munition known as the HORN."
+   target_type:      0x000ffff0
+   value:            3
+   ammo:             1
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      1
+   charge:           1
+   min_charge:       1
+   damage:           5e3
+   penetration:      10
+   speed:            5e3
+   life:             20
+   visible_stores:   true
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:        10e3
+   max_range:        50e3
+   max_track:        90e3
+   
+   carry_mass:       1.255
+   carry_resist:     2
+   
+   guided:           1
+   mass:             1
+   thrust:           10e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       3
+   yaw_rate:         3
+
+   graphic_type:     1	// solid
+   scale:            0.15
+   light:            200
+   model:            "missile02.mag"
+   trail:            "smoke.pcx"
+   trail_width:      2
+   trail_dim:        5
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "Missile1.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+
+missile: {
+   name:             Rockets
+   group:            RKS
+   beauty:           "Rocket_Beauty.pcx"
+   description:      "Each fighter-based ROCKET POD holds twelve guided submunitions that may be employed against a wide variety of spaceborne and ground-based targets.  Rockets are fired from the pod in salvos of four each time press the firing stud.  Rockets are most effective against stationary or slow moving targets, and are often used in mine-sweeping missions."
+   target_type:      0xffffffff
+   value:            2
+   ammo:             12
+   ripple_count:     4
+   recharge_rate:    10
+   refire_delay:     0.35
+   charge:           1
+   min_charge:       1
+   damage:           1e3
+   lethal_radius:    100
+   speed:            5e3
+   life:             8
+   visible_stores:   false
+
+   self_aiming:      false
+   aim_az_max:       0
+   aim_el_max:       0
+
+   min_range:         5e3
+   max_range:        25e3
+   max_track:        60e3
+   
+   carry_mass:       0.8
+   carry_resist:     0.3
+   
+   guided:           1
+   mass:             0.2
+   thrust:           2e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        0.5
+   pitch_rate:       0.5
+   yaw_rate:         0.5
+
+   turret:           "rocket_launcher.mag"
+   scale:            0.15
+   eject:            (0, 0, 300)
+
+   graphic_type:     1	// solid
+   scale:            0.15
+   light:            200
+   model:            "missile00.mag"
+   trail:            "smoke.pcx"
+   trail_width:      1
+   trail_dim:        8
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "missile2.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   10e3
+}
+
+missile: {
+   name:             "Recon Pod"
+   group:            CAM
+   beauty:           "Recon_Beauty.pcx"
+   description:      "The wing-mounted RECON POD is a multi-frequency sensor package that may be used to capture detailed information about an enemy ship, station, or ground unit.  The Recon Pod will perform two detailed scans in rapid succession each time you depress the firing stud.  The Pod contains storage for ten scans, so you can only fire it five times before returning to base.  Of course, the Recon Pod does no damage to enemy targets."
+   target_type:      0xffffffff
+   value:            1
+   ammo:             10
+   ripple_count:     2
+   recharge_rate:    10
+   refire_delay:     0.35
+   charge:           1
+   min_charge:       1
+   damage:           -1
+   lethal_radius:    100
+   speed:            30e3
+   life:             1.5
+   visible_stores:   false
+
+   self_aiming:      false
+   aim_az_max:       0
+   aim_el_max:       0
+
+   min_range:         5e3
+   max_range:        30e3
+   max_track:        60e3
+   
+   carry_mass:       1.1
+   carry_resist:     1
+   
+   guided:           1
+   mass:             0.2
+   thrust:           4e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       1
+   yaw_rate:         1
+
+   turret:           "recon.mag"
+   scale:            0.15
+
+   sound:            "click.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   4e3
+}
+
+
+drone: {
+   name:             "Fighter Decoy"
+   group:            DECOY
+   beauty:           "Decoy_Beauty.pcx"
+   description:      "The FIGHTER DECOY is a general-purpose missile countermeasure that is designed to mimic the radient energy signature of your fighter's engine.  Anti-fighter missiles will generally guide on the closest, strongest return that their sensors can detect.  When your Sensor Warning Receiver notifies you of an inbound threat, you should release a decoy and disengage your drive augmenter (afterburner) to evade the missile.  The Fighter Decoy does no damage to enemy targets."
+   target_type:      0x00
+   value:            1
+   ammo:             10
+   recharge_rate:    1
+   refire_delay:     1
+   damage:           0
+   speed:            300
+   life:             5
+
+   carry_mass:       0.1
+   carry_resist:     0
+   
+   decoy:            Fighter
+   guided:           0
+   mass:             0.5
+   thrust:           150
+   drag:             0.1
+
+   graphic_type:     2	// sprite
+   scale:            0.25
+   bitmap:           "drive.pcx"
+
+   flare:            "shot7.pcx"
+   flare_scale:      1.3
+
+   sound:            "decoy.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   10e3
+}
+
+
+primary: {
+   name:             "Blockade Cannon"
+   group:            PDB
+   beauty:           "Blockade_Beauty.pcx"
+   description:      "The BLOCKADE CANNON is an energy bolt turret that is usually mounted on space mines.  The Blockade Cannon is designed to engage civilian shipping, but it is also quite effective against fighter and attack craft."
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.2
+   capacity:         2000
+   charge:           10
+   min_charge:       10
+   damage:           50
+   penetration:      10
+   speed:            7.5e3
+   life:             2
+
+   min_range:         4e3
+   max_range:        15e3
+   max_track:        30e3
+
+   self_aiming:      true
+   aim_az_max:       3.15
+   aim_el_max:       1.00
+   slew_rate:        0.10 // ~5 degrees / second
+
+   turret:           "mine_guns.mag"
+   turret_base:      "mine_base.mag"
+   scale:            1
+
+   graphic_type:     3	// bolt
+   width:            8
+   length:           100
+   bitmap:           "shot0.pcx"
+   flash:            "flash0.pcx"
+   flash_scale:      1.0
+   sound:            "blockade_cannon.wav"
+   sound_min_dist:   3e3
+   sound_max_dist:   30e3
+}
+
+
+primary: {
+   name:             "Vulcan Cannon"
+   group:            VULCAN
+   beauty:           "Vulcan_Beauty.pcx"
+   description:      "The VULCAN CANNON is a rapid-fire energy bolt weapon that is generally deployed on LCA-class attack craft.  The Vulcan can engage targets ranging from small fighters to medium-size starships and ground units."
+   target_type:      0xffffffff
+   value:            1
+   recharge_rate:    15
+   refire_delay:     0.08
+   charge:           5
+   min_charge:       5
+   damage:           10
+   speed:            25e3
+   life:             2
+
+   min_range:         15e3
+   max_range:         50e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       0.05
+   aim_el_max:       0.05
+
+   graphic_type:     3	// bolt
+   width:            5
+   length:           120
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      0.2
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+
+primary: {
+   name:             "Zolon Cannon"
+   group:            GUNS
+   target_type:      0x000fffff
+   value:            2
+   recharge_rate:    30
+   refire_delay:     0.33
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           150
+   speed:            7.5e3
+   life:             2.5
+
+   syncro:           true
+   self_aiming:      true
+   aim_az_max:       0.25
+   aim_el_max:       0.25
+
+   graphic_type:     2 // sprite
+   scale:            0.75
+   light:            150
+   light_color:      (140,255,180)
+   bitmap:           "ShotZ.pcx"
+   sound:            "shot4.wav"
+   sound_min_dist:   500
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Phalanx Cannon"
+   group:            PDB
+   beauty:           "Phalanx_Beauty.pcx"
+   description:      "The PHALANX CANNON is the standard point defense battery (PDB) for smaller Force:Space starships.  Each Phalanx mount is a freely rotating ball turret with two alternate firing barrels.  The Phalanx is deadly accurate against fighter and combat drone targets at short ranges."
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            20e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.50
+
+   turret:           "Alliance/BallTurret2opt.mag"
+   scale:            0.3
+   muzzle:           ( 16,   0,  110),
+   muzzle:           (-16,   0,  110),
+
+   graphic_type:     3	// bolt
+   width:            20
+   length:           400
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      1
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Viking Cannon"
+   group:            PDB
+   beauty:           "Viking_Beauty.pcx"
+   description:      "The VIKING CANNON is the standard point defense battery (PDB) for many military stations.  Each Viking mount is a freely rotating cylindrical turret with two alternate firing barrels.  The Viking is quite accurate and delivers a devastating punch against against fighter targets at short to medium ranges."
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           25
+   speed:            23e3
+   life:             3
+
+   min_range:         10e3
+   max_range:         40e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.50
+
+   turret:           "Alliance/BallTurret1opt.mag"
+   scale:            5
+   muzzle:           ( 4, 0, 65)
+   muzzle:           (-4, 0, 65)
+
+   graphic_type:     3	// bolt
+   width:            20
+   length:           400
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      1
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Ursa Cannon"
+   group:            PDB
+   beauty:           "Ursa_Beauty.pcx"
+   description:      "The URSA CANNON is an older point defense battery (PDB) system in use on some Hegemony and Independent Worlds frigate-class starships.  The Ursa Cannon has only half the rate of fire of the Alliance's Phalanx system, but its high-speed bolts make in an effective offensive and defensive gun."
+   target_type:      0x000fffff
+   value:            1
+   recharge_rate:    20
+   refire_delay:     0.2
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            35e3
+   life:             1
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       0.05
+   aim_el_max:       0.70
+
+   turret:           "Dantari/Ursa.mag"
+   scale:            2
+
+   graphic_type:     3	// bolt
+   width:            20
+   length:           150
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      1
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Orca Cannon"
+   group:            PDB
+   beauty:           "Orca_Beauty.pcx"
+   description:      "The ORCA CANNON is the standard point defense battery (PDB) for Hegemony and Independent Worlds starships.  Each Orca mount is an articulated deck platform turret with two alternate firing barrels.  The Orca is deadly accurate against fighter and combat drone targets at short ranges, but lacks the speed and rate of fire of the Alliance Phalanx PDB system."
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.2
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           10
+   speed:            18e3
+   life:             2
+
+   min_range:         4e3
+   max_range:        28e3
+   max_track:        50e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+
+   turret:           "Dantari/Rail-12.mag"
+   scale:            2
+
+   graphic_type:     3	// bolt
+   width:            10
+   length:           120
+   bitmap:           "Orca/shot0.pcx"
+   flash:            "Orca/flash0.pcx"
+   flash_scale:      1.5
+   sound:            "Shot2.wav"
+   sound_min_dist:   3e3
+   sound_max_dist:   30e3
+}
+
+primary: {
+   name:             "Orca Inverted"
+   group:            PDB
+   beauty:           "Orca_Beauty.pcx"
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.2
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           10
+   speed:            18e3
+   life:             2
+
+   min_range:         4e3
+   max_range:        28e3
+   max_track:        50e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.10
+   aim_el_min:      -0.80
+
+   turret:           "Dantari/Rail-12-Inverted.mag"
+   scale:            2
+
+   graphic_type:     3	// bolt
+   width:            10
+   length:           120
+   bitmap:           "Orca/shot0.pcx"
+   flash:            "Orca/flash0.pcx"
+   flash_scale:      1.5
+   sound:            "Shot2.wav"
+   sound_min_dist:   3e3
+   sound_max_dist:   30e3
+}
+
+primary: {
+   name:             "Orca 2 Cannon"
+   group:            PDB
+   beauty:           "Orca_Beauty.pcx"
+   description:      "The ORCA 2 CANNON is the big brother of the standard Orca PDB.  Outwardly similar to the standard Orca, this heavy duty gun is mainly used defending Hegemony stations.  Each Orca 2 mount is an articulated deck platform turret with two alternate firing barrels.  Slower and less accurate than the standard Orca mount, this high-powered weapon packs quite a wallop when it does manage to hit the target."
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.2
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           30
+   speed:            10e3
+   life:             2
+
+   min_range:         4e3
+   max_range:        20e3
+   max_track:        50e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+
+   turret:           "Orca/t2_guns.mag"
+   turret_base:      "Orca/t2_base.mag"
+   scale:            1
+
+   graphic_type:     3	// bolt
+   width:            15
+   length:           150
+   bitmap:           "Orca/shot0.pcx"
+   flash:            "Orca/flash0.pcx"
+   flash_scale:      1.5
+   sound:            "Shot2.wav"
+   sound_min_dist:   3e3
+   sound_max_dist:   30e3
+}
+
+primary: {
+   name:             "Orca 2 Inverted"
+   group:            PDB
+   beauty:           "Orca_Beauty.pcx"
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.2
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           7
+   speed:            10e3
+   life:             2
+
+   min_range:         4e3
+   max_range:        20e3
+   max_track:        50e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.10
+   aim_el_min:      -0.80
+
+   turret:           "Orca/t2_guns.mag"
+   turret_base:      "Orca/t2_base_inv.mag"
+   scale:            1
+
+   graphic_type:     3	// bolt
+   width:            15
+   length:           150
+   bitmap:           "Orca/shot0.pcx"
+   flash:            "Orca/flash0.pcx"
+   flash_scale:      1.5
+   sound:            "Shot2.wav"
+   sound_min_dist:   3e3
+   sound_max_dist:   30e3
+}
+
+primary: {
+   name:             "Vanguard"
+   group:            GUNS
+   beauty:           "Vanguard_Beauty.pcx"
+   description:      "The VANGUARD CANNON is the standard point defense battery (PDB) for Force:Space cruisers and carriers.  Each Vanguard mount is an articulated deck platform turret with two alternate firing barrels.  The Vanguard is more powerful than the Phalanx system used on smaller starships, but not quite as accurate."
+   target_type:      0x000fffff
+   value:            3
+   recharge_rate:    20
+   refire_delay:     0.15
+   capacity:         1000
+   charge:           10
+   min_charge:       10
+   damage:           25
+   speed:            15e3
+   life:             3
+
+   min_range:          5e3
+   max_range:         45e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.20
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+
+   turret:           "Alliance/Guns1opt.mag"
+   turret_base:      "Alliance/Base1opt.mag"
+   scale:            1.2
+   muzzle:           ( 7,   0,  60),
+   muzzle:           (-7,   0,  60),
+
+   graphic_type:     3	// bolt
+   width:            3
+   length:           60
+   bitmap:           "shot1.pcx"
+   flash:            "flash1.pcx"
+   flash_scale:      1
+   sound:            "Shot2.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Helicon"
+   group:             PDB
+   beauty:           "Helicon_Beauty.pcx"
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            20e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+   slew_rate: 	     0.75
+
+   graphic_type:     3,	     // blob
+
+   scale:            1
+   turret:          "Marakan/28MMGAUSSGUN.MAG"
+   muzzle:           (0, 10, 131)
+
+   width:            4
+   length:           45
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Gauss_Bolt.jpg",
+   flash:	     "Marakan/Gauss_Flash.jpg",
+   flash_scale:	     0.2,
+
+   sound:            "Marakan/Gauss_Sound.wav",
+   sound_min_dist:   2e3,
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Light-PDB"
+   group:            PDB
+   secret:           true
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            20e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+   slew_rate: 	     0.75
+
+   graphic_type:     3,	     // blob
+
+   scale:            1.5,
+   turret:          "Marakan/SmallGun.mag",
+
+   width:            4
+   length:           45
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Gauss_Bolt.jpg",
+   flash:	     "Marakan/Gauss_Flash.jpg",
+   flash_scale:	     0.2,
+
+   sound:            "Marakan/Gauss_Sound.wav",
+   sound_min_dist:   2e3,
+   sound_max_dist:   20e3
+}
+
+
+primary: {
+   name:             "Rail-5"
+   group:             RAIL
+   secret:           true
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            15e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+   slew_rate: 	     0.75
+
+   graphic_type:     3,	     // blob
+
+   scale:            2,
+   turret:          "Marakan/Rail-12.mag",
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   width:            10,
+   length:           120,
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Rail_Bolt.jpg",
+   flash:	     "Marakan/Rail_Flash.jpg",
+   flash_scale:	     0.3,
+
+   sound:            "Marakan/Rail_Sound.wav",
+   sound_min_dist:   2e3,
+   sound_max_dist:   20e3
+}
+
+
+primary: {
+   name:             "Rail-12"
+   group:             RAIL
+   beauty:           "Rail12_Beauty.pcx"
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            15e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+   slew_rate: 	     0.75
+
+   graphic_type:     3,	     // blob
+
+   scale:            3,
+   turret:          "Marakan/Rail-12.mag",
+   muzzle:           ( 4, 11, 75),
+   muzzle:           (-4, 11, 75),
+
+   width:            15,
+   length:           150,
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Rail_Bolt.jpg",
+   flash:	     "Marakan/Rail_Flash.jpg",
+   flash_scale:	     1.5,
+   flare:            "Marakan/Rail_Flare.jpg",
+   flare_scale:      0.03,
+
+   sound:            "Marakan/Rail_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+
+primary: {
+   name:             "Rail-12 Inverted"
+   group:             RAIL
+
+   target_type:      0x000fffff
+   value:            1
+   capacity:         200
+   recharge_rate:    25
+   refire_delay:     0.1
+   charge:           10
+   min_charge:       5
+   damage:           20
+   speed:            15e3
+   life:             2
+
+   min_range:         10e3
+   max_range:         35e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.80
+   aim_el_min:      -0.10
+   slew_rate: 	     0.75
+
+   graphic_type:     3,	     // blob
+
+   scale:            3,
+   turret:          "Marakan/Rail-12-Inverted.mag",
+   muzzle:           ( 4, -11, 75),
+   muzzle:           (-4, -11, 75),
+
+   width:            15,
+   length:           150,
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Rail_Bolt.jpg",
+   flash:	     "Marakan/Rail_Flash.jpg",
+   flash_scale:	     1.5,
+   flare:            "Marakan/Rail_Flare.jpg",
+   flare_scale:      0.03,
+
+   sound:            "Marakan/Rail_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+primary: {
+   name:             "Rail-15"
+   group:             RAIL
+   beauty:           "Rail15_Beauty.pcx"
+
+   target_type:      0x0000fff0
+   value:            5
+
+   damage:           150
+
+   capacity:         2000
+   charge:           1
+   min_charge:       0.8
+
+   recharge_rate:    0
+
+   refire_delay:     4
+   
+   speed:            10e3
+   mass:             7
+ 
+   life:             4.375
+
+   guided:           0
+   syncro:	     true
+   self_aiming:      true
+
+   slew_rate: 	     1
+
+   min_range:         1e3
+   max_range:        35e3
+   max_track:        55e3
+
+   graphic_type:     3
+   scale:            4,
+
+   turret:          "Marakan/DUEL15INRAILGUN.MAG",
+
+   width:            18,
+   length:           170,
+
+   light:            200,
+   light_color:      (114, 45, 0),
+   bitmap:   	     "Marakan/Rail_Bolt.jpg",
+   flash:	     "Marakan/Rail_Flash.jpg",
+   flash_scale:	     1.9,
+
+   sound:            "Marakan/Rail_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+
+primary: {
+   name:             "Mag-18"
+   group:             MAG
+   beauty:           "Mag18_Beauty.pcx"
+
+   target_type:      0x0000fff0
+   value:            5
+ 
+   damage:           220
+
+   capacity:         1000
+   charge:           1
+   min_charge:       0.9
+   recharge_rate:    0
+   refire_delay:     2
+   
+   speed:            6000
+   mass:             12
+ 
+   life:             7.5
+
+   guided:           0
+   syncro:           true
+   self_aiming:      true
+
+   slew_rate:        1
+
+   min_range:         1e3
+   max_range:        40e3
+   max_track:        60e3
+
+   graphic_type:     3,	     // blob
+
+   scale:            4,
+
+   turret:          "Marakan/18INMAGGUN.MAG",
+   muzzle:             (0, 12, 81),
+
+   width:            50,
+   length:           230,
+
+
+   light:            200,
+   light_color:      (100, 10, 0),
+   bitmap:   	     "Marakan/Mag_Bolt.jpg",
+   flash:	     "Marakan/Mag_Flash.jpg",
+   flash_scale:	     3,
+   flare:            "Marakan/Mag_Flare.jpg",
+   flare_scale:      0.8,
+   trail:            "Marakan/Mag_Trail.jpg",
+   trail_width:       6,
+   sound:            "Marakan/Mag_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+
+drone: {
+   name:             "Rostov"
+   group:             ROSTOV
+   beauty:           "Rostov_Beauty.pcx"
+   target_type:       0x0000fff0
+   value:             5
+
+   damage:            9e3
+   integrity:  	       50
+   speed:            6000
+   ammo:               40
+   refire_delay:        5
+   life:               10
+   eject:	(0,0,6000)
+   mass:               10
+   thrust:           23e3
+
+   capacity:            1, 
+   ripple_count:        1,
+
+   roll_rate:        5,
+   pitch_rate:       5,
+   yaw_rate:         5,
+
+   guided:              1,
+   lethal_radius:	100,
+
+   min_range:         1e3
+   max_range:        40e3
+   max_track:        60e3
+
+   charge:           	  1,
+   min_charge:            0.9,
+   recharge_rate:   	  10,
+  
+   scale:            4,
+   turret:          "Marakan/Rostov-L.MAG",
+
+   syncro:	        false,
+   self_aiming:         true,
+
+   aim_az_max:           0
+   aim_az_min:           0
+   aim_el_max:           1
+   aim_el_min:          -1
+
+   slew_rate: 	        1,
+   graphic_type:     	1 // solid
+
+   roll_drag:        1,
+   pitch_drag:       1,
+   yaw_drag:         1,
+
+   light:            200,
+   light_color:      (160, 100, 00),
+
+   model:   	     "Marakan/MISSILE.mag",
+   flash:	     "Marakan/Rostov_Flash.jpg",
+   flash_scale:	     2,
+   flare:            "Marakan/Rostov_Flare.jpg",
+   flare_scale:      1.5,
+   trail:            "Marakan/Rostov_Trail.jpg",
+   trail_width:       20,
+
+   sound:            "Marakan/Rostov_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+drone: {
+   name:             "Rostov-Starboard"
+   group:             ROSTOV
+   secret:            true
+   target_type:       0x0000fff0
+   value:             5
+
+   damage:            9e3
+   integrity:  	       50
+   speed:            6000
+   ammo:               40
+   refire_delay:        5
+   life:               10
+   eject:	(0,0,6000)
+   mass:               10
+   thrust:           25e3
+
+   capacity:            1, 
+   ripple_count:        1,
+
+   roll_rate:        5,
+   pitch_rate:       5,
+   yaw_rate:         5,
+
+   guided:              1,
+   lethal_radius:	100,
+
+   min_range:         1e3
+   max_range:        40e3
+   max_track:        60e3
+
+   charge:           	  1,
+   min_charge:            0.9,
+   recharge_rate:   	  10,
+  
+   scale:            4,
+   turret:          "Marakan/Rostov-R.MAG",
+
+   syncro:	        false,
+   self_aiming:         true,
+
+   aim_az_max:           0
+   aim_az_min:           0
+   aim_el_max:           1
+   aim_el_min:          -1
+
+   slew_rate: 	        1,
+   graphic_type:     	1 // solid
+
+   roll_drag:        1,
+   pitch_drag:       1,
+   yaw_drag:         1,
+
+   light:            200,
+   light_color:      (160, 100, 00),
+
+   model:   	     "Marakan/MISSILE.mag",
+   flash:	     "Marakan/Rostov_Flash.jpg",
+   flash_scale:	     2,
+   flare:            "Marakan/Rostov_Flare.jpg",
+   flare_scale:      1.5,
+   trail:            "Marakan/Rostov_Trail.jpg",
+   trail_width:       20,
+
+   sound:            "Marakan/Rostov_Sound.wav",
+   sound_min_dist:   3e3,
+   sound_max_dist:   30e3
+}
+
+
+
+primary: {
+   name:             "Plasma Cannon"
+   group:            CANNON
+   beauty:           "Decoy_Beauty.pcx"
+   description:      "The PLASMA CANNON is used as the primary antiship gun on Alliance Frigates."
+   target_type:      0x000ffff0
+   value:            1
+   recharge_rate:    15
+   refire_delay:     0.15
+   charge:           10
+   min_charge:       5
+   damage:           30
+   speed:            15e3
+   life:             5
+
+   min_range:         10e3
+   max_range:         40e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.50
+
+   graphic_type:     2	// sprite
+   scale:            1
+   bitmap:           "shot7.pcx"
+   sound:            "shot4.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+beam: {
+   name:             "XRay Laser"
+   group:            XRAY
+   beauty:           "XRay_Beauty.pcx"
+   description:      "XRAY LASER batteries are the most common primary beam weapons used by destroyer and light cruiser class starships in the Blue Drift region.  These weapons deliver a tremendous amount of destructive energy each second the beams are in contact with the hull armor of their target.  However, the coherent x-rays are easily scattered by standard gravitational deflector shields, giving them a low shield penetration factor."
+   target_type:      0x000ffff0
+   value:            10
+   recharge_rate:    100
+   refire_delay:     0 // limited by min_charge
+   capacity:         1000
+   charge:           1000
+   min_charge:       500
+   damage:           3
+   speed:            3e8
+   life:             1.5
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       0.175
+   aim_el_max:       0.175
+
+   graphic_type:     3	// bolt
+   width:            20
+   length:           3e8
+   bitmap:           "shot9.pcx"
+   flash:            "flash9.pcx"
+   flash_scale:      1.75
+   sound:            "beam2.wav"
+   sound_min_dist:   10e3
+   sound_max_dist:   50e3
+}
+
+beam: {
+   name:             "Gamma Laser"
+   group:            GRASER
+   beauty:           "Gamma_Beauty.pcx"
+   description:      "GAMMA RAY LASER batteries are the most powerful primary beam weapons in service in the Blue Drift region.  Used mainly by heavy cruiser class starships, these weapons are more than twice as powerful as the X-Ray Laser batteries used on lighter starships.  Like their smaller cousins, Gamma Ray Lasers have poor shield penetration, but they still pack enough punch to make an effective weapon against heavy starships and orbital stations."
+   target_type:      0x000ffff0
+   value:            15
+   recharge_rate:    100
+   refire_delay:     0 // limited by min_charge
+   capacity:         1500
+   charge:           1500
+   min_charge:       500
+   damage:           4
+   speed:            3e8
+   life:             3
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       0.175
+   aim_el_max:       0.175
+
+   spread_az:        0.1
+   spread_el:        0.1
+
+   graphic_type:     3	// bolt
+   width:            25
+   length:           3e8
+   bitmap:           "ShotGamma.pcx"
+   flash:            "FlashGamma.pcx"
+   flash_scale:      2
+   sound:            "Beam3.wav"
+   sound_min_dist:   10e3
+   sound_max_dist:   50e3
+}
+
+beam: {
+   name:             "Graser Turret"
+   group:            GRASER
+   beauty:           "GraserTurret_Beauty.pcx"
+   description:      "GAMMA RAY LASER TURRETS are often mounted on Hegemony military stations for defense against starship assault.  These weapons are essentially turret-mounted versions of the Gamma Ray Lasers used on heavy starships.  Backed by the powerful reactors of a military station, Gamma Ray Laser Turrets have the endurance to wear down enemy starships even through the scattering effect of their gravitational deflector shields."
+   target_type:      0x000ffff0
+   value:            15
+   recharge_rate:    100
+   refire_delay:     0 // limited by min_charge
+   capacity:         1500
+   charge:           1500
+   min_charge:       500
+   damage:           6
+   speed:            3e8
+   life:             3
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       1.00
+   aim_el_max:       0.65
+   aim_el_min:      -0.08
+
+   turret:           "GraserTurret/guns.mag"
+   turret_base:      "GraserTurret/base.mag"
+   scale:            2
+   muzzle:           ( 0,  0,  90),
+
+   spread_az:        0.1
+   spread_el:        0.1
+
+   graphic_type:     3	// bolt
+   width:            50
+   length:           3e8
+   bitmap:           "ShotGamma.pcx"
+   flash:            "FlashGamma.pcx"
+   flash_scale:      2
+   sound:            "Beam3.wav"
+   sound_min_dist:   10e3
+   sound_max_dist:   50e3
+}
+
+
+beam: {
+   name:             "Zolon Laser"
+   group:            LASER
+   target_type:      0x000ffff0
+   value:            15
+   recharge_rate:    150
+   refire_delay:     0 // limited by min_charge
+   capacity:         1500
+   charge:           1500
+   min_charge:       500
+   damage:           30
+   speed:            3e8
+   life:             3
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        100e3
+
+   self_aiming:      true
+   aim_az_max:       0.175
+   aim_el_max:       0.175
+
+   spread_az:        0.1
+   spread_el:        0.1
+
+   graphic_type:     3	// bolt
+   width:            25
+   length:           3e8
+   bitmap:           "ShotZBeam.pcx"
+   flash:            "FlashZBeam.pcx"
+   flash_scale:      2
+   sound:            "Beam3.wav"
+   sound_min_dist:   10e3
+   sound_max_dist:   50e3
+}
+
+
+primary: {
+   name:             "AAA Cannon"
+   group:            AAA
+   beauty:           "Ground/AAA2_Beauty.pcx"
+   description:      "The ANTI AIRCRAFT ARTILLERY (AAA) CANNON is an autonomous ground-based energy bolt system optimized for area defense against hostile airborne targets.  This variant has two alternate firing barrels mounted on an upright turret with built-in multifrequency sensor.  It can engage fighters and attack craft at ranges up to 50 km."
+   target_type:      0x000fffff
+   value:            1
+   recharge_rate:    20
+   refire_delay:     0.2
+   charge:           1
+   min_charge:       1
+   damage:           50
+   speed:            30e3
+   life:             3
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       3.15
+   aim_el_max:       0.75
+
+   turret:           "Ground/AAA2Guns.mag"
+   turret_base:      "Ground/AAA2Turret.mag"
+   scale:            2
+   muzzle:           ( 12,   0,  112),
+   muzzle:           (-12,   0,  112),
+
+   graphic_type:     3	// bolt
+   width:            32
+   length:           800
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      1
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+primary: {
+   name:             "Quad AAA"
+   group:            AAA
+   beauty:           "Ground/AAA4_Beauty.pcx"
+   description:      "The ANTI AIRCRAFT ARTILLERY (AAA) CANNON is an autonomous ground-based energy bolt system optimized for area defense against hostile airborne targets.  This variant has four sequenced barrels for increased firing speed and coverage.  It can engage fighters and attack craft at ranges up to 50 km."
+   target_type:      0x000fffff
+   value:            1
+   recharge_rate:    20
+   refire_delay:     0.1
+   charge:           1
+   min_charge:       1
+   damage:           25
+   speed:            30e3
+   life:             3
+
+   min_range:         10e3
+   max_range:         50e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       3.15
+   aim_el_max:       0.75
+
+   turret:           "Ground/AAA4Guns.mag"
+   turret_base:      "Ground/AAA4Turret.mag"
+   scale:            2
+   muzzle:           ( 29,   9,  68)
+   muzzle:           (-29,   9,  68)
+   muzzle:           ( 29,  -8,  68)
+   muzzle:           (-29,  -8,  68)
+
+   graphic_type:     3	// bolt
+   width:            32
+   length:           500
+   bitmap:           "shot2.pcx"
+   flash:            "flash2.pcx"
+   flash_scale:      1
+   sound:            "shot3.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+
+
+missile: {
+   name:             "SAM-1"
+   group:            SAM
+   beauty:           "Ground/SAM_Beauty.pcx"
+   description:      "The SURFACE-TO-AIR MISSILE (SAM) BATTERY is an autonomous ground-launched guided missile system designed for area defense against a variety of airborne targets.  Each SAM Battery carries eight missiles on an upright turret with integrated sensor array.  It can engage fighters and attack craft at ranges up to 20 km."
+   target_type:      0x0f
+   value:            4
+   ammo:             1
+   recharge_rate:    10
+   refire_delay:     5
+   charge:           1
+   min_charge:       1
+   damage:           2.5e3
+   speed:            5e3
+   life:             10
+   visible_stores:   true
+
+   self_aiming:      true
+   aim_az_max:       3.15
+   aim_el_max:       0.5
+
+   min_range:         5e3
+   max_range:        20e3
+   max_track:        60e3
+   
+   carry_mass:       0.5
+   carry_resist:     2
+   
+   guided:           2
+   mass:             0.5
+   thrust:           3e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       3
+   yaw_rate:         3
+
+   turret:           "Ground/SAMRail.mag"
+   turret_base:      "Ground/SAMTurret.mag"
+   scale:            2
+
+   graphic_type:     1	// solid
+   light:            200
+   model:            "sam.mag"
+   trail:            "smoke.pcx"
+   trail_width:      5
+   trail_dim:        6
+   flare:            "drive.pcx"
+   flare_scale:      0.25
+   sound:            "Missile1.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   15e3
+}
+
+
+
+missile: {
+   name:             "Mk7 Interceptor"
+   group:            MK7
+   beauty:           "Mk7_Beauty.pcx"
+   description:      "The MARK VII INTERCEPTOR is a ship-launched antifighter weapon that is also effective at engaging enemy combat drones and missiles.  The Mark VII also has some limited effectiveness against starship targets.  The Mark VII is commonly deployed on frigates tasked with fleet defense, as well as heavier cruiser class starships."
+   target_type:      0x000fffff
+   value:            2
+   ammo:             20
+   recharge_rate:    10
+   refire_delay:     1
+   salvo_delay:      5
+   charge:           1
+   min_charge:       1
+   damage:           750
+   lethal_radius:    500
+   speed:            5e3
+   life:             10
+
+   self_aiming:      true
+   aim_az_max:       1
+   aim_el_max:       1
+
+   min_range:         5e3
+   max_range:        50e3
+   max_track:        90e3
+   
+   guided:           2
+   mass:             0.5
+   thrust:           15e3
+   drag:             2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       2
+   yaw_rate:         2
+
+   eject:            (0, 0, 200)
+
+   graphic_type:     1	// solid
+   scale:            0.1
+   model:            "Alliance/Mk7.mag"
+   trail:            "smoke.pcx"
+   trail_width:      2
+   trail_dim:        6
+   flare:            "shot6.pcx"
+   flare_scale:      1
+   sound:            "Mk7.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+drone: {
+   name:             "Fusion Torpedo"
+   group:            TORP
+   beauty:           "Fusion_Beauty.pcx"
+   description:      "The FUSION TORPEDO is the standard issue guided long range antiship munition in use on most Force:Space destroyer and destroyer-escort class vessels.  Fusion Torpedoes pack a large amount of destructive power in a small package, but low speed and acceleration make them easy targets for PDB and Interceptor fire.  Employing them at point blank range can mitigate this effect."
+   target_type:      0x0000fff0
+   value:            4
+   ammo:             20
+   recharge_rate:    1
+   refire_delay:     25
+   charge:           1
+   min_charge:       1
+   damage:           20e3
+   speed:            3e3
+   life:             60
+
+   min_range:         40e3
+   max_range:        100e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       0.8
+   aim_el_max:       0.4
+
+   carry_mass:       2.5
+   carry_resist:     0
+   
+   guided:           2
+   mass:             3
+   thrust:           60e3
+   drag:             1.5
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       1
+   yaw_rate:         1
+
+   eject:            (0, 0, 750)
+
+   graphic_type:     1	// solid
+   scale:            0.5
+   model:            "FusionTorp.mag"
+   flare:            "drive.pcx"
+   flare_scale:      1.25
+   sound:            "Torpedo.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+drone: {
+   name:             Nike
+   group:            NIKE
+   beauty:           "Nike_Beauty.pcx"
+   description:      "The NIKE high-speed antiship missile is commonly used on light cruiser class starships.  The Nike is considerably faster than the smaller Fusion Torpedo, and also has better shield penetration capabilities."
+   target_type:      0x000ffff0
+   value:            5
+   ammo:             16
+   recharge_rate:    1
+   refire_delay:     5
+   salvo_delay:      15
+   charge:           1
+   min_charge:       1
+   damage:           25e3
+   penetration:      10
+   speed:            5e3
+   life:             60
+
+   min_range:         20e3
+   max_range:        100e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       0.8
+   aim_el_max:       0.4
+
+   carry_mass:       2.5
+   carry_resist:     0
+
+   guided:           2
+   mass:             3
+   thrust:           70e3
+   drag:             1.2
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       2
+   yaw_rate:         2
+
+   eject:            (0, 0, 750)
+
+   graphic_type:     1	// solid
+   scale:            0.5
+   model:            "Nike.mag"
+   flare:            "drive.pcx"
+   flare_scale:      1.25
+   sound:            "Nike.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+drone: {
+   name:             Athena1
+   group:            ATHENA
+   beauty:           "Nike_Beauty.pcx"
+   description:      "The ATHENA is the elder sister of the Nike Antiship Missile.  Compared to the Nike, the Athena has a more advanced drive sytstem and greater acceleration.  Mounted only on heavy cruiser starship types, this Athena variant is designed for starboard missile tubes."
+   target_type:      0x000ffff0
+   value:            6
+   ammo:             12
+   recharge_rate:    1
+   refire_delay:     4
+   salvo_delay:      16
+   charge:           1
+   min_charge:       1
+   damage:           25e3
+   penetration:      10
+   speed:            5e3
+   life:             60
+
+   min_range:         20e3
+   max_range:        100e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       0.8
+   aim_el_max:       0.4
+
+   carry_mass:       2.5
+   carry_resist:     0
+
+   guided:           2
+   mass:             3
+   thrust:           90e3
+   drag:             1.1
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       2
+   yaw_rate:         2
+
+   eject:            (500, 0, 0)
+
+   graphic_type:     1	// solid
+   scale:            0.5
+   model:            "Nike.mag"
+   flare:            "drive.pcx"
+   flare_scale:      1.25
+   sound:            "Nike.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+drone: {
+   name:             Athena2
+   group:            ATHENA
+   beauty:           "Nike_Beauty.pcx"
+   description:      "The ATHENA is the elder sister of the Nike Antiship Missile.  Compared to the Nike, the Athena has a more advanced drive sytstem and greater acceleration.  Mounted only on heavy cruiser starship types, this Athena variant is designed for port side missile tubes."
+   target_type:      0x000ffff0
+   value:            6
+   ammo:             12
+   recharge_rate:    1
+   refire_delay:     4
+   salvo_delay:      16
+   charge:           1
+   min_charge:       1
+   damage:           25e3
+   penetration:      10
+   speed:            5e3
+   life:             60
+
+   min_range:         20e3
+   max_range:        100e3
+   max_track:        150e3
+
+   self_aiming:      true
+   aim_az_max:       0.8
+   aim_el_max:       0.4
+
+   carry_mass:       2.5
+   carry_resist:     0
+
+   guided:           2
+   mass:             3
+   thrust:           90e3
+   drag:             1.1
+   roll_drag:        4
+   pitch_drag:       4
+   yaw_drag:         4
+   roll_rate:        1
+   pitch_rate:       2
+   yaw_rate:         2
+
+   eject:            (-500, 0, 0)
+
+   graphic_type:     1	// solid
+   scale:            0.5
+   model:            "Nike.mag"
+   flare:            "drive.pcx"
+   flare_scale:      1.25
+   sound:            "Nike.wav"
+   sound_min_dist:   2e3
+   sound_max_dist:   20e3
+}
+
+drone: {
+   name:             "Sensor Drone"
+   group:            DRONE
+   beauty:           "Probe_Beauty.pcx"
+   description:      "The starship SENSOR DRONE is a multi-frequency active sensor probe that may be used to detect enemy ships far beyond the range of onboard ship sensors.  As long as it is active, the Sensor Drone will detect any contact that comes within 50 km of its position.  Of course, the Sensor Drone does no damage to enemy targets."
+   target_type:      0x00
+   value:            1
+   ammo:             4
+   recharge_rate:    1
+   refire_delay:     10
+   damage:           0
+   speed:            200
+   life:             60
+
+   carry_mass:       0.5
+   carry_resist:     0
+   
+   probe:            true
+   guided:           0
+   mass:             0.5
+   thrust:           700
+   drag:             0.2
+
+   eject:            (0, 0, 100)
+
+   flare:            "drive.pcx"
+   flare_scale:      1
+
+   sound:            "probe.wav"
+   sound_min_dist:   1e3
+   sound_max_dist:   10e3
+}
+

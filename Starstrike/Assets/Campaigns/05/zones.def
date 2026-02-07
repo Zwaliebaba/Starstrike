@@ -1,0 +1,97 @@
+ZONES
+
+
+// ISHAM
+
+zone: {
+   system: Isham,
+   region: Garden,
+   region: "Tiger Bay",
+}
+
+zone: {
+   system: Isham,
+   region: Senesca,
+}
+
+zone: {
+   system: Isham,
+   region: Ramek,
+}
+
+zone: {
+   system: Isham,
+   region: Relay,
+}
+
+
+// RADIX
+
+zone: {
+   system: Radix,
+   region: Senna,
+}
+
+zone: {
+   system: Radix,
+   region: Radix,
+   region: "Shadow Canyon",
+}
+
+zone: {
+   system: Radix,
+   region: Cavenda,
+}
+
+// GARRISON
+
+zone: {
+   system: Garrison,
+   region: Rhofar
+}
+
+zone: {
+   system: Garrison,
+   region: Garrison
+}
+
+zone: {
+   system: Garrison,
+   region: Korul
+}
+
+zone: {
+   system: Garrison,
+   region: Nerasil
+}
+
+// TROCANTHER
+   
+zone: {
+   system: Trocanther,
+   region: Volante,
+   region: "Hell's Kitchen",
+}
+
+zone: {
+   system: Trocanther,
+   region: Narcissus
+}
+   
+zone: {
+   system: Trocanther,
+   region: Path,
+}
+
+
+// MARAK
+
+zone: {
+   system: Marak,
+   region: Marak,
+}
+
+zone: {
+   system: Marak,
+   region: Xanthe,
+}

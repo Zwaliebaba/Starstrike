@@ -1,0 +1,507 @@
+MISSION_TEMPLATE
+
+name:   "Zolon Patrol"
+type:   "Patrol"
+system: "Tarsus"
+region: "Tarsus"
+
+degrees: true
+
+alias:      { name: ZCS, elem: "Consular Starship", loc: (0,0,0)  }
+alias:      { name: ZD1, elem: "ZD02" }
+alias:      { name: ZD2, elem: "ZD03" }
+alias:      { name: A1,  elem: "Atlas" }
+
+callsign:   { name: ZF1,     iff: 4 }
+callsign:   { name: ZF2,     iff: 4 }
+callsign:   { name: ZF3,     iff: 4 }
+
+alias: {
+   name:    Player,
+   code:    player,
+   mission: patrol,
+
+   navpt:   { cmd: patrol, rloc: { ref: ZCS, dex: 40e3, dex_var: 15e3, az:   0, az_var: 10 }, speed: 750 },
+   navpt:   { cmd: patrol, rloc: { ref: ZCS, dex: 40e3, dex_var: 15e3, az:  90, az_var: 10 }, speed: 750 },
+   navpt:   { cmd: patrol, rloc: { ref: ZCS, dex: 40e3, dex_var: 15e3, az: 170, az_var: 10 }, speed: 750 },
+
+   objective: { cmd: patrol, tgt_desc: "suspected enemy units" },
+}
+
+
+// ZOLON FORCES:
+
+element: {
+   name:      ZF1,
+   design:    ZZF,
+   mission:   Assault,
+
+   intel:     Secret,
+   count:     4,
+   command_ai:1,
+   iff:       4,
+   playable:  false,
+   region:    Theramin,
+   loc:       (-20000, -25000, 0),
+}
+
+element: {
+   name:      ZF2,
+   design:    ZZA,
+   mission:   Assault,
+
+   intel:     Secret,
+   count:     4,
+   command_ai:1,
+   iff:       4,
+   playable:  false,
+   region:    Theramin,
+   loc:       (-30000, -25000, 0),
+}
+
+element: {
+   name:      ZF3,
+   design:    ZZF,
+   mission:   Patrol,
+
+   intel:     Secret,
+   count:     4,
+   command_ai:1,
+   iff:       4,
+   playable:  false,
+   region:    Theramin,
+   loc:       (-40000, -25000, 0),
+}
+
+
+
+
+// ZOLON EVENTS:
+
+event: {
+   id:              1,
+   time:            200.0,
+   event:           Jump,
+   event_ship:      "ZF1 1",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              2,
+   time:            201.0,
+   event:           Jump,
+   event_ship:      "ZF1 2",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              3,
+   time:            203.0,
+   event:           Jump,
+   event_ship:      "ZF1 3",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              4,
+   time:            203.5,
+   event:           Jump,
+   event_ship:      "ZF1 4",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              5,
+   event:           Objective,
+   event_ship:      ZF1,
+   event_param:     10,
+   event_target:    ZCS,
+
+   trigger:         Event,
+   trigger_param:   4,
+   delay:           2,
+}
+
+event: {
+   id:              11,
+   time:            220.0,
+   event:           Jump,
+   event_ship:      "ZF2 1",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              12,
+   time:            221.0,
+   event:           Jump,
+   event_ship:      "ZF2 2",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              13,
+   time:            223.0,
+   event:           Jump,
+   event_ship:      "ZF2 3",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              14,
+   time:            223.5,
+   event:           Jump,
+   event_ship:      "ZF2 4",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              15,
+   event:           Objective,
+   event_ship:      ZF2,
+   event_param:     10,
+   event_target:    ZCS,
+
+   trigger:         Event,
+   trigger_param:   14,
+   delay:           2,
+}
+
+event: {
+   id:              21,
+   time:            300.0,
+   event:           Jump,
+   event_ship:      "ZF3 1",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              22,
+   time:            301.0,
+   event:           Jump,
+   event_ship:      "ZF3 2",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              23,
+   time:            303.0,
+   event:           Jump,
+   event_ship:      "ZF3 3",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              24,
+   time:            303.5,
+   event:           Jump,
+   event_ship:      "ZF3 4",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              50,
+   time:            300.0,
+   event:           Jump,
+   event_ship:      "ZD1",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+event: {
+   id:              51,
+   time:            315.0,
+   event:           Jump,
+   event_ship:      "ZD2",
+   event_target:    Tarsus,
+   trigger:         Time,
+}
+
+
+event: {
+   id:              52,
+   event:           Objective,
+   event_ship:      ZD1,
+   event_param:     10,
+   event_target:    ZCS,
+
+   trigger:         Event,
+   trigger_param:   4,
+   delay:           2,
+}
+
+event: {
+   id:              53,
+   event:           Objective,
+   event_ship:      ZD2,
+   event_param:     10,
+   event_target:    ZCS,
+
+   trigger:         Event,
+   trigger_param:   4,
+   delay:           2,
+}
+
+
+// in case the zolon destroyers get shot down
+
+event: {
+   id:              100
+   time:            0
+   delay:           8
+   event:           Damage
+   event_ship:      ZCS
+   event_target:    ZCS
+   event_param:     300e3
+   event_chance:    100
+   trigger:         Destroyed
+   trigger_ship:    ZD2
+}
+
+event: {
+   id:              101
+   time:            0
+   delay:           7
+   event:           Damage
+   event_ship:      ZCS
+   event_target:    ZCS
+   event_param:     300e3
+   event_chance:    100
+   trigger:         Destroyed
+   trigger_ship:    ZD1
+}
+
+event: {
+   id:              102
+   time:            900
+   delay:           0
+   event:           Damage
+   event_ship:      ZCS
+   event_target:    ZCS
+   event_param:     500e3
+   event_chance:    100
+   trigger:         Time
+}
+
+
+// after the consular ship is destroyed
+
+event: {
+   id:              200,
+   time:            0.0,
+   delay:           20.0,
+   event:           Jump,
+   event_ship:      "ZF1 1",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              201,
+   time:            0.0,
+   delay:           21.2,
+   event:           Jump,
+   event_ship:      "ZF1 2",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              202,
+   time:            0.0,
+   delay:           22.0,
+   event:           Jump,
+   event_ship:      "ZF1 3",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              203,
+   time:            0.0,
+   delay:           22.8,
+   event:           Jump,
+   event_ship:      "ZF1 4",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+
+event: {
+   id:              204,
+   time:            0.0,
+   delay:           25.0,
+   event:           Jump,
+   event_ship:      "ZF2 1",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              205,
+   time:            0.0,
+   delay:           25.3,
+   event:           Jump,
+   event_ship:      "ZF2 2",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              206,
+   time:            0.0,
+   delay:           26.0,
+   event:           Jump,
+   event_ship:      "ZF2 3",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              207,
+   time:            0.0,
+   delay:           27.2,
+   event:           Jump,
+   event_ship:      "ZF2 4",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              208,
+   time:            0.0,
+   delay:           29.0,
+   event:           Jump,
+   event_ship:      "ZF3 1",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              209,
+   time:            0.0,
+   delay:           30.0,
+   event:           Jump,
+   event_ship:      "ZF3 2",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              210,
+   time:            0.0,
+   delay:           30.4,
+   event:           Jump,
+   event_ship:      "ZF3 3",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              211,
+   time:            0.0,
+   delay:           31.1,
+   event:           Jump,
+   event_ship:      "ZF3 4",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              212,
+   time:            0.0,
+   delay:           40.0,
+   event:           Jump,
+   event_ship:      "ZD1",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              213,
+   time:            0.0,
+   delay:           41.0,
+   event:           Jump,
+   event_ship:      "ZD2",
+   event_target:    Theramin,
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+// end of bugout
+
+
+
+event: {
+   id:              300,
+   time:            230.0,
+   event:           Message,
+   sound:           "Vox\Misc\A02-02.wav",
+   event_message:   "Be advised - we show several high-speed contacts inbound.",
+}
+
+event: {
+   id:              301,
+   time:            233.0,
+   event:           Message,
+   sound:           "Vox\Misc\A02-03.wav",
+   event_message:   "Contacts are unknown configuration and presumed hostile.",
+}
+
+event: {
+   id:              302,
+   time:            238.0,
+   event:           Objective,
+   sound:           "Vox\Misc\A02-04.wav",
+   event_message:   "We have new orders: Defend the Zolon Consular Starship.",
+   event_param:     4,
+   event_target:    ZCS,
+}
+
+event: {
+   id:              310,
+   time:            0,
+   delay:           55,
+   event:           Message,
+   sound:           "Vox\Misc\A02-07.wav",
+   event_message:   "So much for the peace conference, I guess...",
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+event: {
+   id:              311,
+   time:            0,
+   delay:           58,
+   event:           Message,
+   sound:           "Vox\Misc\A02-08.wav",
+   event_message:   "All units stand down.",
+   trigger:         Destroyed,
+   trigger_ship:    ZCS,
+}
+
+// EOF

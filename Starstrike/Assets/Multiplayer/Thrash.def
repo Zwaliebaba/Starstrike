@@ -1,0 +1,97 @@
+MISSION
+
+id:     2
+name:   "Fighter Thrash Pit"
+type:   "Patrol"
+desc:   "Multiple spaceborne fighters locked in team-vs-team action."
+system: "Kolchev"
+region: "Kolchev"
+
+objective: "* Eliminate all enemy fighters.\n* Protect friendly strike ships."
+
+sitrep: "Get ready to rumble!  This is a team-vs-team scenario with six ships on each side. "
+        "The Blue team has four Stormhawk multirole fighters and two Thunderbolt attack ships, "
+        "while the Red team has four Viper interceptors and two Avenger heavy fighters.\n\n"
+        "Your mission is to eliminate the opposition and protect your team mates.  All ships "
+        "have three lives, so be sure to watch your back!"
+
+start: "33:00:00"
+
+degrees: true
+
+element: {
+   name:      "Alpha",
+   design:    "Stormhawk",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     4,
+   command_ai:1,
+   iff:       1,
+   player:    1,
+   playable:  true,
+   region:    "Kolchev",
+   loc:       (0, 0, 0),
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+
+   objective: { cmd: Escort, tgt: "Bravo" },
+}
+
+element: {
+   name:      "Bravo",
+   design:    "Thunderbolt",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     2,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Kolchev",
+   loc:       (23000, 4000, 0),
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:      "Narom",
+   design:    "Viper",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     4,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Kolchev",
+   loc:       (27000, -34000, 0),
+   head:      179,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+
+   objective: { cmd: Escort, tgt: "Nagal" },
+}
+
+element: {
+   name:      "Nagal",
+   design:    "Avenger",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     2,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Kolchev",
+   loc:       (22000, -46000, 0),
+   head:      179,
+   respawns:  2,
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+}
+
+// EOF

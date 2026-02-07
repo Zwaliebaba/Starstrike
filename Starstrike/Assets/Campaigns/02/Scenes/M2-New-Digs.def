@@ -1,0 +1,46 @@
+MISSION
+
+name:   "Cmpn 02 Mail 02"
+type:   "Patrol"
+system: "Jarnell"
+region: "Jarnell"
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Display,    message: "MAIL", font: Limerick18, color: 0xffffffff, fade: (0,83,0), rect: (20,20, 300,100) }
+
+event: { event: Display,    time:   1, message: "Decoding Path...",    fade: (0,2,0), rect: (20, 40, 600,150), font: OCRB, color: 0xff33ff44, sound: "Bleep6.wav" }
+
+event: { event: Display,    time:   3, message: "Decoding Content...", fade: (0,2,0), rect: (20,190, 600,800), font: OCRB, color: 0xff33ff44, sound: "Bleep12.wav" }
+
+event: { event: Display,               fade: (0,77,0), rect: (20,40, 600,150), font: OCRB, color: 0xff33ff44,
+         message: "TO: $RANK $NAME\nCO: $GROUP\nFM: Sara Hunter - Ele'aan Consulate Jarnell\nRE: NEW DIGS\n-----\nPATH: Ele'aan Consular Net Center | Jarnell Main Traffic Relay | Athenar Terminus | Janek Station Courier Drop | 3RD FLEET HQ | Trellis Relay | $GROUP\n-----\n" }
+
+event: { event: Display,    time:   5, fade: (0,75,0), rect: (20,190, 600,800), font: OCRB, color: 0xff33ff44,
+         message: "Hello,\n\nWell, we're finally just about moved in to the new Ele'aan Consular Center.  My new position as the Junior Consular Liason to the Ele'aan Fusion rates a new office with a lovely view of the Endless Falls.  At twilight, when the mist shroud catches the light of the setting sun, it's just breathtaking.  Ever so much better than that sub-basement hovel I was lurking in on Borova.  Yay me!\n\nThanks for relaying that message from Jonas.  'I am the Doorway'  Honestly, he's such a character. [giggle]  I don't even know where he could have heard that expression - it's part of an old Ele'aan greeting and farewell ritual.  The Ele'aans are an advanced race, but they can be pretty inscrutable at times, even for me.\n\nIn fact, right now they are all agitated about the Zolon Empire for some reason.  They won't tell anybody what's going on, but I get little bits of messages here and there, and they are definitely worried about something, if you can believe that.\n\nSay, if you talk to Jonas again, see if he knows anything about Zolon activity.  I know his trade routes take him through the northern Hegemony systems.  I don't know if he's ever been out as far as Nephrys in all his wanderings.  That's right on the border of Zolon space.  Maybe he's seen or heard something out there...\n\nAnyway, congratulations on your promotion!  I knew you'd hit the big time eventually. [grin]\n\nLove from\nSara" }
+
+
+event: {
+   event: Message
+   time:  5
+   sound: "Vox\Scenes\02/Mail_02_New_Digs.wav"
+}
+
+
+event: { event: EndScene,   time: 80, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

@@ -1,0 +1,138 @@
+ZONES
+
+// SILESSIA
+
+zone: {
+   system: Silessia,
+   region: Silessia,
+}
+   
+zone: {
+   system: Silessia,
+   region: Prosenar,
+}
+   
+zone: {
+   system: Silessia,
+   region: Vesta,
+}
+   
+zone: {
+   system: Silessia,
+   region: Nero,
+}
+
+// HAICHE
+   
+zone: {
+   system: Haiche,
+   region: Haiche,
+   region: Tantalus,
+}
+   
+zone: {
+   system: Haiche,
+   region: Cygnus,
+}
+   
+zone: {
+   system: Haiche,
+   region: "Tal Amin",
+}
+   
+zone: {
+   system: Haiche,
+   region: Kala,
+}
+   
+// JANUS
+
+zone: {
+   system: Janus,
+   region: Dante,
+}
+
+zone: {
+   system: Janus,
+   region: Janek,
+   region: "Janek Station",
+}
+
+zone: {
+   system: Janus,
+   region: Alystra,
+   region: Navara,
+}
+
+zone: {
+   system: Janus,
+   region: Dante,
+}
+
+// BOROVA
+
+zone: {
+   system: Borova,
+   region: Talistar,
+}
+
+zone: {
+   system: Borova,
+   region: Maraner,
+}
+
+zone: {
+   system: Borova,
+   region: Borova,
+}
+
+zone: {
+   system: Borova,
+   region: Danova,
+}
+
+zone: {
+   system: Borova,
+   region: Zhalisal,
+}
+
+zone: {
+   system: Borova,
+   region: Tulkas,
+}
+
+// JARNELL
+
+zone: {
+   system: Jarnell,
+   region: Adonai,
+}
+
+zone: {
+   system: Jarnell,
+   region: Jarnell,
+}
+
+zone: {
+   system: Jarnell,
+   region: Caladan,
+}
+
+zone: {
+   system: Jarnell,
+   region: Dawn,
+}
+
+// ATHENAR
+
+zone: {
+   system: Athenar,
+   region: Athenar,
+}
+
+zone: {
+   system: Athenar,
+   region: Pallas,
+}
+
+

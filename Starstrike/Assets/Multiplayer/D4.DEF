@@ -1,0 +1,140 @@
+MISSION
+
+id:     3
+name:   "Destroyer Duel"
+desc:   "Small fleet engagement between opposing destroyer squadrons."
+type:   "Patrol"
+system: "Janus"
+region: "Dante"
+
+objective: "Fleet Engagement - Engage the Destroyer Squadron led by DD-701 Clarke.  Clear Dante orbit of hostile vessels."
+
+sitrep: "A rogue faction has taken command of the Clarke DETRON in the Dante sector.  Accompanying the Clarke are the Destroyer/Escort Jackson, and the Berents-class Frigates Parker and Suffolk. You are in command of DETRON 40, led by DD-351 Wraith, and supported by the Nemesis and the Frigate Bosporus.\n \n Hostile actions by Force officers will not stand.  You must drive this lesson home at all costs.  Good luck."
+
+start: "82:34:00"
+
+element: {
+   name:      "Wraith",
+   design:    "Spectre",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   player:    1,
+   playable:  true,
+   region:    "Dante",
+   loc:       (0, 10000, 0),
+}
+
+element: {
+   name:      "Nemesis",
+   design:    "Spectre",
+   commander: "Wraith",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Dante",
+   loc:       (45152, -320, -500),
+}
+
+element: {
+   name:      "Bosporus",
+   design:    "Berents",
+   commander: "Wraith",
+   mission:   "Escort",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  false,
+   region:    "Dante",
+   loc:       (-39475, -836, 1200),
+}
+
+element: {
+   name:      "Barth",
+   design:    "Berents",
+   commander: "Wraith",
+   mission:   "Escort",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  false,
+   region:    "Dante",
+   loc:       (64000, -13000, 0),
+
+   objective: { cmd: Escort, tgt: "Nemesis" },
+}
+
+element: {
+   name:      "Clarke",
+   design:    "Asher",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Dante",
+   loc:       (-20000, -145000, 1000),
+   head:      3.142,
+}
+
+element: {
+   name:      "Jackson",
+   design:    "Asher",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Dante",
+   loc:       (10000, -135000, 700),
+   head:      3.142,
+}
+
+element: {
+   name:      "Parker",
+   design:    "Berents",
+   commander: "Clarke",
+   mission:   "Escort",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  false,
+   region:    "Dante",
+   loc:       (-25000, -135000, 1000),
+   head:      3.142,
+}
+
+element: {
+   name:      "Suffolk",
+   design:    "Berents",
+   commander: "Clarke",
+   mission:   "Escort",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  false,
+   region:    "Dante",
+   loc:       (45000, -135000, 0),
+   head:      3.142,
+}
+
+// EOF

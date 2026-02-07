@@ -1,0 +1,487 @@
+SHIP
+
+name:          "Hulk-Dragon"
+display_name:  Dragon
+class:         Carrier
+
+hud_icon:   "DragonHud.pcx"
+
+model:      "Hulk-Dragon.mag"
+
+mass:       937.6e3
+agility:    1.3
+vlimit:     210
+roll_rate:  7
+integrity:  68e3
+scale:      3
+acs:        1.5
+
+trans_x:     5e6
+trans_y:     1e6
+trans_z:     3e6
+
+auto_roll:     -1
+arcade_drag:   0
+drag:          0
+roll_drag:     0
+pitch_drag:    0
+yaw_drag:      0
+
+explosion_scale: 4
+
+degrees:    true
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       95e3,
+
+   loc:              (0, -40, -50),
+   size:             64,
+   hull_factor:      0.9,
+   explosion:        7
+}
+
+drive: {
+   type:             Stealth
+   name:             "Plasma Drive",
+   abrv:             "Drive",
+   design:           "Plasma Drive",
+   thrust:           38e3,
+   scale:            10,
+
+   port:             (   0, -315, -730)
+   port:             (   0, -400, -730)
+   port:             (-440,   67, -730)
+   port:             (-440,  -24, -730)
+
+   loc:              (0, 0, -120),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   abrv:             "Shield"
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, -90, -50),
+   size:             60,
+   hull_factor:      0.8
+}
+
+power:      {
+   type:             "Auxilliary Reactor",
+   abrv:             "Aux Reac"
+   design:           "Auxilliary Reactor",
+   max_output:       5e3,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 1",
+
+   muzzle:             (-283, 6, 1650),
+
+   loc:              (-30, -15,330),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 2",
+
+   muzzle:             ( 283, 6, 1650),
+
+   loc:              (30, -15,330),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-1",
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              ( 200, 118, 1150),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-2",
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              (-200, 118, 1150),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-3",
+
+   azimuth:           90
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              ( 200, 118, 200),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-4",
+
+   azimuth:         -90
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              (-200, 118, 200),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-5",
+
+   azimuth:          180
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              ( 90, 155, -1250),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB-6",
+
+   azimuth:          180
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              (-90, 155, -1250),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "PDB-7",
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:         0.0,
+   aim_el_min:       -75.0,
+
+   loc:              ( 200, -118, 1150),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "PDB-8",
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:         0.0,
+   aim_el_min:       -75.0,
+
+   loc:              (-200, 118, 1150),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "PDB-9",
+
+   azimuth:           90
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:         0.0,
+   aim_el_min:       -75.0,
+
+   loc:              ( 200, -118, 200),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "PDB-10",
+
+   azimuth:         -90
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   loc:              (-200, -118, 200),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+
+flightdeck: {
+   name:       "Deck 1",
+   abrv:       "Deck 1",
+   design:     "Flight Deck",
+   loc:        ( 55,  0,  610),
+   cam:        (  0,  0,  610),
+   start:      ( 55, -8,  576),
+   end:        (2e3,  0, 2500),
+
+   spot:       { loc: ( 30, -8, 550), filter: 0x7 },
+   spot:       { loc: ( 80, -8, 550), filter: 0x7 },
+   spot:       { loc: ( 55, -8, 550), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       28,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Deck 2",
+   abrv:       "Deck 2",
+   design:     "Flight Deck",
+   loc:        (-55,  0,  610),
+   cam:        (  0,  0,  610),
+   start:      (-55, -8,  576),
+   end:        (-2e3,  0, 2500),
+
+   spot:       { loc: (-30, -8, 550), filter: 0x7 },
+   spot:       { loc: (-80, -8, 550), filter: 0x7 },
+   spot:       { loc: (-55, -8, 550), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       28,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Deck 3",
+   abrv:       "Deck 3",
+   design:     "Flight Deck",
+   loc:        (  160,   0,   192),
+   cam:        (  160,   0,   128),
+   start:      ( 1088,   4,  -512),
+   end:        (  160,   0,   192),
+
+   approach:   (  200,   0, -2000),
+   approach:   ( 1000,   0, -1000),
+   approach:   ( 1000,   0,  1000),
+   approach:   (  250,   0,  2500),
+
+   spot:       (  160,   0,   192),
+   azimuth:    53,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 15,
+
+   size:       40,
+   hull_factor: 0.5,
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   abrv:             Batt
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "DragonMap0.pcx",
+   sprite: "DragonMap1.pcx",
+   sprite: "DragonMap2.pcx",
+   sprite: "DragonMap3.pcx",
+   sprite: "DragonMap4.pcx",
+   sprite: "DragonMap5.pcx",
+   sprite: "DragonMap6.pcx",
+   sprite: "DragonMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5
+
+   explosion: { type: 10, time: 2.0, loc: (-50,  10,    0) }
+   explosion: { type: 10, time: 0.7, loc: ( 60,  20,  260) }
+   explosion: { type: 10, time: 0.5, loc: (-20, -18, -240) }
+   explosion: { type: 10, time: 0.3, loc: ( 20,  20, -120) }
+
+   explosion: { type: 12, loc: (0,0,-100), final: true } // Large burst
+   explosion: { type: 13, loc: (0,0,   0), final: true } // Nuke
+   explosion: { type: 13, loc: (0,0,-200), final: true } // Nuke
+
+   debris:    { model: "DragonDebris1.mag", loc: (-240,-20,0), mass: 48e3, count:  1, life: 360 }
+   debris:    { model: "DragonDebris2.mag", loc: (0,0,600), mass: 298e3, count:  1, life: 380,
+                fire:  (-110,0,-600), fire:  (20,20,-450), fire: (100,-10,-500) }
+   debris:    { model: "Debris0A.mag",      loc: (0,0,-50), mass:   95, count: 20, life:  20 }
+   debris:    { model: "Debris0B.mag",      loc: (0,0,-50), mass:   44, count: 20, life:  35 }
+   debris:    { model: "Debris0C.mag",      loc: (0,0,0),   mass:   23, count: 15, life:  30 }
+
+}
+
+
+

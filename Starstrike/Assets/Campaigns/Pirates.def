@@ -1,0 +1,452 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Brotherhood of Iron",
+  intel:  secret,
+  iff:    3,
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   fleet,
+  id:     1,
+  name:   "Eastern Fire",
+  intel:  reserve,
+  iff:    3,
+  region: "Prosenar",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     5,
+  name:   "Marauders",
+  intel:  known,
+  iff:    3,
+  region: "Prosenar",
+  loc:    (-280e3, -120e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Marauder",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "305",
+    },
+
+  unit: {
+    name:   "Punisher",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "306",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     6,
+  name:   "Raiders",
+  intel:  known,
+  iff:    3,
+  region: "Vesta",
+  loc:    (-100e3, -270e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Widow Maker",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Murder of Crows",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     7,
+  name:   "Vengeance",
+  intel:  known,
+  iff:    3,
+  region: "Nero",
+  loc:    (-100e3, 70e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Blinding Flash",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Hellhound",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   station,
+  id:     1,
+  name:   "Skull Cove",
+  intel:  known,
+  iff:    3,
+  region: "Vesta",
+  loc:    (230e3, 320e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Skull Cove",
+    type:   "Station",
+    design: "Station5",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     8,
+  name:   "Storm Bringers",
+  intel:  known,
+  iff:    3,
+  region: "Prosenar",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: station,
+  parent_id:   1,
+
+  unit: {
+    name:   "Storm Bringer",
+    type:   "Fighter",
+    design: "Cutlass",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     9,
+  name:   "Flaming Arrows",
+  intel:  known,
+  iff:    3,
+  region: "Vesta",
+  loc:    (0, -20e3, 7e3),
+  parent_type: station,
+  parent_id:   1,
+
+  unit: {
+    name:   "Flaming Arrow",
+    type:   "Fighter",
+    design: "Cutlass",
+    count:  18,
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     2,
+  name:   "Southern Cross",
+  intel:  reserve,
+  iff:    3,
+  region: "Duna",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     15,
+  name:   "Royals",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (-280e3, -120e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Count Rugen",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "305",
+    },
+
+  unit: {
+    name:   "Swordsman",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "306",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     16,
+  name:   "Crossbones",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (-100e3, -270e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Vandal",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Ruin",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     17,
+  name:   "Terror",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (-100e3, 70e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Deathbringer",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Terror",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   station,
+  id:     2,
+  name:   "Dead Reef",
+  intel:  known,
+  iff:    3,
+  region: "Casalle",
+  loc:    (130e3, -420e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Dead Reef",
+    type:   "Station",
+    design: "Station5",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     18,
+  name:   "Hellforge",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: station,
+  parent_id:   2,
+
+  unit: {
+    name:   "Hellforge",
+    type:   "Fighter",
+    design: "Cutlass",
+    count:  16,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     19,
+  name:   "Daggers",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (0, -20e3, 7e3),
+  parent_type: station,
+  parent_id:   2,
+
+  unit: {
+    name:   "Dagger",
+    type:   "Fighter",
+    design: "Cutlass",
+    count:  16,
+    },
+}
+
+group: {
+  type:   fleet,
+  id:     3,
+  name:   "North Wind",
+  intel:  reserve,
+  iff:    3,
+  region: "Casalle",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     25,
+  name:   "Marauders",
+  intel:  known,
+  iff:    3,
+  region: "Casalle",
+  loc:    (-280e3, -120e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Rapacious",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "305",
+    },
+
+  unit: {
+    name:   "Claw",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "306",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     26,
+  name:   "Hook",
+  intel:  known,
+  iff:    3,
+  region: "Duna",
+  loc:    (-100e3, -270e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Insanity",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Vorpal",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     27,
+  name:   "Thunder",
+  intel:  secret,
+  iff:    3,
+  region: "Nergal",
+  loc:    (-100e3, 70e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Thunderous",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "103",
+    },
+
+  unit: {
+    name:   "Agony",
+    type:   "Frigate",
+    design: "Marauder",
+    regnum: "104",
+    },
+}
+
+group: {
+  type:   station,
+  id:     3,
+  name:   "Blackhand",
+  intel:  known,
+  iff:    3,
+  region: "Loris",
+  loc:    (130e3, -420e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Blackhand",
+    type:   "Station",
+    design: "Station5",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     28,
+  name:   "Spawn",
+  intel:  secret,
+  iff:    3,
+  region: "Loris",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: station,
+  parent_id:   3,
+
+  unit: {
+    name:   "Spawn",
+    type:   "Fighter",
+    design: "Saber",
+    count:  18,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     29,
+  name:   "Blades",
+  intel:  secret,
+  iff:    3,
+  region: "Loris",
+  loc:    (0, -20e3, 7e3),
+  parent_type: station,
+  parent_id:   3,
+
+  unit: {
+    name:   "Blade",
+    type:   "Fighter",
+    design: "Saber",
+    count:  18,
+    },
+}
+

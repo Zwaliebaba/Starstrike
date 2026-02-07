@@ -1,0 +1,155 @@
+STARSYSTEM
+
+name:       Trocanther
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Trocanther.mag",
+   poly_stars: "stars.mag"
+   haze:       "Trocanther/Hell/TerrainHaze.mag"
+   }
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (30, 15,  0)
+
+star:        {
+   name:    Trocanther
+   map:     "Suns/StarK_map.pcx"
+   image:   "Suns/K1.pcx",
+   tscale:  6,
+   radius:  16e8,
+   mass:    2e30,
+   light:   1.6e11,
+   color:   (255, 240, 220),// - K Orange
+   back:    ( 90,  50,  30) // - nebula20
+}
+
+
+planet: {
+   name:    Volante
+   map:     "Trocanther/volante_map.pcx"
+   image:   "Trocanther/volante_lo.pcx",
+   high_res:"Trocanther/volante_hi.jpg",
+   radius:  6e6,
+   mass:    5.1e24,
+   orbit:   1.4e11,
+   rotation: 21.7
+}
+
+terrain: {
+   name:          "Hell's Kitchen",
+   radius:        480e3,
+   grid:          20e3,
+
+   patch:         "Trocanther/Hell/terrain.pcx",
+   patch_texture: "Trocanther/Hell/terrain_big.pcx",
+   apron:         "Trocanther/Hell/terrain_apron.pcx",
+   apron_texture: "Trocanther/Hell/terrain_apron_tex.pcx",
+   sky_color:     "Trocanther/Hell/terrain_sky.pcx",
+
+   layer: { tile: "Trocanther/Hell/Layer0.pcx"  height:    0  detail: "Radix/Canyon/noise0.pcx" }
+   layer: { tile: "Trocanther/Hell/Layer1.pcx"  height: 3000  detail: "Radix/Canyon/noise1.pcx" }
+   layer: { tile: "Trocanther/Hell/Layer2.pcx"  height: 9000  detail: "Radix/Canyon/noise1.pcx" }
+
+   clouds_high:   "Trocanther/Hell/terrain_cloud0.pcx",
+   clouds_low:    "Trocanther/Hell/terrain_cloud1.pcx",
+   shades_low:    "Trocanther/Hell/terrain_cloud1a.pcx",
+   clouds_alt_high: 16.3e3,
+   clouds_alt_low:  13.1e3,
+
+   scale:         1.75e3,
+   mtnscale:      60,
+   haze_fade:     0.5,
+   fog_density:   0.5,
+   fog_scale:     5,
+   
+   weather_period:        59876,
+
+   weather_high_clouds:      0, //20,
+   weather_moderate_clouds:  0, //75,
+   weather_overcast:          0,
+   weather_fog:               0,
+   weather_storm:            100, // 5,
+}
+
+region: {
+   name:    Volante,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   18e6,
+   inclination: 0.4
+}
+
+
+// GAS GIANTS:
+
+planet: {
+   name:    Narcissus
+   map:     "Giants/GasGiant1_map.pcx"
+   image:   "Giants/GasGiant1.jpg",
+   radius:  13.7e6,
+   mass:    3.6e26,
+   orbit:   2.51e11,
+   rotation: 43.7
+}
+
+region: {
+   name:    Narcissus,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   55e6,
+   inclination: 0.3
+}
+
+moon: {
+   name:    Liriope
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  2.3e6,
+   rotation: 26.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   3.11e8
+}
+
+moon: {
+   name:    Echo
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  4.1e6,
+   rotation: 38.4,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   5.24e8
+}
+
+
+
+planet: {
+   name:    Path
+   map:     "Trocanther/path_map.pcx"
+   image:   "Trocanther/path_lo.pcx",
+   high_res:"Trocanther/path_hi.pcx",
+   radius:  4.1e6,
+   mass:    3.5e24,
+   orbit:   4.4e11,
+   rotation: 51.7
+}
+
+region: {
+   name:    Path,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   15e6,
+   inclination: 0.2,
+   link:    Xanthe, // Marak
+   link:    Relay,  // Isham
+}
+

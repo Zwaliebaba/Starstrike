@@ -1,0 +1,199 @@
+SHIP
+
+name:          Station6
+display_name:  "Freight Xfer"
+class:         STATION
+hud_icon:      "s6hud.pcx"
+
+model: "S2opt.mag"
+
+mass:       5e6
+integrity:  5e5
+scale:      9
+acs:        5e6
+splash_radius: 5e3
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+degrees:    true
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       15e3,
+
+   loc:              (0, -120, 0),
+   size:             55,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Viking Cannon",
+   design:           "Bolt Weapon",
+   name:             "Turret 1",
+
+   azimuth:          0,
+   loc:              (0,  118, 920),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Viking Cannon",
+   design:           "Bolt Weapon",
+   name:             "Turret 2",
+
+   azimuth:          0,
+   loc:              (0, -118, 920),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Viking Cannon",
+   design:           "Bolt Weapon",
+   name:             "Turret 3",
+
+   azimuth:          180,
+   loc:              (0,  118, -920),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Viking Cannon",
+   design:           "Bolt Weapon",
+   name:             "Turret 4",
+
+   azimuth:          180,
+   loc:              (0, -118, -920),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+flightdeck: {
+   name:       "Launch Bay 1"
+
+   loc:        (  15, 20,   920)
+   cam:        (  20, 25,   890)
+   start:      (  15, 16,   920)
+   end:        ( 2e3, 20,   920)
+
+   spot:       (  10, 16,   900)
+   spot:       (  10, 16,   940)
+
+   light:      250
+
+   azimuth:    90
+   launch:     true
+   cycle_time: 20
+
+   size:       32
+   hull_factor: 0.5
+}
+
+
+flightdeck: {
+   name:       "Docking Bay 1",
+
+   loc:        ( -15, 20,   920)
+   cam:        ( -20, 25,   890)
+   start:      (-2e3, 20,   920)
+   end:        ( -15, 16,   920)
+   spot:       ( -15, 16,   920)
+
+   azimuth:    90
+
+   light:      250,
+
+   azimuth:    90
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Launch Bay 2"
+
+   loc:        ( -15, 20,  -920)
+   cam:        ( -20, 25,  -890)
+   start:      ( -15, 16,  -920)
+   end:        (-2e3, 20,  -920)
+
+   spot:       ( -10, 16,  -900)
+   spot:       ( -10, 16,  -940)
+
+   light:      250
+
+   azimuth:    270
+   launch:     true
+   cycle_time: 20
+
+   size:       32
+   hull_factor: 0.5
+}
+
+
+flightdeck: {
+   name:       "Docking Bay 2",
+
+   loc:        (  15, 20,  -920)
+   cam:        (  20, 25,  -890)
+   start:      ( 2e3, 20,  -920)
+   end:        (  15, 16,  -920)
+   spot:       (  15, 16,  -920)
+
+   azimuth:    270
+
+   light:      250,
+
+   azimuth:    90
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -380, 0),
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+
+map: {
+   sprite: "s6map.pcx"
+}
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+}
+
+

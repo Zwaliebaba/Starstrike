@@ -1,0 +1,252 @@
+SHIP
+
+name:       IM3500
+display_name: "IM3500 Freighter"
+class:      Freighter
+
+hud_icon:   "CAHud.pcx"
+
+detail_0:   "CargoA_0opt.mag"
+feature_0:  1000
+detail_1:   "CargoA_1opt.mag"
+feature_1:  20
+detail_2:   "CargoA_2opt.mag"
+feature_2:  12
+
+mass:       18.2e3
+agility:    1
+vlimit:     280
+roll_rate:  5
+integrity:  20e3
+scale:      2.5
+acs:        1
+
+trans_x:     75e3
+trans_y:     25e3
+trans_z:     75e3
+
+drag:       1e-6
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1e3, 200)
+bridge:     (0, 216,   34)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       5300,
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.8,
+   explosion:        7
+   }
+
+drive:      {
+   type:             Fusion,
+   name:             "Fusion Drive",
+   design:           "Fusion Drive",
+   thrust:           1500,
+   scale:            4,
+   port:             (-92, 0,-326),
+   port:             ( 94, 0,-326),
+
+   loc:              (0, 30, -170),
+   size:             32,
+   hull_factor:      0.6,
+   explosion:        7
+   }
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 64),
+   size:             24,
+   hull_factor:      0.5
+   }
+
+quantum:     {
+   design:           "Quantum Drive",
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.5
+   }
+
+
+shield:     {
+   type:             1,
+   design:           "Grav Shield",
+   factor:           0.25,
+   pcs:              100,
+   loc:              (0, 20, -80),
+   size:             16,
+   hull_factor:      0.8
+   }
+
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       10
+   }
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 180),
+   size:             16,
+   hull_factor:      0.1
+   }
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+   }
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+   }
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+   }
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "DebrisPod.mag",
+   debris_loc:       (-50,0,-20),
+   debris_mass:      11e3,
+   debris_count:     1,
+   debris_life:      315,
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     15,
+   debris_life:      15,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     10,
+   debris_life:      15,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     8,
+   debris_life:      15,
+
+
+   }
+
+map: {
+   sprite: "CAmap0.pcx",
+   sprite: "CAmap1.pcx",
+   sprite: "CAmap2.pcx",
+   sprite: "CAmap3.pcx",
+   sprite: "CAmap4.pcx",
+   sprite: "CAmap5.pcx",
+   sprite: "CAmap6.pcx",
+   sprite: "CAmap7.pcx"
+}
+
+skin: {
+   name: Blue
+   mtl:  { 
+         name:  Hull
+         Ka:    (0.5, 0.5, 0.7)
+         Kd:    (1.0, 1.0, 1.0)
+         Ks:    (1.0, 0.9, 0.8)
+         Ke:    (1.0, 1.0, 1.0)
+         power: 20
+         bump:  3
+         tex_d: "MAIN_D2.jpg"
+         tex_s: "MAIN_S.jpg"
+         tex_b: "MAIN_B.jpg"
+         tex_e: "MAIN_G2.jpg"
+   }
+}
+
+skin: {
+   name: Green
+   mtl:  { 
+         name:  Hull
+         Ka:    (0.5, 0.7, 0.5)
+         Kd:    (1.0, 1.0, 1.0)
+         Ks:    (1.0, 0.9, 0.8)
+         Ke:    (1.0, 1.0, 1.0)
+         power: 20
+         bump:  3
+         tex_d: "MAIN_D3.jpg"
+         tex_s: "MAIN_S.jpg"
+         tex_b: "MAIN_B.jpg"
+         tex_e: "MAIN_G3.jpg"
+   }
+}
+
+skin: {
+   name: Red
+   mtl:  { 
+         name:  Hull
+         Ka:    (0.7, 0.5, 0.5)
+         Kd:    (1.0, 1.0, 1.0)
+         Ks:    (1.0, 0.9, 0.8)
+         Ke:    (1.0, 1.0, 1.0)
+         power: 20
+         bump:  3
+         tex_d: "MAIN_D4.jpg"
+         tex_s: "MAIN_S.jpg"
+         tex_b: "MAIN_B.jpg"
+         tex_e: "MAIN_G4.jpg"
+   }
+}

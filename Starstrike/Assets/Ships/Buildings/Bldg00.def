@@ -1,0 +1,37 @@
+SHIP
+
+name:         Bldg00
+class:        Building
+display_name: "Office Complex"
+hud_icon:     "hud_bldg00.pcx"
+
+detail_0:   "Bldg00-0.mag"
+feature_0:  1000
+detail_1:   "Bldg00-6.mag"
+feature_1:  6
+
+mass:       5e3
+integrity:  8e3
+scale:      3
+acs:        50e3
+
+explosion_scale: 1.2
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       10,   // SMALL_EXPLOSION
+   final_loc:        (0, 32, 0),
+
+   final_type:       6,   // LARGE_BURST
+   final_loc:        (0,  0, 0),
+
+   final_type:       8,    // smoke trail
+   final_loc:        (0,  0, 0),
+   }
+
+
+

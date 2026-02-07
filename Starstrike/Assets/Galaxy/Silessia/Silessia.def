@@ -1,0 +1,191 @@
+STARSYSTEM
+
+name:       Silessia
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Silessia.mag",
+   poly_stars: "stars.mag",
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (15, 15, 18)
+
+star:        {
+   name:    Siltana
+   map:     "Suns/StarK_map.pcx"
+   image:   "Suns/K1.pcx",
+   tscale:  6,
+   radius:  12e8,
+   mass:    1e30,
+   light:   7e10,
+   color:   (255, 232, 220),
+   back:    (45, 65, 75)
+}
+
+planet:       {
+   name:    Silessia
+   map:     "Silessia/silessia_map.pcx"
+   image:   "Silessia/silessia_lo.pcx",
+   high_res:"Silessia/silessia_hi.jpg",
+   glow_high_res: "Silessia/silessia_glow.jpg",
+   gloss:   "Silessia/silessia_gloss.jpg",
+   radius:  5.4e6,
+   mass:    3.38e24,
+   atmosphere: (80,120,150),
+   orbit:   0.97e11,
+   rotation: 19
+}
+
+region:     {
+   name:    Silessia,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   19e6,
+   inclination: 0.45
+}
+
+moon:       {
+   name:    Tannis
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  1e6,
+   mass:    8e22,
+   orbit:   95e6
+}
+
+
+
+// GAS GIANTS:
+
+planet: {
+   name:    Prosenar
+   map:     "Giants/GasGiant8_map.pcx"
+   image:   "Giants/GasGiant8.jpg",
+   radius:  14.1e6,
+   mass:    3.6e26,
+   tilt:    0.2,
+   ring:    "Giants/Ring3.pcx",
+   minrad:  1.5,
+   maxrad:  1.9,
+   orbit:   1.85e11,
+   rotation: 61.3
+}
+
+region: {
+   name:    Prosenar,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   55.53e6,
+   inclination: 0.3
+}
+
+moon: {
+   name:    "Proson I",
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  2.3e6,
+   rotation: 16.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   4.11e8
+}
+
+moon: {
+   name:    "Proson II",
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  4.2e6,
+   rotation: 18.4,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   6.24e8
+}
+
+
+planet: {
+   name:    Vesta
+   map:     "Giants/GasGiant2_map.pcx"
+   image:   "Giants/GasGiant2.jpg",
+   radius:  18.1e6,
+   mass:    3.6e26,
+   tilt:    0.13,
+   orbit:   3.15e11,
+   rotation: 31.3
+}
+
+region: {
+   name:    Vesta,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   65.3e6,
+   inclination: 0.3
+}
+
+moon: {
+   name:    "Vesta I",
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  5.3e6,
+   rotation: 16.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   4.11e8
+}
+
+moon: {
+   name:    "Vesta II",
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  3.1e6,
+   rotation: 18.4,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   6.24e8
+}
+
+moon: {
+   name:    "Vesta III",
+   map:     "Moons/ice_map.pcx"
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6.1e6,
+   rotation: 38.4,
+   mass:    5.98e24,
+   orbit:   13.24e8
+}
+
+
+
+planet: {
+   name:    Nero
+   map:     "Silessia/nero_map.pcx"
+   image:   "Silessia/nero_lo.pcx",
+   high_res:"Silessia/nero_hi.jpg",
+   radius:  2.64e6,
+   mass:    1.48e24,
+   orbit:   5.18e11,
+   rotation: 219
+}
+
+region: {
+   name:    Nero,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   15e6,
+   inclination: 0.2,
+   link:    Tulkas,   // Borova
+   link:    Navara,   // Janus
+   link:    Trellis,  // Solus
+   link:    Casalle,  // Loris
+}

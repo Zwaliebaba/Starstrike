@@ -1,0 +1,81 @@
+SHIP
+
+name:          CameraPod
+display_name:  CameraPod
+class:         Drone
+
+model:         "Invisible.mag"
+cockpit_model: "Invisible.mag"
+cockpit_scale: 1e-6
+
+mass:       14.5
+integrity:  4e12
+vlimit:     290
+agility:    130
+air_factor: 0.25
+roll_rate:  1900
+scale:      1e-6
+acs:        1.1
+detet:      250e3
+
+trans_x:    2e3
+trans_y:    1e3
+trans_z:    2e3
+
+arcade_drag: 0.1
+drag:       3.0e-5
+roll_drag:  10
+pitch_drag: 10
+yaw_drag:   10
+
+CL:         1.3e-2
+CD:         0.7e-1
+stall:      0.40
+
+prep_time:  15
+avoid_fighter: 7
+
+chase:      (0, -750, 200)
+bridge:     (0,  131,  23)
+
+power:      {
+   type:    Fusion,
+   max_output: 500,
+   fuel_range: 5,
+   
+   loc:     (0, 0, -40),
+   size:    32,
+   hull_factor: 0.75
+   }
+
+drive:      {
+   type:    Stealth
+   thrust:  20,
+   augmenter: 50,
+   port:    ( 0, 0, -155),
+
+   loc:     (0, 0, -130),
+   size:    16,
+   hull_factor: 0.85
+   }
+
+sensor:     {
+   pcs:                 0
+   active_efficiency:   2e10
+   passive_efficiency:  2e10
+
+   range:   100e3
+   range:   250e3
+   range:   500e3
+
+   loc:     (0, 0, 10),
+   size:    25,
+   hull_factor: 0.25
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+

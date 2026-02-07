@@ -1,0 +1,33 @@
+SHIP
+
+name:          Relay1
+display_name:  Relay
+class:         COMSAT
+hud_icon:      "hud_relay.pcx"
+
+model:      "Relay1.mag"
+
+mass:       500e3
+integrity:  50e3
+scale:      6
+acs:        1
+degrees:    true
+
+chase:      (0, -800, 50)
+bridge:     (0,    0,  0)
+
+
+map: {
+   sprite: "map_relay.pcx"
+}
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+}
+

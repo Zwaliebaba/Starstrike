@@ -1,0 +1,367 @@
+SHIP
+
+name:          Wolf
+display_name:  Wolf
+class:         Destroyer
+description:   "The DD-305 WOLF class of medium destroyers are an older type of Hegemony warship now mainly used by client states and guerilla groups such as the Dantari Separatists.  The Wolf class features a pair of internally-mounted heavy XRay Laser batteries and a full complement of Orca point defense batteries for protection from inbound threats.  Due to design limitations, the Orca PDBs tend to provide better coverage for the dorsal hemisphere, leaving the Wolf class with a vulnerable underbelly."
+
+degrees:    true
+beauty:     (-7, 4, 1.1)
+hud_icon:   "WolfHud.pcx"
+
+detail_0:   "Destroyer_0opt.mag"
+feature_0:  1000
+detail_1:   "Destroyer_1opt.mag"
+feature_1:  32
+detail_2:   "Destroyer_2opt.mag"
+feature_2:  16
+
+mass:       15.8e3
+agility:    3.5
+vlimit:     240
+roll_rate:  7
+integrity:  18e3
+scale:      1.7
+acs:        1.2
+
+scuttle:    6e3
+
+trans_x:     300e3
+trans_y:     100e3
+trans_z:     300e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       7000,
+
+   loc:              (0, -40, -220),
+   size:             48,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+drive: {
+   type:             Yellow,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           1250,
+   scale:            5,
+   port:             (-88,  10, -808),
+   port:             (  0,  12, -808),
+   port:             ( 85,  10, -808),
+
+   loc:              (0, 0, -400),
+   size:             50,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+
+thruster: {
+   design:           Thruster
+   type:             Yellow,
+
+   loc:              (0, 0, 64)
+   size:             24,
+   hull_factor:      0.3
+   scale:            2
+
+   port_left:   {loc:(-170,   9,-601), fire: 0x0041}
+   port_left:   {loc:(-170,   9,-579), fire: 0x0041}
+   port_left:   {loc:(-100,  18, 786), fire: 0x0081}
+   port_left:   {loc:(-100, -34, 786), fire: 0x0081}
+
+   port_right:  {loc:( 170,   9,-601), fire: 0x0082}
+   port_right:  {loc:( 170,   9,-579), fire: 0x0082}
+   port_right:  {loc:( 100,  18, 786), fire: 0x0042}
+   port_right:  {loc:( 100, -34, 786), fire: 0x0042}
+
+   port_fore:   {loc:( -73, -34, 845), fire: 0x0044}
+   port_fore:   {loc:( -30, -63, 845), fire: 0x0044}
+   port_fore:   {loc:(  30, -63, 845), fire: 0x0084}
+   port_fore:   {loc:(  73, -34, 845), fire: 0x0084}
+
+   port_aft:    {loc:( -45,  48,-770), fire: 0x0088}
+   port_aft:    {loc:( -45, -27,-770), fire: 0x0088}
+   port_aft:    {loc:(  42,  48,-770), fire: 0x0048}
+   port_aft:    {loc:(  42, -27,-770), fire: 0x0048}
+
+   port_top:    {loc:( -80,  87,-601), fire: 0x0510}
+   port_top:    {loc:(  77,  87,-601), fire: 0x0910}
+
+   port_bottom: {loc:( -80, -69,-601), fire: 0x0A20}
+   port_bottom: {loc:(  77, -69,-601), fire: 0x0620}
+
+   port_top:    {loc:( -26,  71, 783), fire: 0x0610}
+   port_top:    {loc:(  25,  71, 783), fire: 0x0A10}
+
+   port_bottom: {loc:( -26, -85, 783), fire: 0x0920}
+   port_bottom: {loc:(  25, -85, 783), fire: 0x0520}
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3,
+   countdown:        7.5
+}
+
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   factor:           0.0125,
+   consumption:      6000,
+   // model:            "WolfShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100,
+   loc:              (0, 20, -80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       1100,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.8
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-25,  23, 907),
+
+   loc:              (-25,  23, 800),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 25,  23, 907),
+
+   loc:              ( 25,  23, 800),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "Fwd Cannon",
+   muzzle:           ( 4, 11, 75),
+   muzzle:           (-4, 11, 75),
+
+   loc:              (  0, 82, 500),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Orca Inverted",
+   design:           "Bolt Weapon",
+   name:             "Chin Cannon",
+   muzzle:           ( 4, -11, 75),
+   muzzle:           (-4, -11, 75),
+
+   loc:              (  0, -102, 500),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "Stbd Cannon",
+   muzzle:           ( 4, 11, 75),
+   muzzle:           (-4, 11, 75),
+
+   loc:              ( 60, 50, 38),
+   size:             32,
+   hull_factor:      0.3,
+
+   azimuth:          90
+   rest_azimuth:    -90
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Cannon",
+   muzzle:           ( 4, 11, 75),
+   muzzle:           (-4, 11, 75),
+
+   loc:              (-60, 50, 38),
+   size:             32,
+   hull_factor:      0.3,
+
+   azimuth:         -90
+   rest_azimuth:     90
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "Aft Cannon",
+   muzzle:           ( 4, 11, 75),
+   muzzle:           (-4, 11, 75),
+
+   loc:              (  0, 70, -256),
+   size:             32,
+   hull_factor:      0.3,
+
+   azimuth:          180
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "WolfMap0.pcx",
+   sprite: "WolfMap1.pcx",
+   sprite: "WolfMap2.pcx",
+   sprite: "WolfMap3.pcx",
+   sprite: "WolfMap4.pcx",
+   sprite: "WolfMap5.pcx",
+   sprite: "WolfMap6.pcx",
+   sprite: "WolfMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "DebrisDestroyer2.mag",
+   debris_loc:       (0,0,520),
+   debris_mass:      21e3,
+   debris_count:     1,
+   debris_life:      500,
+   debris_fire:      (44, 14,-314),
+   debris_fire:      (34,-24,-306),
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     15,
+   debris_life:      20,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     15,
+   debris_life:      25,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     10,
+   debris_life:      30,
+
+}
+

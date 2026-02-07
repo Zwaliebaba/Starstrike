@@ -1,89 +1,62 @@
-#ifndef INCLUDED_EXPLOSION
-#define INCLUDED_EXPLOSION
+#ifndef Explosion_h
+#define Explosion_h
 
-#include "matrix33.h"
-#include "rgb_colour.h"
-#include "shape.h"
+#include "Geometry.h"
+#include "SimObject.h"
 
-//*****************************************************************************
-// Class Tumbler
-//*****************************************************************************
+class Solid;
+class Particles;
+class System;
 
-// This class maintains a rotation matrix that is used to make an ExplodingTri
-// tumble as it flys through space. The m_rotMat matrix has a little bit of
-// rotation multiplied on to it every frame.
-class Tumbler
+class Explosion : public SimObject, public SimObserver
 {
   public:
-    Matrix33 m_rotMat;
-    LegacyVector3 m_angVel;
+    
+    enum Type
+    {
+      SHIELD_FLASH    = 1,
+      HULL_FLASH      = 2,
+      BEAM_FLASH      = 3,
+      SHOT_BLAST      = 4,
+      HULL_BURST      = 5,
+      HULL_FIRE       = 6,
+      PLASMA_LEAK     = 7,
+      SMOKE_TRAIL     = 8,
+      SMALL_FIRE      = 9,
+      SMALL_EXPLOSION = 10,
+      LARGE_EXPLOSION = 11,
+      LARGE_BURST     = 12,
+      NUKE_EXPLOSION  = 13,
+      QUANTUM_FLASH   = 14,
+      HYPER_FLASH     = 15
+    };
 
-    Tumbler();
-    void Advance();
-};
+    Explosion(int type, const Vec3& pos, const Vec3& vel, float exp_scale, float part_scale, SimRegion* rgn = nullptr,
+              SimObject* source = nullptr);
+    ~Explosion() override;
 
-//*****************************************************************************
-// Class ExplodingTri
-//*****************************************************************************
+    static void Initialize();
+    static void Close();
 
-class ExplodingTri
-{
-  public:
-    LegacyVector3 m_vel;
-    LegacyVector3 m_pos;
-    LegacyVector3 m_v1, m_v2, m_v3;
-    LegacyVector3 m_norm;
-    Tumbler* m_tumbler;
-    float m_timeToDie;
-    RGBAColor m_colour;
-};
+    void ExecFrame(double seconds) override;
+    Particles* GetParticles() { return particles; }
 
-//*****************************************************************************
-// Class Explosion
-//*****************************************************************************
+    void Activate(Scene& scene) override;
+    void Deactivate(Scene& scene) override;
 
-class Explosion
-{
+    bool Update(SimObject* obj) override;
+    std::string GetObserverName() const override;
+
   protected:
-    Tumbler* m_tumblers;
-    unsigned int m_numTumblers;
-    ExplodingTri* m_tris;
-    unsigned int m_numTris;
-    float m_timeToDie;
+    int type;
+    Particles* particles;
 
-  public:
-    Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fraction);
-    ~Explosion();
+    float scale;
+    float scale1;
+    float scale2;
 
-    bool Advance();	// Returns true if the explosion has finished
-    void Render();
-
-    LegacyVector3 GetCenter() const;
+    SimObject* source;
+    Point mount_rel;
 };
 
-//*****************************************************************************
-// Class ExplosionManager
-//*****************************************************************************
-
-class ExplosionManager
-{
-  protected:
-    LList<Explosion*> m_explosions;
-
-  public:
-    ExplosionManager();
-    ~ExplosionManager();
-
-    void AddExplosion(ShapeFragment* _frag, const Matrix34& _transform, bool _recurse, float _fraction);
-    void AddExplosion(Shape* _shape, const Matrix34& _transform, float _fraction = 1.0f);
-    void Reset();
-
-    void Advance();
-    void Render();
-
-    const LList<Explosion*>& GetExplosionList() { return m_explosions; } // read access for DeformEffect
-};
-
-extern ExplosionManager g_explosionManager;
-
-#endif
+#endif Explosion_h

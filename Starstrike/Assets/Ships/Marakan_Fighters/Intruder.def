@@ -1,0 +1,309 @@
+SHIP
+
+name:           Intruder
+display_name:   Intruder
+class:          fighter
+abrv:           "F4F"
+description:   "The F4F INTRUDER is the latest edition single-seat intercept fighter craft used by the Marakan Hegemony.  More expensive than the older Viper models, the Intruder remains a lightweight and highly maneuverable tactical fighter.  It is armed with twin Alpha particle cannon, and four underwing hard points capable of mounting a variety of antiship and anti-fighter ordnance.  The Intruder is usually tasked with patrol, intercept, and escort mission profiles, but may also serve as a strike fighter in a pinch."
+
+hud_icon:       "IntruderHud.pcx"
+
+detail_0:       "Interceptor_1opt.mag"
+feature_0:      25
+detail_1:       "Interceptor_2opt.mag"
+feature_1:      0.5
+ 
+mass:        	25
+integrity:   	2500
+vlimit:      	250
+agility:     	75
+air_factor:  	0.25
+roll_rate:   	600
+scale:       	0.25
+acs:         	1.0
+detet:	 	50e3
+
+trans_x:     	2200
+trans_y:     	2200
+trans_z:     	2200
+
+arcade_drag:    0.15
+drag:           5.5e-5
+roll_drag:      5
+pitch_drag:     4
+yaw_drag:       4
+
+CL:             8.0e-3
+CD:             1.1e-1
+stall:          0.40
+
+prep_time:     	15
+avoid_fighter: 	7
+
+chase:          (0, -1200, 250)
+bridge:		(0,   240,   0)
+
+power: {
+   type:        Fusion,
+   name:        "Fusion Reactor",
+   design:      "Fusion Reactor",
+   max_output:  75,
+
+   loc:         (0, 0, 0),
+   size:        10,
+   hull_factor: 0.5,
+}
+
+drive: {
+   type:        Yellow
+   design:      "Plasma Drive",
+   thrust:      17,
+   augmenter:	50,
+   scale:       0.3,
+   port:        ( 28, 11, -178),
+   port:        (-28, 11, -178),
+   loc:         ( 0, 0, 0),
+   size:        24,
+   hull_factor: 0.5,
+}
+
+weapon:     {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-24,  -6, 145),
+   muzzle:  ( 24,  -6, 145),
+
+   loc:     (0, 0, 120),
+   size:    32,
+   hull_factor: 0.5
+}
+
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-1",
+   muzzle:  ( -93, -27, -125),
+
+   loc:     ( -93, -27, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-2",
+   muzzle:  ( -62, -25, -120),
+
+   loc:     ( -62, -25, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-3",
+   muzzle:  (  62, -25, -120),
+
+   loc:     (  62, -25, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-4",
+   muzzle:  (  93, -27, -125),
+
+   loc:     (  93, -27, -100),
+   size:    16,
+   hull_factor: 0.2
+}
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: ( 0, -1, -1,  0) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  1,  1,  0) }
+loadout: { name: "Ground Strike",    stations: ( 0,  1,  1,  0) }
+loadout: { name: "Ship Strike",      stations: ( 0,  2,  2,  0) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 2,  2,  2,  2) }
+
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -32, 0),
+
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5
+}
+
+sensor: {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:               25e3,
+   range:               50e3,
+   range:               75e3,
+
+   loc:                 (0, 0, 30),
+   size:                16,
+   hull_factor:         0.1
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (0, 0, 40),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+   loc:              (0, 0, 90),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 0, -10),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose0.mag",
+      start: (0, -25, 134),
+      end:   (0, -50, 148)
+   },
+
+   gear: {
+      model: "GearLeft0.mag",
+      start: (-20, -30, -64),
+      end:   (-45, -60, -64),
+   },
+
+   gear: {
+      model: "GearRight0.mag",
+      start: ( 20, -30, -64),
+      end:   ( 45, -60, -64),
+   },
+}
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+   scale:            0.12,
+
+   port_fore:   {loc:(-123, -22, -69), fire: 0x0044}
+   port_fore:   {loc:( 123, -22, -69), fire: 0x0084}
+
+   port_aft:    {loc:(-123, -22,-129), fire: 0x0088}
+   port_aft:    {loc:( 123, -22,-129), fire: 0x0048}
+
+   port_top:    {loc:(  -5,  12, -99), fire: 0x0110}
+   port_top:    {loc:(   5,  12, -99), fire: 0x0110}
+
+   port_top:    {loc:(  -5,  18,  35), fire: 0x0210}
+   port_top:    {loc:(   5,  18,  35), fire: 0x0210}
+
+   port_bottom: {loc:( -14,  -8,  35), fire: 0x0120}
+   port_bottom: {loc:(  14,  -8,  35), fire: 0x0120}
+
+   port_top:    {loc:(-123, -17, -82), fire: 0x0410}
+   port_top:    {loc:(-123, -17,-117), fire: 0x0410}
+
+   port_top:    {loc:( 123, -17, -82), fire: 0x0810}
+   port_top:    {loc:( 123, -17,-117), fire: 0x0810}
+
+   port_bottom: {loc:(-123, -27, -82), fire: 0x0820}
+   port_bottom: {loc:(-123, -27,-117), fire: 0x0A20}
+
+   port_bottom: {loc:( 123, -27, -82), fire: 0x0420}
+   port_bottom: {loc:( 123, -27,-117), fire: 0x0620}
+
+   port_left:   {loc:( -15,   2, 128), fire: 0x0081}
+   port_right:  {loc:(  15,   2, 128), fire: 0x0042}
+}
+
+
+death_spiral: {
+   time:             2.9,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.1,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.5,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     190
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     220
+}
+
+
+map: {
+   sprite: "IntruderMap0.pcx",
+   sprite: "IntruderMap1.pcx",
+   sprite: "IntruderMap2.pcx",
+   sprite: "IntruderMap3.pcx",
+   sprite: "IntruderMap4.pcx",
+   sprite: "IntruderMap5.pcx",
+   sprite: "IntruderMap6.pcx",
+   sprite: "IntruderMap7.pcx",
+}
+
+
+

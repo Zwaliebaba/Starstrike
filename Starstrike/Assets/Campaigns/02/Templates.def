@@ -1,0 +1,20 @@
+TEMPLATELIST
+
+// specialized templates first
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_HS.def", rgn: Solus,   name: "Harmony Patrol", after: "05/12:00:00", exec_once: 1 }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_HS.def", rgn: Solus,   name: "Harmony Patrol", after: "05/12:00:00", exec_once: 1 }
+
+// then general templates
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_01.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_01.def" }
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_02.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_02.def" }
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_03.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_03.def" }
+
+mission: { type: ESCORT_FREIGHT, group: INTERCEPT_SQUADRON, script: "Templates/IS_Escort_01.def", rgn: Trellis, name: "Humanitarian Aid" }
+mission: { type: ESCORT_FREIGHT, group: FIGHTER_SQUADRON,   script: "Templates/FS_Escort_01.def", rgn: Trellis, name: "Humanitarian Aid" }
+mission: { type: ESCORT_FREIGHT, group: INTERCEPT_SQUADRON, script: "Templates/IS_Escort_02.def", rgn: Trellis, name: "Harmony Run"      }
+mission: { type: ESCORT_FREIGHT, group: FIGHTER_SQUADRON,   script: "Templates/FS_Escort_02.def", rgn: Trellis, name: "Harmony Run"      }
+
+mission: { type: ESCORT_FREIGHT, group: DESTROYER_SQUADRON, script: "Templates/DS_Escort_03.def", rgn: Trellis, name: "Freight Escort"   }

@@ -1,0 +1,242 @@
+MISSION
+
+name:       "06. Supression of Enemy Air Defense"
+type:       STRIKE
+system:     Radix
+region:     "Shadow Canyon"
+
+start:      "05/10:34:00"
+degrees:    true
+stardate:   1079221203.0
+
+sitrep:     "A radical faction of the Radix Military has taken a Force "
+            "recon ship and her crew hostage.  Force:Intel has determined "
+            "that the hostages are being held at a military base in the "
+            "Shadow Canyon sector on Radix Prime.  We are dispatching two "
+            "Zodiac landing craft to rescue the hostages and destroy the "
+            "recon ship before it can be compromised.\n\n"
+
+            "We need you to take out the SAM and AAA emplacements protecting "
+            "the base.  You will take only a single Thunderbolt fighter "
+            "to minimize the chance of our rescue operation being detected.  "
+            "Stay as low as possible, and use EMCON 2 until you reach the "
+            "strike zone.  Those hostages are counting on you, so get moving."
+
+objective:  "* SEAD - Destroy SAM and AAA near Shadow Canyon military base\n"
+            "* Avoid detection until the last possible moment\n"
+            "* Return safely to base"
+
+element: {
+   name:    Echo,
+   design:  Thunderbolt,
+   loc:     (5e3, -4e3, 2e3),
+   mission: strike,
+   player:  1,
+   count:   1,
+   iff:     1,
+   loadout: { ship: -1, name: "Ground Strike" },
+
+   navpt:   { cmd: vector, loc: ( 4.5e3,  -26e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: ( -16e3,  -44e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: ( -34e3,  -50e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: ( -42e3,  -87e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: ( -82e3,  -50e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: (-115e3,  -42e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: (-135e3,  -60e3, 1e3), speed: 500 },
+   navpt:   { cmd: vector, loc: (-155e3,  -67e3, 2e3), speed: 500 },
+   navpt:   { cmd: vector, loc: (-171e3,  -93e3, 6e3), speed: 500 },
+   navpt:   { cmd: strike, loc: (-180e3, -110e3, 2e3), speed: 500 },
+
+}
+
+
+element: {
+   name:      "Jackal",
+   design:    "Jackal",
+   mission:   "Patrol",
+   intel:     "Secret",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-25e3, -95e3, 50),
+   hold:      600,
+
+   navpt:   { cmd: patrol, loc: ( -42e3,  -87e3, 1e3), speed: 500 },
+}
+
+
+element: {
+   name:      "Administration",
+   design:    "Dsrt01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-175e3, -145e3, 0),
+}
+
+element: {
+   name:      "Outpost",
+   design:    "Dsrt04",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-175e3, -140e3, 0),
+}
+
+element: {
+   name:      "Barracks 1",
+   design:    "Dsrt03",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-177e3, -148e3, 0),
+}
+
+element: {
+   name:      "Barracks 2",
+   design:    "Dsrt03",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-175e3, -148e3, 0),
+}
+
+element: {
+   name:      "Barracks 3",
+   design:    "Dsrt03",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-173e3, -148e3, 0),
+}
+
+element: {
+   name:      "Cryo Tank",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     2,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-170e3, -138e3, 0),
+}
+
+element: {
+   name:      "Reactor",
+   design:    "Reac01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-170e3, -140e3, 0),
+}
+
+element: {
+   name:      "Starbase",
+   design:    "Airbase3",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-180e3, -125e3, 0),
+}
+
+element: {
+   name:      "SAM 1",
+   design:    "SAM 1",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-173e3, -130e3, 0),
+}
+
+element: {
+   name:      "AAA 1",
+   design:    "AAA 1",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       2,
+   playable:  false,
+   region:    "Shadow Canyon",
+   loc:       (-175e3, -152e3, 0),
+}
+
+
+// ******* EVENT LIST *******
+
+
+event: {
+   id:              1,
+   event:           Hold,
+   event_param:     0,
+   event_ship:      Jackal,
+
+   trigger:         Navpoint,
+   trigger_ship:    Echo,
+   trigger_param:   3,
+}
+
+
+event: {
+   id:              25,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    "SAM 1",
+}
+
+event: {
+   id:              26,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    "AAA 1",
+}
+
+event: {
+   id:              60,
+   event:           Message,
+   sound:           "Vox\Misc\M06-E60.wav",
+   event_message:   "The SAM and AAA sites have been destroyed.  Mission accomplished!",
+   event_ship:      Pickup,
+
+   trigger:         "Event (ALL)",
+   trigger_param:   (25, 26),
+   delay:           5,
+}
+
+event: {
+   id:              99,
+   event:           Exit,
+
+   trigger:         "Event",
+   trigger_param:   60,
+   delay:           5,
+}

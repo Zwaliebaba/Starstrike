@@ -1,0 +1,88 @@
+SHIP
+
+name:       Colony
+display_name: "Colony Ship"
+class:      Station
+secret:     true
+hud_icon:   "Colony_hud.pcx"
+
+detail_0:   "Colony1e.mag"
+feature_0:  1000
+detail_1:   "Colony2e.mag"
+feature_1:  32
+
+mass:       2.1e6
+agility:    0
+vlimit:     0
+roll_rate:  0
+integrity:  250e3
+scale:      7
+acs:        1
+
+chase:      (0, -1e3, 200)
+bridge:     (0, 1040,   0)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       10e3,
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+   }
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 180),
+   size:             16,
+   hull_factor:      0.1
+   }
+
+
+
+death_spiral: {
+   time:             3,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   }
+
+
+map: { sprite: "Colony_map.pcx" }
+
+
+
+

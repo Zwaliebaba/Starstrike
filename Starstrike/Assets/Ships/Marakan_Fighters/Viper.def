@@ -1,0 +1,273 @@
+SHIP
+
+name:          Viper
+display_name:  Viper
+class:         Fighter
+abrv:          "F-MK1"
+description:   "The MARK-1 VIPER is an older model single-seat intercept fighter craft used by the Marakan Hegemony and many of its client states.  Designed to be inexpensive, lightweight, and highly maneuverable, the Viper has become ubiquitous as a versatile tactical fighter.  It is armed with twin Alpha particle cannon, and six underwing hard points capable of mounting a variety of anti-fighter ordnance.  The Viper is often asked to perform patrol, intercept, and escort mission profiles."
+
+hud_icon:      "ViperHud.pcx"
+
+detail_0:   "Viper_1opt.mag"
+feature_0:  0.1
+detail_1:   "Viper_2opt.mag"
+feature_1:  1.5
+
+mass:       14
+integrity:  2050
+vlimit:     280
+agility:    60
+roll_rate:  550
+scale:      0.23
+acs:        1
+detet:      50e3
+
+trans_x:    2000
+trans_y:    2000
+trans_z:    2000
+
+arcade_drag: 0.125
+drag:       5.0e-5
+roll_drag:  5
+pitch_drag: 4
+yaw_drag:   4
+
+CL:         9.0e-3
+CD:         1.0e-1
+stall:      0.40
+
+avoid_fighter: 7
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 50,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+   }
+
+drive:      {
+   type:    Yellow,
+   thrust:  16,
+   augmenter: 30,
+   scale:   0.32,
+   port:    (0, 0, -166),
+
+   loc:     (0, 0, -80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+
+weapon:     {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-7,  7, 190),
+   muzzle:  ( 7,  7, 190),
+
+   loc:     (0, 0, 120),
+   size:    32,
+   hull_factor: 0.5
+}
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-1",
+   muzzle:  ( 103, -39, -118),
+
+   loc:     ( 103, -39, -100),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-2",
+   muzzle:  (  83, -35, -118),
+
+   loc:     (  83, -35, -100),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-3",
+   muzzle:  ( 51, -25, -80),
+
+   loc:     ( 51, -25, -60),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-4",
+   muzzle:  (-51, -25, -80),
+
+   loc:     (-51, -25, -60),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-5",
+   muzzle:  ( -84, -33, -118),
+
+   loc:     ( -84, -33, -100),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   abrv:    "STA-6",
+   muzzle:  (-103, -39, -118),
+
+   loc:     (-103, -39, -100),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: ( 0,  0, -1, -1,  0,  0) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  0,  0,  0,  0,  0) }
+loadout: { name: "Ground Strike",    stations: ( 0,  0,  0,  0,  0,  0) }
+loadout: { name: "Ship Strike",      stations: ( 0,  0,  1,  1,  0,  0) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 0,  1,  1,  1,  1,  0) }
+
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -24, 0),
+
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.2
+   }
+
+sensor:     {
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    32,
+   hull_factor: 0.1
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose0.mag",
+      start: (0, -14, 73),
+      end:   (0, -40, 87)
+   },
+
+   gear: {
+      model: "GearLeft0.mag",
+      start: (-30, -12, -40),
+      end:   (-50, -40, -40)
+   },
+
+   gear: {
+      model: "GearRight0.mag",
+      start: ( 30, -12, -40),
+      end:   ( 50, -40, -40)
+   },
+}
+
+death_spiral: {
+   time:             2.5,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   0.6,
+   explosion_loc:    (0, 0, -28),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.4,
+   explosion_loc:    (-10, 10, 30),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -12),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -12),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     196
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     225
+}
+
+
+map: {
+   sprite: "ViperMap0.pcx",
+   sprite: "ViperMap1.pcx",
+   sprite: "ViperMap2.pcx",
+   sprite: "ViperMap3.pcx",
+   sprite: "ViperMap4.pcx",
+   sprite: "ViperMap5.pcx",
+   sprite: "ViperMap6.pcx",
+   sprite: "ViperMap7.pcx",
+}
+

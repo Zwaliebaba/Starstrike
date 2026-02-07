@@ -1,0 +1,115 @@
+MISSION
+
+name:   "Cmpn04 Brief09 - Kolchev"
+type:   "Patrol"
+system: "Kolchev"
+region: "Kolchev"
+stardate: 1177883311.0
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+   invulnerable: true
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (0, 0, 0)
+   rgn:       Kolchev
+}
+
+
+element: {
+   name:      Gryphon
+   design:    Dragon
+   iff:       0
+   loc:       (20e3, 0, 0)
+   rgn:       Kolchev
+   navpt:     { cmd: Vector, loc: (20e3, -100e3, 0), rgn: Kolchev, speed: 500 }
+}
+
+element: {
+   name:      "Gol Duvain"
+   design:    Volnaris
+   iff:       0
+   loc:       (23e3, 0, 0)
+   rgn:       Kolchev
+   navpt:     { cmd: Vector, loc: (24e3, -100e3, 0), rgn: Kolchev, speed: 700 }
+}
+
+element: {
+   name:      "Tol Branta"
+   design:    Volnaris
+   iff:       0
+   loc:       (18e3, 0, -2e3)
+   rgn:       Kolchev
+   navpt:     { cmd: Vector, loc: (15e3, -100e3, -2e3), rgn: Kolchev, speed: 600 }
+}
+
+
+element: {
+   name:      Wrath
+   design:    Vendetta
+   iff:       0
+   loc:       (20e3, 0, 0)
+   rgn:       Anatoly
+   navpt:     { cmd: Vector, loc: (20e3, -100e3, 0), rgn: Anatoly, speed: 600 }
+}
+
+
+element: {
+   name:      Narom
+   design:    Raptor
+   iff:       0
+   count:     4
+   loc:       (20e3, 0, 0)
+   rgn:       Volova
+   navpt:     { cmd: Vector, loc: (220e3, -100e3, 0), rgn: Volova, speed: 700 }
+   loadout:   { ship: -1, name: "ACM Medium Range" }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Kolchev", vec: (-2, 0.1, 2e7)         }
+event: { event: Camera,                param: 5,                              vec: (-0.07, 0.007, -0.01) }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "STRATPLAN BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "Timestamp: $TIME\nSubject: Kolchev System\nClassified: SECRET R3 NTK" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\04/C4-B09-OK.wav" }
+
+event: { event: Camera,     time:  12, param: (6,13), target: "Gryphon"   }
+event: { event: Display,    fade:  (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Kolchev Sector" }
+
+
+event: { event: Camera,     time:  25, param: 3,      target: "body:Ilya", vec: (5, 0.1, 1.8e7)    }
+event: { event: Camera,                param: 5,                           vec: (0.1, 0.007, -0.01) }
+event: { event: Display,    fade:  (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Ilya Sector" }
+event: { event: Display,    fade:  (1,5,1), rect: (20,40, 300,100), font: Limerick12, color: 0xffffff80, 
+         message: "Kolchev System" }
+
+
+event: { event: Camera,     time:  35, param: (6,20), target: "Narom 1"   }
+event: { event: Display,    fade:  (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Volova Sector" }
+
+
+event: { event: Camera,     time:  48, param: (6,20), target: "Wrath"   }
+event: { event: Display,    fade:  (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffff80,
+         message: "Anatoly Sector" }
+
+
+event: { event: EndScene,   time:  60, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

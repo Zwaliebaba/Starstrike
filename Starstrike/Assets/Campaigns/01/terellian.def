@@ -1,0 +1,405 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Terellian Alliance",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   fleet,
+  id:     3,
+  name:   "Borova",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     6,
+  name:   "Archon",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-122e3, 80e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Archon",
+    design: "Orion",
+    regnum: "71" },
+
+  unit: {
+    name:   "Gerson",
+    design: "Spectre",
+    regnum: "682" },
+
+  unit: {
+    name:   "Simmons",
+    design: "Spectre",
+    regnum: "687" },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     112,
+  name:   "Warbirds",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-144e3, 45e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Warbird",
+    design: "Stormhawk",
+    count:  20 },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     36,
+  name:   "Stallions",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-169e3, 60e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Stallion",
+    design: "Stormhawk",
+    count:  20 },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     37,
+  name:   "Avengers",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-163e3, 107e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Avenger",
+    design: "Stormhawk",
+    count:  20 },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Starlifters",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-71e3, 136e3, 0),
+  parent_type: carrier_group,
+  parent_id:   6,
+
+  unit: {
+    name:   "Starlifters",
+    design: "Zodiac",
+    count:  8 },
+}
+
+group: {
+  type:   battle_group,
+  id:     9,
+  name:   "Onslaught",
+  intel:  known,
+  iff:    1,
+  region: "Vail",
+  loc:    (-109e3, -77e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Onslaught",
+    design: "Spectre",
+    regnum: "406" },
+
+  unit: {
+    name:   "Redstone",
+    design: "Courageous",
+    regnum: "534" },
+
+  unit: {
+    name:   "Raven",
+    design: "Spectre",
+    regnum: "692" },
+
+  unit: {
+    name:   "Hemmet",
+    design: "Berents",
+    regnum: "923" },
+}
+
+group: {
+  type:   battle_group,
+  id:     10,
+  name:   "Predator",
+  intel:  known,
+  iff:    1,
+  region: "Navara",
+  loc:    (30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Predator",
+    design: "Spectre",
+    regnum: "411" },
+
+  unit: {
+    name:   "Audacious",
+    design: "Courageous",
+    regnum: "539" },
+
+  unit: {
+    name:   "Brunner",
+    design: "Spectre",
+    regnum: "697" },
+
+  unit: {
+    name:   "Essex",
+    design: "Berents",
+    regnum: "928" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     43,
+  name:   "Shadow",
+  intel:  known,
+  iff:    1,
+  region: "Vail",
+  loc:    (-109e3, 51e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Shadow",
+    design: "Spectre",
+    regnum: "352" },
+
+  unit: {
+    name:   "Necromancer",
+    design: "Spectre",
+    regnum: "357" },
+
+  unit: {
+    name:   "Belfast",
+    design: "Berents",
+    regnum: "913" },
+
+  unit: {
+    name:   "Canton",
+    design: "Berents",
+    regnum: "918" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     44,
+  name:   "Hydra",
+  intel:  known,
+  iff:    1,
+  region: "Alystra",
+  loc:    (93e3, -101e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Hydra",
+    design: "Spectre",
+    regnum: "362" },
+
+  unit: {
+    name:   "Banshee",
+    design: "Spectre",
+    regnum: "367" },
+
+  unit: {
+    name:   "Canton",
+    design: "Berents",
+    regnum: "918" },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     60,
+  name:   "Gunther",
+  intel:  known,
+  iff:    1,
+  region: "Alystra",
+  loc:    (55e3, 71e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Gunther",
+    design: "Spectre",
+    regnum: "702" },
+
+  unit: {
+    name:   "Fletcher",
+    design: "Spectre",
+    regnum: "707" },
+
+  unit: {
+    name:   "Rainier",
+    design: "Berents",
+    regnum: "933" },
+
+  unit: {
+    name:   "Tanner",
+    design: "Berents",
+    regnum: "938" },
+}
+
+group: {
+  type:   civilian,
+  id:     1000,
+  name:   "Civilian Forces",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   war_production,
+  id:     2000,
+  name:   "War Production",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1000,
+}
+
+group: {
+  type:   resource,
+  id:     3000,
+  name:   "Tantalum Mining Station",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (0, 0, 0),
+  parent_type: war_production,
+  parent_id:   2000,
+}
+
+group: {
+  type:   network,
+  id:     3001,
+  name:   "Administration",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (-71e3, 21e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Administration",
+    design: "Bldg00",
+    regnum: "" },
+}
+
+group: {
+  type:   refinery,
+  id:     3002,
+  name:   "Refinery",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (-77e3, 39e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Refinery",
+    design: "Bldg01",
+    regnum: "" },
+
+  unit: {
+    name:   "Cooling Tower",
+    design: "Cool00",
+    count:  3 },
+
+  unit: {
+    name:   "Cryo Tank",
+    design: "Tank00",
+    count:  2 },
+}
+
+group: {
+  type:   resource,
+  id:     3011,
+  name:   "Factory",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (-55e3, 48e3, 0),
+  parent_type: resource,
+  parent_id:   3000,
+
+  unit: {
+    name:   "Factory Tower",
+    design: "Fact00",
+    regnum: "000" },
+
+  unit: {
+    name:   "Processing Plant",
+    design: "Fact01",
+    regnum: "000" },
+}
+
+group: {
+  type:   non_com,
+  id:     2000,
+  name:   "Freight",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1000,
+}
+
+group: {
+  type:   freight,
+  id:     3000,
+  name:   "Star Freight",
+  intel:  known,
+  iff:    1,
+  region: "Navara",
+  loc:    (0, 0, 0),
+  parent_type: non_com,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Ecliptic",
+    design: "TypeIII",
+    regnum: "1919" },
+
+  unit: {
+    name:   "Rand",
+    design: "TypeIII",
+    regnum: "2207" },
+}
+

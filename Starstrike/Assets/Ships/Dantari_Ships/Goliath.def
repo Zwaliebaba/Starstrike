@@ -1,0 +1,363 @@
+SHIP
+
+name:          Goliath
+display_name:  Goliath
+class:         Carrier
+description:   "The GOLIATH class carrier vessels provide the Dantari Separatists with their main force projection capability in the Solus system.  Unlike the rest of the Dantari fleet, which consists largely of older Hegemony warships, the Goliath class carriers were designed and constructed specifically for their Dantari crew.  Due to budgetary constraints, the Goliath class is outfitted with only a single launch rail, but still has a full complement of point defense batteries for close-in protection."
+
+hud_icon:   "GoliathHud.pcx"
+
+detail_0:   "Goliath_1opt.mag"
+feature_0:  1000
+detail_1:   "Goliath_2opt.mag"
+feature_1:  48
+
+mass:       782e3
+agility:    1
+vlimit:     220
+roll_rate:  7
+integrity:  75e3
+scale:      3.3
+acs:        1.5
+
+trans_x:      1e6
+trans_y:      5e5
+trans_z:      1e6
+
+arcade_drag: 4.5e-2
+drag:       1e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+degrees:    true
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       50e3,
+
+   loc:              (0, 4, -280),
+   size:             48,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+drive: {
+   type:             Yellow
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           25e3,
+   scale:            12,
+   port:             ( 54, -84, -489),
+   port:             (-54, -84, -489),
+   port:             (  0, -57, -527),
+   port:             (  0,-111, -489),
+
+   loc:              (0, 0, -450),
+   size:             50,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3,
+   countdown:        7.5
+}
+
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   factor:           0.0125,
+   consumption:      6000,
+   // model:            "GoliathShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100,
+   loc:              (0, 20, -80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       1100,
+
+   loc:              (0, 0, -100),
+   hull_factor:      0.8
+}
+
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "PDB 1",
+   abrv:             "PDB 1",
+   loc:              (104, -17, 64),
+   muzzle:           ( 30,  0,  190),
+   muzzle:           (-30,  0,  190),
+
+   azimuth:           60,
+   aim_az_max:        90,
+   aim_az_min:       -60,
+   aim_az_rest:      -60,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "PDB 2",
+   abrv:             "PDB 2",
+   loc:              (-104, -17, 64),
+   muzzle:           ( 30,  0,  190),
+   muzzle:           (-30,  0,  190),
+
+   azimuth:          -60,
+   aim_az_max:       -90,
+   aim_az_min:        60,
+   aim_az_rest:       60,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "PDB 3",
+   abrv:             "PDB 3",
+   loc:              (104, -17, -64),
+   muzzle:           ( 30,  0,  190),
+   muzzle:           (-30,  0,  190),
+
+   azimuth:           90,
+   aim_az_max:        75,
+   aim_az_min:       -75,
+   aim_az_rest:       90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Orca Cannon",
+   design:           "Bolt Weapon",
+   name:             "PDB 4",
+   abrv:             "PDB 4",
+   loc:              (-104, -17, -64),
+   muzzle:           ( 30,  0,  190),
+   muzzle:           (-30,  0,  190),
+
+   azimuth:          -90,
+   aim_az_max:       -75,
+   aim_az_min:        75,
+   aim_az_rest:      -90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+
+flightdeck: {
+   name:       "Deck 1",
+   abrv:       "Deck 1",
+   design:     "Flight Deck",
+   loc:        (  0, -85, 192),
+   cam:        (-20, -85, 192),
+   start:      (  0, -85, 170),
+   end:        (2e3,-200, 2500),
+
+   spot:       { loc: ( 16, -85, 160), filter: 0x7 },
+   spot:       { loc: (-16, -85, 160), filter: 0x7 },
+   spot:       { loc: (  0, -85, 160), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       28,
+   hull_factor: 0.5,
+}
+
+
+flightdeck: {
+   name:       "Deck 2",
+   abrv:       "Deck 2",
+   design:     "Flight Deck",
+   loc:        (  0, -82, -92),
+   cam:        (-20, -72, -92),
+   start:      (  0, -90, -1e3),
+   end:        (  0, -82, -92),
+   spot:       (  0, -82, -92),
+
+   approach:   (   0,-90, -2000),
+   approach:   (1000,  0, -1000),
+   approach:   (1000,  0,  1000),
+   approach:   ( 250,  0,  2500),
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 15,
+
+   size:       40,
+   hull_factor: 0.5,
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "GoliathMap0.pcx",
+   sprite: "GoliathMap1.pcx",
+   sprite: "GoliathMap2.pcx",
+   sprite: "GoliathMap3.pcx",
+   sprite: "GoliathMap4.pcx",
+   sprite: "GoliathMap5.pcx",
+   sprite: "GoliathMap6.pcx",
+   sprite: "GoliathMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "DebrisGoliath1.mag",
+   debris_loc:       (0,0,400),
+   debris_mass:      91e3,
+   debris_count:     1,
+   debris_life:      600,
+   debris_fire:      (44,-34,64),
+   debris_fire:      (34,-44,-30),
+
+   debris:           "DebrisGoliath2.mag",
+   debris_loc:       (0,0,-290),
+   debris_mass:      61e3,
+   debris_count:     1,
+   debris_life:      500,
+   debris_fire:      (64, 34,74),
+   debris_fire:      (64,-32,-70),
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      22,
+   debris_count:     15,
+   debris_life:      25,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      16,
+   debris_count:     15,
+   debris_life:      28,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      11,
+   debris_count:     10,
+   debris_life:      32,
+
+}
+

@@ -1,0 +1,94 @@
+MISSION
+
+name:   "Cmpn 05 Defeat 02"
+type:   "Patrol"
+system: Garrison
+region: Garrison
+stardate: 1188998811
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   iff:       10
+   player:    1
+   loc:       (50e3, 0, 0)
+   invulnerable: true
+}
+
+element: {
+   name:      Imperial
+   design:    Imperial
+   invulnerable: true
+   iff:       2
+   loc:       (0,0,0)
+   navpt:     { cmd: Assault, tgt: Heracles, loc: (0,-60e3,0), speed: 500 }
+}
+
+element: {
+   name:      Broadsword
+   design:    Broadsword
+   invulnerable: true
+   iff:       2
+   loc:       (18e3,0,-300)
+   navpt:     { cmd: Assault, tgt: Heracles, loc: (7e3,-60e3,-300), speed: 500 }
+}
+
+
+element: {
+   name: Heracles
+   design: Orion
+   command_ai: 1
+   iff: 1
+   loc: (0, -30e3, 0)
+   rgn: Garrison
+   navpt: { cmd: Vector, loc: (-35e3, -10e3, 0), rgn: Garrison, speed: 780 }
+   heading:   90
+}
+
+element: {
+   name: Devastator
+   design: Devastator
+   command_ai: 1
+   iff: 1
+   loc: (45e3, -25e3, 0)
+   rgn: Garrison
+   head: 180
+   navpt:     { cmd: Assault, tgt: Broadsword, loc: (5e3,0,0), speed: 600 }
+   invulnerable: true
+}
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Garrison",  vec: (1,0,2.5e7) }
+event: { event: Camera,                param: 5,                           vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Nightfall", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 600,100) }
+event: { event: Display,    message: "Defeat",                    font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 600,100) }
+
+event: {
+   event: Message
+   time:  3
+   sound: "Vox\Scenes\05\End_03_Defeat.wav"
+}
+
+event: { event: Camera,     time:  10, param: 3, target: Imperial, vec: (1, 0, 8e3) }
+event: { event: Camera,                param: 5,                   vec: (0.09, 0.005, -0.01) }
+
+event: { event: Camera,     time:  20, param: 3, target: Heracles, vec: (1, 0, 8e3) }
+event: { event: Camera,                param: 5,                   vec: (-0.1, 0.005, -0.01) }
+
+event: { event: Damage,     time:  21, param: 2e4, ship: Heracles, target: Heracles }
+event: { event: Damage,     time:  22, param: 2e4, ship: Heracles, target: Heracles }
+event: { event: Damage,     time:  23, param: 1e4, ship: Heracles, target: Heracles }
+event: { event: Damage,     time:  24, param: 1e4, ship: Heracles, target: Heracles }
+
+event: { event: Camera,     time:  27, param: (6,21,2), target: Devastator }
+
+event: { event: Damage,     time:  30, param: 1e7, ship: Heracles, target: Heracles }
+
+event: { event: Display,    time:  38, image: "Campaigns\05\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+
+event: { event: EndScene,   time:  40, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

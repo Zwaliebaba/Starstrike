@@ -1,0 +1,297 @@
+MISSION
+
+name:   "Cmpn02 News03 - Blockade Broken"
+type:   "Patrol"
+system: "Solus"
+region: "Trellis"
+
+objective: "Unspecified"
+
+sitrep: "Unknown"
+
+start: "33:00:00"
+
+degrees: true
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+
+element: {
+   name:      "Solus-Trellis"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (-200e3, -100e3, 0)
+
+   objective: { cmd: Vector, tgt: "Trellis-Solus" }
+}
+
+element: {
+   name:      "Solus-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (150e3, -180e3, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Solus" }
+}
+
+element: {
+   name:      "Jalah-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (0, 0, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Jalah" }
+}
+
+element: {
+   name:      "Jalah-Trellis"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (120e3, -200e3, 0)
+
+   objective: { cmd: Vector, tgt: "Trellis-Jalah" }
+}
+
+element: {
+   name:      "Trellis-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (-100e3, -150e3, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Trellis" }
+}
+
+element: {
+   name:      "Trellis-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (50e3, -100e3, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Trellis" }
+}
+
+element: {
+   name:      "Trellis Docks"
+   design:    "Station1"
+   mission:   "Flight Ops"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (0, 0, 0)
+}
+
+
+element: {
+   name:      "Archon"
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Trellis"
+   loc:       (-130000, 160000, 0)
+}
+
+element: {
+   name:      "Stalwart"
+   design:    "Courageous"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Trellis"
+   loc:       (-111503, 155656, 0)
+
+   objective: { cmd: Escort, tgt: "Archon" }
+}
+
+element: {
+   name:      "Gerson"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Trellis"
+   loc:       (-155657, 148787, 0)
+
+   objective: { cmd: Escort, tgt: "Archon" }
+}
+
+element: {
+   name:      "Simmons"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Escort"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Trellis"
+   loc:       (-166015, 151521, 0)
+
+   objective: { cmd: Escort, tgt: "Archon" }
+}
+
+element: {
+   name:      "Avengers"
+   design:    "Falcon"
+   carrier:   "Archon"
+   commander: "Archon"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     32
+   maint_count: 16
+   iff:       1
+   region:    "Trellis"
+   loc:       (-118941, 180411, 0)
+}
+
+element: {
+   name:      "Stallions"
+   design:    "Stormhawk"
+   carrier:   "Archon"
+   commander: "Archon"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     32
+   maint_count: 16
+   iff:       1
+   region:    "Trellis"
+   loc:       (-118754, 143664, 0)
+}
+
+element: {
+   name:      "Warbirds"
+   design:    "Thunderbolt"
+   carrier:   "Archon"
+   commander: "Archon"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     20
+   maint_count: 10
+   iff:       1
+   region:    "Trellis"
+   loc:       (-135947, 178901, 0)
+}
+
+
+/***
+
+TRELLIS - The Alliance Third Fleet has broken the blockade of the
+Trellis-Solus Farcaster network, a Force:Command spokesperson has
+announced.  The minefields surrounding the Farcaster terminus have
+been cleared, and several Separatist squadrons have been eliminated
+or greatly reduced in strength.
+
+Theater commander Admiral Evars has given official authorization for
+the commencement of humanitarian aid traffic to the inner planets. 
+Certified non-governmental agencies delivering food, clothing,
+medicines, and emergency equipment will receive protective escorts
+by warships from the Third Fleet.
+
+"Although the blockade has been broken, there are still several
+hostile squadrons in operation near the outer worlds.  We strongly
+recommend that only emergency traffic be routed through the Trellis
+sector.  Civilian ships are advised to avoid the area until the threat
+can be assessed and appropriate actions taken," Evars was quoted as
+saying.
+
+***/
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Display,               image: "Campaigns\02/Scenes\Black.pcx", color: 0xffffffff, fade: (0,5,2), rect: (0,0,0,0) }
+event: { event: Display,               image: "Campaigns\02/Scenes\News.pcx",  color: 0xffffffff, fade: (1,4,1), rect: (0,0, -512,-128) }
+
+event: { event: Camera,                param: 3,  target: "Trellis-Solus", vec: (0,0,1000)           }
+event: { event: Camera,                param: 5,                           vec: (0.12, 0.01, 0.02)  }
+
+event: { event: Display,    time:   5, message: "Trellis-Solus Farcaster", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Messasge,              sound: "Vox\Scenes\02/News_03_Blockade_Broken.wav" }
+
+
+event: { event: Camera,     time:  25, param: 3,  target: "Archon",        vec: (2,0,2700)           }
+event: { event: Camera,                param: 5,                           vec: (0.12, 0.006, -0.02) }
+
+event: { event: Display,    message: "Task Force 3.7",     font: Limerick18,   color: 0xffffff80, fade: (1,7,1),  rect: (20,20, 400,100) }
+event: { event: Display,    message: "CV-71 'Archon'",     font: Limerick12,   color: 0xffffff80, fade: (1,7,1),  rect: (20,40, 200,100) }
+
+
+
+event: { event: EndScene,   time:  65, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

@@ -1,0 +1,446 @@
+MISSION
+
+id:     4
+name:   "War Games"
+desc:   "Fleet war game scenario designed for the persistent multiplayer server mode."
+type:   "Patrol"
+system: "Janus"
+region: "Janek"
+
+objective: "Unspecified"
+
+sitrep: "Welcome to the Force:Space fleet war game exercises in Janus System.   For this scenario, two equal star fleets will face off in unlimited combat.  The entire system is in bounds for this exercise.\n \n Fleet 1 (BLUE) consists of the Archon CVBG including twenty Stormhawk fighters, and Spectre-Class DESRON 43 'Shadow'.\n \n Fleet 2 (RED) includes the Titan CVBG with twenty Stormhawk fighters, and Spectre-Class DESRON 45 'Warlock'.\n \n The goal of the exercise is to destroy the enemy carrier.  The exercise will end when either the Archon or the Titan has been destroyed."
+
+start: "33:00:00"
+
+degrees: true
+
+element: {
+   name:      "Archon",
+   design:    "Orion",
+   mission:   "Flight Ops",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   player:    1,
+   playable:  true,
+   region:    "Janek",
+   loc:       (0, 0, 0),
+}
+
+element: {
+   name:      "Stallions",
+   design:    "Stormhawk",
+   carrier:   "Archon",
+   commander: "Archon",
+   mission:   "Flight Ops",
+
+   intel:     "Secret",
+   count:     20,
+   iff:       1,
+   region:    "Janek",
+   loc:       (5000, 0, 0),
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:      "Stalwart",
+   design:    "Courageous",
+   commander: "Archon",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Janek",
+   loc:       (22000, 6000, 0),
+}
+
+element: {
+   name:      "Gerson",
+   design:    "Asher",
+   commander: "Archon",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Janek",
+   loc:       (-25000, -2000, 0),
+}
+
+element: {
+   name:      "Simmons",
+   design:    "Asher",
+   commander: "Archon",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Janek",
+   loc:       (33000, -20000, 0),
+}
+
+element: {
+   name:      "Shadow",
+   design:    "Spectre",
+   commander: "Archon",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Dante",
+   loc:       (-25000, -2000, 0),
+}
+
+element: {
+   name:      "Necromancer",
+   design:    "Spectre",
+   commander: "Shadow",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       1,
+   playable:  true,
+   region:    "Dante",
+   loc:       (33000, -20000, 0),
+}
+
+element: {
+   name:      "Titan",
+   design:    "Orion",
+   mission:   "Flight Ops",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Alystra",
+   loc:       (0, 0, 0),
+}
+
+element: {
+   name:      "Chargers",
+   design:    "Stormhawk",
+   carrier:   "Titan",
+   commander: "Titan",
+   mission:   "Flight Ops",
+
+   intel:     "Secret",
+   count:     20,
+   iff:       2,
+   region:    "Alystra",
+   loc:       (5000, 0, 0),
+
+   loadout:   { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:      "Defender",
+   design:    "Courageous",
+   commander: "Titan",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Alystra",
+   loc:       (22000, 6000, 0),
+}
+
+element: {
+   name:      "Reynolds",
+   design:    "Asher",
+   commander: "Titan",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Alystra",
+   loc:       (-25000, -2000, 0),
+}
+
+element: {
+   name:      "Hawker",
+   design:    "Asher",
+   commander: "Titan",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Alystra",
+   loc:       (33000, -20000, 0),
+}
+
+element: {
+   name:      "Warlock",
+   design:    "Spectre",
+   commander: "Titan",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Navara",
+   loc:       (-25000, -2000, 0),
+}
+
+element: {
+   name:      "Merlin",
+   design:    "Spectre",
+   commander: "Warlock",
+   mission:   "Fleet",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       2,
+   playable:  true,
+   region:    "Navara",
+   loc:       (33000, -20000, 0),
+}
+
+element: {
+   name:      "Janek-Ilon",
+   design:    "Farcaster",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       0,
+   playable:  false,
+   region:    "Janek",
+   loc:       (80000, -50000, 0),
+
+   objective: { cmd: Vector, tgt: "Ilon-Janek" },
+}
+
+element: {
+   name:      "Ilon-Janek",
+   design:    "Farcaster",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       0,
+   playable:  false,
+   region:    "Ilon",
+   loc:       (50000, -40000, 0),
+
+   objective: { cmd: Vector, tgt: "Janek-Ilon" },
+}
+
+element: {
+   name:      "Janek-Alystra",
+   design:    "Farcaster",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       0,
+   playable:  false,
+   region:    "Janek",
+   loc:       (-80000, 60000, 0),
+
+   objective: { cmd: Vector, tgt: "Alystra-Janek" },
+}
+
+element: {
+   name:      "Alystra-Janek",
+   design:    "Farcaster",
+   mission:   "Misc",
+
+   intel:     "Secret",
+   count:     1,
+   command_ai:1,
+   iff:       0,
+   playable:  false,
+   region:    "Alystra",
+   loc:       (-50000, -40000, 0),
+
+   objective: { cmd: Vector, tgt: "Janek-Alystra" },
+}
+
+event: {
+   id:              1,
+   time:            0.0,
+   delay:           0.0,
+   event:           Message,
+   event_message:   "ARCHON DESTROYED - RED TEAM VICTORY!",
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              2,
+   time:            0.0,
+   delay:           1.0,
+   event:           Damage,
+   event_ship:      "Stalwart",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              3,
+   time:            0.0,
+   delay:           2.0,
+   event:           Damage,
+   event_ship:      "Gerson",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              4,
+   time:            0.0,
+   delay:           3.0,
+   event:           Damage,
+   event_ship:      "Simmons",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              5,
+   time:            0.0,
+   delay:           4.0,
+   event:           Damage,
+   event_ship:      "Shadow",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              6,
+   time:            0.0,
+   delay:           5.0,
+   event:           Damage,
+   event_ship:      "Necromancer",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Archon",
+}
+
+event: {
+   id:              7,
+   time:            0.0,
+   delay:           0.0,
+   event:           Message,
+   event_message:   "TITAN DESTROYED - BLUE TEAM VICTORY!",
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              8,
+   time:            0.0,
+   delay:           1.0,
+   event:           Damage,
+   event_ship:      "Defender",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              9,
+   time:            0.0,
+   delay:           2.0,
+   event:           Damage,
+   event_ship:      "Reynolds",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              10,
+   time:            0.0,
+   delay:           3.0,
+   event:           Damage,
+   event_ship:      "Hawker",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              11,
+   time:            0.0,
+   delay:           4.0,
+   event:           Damage,
+   event_ship:      "Warlock",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              12,
+   time:            0.0,
+   delay:           5.0,
+   event:           Damage,
+   event_ship:      "Merlin",
+   event_param:     1000000,
+   event_chance:    100,
+   trigger:         "Destroyed",
+   trigger_ship:    "Titan",
+}
+
+event: {
+   id:              13,
+   time:            0.0,
+   delay:           10.0,
+   event:           Exit,
+   event_message:   "Mission Exit",
+   event_chance:    100,
+   trigger:         "Event (ANY)",
+   trigger_param:   (1, 7),
+}
+
+// EOF

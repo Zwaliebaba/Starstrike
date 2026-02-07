@@ -1,0 +1,175 @@
+MISSION_TEMPLATE
+
+name:       "Freight Escort"
+type:       ESCORT_FREIGHT
+system:     Solus
+region:     Trellis
+degrees:    true
+
+alias:      { name: FC1, elem: "Trellis-Solus"                 }
+alias:      { name: Obs, elem: "Tal Vesta Stellar Observatory" }
+
+callsign:   { name: Alpha,   iff: 2 }
+callsign:   { name: Bravo,   iff: 2 }
+
+element: {
+   name:    Ward,
+   design:  TypeIII,
+   rloc:    { ref: FC1, dex: 180e3, dex_var: 50e3, el: 0, el_var: 0 },
+   mission: freight,
+   count:   1,
+   iff:     1,
+   intel:   tracked,
+   hold:    900,
+
+   navpt:   { cmd: vector, rloc: { ref: Ward, dex: 50e3, dex_var:10e3, el: 0, el_var: 0 }, speed: 450, rgn: Trellis  },
+   navpt:   { cmd: vector, rloc: { ref: Obs,  dex: 40e3, dex_var:10e3, el: 0, el_var: 0 }, speed: 450, rgn: Meridian },
+}
+
+ward: Ward
+
+alias:      {
+   name:    Player,
+   code:    player,
+   mission: escort_freight,
+
+   navpt:   { cmd: vector, rloc: { ref: "Ward",   dex: 15e3, az: 270, az_var: 20, el_var: 0 }, speed: 500, rgn: Trellis  },
+   navpt:   { cmd: escort, rloc: { ref: "Ward:1", dex: 10e3, az: 270, az_var: 30, el_var: 0 }, speed: 500, rgn: Trellis  },
+   navpt:   { cmd: escort, rloc: { ref: "Ward:2", dex:  7e3, az: 270, az_var: 20, el_var: 0 }, speed: 500, rgn: Meridian },
+   navpt:   { cmd: rtb,    rloc: { ref: Player,   dex: 20e3,                      el_var: 0 }, speed: 250, rgn: Trellis  },
+ 
+   objective: { cmd: patrol,            tgt_desc: "inbound enemy units" },
+   objective: { cmd: escort, tgt: Ward, tgt_desc: "the merchant vessel" },
+}
+
+event: {
+   id:              1,
+   event:           Hold,
+   event_ship:      Ward,
+   event_param:     0,
+
+   trigger:         Navpoint,
+   trigger_ship:    Player,
+   trigger_param:   1,
+}
+
+event: {
+   id:              2,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-01.wav",
+   event_message:   "Glad to see you guys! Thanks for escorting us.",
+   event_chance:    50,
+
+   trigger:         Event,
+   trigger_param:   1,
+   delay:           1,
+}
+
+event: {
+   id:              5,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-07.wav",
+   event_message:   "Looks like our pick-up is late.",
+   event_chance:    50,
+
+   trigger:         Navpoint,
+   trigger_ship:    Ward,
+   trigger_param:   3,
+}
+
+event: {
+   id:              6,
+   event:           Message,
+   event_ship:      Player,
+   sound:           "Vox\Misc\A01-08.wav",
+   event_message:   "Can you stick with us in case there's any trouble?",
+
+   trigger:         Event,
+   trigger_param:   5,
+   delay:           2,
+}
+
+event: {
+   id:              7,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-06.wav",
+   event_message:   "Thanks for the lift.  I think we are clear now.",
+
+   trigger:         Navpoint,
+   trigger_ship:    Ward,
+   trigger_param:   4,
+   delay:           2,
+}
+
+// ALTERNATE MESSAGES:
+event: {
+   id:              102,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-09.wav",
+   event_message:   "Looks like our escort is here.  Let's get going.",
+
+   trigger:         Skipped,
+   trigger_param:   2,
+}
+
+event: {
+   id:              105,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-10.wav",
+   event_message:   "We were expecting some Zodiacs to pick up our cargo.",
+
+   trigger:         Skipped,
+   trigger_param:   5,
+}
+
+event: {
+   id:              106,
+   event:           Message,
+   event_ship:      Player,
+   sound:           "Vox\Misc\A01-11.wav",
+   event_message:   "Still can't see them.  I hope everything is all right.",
+
+   trigger:         Event,
+   trigger_param:   105,
+   delay:           5,
+}
+
+optional: {
+    min: 1,
+    max: 2,
+
+    element: {
+       name:    Alpha,
+       design:  Viper,
+       rloc:    { ref: "Ward:1", dex: 75e3, az: 200, az_var: 30 },
+       count:   2,
+       iff:     2,
+       loadout: { ship: -1, name: "Ship Strike" },
+       intel:   secret,
+
+       navpt:   { cmd: assault, tgt: Ward, rloc: { ref: "Ward:1", dex: 20e3, az: 180, az_var: 20, el_var: 0 }, speed: 800, rgn: Trellis   },
+    },
+
+    element: {
+       name:    Bravo,
+       design:  Razor,
+       region:  Meridian,
+       rloc:    { ref: "Ward:2", dex: 170e3, az: 90, az_var: 45 },
+       count:   3,
+       iff:     2,
+       loadout: { ship: -1, name: "Ship Strike" },
+       intel:   secret,
+
+       navpt:   { cmd: assault, tgt: Ward, rloc: { ref: "Ward:2", dex: 20e3, az: 180, az_var: 20, el_var: 0 }, speed: 800, rgn: Meridian   },
+    },
+}

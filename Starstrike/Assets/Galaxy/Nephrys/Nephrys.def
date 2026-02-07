@@ -1,0 +1,53 @@
+STARSYSTEM
+
+name:       Nephrys
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Nephrys.mag",
+   poly_stars: "stars.mag"
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (8,  8,  10)
+
+star:        {
+   name:    Nephrys
+   map:     "Suns/StarA_map.pcx"
+   image:   "Suns/G3.pcx",
+   tscale:  6,
+   radius:  16e8,
+   mass:    3e30,
+   light:   2.6e11,
+   color:   (245, 245, 255),// - A Blue-White
+   back:    ( 43,  40,  46) // - nebula18 (dark gray)
+}
+
+planet:     {
+   name:    Nergal
+   map:     "Nephrys/nergal_map.pcx"
+   image:   "Nephrys/nergal_lo.pcx",
+   high_res:"Nephrys/nergal_hi.jpg",
+   gloss:   "Nephrys/nergal_gloss.jpg",
+   glow_high_res: "Nephrys/nergal_fire.jpg",
+   radius:  9e6,
+   mass:    5.6e28,
+   orbit:   4.8e11,
+   rotation: 160.3,
+}
+
+region:     {
+   name:    Nergal,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   35e6,
+   inclination: 0.1,
+   link:    Casalle, // Loris
+   link:    Solnas,  // Korius
+}
+

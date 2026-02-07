@@ -1,0 +1,337 @@
+SHIP
+
+name:          Razor
+display_name:  Razor
+class:         Fighter
+abrv:          "F-MK2"
+description:   "The MARK-2 RAZOR is a forward-delta configuration multi-role fighter spacecraft commonly used by the Marakan Hegemony and its client states. It is fast and sturdy and has proven itself in spaceborne and airborne combat as well as in surface attack missions. Like the Mark 1 Viper, the Razor is armed with twin Alpha particle cannon, along with eight underwing hard points capable of mounting several types of anti-fighter ordnance.  The Razor's heavy delta wing design also gives it the capacity to mount a variety of air-to-ground and antiship weapons."
+
+hud_icon:      "RazorHud.pcx"
+
+detail_0:   "Razor_1opt.mag"
+feature_0:  0.1
+detail_1:   "Razor_2opt.mag"
+feature_1:  1.5
+
+mass:       15
+integrity:  2550
+vlimit:     290
+agility:    80
+roll_rate:  750
+scale:      0.23
+acs:        1
+detet:      50e3
+
+trans_x:    2000
+trans_y:    2000
+trans_z:    2000
+
+arcade_drag: 0.14
+drag:       5.0e-5
+roll_drag:  5
+pitch_drag: 4
+yaw_drag:   4
+
+CL:         1.1e-2
+CD:         1.0e-1
+stall:      0.40
+
+avoid_fighter: 7
+
+chase:      (0, -1200, 250)
+bridge:     (0,   145,   8)
+
+power:      {
+   type:    Fusion,
+   max_output: 50,
+   
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.5
+   }
+
+drive:      {
+   type:    Yellow,
+   thrust:  16,
+   augmenter: 30,
+   scale:   0.3,
+   port:    (0, 0, -166),
+
+   loc:     (0, 0, -120),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+
+weapon:     {
+   type:    "Alpha Cannon",
+   abrv:    Cannon,
+   muzzle:  (-7, 9, 190),
+   muzzle:  ( 7, 9, 190),
+
+   loc:     (0, 0, 32),
+   size:    32,
+   hull_factor: 0.5
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-1",
+   muzzle:  ( 126, -29, -50),
+
+   loc:     ( 126, -29,   0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-2",
+   muzzle:  ( 102, -26, -50),
+
+   loc:     ( 102, -26,   0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-3",
+   muzzle:  ( 62, -21, -8),
+
+   loc:     ( 62, -21,  0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-4",
+   muzzle:  ( 36, -19, -8),
+
+   loc:     ( 36, -19,  0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-5",
+   muzzle:  (-36, -19, -8),
+
+   loc:     (-36, -19,  0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   type:    "Harpoon",
+   type:    "Hammer",
+   abrv:    "STA-6",
+   muzzle:  (-62, -21, -8),
+
+   loc:     (-62, -21,  0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-7",
+   muzzle:  (-102, -26, -50),
+
+   loc:     (-102, -26,   0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+hardpoint:     {
+   type:    "Archer",
+   abrv:    "STA-8",
+   muzzle:  (-126, -29, -50),
+
+   loc:     (-126, -29,   0),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1, -1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: ( 0,  0, -1, -1, -1, -1,  0,  0) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0,  0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  0,  0,  0,  0,  0,  0,  0) }
+loadout: { name: "Ground Strike",    stations: ( 0,  0,  2,  2,  2,  2,  0,  0) }
+loadout: { name: "Ship Strike",      stations: ( 0,  0,  1,  1,  1,  1,  0,  0) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 0,  0,  1,  1,  1,  1,  0,  0) }
+
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -24, 0),
+
+   loc:     (0, 0, 0),
+   size:    32,
+   hull_factor: 0.2
+   }
+
+sensor:     {
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    32,
+   hull_factor: 0.1
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.2
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose0.mag",
+      start: (0, -14, 113),
+      end:   (0, -40, 127)
+   },
+
+   gear: {
+      model: "GearLeft0.mag",
+      start: (-25, -20, 10),
+      end:   (-45, -40, 10)
+   },
+
+   gear: {
+      model: "GearRight0.mag",
+      start: ( 25, -20, 10),
+      end:   ( 45, -40, 10)
+   },
+}
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+   scale:            0.12,
+
+   port_fore:   {loc:(-159, -24,   5), fire: 0x0044}
+   port_fore:   {loc:( 159, -24,   5), fire: 0x0084}
+
+   port_aft:    {loc:(-159, -24, -54), fire: 0x0088}
+   port_aft:    {loc:( 159, -24, -54), fire: 0x0048}
+
+   port_top:    {loc:( -39, -13,-125), fire: 0x0110}
+   port_top:    {loc:(  39, -13,-125), fire: 0x0110}
+
+   port_top:    {loc:( -39,  -4, 127), fire: 0x0210}
+   port_top:    {loc:(  39,  -4, 127), fire: 0x0210}
+
+   port_bottom: {loc:( -39, -24,-125), fire: 0x0120}
+   port_bottom: {loc:(  39, -24,-125), fire: 0x0120}
+
+   port_bottom: {loc:( -39, -15, 127), fire: 0x0120}
+   port_bottom: {loc:(  39, -15, 127), fire: 0x0120}
+
+   port_top:    {loc:(-159, -19,  -8), fire: 0x0410}
+   port_top:    {loc:(-159, -19, -41), fire: 0x0410}
+
+   port_top:    {loc:( 159, -19,  -8), fire: 0x0810}
+   port_top:    {loc:( 159, -19, -41), fire: 0x0810}
+
+   port_bottom: {loc:(-159, -29,  -8), fire: 0x0820}
+   port_bottom: {loc:(-159, -29, -41), fire: 0x0820}
+
+   port_bottom: {loc:( 159, -29,  -8), fire: 0x0420}
+   port_bottom: {loc:( 159, -29, -41), fire: 0x0420}
+}
+
+
+
+death_spiral: {
+   time:             3.2,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (0, 0, -28),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.2,
+   explosion_loc:    (-10, 10, 30),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -12),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -12),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     190
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     220
+}
+
+
+map: {
+   sprite: "RazorMap0.pcx",
+   sprite: "RazorMap1.pcx",
+   sprite: "RazorMap2.pcx",
+   sprite: "RazorMap3.pcx",
+   sprite: "RazorMap4.pcx",
+   sprite: "RazorMap5.pcx",
+   sprite: "RazorMap6.pcx",
+   sprite: "RazorMap7.pcx",
+}
+

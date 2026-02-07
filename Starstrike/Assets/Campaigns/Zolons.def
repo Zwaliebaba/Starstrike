@@ -1,0 +1,330 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Zolon Empire",
+  intel:  secret,
+  iff:    4,
+  loc:    (0, 0, 0),
+}
+
+group: {
+  type:   fleet,
+  id:     1,
+  name:   "Nephrys",
+  intel:  reserve,
+  iff:    4,
+  region: "Nergal",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     1,
+  name:   "Zolon",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (-1e5, -1e5, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "ZD01",
+    type:   "Cruiser",
+    design: "ZZCA",
+    },
+
+  unit: {
+    name:   "ZD02",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD03",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD04",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZF01",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+
+  unit: {
+    name:   "ZF02",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     8,
+  name:   "Krill",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (-1.1e5, -1.1e5, 6e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Krill",
+    type:   "Fighter",
+    design: "ZZF",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     9,
+  name:   "Sculpin",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (1e5, -1e5, 7e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Sculpin",
+    type:   "Attack",
+    design: "ZZA",
+    count:  24,
+    },
+}
+
+
+
+group: {
+  type:   fleet,
+  id:     2,
+  name:   "Nephrys",
+  intel:  reserve,
+  iff:    4,
+  region: "Nergal",
+  loc:    (0, 180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     2,
+  name:   "Zolon",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (1e5, 1e5, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "ZD11",
+    type:   "Cruiser",
+    design: "ZZCA",
+    },
+
+  unit: {
+    name:   "ZD12",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD13",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD14",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZF11",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+
+  unit: {
+    name:   "ZF12",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     3,
+  name:   "Moray",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (-1.1e5, -1.1e5, 6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Moray",
+    type:   "Fighter",
+    design: "ZZF",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     4,
+  name:   "Lamprey",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (1e5, -1e5, 7e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Lamprey",
+    type:   "Attack",
+    design: "ZZA",
+    count:  24,
+    },
+}
+
+
+
+group: {
+  type:   fleet,
+  id:     3,
+  name:   "Nephrys",
+  intel:  reserve,
+  iff:    4,
+  region: "Nergal",
+  loc:    (0, 180e3, 6e3),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     3,
+  name:   "Zolon",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (1e5, 1e5, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "ZD21",
+    type:   "Cruiser",
+    design: "ZZCA",
+    },
+
+  unit: {
+    name:   "ZD22",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD23",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZD24",
+    type:   "Destroyer",
+    design: "ZZDD",
+    },
+
+  unit: {
+    name:   "ZF21",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+
+  unit: {
+    name:   "ZF22",
+    type:   "Frigate",
+    design: "ZZFF",
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     12,
+  name:   "Crab",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (-1.1e5, -1.1e5, 6e3),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Moray",
+    type:   "Fighter",
+    design: "ZZF",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     15,
+  name:   "Steelhead",
+  intel:  secret,
+  iff:    4,
+  region: "Sintar",
+  loc:    (1e5, -1e5, 7e3),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Lamprey",
+    type:   "Attack",
+    design: "ZZA",
+    count:  24,
+    },
+}
+
+
+
+
+group: {
+  type:   non_com,
+  id:     1,
+  name:   "Zolon Ambassador",
+  intel:  known,
+  iff:    0,
+  region: "Tarsus",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+
+  unit: {
+    name:   "Consular Starship",
+    type:   "Cruiser",
+    design: "ZZCS",
+    },
+}
+

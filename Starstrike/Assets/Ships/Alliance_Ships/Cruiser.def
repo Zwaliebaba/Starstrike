@@ -1,0 +1,437 @@
+SHIP
+
+name:          Courageous
+display_name:  Courageous
+class:         Cruiser
+description:   "Modern Force:Space guided missile cruisers such as the CA-521 COURAGEOUS class perform primarily in a Battle Force role. These ships are multi-mission spaceborne combatants capable of supporting carrier battle groups, landing forces, or of operating independently and as flagships of space action groups. The Courageous class features four MARK VII interceptor launchers for close air support against fighters and inbound missiles.  Courageous class cruisers are also equipped with Nike high-speed antiship missiles giving them additional long range assault capability."
+
+degrees:    true
+beauty:     (-9, 3.5, 1.27)
+hud_icon:   "CourageousHud.pcx"
+
+detail_0:   "Courageous_1opt.mag"
+feature_0:  1000
+detail_1:   "Courageous_2opt.mag"
+feature_1:  20
+
+
+mass:       45.3e3
+agility:    1.3
+vlimit:     300
+roll_rate:  7
+integrity:  50e3
+scale:      2.2
+acs:        1.2
+
+trans_x:     500e3
+trans_y:     300e3
+trans_z:     500e3
+
+arcade_drag: 3e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+
+chase:      (0, -1300, 300)
+bridge:     (0,   520, 120)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       20e3,
+   
+   loc:              (0, 0, -92),
+   size:             64,
+   hull_factor:      0.9
+}
+
+drive: {
+   type:             Plasma
+   abrv:             Drive
+   design:           "Plasma Drive",
+   thrust:           15e3,
+   scale:            5.5,
+   port:             ( 21, -10, -760),
+   port:             ( 21, -30, -760),
+   port:             (-21, -10, -760),
+   port:             (-21, -30, -760),
+
+   loc:              (0, 0, -320),
+   size:             64,
+   hull_factor:      0.5
+}
+
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+   scale:            2
+
+   port_left:   {loc:( -90,  -7,-545), fire: 0x0041}
+   port_left:   {loc:( -90,  -7,-499), fire: 0x0041}
+   port_left:   {loc:( -77, -12, 436), fire: 0x0081}
+   port_left:   {loc:( -77, -12, 457), fire: 0x0081}
+
+   port_right:  {loc:(  90,  -7,-545), fire: 0x0082}
+   port_right:  {loc:(  90,  -7,-499), fire: 0x0082}
+   port_right:  {loc:(  77, -12, 436), fire: 0x0042}
+   port_right:  {loc:(  77, -12, 457), fire: 0x0042}
+
+   port_fore:   {loc:(-185,  45, -37), fire: 0x0044}
+   port_fore:   {loc:(-167,  45, -37), fire: 0x0044}
+   port_fore:   {loc:( 167,  45, -37), fire: 0x0084}
+   port_fore:   {loc:( 185,  45, -37), fire: 0x0084}
+
+   port_aft:    {loc:(-185,  45,-432), fire: 0x0088}
+   port_aft:    {loc:(-167,  45,-432), fire: 0x0088}
+   port_aft:    {loc:( 167,  45,-432), fire: 0x0048}
+   port_aft:    {loc:( 185,  45,-432), fire: 0x0048}
+
+   port_top:    {loc:(-175,  79, -84), fire: 0x0410}
+   port_top:    {loc:(-175,  79,-385), fire: 0x0410}
+   port_top:    {loc:( 175,  79, -84), fire: 0x0810}
+   port_top:    {loc:( 175,  79,-385), fire: 0x0810}
+
+   port_bottom: {loc:(-175,  21, -84), fire: 0x0820}
+   port_bottom: {loc:(-175,  21,-385), fire: 0x0820}
+   port_bottom: {loc:( 175,  21, -84), fire: 0x0420}
+   port_bottom: {loc:( 175,  21,-385), fire: 0x0420}
+
+   port_top:    {loc:( -18,  58, 660), fire: 0x0210}
+   port_top:    {loc:(  18,  58, 660), fire: 0x0210}
+
+   port_bottom: {loc:( -18, -51, 660), fire: 0x0120}
+   port_bottom: {loc:(  18, -51, 660), fire: 0x0120}
+
+   port_top:    {loc:( -17,  26,-617), fire: 0x0110}
+   port_top:    {loc:(  17,  26,-617), fire: 0x0110}
+
+   port_bottom: {loc:( -17,-111,-617), fire: 0x0220}
+   port_bottom: {loc:(  17,-111,-617), fire: 0x0220}
+}
+
+
+quantum: {
+   design:           "Quantum Drive"
+   abrv:             "Q-Drive"
+   loc:              (0, 0, 0),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield"
+   abrv:             "Shield"
+   pcs:              100,
+   model:            "CourageousShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav"
+   beam_hit_sound:   "shield_hit5.wav"
+
+   loc:              (0, 0, 40),
+   size:             42,
+   hull_factor:      0.7
+}
+
+power: {
+   type:             Auxilliary,
+   design:           "Auxilliary Reactor"
+   abrv:             "Aux Reac"
+   max_output:       3e3,
+   
+   loc:              (0, -32, -64),
+   size:             64,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-51, -12, 641),
+
+   loc:              (-40, -12, 600),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 51, -12, 641),
+
+   loc:              ( 40, -12, 600),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 3",
+   abrv:             "Laser-3",
+   muzzle:           (-37, -45, 623),
+
+   loc:              (-30, -45, 580),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 4",
+   abrv:             "Laser-4",
+   muzzle:           ( 37, -45, 623),
+
+   loc:              ( 30, -45, 580),
+   size:             32,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+
+weapon:     {
+   type:             "Nike",
+   design:           "Missile Weapon",
+   name:             "Starboard Missile",
+   abrv:             "Nike-1",
+   muzzle:           ( 70,  55, 355),
+   muzzle:           ( 80,  45, 355),
+   azimuth:          15,
+
+   loc:              ( 100, 22, 250),
+   size:             32,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Nike",
+   design:           "Missile Weapon",
+   name:             "Port Missile",
+   abrv:             "Nike-2",
+   muzzle:           (-70,  55, 355),
+   muzzle:           (-80,  45, 355),
+   azimuth:          -15,
+
+   loc:              (-100, 22, 250),
+
+   size:             32,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Mk7 Interceptor",
+   design:           "Missile Weapon",
+   name:             "Interceptor",
+   abrv:             "MK7-1",
+   muzzle:           ( 35,  75, 355),
+   muzzle:           ( 50,  70, 355),
+   muzzle:           (-35,  75, 355),
+   muzzle:           (-50,  70, 355),
+
+   loc:              (  0,  30, 250),
+   size:             16,
+   hull_factor:      0.3
+}
+
+
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-1",
+   abrv:             "PDB 1"
+   group:            "PDB"
+   loc:              ( 0,  87, 400),
+
+   size:             32,
+   hull_factor:      0.4
+}
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-2",
+   abrv:             "PDB 2"
+   group:            "PDB"
+   loc:              ( 0, 130, -15),
+
+   azimuth:          180,
+   size:             32,
+   hull_factor:      0.4
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx 1",
+   abrv:             "PDB 3",
+   group:            "PDB"
+   loc:              (-176, 78, -250),
+   azimuth:          -90
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Stbd Phalanx 1",
+   abrv:             "PDB 4",
+   group:            "PDB"
+   loc:              ( 176, 78, -250),
+   azimuth:          90
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Phalanx 2",
+   abrv:             "PDB 5",
+   group:            "PDB"
+   loc:              (-176, 18, -220),
+   azimuth:          -90
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon: {
+   type:             "Phalanx Cannon",
+   design:           "Bolt Weapon",
+   name:             "Stbd Phalanx 2",
+   abrv:             "PDB 6",
+   group:            "PDB"
+   loc:              ( 176, 18, -220),
+   azimuth:          90,
+
+   size:             32,
+   hull_factor:      0.2
+}
+
+
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, 32, 380),
+   size:             24,
+   hull_factor:      0.2
+}
+
+probe: {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+power: {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer: {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, -32, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer: {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -32, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav: {
+   loc:              (0, 32, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+navlight:  {
+   scale:  0.66,
+   period: 2.5,
+
+   light:  { loc: ( 208,-10,-320), pattern: 0x11000000, type: 3 },
+   light:  { loc: (-208,-10,-320), pattern: 0x00110000, type: 2 },
+   light:  { loc: (   0,-93, 175), pattern: 0x00000120, type: 1 },
+   light:  { loc: (   0,100, 175), pattern: 0x00000120, type: 1 },
+   light:  { loc: (   0,100,-115), pattern: 0x00000120, type: 1 },
+}
+
+death_spiral: {
+   time:      5
+
+   explosion: { type: 10, time: 2.0, loc: (-50,  50,    0) }
+   explosion: { type: 10, time: 1.0, loc: ( 60,  40,  190) }
+   explosion: { type: 10, time: 0.5, loc: (  0, -48, -180) }
+   explosion: { type: 10, time: 0.1, loc: ( 20,  80, -190) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+   debris:    { model: "Debris1A.mag",          loc: (0,0,-550), mass: 17e3, count:  1, life: 350 }
+   debris:    { model: "Debris1B.mag",          loc: (320,0,10), mass:  4e3, count:  1, life: 380 }
+   debris:    { model: "CourageousDebris2.mag", loc: (0,0,400),  mass: 18e3, count:  1, life: 380 
+                fire:  (60,60,20), fire:  (-60,-30,-10) }
+   debris:    { model: "Debris0A.mag",          loc: (0,0,-50),  mass:  44, count: 25, life:  20 }
+   debris:    { model: "Debris0B.mag",          loc: (0,0,-50),  mass:  33, count: 20, life:  25 }
+   debris:    { model: "Debris0C.mag",          loc: (0,0,0),    mass:  22, count: 25, life:  30 }
+}
+
+
+map: {
+   sprite: "CourageousMap0.pcx",
+   sprite: "CourageousMap1.pcx",
+   sprite: "CourageousMap2.pcx",
+   sprite: "CourageousMap3.pcx",
+   sprite: "CourageousMap4.pcx",
+   sprite: "CourageousMap5.pcx",
+   sprite: "CourageousMap6.pcx",
+   sprite: "CourageousMap7.pcx"
+}
+
+
+
+
+
+

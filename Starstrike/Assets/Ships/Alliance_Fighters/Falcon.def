@@ -1,0 +1,309 @@
+SHIP
+
+name:          Falcon
+display_name:  Falcon
+class:         Fighter
+abrv:          "F-32"
+
+hud_icon:      "FalconHud.pcx"
+description:   "The F-32 FALCON is the premier single-seat intercept fighter craft for the Alliance FORCE:Space.  Designed to be lightweight, low cost and easy to maintain, the Falcon is a respected highly maneuverable and versatile tactical fighter.  It is armed with twin Delta particle cannon, and four underwing hard points capable of mounting a variety of anti-fighter ordnance.  The Falcon is routinely tasked with patrol, escort, and intercept mission profiles."
+
+detail_0:   "falcon6_0.mag"
+feature_0:  25
+detail_1:   "Falcon6_1.mag"
+feature_1:  1
+
+cockpit_model: "FalconPit.mag"
+cockpit_scale: 0.02
+
+mass:       14.5
+integrity:  4e3
+scuttle:    1e3
+vlimit:     290
+agility:    170
+air_factor: 0.25
+roll_rate:  1900
+scale:      0.27
+acs:        1.1
+detet:      50e3
+
+trans_x:    2e3
+trans_y:    1e3
+trans_z:    2e3
+
+arcade_drag: 0.1
+drag:       3.0e-5
+roll_drag:  10
+pitch_drag: 10
+yaw_drag:   10
+
+CL:         1.3e-2
+CD:         0.7e-1
+stall:      0.40
+
+prep_time:  15
+avoid_fighter: 7
+
+chase:      (0, -750,  80)
+bridge:     (0,  131,  23)
+
+power:      {
+   type:    Fusion,
+   max_output: 65,
+   fuel_range: 0.75,
+   
+   loc:     (0, 0, -40),
+   size:    32,
+   hull_factor: 0.75
+   }
+
+drive:      {
+   type:    Plasma,
+   thrust:  20,
+   augmenter: 50,
+   scale:   0.32,
+   port:    ( 33, 12, -175),
+   port:    (-33, 12, -175),
+
+   loc:     (0, 0, -130),
+   size:    16,
+   hull_factor: 0.85
+   }
+
+
+weapon:     {
+   type:    "Delta Cannon",
+   abrv:    Cannon,
+   muzzle:  (-21, 0, 130),
+   muzzle:  ( 21, 0, 130),
+
+   loc:     (0, 0, -32),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   abrv:    "STA-1",
+   muzzle:  (-110, -7, -145),
+
+   loc:     (-110, -7, -145),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Rockets",
+   abrv:    "STA-2",
+   muzzle:  (-93, -5, -145),
+
+   loc:     (-93, -5, -145),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   type:    "Rockets",
+   abrv:    "STA-3",
+   muzzle:  ( 93, -5, -145),
+
+   loc:     ( 93, -5, -145),
+   size:    16,
+   hull_factor: 0.2
+}
+
+hardpoint:     {
+   type:    "Javelin",
+   type:    "Vector",
+   type:    "Harpoon",
+   abrv:    "STA-4",
+   muzzle:  (110, -7, -145),
+
+   loc:     (110, -7, -145),
+   size:    16,
+   hull_factor: 0.2
+}
+
+loadout: { name: "Clean",            stations: (-1, -1, -1, -1) }
+loadout: { name: "ACM Light",        stations: ( 0, -1, -1,  0) }
+loadout: { name: "ACM Short Range",  stations: ( 0,  0,  0,  0) }
+loadout: { name: "ACM Medium Range", stations: ( 0,  1,  1,  0) }
+loadout: { name: "Ground Strike",    stations: ( 1,  3,  3,  1) }
+loadout: { name: "Ship Strike",      stations: ( 1,  2,  2,  1) }
+loadout: { name: "Hvy Ship Strike",  stations: ( 1,  2,  2,  1) }
+loadout: { name: "Rockets",          stations: ( 0,  3,  3,  0) }
+loadout: { name: "Scout/Recon",      stations: ( 0, -1, -1,  0) }
+
+
+decoy:     {
+   type:    "Fighter Decoy",
+   abrv:    Decoy,
+   muzzle:  ( 0, -32, 0),
+
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+sensor:     {
+   pcs:                 25,
+   active_efficiency:   2e9,
+   passive_efficiency:  500,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+
+   loc:     (0, 0, 100),
+   size:    25,
+   hull_factor: 0.25
+   }
+
+computer:   {
+   name:    "Avionics Package",
+   abrv:    HUD,
+   type:    1,
+
+   loc:     (20, 0, 80),
+   size:    8,
+   hull_factor: 0.2
+   }
+
+computer:   {
+   name:    "Flight Computer",
+   abrv:    Flight,
+   type:    2,
+
+   loc:     (-20, 0, 80),
+   size:    16,
+   hull_factor: 0.5
+   }
+
+gear: {
+   name:    "Undercarriage",
+   abrv:    Gear,
+   loc:     (0, 0, 0),
+   size:    16,
+   hull_factor: 0.5,
+
+   gear: {
+      model: "GearNose1.mag",
+      start: (0,  -8,  90),
+      end:   (0, -28, 120)
+      },
+
+   gear: {
+      model: "GearLeft1.mag",
+      start: (-20, -17, -79),
+      end:   (-40, -37, -75)
+      },
+
+   gear: {
+      model: "GearRight1.mag",
+      start: ( 20, -17, -79),
+      end:   ( 40, -37, -75)
+      },
+   }
+
+nav:        {
+   loc:     (0, 0, 60),
+   size:    16,
+   hull_factor: 0.1
+   }
+
+
+thruster: {
+   design:           Thruster,
+   type:             Plasma,
+   loc:              (0, -52,0),
+   size:             32,
+   hull_factor:      0.8
+   scale:            0.12,
+
+   port_fore:   {loc:( -31,   8,   5), fire: 0x0044},
+   port_fore:   {loc:( -27,  14,   5), fire: 0x0044},
+   port_fore:   {loc:(  27,  14,   5), fire: 0x0084},
+   port_fore:   {loc:(  31,   8,   5), fire: 0x0084},
+
+   port_aft:    {loc:(  -8,   2,-172), fire: 0x0088},
+   port_aft:    {loc:(   8,   2,-172), fire: 0x0048},
+
+   port_top:    {loc:(  -2,  12,-162), fire: 0x0110},
+   port_top:    {loc:(   2,  12,-162), fire: 0x0110},
+
+   port_bottom: {loc:(  -2, -12,-162), fire: 0x0220},
+   port_bottom: {loc:(   2, -12,-162), fire: 0x0220},
+
+   port_top:    {loc:(-124,  -4, -96), fire: 0x0410},
+   port_top:    {loc:(-124,  -4,-115), fire: 0x0410},
+
+   port_top:    {loc:( 124,  -4, -96), fire: 0x0810},
+   port_top:    {loc:( 124,  -4,-115), fire: 0x0810},
+
+   port_bottom: {loc:(-123,  -5, -96), fire: 0x0820},
+   port_bottom: {loc:(-123,  -5,-115), fire: 0x0820},
+
+   port_bottom: {loc:( 123,  -5, -96), fire: 0x0420},
+   port_bottom: {loc:( 123,  -5,-115), fire: 0x0420},
+
+   port_bottom: {loc:(  -2,  -6, 141), fire: 0x0120},
+   port_bottom: {loc:(   2,  -6, 141), fire: 0x0120},
+
+}
+
+
+death_spiral: {
+   time:             3,
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.1,
+   explosion_loc:    (0, 0, -64),
+
+   explosion_type:   22,   // SMALL_EXPLOSION
+   explosion_time:   1.8,
+   explosion_loc:    (20, 10, -20),
+
+   final_type:       23,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, -32),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, -32),
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (1,0,-2)
+   debris_mass:      20
+   debris_count:     4
+   debris_life:      1.8
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.3
+   debris_speed:     190
+
+   debris:           "DebrisX.mag"
+   debris_loc:       (0,0,3)
+   debris_mass:      20
+   debris_count:     3
+   debris_life:      2.2
+   debris_fire:      (1,1,1)
+   debris_fire_type: 25
+   debris_drag:      0.35
+   debris_speed:     220
+}
+
+map: {
+   sprite: "f_map0.pcx",
+   sprite: "f_map1.pcx",
+   sprite: "f_map2.pcx",
+   sprite: "f_map3.pcx",
+   sprite: "f_map4.pcx",
+   sprite: "f_map5.pcx",
+   sprite: "f_map6.pcx",
+   sprite: "f_map7.pcx"
+}
+

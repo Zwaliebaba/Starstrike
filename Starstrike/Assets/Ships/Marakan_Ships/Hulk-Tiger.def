@@ -1,0 +1,256 @@
+SHIP
+
+name:          "Hulk-Tiger"
+display_name:  Tiger
+class:         Frigate
+
+hud_icon:   "TigerHud.pcx"
+
+model: "Hulk-Frigate.mag"
+
+mass:       4.53e3
+agility:    3.8
+vlimit:     300
+roll_rate:  8
+integrity:  18e3
+scale:      1.8
+acs:        1
+
+trans_x:     85e3
+trans_y:     35e3
+trans_z:     85e3
+
+auto_roll:     -1
+arcade_drag:   0
+drag:          0
+roll_drag:     0
+pitch_drag:    0
+yaw_drag:      0
+
+chase:      (0, -1e3, 200)
+bridge:     (0, 0,    92)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       4000,
+
+   loc:              (0, -100, 0),
+   size:             60,
+   hull_factor:      0.8,
+   explosion:        7
+}
+
+drive:      {
+   type:             Stealth
+   name:             "Plasma Drive",
+   abrv:             Drive
+   design:           "Plasma Drive",
+   thrust:           750,
+   scale:            4,
+   port:             ( 24,91,-580)
+   port:             (-24,91,-580)
+   port:             ( 24,13,-580)
+   port:             (-24,13,-580)
+
+   loc:              (0,30,-450)
+   size:             64,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow,
+   scale:            1,
+   loc:              (0, -52,0),
+   explosion:        8,
+
+
+   size:             32,
+   hull_factor:      0.8
+}
+
+quantum:     {
+   design:           "Quantum Drive",
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.5
+}
+
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   abrv:             Shield
+   factor:           0.03,
+   consumption:      1500,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100,
+   loc:              (0, 0, 0),
+   size:             48,
+   hull_factor:      0.4
+}
+
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           ( 74, -12, 240)
+
+   loc:              ( 74, -12, 110)
+   size:             24
+   hull_factor:      0.2
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           (-74, -12, 240)
+
+   loc:              (-74, -12, 110)
+   size:             24
+   hull_factor:      0.2
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Mk7 Interceptor",
+   design:           "Missile Weapon",
+   name:             "Interceptor 1",
+   abrv:             "MK7",
+   muzzle:           (-40, 0, 390),
+   muzzle:           ( 40, 0, 390),
+   azimuth:          0,
+
+   loc:              (-20, 0, 300),
+   size:             32,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Helicon",
+   design:           "Bolt Weapon",
+   name:             "PDB-1",
+   muzzle:           (0, 10, 131),
+
+   loc:              (0, 75, 220),
+   size:             32,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Helicon",
+   design:           "Bolt Weapon",
+   name:             "PDB-2",
+   muzzle:           (0, 10, 131),
+
+   loc:              (0, 135, -420),
+   size:             32,
+   hull_factor:      0.3
+
+   azimuth:          3.14159,
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -10, 64),
+
+   loc:     (0, -10, 50),
+   size:    16,
+   hull_factor: 0.2
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   abrv:             Batt
+   max_output:       250
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 180),
+   size:             16,
+   hull_factor:      0.1
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion: { type: 10, time: 2.0, loc: (-30,  50,   0) }
+   explosion: { type: 10, time: 1.0, loc: ( 60,  20,  90) }
+   explosion: { type: 10, time: 0.5, loc: (  0, -48, -80) }
+   explosion: { type: 10, time: 0.1, loc: ( 10,  80, -90) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+   debris:    { model: "FrigateDebris1.mag",    loc: (0,0,200),  mass:18e3, count:  1, life: 330, fire:  (30,60,20) }
+   debris:    { model: "FrigateDebris2.mag",    loc: (100,0,0),  mass:18e3, count:  1, life: 330 }
+   debris:    { model: "Debris0A.mag",          loc: (0,0,-20),  mass:  55, count: 15, life:  20 }
+   debris:    { model: "Debris0B.mag",          loc: (0,0,-20),  mass:  54, count: 10, life:  35 }
+   debris:    { model: "Debris0C.mag",          loc: (0,0,0),    mass:  53, count: 11, life:  30 }
+
+   }
+
+map: {
+   sprite: "TigerMap0.pcx",
+   sprite: "TigerMap1.pcx",
+   sprite: "TigerMap2.pcx",
+   sprite: "TigerMap3.pcx",
+   sprite: "TigerMap4.pcx",
+   sprite: "TigerMap5.pcx",
+   sprite: "TigerMap6.pcx",
+   sprite: "TigerMap7.pcx"
+}
+
+

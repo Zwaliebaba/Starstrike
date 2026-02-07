@@ -1,0 +1,70 @@
+MISSION
+
+name:   "Cmpn 02 Defeat 01"
+type:   "Patrol"
+system: "Solus"
+region: "Solus"
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Kitts"
+   design:    "Wolf"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       2
+   playable:  false
+   loc:       (185e3, -280e3, 0)
+}
+
+element: {
+   name:      "Lovo"
+   design:    "Baikal"
+   commander: "Kitts"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       2
+   playable:  false
+   loc:       (187e3, -281e3, 0)
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Solus",     vec: (3,0,4e6) }
+event: { event: Camera,                param: 5,                           vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Highland", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 300,100) }
+event: { event: Display,    message: "Defeat",             font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 300,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\02/End_02_Defeat.wav"
+}
+
+event: { event: Camera,     time:  20, param: 3, target: "Kitts",          vec: (1,0.05,4e3) }
+event: { event: Camera,                param: 5,                           vec: (-0.08,-0.005, 0.01) }
+
+event: { event: Display,    time:  40, image: "Campaigns\02\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+
+event: { event: EndScene,   time:  42, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

@@ -1,0 +1,255 @@
+MISSION_TEMPLATE
+
+name:       "Harmony Run"
+type:       ESCORT_FREIGHT
+system:     Solus
+region:     Trellis
+degrees:    true
+
+alias:      { name: A1,  code: player_carrier    }
+alias:      { name: A2,  code: player_squadron   }
+alias:      { name: FC1, elem: "Trellis-Solus"   }
+alias:      { name: FC2, elem: "Solus-Trellis"   }
+alias:      { name: FC3, elem: "Solus-Kalon"     }
+alias:      { name: FC4, elem: "Kalon-Solus"     }
+alias:      { name: HS,  elem: "Harmony"         }
+
+callsign:   { name: Player,  iff: 1 }
+callsign:   { name: Alpha,   iff: 2 }
+callsign:   { name: Bravo,   iff: 2 }
+callsign:   { name: Charlie, iff: 2 }
+callsign:   { name: Echo,    iff: 2 }
+
+element: {
+   name:    Ward1,
+   design:  IM2800,
+   region:  Trellis,
+   rloc:    { ref: A1, dex: 130e3, dex_var: 15e3, az: 70, az_var: 30 },
+   mission: cargo,
+   count:   1,
+   iff:     0,
+   intel:   tracked,
+   hold:    900,
+
+   navpt:   { cmd: vector, rloc: { ref: FC1, dex: 99e3, dex_var:10e3, az: 180, az_var: 45, el_var: 0 }, speed: 530, rgn: Trellis },
+   navpt:   { cmd: vector, rloc: { ref: FC1, dex: 30e3, dex_var: 3e3, az: 180, az_var:  3, el_var: 0 }, speed: 530, rgn: Trellis },
+   navpt:   { cmd: vector, rloc: { ref: FC2, dex: 25e3,               az:   0, az_var:  3, el_var: 0 }, speed: 520, rgn: Solus   },
+   navpt:   { cmd: vector, rloc: { ref: FC3, dex: 20e3, dex_var: 3e3, az: 180, az_var:  5, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: vector, rloc: { ref: FC4, dex: 50e3, dex_var: 5e3, az:   0, az_var: 60, el_var: 0 }, speed: 500, rgn: Kalon   },
+   navpt:   { cmd: vector, rloc: { ref: HS,  dex: 90e3, dex_var:30e3                                 }, speed: 450, rgn: Kalon   },
+}
+
+ward: Ward1
+
+element: {
+   name:    Ward2,
+   design:  IM2800,
+   region:  Solus,
+   rloc:    { ref: FC2, dex: 28e3, dex_var: 3e3, az: 0, az_var: 30 },
+   mission: cargo,
+   count:   1,
+   iff:     0,
+   intel:   tracked,
+   hold:    1800,
+
+   navpt:   { cmd: vector, rloc: { ref: FC3, dex: 22e3, dex_var: 6e3, az: 180, az_var:  5, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: vector, rloc: { ref: FC4, dex: 50e3, dex_var:20e3, az:   0, az_var: 60, el_var: 0 }, speed: 500, rgn: Kalon   },
+   navpt:   { cmd: vector, rloc: { ref: HS,  dex: 90e3, dex_var:30e3                                 }, speed: 450, rgn: Kalon   },
+}
+
+element: {
+   name:    Player,
+   design:  Stormhawk,
+   squadron: A2,
+   commander: A1,
+   region:  Trellis,
+   rloc:    { ref: A1, dex: 20e3, dex_var: 1e3 },
+   mission: escort_freight,
+
+   player:  1,
+   alert:   true,
+   count:   2,
+   iff:     1,
+
+   navpt:   { cmd: vector, rloc: { ref: "Ward1",   dex: 15e3, az: 270, az_var: 20, el_var: 0 }, speed: 500, rgn: Trellis },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:1", dex: 10e3, az: 270, az_var: 30, el_var: 0 }, speed: 500, rgn: Trellis },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:2", dex: 10e3, az: 270, az_var: 20, el_var: 0 }, speed: 500, rgn: Trellis },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:3", dex: 10e3, az:   0, az_var: 10, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:4", dex: 10e3, az: 180, az_var: 20, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:5", dex: 10e3, az: 180, az_var: 20, el_var: 0 }, speed: 500, rgn: Kalon   },
+   navpt:   { cmd: escort, rloc: { ref: "Ward1:6", dex: 10e3, az: 180, az_var: 20, el_var: 0 }, speed: 500, rgn: Kalon   },
+
+   navpt:   { cmd: vector, rloc: { ref: FC4, dex: 28e3, dex_var: 3e3, az: 180, az_var: 5, el_var: 0 }, speed: 500, rgn: Kalon   },
+   navpt:   { cmd: vector, rloc: { ref: FC3, dex: 18e3, dex_var: 3e3, az:   0, az_var: 5, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: vector, rloc: { ref: FC2, dex: 28e3, dex_var: 3e3, az: 180, az_var: 5, el_var: 0 }, speed: 500, rgn: Solus   },
+   navpt:   { cmd: vector, rloc: { ref: A1,  dex: 60e3, dex_var: 5e3, az: 150, az_var: 5, el_var: 0 }, speed: 500, rgn: Trellis },
+   navpt:   { cmd: rtb,    rloc: { ref: A1,  dex: 20e3,               az: 180, az_var: 0, el_var: 0 }, speed: 250, rgn: Trellis },
+ 
+   objective: { cmd: patrol,             tgt_desc: "inbound enemy units" },
+   objective: { cmd: escort, tgt: Ward1, tgt_desc: "the merchant vessel" },
+   objective: { cmd: escort, tgt: Ward2, tgt_desc: "the merchant vessel" },
+   objective: { cmd: rtb },
+
+   loadout: { ship: -1, name: "ACM Medium Range" },
+}
+
+event: {
+   id:              1,
+   event:           Hold,
+   event_ship:      Ward1,
+   event_param:     0,
+
+   trigger:         Navpoint,
+   trigger_ship:    Player,
+   trigger_param:   1,
+}
+
+event: {
+   id:              2,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward1,
+   sound:           "Vox\Misc\A01-01.wav",
+   event_message:   "Glad to see you guys! Thanks for escorting us.",
+
+   trigger:         Event,
+   trigger_param:   1,
+   delay:           1,
+}
+
+event: {
+   id:              3,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward1,
+   sound:           "Vox\Misc\A01-02.wav",
+   event_message:   "OK, we're ready to make the jump.",
+
+   trigger:         Navpoint,
+   trigger_ship:    Ward1,
+   trigger_param:   2,
+   delay:           1,
+}
+
+event: {
+   id:              4,
+   event:           Message,
+   event_ship:      Player,
+   sound:           "Vox\Misc\A01-03.wav",
+   event_message:   "Form up and we'll go through together.",
+
+   trigger:         Event,
+   trigger_param:   3,
+   delay:           2,
+}
+
+event: {
+   id:              5,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward,
+   sound:           "Vox\Misc\A01-04.wav",
+   event_message:   "All right, we're half way there.",
+
+   trigger:         Navpoint,
+   trigger_ship:    Ward1,
+   trigger_param:   3,
+}
+
+event: {
+   id:              6,
+   event:           Message,
+   event_ship:      Player,
+   sound:           "Vox\Misc\A01-05.wav",
+   event_message:   "Next stop: Harmony Station.",
+
+   trigger:         Event,
+   trigger_param:   5,
+   delay:           2,
+}
+
+event: {
+   id:              7,
+   event:           Message,
+   event_ship:      Player,
+   event_source:    Ward1,
+   sound:           "Vox\Misc\A01-06.wav",
+   event_message:   "Thanks for the lift.  I think we are clear now.",
+
+   trigger:         Navpoint,
+   trigger_ship:    Ward1,
+   trigger_param:   6,
+   delay:           2,
+}
+
+event: {
+   id:              8,
+   event:           Hold,
+   event_ship:      Ward2,
+   event_param:     0,
+
+   trigger:         Navpoint,
+   trigger_ship:    Player,
+   trigger_param:   4,
+}
+
+optional: {
+    min: 1,
+    max: 2,
+
+    element: {
+       name:    Alpha,
+       design:  Viper,
+       rloc:    { ref: "Ward:1", dex: 135e3, az: 200, az_var: 30 },
+       count:   2,
+       iff:     2,
+       loadout: { ship: -1, name: "ACM Medium Range" },
+       intel:   known,
+
+       navpt:   { cmd: intercept, tgt: Player, rloc: { ref: "Ward1:1", dex: 40e3, az: 200, az_var: 30 }, speed: 300, rgn: Trellis },
+    },
+
+    element: {
+       name:    Bravo,
+       design:  Razor,
+       region:  Solus,
+       rloc:    { ref: "Ward1:4", dex: 140e3, az: 180, az_var: 45 },
+       count:   3,
+       iff:     2,
+       loadout: { ship: -1, name: "Ship Strike" },
+       intel:   secret,
+
+       navpt:   { cmd: assault, tgt: Ward1, rloc: { ref: "Ward1:4", dex: 20e3, az: 180, az_var: 20, el_var: 0 }, speed: 200, rgn: Solus   },
+    },
+}
+
+optional: {
+    min: 1,
+    max: 2,
+
+    element: {
+       name:    Charlie,
+       design:  Viper,
+       region:  Kalon,
+       rloc:    { ref: "Ward1:6", dex: 135e3, az: 200, az_var: 30 },
+       count:   2,
+       iff:     2,
+       loadout: { ship: -1, name: "ACM Medium Range" },
+       intel:   known,
+
+       navpt:   { cmd: intercept, tgt: Player, rloc: { ref: "Ward1:5", dex: 40e3, az: 200, az_var: 30 }, speed: 300, rgn: Kalon },
+    },
+
+    element: {
+       name:    Echo,
+       design:  Razor,
+       region:  Kalon,
+       rloc:    { ref: "Ward1:6", dex: 140e3, az: 180, az_var: 45 },
+       count:   3,
+       iff:     2,
+       loadout: { ship: -1, name: "Ship Strike" },
+       intel:   secret,
+
+       navpt:   { cmd: assault, tgt: Ward2, rloc: { ref: "Ward1:5", dex: 20e3, az: 180, az_var: 20, el_var: 0 }, speed: 200, rgn: Kalon   },
+    },
+}

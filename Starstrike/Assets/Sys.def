@@ -1,0 +1,751 @@
+SYSTEM
+
+// COMPONENT DAMAGE EFFECTS:
+//    DAMAGE_EFFICIENCY = 1
+//    DAMAGE_SAFETY     = 2
+//    DAMAGE_STABILITY  = 4
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Fusion Reactor",
+
+   component:        {
+      name:          "Reactor Core",
+      abrv:          "Reac Core",
+      repair_time:   120,
+      replace_time:  24000,
+      spares:        0,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Fuel System",
+      abrv:          "Fuel Sys",
+      repair_time:   120,
+      replace_time:  1200,
+      spares:        0,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Presequencer",
+      abrv:          "Preseq",
+      repair_time:   30,
+      replace_time:  400,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Radiation Shield",
+      abrv:          "Rad Shield",
+      repair_time:   30,
+      replace_time:  300,
+      spares:        1,
+      affects:       2
+   },
+
+   component:        {
+      name:          "Power Regulator",
+      abrv:          "Pwr Reg",
+      repair_time:   300,
+      replace_time:  60,
+      spares:        2,
+      affects:       4
+   },
+
+   component:        {
+      name:          "Heat Exchanger",
+      abrv:          "Heat Exch",
+      repair_time:   60,
+      replace_time:  3600,
+      spares:        1,
+      affects:       6
+   },
+
+   component:        {
+      name:          "Coolant Tanks",
+      abrv:          "Coolant",
+      repair_time:   45,
+      replace_time:  1800,
+      spares:        0,
+      affects:       6
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Auxilliary Reactor",
+
+   component:        {
+      name:          "Reactor Core",
+      abrv:          "Reac Core",
+      repair_time:   60,
+      replace_time:  2400,
+      spares:        0,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Reactant",
+      abrv:          "Reactant",
+      repair_time:   30,
+      replace_time:  600,
+      spares:        0,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Injector",
+      abrv:          "Injector",
+      repair_time:   60,
+      replace_time:  500,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Magnetic Coil",
+      abrv:          "Mag Coil",
+      repair_time:   120,
+      replace_time:  300,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Radiation Shield",
+      abrv:          "Rad Shield",
+      repair_time:   60,
+      replace_time:  300,
+      spares:        1,
+      affects:       2
+   },
+
+   component:        {
+      name:          "Power Regulator",
+      abrv:          "Pwr Reg",
+      repair_time:   300,
+      replace_time:  60,
+      spares:        2,
+      affects:       4
+   },
+
+   component:        {
+      name:          "Heat Exchanger",
+      abrv:          "Heat Exch",
+      repair_time:   120,
+      replace_time:  3600,
+      spares:        0,
+      affects:       6
+   },
+
+   component:        {
+      name:          "Coolant Tanks",
+      abrv:          "Coolant",
+      repair_time:   120,
+      replace_time:  1800,
+      spares:        0,
+      affects:       6
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Battery",
+
+   component:        {
+      name:          "EMG Cell",
+      abrv:          "EMG Cell",
+      repair_time:   120,
+      replace_time:  2400,
+      spares:        0,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Reactant",
+      abrv:          "Reactant",
+      repair_time:   30,
+      replace_time:  1200,
+      spares:        0,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Reactant Valves",
+      abrv:          "Reac Valve",
+      repair_time:   20,
+      replace_time:  1200,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Power Regulator",
+      abrv:          "Pwr Reg",
+      repair_time:   120,
+      replace_time:  60,
+      spares:        2,
+      affects:       4
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Plasma Drive",
+
+   component:        {
+      name:          "Plasma Core",
+      abrv:          "Plasma Core",
+      repair_time:   90,
+      replace_time:  1800,
+      spares:        0,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Presequence Injector",
+      abrv:          "Injector",
+      repair_time:   40,
+      replace_time:  600,
+      spares:        1,
+      affects:       5
+   },
+
+   component:        {
+      name:          "Plasma Impeller",
+      abrv:          "Impeller",
+      repair_time:   30,
+      replace_time:  900,
+      spares:        1,
+      affects:       5
+   },
+
+   component:        {
+      name:          "Magnetic Resonance Focuser",
+      abrv:          "Mag Focus",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Radiation Shield",
+      abrv:          "Rad Shield",
+      repair_time:   60,
+      replace_time:  1200,
+      spares:        1,
+      affects:       2
+   },
+
+   component:        {
+      name:          "Heat Exchanger",
+      abrv:          "Heat Exch",
+      repair_time:   90,
+      replace_time:  3600,
+      spares:        0,
+      affects:       6
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             Thruster,
+
+   component:        {
+      name:          "Lateral Thrust Motors",
+      abrv:          "Lateral",
+      repair_time:   90,
+      replace_time:  3600,
+      spares:        1,
+      affects:       0x83
+   },
+
+   component:        {
+      name:          "Spinal Thrust Motors",
+      abrv:          "Spinal",
+      repair_time:   90,
+      replace_time:  3600,
+      spares:        1,
+      affects:       0x83
+   },
+
+   component:        {
+      name:          "Braking Thrusters",
+      abrv:          "Braking",
+      repair_time:   60,
+      replace_time:  3600,
+      spares:        1,
+      affects:       0x83
+   },
+
+   component:        {
+      name:          "Plasma Grid",
+      abrv:          "Plasma Grid",
+      repair_time:   180,
+      replace_time:  7200,
+      spares:        1,
+      affects:       3
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Quantum Drive",
+
+   component:        {
+      name:          "Graviscalar Bias Node A",
+      abrv:          "Alpha Node",
+      repair_time:   200,
+      replace_time:  3600,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Graviscalar Bias Node B",
+      abrv:          "Beta Node",
+      repair_time:   200,
+      replace_time:  3600,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Quantum Wave Containment Generator",
+      abrv:          "Containment",
+      repair_time:   60,
+      replace_time:  1200,
+      spares:        1,
+      affects:       2
+   },
+
+   component:        {
+      name:          "Dimensional Waveguide",
+      abrv:          "Waveguide",
+      repair_time:   30,
+      replace_time:  400,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Power Filter/Sync Lock",
+      abrv:          "Sync Lock",
+      repair_time:   600,
+      replace_time:  60,
+      spares:        1,
+      affects:       1
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Grav Shield",
+
+   component:        {
+      name:          "Grav Bias Generator",
+      abrv:          "Grav Gen",
+      repair_time:   30,
+      replace_time:  300,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Fusion Power Adaptor",
+      abrv:          "Pwr Adaptor",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Harmonic Oscillator",
+      abrv:          "Harm Osc",
+      repair_time:   1200,
+      replace_time:  60,
+      spares:        2,
+      affects:       5
+   },
+
+   component:        {
+      name:          "Tactical Computer Interface",
+      abrv:          "Tac I/F",
+      repair_time:   900,
+      replace_time:  60,
+      spares:        1,
+      affects:       5
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Sensor",
+
+   component:        {
+      name:          "Transmit Array",
+      abrv:          "XMIT",
+      repair_time:   1200,
+      replace_time:  120,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Receive Array",
+      abrv:          "RECV",
+      repair_time:   1200,
+      replace_time:  120,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Spacial Filter",
+      abrv:          "Filter",
+      repair_time:   1800,
+      replace_time:  60,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Processor",
+      abrv:          "CPU",
+      repair_time:   600,
+      replace_time:  90,
+      spares:        2,
+      affects:       1
+   },
+
+   component:        {
+      name:          "System Interface",
+      abrv:          "Sys I/F",
+      repair_time:   900,
+      replace_time:  60,
+      spares:        2,
+      affects:       1
+   }
+}
+
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Computer",
+
+   component:        {
+      name:          "Processor",
+      abrv:          "CPU",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Storage",
+      abrv:          "Storage",
+      repair_time:   300,
+      replace_time:  60,
+      spares:        2,
+      affects:       1
+   },
+
+   component:        {
+      name:          "System Interface",
+      abrv:          "Sys I/F",
+      repair_time:   90,
+      replace_time:  30,
+      spares:        2,
+      affects:       1
+   }
+}
+
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Beam Weapon",
+
+   component:        {
+      name:          "Beam Generator",
+      abrv:          "Beam Gen",
+      repair_time:   60,
+      replace_time:  2400,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Power Flux Coupling",
+      abrv:          "Pwr Coupling",
+      repair_time:   60,
+      replace_time:  300,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Beam Focuser",
+      abrv:          "Beam Focus",
+      repair_time:   900,
+      replace_time:  30,
+      spares:        2,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Flashback Supressor",
+      abrv:          "Flash Sup",
+      repair_time:   90,
+      replace_time:  1500,
+      spares:        1,
+      affects:       6
+   },
+
+   component:        {
+      name:          "Tactical Computer Interface",
+      abrv:          "Tac I/F",
+      repair_time:   120,
+      replace_time:  30,
+      spares:        1,
+      affects:       5
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Bolt Weapon",
+
+   component:        {
+      name:          "Laser Generator",
+      abrv:          "Laser Gen",
+      repair_time:   60,
+      replace_time:  1800,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Power Flux Coupling",
+      abrv:          "Pwr Coupling",
+      repair_time:   60,
+      replace_time:  300,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Tactical Computer Interface",
+      abrv:          "Tac I/F",
+      repair_time:   300,
+      replace_time:  60,
+      spares:        1,
+      affects:       5
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Plasma Weapon",
+
+   component:        {
+      name:          "Plasma Exciter",
+      abrv:          "Exciter",
+      repair_time:   60,
+      replace_time:  300,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Plasma Coupling",
+      abrv:          "Plasma Cpl",
+      repair_time:   60,
+      replace_time:  300,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Radiation Shield",
+      abrv:          "Rad Shield",
+      repair_time:   120,
+      replace_time:  900,
+      spares:        1,
+      affects:       2
+   },
+
+   component:        {
+      name:          "Heat Exchanger",
+      abrv:          "Heat Exch",
+      repair_time:   60,
+      replace_time:  1800,
+      spares:        1,
+      affects:       6
+   },
+
+   component:        {
+      name:          "Tactical Computer Interface",
+      abrv:          "Tac I/F",
+      repair_time:   180,
+      replace_time:  30,
+      spares:        1,
+      affects:       5
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Missile Weapon",
+
+   component:        {
+      name:          "Magnetic Launch Rail",
+      abrv:          "Launcher",
+      repair_time:   300,
+      replace_time:  3000,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Ordnance Trolley/Loader",
+      abrv:          "Loader",
+      repair_time:   120,
+      replace_time:  6000,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Power Flux Coupling",
+      abrv:          "Pwr Coupling",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Tactical Computer Interface",
+      abrv:          "Tac I/F",
+      repair_time:   90,
+      replace_time:  240,
+      spares:        1,
+      affects:       5
+   }
+}
+
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Probe",
+
+   component:        {
+      name:          "Magnetic Launcher",
+      abrv:          "Launcher",
+      repair_time:   300,
+      replace_time:  3000,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Probe Caddy/Loader",
+      abrv:          "Loader",
+      repair_time:   120,
+      replace_time:  6000,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Power Flux Coupling",
+      abrv:          "Pwr Coupling",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "System Computer Interface",
+      abrv:          "Sys I/F",
+      repair_time:   90,
+      replace_time:  240,
+      spares:        1,
+      affects:       5
+   }
+}
+
+// +------------------------------------------------------------------------+
+
+system: {
+   name:             "Flight Deck",
+
+   component:        {
+      name:          "Magnetic Launch Rail",
+      abrv:          "Mag Rail",
+      repair_time:   120,
+      replace_time:  1800,
+      spares:        1,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Hangar Access Causeway",
+      abrv:          "Elevator",
+      repair_time:   300,
+      replace_time:  6000,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "ILS Transponder",
+      abrv:          "ILS",
+      repair_time:   120,
+      replace_time:  2000,
+      spares:        1,
+      affects:       1
+   },
+
+   component:        {
+      name:          "Power Coupling",
+      abrv:          "Pwr Coupling",
+      repair_time:   600,
+      replace_time:  30,
+      spares:        2,
+      affects:       3
+   },
+
+   component:        {
+      name:          "Navigational Computer Interface",
+      abrv:          "Nav I/F",
+      repair_time:   90,
+      replace_time:  240,
+      spares:        1,
+      affects:       5
+   }
+}
+
+
+
+

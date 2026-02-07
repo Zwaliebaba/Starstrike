@@ -1,0 +1,61 @@
+STARSYSTEM
+
+name:       Ostara
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Ostara.mag",
+   poly_stars: "stars.mag",
+   }
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (32, 8, 8)
+
+star: {
+   name:    Ostara,
+   image:   "Suns/M1.pcx",
+   tscale:  6,
+   radius:  12e8,
+   mass:    1e30,
+   light:   5e10,
+   color:   (255, 170, 160),// - deep red
+   back:    (130,  90,  50) // - nebula2
+}
+
+planet: {
+   name:    Aram,
+   image:   "Ostara/aram_lo.pcx",
+   high_res:"Ostara/aram_hi.pcx",
+   radius:  6.4e6,
+   mass:    5.98e24,
+   atmosphere: (180,90,60),
+   orbit:   10.34e10,
+   rotation: 15
+}
+
+region: {
+   name:    Aram,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   19e6,
+   inclination: 0.45,
+   link:    Volova,   // Kolchev
+   link:    Kala,     // Haiche
+   link:    Theramin, // Tarsus
+}
+
+moon: {
+   name:    Ur,
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:  1e6,
+   mass:    8e22,
+   orbit:   85e6
+}
+
+

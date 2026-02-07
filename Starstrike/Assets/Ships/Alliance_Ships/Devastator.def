@@ -1,0 +1,450 @@
+SHIP
+
+name:          Devastator
+display_name:  Devastator
+class:         Cruiser
+description:   "The CA-400 DEVASTATOR class of heavy cruisers forms the backbone of the Alliance heavy gun capability.  Big, slow, and very tough, each of these enormous vessels features a pair of heavy gamma ray laser batteries and four Athena missile launchers.  Together these weapons can bring down the largest starships and orbital stations.  For defense against strike ships and inbound missile weapons, the Devastator has full coverage from a set of Vanguard point defense batteries."
+
+degrees:    true
+beauty:     (-9, 3.5, 1.27)
+hud_icon:   "DevastatorHud.pcx"
+
+detail_0:   "Devastator_0.mag"
+feature_0:  1000
+detail_1:   "Devastator_1.mag"
+feature_1:  32
+detail_2:   "Devastator_2.mag"
+feature_2:  20
+
+mass:       98.1e3
+agility:    2
+vlimit:     220
+roll_rate:  7
+integrity:  55e3
+scale:      2.5
+acs:        1.2
+
+trans_x:     500e3
+trans_y:     300e3
+trans_z:     500e3
+
+arcade_drag: 3e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1300, 300)
+bridge:     (0,   520,  50)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       35e3,
+   
+   loc:              (0, 0, -92),
+   size:             64,
+   hull_factor:      0.9
+}
+
+drive: {
+   type:             Plasma
+   abrv:             Drive
+   design:           "Plasma Drive",
+   thrust:           17.5e3,
+   scale:            10,
+   port:             (   0, -18, -795),
+   port:             (   0, -40, -795),
+   port:             ( -36, -18, -788),
+   port:             ( -36, -40, -788),
+   port:             (  36, -18, -788),
+   port:             (  36, -40, -788),
+
+   loc:              (0, 0, -320),
+   size:             64,
+   hull_factor:      0.5
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+   scale:            2.5
+
+   port_left:   {loc:(-106, -13,-574), fire: 0x0041}
+   port_left:   {loc:(-106, -13,-555), fire: 0x0041}
+   port_left:   {loc:( -90, -22, 444), fire: 0x0081}
+   port_left:   {loc:( -90, -22, 466), fire: 0x0081}
+
+   port_right:  {loc:( 104, -13,-574), fire: 0x0082}
+   port_right:  {loc:( 104, -13,-555), fire: 0x0082}
+   port_right:  {loc:(  89, -22, 444), fire: 0x0042}
+   port_right:  {loc:(  89, -22, 466), fire: 0x0042}
+
+   port_fore:   {loc:(-198,  36, -70), fire: 0x0044}
+   port_fore:   {loc:(-180,  36, -70), fire: 0x0044}
+   port_fore:   {loc:( 180,  36, -70), fire: 0x0084}
+   port_fore:   {loc:( 198,  36, -70), fire: 0x0084}
+   port_fore:   {loc:(-211, -24, -70), fire: 0x0044}
+   port_fore:   {loc:(-193, -24, -70), fire: 0x0044}
+   port_fore:   {loc:( 193, -24, -70), fire: 0x0084}
+   port_fore:   {loc:( 211, -24, -70), fire: 0x0084}
+
+   port_aft:    {loc:(-198,  36,-466), fire: 0x0088}
+   port_aft:    {loc:(-180,  36,-466), fire: 0x0088}
+   port_aft:    {loc:( 180,  36,-466), fire: 0x0048}
+   port_aft:    {loc:( 198,  36,-466), fire: 0x0048}
+   port_aft:    {loc:(-211, -24,-466), fire: 0x0088}
+   port_aft:    {loc:(-193, -24,-466), fire: 0x0088}
+   port_aft:    {loc:( 193, -24,-466), fire: 0x0048}
+   port_aft:    {loc:( 211, -24,-466), fire: 0x0048}
+
+   port_top:    {loc:(-189,  70,-118), fire: 0x0410}
+   port_top:    {loc:(-189,  70,-418), fire: 0x0410}
+   port_top:    {loc:( 189,  70,-118), fire: 0x0810}
+   port_top:    {loc:( 189,  70,-418), fire: 0x0810}
+
+   port_bottom: {loc:(-202, -49,-118), fire: 0x0820}
+   port_bottom: {loc:(-202, -49,-418), fire: 0x0820}
+   port_bottom: {loc:( 202, -49,-118), fire: 0x0420}
+   port_bottom: {loc:( 202, -49,-418), fire: 0x0420}
+
+   port_top:    {loc:( -32,  49, 781), fire: 0x0210}
+   port_top:    {loc:(  31,  49, 781), fire: 0x0210}
+
+   port_bottom: {loc:( -32, -60, 781), fire: 0x0120}
+   port_bottom: {loc:(  31, -60, 781), fire: 0x0120}
+
+   port_top:    {loc:( -32,  17,-650), fire: 0x0110}
+   port_top:    {loc:(  32,  17,-650), fire: 0x0110}
+
+   port_bottom: {loc:( -32,-120,-650), fire: 0x0220}
+   port_bottom: {loc:(  32,-120,-650), fire: 0x0220}
+}
+
+quantum: {
+   design:           "Quantum Drive"
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -200),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield"
+   abrv:             Shield
+   pcs:              100,
+   model:            "DevastatorShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav"
+   beam_hit_sound:   "shield_hit5.wav"
+
+   loc:              (0, 0, -60),
+   size:             48
+   hull_factor:      0.7
+}
+
+power: {
+   type:             Auxilliary
+   design:           "Auxilliary Reactor"
+   abrv:             "Aux Reac"
+   max_output:       3e3,
+   
+   loc:              (0, -32, -64),
+   size:             64,
+   hull_factor:      0.4
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 1",
+   abrv:             "Graser-1",
+   muzzle:           (-65, -22, 760),
+
+   loc:              (-65, -22, 730),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 2",
+   abrv:             "Graser-2",
+   muzzle:           ( 65, -22, 760),
+
+   loc:              ( 65, -22, 730),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 33",
+   abrv:             "Graser-3",
+   muzzle:           (-52, -54, 740),
+
+   loc:              (-52, -54, 710),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 4",
+   abrv:             "Graser-4",
+   muzzle:           ( 52, -54, 740),
+
+   loc:              ( 52, -54, 710),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+
+weapon:     {
+   type:             "Athena1",
+   design:           "Missile Weapon",
+   name:             "Starboard Missile",
+   abrv:             "Athena-1",
+   muzzle:           ( 75,  13, 600),
+   muzzle:           ( 65,  13, 600),
+   azimuth:          15,
+
+   loc:              ( 60, 0, 400),
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Athena2",
+   design:           "Missile Weapon",
+   name:             "Port Missile",
+   abrv:             "Athena-2",
+   muzzle:           (-75,  13, 600),
+   muzzle:           (-65,  13, 600),
+   azimuth:          -15,
+
+   loc:              (-60, 0, 400),
+   size:             32,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-1",
+   abrv:             "PDB 1",
+   loc:              ( 0,  80, 575),
+
+   azimuth:           0,
+   size:             32,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-2",
+   abrv:             "PDB 2",
+   loc:              ( 0, 110,-550),
+
+   azimuth:          180,
+   size:             32,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-3",
+   abrv:             "PDB 3",
+   loc:              (190, 72, -275),
+
+   azimuth:           90,
+   aim_az_max:        95,
+   aim_az_min:       -75,
+   aim_az_rest:       90,
+
+   size:             32,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Vanguard",
+   design:           "Bolt Weapon",
+   name:             "Gun-4",
+   abrv:             "PDB 4",
+   loc:              (-190, 72, -275),
+
+   azimuth:          270,
+   aim_az_max:        75,
+   aim_az_min:       -95,
+   aim_az_rest:      -90,
+
+   size:             32,
+   hull_factor:      0.5
+}
+
+
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, 32, 380),
+   size:             24,
+   hull_factor:      0.1
+}
+
+probe: {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  (0, -64, 400),
+
+   loc:     (0, -40, 400),
+   size:    16,
+   hull_factor: 0.2
+}
+
+power: {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer: {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, -32, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer: {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -32, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav: {
+   loc:              (0, 32, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+navlight:  {
+   scale:  0.66,
+   period: 2.5,
+
+   light:  { loc: ( 235,   0,-190), pattern: 0x11000000, type: 3 },
+   light:  { loc: (-235,   0,-190), pattern: 0x00110000, type: 2 },
+   light:  { loc: (   0, 150,-285), pattern: 0x00000120, type: 1 },
+   light:  { loc: (   0, 108, 192), pattern: 0x00000120, type: 1 },
+   light:  { loc: (   0, -60, 192), pattern: 0x00000120, type: 1 },
+}
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+
+   debris:           "Debris1A.mag",
+   debris_loc:       (0,0,-550),
+   debris_mass:      17e3,
+   debris_count:     1,
+   debris_life:      350,
+
+   debris:           "Debris1B.mag",
+   debris_loc:       (320,0,10),
+   debris_mass:      13e3,
+   debris_count:     1,
+   debris_life:      380,
+
+   debris:           "CourageousDebris2.mag",
+   debris_loc:       (0,0,500),
+   debris_mass:      18e3,
+   debris_count:     1,
+   debris_life:      380,
+
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      55,
+   debris_count:     35,
+   debris_life:      15,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      44,
+   debris_count:     30,
+   debris_life:      25,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      33,
+   debris_count:     22,
+   debris_life:      35,
+}
+
+
+map: {
+   sprite: "DevastatorMap0.pcx",
+   sprite: "DevastatorMap1.pcx",
+   sprite: "DevastatorMap2.pcx",
+   sprite: "DevastatorMap3.pcx",
+   sprite: "DevastatorMap4.pcx",
+   sprite: "DevastatorMap5.pcx",
+   sprite: "DevastatorMap6.pcx",
+   sprite: "DevastatorMap7.pcx"
+}
+
+
+
+
+
+

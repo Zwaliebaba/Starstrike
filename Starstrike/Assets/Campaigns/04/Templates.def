@@ -1,0 +1,13 @@
+TEMPLATELIST
+
+// specialized templates first
+
+
+// then general templates
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_01.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_01.def" }
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_02.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_02.def" }
+mission: { type: PATROL,         group: INTERCEPT_SQUADRON, script: "Templates/IS_Patrol_03.def" }
+mission: { type: PATROL,         group: FIGHTER_SQUADRON,   script: "Templates/FS_Patrol_03.def" }
+

@@ -1,0 +1,349 @@
+MISSION
+
+name:   "Cmpn03 News03 - Titan Destroyed"
+type:   "Patrol"
+system: Jarnell
+system: Borova
+region: Borova
+stardate: 1155770000.0
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       0
+   player:    1
+   loc:       (1e3, 30e3, 0)
+   rgn:       Borova
+   navpt:     { cmd: Vector, loc: (0, 0, 0), rgn: "Borova", speed: 50 }
+}
+
+element: {
+   name:      Titan
+   design:    "Orion"
+   mission:   "Flight Ops"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    "Borova"
+   loc:       (0, 0, 0)
+   navpt:     { cmd: Vector, loc: (0, -70e3, 0), rgn: "Borova", speed: 600 }
+}
+
+element: {
+   name:      "Stalwart"
+   design:    "Courageous"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    "Borova"
+   loc:       (-2e3, 15e3, 0)
+   navpt:     { cmd: Vector, loc: (-8e3, -70e3, 0), rgn: "Borova", speed: 600 }
+}
+
+element: {
+   name:      "Gerson"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    "Borova"
+   loc:       (25e3, -15e3, 0)
+   navpt:     { cmd: Vector, loc: (25e3, -90e3, 0), rgn: "Borova", speed: 600 }
+}
+
+element: {
+   name:      "Simmons"
+   design:    "Asher"
+   commander: "Archon"
+   mission:   "Fleet"
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       1
+   region:    "Borova"
+   loc:       (-11e3, -12e3, 0)
+   navpt:     { cmd: Vector, loc: (-24e3, -70e3, 0), rgn: "Borova", speed: 600 }
+}
+
+element: {
+   name:      "Windriders"
+   design:    "Falcon"
+   carrier:   "Titan"
+   commander: "Titan"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     32
+   maint_count: 16
+   iff:       1
+   region:    "Borova"
+   loc:       (10e3, 0, 0)
+}
+
+element: {
+   name:      "Chargers"
+   design:    "Stormhawk"
+   carrier:   "Titan"
+   commander: "Titan"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     32
+   maint_count: 16
+   iff:       1
+   region:    "Borova"
+   loc:       (10e3, 0, 0)
+}
+
+element: {
+   name:      "Razorbacks"
+   design:    "Thunderbolt"
+   carrier:   "Titan"
+   commander: "Titan"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     20
+   maint_count: 10
+   iff:       1
+   region:    "Borova"
+   loc:       (10e3, 0, 0)
+}
+
+element: {
+   name:      "Artemis"
+   design:    "Zodiac"
+   carrier:   "Titan"
+   commander: "Titan"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     8
+   maint_count: 4
+   iff:       1
+   region:    "Borova"
+   loc:       (10e3, 0, 0)
+}
+
+element: {
+   name:      "Omega"
+   design:    "Falcon"
+   squadron:  "Windriders"
+   commander: "Titan"
+   mission:   "Patrol"
+
+   intel:     "Known"
+   count:     4
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (18e3, -18e3, 0)
+
+   loadout:   { ship: -1, name: "ACM Medium Range" }
+}
+
+element: {
+   name:      "Vulcan"
+   design:    "Stormhawk"
+   squadron:  "Chargers"
+   commander: "Titan"
+   mission:   "Patrol"
+
+   intel:     "Known"
+   count:     4
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Borova"
+   loc:       (-6e3, -23e3, 0)
+
+   loadout:   { ship: -1, name: "ACM Medium Range" }
+}
+
+
+element: {
+   name:      Ascendance
+   design:    Imperial
+   mission:   Fleet
+   invulnerable: true
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (40e3, 40e3, 0)
+   navpt:     { cmd: Assault, tgt: Titan, rgn: Borova, loc: (0,0,0), speed: 500 }
+}
+
+element: {
+   name:      Throne
+   design:    Imperial
+   mission:   Fleet
+   invulnerable: true
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (-30e3, -50e3, 0)
+   head:      180
+   navpt:     { cmd: Assault, tgt: Titan, rgn: Borova, loc: (0,0,0), speed: 500 }
+}
+
+
+element: {
+   name:      "Nels Berens"
+   design:    Volnaris
+   mission:   Fleet
+   invulnerable: true
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (28e3, -44e3, 0)
+   head:      180
+   navpt:     { cmd: Assault, tgt: Stalwart, rgn: Borova, loc: (10e3,20e3,0), speed: 500 }
+}
+
+element: {
+   name:      Sabre
+   design:    Broadsword
+   mission:   Fleet
+   invulnerable: true
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (38e3, -24e3, 0)
+   head:      180
+   navpt:     { cmd: Assault, tgt: Stalwart, rgn: Borova, loc: (10e3,20e3,0), speed: 500 }
+}
+
+element: {
+   name:      Lance
+   design:    Broadsword
+   mission:   Fleet
+   invulnerable: true
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (48e3, 24e3, 0)
+   navpt:     { cmd: Assault, tgt: Stalwart, rgn: Borova, loc: (10e3,20e3,0), speed: 500 }
+}
+
+
+element: {
+   name:      "Sirocco"
+   design:    Tiger
+   mission:   Fleet
+
+   intel:     "Secret"
+   count:     1
+   command_ai:1
+   iff:       2
+   region:    Borova
+   loc:       (-41e3, 29e3, 0)
+}
+
+element: {
+   name:      "Sorrin"
+   design:    "Viper"
+   squadron:  "Vipers"
+   commander: "Cyclops"
+   mission:   "Patrol"
+
+   intel:     "Known"
+   count:     4
+   command_ai:1
+   iff:       2
+   playable:  false
+   region:    "Borova"
+   loc:       (-34e3, 28e3, 0)
+
+   loadout:   { ship: -1, name: "ACM Medium Range" }
+}
+
+element: {
+   name:      "Amnar"
+   design:    "Cobra"
+   mission:   Assault
+
+   intel:     "Known"
+   count:     4
+   command_ai:1
+   iff:       2
+   playable:  false
+   region:    "Borova"
+   loc:       (-45e3, 25e3, 0)
+
+   loadout:   { ship: -1, name: "Ship Strike" }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Display,               image: "Campaigns\03/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+
+event: { event: Display,               message: "Force:Space Fourth Fleet", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "7th Carrier Group 'Titan'", font: Limerick12,  color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: Camera,                param: 3,  target: "Titan", vec: (0.3, -0.15, 3e3)     }
+event: { event: Camera,                param: 5,                   vec: (0.12, 0.01, 0.03)  }
+
+
+event: { event: Camera,     time:  10, param: (6, 7), target: "Vulcan 1" }
+
+event: { event: Camera,     time:  15, param: (6, 7), target: "Omega 1"  }
+
+event: { event: Camera,     time:  20, param: (6,23), target: "Throne"   }
+
+event: { event: Camera,     time:  25, param: 3,      target: "Stalwart", vec: (0.2,0,3e3)   }
+event: { event: Camera,                param: 5,                   vec: (-0.13, 0.01, 0.01)  }
+
+event: { event: Message,    time:  28, sound: "Vox\Scenes\03/News_03_Titan_Destroyed.wav" }
+
+event: { event: Camera,     time:  30, param: (6,10), target: "Titan", vec: (15e3,0,6e3)   }
+
+
+event: { event: Damage,     time:  33, param: 1e9,    ship:   "Titan"    }
+
+
+event: { event: Camera,     time:  40, param: (6,15), target: "Ascendance", vec: (2.3,0,3e3)   }
+
+event: { event: Camera,     time:  50, param: 3,      target: "Gerson", vec: (0.7,0.7,4e3)   }
+event: { event: Camera,                param: 5,                   vec: (0.12, -0.01, 0.02)  }
+
+event: { event: Camera,     time:  70, param: 3,      target: "Simmons", vec: (1.7,0,4e3)   }
+event: { event: Camera,                param: 5,                   vec: (-0.12, 0.01, 0.02)  }
+
+event: { event: EndScene,   time:  90, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

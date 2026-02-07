@@ -1,0 +1,274 @@
+SHIP
+
+name:          ZZCS
+display_name:  "Zolon Consul"
+class:         Cruiser
+abrv:          ZCS
+secret:        true
+
+detail_0:   "ZolonC1opt.mag"
+feature_0:  1000
+detail_1:   "ZolonC2opt.mag"
+feature_1:  30
+
+mass:       218.1e3
+agility:    3
+vlimit:     280
+roll_rate:  7
+integrity:  400e3
+scale:      7.5
+acs:        1.2
+auto_roll:  1
+
+splash_radius: 15e3
+
+trans_x:     550e3
+trans_y:     400e3
+trans_z:     550e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   640, 100)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       50e3,
+
+   loc:              (0, 0, -90),
+   size:             64,
+   hull_factor:      0.4,
+   explosion:        7
+}
+
+drive: {
+   type:             Alien,
+   name:             Drive,
+   design:           "Plasma Drive",
+   thrust:           7500,
+   scale:            15,
+   port:             ( 16, 16, -156),
+   port:             (-16, 16, -156),
+   port:             ( 16,-16, -156),
+   port:             (-16,-16, -156),
+
+   loc:              (0, 0, -140),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 88),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   type:             Hyper,
+   loc:              (0, 0, -60),
+   capacity:         10e3,
+   consumption:      1e3,
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             3,
+   design:           "Hyper Shield",
+   shield_bubble:    true,
+   pcs:              100,
+   model:            "ZShieldC2.mag"
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, 0),
+   size:             32,
+   hull_factor:      0.7
+}
+
+weapon: {
+   type:             "Zolon Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-64,  0, 192),
+
+   loc:              (-60,  0, 128),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "Zolon Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 64,  0, 192),
+
+   loc:              ( 60,  0, 128),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "Zolon Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 3",
+   abrv:             "Laser-3",
+   muzzle:           (0, -64, 192),
+
+   loc:              (0, -60, 128),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon: {
+   type:             "Zolon Laser",
+   design:           "Beam Weapon",
+   name:             "Laser 4",
+   abrv:             "Laser-4",
+   muzzle:           (0, 64, 192),
+
+   loc:              (0, 60, 128),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       2000,
+
+   loc:              (0, 0, 40),
+   hull_factor:      0.6
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 220),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: { sprite: "zmap.pcx" }
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -150),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -120),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "Debris5.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     15,
+   debris_life:      15,
+
+   debris:           "Debris6.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     15,
+   debris_life:      25,
+
+   debris:           "Debris7.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     10,
+   debris_life:      35,
+
+}
+
+
+
+
+
+

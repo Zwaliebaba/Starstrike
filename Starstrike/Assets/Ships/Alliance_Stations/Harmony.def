@@ -1,0 +1,158 @@
+SHIP
+
+name:          Station2
+display_name:  Station
+class:         STATION
+hud_icon:      "s5hud.pcx"
+
+model:      "S5opt.mag"
+
+mass:       9e6
+integrity:  5e6
+scale:      10
+acs:        5e6
+
+chase:      (0, -800, 50)
+bridge:     (0,    0,  0)
+
+degrees:    true
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       90e3,
+
+   loc:              (0, 0, 0),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+flightdeck: {
+   name:       "Launch Bay 1",
+
+   loc:        (   0,  20,  700),
+   cam:        (  20,  24,  715),
+   start:      (   0,  14,  700),
+   end:        ( 3e3,   0,  700),
+
+   spot:       ( -20,  24,  680),
+   azimuth:     90,
+
+   light:      250,
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Launch Bay 2",
+
+   loc:        (   0,  20, -700),
+   cam:        ( -20,  24, -715),
+   start:      (   0,  14, -700),
+   end:        (-3e3,   0, -700),
+
+   spot:       (  20,  24, -680),
+   azimuth:    -90,
+
+   light:      250,
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Docking Bay 1",
+   loc:        ( 700,  20,   0),
+   cam:        ( 720,  24,   5),
+   start:      ( 800,  14,-400),
+   end:        ( 700,   0,   0),
+
+   spot:       ( 700,  14,   0),
+
+   light:      250,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Docking Bay 1",
+   loc:        (-700,  20,   0),
+   cam:        (-720,  24,   5),
+   start:      (-800,  14, 400),
+   end:        (-700,   0,   0),
+
+   spot:       (-700,  14,   0)
+   azimuth:    180
+
+   light:      250,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+navlight:  {
+   scale:  2.5,
+   period: 2,
+
+   light:  { loc: (-90,  64, -160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: (-90,  64,  160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: ( 90,  64, -160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: ( 90,  64,  160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: (-90, -64, -160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: (-90, -64,  160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: ( 90, -64, -160), pattern: 0xf0100000, type: 1 },
+   light:  { loc: ( 90, -64,  160), pattern: 0xf0100000, type: 1 },
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "s5map.pcx"
+}
+
+death_spiral: {
+   time:             0.0,
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+}
+
+

@@ -1,0 +1,95 @@
+MISSION
+
+name:   "Cmpn 02 Defeat 02"
+type:   "Patrol"
+system: "Renser"
+region: "Khaital"
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+
+element: {
+   name:      Ironhelm
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (0, 0, 0)
+   region:    Khaital
+   navpt:     { cmd: Vector, loc: (0,-50e3,0), speed: 750, rgn: Khaital }
+}
+
+element: {
+   name:      Mattock
+   design:    Broadsword
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (10e3, 2e3, 0)
+   region:    Khaital
+   navpt:     { cmd: Vector, loc: (-10e3,-50e3,0), speed: 750, rgn: Khaital }
+}
+
+element: {
+   name:      "Oak Hall"
+   design:    Tiger
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (5e3, 6e3, 0)
+   region:    Khaital
+   navpt:     { cmd: Vector, loc: (-2e3,-50e3,0), speed: 750, rgn: Khaital }
+}
+
+element: {
+   name:      "North Point"
+   design:    Tiger
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       2
+   loc:       (-5e3, -4e3, 0)
+   region:    Khaital
+   navpt:     { cmd: Vector, loc: (11e3,-50e3,0), speed: 750, rgn: Khaital }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3, target: "body:Khaital",   vec: (1,0,4e6) }
+event: { event: Camera,                param: 5,                           vec: (0.06, 0.002, 0.01) }
+
+event: { event: Display,    message: "Operation Highland", font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,20, 300,100) }
+event: { event: Display,    message: "Defeat",             font: Limerick18, color: 0xffffff80, fade: (0,73,0), rect: (20,42, 300,100) }
+
+event: {
+   event: Message
+   time:  2
+   sound: "Vox\Scenes\02\End_03_Defeat.wav"
+}
+
+event: { event: Camera,     time:  15, param: (6,30), target: Ironhelm }
+
+event: { event: Display,    time:  33, image: "Campaigns\02\Scenes\Black.pcx", color: 0xffffffff, fade: (1,10,0), rect: (0,0,0,0) }
+
+event: { event: EndScene,   time:  35, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

@@ -1,0 +1,255 @@
+SHIP
+
+name:          Station4
+display_name:  Fortress
+class:         STATION
+hud_icon:      "S4hud.pcx"
+
+model:      "S4opt.mag"
+
+mass:       5e6
+integrity:  5e5
+scale:      8
+acs:        5e6
+splash_radius: 15e3
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+degrees:    true
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       45e3,
+
+   loc:              (0, -64, 0),
+   size:             70,
+   hull_factor:      0.6,
+   explosion:        7
+}
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   factor:           0.02,
+   consumption:      6000,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100,
+   loc:              (0, -60, 0),
+   size:             16,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 1A",
+
+   azimuth:          90,
+   loc:              (1200,  85, 0),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 1B",
+
+   azimuth:          90,
+   loc:              (1200, -85, 0),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 2A",
+
+   azimuth:          180,
+   loc:              (0,  85, -1200),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 2B",
+
+   azimuth:          180,
+   loc:              (0, -85, -1200),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 3A",
+
+   azimuth:          -90,
+   loc:              (-1200,  85, 0),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 3B",
+
+   azimuth:          -90,
+   loc:              (-1200, -85, 0),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 4A",
+
+   azimuth:          0,
+   loc:              (0,  85, 1200),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 4B",
+
+   azimuth:          0,
+   loc:              (0, -85, 1200),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+
+
+flightdeck: {
+   name:       "Launch Bay 1",
+
+   loc:        (   0, -210,   890),
+   cam:        (  40, -200,   920),
+   start:      (   0, -210,   890),
+   end:        (   0,    0,  2900),
+
+   spot:       ( -25, -210,   875),
+   spot:       (  25, -210,   875),
+
+   light:      250,
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Launch Bay 2"
+
+   azimuth: 180
+
+   loc:        (   0, -210,  -890),
+   cam:        (  40, -200,  -920),
+   start:      (   0, -210,  -890),
+   end:        (   0,    0, -2900),
+
+   spot:       ( -25, -210,  -875),
+   spot:       (  25, -210,  -875),
+
+   light:      250,
+
+   launch:     true,
+   cycle_time: 20,
+
+   size:       32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Docking Bay 1"
+
+   azimuth:    -90
+
+   loc:        ( 890, -210,     0),
+   cam:        ( 870, -210,    20),
+   start:      ( 3e3, -210,     0),
+   end:        ( 890, -210,     0),
+   spot:       ( 890, -210,     0),
+
+   light:      250,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Docking Bay 2",
+
+   azimuth:    90
+
+   loc:        (-890, -210,     0),
+   cam:        (-870, -210,    20),
+   start:      (-3e3, -210,     0),
+   end:        (-890, -210,     0),
+   spot:       (-890, -210,     0),
+
+
+   light:      250,
+
+   recovery:   true,
+   max_ships:  1,
+   cycle_time: 5,
+
+   size:        32,
+   hull_factor: 0.5,
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "S4map.pcx"
+}
+
+
+death_spiral: {
+   time:             0
+
+   explosion: { type: 12, loc: (0,0,0), final: true } // Large burst
+   explosion: { type: 13, loc: (0,0,0), final: true } // Nuke
+
+   debris:    { model: "DebrisS41.mag", loc: (-40,-20,900), mass: 68e3, count:  1, life: 560 }
+   debris:    { model: "DebrisS42.mag", loc: (0,0,-470),    mass: 78e3, count:  1, life: 575 }
+   debris:    { model: "Debris0A.mag",      loc: (0,0,0),   mass:   35, count: 20, life:  35 }
+   debris:    { model: "Debris0B.mag",      loc: (0,0,0),   mass:   44, count: 20, life:  45 }
+   debris:    { model: "Debris0C.mag",      loc: (0,0,0),   mass:   23, count: 15, life:  35 }
+
+}
+

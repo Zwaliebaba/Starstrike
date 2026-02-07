@@ -1,0 +1,218 @@
+SHIP
+
+name:          Station7
+display_name:  "Military Lab"
+class:         STATION
+hud_icon:      "S7hud.pcx"
+
+model:      "S7opt.mag"
+
+mass:       7e6
+integrity:  5e5
+scale:      15
+acs:        5e6
+splash_radius: 35e3
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+
+degrees:    true
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       75e3,
+
+   loc:              (0, 0, 0),
+   size:             55,
+   hull_factor:      0.5,
+   explosion:        7
+}
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   factor:           0.0125,
+   consumption:      7500,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100,
+   loc:              (0, -100, 220),
+   size:             16,
+   hull_factor:      0.5
+}
+
+weapon:     {
+   type:             "Graser Turret",
+   design:           "Beam Weapon",
+   name:             "Graser 1",
+
+   azimuth:          90,
+   loc:              (240, 50, 100),
+   size:             40,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Graser Turret",
+   design:           "Beam Weapon",
+   name:             "Graser 2",
+
+   azimuth:          -90,
+   loc:              (-240, 50, 100),
+   size:             40,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Graser Turret",
+   design:           "Beam Weapon",
+   name:             "Graser 3",
+
+   azimuth:          90,
+   loc:              (240, 50, -100),
+   size:             40,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Graser Turret",
+   design:           "Beam Weapon",
+   name:             "Graser 4",
+
+   azimuth:          -90,
+   loc:              (-240, 50, -100),
+   size:             40,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 1A",
+
+   azimuth:          90,
+   loc:              (105, 36, 704),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 2A",
+
+   azimuth:          90,
+   loc:              (105, 36, -640),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 3A",
+
+   azimuth:          -90,
+   loc:              (-105, 36, 704),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "Turret 4A",
+
+   azimuth:          -90,
+   loc:              (-105, 36, -640),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 1B",
+
+   azimuth:          90,
+   loc:              (105, -24, 704),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 2B",
+
+   azimuth:          90,
+   loc:              (105, -24, -640),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 3B",
+
+   azimuth:          -90,
+   loc:              (-105, -24, 704),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+weapon:     {
+   type:             "Rail-12 Inverted",
+   design:           "Bolt Weapon",
+   name:             "Turret 4B",
+
+   azimuth:          -90,
+   loc:              (-105, -24, -640),
+   size:             32,
+   hull_factor:      0.3,
+}
+
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   25e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, -380, 0),
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+
+map: {
+   sprite: "S7map.pcx"
+}
+
+death_spiral: {
+   time:             0
+
+   explosion: { type: 13, loc: (0,0, 200), final: true } // Nuke
+   explosion: { type: 13, loc: (0,0,-200), final: true } // Nuke
+
+   debris:    { model: "DebrisS71.mag", loc: (-120,10,650), mass:  68e3, count:  1, life: 660 }
+   debris:    { model: "DebrisS72.mag", loc: (-100,0,-450), mass:  78e3, count:  1, life: 675 }
+   debris:    { model: "DebrisS73.mag", loc: ( 240,20,0),   mass: 300e3, count:  1, life: 660 }
+
+   debris:    { model: "Debris0A.mag",      loc: (0,0,0),   mass:   35, count: 20, life:  35 }
+   debris:    { model: "Debris0B.mag",      loc: (0,0,0),   mass:   44, count: 20, life:  45 }
+   debris:    { model: "Debris0C.mag",      loc: (0,0,0),   mass:   23, count: 15, life:  35 }
+
+}
+
+
+

@@ -1,0 +1,137 @@
+MISSIONLIST
+
+mission: {
+   id:      1,
+   name:    "01. Red Alert",
+   type:    PATROL,
+   desc:    "The long range reconnaissance ship AFS Vasquez "
+            "has failed to report in during a routine patrol of "
+            "Hegemony border space. Your element will patrol the "
+            "Aram sector for evidence of "
+            "the missing ship.",
+   start:   "00/08:00:00",
+   system:  Ostara,
+   region:  Aram,
+   script:  "01-Alert.def"
+}
+
+mission: {
+   id:      2,
+   name:    "02. On Wings of Thunder",
+   type:    ESCORT_STRIKE,
+   desc:    "The Heracles is launching strike package Condor "
+            "to take out an enemy freighter before it can leave Loris space."
+            "Your element is assigned to escort the strike "
+            "package and protect it from enemy fighters.",
+   start:   "01/11:00:00",
+   system:  Loris,
+   region:  Loris,
+   script:  "02-Wings.def"
+}
+
+mission: {
+   id:      3,
+   name:    "03. Honor Guard",
+   type:    ESCORT_SHUTTLE,
+   desc:    "Your element has been assigned to escort the diplomatic "
+            "shuttle from Telmera Starbase to Solus orbit, and then "
+            "through the Farcaster to Omane sector and Harmony Station.",
+   start:   "02/18:10:00",
+   system:  Solus,
+   region:  Telmera,
+   script:  "03-Honor.def"
+}
+
+mission: {
+   id:      4,
+   name:    "04. A Line in the Sand",
+   type:    STRIKE,
+   desc:    "The Hegemony is operating an illegal mining operation in the "
+            "Tantalus sector of Haiche.  Your element has been tasked with "
+            "destroying the support facilities for the mine.",
+   start:   "03/09:05:00",
+   system:  Haiche,
+   region:  Haiche,
+   script:  "04-Sand.def"
+}
+
+mission: {
+   id:      5,
+   name:    "05. Execution is Everything",
+   type:    ASSAULT,
+   desc:    "A group of smugglers broke out of Solus impound three days "
+            "ago and reached Lornas asteroid belt this morning.  Your "
+            "element is to sweep the asteroid field and find the "
+            "smugglers' ship.",
+   start:   "04/19:20:00",
+   system:  Renser,
+   region:  Lornas,
+   script:  "05-Execution.def"
+}
+
+mission: {
+   id:      6,
+   name:    "06. Supression of Enemy Air Defense",
+   type:    STRIKE,
+   desc:    "A radical faction of the Radix Military has taken a Force "
+            "recon ship and her crew hostage at a military base in the "
+            "Shadow Canyon sector on Radix.  We need you to take out the "
+            "SAM and AAA emplacements protecting the base.",
+   start:   "05/10:34:00",
+   system:  Radix,
+   region:  "Shadow Canyon",
+   script:  "06-SEAD.def"
+}
+
+mission: {
+   id:      7,
+   name:    "07. Send Lawyers, Guns, and Money",
+   type:    ESCORT_FREIGHT,
+   desc:    "Your Berents-class frigate has been assigned to escort the freighters "
+            "Silver Stag and Golden Hart through hostile territory.",
+   start:   "06/16:21:00",
+   system:  Borova,
+   region:  Tulkas,
+   script:  "07-SLGAM.def"
+}
+
+mission: {
+   id:      8,
+   name:    "08. A Matter of Focus",
+   type:    PATROL,
+   desc:    "An illegal drug cartel has set up major a distribution operation "
+            "in the Solus system.  A major shipment is being brought in tonight.  "
+            "Disable or destroy the smugglers before they can offload their cargo.",
+   start:   "07/23:29:00",
+   system:  Solus,
+   region:  Solus,
+   script:  "08-Focus.def"
+}
+
+mission: {
+   id:      9,
+   name:    "09. Hounds and Hunters",
+   type:    FLEET,
+   desc:    "An enemy destroyer squadron has broken off from the main fleet "
+            "and entered the Paragon system.  Your Spectre-class Task Force must "
+            "resolve this threat as quickly as possible and return to the main fleet.",
+   start:   "08/09:34:00",
+   system:  Paragon,
+   region:  Paragon,
+   script:  "09-Hounds.def"
+}
+
+mission: {
+   id:      10,
+   name:    "10. Fiery the Angels Fell",
+   type:    FLIGHT_OPS,
+   desc:    "The Korian Affair has reached a crisis point.  "
+            "The only hope of salvaging the treaty negotiations is for Force Second "
+            "Fleet to intercept the Dantari CVBG before the Korian faction has time "
+            "to react.  The CV-70 Antares and her battle group will deploy in the Korius "
+            "sector and force the Dantari back to the negotiating table.",
+   start:   "09/17:15:00",
+   system:  Korius,
+   region:  Korius,
+   script:  "10-Angels.def"
+}

@@ -1,0 +1,99 @@
+MISSION
+
+name:   "Cmpn03 News 06 Ele'aan Diplomats"
+type:   "Patrol"
+system: "Jarnell"
+system: "Nephrys"
+system: "Borova"
+region: "Borova"
+stardate: 1166770000.0
+
+degrees: true
+
+element: {
+   name:      "Camera"
+   design:    CameraPod
+   mission:   Misc
+
+   count:     1
+   iff:       1
+   player:    1
+   rgn:       Borova
+   loc:       (0, 0, 0)
+}
+
+
+element: {
+   name:      Consul
+   design:    Transport
+   mission:   Misc
+
+   count:     1
+   iff:       1
+   loc:       (0, 0, 0)
+   rgn:       Borova
+   navpt:     { cmd: Vector, loc: (0,-50e3,0), rgn: Borova, speed: 500 }
+}
+
+
+
+element: {
+   name:      "Force:Space HQ"
+   design:    Station1
+   mission:   Misc
+
+   count:     1
+   iff:       1
+   loc:       (0, 0, 0)
+   rgn:       Jarnell
+   head:      90
+}
+
+
+element: {
+   name:      Krill
+   design:    ZZF
+   mission:   Patrol
+
+   count:     2
+   iff:       4
+   loc:       (0,0,0)
+   rgn:       Nergal
+   navpt:     { cmd: Vector, loc: (0,-100e3,0), rgn: Nergal, speed: 1e3 }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Display,               image: "Campaigns\03/Scenes\Black.pcx", color: 0xffffffff, fade: (0,3,1), rect: (0,0,0,0) }
+event: { event: Display,               image: "Campaigns\03/Scenes\News.pcx",  color: 0xffffffff, fade: (1,2,1), rect: (0,0, -512,-128) }
+
+event: { event: Camera,                param: 3,  target: "body:Borova",  vec: (2,0,1.3e7)           }
+event: { event: Camera,                param: 5,                          vec: (0.12, 0.012, 0.025)  }
+event: { event: Display,    time:   4, message: "Borovan Republic", font: Limerick18,   color: 0xffffff80, fade: (1,4,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Capitol",      font: Limerick12,   color: 0xffffff80, fade: (1,4,1), rect: (20,40, 300,100) }
+event: { event: Messasge,              sound: "Vox\Scenes\03/News_06_Ele'aan_Diplomats.wav" }
+
+
+event: { event: Camera,     time:  10, param: (6,30), target: Consul }
+event: { event: Display,               message: "Ele'aan Consular Starship",  font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Leaving Borova Orbit",   font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+
+event: { event: Camera,     time:  45, param: 3,      target: "Force:Space HQ", vec: (-2, 0.1, 5e3)         }
+event: { event: Camera,                param: 5,                                vec: (-0.07, 0.007, -0.01) }
+event: { event: Display,               message: "Force:Space HQ",  font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Jarnell Orbit",   font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+
+event: { event: Camera,     time:  68, param: 3,      target: "body:Nergal",   vec: (2, -0.2, 4e7)         }
+event: { event: Camera,                param: 5,                                vec: (0.09, 0.007, -0.005) }
+event: { event: Display,               message: "Nephrys System",  font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "On the Hegemony Border",   font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: Camera,     time: 100, param: (6,22), target: "Krill 1" }
+
+event: { event: EndScene,   time: 120, message: "Scene 1" }
+event: { event: Exit }
+
+
+// EOF

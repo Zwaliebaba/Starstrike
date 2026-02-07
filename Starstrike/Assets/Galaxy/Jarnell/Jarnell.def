@@ -1,0 +1,227 @@
+STARSYSTEM
+
+name:       Jarnell
+
+/*************************************/
+
+sky: {
+   nebula:     "Nebula-Jarnell.mag",
+   poly_stars: "stars.mag",
+
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (10, 15, 13)
+
+star: {
+   name:    Valtala
+   map:     "Suns/StarG_map.pcx"
+   image:   "Suns/G3.pcx",
+   tscale:  6,
+   radius:  16e8,
+   mass:    2e30,
+   light:   1.4e11,
+   color:   (255, 250, 230),// - standard yellow
+   back:    ( 11,  18,  15),// - nebula10
+}
+
+
+planet: {
+   name:    Adonis,
+   map:     "Giants/GasGiant7_map.pcx",
+   image:   "Giants/GasGiant7.jpg",
+   radius:  18e6,
+   mass:    2.1e26,
+   orbit:   0.8e11,
+   tscale:  2,
+   tilt:    0.2,
+   ring:    "Giants/Ring3.pcx",
+   minrad:  1.5,
+   maxrad:  1.9,
+   rotation: 19.5
+}
+
+region: {
+   name:    Adonis,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   1.15e8,
+   inclination: 0.45
+}
+
+moon: {
+   name:    Synad,
+   map:     "Moons/rock_map.pcx",
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:  2.2e6,
+   mass:    1.9e22,
+   orbit:   1.44e8,
+   rotation: 30
+}
+
+moon: {
+   name:    Olan,
+   map:     "Moons/lunar_map.pcx",
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      3.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        1.7e24,
+   orbit:       2.251e8
+}
+
+moon: {
+   name:    Amnia,
+   map:     "Moons/lunar_map.pcx",
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      1.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        1.0e24,
+   orbit:       3.771e8
+}
+
+
+planet: {
+   name:    Jarnell,
+   map:      "Jarnell/jarnell_map.pcx",
+   image:    "Jarnell/jarnell_lo.pcx",
+   high_res: "Jarnell/jarnell_hi.jpg",
+   gloss:    "Jarnell/jarnell_gloss.jpg",
+   glow_high_res: "Jarnell/jarnell_lights.jpg"
+   radius:  5.8e6,
+   mass:    4.98e24,
+   atmosphere: (100,180,220),
+   orbit:   1.4e11,
+   rotation: 27
+}
+
+region: {
+   name:    Jarnell,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   19e6,
+   inclination: 0.5
+}
+
+moon: {
+   name:    Lanora,
+   map:     "Jarnell/lanos_map.pcx",
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  1e6,
+   mass:    8e22,
+   orbit:   42e6
+}
+
+
+planet: {
+   name:    Caladan,
+   map:      "Jarnell/caladan_map.pcx",
+   image:    "Jarnell/caladan_lo.pcx",
+   high_res: "Jarnell/caladan_hi.pcx",
+   radius:  3.8e6,
+   mass:    2.98e24,
+   atmosphere: (50,80,70),
+   orbit:   2.01e11,
+   rotation: 32
+}
+
+region: {
+   name:    Caladan,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   12e6,
+   inclination: 0.35
+}
+
+moon: {
+   name:    Malta,
+   map:     "Jarnell/lanos_map.pcx"
+   image:   "Jarnell/lanos_lo.pcx",
+   high_res:"Jarnell/lanos_hi.pcx",
+   radius:  0.72e6,
+   mass:    6e22,
+   orbit:   32e6
+}
+
+
+planet:     {
+   name:    Dawn,
+   map:     "Giants/GasGiant6_map.pcx"
+   image:   "Giants/GasGiant6.jpg",
+   radius:  28e6,
+   mass:    5.1e26,
+   orbit:   4.3e11,
+   tscale:  2,
+   tilt:    0.12,
+   rotation: 27.3,
+}
+
+region: {
+   name:    Dawn,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   1.0e8,
+   inclination: 0.25,
+   link:    Pallas, // Athenar
+   link:    Tulkas, // Borova
+   link:    Sparta, // Thralis
+   link:    Atlan,  // Paragon
+}
+
+moon: {
+   name:    Kash,
+   map:     "Moons/rock_map.pcx",
+   image:   "Moons/rock_lo.pcx",
+   high_res:"Moons/rock_hi.pcx",
+   radius:  3e6,
+   mass:    3e22,
+   orbit:   2.14e8,
+   rotation: 100
+}
+
+moon: {
+   name:    Kara
+   map:     "Moons/lunar_map.pcx"
+   image:   "Moons/lunar_lo.pcx",
+   high_res:"Moons/lunar_hi.pcx",
+   radius:      5.2e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        6.0e24,
+   orbit:       4.551e8
+}
+
+moon: {
+   name:    Soma,
+   map:     "Moons/ice_map.pcx",
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  6e6,
+   rotation: 27.4,
+   atmosphere: (180,180,255),
+   mass:    5.98e24,
+   orbit:   7.11e8
+}
+
+moon: {
+   name:    Tarina,
+   map:     "Moons/ice_map.pcx",
+   image:   "Moons/ice_lo.pcx",
+   high_res:"Moons/ice_hi.pcx",
+   radius:  4e6,
+   rotation: 172.1,
+   atmosphere: (180,180,255),
+   mass:    3.28e24,
+   orbit:   9.34e8
+}
+
+

@@ -1,0 +1,17 @@
+SHIP
+
+name:       Senate
+class:      Building
+display_name: "Senate"
+
+model: "senate2-6.mag"
+
+mass:       550e4
+integrity:  500e4
+scale:      3
+acs:        0
+pcs:        0
+
+chase:      (0, -1200, 250)
+bridge:     (0,     0,  32)
+

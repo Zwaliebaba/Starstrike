@@ -1,0 +1,117 @@
+SHIPCATALOG
+
+item: { name: TargetDrone, type: Drone,      path: "Ships\TargetDrone",        file: "TargetDrone.def" }
+item: { name: CameraPod,   type: Drone,      path: "Ships\CameraPod",          file: "CameraPod.def",    hide: true }
+
+item: { name: Falcon,      type: Fighter,    path: "Ships\Alliance_Fighters",  file: "Falcon.def"      }
+item: { name: Stormhawk,   type: Fighter,    path: "Ships\Alliance_Fighters",  file: "Stormhawk.def"   }
+item: { name: Eagle,       type: Fighter,    path: "Ships\Alliance_Fighters",  file: "Eagle.def"       }
+item: { name: Viper,       type: Fighter,    path: "Ships\Marakan_Fighters",   file: "Viper.def"       }
+item: { name: Razor,       type: Fighter,    path: "Ships\Marakan_Fighters",   file: "Razor.def"       }
+item: { name: Intruder,    type: Fighter,    path: "Ships\Marakan_Fighters",   file: "Intruder.def"    }
+item: { name: Raptor,      type: Fighter,    path: "Ships\Marakan_Fighters",   file: "Raptor.def"      }
+item: { name: Cutlass,     type: Fighter,    path: "Ships\Pirate_Ships",       file: "Cutlass.def"     }
+item: { name: Saber,       type: Fighter,    path: "Ships\Pirate_Ships",       file: "Saber.def"       }
+
+item: { name: Thunderbolt, type: Attack,     path: "Ships\Alliance_Fighters",  file: "Thunderbolt.def" }
+item: { name: Cobra,       type: Attack,     path: "Ships\Marakan_Fighters",   file: "Cobra.def"       }
+item: { name: Avenger,     type: Attack,     path: "Ships\Marakan_Fighters",   file: "Avenger.def"     }
+
+item: { name: Jackal,      type: LCA,        path: "Ships\Marakan_Fighters",   file: "Jackal.def"      }
+item: { name: Zodiac,      type: LCA,        path: "Ships\Alliance_Fighters",  file: "Zodiac.def"      }
+
+item: { name: Baikal,      type: Frigate,    path: "Ships\Dantari_Ships",      file: "Baikal.def"      }
+item: { name: Berents,     type: Frigate,    path: "Ships\Alliance_Ships",     file: "Berents.def"     }
+item: { name: Tiger,       type: Frigate,    path: "Ships\Marakan_Ships",      file: "Tiger.def"       }
+item: { name: Marauder,    type: Frigate,    path: "Ships\Pirate_Ships",       file: "Marauder.def"    }
+item: { name: QShip,       type: Frigate,    path: "Ships\Pirate_Ships",       file: "QShip.def",        hide: true }
+item: { name: Adventure,   type: Carrier,    path: "Ships\Pirate_Ships",       file: "Carrier.def",      hide: true }
+
+item: { name: Asher,       type: Destroyer,  path: "Ships\Alliance_Ships",     file: "Asher.def"       }
+item: { name: Spectre,     type: Destroyer,  path: "Ships\Alliance_Ships",     file: "Spectre.def"     }
+item: { name: Volnaris,    type: Destroyer,  path: "Ships\Marakan_Ships",      file: "Volnaris.def"    }
+item: { name: Broadsword,  type: Destroyer,  path: "Ships\Marakan_Ships",      file: "Broadsword.def"  }
+item: { name: Wolf,        type: Destroyer,  path: "Ships\Dantari_Ships",      file: "Wolf.def"        }
+
+item: { name: Courageous,  type: Cruiser,    path: "Ships\Alliance_Ships",     file: "Cruiser.def"     }
+item: { name: Devastator,  type: Cruiser,    path: "Ships\Alliance_Ships",     file: "Devastator.def"  }
+item: { name: Imperial,    type: Cruiser,    path: "Ships\Marakan_Ships",      file: "Imperial.def"    }
+item: { name: Vendetta,    type: Cruiser,    path: "Ships\Marakan_Ships",      file: "Vendetta.def"    }
+
+item: { name: Dragon,      type: Carrier,    path: "Ships\Marakan_Ships",      file: "Dragon.def"      }
+item: { name: Goliath,     type: Carrier,    path: "Ships\Dantari_Ships",      file: "Goliath.def"     }
+item: { name: Orion,       type: Carrier,    path: "Ships\Alliance_Ships",     file: "Orion.def"       }
+
+item: { name: ZZF,         type: Fighter,    path: "Ships\Zolons",             file: "ZZF.def",          hide: true }
+item: { name: ZZA,         type: Attack,     path: "Ships\Zolons",             file: "ZZA.def",          hide: true }
+item: { name: ZZFF,        type: Frigate,    path: "Ships\Zolons",             file: "ZZFF.def",         hide: true }
+item: { name: ZZDD,        type: Destroyer,  path: "Ships\Zolons",             file: "ZZDD.def",         hide: true }
+item: { name: ZZCA,        type: Cruiser,    path: "Ships\Zolons",             file: "ZZCA.def",         hide: true }
+item: { name: ZZCS,        type: Cruiser,    path: "Ships\Zolons",             file: "ZZCS.def",         hide: true }
+
+item: { name: "Hulk-Frigate",     type: Frigate,    path: "Ships\Marakan_Ships",      file: "Hulk-Frigate.def",      hide: true }
+item: { name: "Hulk-Broadsword",  type: Destroyer,  path: "Ships\Marakan_Ships",      file: "Hulk-Broadsword.def",   hide: true }
+item: { name: "Hulk-Volnaris",    type: Destroyer,  path: "Ships\Marakan_Ships",      file: "Hulk-Volnaris.def",     hide: true }
+item: { name: "Hulk-Imperial",    type: Cruiser,    path: "Ships\Marakan_Ships",      file: "Hulk-Imperial.def",     hide: true }
+item: { name: "Hulk-Vendetta",    type: Cruiser,    path: "Ships\Marakan_Ships",      file: "Hulk-Vendetta.def",     hide: true }
+item: { name: "Hulk-Dragon",      type: Carrier,    path: "Ships\Marakan_Ships",      file: "Hulk-Dragon.def",       hide: true }
+
+item: { name: "Archaelith",       type: Drone,      path: "Ships\Archaelith",         file: "Archaelith.def",        hide: true }
+
+item: { name: Colony,      type: Station,    path: "Ships\Colony",             file: "Colony.def"      }
+item: { name: Relay1,      type: COMSAT,     path: "Ships\Stations",           file: "Relay1.def"      }
+item: { name: Station1,    type: Station,    path: "Ships\Alliance_Stations",  file: "FreightXfer.def" }
+item: { name: Station2,    type: Station,    path: "Ships\Alliance_Stations",  file: "Harmony.def"     }
+item: { name: Station3,    type: Station,    path: "Ships\Alliance_Stations",  file: "Fortress.def"    }
+item: { name: Station4,    type: Station,    path: "Ships\Marakan_Stations",   file: "S4.def"          }
+item: { name: Station5,    type: Station,    path: "Ships\Marakan_Stations",   file: "S5.def"          }
+item: { name: Station6,    type: Station,    path: "Ships\Alliance_Stations",  file: "S6.def"          }
+item: { name: Station7,    type: Station,    path: "Ships\Marakan_Stations",   file: "S7.def"          }
+item: { name: Observatory, type: Station,    path: "Ships\Alliance_Stations",  file: "Observatory.def" }
+item: { name: IM2800,      type: Cargo,      path: "Ships\Civil",              file: "CargoC.def"      }
+item: { name: IM3500,      type: Freighter,  path: "Ships\Civil",              file: "CargoA.def"      }
+item: { name: IM4300,      type: Freighter,  path: "Ships\Civil",              file: "CargoB.def"      }
+item: { name: IM1906,      type: Freighter,  path: "Ships\Civil",              file: "TankerA.def"     }
+item: { name: IM1912,      type: Freighter,  path: "Ships\Civil",              file: "TankerB.def"     }
+item: { name: Transport,   type: Courier,    path: "Ships\Civil",              file: "Transport.def"   }
+item: { name: Courier,     type: Courier,    path: "Ships\Civil",              file: "Courier.def"     }
+
+item: { name: Farcaster,   type: Farcaster,  path: "Ships\Alliance_Stations",  file: "Farcaster.def"   }
+item: { name: Farcaster2,  type: Farcaster,  path: "Ships\Farcaster",          file: "Farcaster2.def"  }
+item: { name: Airbase1,    type: Starbase,   path: "Ships\Airbases",           file: "Airbase1.def"    }
+item: { name: Airbase2,    type: Starbase,   path: "Ships\Airbases",           file: "Airbase2.def"    }
+item: { name: Airbase3,    type: Starbase,   path: "Ships\Airbases",           file: "Airbase3.def"    }
+item: { name: "Blockade Mine",type: Mine,    path: "Ships\Dantari_Ships",      file: "Mine1.def"       }
+item: { name: "AAA 1",     type: SAM,        path: "Ships\Ground_Units",       file: "Gnd_aaa1.def"    }
+item: { name: "AAA 2",     type: SAM,        path: "Ships\Ground_Units",       file: "Gnd_aaa2.def"    }
+item: { name: "SAM 1",     type: SAM,        path: "Ships\Ground_Units",       file: "Gnd_sam1.def"    }
+item: { name: Barracks,    type: Building,   path: "Ships\Buildings",          file: "Barracks.def"    }
+item: { name: Bldg00,      type: Building,   path: "Ships\Buildings",          file: "Bldg00.def"      }
+item: { name: Bldg01,      type: Building,   path: "Ships\Buildings",          file: "Bldg01.def"      }
+item: { name: Bldg02,      type: Building,   path: "Ships\Buildings",          file: "Bldg02.def"      }
+item: { name: Bldg03,      type: Building,   path: "Ships\Buildings",          file: "Bldg03.def"      }
+item: { name: Bldg04,      type: Building,   path: "Ships\Buildings",          file: "Bldg04.def"      }
+item: { name: Bldg05,      type: Building,   path: "Ships\Buildings",          file: "Bldg05.def"      }
+item: { name: BioDome,     type: Building,   path: "Ships\Buildings",          file: "BioDome.def"      hide: true }
+item: { name: BioDome2,    type: Building,   path: "Ships\Buildings",          file: "BioDome2.def"     hide: true }
+item: { name: BioTrail,    type: Building,   path: "Ships\Buildings",          file: "BioTrail.def"     hide: true }
+item: { name: City00,      type: Building,   path: "Ships\Buildings",          file: "City00.def"      }
+item: { name: City01,      type: Building,   path: "Ships\Buildings",          file: "City01.def"      }
+item: { name: City02,      type: Building,   path: "Ships\Buildings",          file: "City02.def"      }
+item: { name: City03,      type: Building,   path: "Ships\Buildings",          file: "City03.def"      }
+item: { name: Cool00,      type: Building,   path: "Ships\Buildings",          file: "Cool00.def"      }
+item: { name: Dsrt00,      type: Building,   path: "Ships\Buildings",          file: "Dsrt00.def"      }
+item: { name: Dsrt01,      type: Building,   path: "Ships\Buildings",          file: "Dsrt01.def"      }
+item: { name: Dsrt02,      type: Building,   path: "Ships\Buildings",          file: "Dsrt02.def"      }
+item: { name: Dsrt03,      type: Building,   path: "Ships\Buildings",          file: "Dsrt03.def"      }
+item: { name: Dsrt04,      type: Building,   path: "Ships\Buildings",          file: "Dsrt04.def"      }
+item: { name: Dsrt05,      type: Building,   path: "Ships\Buildings",          file: "Dsrt05.def"      }
+item: { name: Fact00,      type: Factory,    path: "Ships\Buildings",          file: "Fact00.def"      }
+item: { name: Fact01,      type: Factory,    path: "Ships\Buildings",          file: "Fact01.def"      }
+item: { name: Fact02,      type: Factory,    path: "Ships\Buildings",          file: "Fact02.def"      }
+item: { name: Fact03,      type: Factory,    path: "Ships\Buildings",          file: "Fact03.def"      }
+item: { name: Fact04,      type: Factory,    path: "Ships\Buildings",          file: "Fact04.def"      }
+item: { name: Reac01,      type: Factory,    path: "Ships\Buildings",          file: "Reac01.def"      }
+item: { name: Tank00,      type: Factory,    path: "Ships\Buildings",          file: "Tank00.def"      }
+item: { name: Platform,    type: Factory,    path: "Ships\Buildings",          file: "Platform.def"    }
+

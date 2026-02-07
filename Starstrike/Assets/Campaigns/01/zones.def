@@ -1,0 +1,32 @@
+ZONES
+
+zone: {
+   system: Janus,
+   region: "Ilon"
+}
+
+zone: {
+   system: Janus,
+   region: "Dante"
+}
+
+zone: {
+   system: Janus,
+   region: "Janek",
+   region: "Janek Station",
+}
+
+zone: {
+   system: Janus,
+   region: "Alystra",
+}
+
+zone: {
+   system: Janus,
+   region: "Navara",
+}
+
+zone: {
+   system: Janus,
+   region: "Vail",
+}

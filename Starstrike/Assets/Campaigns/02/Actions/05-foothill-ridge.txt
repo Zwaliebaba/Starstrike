@@ -1,0 +1,17 @@
+*************************************
+*** FLASH CODED +$TIME 
+*** FOOTHILL RIDGE 
+*** TELMERA SECTOR 
+*** CLASSIFIED: SECRET R5 NTK
+*************************************
+
+Dantari Separatist base discovered on Solus
+
+Force:Intel field agents have uncovered a Separatist military base in the city of Foothill Ridge near Telmera on Solus.  The encampment consists of an operational airbase, reactor complex, weapons bunkers, and an unknown complement of starfighters and personnel.  The Foothill Ridge Base is protected by a series of AAA and SAM batteries in the hills surrounding the city.
+
+Force:Intel recommends Force:Space deploy a package of air strikes to reduce the fixed weapon emplacements and the airbase.  The reactor complex does not appear to be needed for civilian power in the Foothill Ridge area.  However, the reactor poses an unknown danger to the area of radiation and toxic chemical contamination if it is destroyed using air-to-ground weapons, so you will need to be careful when you prosecute your ground strikes.
+
+---
+Kash Anlon, Force:Intel Second Directorate
+
+*************************************

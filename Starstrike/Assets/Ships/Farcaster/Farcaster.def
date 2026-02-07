@@ -1,0 +1,146 @@
+SHIP
+
+name:       Farcaster
+class:      Farcaster
+description: "The standard Terellian Alliance quantum portal for long range travel.  The 185 exawatt Type I FARCASTER can translate any starship or fighter-class vessel, even without an onboard FTL quantum drive, instantly to a remote destination.  Farcaster portals are always connected in pairs."
+
+model:      "Farcaster.mag"
+
+mass:       5e6
+integrity:  3e6
+scale:      15.0
+acs:        320e3
+
+drag:       100
+roll_drag:  100
+pitch_drag: 100
+yaw_drag:   100
+
+chase:      (0, -750, 80)
+bridge:     (0,    0, 24)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       90e3,
+
+   loc:        (0, 0, -32),
+   size:       64,
+   hull_factor: 0.5
+   }
+
+farcaster:     {
+   approach:   (0, 0, -2000),
+   start:      (0, 0, 0),
+   end:        (0, 0, 1000),
+
+   loc:        (0, 0, 0),
+   size:       128,
+   hull_factor: 0.5
+   }
+
+navlight:  {
+   scale:  6,
+   period: 1.5,
+
+   light:  { loc: (-138,-42,-257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: (-138,-42, 257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: (-138, 42,-257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: (-138, 42, 257), pattern: 0xf0000000, type: 3 },
+
+   light:  { loc: ( 138,-42,-257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: ( 138,-42, 257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: ( 138, 42,-257), pattern: 0xf0000000, type: 3 },
+   light:  { loc: ( 138, 42, 257), pattern: 0xf0000000, type: 3 },
+}
+
+navlight:  {
+   scale:  6,
+   period: 1,
+
+   light:  { loc: (-138,-42,-257), pattern: 0xf0000000, type: 2 },
+   light:  { loc: ( 138,-42,-257), pattern: 0x00f00000, type: 2 },
+   light:  { loc: (-138, 42,-257), pattern: 0x00f00000, type: 2 },
+   light:  { loc: ( 138, 42,-257), pattern: 0xf0000000, type: 2 },
+
+   light:  { loc: (-138,-42, 257), pattern: 0x00f00000, type: 2 },
+   light:  { loc: ( 138,-42, 257), pattern: 0xf0000000, type: 2 },
+   light:  { loc: (-138, 42, 257), pattern: 0xf0000000, type: 2 },
+   light:  { loc: ( 138, 42, 257), pattern: 0x00f00000, type: 2 },
+}
+
+map: {
+   sprite: "map.pcx"
+}
+
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-150, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (160, 40, 100),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.5,
+   explosion_loc:    (230, -48, -180),
+
+   explosion_type:   20,   // LARGE_BURST (custom)
+   explosion_time:   0.1,
+   explosion_loc:    (220, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0.3,
+   explosion_loc:    (-160, 80, -90),
+
+   explosion_type:   20,   // LARGE_BURST (custom)
+   explosion_time:   0.1,
+   explosion_loc:    (-160, 80, -90),
+
+   final_type:       13,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "Debris1.mag",
+   debris_loc:       (180,0,0),
+   debris_mass:      100e3,
+   debris_count:     1,
+   debris_life:      600,
+   debris_fire:      (-10,0,0),
+   debris_fire:      ( 15,20,10),
+
+   debris:           "Debris2.mag",
+   debris_loc:       (-160,-120,0),
+   debris_mass:      100e3,
+   debris_count:     1,
+   debris_life:      500,
+
+   debris:           "Debris3.mag",
+   debris_loc:       (-180,0,0),
+   debris_mass:      100e3,
+   debris_count:     1,
+   debris_life:      400,
+   debris_fire:      ( 4,0,10),
+   debris_fire:      (25,20,0),
+   debris_fire:      ( 5,-10,-20),
+
+   debris:           "Debris5.mag",
+   debris_loc:       (0,20,0),
+   debris_mass:      1,
+   debris_count:     8,
+   debris_life:      25,
+
+   debris:           "Debris7.mag",
+   debris_loc:       (10,0,0),
+   debris_mass:      1,
+   debris_count:     12,
+   debris_life:      15,
+   }
+

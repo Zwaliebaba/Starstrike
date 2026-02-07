@@ -1,0 +1,906 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Independent System of Solus",
+  intel:  known,
+  iff:    0,
+}
+
+group: {
+  type:   civilian,
+  id:     1,
+  name:   "Civilian Infrastructure",
+  intel:  known,
+  iff:    0,
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2000,
+  name:   "Solus Farcaster Network",
+  intel:  known,
+  iff:    0,
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2001,
+  name:   "Solus-Kalon",
+  intel:  located,
+  iff:    0,
+  region: "Solus",
+  loc:    (80e3, 20e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Solus-Kalon",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2002,
+  name:   "Kalon-Solus",
+  intel:  located,
+  iff:    0,
+  region: "Kalon",
+  loc:    (90e3, -54e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Kalon-Solus",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2003,
+  name:   "Solus-Trellis",
+  intel:  located,
+  iff:    0,
+  region: "Solus",
+  loc:    (-200e3, -100e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Solus-Trellis",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2004,
+  name:   "Trellis-Solus",
+  intel:  located,
+  iff:    0,
+  region: "Trellis",
+  loc:    (-100e3, -150e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Trellis-Solus",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2005,
+  name:   "Solus-Jalah",
+  intel:  located,
+  iff:    0,
+  region: "Solus",
+  loc:    (150e3, -180e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Solus-Jalah",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2006,
+  name:   "Jalah-Solus",
+  intel:  located,
+  iff:    0,
+  region: "Jalah",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Jalah-Solus",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2007,
+  name:   "Trellis-Jalah",
+  intel:  located,
+  iff:    0,
+  region: "Trellis",
+  loc:    (50e3, -100e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Trellis-Jalah",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     2008,
+  name:   "Jalah-Trellis",
+  intel:  located,
+  iff:    0,
+  region: "Jalah",
+  loc:    (120e3, -200e3, 0),
+  parent_type: infrastructure,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Jalah-Trellis",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   transport,
+  id:     2100,
+  name:   "Solus Port Authority",
+  intel:  known,
+  iff:    0,
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   station,
+  id:     2101,
+  name:   "Trellis Docks",
+  intel:  located,
+  iff:    0,
+  region: "Trellis",
+  loc:    (0, 0, 0),
+  parent_type: transport,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Trellis Docks"
+    type:   "Station"
+    design: "Station1"
+    regnum: ""
+  }
+}
+
+group: {
+  type:   intercept_squadron
+  id:     2110
+  name:   "Trellis Guest 1"
+  intel:  known
+  iff:    0,
+  region: "Trellis",
+  loc:    (0, 0, 0),
+  parent_type: station,
+  parent_id:   2101,
+
+  unit: {
+    name:   "Trellis Guest 1"
+    type:   "Fighter"
+    design: "Falcon"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     2111,
+  name:   "Trellis Guest 2",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (0, 0, 0),
+  parent_type: station,
+  parent_id:   2101,
+
+  unit: {
+    name:   "Trellis Guest 2"
+    type:   "Fighter"
+    design: "Stormhawk"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   lca_squadron,
+  id:     2112,
+  name:   "Trellis Guest 3",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (0, 0, 0),
+  parent_type: station,
+  parent_id:   2101,
+
+  unit: {
+    name:   "Trellis Guest 3"
+    type:   "LCA"
+    design: "Zodiac"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   station
+  id:     2102
+  name:   "Harmony Station"
+  intel:  located
+  iff:    0
+  region: "Kalon"
+  loc:    (0, 0, 0)
+  parent_type: transport
+  parent_id:   2100
+
+  unit: {
+    name:   "Harmony Station"
+    type:   "Station"
+    design: "Station2"
+  }
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     2120,
+  name:   "Harmony Guest 1",
+  intel:  known,
+  iff:    0,
+  region: "Kalon",
+  loc:    (0, 0, 0),
+  parent_type: station,
+  parent_id:   2102,
+
+  unit: {
+    name:   "Harmony Guest 1"
+    type:   "Fighter"
+    design: "Falcon"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   fighter_squadron
+  id:     2121
+  name:   "Harmony Guest 2"
+  intel:  known
+  iff:    0
+  region: "Kalon"
+  loc:    (0, 0, 0)
+  parent_type: station
+  parent_id:   2102
+
+  unit: {
+    name:   "Harmony Guest 2"
+    type:   "Fighter"
+    design: "Stormhawk"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   lca_squadron
+  id:     2122
+  name:   "Harmony Guest 3"
+  intel:  known
+  iff:    0
+  region: "Kalon"
+  loc:    (0, 0, 0),
+  parent_type: station
+  parent_id:   2102
+
+  unit: {
+    name:   "Harmony Guest 3"
+    type:   "LCA"
+    design: "Zodiac"
+    count:  8
+    dead_count: 8
+  }
+}
+
+group: {
+  type:   civilian,
+  id:     2200,
+  name:   "Telmera City",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-54e3, 30e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   civilian,
+  id:     2201,
+  name:   "Admin",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-53000, 29500, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Admin",
+    type:   "Building",
+    design: "Bldg00",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2202,
+  name:   "Office",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-52500, 28e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Office",
+    type:   "Building",
+    design: "Bldg01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2203,
+  name:   "Tower",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-54600, 32800, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Tower",
+    type:   "Building",
+    design: "Bldg02",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2204,
+  name:   "Alton",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-56e3, 26e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Alton",
+    type:   "Building",
+    design: "Bldg03",
+    regnum: "",
+    },
+}
+
+
+group: {
+  type:   civilian,
+  id:     2210,
+  name:   "City Block",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-60e3, 28e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2211,
+  name:   "City Block",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-56000, 30000, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City02",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2212,
+  name:   "City Block",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-51e3, 30700, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2215,
+  name:   "City Block",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (52600, -52000, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City00",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2216,
+  name:   "City Block",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (53e3, -55e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "City Block",
+    type:   "Building",
+    design: "City01",
+    regnum: "",
+    },
+}
+
+
+group: {
+  type:   war_production,
+  id:     2207,
+  name:   "Factory 2",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-53000, 30500, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Factory 2",
+    type:   "Factory",
+    design: "Fact04",
+    regnum: "000",
+    },
+}
+
+group: {
+  type:   starbase,
+  id:     1,
+  name:   "Telmera Starport",
+  intel:  located,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-55e3, 22e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Telmera Starport",
+    type:   "Starbase",
+    design: "Airbase1",
+    regnum: "000",
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     2223,
+  name:   "Telmera Guest 1",
+  intel:  known,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-55e3, 22e3, 0),
+  parent_type: starbase,
+  parent_id:   1,
+
+  unit: {
+    name:   "Telmera Guest 1",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  10,
+    dead_count: 10,
+    },
+}
+
+
+group: {
+  type:   fighter_squadron,
+  id:     2224,
+  name:   "Telmera Guest 2",
+  intel:  known,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-55e3, 22e3, 0),
+  parent_type: starbase,
+  parent_id:   1,
+
+  unit: {
+    name:   "Telmera Guest 2",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  10,
+    dead_count: 10,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     2225,
+  name:   "Telmera Guest 3",
+  intel:  known,
+  iff:    0,
+  region: "Telmera",
+  loc:    (-55e3, 22e3, 0),
+  parent_type: starbase,
+  parent_id:   1,
+
+  unit: {
+    name:   "Telmera Guest 3",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  10,
+    dead_count: 10,
+    },
+}
+
+group: {
+  type:   non_com,
+  id:     2300,
+  name:   "Freight",
+  intel:  known,
+  iff:    0,
+  loc:    (0, -20e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   freight,
+  id:     3000,
+  name:   "Independent Shipping",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (80e3, -120e3, 0),
+  parent_type: non_com,
+  parent_id:   2300,
+}
+
+group: {
+  type:   freight,
+  id:     3798,
+  name:   "ISS White Dawn",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (90e3, -130e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS White Dawn",
+    type:   Cargo
+    design: IM2800
+    skin:   Green
+    regnum: "798",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3780,
+  name:   "ISS Fairlight",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (110e3, -120e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Fairlight",
+    type:   Cargo
+    design: IM2800
+    skin:   Green
+    regnum: "780",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3354,
+  name:   "ISS Turimo",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (175e3, 200e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Turimo",
+    type:   Cargo
+    design: IM2800
+    skin:   Green
+    regnum: "354",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3843,
+  name:   "ISS Farlook",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (160e3, 211e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Farlook",
+    type:   Cargo
+    design: IM3500
+    skin:   Green
+    regnum: "843",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3235,
+  name:   "ISS Grayhawke",
+  intel:  known,
+  iff:    0,
+  region: "Trellis",
+  loc:    (-20e3, 228e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Grayhawke",
+    type:   Cargo
+    design: IM3500
+    skin:   Blue
+    regnum: "235",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3493,
+  name:   "ISS Ulmo",
+  intel:  known,
+  iff:    0,
+  region: "Kalon",
+  loc:    (-90e3, 160e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Ulmo",
+    type:   Cargo
+    design: IM4300
+    skin:   Blue
+    regnum: "493",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3219,
+  name:   "ISS Wayward",
+  intel:  known,
+  iff:    0,
+  region: "Kalon",
+  loc:    (-102e3, 138e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Wayward",
+    type:   Cargo
+    design: IM4300
+    skin:   Blue
+    regnum: "219",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3381,
+  name:   "ISS Sutter",
+  intel:  known,
+  iff:    0,
+  region: "Kalon",
+  loc:    (99e3, -128e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Sutter",
+    type:   Cargo
+    design: IM2800
+    skin:   Blue
+    regnum: "381",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3521,
+  name:   "ISS Alen Carl",
+  intel:  known,
+  iff:    0,
+  region: "Solus",
+  loc:    (79e3, 228e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Alen Carl",
+    type:   Cargo
+    design: IM2800
+    skin:   Blue
+    regnum: "521",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3617,
+  name:   "ISS Hal Bennet",
+  intel:  known,
+  iff:    0,
+  region: "Meridian",
+  loc:    (75e3, -150e3, 0),
+  parent_type: freight,
+  parent_id:   3000,
+
+  unit: {
+    name:   "ISS Hal Bennet",
+    type:   "Cargo",
+    design: IM3500
+    skin:   Blue
+    regnum: "617",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     5000,
+  name:   "University",
+  intel:  known,
+  iff:    0,
+  region: "Meridian",
+  loc:    (75e3, 80e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   habitat,
+  id:     5001,
+  name:   "Tal Vesta Stellar Observatory",
+  intel:  known,
+  iff:    0,
+  region: "Meridian",
+  loc:    (75e3, 75e3, 0),
+  parent_type: civilian,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Tal Vesta Stellar Observatory",
+    type:   "Station",
+    design: "Observatory",
+    regnum: "000",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     5002,
+  name:   "Logistics",
+  intel:  secret,
+  iff:    0,
+  region: "Meridian",
+  loc:    (30e3, -180e3, 0),
+  parent_type: habitat,
+  parent_id:   5001,
+
+  unit: {
+    name:   "Loader",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  2,
+    },
+}
+

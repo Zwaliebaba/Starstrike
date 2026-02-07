@@ -1,0 +1,314 @@
+SHIP
+
+name:          Baikal
+display_name:  Baikal
+class:         Frigate
+description:   "The BAIKAL class frigates are commonly used by the independent systems as anti-fighter platforms.  Designed by the Marakan Hegemony as cost efficient space combatants, they lack the multi-mission capability necessary for modern warships faced with multiple, high-technology threats. They also offer limited capacity for growth. Despite this, the FF-101 Baikal class is a robust platform, capable of withstanding considerable damage while staying 'in the fight.'"
+
+degrees:    true
+beauty:     (-22, 7, 1.1)
+hud_icon:   "BaikalHud.pcx"
+
+detail_0:   "Frigate_0opt.mag"
+feature_0:  1000
+detail_1:   "Frigate_1opt.mag"
+feature_1:  32
+detail_2:   "Frigate_2opt.mag"
+feature_2:  16
+
+mass:       9.53e3
+agility:    3.8
+vlimit:     300
+roll_rate:  8
+integrity:  21e3
+scale:      1.6
+acs:        1
+degrees:    true
+
+trans_x:     85e3
+trans_y:     35e3
+trans_z:     85e3
+
+arcade_drag: 2e-2
+drag:       1e-6
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1e3, 200)
+bridge:     (0, 0,    92)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       3e3,
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.9,
+   explosion:        7
+}
+
+drive:      {
+   type:             Yellow
+   abrv:             Drive
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           750,
+   scale:            3,
+   port:             (  0, 43,-435),
+   port:             ( 42,  0,-435),
+   port:             (-42,  0,-435),
+   port:             (  0,-43,-435),
+
+   loc:              (0, 0, -220),
+   size:             32,
+   hull_factor:      0.6,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster
+   type:             Yellow,
+
+   loc:              (0, 0, 64)
+   size:             24,
+   hull_factor:      0.3
+   scale:            1.5
+
+   port_left:   {loc:( -88,   0,-356), fire: 0x0041}
+   port_left:   {loc:( -72, -19, 453), fire: 0x0081}
+   port_left:   {loc:( -72,  19, 453), fire: 0x0081}
+
+   port_right:  {loc:(  88,   0,-356), fire: 0x0082}
+   port_right:  {loc:(  72, -19, 453), fire: 0x0042}
+   port_right:  {loc:(  72,  19, 453), fire: 0x0042}
+
+   port_fore:   {loc:( -54, -19, 498), fire: 0x0044}
+   port_fore:   {loc:( -21, -41, 498), fire: 0x0044}
+   port_fore:   {loc:(  21, -41, 498), fire: 0x0084}
+   port_fore:   {loc:(  54, -19, 498), fire: 0x0084}
+
+   port_top:    {loc:( -64,  29,-319), fire: 0x0510}
+   port_top:    {loc:(  64,  29,-319), fire: 0x0910}
+
+   port_bottom: {loc:( -64, -29,-319), fire: 0x0A20}
+   port_bottom: {loc:(  64, -29,-319), fire: 0x0620}
+
+   port_top:    {loc:( -19,  60, 452), fire: 0x0610}
+   port_top:    {loc:(  19,  60, 452), fire: 0x0A10}
+
+   port_bottom: {loc:( -19, -60, 452), fire: 0x0920}
+   port_bottom: {loc:(  19, -60, 452), fire: 0x0520}
+}
+
+quantum:     {
+   design:           "Quantum Drive",
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.7
+}
+
+
+shield:     {
+   type:             2,
+   design:           "Grav Shield",
+   abrv:             Shield
+   factor:           0.02,
+   consumption:      1500,
+   // model:            "BaikalShield.mag",
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   pcs:              100
+   loc:              (0, 20, -80)
+   size:             16
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "Plasma Cannon",
+   design:           "Plasma Weapon",
+   name:             "Fwd Cannon",
+   abrv:             "Plasma 1",
+   muzzle:           (0, 25, 540),
+   azimuth:          0,
+
+   loc:              (0, 25, 500),
+   size:             24,
+   hull_factor:      0.1
+}
+
+weapon:     {
+   type:             "Mk7 Interceptor",
+   design:           "Missile Weapon",
+   name:             "Interceptor 1",
+   abrv:             "MK7",
+   muzzle:           (-20, 0, 450),
+   muzzle:           ( 20, 0, 450),
+   azimuth:          0,
+
+   loc:              (-50, 0, -40),
+   size:             16,
+   hull_factor:      0.1
+}
+
+weapon:     {
+   type:             "Ursa Cannon",
+   design:           "Bolt Weapon",
+   name:             "Starboard Cannon",
+   abrv:             "PDB 1",
+
+   loc:              ( 85, 0, -30),
+   muzzle:           (  0, 0,  70),
+   azimuth:          90
+   rest_azimuth:     -90
+
+   size:             24,
+   hull_factor:      0.3
+}
+
+weapon:     {
+   type:             "Ursa Cannon",
+   design:           "Bolt Weapon",
+   name:             "Port Cannon",
+   abrv:             "PDB 2",
+
+   loc:              (-85, 0, -30),
+   muzzle:           (  0, 0,  70),
+   azimuth:          -90
+   rest_azimuth:      90
+
+   size:             24,
+   hull_factor:      0.3
+}
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -10, 64),
+
+   loc:     (0, -10, 50),
+   size:    16,
+   hull_factor: 0.3
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   abrv:             Batt
+   max_output:       250
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:   50e3,
+   range:   75e3,
+   range:   100e3,
+
+   loc:              (0, 0, 180),
+   size:             16,
+   hull_factor:      0.1
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       11,   // LARGE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "DebrisFrigate1.mag",
+   debris_loc:       (0,0,-150),
+   debris_mass:      11e3,
+   debris_count:     1,
+   debris_life:      400,
+   debris_fire:      ( 44, 24, 84),
+   debris_fire:      (-41,-24,100),
+
+   debris:           "Debris0A.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     10,
+   debris_life:      15,
+
+   debris:           "Debris0B.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     15,
+   debris_life:      20,
+
+   debris:           "Debris0C.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      2,
+   debris_count:     10,
+   debris_life:      22,
+
+   }
+
+map: {
+   sprite: "BaikalMap0.pcx",
+   sprite: "BaikalMap1.pcx",
+   sprite: "BaikalMap2.pcx",
+   sprite: "BaikalMap3.pcx",
+   sprite: "BaikalMap4.pcx",
+   sprite: "BaikalMap5.pcx",
+   sprite: "BaikalMap6.pcx",
+   sprite: "BaikalMap7.pcx"
+}
+
+

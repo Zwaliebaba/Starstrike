@@ -1,0 +1,210 @@
+MISSION
+
+name:       "09. Hounds and Hunters"
+type:       FLEET
+system:     Paragon
+region:     Paragon
+
+start:      "08/09:34:00"
+degrees:    true
+
+sitrep:     "An enemy destroyer squadron has broken off from the main fleet "
+            "and entered the Paragon system.  Force:Command believes that this "
+            "is a diversionary tactic in preparation for a major incursion "
+            "elsewhere in Alliance space.  We need to resolve this threat as "
+            "quickly as possible and return to the main fleet.\n\n"
+
+            "Paragon traffic control is working to route civilian vessels away "
+            "from the combat zone, but make sure you verify your targets before "
+            "engaging."
+
+objective:  "* Destroy or disable destroyer squadron Wolf\n"
+            "* Protect civilian assets in Paragon system"
+
+
+//
+// GOOD GUYS:
+//
+
+element: {
+   name:    Wraith,
+   design:  Spectre,
+   loc:     (-20e3, 0, 0),
+   count:   1,
+   iff:     1,
+   player:  1,
+   mission: fleet,
+
+   navpt:   { cmd: sweep, rloc: {                dex: 200e3, dex_var: 30e3, az: -45, az_var: 30, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "this:1", dex: 150e3, dex_var: 30e3, az:  35, az_var: 20, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "this:2", dex: 150e3, dex_var: 30e3, az:  85, az_var: 20, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "this:3", dex: 140e3, dex_var: 30e3, az: 135, az_var: 20, el_var: 0 }, speed: 500 },
+}
+
+element: {
+   name:    Nemesis,
+   design:  Spectre,
+   loc:     (-30e3, 7e3, -500),
+   count:   1,
+   iff:     1,
+   commander: Wraith,
+   mission: fleet,
+
+   navpt:   { cmd: sweep, rloc: { ref: "Wraith:1", dex: 20e3, dex_var: 3e3, az: -45, az_var: 30, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "Wraith:2", dex: 20e3, dex_var: 3e3, az:  45, az_var: 20, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "Wraith:3", dex: 20e3, dex_var: 3e3, az: 135, az_var: 20, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: sweep, rloc: { ref: "Wraith:4", dex: 20e3, dex_var: 3e3, az: 200, az_var: 20, el_var: 0 }, speed: 500 },
+}
+
+element: {
+   name:    Bosporus,
+   design:  Berents,
+   loc:     (-5e3, 12e3, 1200),
+   count:   1,
+   iff:     1,
+   commander: Wraith,
+   mission: escort,
+
+   navpt:   { cmd: escort, rloc: { ref: "Wraith:1", dex: 30e3, dex_var: 3e3, az: -45, az_var: 30, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: escort, rloc: { ref: "Wraith:2", dex: 30e3, dex_var: 3e3, az:  45, az_var: 30, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: escort, rloc: { ref: "Wraith:3", dex: 30e3, dex_var: 3e3, az: 135, az_var: 30, el_var: 0 }, speed: 500 },
+   navpt:   { cmd: escort, rloc: { ref: "Wraith:4", dex: 30e3, dex_var: 3e3, az: 200, az_var: 30, el_var: 0 }, speed: 500 },
+}
+
+//
+// BAD GUYS:
+//
+
+element: {
+   name:    Wolf,
+   design:  Wolf,
+   rloc:    { ref: "Wraith:4", dex: 80e3 },
+   count:   1,
+   iff:     2,
+   intel:   Known,
+
+   navpt:   { cmd: patrol, rloc: { ref: "Wraith:4", dex: 80e3, dex_var: 25e3, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: patrol, rloc: { ref: "Wraith:2", dex: 80e3, dex_var: 25e3, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: patrol, rloc: { ref: "Wraith:1", dex: 80e3, dex_var: 25e3, el_var: 0 }, speed: 400 },
+}
+
+element: {
+   name:    Jackal,
+   design:  Wolf,
+   rloc:    { ref: "Wolf", dex: 20e3 },
+   count:   1,
+   iff:     2,
+   intel:   Known,
+
+   navpt:   { cmd: patrol, rloc: { ref: "Wolf:1", dex: 30e3, dex_var: 3e3, az: -45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: patrol, rloc: { ref: "Wolf:2", dex: 30e3, dex_var: 3e3, az:  45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: patrol, rloc: { ref: "Wolf:3", dex: 30e3, dex_var: 3e3, az: 135, az_var: 30, el_var: 0 }, speed: 400 },
+}
+
+element: {
+   name:    Parthan,
+   design:  Baikal,
+   rloc:    { ref: "Wolf", dex: 30e3 },
+   count:   1,
+   iff:     2,
+   commander: Wolf,
+   mission: escort,
+   intel:   Known,
+
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:1", dex: 35e3, dex_var: 3e3, az: -45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:2", dex: 35e3, dex_var: 3e3, az:  45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:3", dex: 35e3, dex_var: 3e3, az: 135, az_var: 30, el_var: 0 }, speed: 400 },
+}
+
+element: {
+   name:    Kyren,
+   design:  Baikal,
+   rloc:    { ref: "Wolf", dex: 30e3 },
+   count:   1,
+   iff:     2,
+   commander: Jackal,
+   mission: escort,
+   intel:   Known,
+
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:1", dex: 40e3, dex_var: 3e3, az: -45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:2", dex: 40e3, dex_var: 3e3, az:  45, az_var: 30, el_var: 0 }, speed: 400 },
+   navpt:   { cmd: escort, rloc: { ref: "Wolf:3", dex: 40e3, dex_var: 3e3, az: 135, az_var: 30, el_var: 0 }, speed: 400 },
+}
+
+//
+// CIVILIANS:
+//
+
+element: {
+   name:    Finisterre
+   design:  IM1912
+   rloc:    { ref: "Wraith:4", dex: 120e3, az: 90, az_var: 45 },
+   count:   1,
+   iff:     0,
+   intel:   Secret,
+
+   navpt:   { cmd: vector, rloc: { ref: "Wraith:1", dex: 120e3, dex_var: 35e3 }, speed: 300 },
+   navpt:   { cmd: vector, loc: (0,0,0), rgn: Atlan, speed: 500 }
+}
+
+
+//
+// EVENT LIST:
+//
+
+event: {
+   id:              25,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Wolf,
+}
+
+event: {
+   id:              26,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Jackal,
+}
+
+event: {
+   id:              27,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Parthan,
+}
+
+event: {
+   id:              28,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Kyren,
+}
+
+event: {
+   id:              50,
+   event:           Message,
+   sound:           "Vox\Misc\M09-E50.wav",
+   event_message:   "The enemy destroyer squadron has been destroyed.  Mission complete!",
+   event_ship:      Drayton,
+
+   trigger:         "Event (ALL)",
+   trigger_param:   (25, 26, 27, 28),
+   delay:           5,
+}
+
+event: {
+   id:              99,
+   event:           Exit,
+
+   trigger:         Event,
+   trigger_param:   50,
+   delay:           10,
+}

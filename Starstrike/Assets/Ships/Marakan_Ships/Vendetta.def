@@ -1,0 +1,449 @@
+SHIP
+
+name:          Vendetta
+display_name:  Vendetta
+class:         Cruiser
+description:   "The CA-5D15 VENDETTA class of heavy cruisers are the core Hegemony heavy gun platforms.  Big, slow, and very tough, each of these enormous vessels features a pair of heavy gamma ray laser batteries and twin Rostov antiship missile turrets.  Together these weapons can bring down the largest starships and orbital stations.  The Vendetta's complement of magnetic rail guns make her more suitable to offense than defense; these ships rely on their tough hide to withstand enemy bombardment while they move in for the kill."
+
+hud_icon:   "VendettaHud.pcx"
+
+detail_0:   "VendettaNarrow_0opt.mag"
+feature_0:  1000
+detail_1:   "VendettaNarrow_1opt.mag"
+feature_1:  48
+detail_2:   "VendettaNarrow_2opt.mag"
+feature_2:  24
+
+mass:       568.1e3
+agility:    2
+vlimit:     230
+roll_rate:  7
+integrity:  60e3
+scale:      4.2
+acs:        1.2
+
+trans_x:     450e3
+trans_y:     300e3
+trans_z:     450e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   640, 100)
+
+degrees: true
+
+power:      {
+   type:             Fusion
+   name:             "Fusion 1"
+   design:           "Fusion Reactor"
+   max_output:       40e3
+
+   loc:              (0, -45, -150),
+   size:             96,
+   hull_factor:      0.9,
+   explosion:        7
+}
+
+drive: {
+   type:             Yellow,
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           35e3
+   scale:            7
+   augmenter:        0
+
+ 	 
+   port:             (-210, 42, -334)
+   port:             (-210,  0, -334)
+   port:             ( 210, 42, -334)
+   port:             ( 210,  0, -334)
+
+   loc:              (0, 0,-0),
+   size:             32,
+   hull_factor:      0.8,
+   explosion:        7
+}
+
+power:      {
+   type:             Fusion
+   name:             "Fusion 2"
+   design:           "Fusion Reactor"
+   max_output:       10e3
+
+   loc:              (0, -45, -550),
+   size:             96,
+   hull_factor:      0.9,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   abrv:             "Shield"
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, -80),
+   size:             48,
+   hull_factor:      0.7
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   max_output:       4e3,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 1",
+   abrv:             "Graser-1",
+   muzzle:           (-8, 33, 779),
+   loc:              (-8, 33,600),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "Gamma Laser",
+   design:           "Beam Weapon",
+   name:             "Gamma Laser 2",
+   abrv:             "Graser-2",
+   muzzle:           ( 8, 33, 779),
+   loc:              ( 8, 33,600),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+
+weapon:     {
+   type:             "Rostov",
+   design:           "Missile Weapon",
+   name:             "Missile 1",
+   abrv:             "MISL-1",
+
+   muzzle:           (   0,  0,  90)
+   loc:              (-282, 40, -92)
+   size:             64
+   hull_factor:      0.8
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rostov-Starboard",
+   design:           "Missile Weapon",
+   name:             "Missile 2",
+   abrv:             "MISL-2",
+
+   muzzle:           (   0,  0,  90)
+   loc:              ( 282, 40, -92)
+   size:             64
+   hull_factor:      0.8
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   aim_az_max:        130.0,
+   aim_az_min:       -130.0,
+
+   aim_el_max:         70.0,
+   aim_el_min:         -1.0,
+
+
+   muzzle:         (0, 12, 81),
+
+   loc:            (0, 90,147),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Mag-18"
+   design:           "Bolt Weapon",
+   name:             "18INMAG",
+   abrv:             "MG12",
+ 
+   azimuth:           180.0, 
+
+   aim_az_max:        120.0,
+   aim_az_min:       -120.0,
+
+   aim_el_max:         70.0,
+   aim_el_min:         -1.0,
+
+
+   muzzle:          (0, 12, 81),
+
+   loc:             (0, 105, -548),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB 1",
+   abrv:             "PDB 1", 
+ 
+   azimuth:           0.0, 
+   elevation:	      0.0,
+
+   aim_az_max:          130.0,
+   aim_az_min:           -130.0,
+
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            (0, 73, 422),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB 2",
+   abrv:             "PDB 2", 
+ 
+   azimuth:           180.0, 
+   elevation:	     -180.0,
+
+
+
+   aim_az_max:           180.0,
+   aim_az_min:           -180.0,
+
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            (0, -143,506),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB 3",
+   abrv:             "PDB 3", 
+ 
+   azimuth:           0.0, 
+   elevation:	      180.0,
+
+
+
+   aim_az_max:           145.0,
+   aim_az_min:           -145.0,
+
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            (0, -104,-360),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB 4",
+   abrv:             "PDB 4", 
+ 
+   azimuth:           90.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           90.0,
+   aim_az_min:          -90.0,
+
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            (209, 88,-96),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12",
+   design:           "Bolt Weapon",
+   name:             "PDB 5",
+   abrv:             "PDB 5", 
+ 
+   azimuth:           -90.0, 
+   elevation:	      0.0,
+
+   aim_az_max:           90.0,
+   aim_az_min:          -90.0,
+
+   aim_el_max:           85.0,
+   aim_el_min:           -1.0,
+
+
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            (-209, 88,-96),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   abrv:             Batt
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "VendettaMap0.pcx",
+   sprite: "VendettaMap1.pcx",
+   sprite: "VendettaMap2.pcx",
+   sprite: "VendettaMap3.pcx",
+   sprite: "VendettaMap4.pcx",
+   sprite: "VendettaMap5.pcx",
+   sprite: "VendettaMap6.pcx",
+   sprite: "VendettaMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5
+
+   explosion: { type: 10, time: 2.0, loc: (-50,  10,    0) }
+   explosion: { type: 10, time: 0.7, loc: ( 60,  20,  260) }
+   explosion: { type: 10, time: 0.5, loc: (-20, -18, -240) }
+   explosion: { type: 10, time: 0.3, loc: ( 20,  20, -120) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+   debris:    { model: "MussonDebris1.mag", loc: (0,0,400), mass: 98e3, count:  1, life: 380,
+                fire:  (60,0,-200), fire:  (100,20,80) }
+   debris:    { model: "MussonDebris2.mag", loc: (140,-120,0), mass: 38e3, count:  1, life: 360 }
+   debris:    { model: "Debris0A.mag",      loc: (0,0,-50), mass:   95, count: 20, life:  20 }
+   debris:    { model: "Debris0B.mag",      loc: (0,0,-50), mass:   44, count: 15, life:  35 }
+   debris:    { model: "Debris0C.mag",      loc: (0,0,0),   mass:   23, count: 10, life:  30 }
+
+}
+
+
+

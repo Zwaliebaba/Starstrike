@@ -1,0 +1,142 @@
+MISSION
+
+name:       "02. On Wings of Thunder"
+type:       ESCORT_STRIKE
+system:     Loris
+region:     Loris
+
+start:      "01/11:00:00"
+degrees:    true
+
+sitrep:     "Force:Intel has discovered a Hegemony plot to smuggle "
+            "weapons and personnel from Loris into Silessia using "
+            "unmarked civilian transports.  Field agents report that "
+            "the first of these shipments will use the freighter "
+            "Ascentia.  The Heracles is launching strike package Condor "
+            "to take out the freighter before it can leave Loris space.\n\n"
+
+            "Your element, Ranger, is assigned to escort the strike "
+            "package and protect it from enemy fighters.  We want to "
+            "get in, do the mission, and get out again before the Hegemony "
+            "has time to react.  Choose your loadout, and get to your ships."
+
+objective:  "* Disable or destroy inbound enemy units in the Loris sector\n"
+            "* Escort the Thunderbolts in strike package Condor\n"
+            "* Return safely to base"
+
+ship: {
+   name:       Heracles,
+   design:     Orion,
+   loc:        (0, 0, 0),
+   count:      1,
+   iff:        1,
+   command_ai: 0
+}
+
+element: {
+   name:       Aces,
+   design:     Falcon,
+   count:      24,
+   maint_count: 4,
+   carrier:    Heracles,
+   iff:        1,
+}
+
+element: {
+   name:       Kings,
+   design:     Thunderbolt,
+   count:      12,
+   maint_count: 4,
+   dead_count: 4,
+   carrier:    Heracles,
+   iff:        1,
+}
+
+element: {
+   name:       Condor,
+   design:     Thunderbolt,
+   squadron:   Kings,
+   loc:        (4e3, 5e3, 0),
+   mission:    assault,
+
+   alert:      true,
+   count:      2,
+   iff:        1,
+   loadout:    { ship: -1, name: "Ship Strike" },
+
+
+   objective:  { cmd: assault, tgt: Ascentia  },
+   objective:  { cmd: RTB  },
+
+   navpt:      { cmd: vector,                 loc: ( 40e3,  -95e3, 0), speed: 500 },
+   navpt:      { cmd: assault, tgt: Ascentia, loc: (-20e3, -120e3, 0), speed: 500 },
+}
+
+element: {
+   name:       Ranger,
+   design:     Falcon,
+   squadron:   Aces,
+   loc:        (4e3, 5e3, 0),
+   mission:    escort,
+
+   player:     1,
+   alert:      false,
+   count:      2,
+   iff:        1,
+   loadout:    { ship: -1, name: "ACM Medium Range" },
+
+   objective:  { cmd: escort, tgt: Condor },
+   objective:  { cmd: RTB  },
+
+   navpt:      { cmd: escort, tgt: Condor, rloc: { ref: "Condor:1", dex: 15e3 }, speed: 500 },
+   navpt:      { cmd: escort, tgt: Condor, rloc: { ref: "Condor:2", dex: 15e3 }, speed: 500 },
+}
+
+
+element: {
+   name:       Ascentia,
+   design:     IM3500
+   skin:       Green
+   loc:        (-200e3, -120e3, 0),
+   mission:    misc,
+   intel:      known,
+   count:      1,
+   iff:        2,
+
+   navpt:      { cmd: vector, loc: (  0e3, -120e3, 0), speed: 500 },
+   navpt:      { cmd: vector, loc: ( 90e3,  -50e3, 0), speed: 500 },
+}
+
+element: {
+   name:       Martak,
+   design:     Viper,
+   rloc:       { ref: Ascentia, dex: 30e3, dex_var: 5e3 },
+   mission:    intercept,
+   intel:      secret,
+   count:      2,
+   iff:        2,
+
+   loadout:    { ship: -1, name: "ACM Medium Range" },
+
+   objective:  { cmd: intercept, tgt: Condor },
+
+   navpt:      { cmd: escort,    tgt: Ascentia, rloc: { ref: "Ascentia:1", dex: 25e3 }, speed: 500 },
+   navpt:      { cmd: intercept, tgt: Condor,   rloc: { ref: "Ascentia:2", dex: 25e3 }, speed: 500 },
+}
+
+element: {
+   name:       Malik,
+   design:     Razor,
+   loc:        (200e3, -120e3, 0),
+   mission:    intercept,
+   intel:      secret,
+   count:      2,
+   iff:        2,
+
+   loadout:    { ship: -1, name: "ACM Medium Range" },
+
+   objective:  { cmd: intercept, tgt: Condor },
+
+   navpt:      { cmd: vector,                   rloc: { ref: "Condor:1", dex: 25e3 }, speed: 500 },
+   navpt:      { cmd: intercept, tgt: Condor,   rloc: { ref: "Condor:2", dex: 25e3 }, speed: 500 },
+}

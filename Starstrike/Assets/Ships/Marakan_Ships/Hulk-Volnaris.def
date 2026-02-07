@@ -1,0 +1,293 @@
+SHIP
+
+name:          "Hulk-Volnaris"
+display_name:  Volnaris
+class:         Destroyer
+
+hud_icon:   "VolnarisHud.pcx"
+
+model:      "Hulk-Volnaris.mag"
+
+mass:       21.1e3
+agility:    2
+vlimit:     240
+roll_rate:  7
+integrity:  20e3
+scale:      3.0
+acs:        1.2
+
+trans_x:     250e3
+trans_y:     100e3
+trans_z:     250e3
+
+auto_roll:     -1
+arcade_drag:   0
+drag:          0
+roll_drag:     0
+pitch_drag:    0
+yaw_drag:      0
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       7500,
+
+   loc:              (0, -40, -220),
+   size:             64,
+   hull_factor:      0.8
+   explosion:        7
+}
+
+drive: {
+   type:             Stealth
+   abrv:             Drive
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           1000,
+   scale:            5,
+   port:             ( 0,  -22, -420)
+   port:             ( 0,  -67, -402)
+   port:             ( 0, -117, -357)
+
+   loc:              (0, 0, -240),
+   size:             48,
+   hull_factor:      0.5
+   explosion:        7
+}
+
+quantum: {
+   abrv:             "Q-Drive"
+   design:           "Quantum Drive",
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.7
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   abrv:             "Aux Reac"
+   max_output:       1200,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-34, -19, 570),
+
+   loc:              (-34, -19, 460),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 34, -19, 570),
+
+   loc:              ( 34, -19, 460),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+
+weapon:     {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Torpedo Banks",
+   abrv:             "Torps",
+   muzzle:           (-25,  17, 470),
+   muzzle:           ( 25,  17, 470),
+   loc:              (  0, -32, 400),
+   size:             80,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 1"
+   abrv:             "PDB 1"
+ 
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            ( 0, 45, 340),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 2"
+   abrv:             "PDB 2"
+ 
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            ( 0, 55, 225),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 3"
+   abrv:             "PDB 3"
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+
+   loc:              (  0, 55, -255),
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+
+   azimuth:          3.14159,
+}
+
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow,
+   scale:            0.04,
+   loc:              (0, -52,0),
+   explosion:        8,
+
+   size:             32,
+   hull_factor:      0.8
+}
+
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   abrv:             Batt
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "BroadMap0.pcx",
+   sprite: "BroadMap1.pcx",
+   sprite: "BroadMap2.pcx",
+   sprite: "BroadMap3.pcx",
+   sprite: "BroadMap4.pcx",
+   sprite: "BroadMap5.pcx",
+   sprite: "BroadMap6.pcx",
+   sprite: "BroadMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion: { type: 10, time: 1.8, loc: (-50,  50,    0) }
+   explosion: { type: 10, time: 0.7, loc: ( 60,  40,  190) }
+   explosion: { type: 10, time: 0.7, loc: (  0, -48, -180) }
+   explosion: { type: 10, time: 0.3, loc: ( 20,  80, -190) }
+   explosion: { type: 10, time: 0.1, loc: (-30,  30,  -90) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+
+   debris:    { model: "VolnarisDebris1.mag",   loc: (0,0,-250), mass:25e3, count:  1, life: 365,
+                fire:  (30,20,170) }
+   debris:    { model: "Debris0A.mag",          loc: (0,0, 20),  mass:  45, count: 16, life:  20 }
+   debris:    { model: "Debris0B.mag",          loc: (0,0,-30),  mass:  24, count: 12, life:  35 }
+   debris:    { model: "Debris0C.mag",          loc: (0,0,0),    mass:  23, count: 10, life:  30 }
+}
+
+
+
+
+
+

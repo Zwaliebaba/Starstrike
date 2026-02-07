@@ -1,0 +1,177 @@
+STARSYSTEM
+
+name:       Korius
+
+/*************************************/
+
+sky:        {
+   nebula:     "Nebula-Korius.mag",
+   poly_stars: "stars.mag",
+   haze:       "Korius/Tanis/TerrainHaze.mag"
+}
+
+stars:      500
+dust:       300
+
+/*************************************/
+
+ambient:    (24, 20, 16)
+
+star:        {
+   name:    Koriset
+   map:     "Suns/StarG_map.pcx"
+   image:   "Suns/G3.pcx"
+   tscale:  6,
+   radius:  16e8,
+   mass:    2e30,
+   light:   1.6e11,
+   color:   (255, 250, 240),// - G Yellow
+   back:    (128, 90, 57),  // Nebula 5 orange
+}
+
+region: {
+   name:    Solnas,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   4.18e11,
+   inclination: 0.23,
+   asteroids: 60,
+   link:    Nergal,  // Nephrys
+   link:    Lornas,  // Renser
+   link:    Casalle, // Loris
+   link:    Volova,  // Kolchev
+   link:    Relay,   // Isham
+}
+
+planet: {
+   name:    Moneta
+   map:     "Paragon/bryn_map.pcx"
+   image:   "Paragon/bryn_hi.jpg",
+   radius:  3.6e6,
+   mass:    3.96e26,
+   orbit:   0.97e11,
+   rotation: 15.13
+}
+
+region:     {
+   name:    Moneta,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   12e6,
+   inclination: 0.6
+}
+
+moon: {
+   name:    Covana
+   map:     "Thralis/benares_map.pcx"
+   image:   "Thralis/benares_lo.pcx",
+   high_res:"Thralis/benares_hi.pcx",
+   radius:      1.1e6,
+   rotation:    19,
+   inclination: 0.0,
+   mass:        1.6e24,
+   orbit:       34.3e6,
+}
+
+
+planet: {
+   name:    Rhomin
+   map:     "Giants/GasGiant11_map.pcx"
+   image:   "Giants/GasGiant11.jpg",
+   radius:  38.2e6,
+   mass:    4.0e26,
+   tilt:    0.1,
+   tscale:  2,
+   orbit:   1.61e11,
+   rotation: 31.3
+}
+
+moon:     {
+   name:    Korius
+   map:     "Korius/korius_map.pcx"
+   image:   "Korius/korius_lo.pcx",
+   high_res:"Korius/korius_hi.jpg",
+   gloss:   "Korius/korius_gloss.jpg",
+   glow_high_res: "Korius/korius_lights.jpg",
+   radius:  4e6,
+   mass:    4.2e24,
+   atmosphere: (130,130,130),
+   orbit:   232e6,
+   rotation: 24.3
+}
+
+region:     {
+   name:    Korius,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   15e6,
+   inclination: 0.4
+}
+
+
+moon:     {
+   name:    Adantar
+   map:     "Korius/adantar_map.pcx"
+   image:   "Korius/adantar_lo.pcx",
+   high_res:"Korius/adantar_hi.jpg",
+   radius:  3.7e6,
+   mass:    3.4e24,
+   atmosphere: (120,100,90),
+   orbit:   356e6,
+   rotation: 17.8
+}
+
+terrain: {
+   name:          "Tanis",
+   radius:        480e3,
+   grid:          20e3,
+
+   patch:         "Korius/Tanis/terrain.pcx",
+   patch_texture: "Korius/Tanis/terrain_big.pcx",
+   apron:         "Korius/Tanis/terrain_apron.pcx",
+   apron_texture: "Korius/Tanis/terrain_apron_tex.pcx",
+   sky_color:     "Korius/Tanis/terrain_sky.pcx",
+
+   layer: { tile: "Korius/Tanis/Layer0.pcx"  height:    0  detail: "Korius/Tanis/noise0.pcx" }
+   layer: { tile: "Korius/Tanis/Layer1.pcx"  height: 3000  detail: "Radix/Canyon/noise1.pcx" }
+   layer: { tile: "Korius/Tanis/Layer2.pcx"  height: 9000  detail: "Radix/Canyon/noise1.pcx" }
+
+   clouds_high:   "Korius/Tanis/terrain_cloud0.pcx",
+   clouds_low:    "Korius/Tanis/terrain_cloud1.pcx",
+   shades_low:    "Korius/Tanis/terrain_cloud1a.pcx",
+   clouds_alt_high: 16.3e3,
+   clouds_alt_low:  13.1e3,
+
+   scale:         1.75e3,
+   mtnscale:      55,
+   haze_fade:     0.35,
+   fog_density:   0.65,
+   fog_scale:     5,
+   
+   weather_period:        49876,
+
+   weather_high_clouds:      50,
+   weather_moderate_clouds:  35,
+   weather_overcast:          0,
+   weather_fog:               0,
+   weather_storm:             2,
+}
+
+region:     {
+   name:    Adantar,
+   radius:  480e3,
+   grid:    20e3,
+   orbit:   15e6,
+   inclination: 0.4
+}
+
+moon: {
+   name:    Alita
+   map:     "Haiche/kala_map.pcx"
+   image:   "Haiche/kala_lo.pcx",
+   high_res:"Haiche/kala_hi.pcx",
+   radius:  2.11e6,
+   mass:    1.9e22,
+   orbit:   421e6,
+   rotation: 10
+}

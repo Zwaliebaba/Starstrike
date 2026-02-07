@@ -2,11 +2,18 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Project Path="GameLogic/GameLogic.vcxproj" Id="b2d03c75-772a-4380-8aaf-76c12577ba26" />
-  <Project Path="NeuronClient/NeuronClient.vcxproj" Id="5af8687f-83f3-46fb-a357-6465b2c730a7" />
-  <Project Path="NeuronCore/NeuronCore.vcxproj" Id="cf9cee84-c949-4613-8bce-65530b5537c0" />
-  <Project Path="Server/Server.vcxproj" Id="91fd0692-07a9-4043-beb6-ea66e127508d" />
-  <Project Path="Starstrike/Starstrike.vcxproj" Id="76dced6c-df0e-4692-aa34-2ed0ef7726b5">
+  <Folder Name="/Solution Files/">
+    <File Path=".clang-format" />
+    <File Path=".clang-tidy" />
+    <File Path=".dockerignore" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="README.md" />
+    <File Path="vcpkg-configuration.json" />
+    <File Path="vcpkg.json" />
+  </Folder>
+  <Project Path="Neuron/Neuron.vcxproj" Id="97ac5df7-34aa-4ea9-a2db-59d40fff105b" />
+  <Project Path="Starstrike/Starstrike.vcxproj" Id="f0e25c67-50d7-4de4-9703-8fe3220bee69">
     <Deploy />
   </Project>
 </Solution>

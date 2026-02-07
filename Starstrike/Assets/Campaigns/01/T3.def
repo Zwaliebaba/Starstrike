@@ -1,0 +1,289 @@
+MISSION
+
+name:    "Flight School"
+type:    "Training"
+system:  "Janus"
+region:  "Janek Station"
+
+objective:
+         "Training - "
+         "Practice airborne fighter operations."
+
+sitrep:  "The Third Fleet is participating in wargame "
+         "exercises in the Janus system. "
+         "Your squadron, the Avengers, are on temporary "
+         "detached duty to Janek Station."
+         "As part of the exercise, you have "
+         "been tasked with practicing take offs and landings, "
+         "flying patrol patterns "
+         "and destroying target drones in your sector."
+
+start:   "01/13:23:00"
+stardate: 1084144000
+
+degrees: true
+
+
+element: {
+   name:       "Janek Station",
+   design:     Airbase1,
+   loc:        (25e3, 0, 0),
+   head:       -90,
+   iff:        1,
+   command_ai: 0,
+}
+
+element: {
+   name:    Avengers,
+   design:  Falcon,
+   count:   20,
+   maint_count: 5,
+   dead_count: 5,
+   carrier: "Janek Station",
+   iff:     1,
+   loadout: { ship: -1, name: "ACM Medium Range" },
+}
+
+element: {
+   name:    Alpha,
+   design:  Falcon,
+   squadron: Avengers,
+   loc:     (15e3,-5e3, 5e3),
+   mission: sweep,
+   objective: { cmd: intercept, tgt: Sierra },
+   player:  1,
+   head:    -90,
+   alert:   true,
+   count:   2,
+   iff:     1,
+   loadout: { ship: -1, name: "ACM Medium Range" },
+
+   navpt:   { cmd: vector, loc: (-15e3,  -5e3,  7e3), speed: 350 },
+   navpt:   { cmd: vector, loc: (-15e3, -20e3,  8e3), speed: 500 },
+   navpt:   { cmd: sweep,  loc: (    0, -10e3, 10e3), speed: 500 },
+   navpt:   { cmd: sweep,  loc: ( 10e3, -10e3, 10e3), speed: 500 },
+   navpt:   { cmd: rtb,    loc: ( 60e3,     0, 10e3), speed: 400 },
+}
+
+
+/***/
+
+element: {
+   name:    Sierra,
+   design:  TargetDrone,
+   loc:     ( 50e3,  20e3, 10e3),
+   count:   4,
+   iff:     2,
+
+   navpt:   { cmd: vector, loc: ( 20e3,  20e3, 10e3), speed: 300 },
+   navpt:   { cmd: vector, loc: ( 20e3,     0, 10e3), speed: 300 },
+   navpt:   { cmd: vector, loc: (    0, -20e3, 10e3), speed: 300 },
+   navpt:   { cmd: vector, loc: (-20e3, -15e3, 10e3), speed: 300 },
+}
+
+element: {
+   name:      "Building",
+   design:    "Bldg00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-19e3, 28e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Building",
+   design:    "Bldg00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-21e3, 29e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Office Block",
+   design:    "Bldg01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-16e3, 32e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Dome",
+   design:    "Tank00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-19e3, 31e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Office Block",
+   design:    "Bldg01",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-18e3, 30e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Building",
+   design:    "Fact03",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     1,
+   iff:       1,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (-17e3, 29e3, 0),
+   head:      -13
+}
+
+element: {
+   name:      "Cooling Tower",
+   design:    "Cool00",
+   mission:   "Misc",
+   intel:     "Located",
+   count:     4,
+   iff:       2,
+   playable:  false,
+   region:    "Janek Station",
+   loc:       (70000, -10000, 0),
+
+}
+
+
+event: {
+   id:              101,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Sierra 1",
+}
+
+event: {
+   id:              102,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Sierra 2",
+}
+
+event: {
+   id:              103,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Sierra 3",
+}
+
+event: {
+   id:              104,
+   event:           Message,
+   trigger:         Destroyed,
+   trigger_ship:    "Sierra 4",
+}
+
+
+// VOICE-OVER
+
+
+event: { id: 200, event: Message, time:   2, sound: "Vox\Train\Train-03-01.wav", message: "Please wait" }
+event: { id: 210, event: Message, time:  20, sound: "Vox\Train\Train-03-02.wav", message: "Taking off" }
+event: { id: 220, event: Message, time:  40, sound: "Vox\Train\Train-03-03.wav", message: "Raise your langing gear" }
+event: { id: 230, event: Message, time:  65, sound: "Vox\Train\Train-03-04.wav", message: "Engage autonav" }
+
+event: {
+    id:             240,
+    event:          Message,
+    message:        "Disengage autonav"
+    sound:          "Vox\Train\Train-03-05.wav",
+    trigger:        Navpoint,
+    trigger_param:  2,
+    trigger_ship:   Alpha
+}
+
+event: {
+    id:             250,
+    event:          Message,
+    sound:          "Vox\Train\Train-03-06.wav",
+    message:        "Airborne combat skills",
+    trigger:        Event,
+    trigger_param:  240,
+    delay:          14
+}
+
+event: {
+    id:             260,
+    event:          Message,
+    sound:          "Vox\Train\Train-03-07.wav",
+    message:        "Well done!",
+    trigger:        "Event (ALL)",
+    trigger_param:   (101, 102, 103, 104), 
+    delay:           1
+}
+
+event: { 
+    id:             270,
+    event:          Message,
+    sound:          "Vox\Train\Train-03-08.wav",
+    message:        "Order your wingman to head for home",
+    trigger:        Navpoint,
+    trigger_param:  4,
+    trigger_ship:   Alpha
+}
+
+event: { 
+    id:             300,
+    event:          Message,
+    sound:          "Vox\Train\Train-03-09.wav",
+    message:        "Return to base",
+    trigger:        Navpoint,
+    trigger_param:  5,
+    trigger_ship:   Alpha
+}
+
+event: {
+    id:             310,
+    event:          Message,
+    time:           120,
+    sound:          "Vox\Train\Train-03-10.wav",
+    message:        "Landing procedure",
+    trigger:        Event,
+    ship:           "Alpha 1",
+    trigger:        Range,
+    trigger_param:  15e3,
+    trigger_ship:   "Janek Station"
+}
+
+event: {
+    id:             311,
+    event:          Message,
+    time:           120,
+    sound:          "Vox\Train\Train-03-11.wav",
+    message:        "Final approach",
+    ship:           "Alpha 1",
+    trigger:        Range,
+    trigger_param:  10e3,
+    trigger_ship:   "Janek Station"
+}
+
+
+/***/

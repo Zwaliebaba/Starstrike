@@ -1,0 +1,52 @@
+MISSION
+
+name:   "Cmpn05 Brief09 - Garrison Station"
+type:   Patrol
+system: Garrison
+region: Garrison
+stardate: 1188554433
+
+degrees: true
+
+element: {
+   name:      Camera
+   design:    CameraPod
+   iff:       0
+   player:    1
+   loc:       (100e3, 30e3, 0)
+}
+
+element: {
+   name:   "Garrison Laboratory",
+   design: "Station7"
+   iff:    0
+   loc:    (0, 0, 0)
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+
+event: { event: Camera,                param: 3,      target: "body:Garrison",  vec: (2, 0.1, 3.7e7)      }
+event: { event: Camera,                param: 5,                                vec: (-0.11, 0.007, -0.01) }
+
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "FORCE:INTEL BRIEFING" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "*************************************\n*** FLASH CODED +$TIME \n*** GARRISON MILITARY LABORATORY\n*** GARRISON SECTOR\n*** CLASSIFIED: SECRET R3 NTK\n*************************************" }
+
+event: { event: Message,    time:   3, sound: "Vox\Scenes\05/Briefing_09_Garrison_Station.wav" }
+
+
+event: { event: Camera,     time:  15, param: 3,      target: "Garrison Laboratory",  vec: (2, 0.1, 27e3)      }
+event: { event: Camera,                param: 5,                                      vec: (0.11, 0.01, -0.02) }
+
+
+event: { event: Display,    time:  20, image: "Campaigns\05/Scenes\Turret.pcx", color: 0xffffffff, fade: (1,7,1), rect: (-280,-280,256,256) }
+
+
+event: { event: EndScene,   time:  48, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

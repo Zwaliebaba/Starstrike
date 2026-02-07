@@ -1,0 +1,264 @@
+MISSION
+
+name:   "Cmpn02 News01 - Campaign Start"
+type:   "Patrol"
+system: "Solus"
+region: "Solus"
+stardate: 1147287263.0
+
+objective: "Unspecified"
+
+sitrep: "Unknown"
+
+start: "33:00:00"
+
+degrees: true
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Tal Vesta Stellar Observatory"
+   design:    "Observatory"
+   mission:   "Flight Ops"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Meridian"
+   loc:       (75000, 75000, 0)
+}
+
+element: {
+   name:      "Solus-Trellis"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (-200e3, -100e3, 0)
+
+   objective: { cmd: Vector, tgt: "Trellis-Solus" }
+}
+
+element: {
+   name:      "Solus-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (150e3, -180e3, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Solus" }
+}
+
+element: {
+   name:      "Jalah-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (0, 0, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Jalah" }
+}
+
+element: {
+   name:      "Jalah-Trellis"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (120e3, -200e3, 0)
+
+   objective: { cmd: Vector, tgt: "Trellis-Jalah" }
+}
+
+element: {
+   name:      "Trellis-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (-100e3, -150e3, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Trellis" }
+}
+
+element: {
+   name:      "Trellis-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (50e3, -100e3, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Trellis" }
+}
+
+element: {
+   name:      "Trellis Docks"
+   design:    "Station1"
+   mission:   "Flight Ops"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Blockade Runner"
+   design:    "Courier"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (-120e3, -90e3, 0)
+
+   navpt:     { cmd: Vector, loc: (-120e3, -170e3, 0), speed: 1000, rgn: "Trellis" }
+}
+
+
+element: {
+   name:      "Kitts"
+   design:    "Wolf"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       2
+   playable:  false
+   region:    "Trellis"
+   loc:       (185e3, -280e3, 0)
+}
+
+element: {
+   name:      "Lovo"
+   design:    "Baikal"
+   commander: "Kitts"
+   mission:   "Misc"
+
+   intel:     "Known"
+   count:     1
+   command_ai:1
+   iff:       2
+   playable:  false
+   region:    "Trellis"
+   loc:       (187e3, -281e3, 0)
+}
+
+
+element: {
+   name:      "Edmonton"
+   design:    "IM4300"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       1
+   playable:  false
+   region:    "Trellis"
+   loc:       (212e3, -290e3, 0)
+
+   navpt:     { cmd: Vector, loc: (-120e3, -170e3, 0), speed: 500, rgn: "Trellis" }
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Hold,                  param: 20, event_ship: Kitts }
+event: { event: Hold,                  param: 20, event_ship: Lovo  }
+
+event: { event: Display,               image: "Campaigns\02/Scenes\Black.pcx", color: 0xffffffff, fade: (0,5,2), rect: (0,0,0,0) }
+event: { event: Display,               image: "Campaigns\02/Scenes\News.pcx",  color: 0xffffffff, fade: (1,4,1), rect: (0,0, -512,-128) }
+
+event: { event: Camera,                param: 3,  target: "body:Solus",  vec: (0,0,1e7)           }
+event: { event: Camera,                param: 5,                         vec: (0.12, 0.01, 0.02)  }
+
+event: { event: Display,    time:   5, message: "Solus System", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Capitol",      font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+event: { event: Messasge,              sound: "Vox\Scenes\02/News_01_Campaign_Start.wav" }
+
+
+event: { event: Camera,     time:  12, param: (6, 15),  target: "Blockade Runner" }
+
+event: { event: Display,               message: "Trellis Sector",   font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Blockade Runner",  font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+
+event: { event: Camera,     time:  22, param: (6, 20),  target: "Kitts" }
+event: { event: Display,               message: "Dantari Separatists",         font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Destroyer Squadron 'Kitts'",  font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: Camera,     time:  40, param: 3,  target: "body:Trellis", vec: (0,0,1e8)           }
+event: { event: Camera,                param: 5,                          vec: (-0.15, 0.01, 0.02) }
+event: { event: Display,               message: "Trellis",      font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+
+
+event: { event: Camera,     time:  50, param: 3,  target: "body:Jalah",   vec: (0,0,8e7)           }
+event: { event: Camera,                param: 5,                          vec: (0.12, 0.01, 0.02) }
+event: { event: Display,               message: "Jalah",      font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+
+
+event: { event: Camera,     time:  65, param: 3,  target: "Tal Vesta Stellar Observatory",   vec: (0,0,2e3) }
+event: { event: Camera,                param: 5,                          vec: (-0.13, 0.01, 0.02) }
+event: { event: Display,               message: "Meridian Sector",                font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 300,100) }
+event: { event: Display,               message: "Tal Vesta Stellar Observatory",  font: Limerick12,   color: 0xffffff80, fade: (1,7,1), rect: (20,40, 300,100) }
+
+event: { event: Camera,     time:  80, param: 3,  target: "body:Solus",   vec: (60,0,1e7)         }
+event: { event: Camera,                param: 5,                          vec: (0.14, 0.01, 0.02) }
+
+
+event: { event: EndScene,   time:  95, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

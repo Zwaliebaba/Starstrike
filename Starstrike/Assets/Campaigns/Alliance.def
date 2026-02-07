@@ -1,0 +1,3471 @@
+ORDER_OF_BATTLE
+
+group: {
+  type:   force,
+  id:     1,
+  name:   "Terellian Alliance",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+}
+
+// -----------------------
+// JARNELL
+
+group: {
+  type:   fleet,
+  id:     1,
+  name:   "Orion",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     4,
+  name:   "Orion",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Orion",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "69",
+    },
+
+  unit: {
+    name:   "Courageous",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "521",
+    },
+
+  unit: {
+    name:   "Asher",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "708",
+    },
+
+  unit: {
+    name:   "Shaw",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "713",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     15,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: carrier_group,
+  parent_id:   4,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     17,
+  name:   "Tigers",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: wing,
+  parent_id:   15,
+
+  unit: {
+    name:   "Tiger",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     25,
+  name:   "Nighthawks",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: wing,
+  parent_id:   15,
+
+  unit: {
+    name:   "Nighthawk",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     28,
+  name:   "Pirates",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: wing,
+  parent_id:   15,
+
+  unit: {
+    name:   "Pirate",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     91,
+  name:   "Starknights",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: wing,
+  parent_id:   15,
+
+  unit: {
+    name:   "Starknight",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  16,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     88,
+  name:   "Rhinos",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-130e3, 50e3, 0),
+  parent_type: wing,
+  parent_id:   15,
+
+  unit: {
+    name:   "Rhino",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     5,
+  name:   "Devastator",
+  intel:  reserve,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (80e3, -90e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Devastator",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "400",
+    },
+
+  unit: {
+    name:   "Steadfast",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "526",
+    },
+
+  unit: {
+    name:   "Dauntless",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "531",
+    },
+
+  unit: {
+    name:   "Vance",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "718",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     6,
+  name:   "Havoc",
+  intel:  known,
+  iff:    1,
+  region: "Adonis",
+  loc:    (-30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Havoc",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "415",
+    },
+
+  unit: {
+    name:   "Braveheart",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "536",
+    },
+
+  unit: {
+    name:   "Integrity",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "541",
+    },
+
+  unit: {
+    name:   "Douglas",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "723",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     50,
+  name:   "Spectre",
+  intel:  reserve,
+  iff:    1,
+  region: "Dawn",
+  loc:    (110e3, 138e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Spectre",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "350",
+    },
+
+  unit: {
+    name:   "Charon",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "355",
+    },
+
+  unit: {
+    name:   "Berents",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "922",
+    },
+
+  unit: {
+    name:   "Clarkeston",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "927",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     53,
+  name:   "Morlock",
+  intel:  reserve,
+  iff:    1,
+  region: "Dawn",
+  loc:    (93e3, -91e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Morlock",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "360",
+    },
+
+  unit: {
+    name:   "Phantasm",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "365",
+    },
+
+  unit: {
+    name:   "Darvon",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "932",
+    },
+
+  unit: {
+    name:   "Avalon",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "937",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     68,
+  name:   "Robinson",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (157e3, 89e3, 0),
+  parent_type: fleet,
+  parent_id:   1,
+
+  unit: {
+    name:   "Robinson",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "728",
+    },
+
+  unit: {
+    name:   "Keller",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "733",
+    },
+
+  unit: {
+    name:   "Malory",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "942",
+    },
+
+  unit: {
+    name:   "Sorrel",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "947",
+    },
+}
+
+
+
+// -----------------------
+// THRALIS
+
+group: {
+  type:   fleet,
+  id:     2,
+  name:   "Antares",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     5,
+  name:   "Antares",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Antares",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "70",
+    },
+
+  unit: {
+    name:   "Fearless",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "522",
+    },
+
+  unit: {
+    name:   "Ryan",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "709",
+    },
+
+  unit: {
+    name:   "Card",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "714",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     12,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (110e3, -220e3, 0),
+  parent_type: carrier_group,
+  parent_id:   5,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     91,
+  name:   "Bearcats",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: wing,
+  parent_id:   12,
+
+  unit: {
+    name:   "Bearcat",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  32,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     30,
+  name:   "Mustangs",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: wing,
+  parent_id:   12,
+
+  unit: {
+    name:   "Mustang",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     37,
+  name:   "Vipers",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: wing,
+  parent_id:   12,
+
+  unit: {
+    name:   "Viper",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     45,
+  name:   "Lancers",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: wing,
+  parent_id:   12,
+
+  unit: {
+    name:   "Lancer",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  16,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     120,
+  name:   "Taurus",
+  intel:  known,
+  iff:    1,
+  region: "Thrale",
+  loc:    (110e3, -220e3, 0),
+  parent_type: wing,
+  parent_id:   12,
+
+  unit: {
+    name:   "Taurus",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     7,
+  name:   "Annihilator",
+  intel:  known,
+  iff:    1,
+  region: "Pollux",
+  loc:    (30e3, 150e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Annihilator",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "401",
+    },
+
+  unit: {
+    name:   "Assurance",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "527",
+    },
+
+  unit: {
+    name:   "Vanguard",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "532",
+    },
+
+  unit: {
+    name:   "Gibson",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "719",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     8,
+  name:   "Vortex",
+  intel:  reserve,
+  iff:    1,
+  region: "Hera",
+  loc:    (110e3, 140e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Vortex",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "411",
+    },
+
+  unit: {
+    name:   "Defiant",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "537",
+    },
+
+  unit: {
+    name:   "Capable",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "542",
+    },
+
+  unit: {
+    name:   "Mahan",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "724",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     40,
+  name:   "Wraith",
+  intel:  known,
+  iff:    1,
+  region: "Zeus",
+  loc:    (-80e3, 40e3, -6e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Wraith",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "351",
+    },
+
+  unit: {
+    name:   "Nemesis",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "356",
+    },
+
+  unit: {
+    name:   "Bosporus",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "923",
+    },
+
+  unit: {
+    name:   "Carlisle",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "928",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     41,
+  name:   "Demon",
+  intel:  reserve,
+  iff:    1,
+  region: "Thrale",
+  loc:    (0, -90e3, -3e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Demon",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "361",
+    },
+
+  unit: {
+    name:   "Revenant",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "366",
+    },
+
+  unit: {
+    name:   "Leyte",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "933",
+    },
+
+  unit: {
+    name:   "Argiles",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "938",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     59,
+  name:   "Clarke",
+  intel:  known,
+  iff:    1,
+  region: "Sparta",
+  loc:    (-160e3, -180e3, -7e3),
+  parent_type: fleet,
+  parent_id:   2,
+
+  unit: {
+    name:   "Clarke",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "729",
+    },
+
+  unit: {
+    name:   "Jackson",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "734",
+    },
+
+  unit: {
+    name:   "Parker",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "943",
+    },
+
+  unit: {
+    name:   "Suffolk",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "948",
+    },
+}
+
+
+// -----------------------
+// BOROVA
+
+group: {
+  type:   fleet,
+  id:     3,
+  name:   "Archon",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     6,
+  name:   "Archon",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-130e3, 160e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Archon",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "71",
+    },
+
+  unit: {
+    name:   "Stalwart",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "524",
+    },
+
+  unit: {
+    name:   "Gerson",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "682",
+    },
+
+  unit: {
+    name:   "Simmons",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "687",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     18,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: carrier_group,
+  parent_id:   6,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     37,
+  name:   "Avengers",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-163e3, 107e3, 0),
+  parent_type: wing,
+  parent_id:   18,
+
+  unit: {
+    name:   "Avenger",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  32,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     36,
+  name:   "Stallions",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-169e3, 60e3, 0),
+  parent_type: wing,
+  parent_id:   18,
+
+  unit: {
+    name:   "Stallion",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     39,
+  name:   "Diamondbacks",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-169e3, 60e3, 0),
+  parent_type: wing,
+  parent_id:   18,
+
+  unit: {
+    name:   "Diamondback",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     112,
+  name:   "Warbirds",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-144e3, 45e3, 0),
+  parent_type: wing,
+  parent_id:   18,
+
+  unit: {
+    name:   "Warbird",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  16,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     101,
+  name:   "Starlifters",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (-71e3, 136e3, 0),
+  parent_type: wing,
+  parent_id:   18,
+
+  unit: {
+    name:   "Starlifters",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     9,
+  name:   "Onslaught",
+  intel:  known,
+  iff:    1,
+  region: "Borova",
+  loc:    (-109e3, -77e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Onslaught",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "402",
+    },
+
+  unit: {
+    name:   "Protector",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "528",
+    },
+
+  unit: {
+    name:   "Redstone",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "533",
+    },
+
+  unit: {
+    name:   "Raven",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "720",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     10,
+  name:   "Predator",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Predator",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "412",
+    },
+
+  unit: {
+    name:   "Audacious",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "538",
+    },
+
+  unit: {
+    name:   "Fortitude",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "543",
+    },
+
+  unit: {
+    name:   "Brunner",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "725",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     43,
+  name:   "Shadow",
+  intel:  reserve,
+  iff:    1,
+  region: "Trellis",
+  loc:    (210e3, 38e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Shadow",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "352",
+    },
+
+  unit: {
+    name:   "Necromancer",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "357",
+    },
+
+  unit: {
+    name:   "Belfast",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "924",
+    },
+
+  unit: {
+    name:   "Canton",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "929",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     44,
+  name:   "Hydra",
+  intel:  known,
+  iff:    1,
+  region: "Alystra",
+  loc:    (93e3, -101e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Hydra",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "362",
+    },
+
+  unit: {
+    name:   "Banshee",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "367",
+    },
+
+  unit: {
+    name:   "Hemmet",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "934",
+    },
+
+  unit: {
+    name:   "Essex",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "939",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     60,
+  name:   "Gerrond",
+  intel:  known,
+  iff:    1,
+  region: "Trellis",
+  loc:    (157e3, 89e3, 0),
+  parent_type: fleet,
+  parent_id:   3,
+
+  unit: {
+    name:   "Gerrond",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "730",
+    },
+
+  unit: {
+    name:   "Radix",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "735",
+    },
+
+  unit: {
+    name:   "Rainier",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "944",
+    },
+
+  unit: {
+    name:   "Tanner",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "949",
+    },
+}
+
+
+// -----------------------
+// BOROVA
+
+group: {
+  type:   fleet,
+  id:     4,
+  name:   "Titan",
+  intel:  known,
+  iff:    1,
+  region: "Borova",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     7,
+  name:   "Titan",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (157e3, -202e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Titan",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "72",
+    },
+
+  unit: {
+    name:   "Defender",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "524",
+    },
+
+  unit: {
+    name:   "Reynolds",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "711",
+    },
+
+  unit: {
+    name:   "Hawker",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "716",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     21,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (147e3, -192e3, 0),
+  parent_type: carrier_group,
+  parent_id:   7,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     93,
+  name:   "Windriders",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (177e3, -212e3, 0),
+  parent_type: wing,
+  parent_id:   21,
+
+  unit: {
+    name:   "Windrider",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  32,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     33,
+  name:   "Chargers",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (165e3, -202e3, 0),
+  parent_type: wing,
+  parent_id:   21,
+
+  unit: {
+    name:   "Charger",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     51,
+  name:   "Wolfhounds",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (165e3, -202e3, 0),
+  parent_type: wing,
+  parent_id:   21,
+
+  unit: {
+    name:   "Wolfhound",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     45,
+  name:   "Razorbacks",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (157e3, -182e3, 0),
+  parent_type: wing,
+  parent_id:   21,
+
+  unit: {
+    name:   "Razorback",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  20,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     103,
+  name:   "Artemis",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (157e3, -182e3, 0),
+  parent_type: wing,
+  parent_id:   21,
+
+  unit: {
+    name:   "Artemis",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   carrier_group,
+  id:     12,
+  name:   "Chronos",
+  intel:  reserve,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (157e3, -202e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Chronos",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "77",
+    },
+
+  unit: {
+    name:   "Impervious",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "524",
+    },
+
+  unit: {
+    name:   "Galland",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "711",
+    },
+
+  unit: {
+    name:   "Pascal",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "716",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     29,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (147e3, -192e3, 0),
+  parent_type: carrier_group,
+  parent_id:   12,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     133,
+  name:   "Windriders",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (177e3, -212e3, 0),
+  parent_type: wing,
+  parent_id:   29,
+
+  unit: {
+    name:   "Windrider",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  20,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     53,
+  name:   "Chargers",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (165e3, -202e3, 0),
+  parent_type: wing,
+  parent_id:   29,
+
+  unit: {
+    name:   "Charger",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  20,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     75,
+  name:   "Razorbacks",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (157e3, -182e3, 0),
+  parent_type: wing,
+  parent_id:   29,
+
+  unit: {
+    name:   "Razorback",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  10,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     113,
+  name:   "Artemis",
+  intel:  known,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (157e3, -182e3, 0),
+  parent_type: wing,
+  parent_id:   29,
+
+  unit: {
+    name:   "Artemis",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  6,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     14,
+  name:   "Relentless",
+  intel:  known,
+  iff:    1,
+  region: "Borova",
+  loc:    (-67e3, 102e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Relentless",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "403",
+    },
+
+  unit: {
+    name:   "Heroic",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "529",
+    },
+
+  unit: {
+    name:   "Victorious",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "534",
+    },
+
+  unit: {
+    name:   "Hale",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "721",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     15,
+  name:   "Huntress",
+  intel:  known,
+  iff:    1,
+  region: "Zhalisal",
+  loc:    (-30e3, 180e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Huntress",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "417",
+    },
+
+  unit: {
+    name:   "Valorous",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "539",
+    },
+
+  unit: {
+    name:   "Intrepid",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "544",
+    },
+
+  unit: {
+    name:   "Weber",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "726",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     45,
+  name:   "Warlock",
+  intel:  reserve,
+  iff:    1,
+  region: "Maraner",
+  loc:    (21e3, 58e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Warlock",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "353",
+    },
+
+  unit: {
+    name:   "Merlin",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "358",
+    },
+
+  unit: {
+    name:   "Bering",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "925",
+    },
+
+  unit: {
+    name:   "Davis",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "930",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     46,
+  name:   "Typhon",
+  intel:  known,
+  iff:    1,
+  region: "Danova",
+  loc:    (-93e3, -141e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Typhon",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "363",
+    },
+
+  unit: {
+    name:   "Chimaera",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "368",
+    },
+
+  unit: {
+    name:   "Messina",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "935",
+    },
+
+  unit: {
+    name:   "Nalu",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "940",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     61,
+  name:   "Gamma",
+  intel:  known,
+  iff:    1,
+  region: "Tulkas",
+  loc:    (157e3, -29e3, 0),
+  parent_type: fleet,
+  parent_id:   4,
+
+  unit: {
+    name:   "Gamma",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "731",
+    },
+
+  unit: {
+    name:   "Lawrence",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "736",
+    },
+
+  unit: {
+    name:   "Kelvin",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "945",
+    },
+
+  unit: {
+    name:   "Trieste",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "950",
+    },
+}
+
+
+
+// -----------------------
+// JANUS/ATHENAR
+
+group: {
+  type:   fleet,
+  id:     5,
+  name:   "Hyperion",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     8,
+  name:   "Hyperion",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (157e3, -162e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Hyperion",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "73",
+    },
+
+  unit: {
+    name:   "Guardian",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "525",
+    },
+
+  unit: {
+    name:   "Nordic",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "712",
+    },
+
+  unit: {
+    name:   "Hughes",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "717",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     27,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (147e3, -162e3, 0),
+  parent_type: carrier_group,
+  parent_id:   8,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     95,
+  name:   "Wizards",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (167e3, -152e3, 0),
+  parent_type: wing,
+  parent_id:   27,
+
+  unit: {
+    name:   "Wizard",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     38,
+  name:   "Hunters",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (147e3, -152e3, 0),
+  parent_type: wing,
+  parent_id:   27,
+
+  unit: {
+    name:   "Hunter",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     46,
+  name:   "Rangers",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (137e3, -162e3, 0),
+  parent_type: wing,
+  parent_id:   27,
+
+  unit: {
+    name:   "Rangers",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  20,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     109,
+  name:   "Capricorn",
+  intel:  known,
+  iff:    1,
+  region: "Athenar",
+  loc:    (147e3, -142e3, 0),
+  parent_type: wing,
+  parent_id:   27,
+
+  unit: {
+    name:   "Capricorn",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     17,
+  name:   "Furious",
+  intel:  known,
+  iff:    1,
+  region: "Janek",
+  loc:    (-247e3, -122e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Furious",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "404",
+    },
+
+  unit: {
+    name:   "Valiant",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "530",
+    },
+
+  unit: {
+    name:   "Honorable",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "535",
+    },
+
+  unit: {
+    name:   "Salas",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "722",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     47,
+  name:   "Phantom",
+  intel:  known,
+  iff:    1,
+  region: "Pallas",
+  loc:    (-217e3, 302e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Phantom",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "354",
+    },
+
+  unit: {
+    name:   "Nightshade",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "359",
+    },
+
+  unit: {
+    name:   "Dalton",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "926",
+    },
+
+  unit: {
+    name:   "Delmar",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "931",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     48,
+  name:   "Enigma",
+  intel:  known,
+  iff:    1,
+  region: "Alystra",
+  loc:    (-247e3, 102e3, 0),
+  parent_type: fleet,
+  parent_id:   5,
+
+  unit: {
+    name:   "Enigma",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "364",
+    },
+
+  unit: {
+    name:   "Gorgon",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "369",
+    },
+
+  unit: {
+    name:   "Morgan",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "936",
+    },
+
+  unit: {
+    name:   "Normandy",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "941",
+    },
+}
+
+group: {
+  type:   battalion,
+  id:     5,
+  name:   "Janek Station",
+  intel:  "known",
+  iff:    1,
+  region: "Janek Station",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   starbase,
+  id:     3,
+  name:   "Janek Station",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (20e3, 0, 0),
+  parent_type: battalion,
+  parent_id:   5,
+
+  unit: {
+    name:   "Janek Station",
+    type:   "Starbase",
+    design: "Airbase1",
+    heading: -90,
+    },
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     7,
+  name:   "Altair",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (25e3, -4e3, 0),
+  parent_type: starbase,
+  parent_id:   3,
+
+  unit: {
+    name:   "Altair",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  20,
+    dead_count: 10,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     5,
+  name:   "Bristol",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (30e3, 4e3, 0),
+  parent_type: starbase,
+  parent_id:   3,
+
+  unit: {
+    name:   "Bristol",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  20,
+    dead_count: 10,
+    },
+}
+
+group: {
+  type:   battery,
+  id:     1,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    1,
+  region: "Telmera",
+  loc:    (45e3, -36e3, 0),
+  parent_type: battalion,
+  parent_id:   5,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   battery,
+  id:     2,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    1,
+  region: "Telmera",
+  loc:    (10e3, 10e3, 0),
+  parent_type: battalion,
+  parent_id:   5,
+
+  unit: {
+    name:   "AAA",
+    type:   "SAM",
+    design: "AAA 1",
+    count:  2,
+    },
+}
+
+group: {
+  type:   battery,
+  id:     3,
+  name:   "SAM Battery",
+  intel:  secret,
+  iff:    1,
+  region: "Telmera",
+  loc:    (30e3, -32e3, 0),
+  parent_type: battalion,
+  parent_id:   5,
+
+  unit: {
+    name:   "SAM",
+    type:   "SAM",
+    design: "SAM 1",
+    regnum: "",
+    },
+}
+
+
+// -----------------------
+// FLEET SIX
+
+group: {
+  type:   fleet,
+  id:     6,
+  name:   "Atlas",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     9,
+  name:   "Atlas",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Atlas",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "74",
+    },
+
+  unit: {
+    name:   "Loyalty",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "546",
+    },
+
+  unit: {
+    name:   "Vernor",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "739",
+    },
+
+  unit: {
+    name:   "Nichols",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "741",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     22,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (0, -20e3, 7e3),
+  parent_type: carrier_group,
+  parent_id:   9,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     94,
+  name:   "Warriors",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (179e3, -300e3, 0),
+  parent_type: wing,
+  parent_id:   22,
+
+  unit: {
+    name:   "Warrior",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     35,
+  name:   "Broncos",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (125e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   22,
+
+  unit: {
+    name:   "Bronco",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     55,
+  name:   "Black Angels",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (125e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   22,
+
+  unit: {
+    name:   "Angel",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     101,
+  name:   "Sabres",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (246e3, -379e3, 0),
+  parent_type: wing,
+  parent_id:   22,
+
+  unit: {
+    name:   "Sabre",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  20,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     104,
+  name:   "Selene",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (195e3, -400e3, 0),
+  parent_type: wing,
+  parent_id:   22,
+
+  unit: {
+    name:   "Selene",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     14,
+  name:   "Stormwind",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (-109e3, -77e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Stormwind",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "420",
+    },
+
+  unit: {
+    name:   "Justice",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "548",
+    },
+
+  unit: {
+    name:   "Truth",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "550",
+    },
+
+  unit: {
+    name:   "Hoffman",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "742",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     15,
+  name:   "Typhoon",
+  intel:  reserve,
+  iff:    1,
+  region: "Dorrath",
+  loc:    (30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Typhoon",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "422",
+    },
+
+  unit: {
+    name:   "Response",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "552",
+    },
+
+  unit: {
+    name:   "Daring",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "554",
+    },
+
+  unit: {
+    name:   "Deforest",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "744",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     45,
+  name:   "Nightmare",
+  intel:  reserve,
+  iff:    1,
+  region: "Bryn",
+  loc:    (210e3, 38e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Nightmare",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "370",
+    },
+
+  unit: {
+    name:   "Ghola",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "375",
+    },
+
+  unit: {
+    name:   "Surrey",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "952",
+    },
+
+  unit: {
+    name:   "Kent",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "954",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     46,
+  name:   "Orknies",
+  intel:  reserve,
+  iff:    1,
+  region: "Atlan",
+  loc:    (93e3, -101e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Orknies",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "383",
+    },
+
+  unit: {
+    name:   "Secret Fire",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "379",
+    },
+
+  unit: {
+    name:   "Durham",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "956",
+    },
+
+  unit: {
+    name:   "Kingston",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "958",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     61,
+  name:   "Bear",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (157e3, 89e3, 0),
+  parent_type: fleet,
+  parent_id:   6,
+
+  unit: {
+    name:   "Bear",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "746",
+    },
+
+  unit: {
+    name:   "Chance",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "748",
+    },
+
+  unit: {
+    name:   "Gamma",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "960",
+    },
+
+  unit: {
+    name:   "Lawrence",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "962",
+    },
+}
+
+
+// -----------------------
+// FLEET SEVEN
+
+group: {
+  type:   fleet,
+  id:     7,
+  name:   "Heracles",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (-390e3, 10e3, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   carrier_group,
+  id:     11,
+  name:   "Heracles",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (207e3, -362e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Heracles",
+    type:   "Carrier",
+    design: "Orion",
+    regnum: "77",
+    },
+
+  unit: {
+    name:   "Forthright",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "547",
+    },
+
+  unit: {
+    name:   "Arthur",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "739",
+    },
+
+  unit: {
+    name:   "Smith",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "741",
+    },
+}
+
+group: {
+  type:   wing,
+  id:     24,
+  name:   "",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (0, -20e3, 7e3),
+  parent_type: carrier_group,
+  parent_id:   11,
+}
+
+group: {
+  type:   intercept_squadron,
+  id:     99,
+  name:   "Aces",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (179e3, -300e3, 0),
+  parent_type: wing,
+  parent_id:   24,
+
+  unit: {
+    name:   "Ace",
+    type:   "Fighter",
+    design: "Falcon",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     39,
+  name:   "Trailblazers",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (125e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   24,
+
+  unit: {
+    name:   "Trailblazer",
+    type:   "Fighter",
+    design: "Stormhawk",
+    count:  24,
+    },
+}
+
+group: {
+  type:   fighter_squadron,
+  id:     54,
+  name:   "Gunfighters",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (127e3, -318e3, 0),
+  parent_type: wing,
+  parent_id:   24,
+
+  unit: {
+    name:   "Gunfighter",
+    type:   "Fighter",
+    design: "Eagle",
+    count:  24,
+    },
+}
+
+group: {
+  type:   attack_squadron,
+  id:     49,
+  name:   "Kings",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (246e3, -379e3, 0),
+  parent_type: wing,
+  parent_id:   24,
+
+  unit: {
+    name:   "King",
+    type:   "Attack",
+    design: "Thunderbolt",
+    count:  16,
+    },
+}
+
+group: {
+  type:   lca_squadron,
+  id:     113,
+  name:   "Perseus",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (195e3, -400e3, 0),
+  parent_type: wing,
+  parent_id:   24,
+
+  unit: {
+    name:   "Perseus",
+    type:   "LCA",
+    design: "Zodiac",
+    count:  8,
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     19,
+  name:   "Demolisher",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (-109e3, -77e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Demolisher",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "421",
+    },
+
+  unit: {
+    name:   "Honesty",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "549",
+    },
+
+  unit: {
+    name:   "Gallantry",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "551",
+    },
+
+  unit: {
+    name:   "Parks",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "753",
+    },
+}
+
+group: {
+  type:   battle_group,
+  id:     20,
+  name:   "Shrike",
+  intel:  known,
+  iff:    1,
+  region: "Dorrath",
+  loc:    (30e3, 180e3, -6e3),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Shrike",
+    type:   "Cruiser",
+    design: "Devastator",
+    regnum: "423",
+    },
+
+  unit: {
+    name:   "Resolve",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "553",
+    },
+
+  unit: {
+    name:   "Bold",
+    type:   "Cruiser",
+    design: "Courageous",
+    regnum: "555",
+    },
+
+  unit: {
+    name:   "Standish",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "755",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     52,
+  name:   "Mysterious",
+  intel:  reserve,
+  iff:    1,
+  region: "Bryn",
+  loc:    (210e3, 38e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Mysterious",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "388",
+    },
+
+  unit: {
+    name:   "Aegis",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "393",
+    },
+
+  unit: {
+    name:   "Halston",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "953",
+    },
+
+  unit: {
+    name:   "Portsmouth",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "955",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     54,
+  name:   "Ogre",
+  intel:  known,
+  iff:    1,
+  region: "Atlan",
+  loc:    (93e3, -101e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Ogre",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "372",
+    },
+
+  unit: {
+    name:   "Chaos",
+    type:   "Destroyer",
+    design: "Spectre",
+    regnum: "373",
+    },
+
+  unit: {
+    name:   "Bristol",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "957",
+    },
+
+  unit: {
+    name:   "Oxford",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "959",
+    },
+}
+
+group: {
+  type:   destroyer_squadron,
+  id:     69,
+  name:   "Drayton",
+  intel:  known,
+  iff:    1,
+  region: "Paragon",
+  loc:    (157e3, 89e3, 0),
+  parent_type: fleet,
+  parent_id:   7,
+
+  unit: {
+    name:   "Drayton",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "747",
+    },
+
+  unit: {
+    name:   "Cavanaugh",
+    type:   "Destroyer",
+    design: "Asher",
+    regnum: "749",
+    },
+
+  unit: {
+    name:   "Columbia",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "961",
+    },
+
+  unit: {
+    name:   "Orleans",
+    type:   "Frigate",
+    design: "Berents",
+    regnum: "963",
+    },
+}
+
+
+
+
+// -----------------------
+// NON-COM and CIVILIAN
+
+group: {
+  type:   civilian,
+  id:     1000,
+  name:   "Civilian Forces",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+group: {
+  type:   war_production,
+  id:     2000,
+  name:   "War Production",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1000,
+}
+
+group: {
+  type:   civilian,
+  id:     2100,
+  name:   "Janek Industries",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (55e3, 35e3, 0),
+  parent_type: war_production,
+  parent_id:   2000,
+}
+
+group: {
+  type:   infrastructure,
+  id:     2101,
+  name:   "Reactor",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (55e3, 36e3, 0),
+  parent_type: civilian,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Reactor",
+    type:   "Factory",
+    design: "Reac01",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   factory,
+  id:     2102,
+  name:   "Factory 1",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (56e3, 35e3, 0),
+  parent_type: civilian,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Factory 1",
+    type:   "Factory",
+    design: "Fact04",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   factory,
+  id:     2103,
+  name:   "Factory 2",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (58e3, 36e3, 0),
+  parent_type: civilian,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Factory 2",
+    type:   "Factory",
+    design: "Fact02",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2104,
+  name:   "Office Block",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (-30e3, 15e3, 0),
+  parent_type: civilian,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Office Block",
+    type:   "Building",
+    design: "Bldg00",
+    count:  3,
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2105,
+  name:   "Office Block",
+  intel:  known,
+  iff:    1,
+  region: "Janek Station",
+  loc:    (-20e3, 10e3, 0),
+  parent_type: civilian,
+  parent_id:   2100,
+
+  unit: {
+    name:   "Office Block",
+    type:   "Building",
+    design: "Bldg01",
+    count:  3,
+    },
+}
+
+
+
+
+group: {
+  type:   non_com,
+  id:     2000,
+  name:   "Freight",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: civilian,
+  parent_id:   1000,
+}
+
+group: {
+  type:   freight,
+  id:     3000,
+  name:   "Roika Starlift",
+  intel:  reserve,
+  iff:    1,
+  loc:    (77e3, 57e3, 0),
+  parent_type: non_com,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Adventure",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "1919",
+    },
+
+  unit: {
+    name:   "Endurance",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2211",
+    },
+
+  unit: {
+    name:   "Mariner",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2234",
+    },
+
+  unit: {
+    name:   "Vantage",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2241",
+    },
+
+  unit: {
+    name:   "Wayfarer",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2243",
+    },
+}
+
+
+group: {
+  type:   freight,
+  id:     3001,
+  name:   "Roika Starlift",
+  intel:  reserve,
+  iff:    1,
+  loc:    (77e3, 57e3, 0),
+  parent_type: non_com,
+  parent_id:   2000,
+
+  unit: {
+    name:   "Challenger",
+    type:   "Freighter",
+    design: IM3500
+    regnum: "1921",
+    },
+
+  unit: {
+    name:   "Explorer",
+    type:   "Freighter",
+    design: IM3500
+    regnum: "1937",
+    },
+
+  unit: {
+    name:   "Seeker",
+    type:   "Freighter",
+    design: IM3500
+    regnum: "2216",
+    },
+
+  unit: {
+    name:   "Viking",
+    type:   "Freighter",
+    design: IM3500
+    regnum: "2320",
+    },
+
+  unit: {
+    name:   "Wanderer",
+    type:   "Freighter",
+    design: IM3500
+    regnum: "2405",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3002,
+  name:   "Roika Starlift",
+  intel:  reserve,
+  iff:    1,
+  loc:    (77e3, 57e3, 0),
+  parent_type: non_com,
+  parent_id:   2000,
+
+
+  unit: {
+    name:   "Discovery",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2117",
+    },
+
+  unit: {
+    name:   "Harvester",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2225",
+    },
+
+  unit: {
+    name:   "Sojourner",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "1875",
+    },
+
+  unit: {
+    name:   "Voyager",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2109",
+    },
+
+  unit: {
+    name:   "Windward",
+    type:   "Freighter",
+    design: IM4300
+    regnum: "2046",
+    },
+}
+
+
+group: {
+  type:   freight,
+  id:     3100,
+  name:   "ChemStar",
+  intel:  reserve,
+  iff:    1,
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: non_com,
+  parent_id:   2000,
+
+  unit: {
+    name:   "ChemStar 1",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1101",
+    },
+
+  unit: {
+    name:   "ChemStar 2",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1102",
+    },
+
+  unit: {
+    name:   "ChemStar 3",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1103",
+    },
+
+  unit: {
+    name:   "ChemStar 4",
+    type:   "Freighter",
+    design: IM1906
+    regnum: "1104",
+    },
+
+  unit: {
+    name:   "ChemStar 5",
+    type:   "Freighter",
+    design: IM1906
+    regnum: "1105",
+    },
+
+  unit: {
+    name:   "ChemStar 6",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1106",
+    },
+}
+
+group: {
+  type:   freight,
+  id:     3101,
+  name:   "ChemStar",
+  intel:  reserve,
+  iff:    1,
+  loc:    (30e3, -180e3, 6e3),
+  parent_type: non_com,
+  parent_id:   2000,
+
+  unit: {
+    name:   "ChemStar 7",
+    type:   "Freighter",
+    design: IM1906
+    regnum: "1107",
+    },
+
+  unit: {
+    name:   "ChemStar 8",
+    type:   "Freighter",
+    design: IM1906
+    regnum: "1108",
+    },
+
+  unit: {
+    name:   "ChemStar 9",
+    type:   "Freighter",
+    design: IM1906
+    regnum: "1109",
+    },
+
+  unit: {
+    name:   "ChemStar 10",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1110",
+    },
+
+  unit: {
+    name:   "ChemStar 11",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1111",
+    },
+
+  unit: {
+    name:   "ChemStar 12",
+    type:   "Freighter",
+    design: IM1912
+    regnum: "1112",
+    },
+}
+
+
+
+// ----------------------------
+// ALLIANCE FARCASTER NETWORK
+
+
+group: {
+  type:   infrastructure,
+  id:     5000,
+  name:   "Alliance Farcaster Network",
+  intel:  known,
+  iff:    1,
+  loc:    (0, 0, 0),
+  parent_type: force,
+  parent_id:   1,
+}
+
+// JARNELL SYSTEM:
+
+group: {
+  type:   infrastructure,
+  id:     5001,
+  name:   "Jarnell-Adonis",
+  intel:  located,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (80e3, 20e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Jarnell-Adonis",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5002,
+  name:   "Adonis-Jarnell",
+  intel:  located,
+  iff:    1,
+  region: "Adonis",
+  loc:    (90e3, -54e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Adonis-Jarnell",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5003,
+  name:   "Jarnell-Dawn",
+  intel:  located,
+  iff:    1,
+  region: "Jarnell",
+  loc:    (-30e3, 10e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Jarnell-Dawn",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5004,
+  name:   "Dawn-Jarnell",
+  intel:  located,
+  iff:    1,
+  region: "Dawn",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Dawn-Jarnell",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "",
+    },
+}
+
+// BOROVA SYSTEM:
+
+group: {
+  type:   infrastructure,
+  id:     5011,
+  name:   "Borova-Danova",
+  intel:  located,
+  iff:    1,
+  region: "Borova",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Borova-Danova",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5011",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5012,
+  name:   "Danova-Borova",
+  intel:  located,
+  iff:    1,
+  region: "Danova",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Danova-Borova",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5012",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5013,
+  name:   "Danova-Tulkas",
+  intel:  located,
+  iff:    1,
+  region: "Danova",
+  loc:    (50e3, -120e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Danova-Tulkas",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5013",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5014,
+  name:   "Tulkas-Danova",
+  intel:  located,
+  iff:    1,
+  region: "Tulkas",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Tulkas-Danova",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5014",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5015,
+  name:   "Borova-Maraner",
+  intel:  located,
+  iff:    1,
+  region: "Borova",
+  loc:    (-30e3, 110e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Borova-Maraner",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5015",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5016,
+  name:   "Maraner-Borova",
+  intel:  located,
+  iff:    1,
+  region: "Maraner",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Maraner-Borova",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5016",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2200,
+  name:   "Vestapol",
+  intel:  located,
+  iff:    0,
+  region: "Vestapol",
+  loc:    (-54e3, 30e3, 0),
+  parent_type: civilian,
+  parent_id:   1,
+}
+
+group: {
+  type:   civilian,
+  id:     2201,
+  name:   "Vestapol",
+  intel:  located,
+  iff:    0,
+  region: "Vestapol",
+  loc:    (-10e3, 0, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Downtown",
+    type:   "Building",
+    design: "City03",
+    regnum: "",
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2202,
+  name:   "Vestapol",
+  intel:  located,
+  iff:    0,
+  region: "Vestapol",
+  loc:    (-16e3, 5e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Crosstown",
+    type:   "Building",
+    design: "City03",
+    regnum: ""
+    heading: 270,
+    },
+}
+
+group: {
+  type:   civilian,
+  id:     2203,
+  name:   "Museum District",
+  intel:  located,
+  iff:    0,
+  region: "Vestapol",
+  loc:    (-10e3, 5e3, 0),
+  parent_type: civilian,
+  parent_id:   2200,
+
+  unit: {
+    name:   "Museum",
+    type:   "Building",
+    design: "Bldg01",
+    regnum: ""
+    },
+}
+
+// JANUS SYSTEM:
+
+group: {
+  type:   infrastructure,
+  id:     5021,
+  name:   "Janek-Alystra",
+  intel:  located,
+  iff:    1,
+  region: "Janek",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Janek-Alystra",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5021",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5022,
+  name:   "Alystra-Janek",
+  intel:  located,
+  iff:    1,
+  region: "Alystra",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Alystra-Janek",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5022",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5023,
+  name:   "Alystra-Navara",
+  intel:  located,
+  iff:    1,
+  region: "Alystra",
+  loc:    (-50e3, 120e3, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Alystra-Navara",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5023",
+    },
+}
+
+group: {
+  type:   infrastructure,
+  id:     5024,
+  name:   "Navara-Alystra",
+  intel:  located,
+  iff:    1,
+  region: "Navara",
+  loc:    (0, 0, 0),
+  parent_type: infrastructure,
+  parent_id:   5000,
+
+  unit: {
+    name:   "Navara-Alystra",
+    type:   "Farcaster",
+    design: "Farcaster",
+    regnum: "5024",
+    },
+}
+
+

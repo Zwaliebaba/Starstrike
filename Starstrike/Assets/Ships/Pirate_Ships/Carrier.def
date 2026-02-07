@@ -1,0 +1,409 @@
+SHIP
+
+name:          Adventure
+display_name:  Adventure
+class:         Carrier
+
+hud_icon:   "CarrierHud.pcx"
+
+detail_0:   "Carrier_1opt.mag"
+feature_0:  1000
+detail_1:   "Carrier_2opt.mag"
+feature_1:  40
+
+mass:       187.6e3
+agility:    1.3
+vlimit:     210
+roll_rate:  7
+integrity:  68e3
+scale:      2.5
+acs:        1.5
+
+trans_x:     5e6
+trans_y:     1e6
+trans_z:     3e6
+
+arcade_drag: 4.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+degrees:    true
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       95e3,
+
+   loc:              (0, -40, -50),
+   size:             64,
+   hull_factor:      0.9,
+   explosion:        7
+}
+
+drive: {
+   type:             Red
+   name:             "Plasma Drive",
+   abrv:             "Drive",
+   design:           "Plasma Drive",
+   thrust:           38e3,
+   scale:            8,
+
+   port:             ( -87,  32, -872)
+   port:             ( -87, -16, -872)
+   port:             ( -30,  32, -872)
+   port:             ( -30, -16, -872)
+   port:             (  30,  32, -872)
+   port:             (  30, -16, -872)
+   port:             (  87,  32, -872)
+   port:             (  87, -16, -872)
+
+   loc:              (0, 0, -120),
+   size:             48,
+   hull_factor:      0.3,
+   explosion:        7
+}
+
+thruster: {
+   design:           Thruster,
+
+   loc:              (0, 0, 128),
+   size:             24,
+   hull_factor:      0.3
+}
+
+quantum: {
+   design:           "Quantum Drive",
+   abrv:             "Q-Drive"
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   abrv:             "Shield"
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, -90, -50),
+   size:             60,
+   hull_factor:      0.8
+}
+
+power:      {
+   type:             "Auxilliary Reactor",
+   abrv:             "Aux Reac"
+   design:           "Auxilliary Reactor",
+   max_output:       5e3,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-1",
+ 
+   aim_az_max:       120.0,
+   aim_az_min:       -20.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   muzzle:           (0, 0, 71)
+   loc:              ( 240, 52, 130),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-2",
+ 
+   aim_az_max:        20.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   muzzle:           (0, 0, 71)
+   loc:              (-240, 52, 130),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-3",
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+   aim_el_max:         0
+   aim_el_min:       -75
+
+   muzzle:           (0, 0, 71)
+   loc:              ( 130, -60, 130),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-4",
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+   aim_el_max:         0
+   aim_el_min:       -75
+
+   muzzle:           (0, 0, 71)
+   loc:              (-130, -60, 130),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-5",
+
+   azimuth:          180
+
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   muzzle:           (0, 0, 71)
+   loc:              ( 90, 80, -580),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Light-PDB",
+   design:           "Bolt Weapon",
+   name:             "PDB-6",
+
+   azimuth:          180
+ 
+   aim_az_max:       120.0,
+   aim_az_min:      -120.0,
+   aim_el_max:        85.0,
+   aim_el_min:        -1.0,
+
+   muzzle:           (0, 0, 71)
+   loc:              (-90, 80, -580),
+
+   size:             64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+
+
+flightdeck: {
+   name:       "Deck 1",
+   abrv:       "Deck 1",
+   design:     "Flight Deck",
+   loc:        ( 30, 15,  512),
+   cam:        (  0, 30,  512),
+   start:      ( 30, 15,  512),
+   end:        (2e3, 15, 2500),
+
+   spot:       { loc: ( 10, 15, 460), filter: 0x7 },
+   spot:       { loc: ( 50, 15, 460), filter: 0x7 },
+   spot:       { loc: ( 30, 15, 460), filter: 0x8 },
+
+   launch:     true,
+   max_ships:  2,
+   cycle_time: 15,
+
+   size:       28,
+   hull_factor: 0.5,
+}
+
+flightdeck: {
+   name:       "Deck 2"
+   abrv:       "Deck 2"
+   design:     "Flight Deck"
+   loc:        (-30, 15,  640)
+   cam:        (  0, 30,  512)
+   start:      (-80, 30, 1500)
+   end:        (-30, 15,  640)
+
+   spot:       (-30, 15,  640)
+
+   azimuth:    180
+   recovery:   true
+   max_ships:  1
+   cycle_time: 15
+
+   size:       40
+   hull_factor: 0.5
+}
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   abrv:             Batt
+   design:           Battery,
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "cvmap0.pcx",
+   sprite: "cvmap1.pcx",
+   sprite: "cvmap2.pcx",
+   sprite: "cvmap3.pcx",
+   sprite: "cvmap4.pcx",
+   sprite: "cvmap5.pcx",
+   sprite: "cvmap6.pcx",
+   sprite: "cvmap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   2,
+   explosion_loc:    (-50, 50, 0),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   1,
+   explosion_loc:    (60, 40, 190),
+
+   explosion_type:   10,   // LARGE_BURST
+   explosion_time:   0.5,
+   explosion_loc:    (0, -48, -180),
+
+   explosion_type:   10,   // SMALL_EXPLOSION
+   explosion_time:   0,
+   explosion_loc:    (20, 80, -190),
+
+   final_type:       13,   // NUKE_EXPLOSION
+   final_loc:        (0, 0, 0),
+
+   final_type:       12,   // LARGE_BURST
+   final_loc:        (0, 0, 0),
+
+   debris:           "DebrisCarrier1.mag",
+   debris_loc:       (0,0,450),
+   debris_mass:      23e3,
+   debris_count:     1,
+   debris_life:      385,
+
+   debris:           "DebrisCarrier2.mag",
+   debris_loc:       (0,0,-700),
+   debris_mass:      19e3,
+   debris_count:     1,
+   debris_life:      425,
+
+   debris:           "Debris5.mag",
+   debris_loc:       (0,0,-50),
+   debris_mass:      5,
+   debris_count:     15,
+   debris_life:      15,
+
+   debris:           "Debris6.mag",
+   debris_loc:       (0,0,60),
+   debris_mass:      4,
+   debris_count:     15,
+   debris_life:      25,
+
+   debris:           "Debris7.mag",
+   debris_loc:       (0,0,0),
+   debris_mass:      1,
+   debris_count:     10,
+   debris_life:      35,
+
+}
+
+
+
+
+
+

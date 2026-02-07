@@ -1,0 +1,349 @@
+SHIP
+
+name:          Volnaris
+display_name:  Volnaris
+class:         Destroyer
+description:   "The DD/E-4D01 VOLNARIS class of destroyer/escorts are the predecessors of the heavier Broadsword destroyer class.  Originally intended as mainline destroyers, the Volnaris ships have now been relegated primarily to escort duty for the Hegemony battle groups.  The Volnaris features a pair of internally-mounted heavy x-ray laser batteries and three fusion torpedo launchers for offensive capability, along with a full complement of Orca point defense batteries for protection from inbound threats.  Due to design limitations, the Orca PDBs tend to provide better coverage for the dorsal hemisphere, leaving the Volnaris class with a vulnerable underbelly."
+
+hud_icon:   "VolnarisHud.pcx"
+
+detail_0:   "Volnaris_0.mag"
+feature_0:  1000
+detail_1:   "Volnaris_1opt.mag"
+feature_1:  40
+detail_2:   "Volnaris_2opt.mag"
+feature_2:  20
+
+mass:       21.1e3
+agility:    2 //3.1
+vlimit:     240
+roll_rate:  7
+integrity:  20e3
+scale:      3.0
+acs:        1.2
+
+trans_x:     250e3
+trans_y:     100e3
+trans_z:     250e3
+
+arcade_drag: 2.5e-2
+drag:       6e-7
+roll_drag:  1.2
+pitch_drag: 1.2
+yaw_drag:   1.2
+
+chase:      (0, -1800, 170)
+bridge:     (0,   320,  60)
+
+power:      {
+   type:             Fusion,
+   design:           "Fusion Reactor",
+   max_output:       7500,
+
+   loc:              (0, -40, -220),
+   size:             64,
+   hull_factor:      0.8
+   explosion:        7
+}
+
+drive: {
+   type:             Yellow,
+   abrv:             Drive
+   name:             "Plasma Drive",
+   design:           "Plasma Drive",
+   thrust:           1000,
+   scale:            5,
+   port:             ( 0,  -22, -420)
+   port:             ( 0,  -67, -402)
+   port:             ( 0, -117, -357)
+
+   loc:              (0, 0, -240),
+   size:             48,
+   hull_factor:      0.5
+   explosion:        7
+}
+
+quantum: {
+   abrv:             "Q-Drive"
+   design:           "Quantum Drive",
+   loc:              (0, 0, -120),
+   size:             24,
+   hull_factor:      0.3
+}
+
+shield: {
+   type:             2,
+   design:           "Grav Shield",
+   pcs:              100,
+   bolt_hit_sound:   "shield_hit4.wav",
+   beam_hit_sound:   "shield_hit5.wav",
+
+   loc:              (0, 0, -60),
+   size:             48,
+   hull_factor:      0.7
+}
+
+
+power:      {
+   type:             "Auxilliary Reactor",
+   design:           "Auxilliary Reactor",
+   abrv:             "Aux Reac"
+   max_output:       1200,
+
+   loc:              (0, 0, -180),
+   hull_factor:      0.6
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 1",
+   abrv:             "Laser-1",
+   muzzle:           (-34, -19, 570),
+
+   loc:              (-34, -19, 460),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+weapon:     {
+   type:             "XRay Laser",
+   design:           "Beam Weapon",
+   name:             "XRay Laser 2",
+   abrv:             "Laser-2",
+   muzzle:           ( 34, -19, 570),
+
+   loc:              ( 34, -19, 460),
+   size:             32,
+   hull_factor:      0.2,
+   explosion:        7
+}
+
+
+weapon:     {
+   type:             "Fusion Torpedo",
+   design:           "Missile Weapon",
+   name:             "Torpedo Banks",
+   abrv:             "Torps",
+   muzzle:           (-25,  17, 470),
+   muzzle:           ( 25,  17, 470),
+   loc:              (  0, -32, 400),
+   size:             80,
+   hull_factor:      0.2
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 1"
+   abrv:             "PDB 1"
+ 
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            ( 0, 45, 340),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 2"
+   abrv:             "PDB 2"
+ 
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+   loc:            ( 0, 55, 225),
+
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+}
+
+
+weapon:     {
+   type:             "Rail-12"
+   design:           "Bolt Weapon",
+   name:             "PDB 3"
+   abrv:             "PDB 3"
+   muzzle:             ( 4, 11, 75),
+   muzzle:             (-4, 11, 75),
+
+
+   loc:              (  0, 55, -255),
+   size:            64,
+   hull_factor:      0.8,
+   explosion:        6
+
+   azimuth:          3.14159,
+}
+
+
+thruster: {
+   design:           Thruster,
+   type:             Yellow,
+   scale:            0.04,
+   loc:              (0, -52,0),
+   explosion:        8,
+
+// fore reverse	
+	port_fore:	{loc:(-159,-24,4),fire:    0x0040},
+	port_fore:	{loc:(159,-24,4),fire:     0x0080},
+
+	port_aft:	{loc:(-159,-24,-55),fire:    0x0080},
+	port_aft:	{loc:(159,-24,-55),fire:     0x0040},
+
+	port_fore:	{loc:(26,8,-28),fire:      0x0004},
+	port_fore:	{loc:(27,1,-28),fire:      0x0004},
+	port_fore:	{loc:(-26,8,-28),fire:     0x0004},
+	port_fore:	{loc:(-27,1,-28),fire:     0x0004},
+	port_fore:	{loc:(-3,-23,-28),fire:    0x0004},
+	port_fore:	{loc:(3,-23,-28),fire:     0x0004},
+
+	port_aft:	{loc:(26,8,-79),fire:      0x0008},
+	port_aft:	{loc:(27,1,-79),fire:      0x0008},
+	port_aft:	{loc:(-26,8,-79),fire:     0x0008},
+	port_aft:	{loc:(-27,1,-79),fire:     0x0008},
+	port_aft:	{loc:(-3,-23,-79),fire:    0x0008},
+	port_aft:	{loc:(3,-23,-79),fire:     0x0008},
+
+// Vertical
+
+	port_top:	{loc:(160,-18,-8),fire:      0x0810},
+	port_top:	{loc:(-160,-18,-8),fire:     0x0410},
+	port_top:	{loc:(160,-18,-41),fire:     0x0810},
+	port_top:	{loc:(-160,-18,-41),fire:    0x0410},	
+
+	port_bottom:	{loc:(160,-29,-8),fire:      0x0420},
+	port_bottom:	{loc:(-160,-29,-8),fire:     0x0820},
+	port_bottom:	{loc:(160,-29,-41),fire:     0x0420},
+	port_bottom:	{loc:(-160,-29,-41),fire:    0x0820},
+
+	port_top:	{loc:(39,-14,-125),fire:     0x0100},	
+	port_top:	{loc:(-39,-14,-125),fire:    0x0100},
+	port_bottom:	{loc:(-39,-23,-125),fire:    0x0200},	
+	port_bottom:	{loc:(39,-23,-125),fire:     0x0200},	
+
+	port_top:	{loc:(39,-5,127),fire:      0x0200},	
+	port_top:	{loc:(-39,-5,127),fire:     0x0200},
+	port_bottom:	{loc:(-39,-14,127),fire:     0x0100},	
+	port_bottom:	{loc:(39,-14,127),fire:     0x0100},
+
+// Side Translantion
+
+	port_right:	{loc:(167,-25,-11),fire:    0x0002},
+	port_right:	{loc:(167,-25,-38),fire:    0x0002},
+
+	port_left:	{loc:(-167,-25,-11),fire:    0x0001},
+	port_left:	{loc:(-167,-25,-38),fire:    0x0001},
+
+   size:             32,
+   hull_factor:      0.8
+}
+
+
+
+probe:     {
+   type:    "Sensor Drone",
+   design:  "Probe",
+   abrv:    "Probe",
+   muzzle:  ( 0, -80, 0),
+
+   loc:     (0, -80, 0),
+   size:    16,
+   hull_factor: 0.2
+}
+
+sensor:     {
+   design:              Sensor,
+   pcs:                 20,
+   active_efficiency:   1e6,
+   passive_efficiency:  10e3,
+   range:    50e3
+   range:   100e3
+   range:   150e3
+
+   loc:              (0, -16, 380),
+   size:             16,
+   hull_factor:      0.1
+}
+
+power:      {
+   type:             Battery,
+   design:           Battery,
+   abrv:             Batt
+   max_output:       100
+}
+
+computer:   {
+   name:             "Avionics Package",
+   abrv:             "HUD",
+   type:             1,
+   design:           Computer,
+
+   loc:              (20, 16, 80),
+   size:             16,
+   hull_factor:      0.5
+}
+
+computer:   {
+   name:             "Flight Computer",
+   abrv:             "Flight",
+   type:             2,
+   design:           Computer,
+
+   loc:              (-20, -16, 80),
+   size:             16,
+   hull_factor:      0.2
+}
+
+nav:        {
+   loc:              (0, 16, 60),
+   design:           Computer,
+   size:             16,
+   hull_factor:      0.1
+}
+
+
+map: {
+   sprite: "BroadMap0.pcx",
+   sprite: "BroadMap1.pcx",
+   sprite: "BroadMap2.pcx",
+   sprite: "BroadMap3.pcx",
+   sprite: "BroadMap4.pcx",
+   sprite: "BroadMap5.pcx",
+   sprite: "BroadMap6.pcx",
+   sprite: "BroadMap7.pcx"
+}
+
+
+death_spiral: {
+   time:             5,
+
+   explosion: { type: 10, time: 1.8, loc: (-50,  50,    0) }
+   explosion: { type: 10, time: 0.7, loc: ( 60,  40,  190) }
+   explosion: { type: 10, time: 0.7, loc: (  0, -48, -180) }
+   explosion: { type: 10, time: 0.3, loc: ( 20,  80, -190) }
+   explosion: { type: 10, time: 0.1, loc: (-30,  30,  -90) }
+
+   explosion: { type: 13, final: true } // Nuke
+   explosion: { type: 12, final: true } // Large burst
+
+
+   debris:    { model: "VolnarisDebris1.mag",   loc: (0,0,-250), mass:25e3, count:  1, life: 365,
+                fire:  (30,20,170) }
+   debris:    { model: "Debris0A.mag",          loc: (0,0, 20),  mass:  45, count: 16, life:  20 }
+   debris:    { model: "Debris0B.mag",          loc: (0,0,-30),  mass:  24, count: 12, life:  35 }
+   debris:    { model: "Debris0C.mag",          loc: (0,0,0),    mass:  23, count: 10, life:  30 }
+}
+
+
+
+
+
+

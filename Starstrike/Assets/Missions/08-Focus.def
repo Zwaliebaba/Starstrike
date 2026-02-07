@@ -1,0 +1,186 @@
+MISSION
+
+name:       "08. A Matter of Focus"
+type:       PATROL
+system:     Solus
+region:     Solus
+
+start:      "07/23:29:00"
+degrees:    true
+
+sitrep:     "An illegal drug cartel backed by the Brotherhood of Iron "
+            "criminal organization has set up major a distribution operation "
+            "in the Solus system.  The drug of choice is a substance "
+            "called 'Focus' that has become increasingly popular among "
+            "students and some of the wealthier intelligensia.  Local "
+            "law enforcement has been unable to stem the tide of this "
+            "devastating and addictive vice.\n\n"
+
+            "We have information from an inside source that a major "
+            "shipment is being brought in tonight.  The smugglers are "
+            "using Brotherhood pirate vessels - they are lightly armored "
+            "but very difficult to track and target."
+
+objective:  "* Disable or destroy smugglers in the Solus sector\n"
+            "* Escort any civilian traffic out of the area"
+
+ship: {
+   name:    Saratoga,
+   design:  Berents,
+   loc:     (0, 0, 0),
+   count:   1,
+   iff:     1,
+   player:  1
+}
+
+ship: {
+   name:    Columbia,
+   design:  Berents,
+   loc:     (35e3, -20e3, 0),
+   count:   1,
+   iff:     1,
+   command_ai: 1,
+   commander:  Saratoga
+}
+
+
+// ***** BAD GUYS *****
+
+ship: {
+   name:    Focus,
+   design:  Marauder,
+   rloc:    { ref: Saratoga, dex: 130e3, az: 90, az_var: 75 },
+   iff:     3,
+   intel:   known,
+
+   navpt:   { cmd: vector, rloc: { ref: "this",   dex:  60e3, az: 90, az_var: 60 }, speed: 400, emcon: 1 },
+   navpt:   { cmd: vector, rloc: { ref: "this:1", dex:  60e3, az: 90, az_var: 60 }, speed: 400, emcon: 1 },
+}
+
+ship: {
+   name:    Vagrant,
+   design:  Marauder,
+   rloc:    { ref: Focus, dex: 23e3 },
+   iff:     3,
+   intel:   known,
+
+   navpt:   { cmd: escort, tgt: Focus, rloc: { ref: "Focus:1", dex: 20e3 }, speed: 400, emcon: 1 },
+   navpt:   { cmd: escort, tgt: Focus, rloc: { ref: "Focus:2", dex: 20e3 }, speed: 400, emcon: 1 },
+}
+
+ship: {
+   name:    Pickup,
+   design:  Jackal,
+   rloc:    { ref: "Focus:2", dex: 30e3 },
+   iff:     3,
+   intel:   secret,
+
+   hold:    1800,
+
+   navpt:   { cmd: vector, rloc: { ref: "this", dex: 50e3, az: 90, az_var: 60  }, speed: 800 },
+   navpt:   { cmd: vector, loc: (0, 0, 5e3), rgn: Telmera },
+}
+
+
+// ***** EVENT LIST *****
+
+event: {
+   id:              1,
+   event:           Hold,
+   event_message:   "",
+   event_param:     0,
+   event_ship:      Pickup,
+
+   trigger:         Navpoint,
+   trigger_ship:    Focus,
+   trigger_param:   2,
+}
+
+event: {
+   id:              20,
+   event:           Message,
+   sound:           "Vox\Misc\M08-E20.wav",
+   event_message:   "The smugglers have transferred their cargo to a landing craft.",
+   event_ship:      Saratoga,
+
+   trigger:         Event,
+   trigger_param:   1,
+   delay:           1,
+}
+
+event: {
+   id:              21,
+   event:           Message,
+   sound:           "Vox\Misc\M08-E21.wav",
+   event_message:   "Disable or destroy the landing craft before it can break orbit.",
+   event_ship:      Saratoga,
+
+   trigger:         Event,
+   trigger_param:   1,
+   delay:           4,
+}
+
+event: {
+   id:              22,
+   event:           Message,
+   sound:           "Vox\Misc\M08-E22.wav",
+   event_message:   "The landing craft has escaped with the shipment.  Your mission has failed.",
+   event_ship:      Saratoga,
+
+   trigger:         Jump,
+   trigger_ship:    Pickup,
+   trigger_param:   0,
+   delay:           1,
+}
+
+event: {
+   id:              25,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Focus,
+}
+
+event: {
+   id:              26,
+   event:           Message,
+   event_message:   "",
+
+   trigger:         Destroyed,
+   trigger_ship:    Pickup,
+}
+
+event: {
+   id:              50,
+   event:           Message,
+   sound:           "Vox\Misc\M08-E50.wav",
+   event_message:   "The smugglers were destroyed before they could offload their shipment.  Mission accomplished!",
+   event_ship:      Saratoga,
+
+   trigger:         "Event (ALL)",
+   trigger_param:   (-20, -22, 25),
+   delay:           5,
+}
+
+event: {
+   id:              60,
+   event:           Message,
+   sound:           "Vox\Misc\M08-E60.wav",
+   event_message:   "The landing craft was destroyed before it could break orbit.  Mission complete!",
+   event_ship:      Saratoga,
+
+   trigger:         "Event (ALL)",
+   trigger_param:   (22, 26),
+   delay:           5,
+}
+
+
+event: {
+   id:              99,
+   event:           Exit,
+
+   trigger:         "Event (ANY)",
+   trigger_param:   (22, 50, 60),
+   delay:           10,
+}

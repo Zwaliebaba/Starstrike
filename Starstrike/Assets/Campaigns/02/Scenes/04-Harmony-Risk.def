@@ -1,0 +1,171 @@
+MISSION
+
+name:   "Cmpn 02 Brief 04"
+type:   "Patrol"
+system: "Solus"
+region: "Solus"
+stardate: 1147287263.0
+
+element: {
+   name:      Falcon
+   design:    CameraPod
+   mission:   Misc
+
+   intel:     Secret
+   count:     1
+   iff:       1
+   player:    1
+   loc:       (0, 0, 0)
+}
+
+element: {
+   name:      "Solus-Kalon"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (80000, 20000, 0)
+
+   objective: { cmd: Vector, tgt: "Kalon-Solus" }
+}
+
+element: {
+   name:      "Kalon-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Kalon"
+   loc:       (90000, -54000, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Kalon" }
+}
+
+element: {
+   name:      "Solus-Trellis"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (-200e3, -100e3, 0)
+
+   objective: { cmd: Vector, tgt: "Trellis-Solus" }
+}
+
+element: {
+   name:      "Solus-Jalah"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Solus"
+   loc:       (150e3, -180e3, 0)
+
+   objective: { cmd: Vector, tgt: "Jalah-Solus" }
+}
+
+element: {
+   name:      "Jalah-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Jalah"
+   loc:       (0, 0, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Jalah" }
+}
+
+
+element: {
+   name:      "Trellis-Solus"
+   design:    "Farcaster"
+   mission:   "Misc"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Trellis"
+   loc:       (-100e3, -150e3, 0)
+
+   objective: { cmd: Vector, tgt: "Solus-Trellis" }
+}
+
+element: {
+   name:      "Harmony Station"
+   design:    "Station2"
+   mission:   "Flight Ops"
+
+   intel:     "Located"
+   count:     1
+   command_ai:1
+   iff:       0
+   playable:  false
+   region:    "Kalon"
+   loc:       (0, 0, 0)
+}
+
+
+event: { event: BeginScene, time:   0, message: "Scene 1" }
+event: { event: Display,               image: "Campaigns\02/Scenes\Black.pcx", color: 0xffffffff, fade: (0,1,1), rect: (0,0,0,0) }
+event: { event: Camera,                param: 3,  target: "body:Solus",  vec: (1,0,1e7)           }
+event: { event: Camera,                param: 5,                         vec: (0.12, 0.01, 0.02)  }
+
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,20, 600,150), font: Limerick18, color: 0xffffffff,
+         message: "Force:Intel Briefing" }
+
+event: { event: Display,    time:   1, fade: (1,5,1), rect: (20,40, 600,150), font: OCRB, color: 0xffffff80,
+         message: "*************************************\n*** FLASH CODED +$TIME \n*** HARMONY STATION \n*** KALON SECTOR \n*** CLASSIFIED: SECRET R3 NTK\n*************************************" }
+
+
+event: {
+   event: Message
+   time:  1
+   sound: "Vox\Scenes\02/Briefing_04_sam.wav"
+}
+
+
+event: { event: Camera,     time:  10, param: 3,  target: "Solus-Kalon", vec: (7,1,7500)          }
+event: { event: Camera,     time:  10, param: 5,                         vec: (-0.12, 0.01, 0.03) }
+event: { event: Display,    time:  10, message: "Solus-Kalon Farcaster", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 400,100) }
+
+
+event: { event: Camera,     time:  20, param: 3,  target: "Kalon-Solus", vec: (1,3,8500)          }
+event: { event: Camera,     time:  20, param: 5,                         vec: (0.14, 0.02, 0.03)  }
+event: { event: Display,    time:  20, message: "Kalon-Solus Farcaster", font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 400,100) }
+
+
+event: { event: Camera,     time:  30, param: 3,  target: "Harmony Station", vec: (2,0,15000)     }
+event: { event: Camera,     time:  30, param: 5,                         vec: (0.15, 0.01,-0.03)  }
+event: { event: Display,    time:  30, message: "Harmony Station",       font: Limerick18,   color: 0xffffff80, fade: (1,7,1), rect: (20,20, 400,100) }
+
+
+event: { event: EndScene,   time:  50, message: "Scene 1" }
+event: { event: Exit }
+
+// EOF

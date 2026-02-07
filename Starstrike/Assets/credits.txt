@@ -1,0 +1,134 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<font Limerick12>STARSHATTER: The Gathering Storm<font Verdana>
+A Destroyer Studios Production
+
+
+<font Limerick12>DEVELOPMENT<font Verdana>
+
+<color bbbbb8>Producer<color ffffff>\t\t\t\t\t\tJohn DiCamillo
+<color bbbbb8>Designer<color ffffff>\t\t\t\t\t\tJohn DiCamillo
+
+<color bbbbb8>Lead Programmer<color ffffff>\t\t\tJohn DiCamillo
+<color bbbbb8>nGen Programmer<color ffffff>\t\t\tJohn DiCamillo
+<color bbbbb8>Magic3D Programmer<color ffffff>\t\tJohn DiCamillo
+
+<color bbbbb8>Art Director<color ffffff>\t\t\t\t\tSean Moser
+<color bbbbb8>3D Artwork<color ffffff>\t\t\t\t\tJason Blaz
+\t\t\t\t\t\t\t\tJohn DiCamillo
+<color bbbbb8>2D Artwork<color ffffff>\t\t\t\t\tJohn DiCamillo
+\t\t\t\t\t\t\t\tSean Moser
+
+<color bbbbb8>Player Manual<color ffffff>\t\t\t\tJohn DiCamillo
+
+<font Limerick12>AUDIO TEAM<font Verdana>
+
+<color bbbbb8>Audio Director<color ffffff>\t\t\t\tScott Cairns
+<color bbbbb8>Voice Over Director<color ffffff>\t\t\tStuart Smith
+<color bbbbb8>Musical Score<color ffffff>\t\t\t\t\tScott Cairns
+<color bbbbb8>Sound Effects<color ffffff>\t\t\t\tJohn DiCamillo
+
+\t\t\t<color bbbbb8>Jonas Devlin<color ffffff>\t\t\t\tStephen Hirst
+\t\t\t<color bbbbb8>Sarah Hunter<color ffffff>\t\t\t\tAmanda Gerrard
+\t\t\t<color bbbbb8>President Valmar<color ffffff>\t\tAndrew Godbold
+\t\t\t<color bbbbb8>Admiral Evars<color ffffff>\t\t\tJames Turner
+\t\t\t<color bbbbb8>Vice Admiral Caldott<color ffffff>\tJohn DiCamillo 
+\t\t\t<color bbbbb8>Kash Anlon<color ffffff>\t\t\t\tSam Cavanaugh
+\t\t\t<color bbbbb8>Newscaster<color ffffff>\t\t\t\tStuart Smith
+\t\t\t<color bbbbb8>Newscaster<color ffffff>\t\t\t\tJodie Connor
+\t\t\t<color bbbbb8>Training Instructor<color ffffff>\t\tCallum Hayes
+
+\t\t\t<color bbbbb8>Fighter Pilot 1<color ffffff>\t\t\tAnthony Howes
+\t\t\t<color bbbbb8>Fighter Pilot 2<color ffffff>\t\t\tStuart Smith
+\t\t\t<color bbbbb8>Fighter Pilot 3<color ffffff>\t\t\tScott Cairns
+\t\t\t<color bbbbb8>Fighter Pilot 4<color ffffff>\t\t\tLina Cairns
+
+<font Limerick12>QUALITY ASSURANCE<font Verdana>
+
+<color bbbbb8>Beta Team Leads<color ffffff>\t\t\tCrazy Eddie
+\t\t\t\t\t\t\t\tMehrunes
+\t\t\t\t\t\t\t\tPheagey
+
+<color bbbbb8>Beta Testers<color ffffff>
+Dragon Lady * cybersleuth58 * ravenMKII * sky_walker *
+se5a * DamoclesX * Henry * executioner_de * FLY135 *
+Ancient Angel * Phoenix Starflare * Vice * Daedalus *
+Deadmannumberone * Deslok * Gunfighter * sniperscope *
+Swordsman * Steelviper33 * Phear * spacedad62 * loafer *
+mldaalder *URG_thrash * Gmicek * Veloxi * DarkeLyte *
+bliu * Slaor * Maddi * Qrias * xaotik * Blair * Slippy *
+Lord QDaan * A2597 * Lord Darkstar * Mr_Torgo * Rhett *
+Col. Blackwolf * starbird34 * fattytheking * Maurader *
+FS_Lancer * GreenJedi * Mopar * Bloodborg * tyrkina *
+amwhere * Bollinger * texmurph * trancetopia * XPav *
+Fallen_angel * panick * Game Ender * Spector445 * Magus *
+Darrylbar * Kallis * river * Stuntie * Kurimuzon * Ace1 *
+John Rowan * Matti Kuokkanen * Parias * Livid Hybrid *
+Mutos * Seawolf156 * Leonides * Elenkis * RedMenace *
+Bob McDobb * bk_raven * Dekzar * Mark Garanchon * jwal *
+Mark Hymer * Ploppy * Red Menace * Rick BC * dukrous *
+nanoprobe * Vespero * Alex Belton * Brian Rubin * Jason
+Ross * John Magarrell * Pumpkin Patch * Tony Molder
+
+
+<font Limerick12>CREATIVE CONSULTANTS<font Verdana>
+
+<color bbbbb8>Design<color ffffff>\t\t\t\t\t\tGreg Eakin
+<color bbbbb8>Graphics<color ffffff>\t\t\t\t\t\tMark DiCamillo
+
+<font Limerick12>TECHNICAL CONSULTANTS<font Verdana>
+
+<color bbbbb8>Aerodynamics<color ffffff>\t\t\t\tJoseph R. DiCamillo
+<color bbbbb8>Digital Control Systems<color ffffff>\t\tDavid Jenkins
+<color bbbbb8>Dynamic Campaign<color ffffff>\t\t\tJohn Walker
+
+<font Limerick12>SPECIAL THANKS<font Verdana>
+
+Ken Beckett
+Richard Brewer
+David Coy
+Dan Foy
+Jill Goldworn
+Marc Hudgins
+Randy Littlejohn
+Jack Nichols
+Jay Patel
+David Ray
+Jeff Reitman
+John Walker
+
+NaturalPoint
+Prime Sounds
+Propellerheads
+Sound Ideas
+Xiphophorous
+
+<font Limerick12>EXTRA SPECIAL THANKS<font Verdana>
+
+Mary DiCamillo
+Marisa DiCamillo
+Michael DiCamillo
+Connor DiCamillo
+
+<font Limerick12>TEAM MASCOT<font Verdana>
+
+Jake
+
+<font Limerick12>PUBLIC RELATIONS<font Verdana>
+
+http://www.starshatter.com
+milo@starshatter.com
+
