@@ -2,18 +2,10 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
-  <Folder Name="/Solution Files/">
-    <File Path=".clang-format" />
-    <File Path=".clang-tidy" />
-    <File Path=".dockerignore" />
-    <File Path=".gitattributes" />
-    <File Path=".gitignore" />
-    <File Path="README.md" />
-    <File Path="vcpkg-configuration.json" />
-    <File Path="vcpkg.json" />
-  </Folder>
-  <Project Path="Neuron/Neuron.vcxproj" Id="97ac5df7-34aa-4ea9-a2db-59d40fff105b" />
-  <Project Path="Starstrike/Starstrike.vcxproj" Id="f0e25c67-50d7-4de4-9703-8fe3220bee69">
+  <Project Path="NeuronClient/NeuronClient.vcxproj" Id="734da3fb-1b67-4a07-ba69-328c9babdd61" />
+  <Project Path="NeuronCore/NeuronCore.vcxproj" Id="ca4e142b-aa7e-4696-84aa-5398e9a4b5bf" />
+  <Project Path="NeuronServer/NeuronServer.vcxproj" Id="b03b22da-cb82-4ef2-a86b-298bb5c5b79d" />
+  <Project Path="Starstrike/Starstrike.vcxproj" Id="bfde9463-4a90-49d6-b4c6-5525f2d3fc91">
     <Deploy />
   </Project>
 </Solution>
