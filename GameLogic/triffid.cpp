@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "file_writer.h"
 #include "resource.h"
 #include "shape.h"
@@ -118,9 +121,18 @@ void Triffid::Render(float _predictionTime)
   LegacyVector3 stemPos = m_stem->GetWorldMatrix(mat).pos;
   LegacyVector3 midPoint = mat.pos + (stemPos - mat.pos).SetLength(10.0f);
   LegacyVector3 midPoint2 = midPoint - LegacyVector3(0, 20, 0);
+  g_imRenderer->Color4f(1.0f, 1.0f, 0.5f, 1.0f);
   glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
   glLineWidth(2.0f);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
+  g_imRenderer->Begin(PRIM_LINES);
+  g_imRenderer->Vertex3fv(mat.pos.GetData());
+  g_imRenderer->Vertex3fv(midPoint.GetData());
+  g_imRenderer->Vertex3fv(midPoint.GetData());
+  g_imRenderer->Vertex3fv(m_pos.GetData());
+  g_imRenderer->End();
+
   glBegin(GL_LINES);
   glVertex3fv(mat.pos.GetData());
   glVertex3fv(midPoint.GetData());
@@ -141,7 +153,9 @@ void Triffid::Render(float _predictionTime)
       mat.u *= (1.0f - sinf(timeIndex) * 0.2f);
     else
       mat.r *= (1.0f - sinf(timeIndex) * 0.5f);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable(GL_BLEND);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
     glBlendFunc(GL_ONE, GL_ONE);
   }
 
@@ -160,7 +174,9 @@ void Triffid::Render(float _predictionTime)
     eggShape->Render(_predictionTime, eggMat);
   }
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glDisable(GL_NORMALIZE);
@@ -170,6 +186,7 @@ void Triffid::RenderAlphas(float _predictionTime)
 {
   if (g_app->m_editing)
   {
+    g_imRenderer->Color4f(1.0f, 0.0f, 0.0f, 1.0f);
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glLineWidth(1.0f);
 
@@ -193,6 +210,12 @@ void Triffid::RenderAlphas(float _predictionTime)
     angle.RotateAround(right * m_pitch * 0.5f);
     LegacyVector3 point3 = point1 + angle * m_force * 3.0f;
 
+    g_imRenderer->Begin(PRIM_LINE_LOOP);
+    g_imRenderer->Vertex3fv(point1.GetData());
+    g_imRenderer->Vertex3fv(point2.GetData());
+    g_imRenderer->Vertex3fv(point3.GetData());
+    g_imRenderer->End();
+
     glBegin(GL_LINE_LOOP);
     glVertex3fv(point1.GetData());
     glVertex3fv(point2.GetData());
@@ -213,8 +236,21 @@ void Triffid::RenderAlphas(float _predictionTime)
       egg.m_vel = velocity;
       egg.m_front = headMat.f;
 
+      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
       glLineWidth(2.0f);
+      g_imRenderer->Begin(PRIM_LINES);
+      while (true)
+      {
+        g_imRenderer->Vertex3fv(egg.m_pos.GetData());
+        egg.Advance(NULL);
+        g_imRenderer->Vertex3fv(egg.m_pos.GetData());
+
+        if (egg.m_vel.Mag() < 20.0f)
+          break;
+      }
+      g_imRenderer->End();
+
       glBegin(GL_LINES);
       while (true)
       {
@@ -231,6 +267,19 @@ void Triffid::RenderAlphas(float _predictionTime)
       {
         LegacyVector3 triggerPos = m_pos + m_triggerLocation;
         int numSteps = 20;
+        g_imRenderer->Begin(PRIM_LINE_LOOP);
+        glLineWidth(1.0f);
+        g_imRenderer->Color4f(1.0f, 0.0f, 0.0f, 1.0f);
+        for (int i = 0; i < numSteps; ++i)
+        {
+          float angle = 2.0f * M_PI * (float)i / (float)numSteps;
+          LegacyVector3 thisPos = triggerPos + LegacyVector3(sinf(angle) * m_triggerRadius, 0.0f, cosf(angle) * m_triggerRadius);
+          thisPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(thisPos.x, thisPos.z);
+          thisPos.y += 10.0f;
+          g_imRenderer->Vertex3fv(thisPos.GetData());
+        }
+        g_imRenderer->End();
+
         glBegin(GL_LINE_LOOP);
         glLineWidth(1.0f);
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);

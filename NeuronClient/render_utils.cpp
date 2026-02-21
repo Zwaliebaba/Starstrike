@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "im_renderer.h"
+
 #include "ogl_extensions.h"
 #include "render_utils.h"
 
@@ -16,6 +18,32 @@ void RenderSplitUpQuadTextured(
 	float posStepZ = sizeZ / (float)steps;
 	float texStepX = texSizeX / (float)steps;
 	float texStepZ = texSizeZ / (float)steps;
+
+    g_imRenderer->Begin(PRIM_QUADS);
+		for (int j = 0; j < steps; ++j)
+		{
+			float pz = posNorth + j * posStepZ;
+			float tz = texNorth + j * texStepZ;
+
+			for (int i = 0; i < steps; ++i)
+			{
+				float px = posEast + i * posStepX;
+				float tx = texEast + i * texStepX;
+
+				g_imRenderer->TexCoord2f(tx + texStepX, tz);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz);
+
+				g_imRenderer->TexCoord2f(tx + texStepX, tz + texStepZ);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz + posStepZ);
+
+				g_imRenderer->TexCoord2f(tx, tz + texStepZ);
+				g_imRenderer->Vertex3f(px, height, pz + posStepZ);
+
+				g_imRenderer->TexCoord2f(tx, tz);
+				g_imRenderer->Vertex3f(px, height, pz);
+			}
+		}
+	g_imRenderer->End();
 
     glBegin(GL_QUADS);
 		for (int j = 0; j < steps; ++j)
@@ -64,6 +92,38 @@ void RenderSplitUpQuadMultiTextured(
 	float texSizeZ2 = texSouth2 - texNorth2;
 	float texStepX2 = texSizeX2 / (float)steps;
 	float texStepZ2 = texSizeZ2 / (float)steps;
+
+    g_imRenderer->Begin(PRIM_QUADS);
+		for (int j = 0; j < steps; ++j)
+		{
+			float pz = posNorth + j * posStepZ;
+			float tz1 = texNorth1 + j * texStepZ1;
+			float tz2 = texNorth2 + j * texStepZ2;
+
+			for (int i = 0; i < steps; ++i)
+			{
+				float px = posEast + i * posStepX;
+				float tx1 = texEast1 + i * texStepX1;
+				float tx2 = texEast2 + i * texStepX2;
+
+				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1);
+				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz);
+
+				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1 + texStepZ1);
+				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2 + texStepZ2);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz + posStepZ);
+
+				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1 + texStepZ1);
+				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2 + texStepZ2);
+				g_imRenderer->Vertex3f(px, height, pz + posStepZ);
+
+				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1);
+				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2);
+				g_imRenderer->Vertex3f(px, height, pz);
+			}
+		}
+	g_imRenderer->End();
 
     glBegin(GL_QUADS);
 		for (int j = 0; j < steps; ++j)

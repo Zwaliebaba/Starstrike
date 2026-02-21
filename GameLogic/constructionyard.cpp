@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "debug_render.h"
 #include "math_utils.h"
 #include "profiler.h"
@@ -191,10 +194,14 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
     LegacyVector3 camUp = g_app->m_camera->GetUp();
     LegacyVector3 camRight = g_app->m_camera->GetRight();
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
 
     float timeIndex = g_gameTime * 2;
@@ -240,9 +247,17 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
         float size = 30.0f * sinf(timeIndex+i*13);
         size = max( size, 5.0f );
 
+        g_imRenderer->Color4f( 0.6f, 0.2f, 0.1f, m_alpha);
         glColor4f( 0.6f, 0.2f, 0.1f, m_alpha);
         //glColor4f( 0.5f, 0.6f, 0.8f, m_alpha );
 
+
+        g_imRenderer->Begin(PRIM_QUADS);
+            g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + camRight * size - camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
             glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
@@ -256,6 +271,7 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
     //
     // Central starbursts
 
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 
     int numStars = 10;
@@ -271,8 +287,16 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
 
         float size = i * 30.0f;
 
+        g_imRenderer->Color4f( 1.0f, 0.4f, 0.2f, m_alpha );
         glColor4f( 1.0f, 0.4f, 0.2f, m_alpha );
         //glColor4f( 0.4f, 0.5f, 1.0f, m_alpha );
+
+        g_imRenderer->Begin(PRIM_QUADS);
+            g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + camRight * size - camUp * size).GetData() );
+            g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
             glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
@@ -288,6 +312,7 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
 
     if( m_timer > 0.0f )
     {
+        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
         glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 
         for( int r = 0; r < 2; ++r )
@@ -304,8 +329,16 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
                 for( int j = 0; j < numStars; ++j )
                 {
                     float size = sinf(timeIndex+r+i) * j * 5.0f;
+                    g_imRenderer->Color4f( 0.6f, 0.2f, 0.1f, m_alpha);
                     glColor4f( 0.6f, 0.2f, 0.1f, m_alpha);
                     //glColor4f( 0.4f, 0.5f, 0.9f, m_alpha );
+
+                    g_imRenderer->Begin(PRIM_QUADS);
+                        g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
+                        g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
+                        g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + camRight * size - camUp * size).GetData() );
+                        g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
+                    g_imRenderer->End();
 
                     glBegin( GL_QUADS );
                         glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
@@ -319,6 +352,7 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
     }
 
     glDisable       ( GL_TEXTURE_2D );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
 
 
@@ -402,8 +436,11 @@ void DisplayScreen::RenderAlphas( float _predictionTime )
 
     LegacyVector3 targetPos = armourMat.pos + LegacyVector3(0,50,0);
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable( GL_BLEND );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable( GL_CULL_FACE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask( false );
 
     //
@@ -412,10 +449,13 @@ void DisplayScreen::RenderAlphas( float _predictionTime )
     LegacyVector3 camRight = g_app->m_camera->GetRight();
     LegacyVector3 camUp = g_app->m_camera->GetUp();
     float size = 70.0f;
+    g_imRenderer->Color4f( 0.4f, 0.3f, 0.4f, 0.0f );
     glColor4f( 0.4f, 0.3f, 0.4f, 0.0f );
     glEnable( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
     glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
 
     //glBegin( GL_QUADS );
@@ -425,12 +465,14 @@ void DisplayScreen::RenderAlphas( float _predictionTime )
         glTexCoord2i(0,1);      glVertex3fv( (targetPos - camRight * size + camUp * size).GetData() );
     glEnd();
 
+    g_imRenderer->UnbindTexture();
     glDisable( GL_TEXTURE_2D );
 
 
     //
     // Render rays
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc( GL_SRC_ALPHA, GL_ONE );
     glShadeModel( GL_SMOOTH );
 
@@ -442,6 +484,16 @@ void DisplayScreen::RenderAlphas( float _predictionTime )
         LegacyVector3 rayToArmour = (rayMat.pos - targetPos).Normalise();
         LegacyVector3 right = ( g_app->m_camera->GetPos() - rayMat.pos ) ^ rayToArmour;
         right.Normalise();
+
+        g_imRenderer->Begin(PRIM_QUADS);
+            g_imRenderer->Color4f( 0.9f, 0.9f, 0.9f, 0.5f );
+            g_imRenderer->Vertex3fv( (rayMat.pos - right).GetData() );
+            g_imRenderer->Vertex3fv( (rayMat.pos + right).GetData() );
+
+            g_imRenderer->Color4f( 0.9f, 0.9f, 0.9f, 0.0f );
+            g_imRenderer->Vertex3fv( (targetPos + right * 30).GetData() );
+            g_imRenderer->Vertex3fv( (targetPos - right * 30).GetData() );
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
             glColor4f( 0.9f, 0.9f, 0.9f, 0.5f );

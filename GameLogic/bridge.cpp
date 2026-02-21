@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include "debug_utils.h"
 #include "file_writer.h"
@@ -83,22 +86,31 @@ void Bridge::RenderAlphas ( float predictionTime )
 
 		        if( m_id.GetTeamId() == 255 )
 		        {
+			        g_imRenderer->Color4f( 0.5f, 0.5f, 0.5f, m_status / 100.0f );
 			        glColor4f( 0.5f, 0.5f, 0.5f, m_status / 100.0f );
 		        }
 		        else
 		        {
                     RGBAColour col = g_app->m_location->m_teams[ m_id.GetTeamId() ].m_colour;
+			        g_imRenderer->Color4ub( col.r, col.g, col.b, (unsigned char)(255.0f * m_status / 100.0f) );
 			        glColor4ub( col.r, col.g, col.b, (unsigned char)(255.0f * m_status / 100.0f) );
 		        }
 
                 glLineWidth ( 3.0f );
+                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                 glEnable    ( GL_BLEND );
                 glEnable    ( GL_LINE_SMOOTH );
+                g_imRenderer->Begin(PRIM_LINES);
+                    g_imRenderer->Vertex3fv( ourPos.GetData() );
+                    g_imRenderer->Vertex3fv( theirPos.GetData() );
+                g_imRenderer->End();
+
                 glBegin( GL_LINES );
                     glVertex3fv( ourPos.GetData() );
                     glVertex3fv( theirPos.GetData() );
                 glEnd();
                 glDisable   ( GL_LINE_SMOOTH );
+                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
                 glDisable   ( GL_BLEND );
             }
         }

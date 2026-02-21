@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <float.h>
 
@@ -184,7 +187,9 @@ void GlobalInternet::Render()
 
     /*static*/ float scale = 1000.0f;
 
+    g_imRenderer->PushMatrix();
     glPushMatrix();
+    g_imRenderer->Scalef( scale, scale, scale );
     glScalef    ( scale, scale, scale );
 
 
@@ -208,9 +213,13 @@ void GlobalInternet::Render()
     glFogi      ( GL_FOG_MODE, GL_LINEAR );
     glEnable    ( GL_FOG );
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
     glEnable        ( GL_TEXTURE_2D );
 
@@ -218,6 +227,7 @@ void GlobalInternet::Render()
 	int linksId = g_app->m_resource->GetDisplayList(DISPLAY_LIST_NAME_LINKS);
     if( linksId >= 0 )
     {
+        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
         glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
 
         glCallList( linksId );
@@ -227,10 +237,34 @@ void GlobalInternet::Render()
         linksId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_LINKS);
         glNewList(linksId, GL_COMPILE);
 
+        g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
         glColor4f       ( 0.25f, 0.25f, 0.5f, 0.8f );
 
 		//
 		// Render Links
+
+        g_imRenderer->Begin(PRIM_QUADS);
+
+        for( int i = 0; i < m_numLinks; ++i )
+        {
+            GlobalInternetLink *link = &m_links[i];
+            GlobalInternetNode *from = &m_nodes[ link->m_from ];
+            GlobalInternetNode *to = &m_nodes[ link->m_to ];
+
+            LegacyVector3 fromPos         = from->m_pos;
+            LegacyVector3 toPos           = to->m_pos;
+            LegacyVector3 midPoint        = (toPos + fromPos)/2.0f;
+            LegacyVector3 camToMidPoint   = g_zeroVector - midPoint;
+            LegacyVector3 rightAngle      = (camToMidPoint ^ ( midPoint - toPos )).Normalise();
+
+            rightAngle *= link->m_size * 0.5f;
+
+            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (fromPos - rightAngle).GetData() );
+            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (fromPos + rightAngle).GetData() );
+            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (toPos + rightAngle).GetData() );
+            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (toPos - rightAngle).GetData() );
+        }
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
 
@@ -262,6 +296,7 @@ void GlobalInternet::Render()
     int nodesId = g_app->m_resource->GetDisplayList(DISPLAY_LIST_NAME_NODES);
     if( nodesId >= 0 )
     {
+        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp") );
         glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp") );
 
         glCallList( nodesId );
@@ -271,8 +306,26 @@ void GlobalInternet::Render()
         nodesId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_NODES);
         glNewList(nodesId, GL_COMPILE);
 
+        g_imRenderer->Color4f( 0.8f, 0.8f, 1.0f, 0.6f );
         glColor4f       ( 0.8f, 0.8f, 1.0f, 0.6f );
         float nodeSize = 10.0f;
+
+        g_imRenderer->Begin(PRIM_QUADS);
+        for( int i = 0; i < m_numNodes; ++i )
+        {
+            GlobalInternetNode *node = &m_nodes[i];
+
+            LegacyVector3 camToMidPoint   = (g_zeroVector - node->m_pos).Normalise();
+            LegacyVector3 right           = camToMidPoint ^ LegacyVector3(0,0,1);
+            LegacyVector3 up              = right ^ camToMidPoint;
+            right *= nodeSize;
+            up *= nodeSize;
+            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up - right).GetData() );
+            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up + right).GetData() );
+            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up + right).GetData() );
+            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up - right).GetData() );
+        }
+        g_imRenderer->End();
 
         glBegin         ( GL_QUADS );
         for( int i = 0; i < m_numNodes; ++i )
@@ -296,9 +349,13 @@ void GlobalInternet::Render()
 
 
     glDisable       ( GL_TEXTURE_2D );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
 
 
@@ -308,6 +365,7 @@ void GlobalInternet::Render()
     g_app->m_globalWorld->SetupFog();
     glDisable( GL_FOG );
 
+    g_imRenderer->PopMatrix();
     glPopMatrix ();
 
     END_PROFILE(g_app->m_profiler,  "Internet" );
@@ -384,13 +442,19 @@ void GlobalInternet::RenderPackets()
     LegacyVector3 camUp = g_app->m_camera->GetUp() * packetSize;
     float posChange = g_advanceTime;
 
+    g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
     glColor4f( 0.25f, 0.25f, 0.5f, 0.8f );
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
 
     for( int i = 0; i < m_numLinks; ++i )
@@ -435,6 +499,13 @@ void GlobalInternet::RenderPackets()
                 packetPos = from->m_pos + ( to->m_pos - from->m_pos ) * -packetVal;
             }
 
+            g_imRenderer->Begin(PRIM_QUADS);
+                g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (packetPos - camUp - camRight).GetData() );
+                g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (packetPos - camUp + camRight).GetData() );
+                g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (packetPos + camUp + camRight).GetData() );
+                g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (packetPos + camUp - camRight).GetData() );
+            g_imRenderer->End();
+
             glBegin( GL_QUADS );
                 glTexCoord2i( 0, 0 );       glVertex3fv( (packetPos - camUp - camRight).GetData() );
                 glTexCoord2i( 1, 0 );       glVertex3fv( (packetPos - camUp + camRight).GetData() );
@@ -444,10 +515,14 @@ void GlobalInternet::RenderPackets()
         }
     }
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask ( true );
     glDisable   ( GL_TEXTURE_2D );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable   ( GL_BLEND );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable    ( GL_CULL_FACE );
 
     glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );

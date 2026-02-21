@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "im_renderer.h"
 
 #include <float.h>
 #include <math.h>
@@ -498,8 +499,22 @@ void Landscape::GenerateNormals()
 
 void Landscape::RenderHitNormals() const
 {
+	g_imRenderer->Color3ub(255,90,90);
 	glColor3ub(255,90,90);
 	glLineWidth(1.0f);
+	g_imRenderer->Begin(PRIM_LINES);
+		for (int z = 0; z < m_heightMap->GetNumRows(); z++)
+		{
+			for (int x = 0; x < m_heightMap->GetNumColumns(); x++)
+			{
+				LegacyVector3 pos(x * m_heightMap->m_cellSizeX, m_heightMap->GetData(x, z), z * m_heightMap->m_cellSizeX);
+				g_imRenderer->Vertex3fv(pos.GetData());
+				pos += m_normalMap->GetData(x, z) * 20.0f;
+				g_imRenderer->Vertex3fv(pos.GetData());
+			}
+		}
+	g_imRenderer->End();
+
 	glBegin(GL_LINES);
 		for (int z = 0; z < m_heightMap->GetNumRows(); z++)
 		{

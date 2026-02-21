@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <math.h>
 
@@ -262,19 +265,25 @@ void LaserFence::RenderAlphas( float predictionTime )
 
             int buildingDetail = g_prefsManager->GetInt( "RenderBuildingDetail", 1 );
 
+            g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
             glDisable           ( GL_CULL_FACE );
+            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             glEnable            ( GL_BLEND );
+            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             glBlendFunc         ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
             glDepthMask         ( false );
 
             unsigned char alpha = 150;
             if( m_id.GetTeamId() == 255 )
             {
+                g_imRenderer->Color4ub( 100, 100, 100, alpha );
                 glColor4ub( 100, 100, 100, alpha );
             }
             else
             {
                 RGBAColour *colour = &g_app->m_location->m_teams[ m_id.GetTeamId() ].m_colour;
+                g_imRenderer->Color4ub( colour->r, colour->g, colour->b, alpha );
                 glColor4ub( colour->r, colour->g, colour->b, alpha );
             }
 
@@ -297,6 +306,7 @@ void LaserFence::RenderAlphas( float predictionTime )
                 glEnable            (GL_TEXTURE_2D);
 
                 gglActiveTextureARB  (GL_TEXTURE0_ARB);
+                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence.bmp" ) );
                 glBindTexture       (GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence.bmp" ) );
 	            glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	            glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -307,6 +317,7 @@ void LaserFence::RenderAlphas( float predictionTime )
                 glEnable            (GL_TEXTURE_2D);
 
                 gglActiveTextureARB  (GL_TEXTURE1_ARB);
+                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp" ) );
                 glBindTexture       (GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence2.bmp" ) );
 	            glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	            glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -316,6 +327,24 @@ void LaserFence::RenderAlphas( float predictionTime )
                 glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_MODULATE);
                 glEnable            (GL_TEXTURE_2D);
 
+
+                g_imRenderer->Begin(PRIM_QUADS);
+                    gglMultiTexCoord2fARB ( GL_TEXTURE0_ARB, timeOff, 0.0f );
+                    gglMultiTexCoord2fARB ( GL_TEXTURE1_ARB, 0, 0 );
+                    g_imRenderer->Vertex3fv( (m_pos - LegacyVector3(0,ourFenceHeight/3,0)).GetData() );
+
+                    gglMultiTexCoord2fARB ( GL_TEXTURE0_ARB, timeOff, dz );
+                    gglMultiTexCoord2fARB ( GL_TEXTURE1_ARB, 0, 1 );
+                    g_imRenderer->Vertex3fv( (m_pos + LegacyVector3(0,ourFenceHeight,0)).GetData() );
+
+                    gglMultiTexCoord2fARB ( GL_TEXTURE0_ARB, timeOff + dx, dz );
+                    gglMultiTexCoord2fARB ( GL_TEXTURE1_ARB, 1, 1 );
+                    g_imRenderer->Vertex3fv( (nextFence->m_pos + LegacyVector3(0,theirFenceHeight,0)).GetData() );
+
+                    gglMultiTexCoord2fARB ( GL_TEXTURE0_ARB, timeOff + dx, 0.0f );
+                    gglMultiTexCoord2fARB ( GL_TEXTURE1_ARB, 1, 0 );
+                    g_imRenderer->Vertex3fv( (nextFence->m_pos - LegacyVector3(0,theirFenceHeight/3,0)).GetData() );
+                g_imRenderer->End();
 
                 glBegin(GL_QUADS);
                     gglMultiTexCoord2fARB ( GL_TEXTURE0_ARB, timeOff, 0.0f );
@@ -352,10 +381,26 @@ void LaserFence::RenderAlphas( float predictionTime )
             // Blend another poly over the top for burn effect
 
             glEnable            (GL_TEXTURE_2D);
+            g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp" ) );
             glBindTexture       (GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence2.bmp" ) );
 	        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
             glBlendFunc         (GL_SRC_ALPHA, GL_ONE);
+
+            g_imRenderer->Begin(PRIM_QUADS);
+                g_imRenderer->TexCoord2f( 0, 0 );
+                g_imRenderer->Vertex3fv( (m_pos - LegacyVector3(0,ourFenceHeight/3,0)).GetData() );
+
+                g_imRenderer->TexCoord2f( 0, 1 );
+                g_imRenderer->Vertex3fv( (m_pos + LegacyVector3(0,ourFenceHeight,0)).GetData() );
+
+                g_imRenderer->TexCoord2f( 1, 1 );
+                g_imRenderer->Vertex3fv( (nextFence->m_pos + LegacyVector3(0,theirFenceHeight,0)).GetData() );
+
+                g_imRenderer->TexCoord2f( 1, 0 );
+                g_imRenderer->Vertex3fv( (nextFence->m_pos - LegacyVector3(0,theirFenceHeight/3,0)).GetData() );
+            g_imRenderer->End();
 
             glBegin(GL_QUADS);
                 glTexCoord2f( 0, 0 );
@@ -379,14 +424,23 @@ void LaserFence::RenderAlphas( float predictionTime )
             glLineWidth ( 2.0f );
             glEnable    ( GL_LINE_SMOOTH );
 
+            g_imRenderer->Begin(PRIM_LINES);
+                g_imRenderer->Vertex3fv( (m_pos + LegacyVector3(0,ourFenceHeight,0)).GetData() );
+                g_imRenderer->Vertex3fv( (nextFence->m_pos + LegacyVector3(0,theirFenceHeight,0)).GetData() );
+            g_imRenderer->End();
+
             glBegin( GL_LINES );
                 glVertex3fv( (m_pos + LegacyVector3(0,ourFenceHeight,0)).GetData() );
                 glVertex3fv( (nextFence->m_pos + LegacyVector3(0,theirFenceHeight,0)).GetData() );
             glEnd();
 
+            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
             glDepthMask ( true );
+            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
             glDisable   ( GL_BLEND );
+            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
             glEnable    ( GL_CULL_FACE );
             glDisable   ( GL_LINE_SMOOTH );
         }

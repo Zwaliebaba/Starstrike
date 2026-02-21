@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "im_renderer.h"
 
 #include <float.h>
 
@@ -586,6 +587,7 @@ bool Tripod::Advance(Unit *_unit)
 
 void Tripod::Render(float _predictionTime)
 {
+    g_imRenderer->UnbindTexture();
     glDisable( GL_TEXTURE_2D );
 
 	g_app->m_renderer->SetObjectLighting();

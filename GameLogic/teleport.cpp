@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <math.h>
 
@@ -124,9 +127,13 @@ void Teleport::RenderAlphas ( float predictionTime )
 
     //RenderHitCheck();
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
 
     for( int i = 0; i < m_inTransit.Size(); ++i )
@@ -141,9 +148,13 @@ void Teleport::RenderAlphas ( float predictionTime )
         }
     }
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     Building::RenderAlphas( predictionTime );
@@ -163,7 +174,15 @@ void Teleport::RenderSpirit( LegacyVector3 const &_pos, int _teamId )
     if( _teamId >= 0 ) colour = g_app->m_location->m_teams[ _teamId ].m_colour;
 
     float size = spiritInnerSize;
+    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, innerAlpha );
     glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
@@ -173,7 +192,15 @@ void Teleport::RenderSpirit( LegacyVector3 const &_pos, int _teamId )
     glEnd();
 
     size = spiritOuterSize;
+    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, outerAlpha );
     glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
+
     glBegin( GL_QUADS );
         glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
         glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );

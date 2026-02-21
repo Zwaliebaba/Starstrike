@@ -114,11 +114,13 @@ void Renderer::BuildOpenGlState() { glGenTextures(1, &m_pixelEffectTexId); }
 
 void Renderer::RenderFlatTexture()
 {
+  g_imRenderer->Color3ubv(g_colourWhite.GetData());
   glColor3ubv(g_colourWhite.GetData());
   glEnable(GL_TEXTURE_2D);
   int textureId = g_app->m_resource->GetTexture("textures/privatedemo.bmp", true, true);
   if (textureId == -1)
     return;
+  g_imRenderer->BindTexture(textureId);
   glBindTexture(GL_TEXTURE_2D, textureId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -130,12 +132,26 @@ void Renderer::RenderFlatTexture()
   LegacyVector3 right = g_app->m_camera->GetRight() * 1.0f * size;
   LegacyVector3 pos = g_app->m_camera->GetPos() + g_app->m_camera->GetFront() * m_nearPlane * 1.01f;
 
+  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_ALPHA_TEST);
   glAlphaFunc(GL_GREATER, 0.02f);
+
+  g_imRenderer->Begin(PRIM_QUADS);
+  g_imRenderer->TexCoord2f(1.0f, 1.0f);
+  g_imRenderer->Vertex3fv((pos + up - right).GetData());
+  g_imRenderer->TexCoord2f(0.0f, 1.0f);
+  g_imRenderer->Vertex3fv((pos + up + right).GetData());
+  g_imRenderer->TexCoord2f(0.0f, 0.0f);
+  g_imRenderer->Vertex3fv((pos - up + right).GetData());
+  g_imRenderer->TexCoord2f(1.0f, 0.0f);
+  g_imRenderer->Vertex3fv((pos - up - right).GetData());
+  g_imRenderer->End();
 
   glBegin(GL_QUADS);
   glTexCoord2f(1.0f, 1.0f);
@@ -150,11 +166,20 @@ void Renderer::RenderFlatTexture()
 
   glAlphaFunc(GL_GREATER, 0.01);
   glDisable(GL_ALPHA_TEST);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
 
   glLineWidth(1.0f);
+  g_imRenderer->Begin(PRIM_LINE_LOOP);
+  g_imRenderer->Vertex3fv((pos + up - right).GetData());
+  g_imRenderer->Vertex3fv((pos + up + right).GetData());
+  g_imRenderer->Vertex3fv((pos - up + right).GetData());
+  g_imRenderer->Vertex3fv((pos - up - right).GetData());
+  g_imRenderer->End();
+
   glBegin(GL_LINE_LOOP);
   glVertex3fv((pos + up - right).GetData());
   glVertex3fv((pos + up + right).GetData());
@@ -165,14 +190,26 @@ void Renderer::RenderFlatTexture()
 
 void Renderer::RenderLogo()
 {
+  g_imRenderer->Color3ubv(g_colourWhite.GetData());
   glColor3ubv(g_colourWhite.GetData());
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  g_imRenderer->Color4ub(0, 0, 0, 200);
   glColor4ub(0, 0, 0, 200);
   float logoW = 200;
   float logoH = 35;
+  g_imRenderer->Begin(PRIM_QUADS);
+  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - logoH - 10);
+  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - logoH - 10);
+  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - 10);
+  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - 10);
+  g_imRenderer->End();
+
   glBegin(GL_QUADS);
   glVertex2f(m_screenW - logoW - 10, m_screenH - logoH - 10);
   glVertex2f(m_screenW - 10, m_screenH - logoH - 10);
@@ -180,15 +217,29 @@ void Renderer::RenderLogo()
   glVertex2f(m_screenW - logoW - 10, m_screenH - 10);
   glEnd();
 
+  g_imRenderer->Color4ub(255, 255, 255, 255);
   glColor4ub(255, 255, 255, 255);
   glEnable(GL_TEXTURE_2D);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   int textureId = g_app->m_resource->GetTexture("textures/privatedemo.bmp", true, false);
   if (textureId == -1)
     return;
+  g_imRenderer->BindTexture(textureId);
   glBindTexture(GL_TEXTURE_2D, textureId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  g_imRenderer->Begin(PRIM_QUADS);
+  g_imRenderer->TexCoord2f(0.0f, 1.0f);
+  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - logoH - 10);
+  g_imRenderer->TexCoord2f(1.0f, 1.0f);
+  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - logoH - 10);
+  g_imRenderer->TexCoord2f(1.0f, 0.0f);
+  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - 10);
+  g_imRenderer->TexCoord2f(0.0f, 0.0f);
+  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - 10);
+  g_imRenderer->End();
 
   glBegin(GL_QUADS);
   glTexCoord2f(0.0f, 1.0f);
@@ -201,11 +252,16 @@ void Renderer::RenderLogo()
   glVertex2f(m_screenW - logoW - 10, m_screenH - 10);
   glEnd();
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  g_imRenderer->Color4f(1.0f, 0.75f, 0.75f, 1.0f);
   glColor4f(1.0f, 0.75f, 0.75f, 1.0f);
   g_gameFont.DrawText2D(20, m_screenH - 70, 25, LANGUAGEPHRASE("privatedemo1"));
   g_gameFont.DrawText2D(20, m_screenH - 40, 25, LANGUAGEPHRASE("privatedemo2"));
@@ -274,12 +330,24 @@ void Renderer::RenderFadeOut()
 
   if (m_fadedness > 0.0001f)
   {
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable(GL_BLEND);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask(false);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
     glDisable(GL_DEPTH_TEST);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    g_imRenderer->Color4ub(0, 0, 0, static_cast<int>(m_fadedness * 255.0f));
     glColor4ub(0, 0, 0, static_cast<int>(m_fadedness * 255.0f));
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->Vertex2i(-1, -1);
+    g_imRenderer->Vertex2i(m_screenW, -1);
+    g_imRenderer->Vertex2i(m_screenW, m_screenH);
+    g_imRenderer->Vertex2i(-1, m_screenH);
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glVertex2i(-1, -1);
     glVertex2i(m_screenW, -1);
@@ -287,9 +355,13 @@ void Renderer::RenderFadeOut()
     glVertex2i(-1, m_screenH);
     glEnd();
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable(GL_BLEND);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask(true);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glEnable(GL_DEPTH_TEST);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 }
@@ -305,10 +377,12 @@ void Renderer::RenderPaused()
 
   // Black Background
   g_gameFont.SetRenderShadow(true);
+  g_imRenderer->Color4f(0.3f, 0.3f, 0.3f, 0.0f);
   glColor4f(0.3f, 0.3f, 0.3f, 0.0f);
   font.DrawText2DCentre(x, y, 80, msg);
 
   // White Foreground
+  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   font.SetRenderShadow(false);
   font.DrawText2DCentre(x, y, 80, msg);
@@ -372,7 +446,15 @@ void Renderer::RenderFrame(bool withFlip)
 
   if (m_displayFPS)
   {
+    g_imRenderer->Color4f(0, 0, 0, 0.6);
     glColor4f(0, 0, 0, 0.6);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->Vertex2f(8.0, 1.0f);
+    g_imRenderer->Vertex2f(70.0, 1.0f);
+    g_imRenderer->Vertex2f(70.0, 15.0f);
+    g_imRenderer->Vertex2f(8.0, 15.0f);
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glVertex2f(8.0, 1.0f);
     glVertex2f(70.0, 1.0f);
@@ -380,6 +462,7 @@ void Renderer::RenderFrame(bool withFlip)
     glVertex2f(8.0, 15.0f);
     glEnd();
 
+    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     g_editorFont.DrawText2D(12, 10, DEF_FONT_SIZE, "FPS: %d", m_fps);
     //		g_editorFont.DrawText2D( 150, 10, DEF_FONT_SIZE, "TFPS: %2.0f", g_targetFrameRate);
@@ -389,7 +472,15 @@ void Renderer::RenderFrame(bool withFlip)
 
   if (m_displayInputMode)
   {
+    g_imRenderer->Color4f(0, 0, 0, 0.6);
     glColor4f(0, 0, 0, 0.6);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->Vertex2f(80.0, 1.0f);
+    g_imRenderer->Vertex2f(230.0, 1.0f);
+    g_imRenderer->Vertex2f(230.0, 18.0f);
+    g_imRenderer->Vertex2f(80.0, 18.0f);
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glVertex2f(80.0, 1.0f);
     glVertex2f(230.0, 1.0f);
@@ -410,6 +501,7 @@ void Renderer::RenderFrame(bool withFlip)
       inmode = "unknown";
     }
 
+    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     g_editorFont.DrawText2D(84, 10, DEF_FONT_SIZE, "InputMode: %s", inmode.c_str());
   }
@@ -419,13 +511,22 @@ void Renderer::RenderFrame(bool withFlip)
     int latency = g_app->m_server->m_sequenceId - g_lastProcessedSequenceId;
     if (latency > 10)
     {
+      g_imRenderer->Color4f(0.0f, 0.0f, 0.0f, 0.8f);
       glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
+      g_imRenderer->Begin(PRIM_QUADS);
+      g_imRenderer->Vertex2f(m_screenW / 2 - 200, 120);
+      g_imRenderer->Vertex2f(m_screenW / 2 + 200, 120);
+      g_imRenderer->Vertex2f(m_screenW / 2 + 200, 80);
+      g_imRenderer->Vertex2f(m_screenW / 2 - 200, 80);
+      g_imRenderer->End();
+
       glBegin(GL_QUADS);
       glVertex2f(m_screenW / 2 - 200, 120);
       glVertex2f(m_screenW / 2 + 200, 120);
       glVertex2f(m_screenW / 2 + 200, 80);
       glVertex2f(m_screenW / 2 - 200, 80);
       glEnd();
+      g_imRenderer->Color4f(1.0f, 0.0f, 0.0f, 1.0f);
       glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
       g_editorFont.DrawText2DCentre(m_screenW / 2, 100, 20, "Client LAG %dms behind Server ", latency * 100);
     }
@@ -449,6 +550,7 @@ void Renderer::RenderFrame(bool withFlip)
   {
     int textureId = g_app->m_resource->GetTexture("icons/darwin_research_associates.bmp");
 
+    g_imRenderer->BindTexture(textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
     glEnable(GL_TEXTURE_2D);
 
@@ -473,14 +575,28 @@ void Renderer::RenderFrame(bool withFlip)
     alpha = max(alpha, 0.0f);
     alpha = min(alpha, 1.0f);
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable(GL_BLEND);
+    g_imRenderer->Color4f(alpha, alpha, alpha, 0.0f);
     glColor4f(alpha, alpha, alpha, 0.0f);
 
     for (float dx = -4; dx <= 4; dx += 4)
     {
       for (float dy = -4; dy <= 4; dy += 4)
       {
+        g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->TexCoord2i(0, 1);
+        g_imRenderer->Vertex2f(x + dx, y + dy);
+        g_imRenderer->TexCoord2i(1, 1);
+        g_imRenderer->Vertex2f(x + w + dx, y + dy);
+        g_imRenderer->TexCoord2i(1, 0);
+        g_imRenderer->Vertex2f(x + w + dx, y + h + dy);
+        g_imRenderer->TexCoord2i(0, 0);
+        g_imRenderer->Vertex2f(x + dx, y + h + dy);
+        g_imRenderer->End();
+
         glBegin(GL_QUADS);
         glTexCoord2i(0, 1);
         glVertex2f(x + dx, y + dy);
@@ -494,8 +610,21 @@ void Renderer::RenderFrame(bool withFlip)
       }
     }
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
     glColor4f(1.0f, 1.0f, 1.0f, alpha);
+
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex2f(x, y);
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex2f(x + w, y);
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex2f(x + w, y + h);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex2f(x, y + h);
+    g_imRenderer->End();
 
     glBegin(GL_QUADS);
     glTexCoord2i(0, 1);
@@ -508,14 +637,18 @@ void Renderer::RenderFrame(bool withFlip)
     glVertex2f(x, y + h);
     glEnd();
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    g_imRenderer->UnbindTexture();
     glDisable(GL_TEXTURE_2D);
 
     float textSize = m_screenH / 9.0f;
     g_gameFont.SetRenderOutline(true);
+    g_imRenderer->Color4f(alpha, alpha, alpha, 0.0f);
     glColor4f(alpha, alpha, alpha, 0.0f);
     g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
     g_gameFont.SetRenderOutline(false);
+    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
     glColor4f(1.0f, 1.0f, 1.0f, alpha);
     g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
   }
@@ -749,6 +882,7 @@ void Renderer::CheckOpenGLState() const
 void Renderer::SetOpenGLState() const
 {
   // Geometry
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
   glPolygonMode(GL_FRONT, GL_FILL);
@@ -778,7 +912,9 @@ void Renderer::SetOpenGLState() const
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
   // Blending, Anti-aliasing, Fog and Polygon Offset
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_ALPHA_TEST);
   glAlphaFunc(GL_GREATER, 0.01);
@@ -790,6 +926,7 @@ void Renderer::SetOpenGLState() const
   glDisable(GL_POINT_SMOOTH);
 
   // Texture Mapping
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -798,7 +935,9 @@ void Renderer::SetOpenGLState() const
   glTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, colour);
 
   // Frame Buffer
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glEnable(GL_DEPTH_TEST);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
   glDepthFunc(GL_LEQUAL);
   //	glStencilMask	(0x00);

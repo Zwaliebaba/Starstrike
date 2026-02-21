@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "debug_utils.h"
 #include "input.h"
 #include "profiler.h"
@@ -817,9 +820,13 @@ void Location::RenderSpirits()
 {
   START_PROFILE(g_app->m_profiler, "Render Spirits");
 
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
 
   float timeSinceAdvance = g_predictionTime;
@@ -838,9 +845,13 @@ void Location::RenderSpirits()
     }
   }
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
 
   END_PROFILE(g_app->m_profiler, "Render Spirits");
@@ -863,6 +874,11 @@ void Location::Render(bool renderWaterAndClouds)
     RenderClouds();
   else
   {
+    g_imRenderer->Begin(PRIM_QUADS);
+    for (unsigned i = 0; i < 4; i++)
+      g_imRenderer->Vertex2f(0, 0);
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     for (unsigned i = 0; i < 4; i++)
       glVertex2f(0, 0);
@@ -1116,9 +1132,13 @@ void Location::RenderWeapons()
   //
   // Render effects
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
 
   for (int i = 0; i < m_effects.Size(); ++i)
@@ -1133,14 +1153,17 @@ void Location::RenderWeapons()
         w->Render(timeSinceAdvance);
     }
   }
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
 
   //
   // Render lasers
 
   glEnable(GL_LINE_SMOOTH);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
   glEnable(GL_TEXTURE_2D);
+  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp", false));
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp", false));
 
   float nearPlaneStart = g_app->m_renderer->GetNearPlane();
@@ -1159,10 +1182,15 @@ void Location::RenderWeapons()
     }
   }
 
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_LINE_SMOOTH);
 

@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "profiler.h"
 #include "text_renderer.h"
 
@@ -105,13 +108,22 @@ void Flag::Render()
     //
     // Render the flag pole
 
+    g_imRenderer->Color4ub( 255, 255, 100, 255 );
     glColor4ub( 255, 255, 100, 255 );
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
     glDisable       ( GL_TEXTURE_2D );
 
     LegacyVector3 right = m_up ^ ( g_app->m_camera->GetFront() );
     right.SetLength( 0.2f );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (m_pos-right).GetData() );
+        g_imRenderer->Vertex3fv( (m_pos+right).GetData() );
+        g_imRenderer->Vertex3fv( (m_pos+m_up*m_size*1.5f+right).GetData() );
+        g_imRenderer->Vertex3fv( (m_pos+m_up*m_size*1.5f-right).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex3fv( (m_pos-right).GetData() );
@@ -123,13 +135,17 @@ void Flag::Render()
     //
     // Render the flag
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(m_texId );
     glBindTexture   ( GL_TEXTURE_2D, m_texId );
     glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.8f );
     glColor4f( 1.0f, 1.0f, 1.0f, 0.8f );
     for( int x = 0; x < FLAG_RESOLUTION-1; ++x )
     {
@@ -138,6 +154,13 @@ void Flag::Render()
             float texX = (float) x / (float) (FLAG_RESOLUTION-1);
             float texY = (float) y / (float) (FLAG_RESOLUTION-1);
             float texW = 1.0f / (FLAG_RESOLUTION-1);
+
+            g_imRenderer->Begin(PRIM_QUADS);
+                g_imRenderer->TexCoord2f(texX,texY);            g_imRenderer->Vertex3fv( m_flag[x][y].GetData() );
+                g_imRenderer->TexCoord2f(texX+texW,texY);       g_imRenderer->Vertex3fv( m_flag[x+1][y].GetData() );
+                g_imRenderer->TexCoord2f(texX+texW,texY+texW);  g_imRenderer->Vertex3fv( m_flag[x+1][y+1].GetData() );
+                g_imRenderer->TexCoord2f(texX,texY+texW);       g_imRenderer->Vertex3fv( m_flag[x][y+1].GetData() );
+            g_imRenderer->End();
 
             glBegin( GL_QUADS );
                 glTexCoord2f(texX,texY);            glVertex3fv( m_flag[x][y].GetData() );
@@ -148,9 +171,12 @@ void Flag::Render()
         }
     }
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
     glDisable       ( GL_TEXTURE_2D );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
 
     END_PROFILE( g_app->m_profiler, "RenderFlag" );

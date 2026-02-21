@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "im_renderer.h"
 
 #include "debug_render.h"
 #include "file_writer.h"
@@ -110,8 +111,22 @@ void SafeArea::Render( float predictionTime )
         int numSteps = 30;
         float angle = 0.0f;
 
+        g_imRenderer->Color4ubv(colour.GetData() );
         glColor4ubv(colour.GetData() );
         glLineWidth( 2.0f );
+        g_imRenderer->Begin(PRIM_LINE_LOOP);
+        for( int i = 0; i <= numSteps; ++i )
+        {
+            float xDiff = m_size * sinf(angle);
+            float zDiff = m_size * cosf(angle);
+            LegacyVector3 pos = m_pos + LegacyVector3(xDiff,5,zDiff);
+	        pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 10.0f;
+            if( pos.y < 2 ) pos.y = 2;
+            g_imRenderer->Vertex3fv( pos.GetData() );
+            angle += 2.0f * M_PI / (float) numSteps;
+        }
+        g_imRenderer->End();
+
         glBegin( GL_LINE_LOOP );
         for( int i = 0; i <= numSteps; ++i )
         {

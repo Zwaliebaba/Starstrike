@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "resource.h"
 #include "math_utils.h"
 #include "preferences.h"
@@ -54,11 +57,16 @@ void GodDish::RenderAlphas(float _predictionTime)
   LegacyVector3 camUp = g_app->m_camera->GetUp();
   LegacyVector3 camRight = g_app->m_camera->GetRight();
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_TEXTURE_2D);
+  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
   glDisable(GL_DEPTH_TEST);
 
   float timeIndex = g_gameTime * 2;
@@ -89,7 +97,19 @@ void GodDish::RenderAlphas(float _predictionTime)
     float size = 20.0f * sinf(timeIndex + i * 13);
     size = max(size, 5.0f);
 
+    g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alpha);
     glColor4f(0.6f, 0.2f, 0.1f, alpha);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((pos - camRight * size + camUp * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((pos + camRight * size + camUp * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((pos + camRight * size - camUp * size).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((pos - camRight * size - camUp * size).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
     glVertex3fv((pos - camRight * size + camUp * size).GetData());
@@ -105,6 +125,7 @@ void GodDish::RenderAlphas(float _predictionTime)
   //
   // Central starbursts
 
+  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
 
   int numStars = 10;
@@ -122,7 +143,19 @@ void GodDish::RenderAlphas(float _predictionTime)
 
     float size = i * 30.0f;
 
+    g_imRenderer->Color4f(1.0f, 0.4f, 0.2f, alpha);
     glColor4f(1.0f, 0.4f, 0.2f, alpha);
+
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((pos - camRight * size + camUp * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((pos + camRight * size + camUp * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((pos + camRight * size - camUp * size).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((pos - camRight * size - camUp * size).GetData());
+    g_imRenderer->End();
 
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
@@ -136,7 +169,9 @@ void GodDish::RenderAlphas(float _predictionTime)
     glEnd();
   }
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glEnable(GL_DEPTH_TEST);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
 }
 

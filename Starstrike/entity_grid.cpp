@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -701,7 +704,9 @@ void EntityGrid::Render ()
     float cellSizeX = g_app->m_location->m_landscape.GetWorldSizeX() / (float) m_numCellsX;
     float cellSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ() / (float) m_numCellsZ;
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable( GL_CULL_FACE );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable( GL_BLEND );
 
     for ( x = 0; x < m_numCellsX; ++x )
@@ -722,7 +727,15 @@ void EntityGrid::Render ()
 
                      float alpha = 128;
                      RGBAColour col = g_app->m_location->m_teams[t].m_colour;
+                     g_imRenderer->Color4ub(col.r, col.g, col.b, alpha);
                      glColor4ub(col.r, col.g, col.b, alpha);
+
+                     g_imRenderer->Begin(PRIM_QUADS);
+                        g_imRenderer->Vertex3f( worldX, worldY, worldZ );
+                        g_imRenderer->Vertex3f( worldX + cellSizeX, worldY, worldZ );
+                        g_imRenderer->Vertex3f( worldX + cellSizeX, worldY, worldZ + cellSizeZ );
+                        g_imRenderer->Vertex3f( worldX, worldY, worldZ + cellSizeZ );
+                     g_imRenderer->End();
 
                      glBegin(GL_QUADS);
                         glVertex3f( worldX, worldY, worldZ );
@@ -737,7 +750,9 @@ void EntityGrid::Render ()
         }
     }
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable( GL_BLEND );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable( GL_CULL_FACE );
 
 #ifdef DEBUG_ENTITY_GRID
@@ -747,7 +762,13 @@ void EntityGrid::Render ()
         {
             EntityGridError *theError = s_entityGridErrors[i];
             LegacyVector3 pos = theError->m_pos;
+            g_imRenderer->Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
             glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
+            g_imRenderer->Begin(PRIM_LINES);
+                g_imRenderer->Vertex3fv( (pos - LegacyVector3(0,500,0)).GetData() );
+                g_imRenderer->Vertex3fv( (pos + LegacyVector3(0,500,0)).GetData() );
+            g_imRenderer->End();
+
             glBegin( GL_LINES );
                 glVertex3fv( (pos - LegacyVector3(0,500,0)).GetData() );
                 glVertex3fv( (pos + LegacyVector3(0,500,0)).GetData() );

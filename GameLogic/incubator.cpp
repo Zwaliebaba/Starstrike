@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include "file_writer.h"
 #include "math_utils.h"
@@ -253,9 +256,13 @@ void Incubator::RenderAlphas( float _predictionTime )
 {
     Building::RenderAlphas( _predictionTime );
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
 
     //
@@ -275,6 +282,7 @@ void Incubator::RenderAlphas( float _predictionTime )
     // Render incoming and outgoing effects
 
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
 
     Matrix34 mat( m_front, g_upVector, m_pos );
@@ -295,7 +303,15 @@ void Incubator::RenderAlphas( float _predictionTime )
 
         rightAngle *= 1.5f;
 
+        g_imRenderer->Color4f( 1.0f, 1.0f, 0.2f, ii->m_alpha );
         glColor4f( 1.0f, 1.0f, 0.2f, ii->m_alpha );
+
+        g_imRenderer->Begin(PRIM_QUADS);
+                g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (fromPos - rightAngle).GetData() );
+                g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (fromPos + rightAngle).GetData() );
+                g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (toPos + rightAngle).GetData() );
+                g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (toPos - rightAngle).GetData() );
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
                 glTexCoord2i(0,0);      glVertex3fv( (fromPos - rightAngle).GetData() );
@@ -307,9 +323,13 @@ void Incubator::RenderAlphas( float _predictionTime )
     }
 
     glDisable       ( GL_TEXTURE_2D );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
 }
 

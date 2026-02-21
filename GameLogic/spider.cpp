@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <float.h>
 
@@ -719,6 +722,7 @@ void Spider::Render(float _predictionTime)
 {
     if( m_dead ) return;
 
+    g_imRenderer->UnbindTexture();
     glDisable( GL_TEXTURE_2D );
 
 
@@ -751,13 +755,17 @@ void Spider::Render(float _predictionTime)
         float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
         if( frand() > 0.5f ) mat.r *= ( 1.0f + sinf(timeIndex) * 0.5f );
         else                 mat.u *= ( 1.0f + sinf(timeIndex) * 0.5f );
+        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         glEnable( GL_BLEND );
+        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
     }
 
 	m_shape->Render(_predictionTime, mat);
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	//

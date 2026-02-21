@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "im_renderer.h"
 #include "hi_res_time.h"
 #include "debug_render.h"
 #include "3d_sprite.h"
@@ -96,6 +97,7 @@ void Snow::Render( float _predictionTime )
 
     float size = 20.0f;
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0 );
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0 );
     Render3DSprite( predictedPos, size, size, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 }

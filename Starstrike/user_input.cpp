@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "eclipse.h"
 #include "debug_utils.h"
 #include "input.h"
@@ -118,16 +121,24 @@ void UserInput::Render()
   //
   // Eclipse
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
   glDisable(GL_DEPTH_TEST);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
 
   EclRender();
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glEnable(GL_DEPTH_TEST);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
   g_editorFont.EndText2D();

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "im_renderer.h"
 
 #include <math.h>
 
@@ -306,7 +307,15 @@ void Spirit::Render( float predictionTime )
     predictedPos += predictionTime * m_hover;
 
     float size = spiritInnerSize;
+    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, innerAlpha );
     glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
@@ -316,7 +325,15 @@ void Spirit::Render( float predictionTime )
     glEnd();
 
     size = spiritOuterSize;
+    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, outerAlpha );
     glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
+
     glBegin( GL_QUADS );
         glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
         glVertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );

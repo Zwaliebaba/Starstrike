@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "math_utils.h"
 #include "resource.h"
 #include "vector2.h"
@@ -108,13 +111,17 @@ void ThrowableWeapon::Render(float _predictionTime)
   Matrix34 transform(m_front, m_up, predictedPos);
 
   g_app->m_renderer->SetObjectLighting();
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_COLOR_MATERIAL);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
   m_shape->Render(_predictionTime, transform);
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
   glDisable(GL_COLOR_MATERIAL);
   g_app->m_renderer->UnsetObjectLighting();
@@ -132,10 +139,24 @@ void ThrowableWeapon::Render(float _predictionTime)
     float distToThrowable = (g_app->m_camera->GetPos() - predictedPos).Mag();
 
     float size = 1000.0f / sqrtf(distToThrowable);
+    g_imRenderer->Color4ub(m_colour.r, m_colour.g, m_colour.b, 200);
     glColor4ub(m_colour.r, m_colour.g, m_colour.b, 200);
     glEnable(GL_TEXTURE_2D);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
     glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable(GL_CULL_FACE);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
     glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
@@ -147,8 +168,21 @@ void ThrowableWeapon::Render(float _predictionTime)
     glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
     glEnd();
     size *= 0.4f;
+    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.7f);
     glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
     glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 1);
     glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
@@ -159,7 +193,9 @@ void ThrowableWeapon::Render(float _predictionTime)
     glTexCoord2i(0, 0);
     glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
     glEnd();
+    g_imRenderer->UnbindTexture();
     glDisable(GL_TEXTURE_2D);
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable(GL_CULL_FACE);
   }
 }
@@ -433,13 +469,17 @@ void Rocket::Render(float predictionTime)
   Matrix34 transform(front, up, predictedPos);
 
   g_app->m_renderer->SetObjectLighting();
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_COLOR_MATERIAL);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
   m_shape->Render(predictionTime, transform);
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
   glDisable(GL_COLOR_MATERIAL);
   g_app->m_renderer->UnsetObjectLighting();
@@ -618,7 +658,22 @@ void Laser::Render(float predictionTime)
   rightAngle *= 0.8f;
 
   const RGBAColour& colour = g_app->m_location->m_teams[m_fromTeamId].m_colour;
+  g_imRenderer->Color4ub(colour.r, colour.g, colour.b, 255);
   glColor4ub(colour.r, colour.g, colour.b, 255);
+
+  g_imRenderer->Begin(PRIM_QUADS);
+  for (int i = 0; i < 5; ++i)
+  {
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((fromPos - rightAngle).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((fromPos + rightAngle).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((toPos + rightAngle).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((toPos - rightAngle).GetData());
+  }
+  g_imRenderer->End();
 
   glBegin(GL_QUADS);
   for (int i = 0; i < 5; ++i)
@@ -702,13 +757,20 @@ bool Shockwave::Advance()
 void Shockwave::Render(float predictionTime)
 {
   glShadeModel(GL_SMOOTH);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
   glDisable(GL_DEPTH_TEST);
 
+  g_imRenderer->Color4f(1.0f, 1.0f, 0.0f, 1.0f);
   glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
   int numSteps = 50.0f;
   float predictedLife = m_life - predictionTime;
   float radius = 35.0f + 40.0f * (m_size - predictedLife);
   float alpha = 0.6f * predictedLife / m_size;
+
+  g_imRenderer->Begin(PRIM_TRIANGLE_FAN);
+  g_imRenderer->Color4f(1.0f, 1.0f, 0.0f, 0.0f);
+  g_imRenderer->Vertex3fv((m_pos + LegacyVector3(0, 5, 0)).GetData());
+  g_imRenderer->Color4f(1.0f, 0.5f, 0.5f, alpha);
 
   glBegin(GL_TRIANGLE_FAN);
   glColor4f(1.0f, 1.0f, 0.0f, 0.0f);
@@ -721,13 +783,16 @@ void Shockwave::Render(float predictionTime)
     float xDiff = radius * sinf(angle);
     float zDiff = radius * cosf(angle);
     LegacyVector3 pos = m_pos + LegacyVector3(xDiff, 5, zDiff);
+    g_imRenderer->Vertex3fv(pos.GetData());
     glVertex3fv(pos.GetData());
     angle += 2.0f * M_PI / static_cast<float>(numSteps);
   }
 
+  g_imRenderer->End();
   glEnd();
 
   glShadeModel(GL_FLAT);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glEnable(GL_DEPTH_TEST);
 
   //
@@ -744,17 +809,27 @@ void Shockwave::Render(float predictionTime)
 
       float alpha = 1.0f - (m_size - predictedLife) / 0.1f;
       alpha *= distanceFactor;
+      g_imRenderer->Color4f(1, 1, 1, alpha);
       glColor4f(1, 1, 1, alpha);
       g_app->m_renderer->SetupMatricesFor2D();
       int screenW = g_app->m_renderer->ScreenW();
       int screenH = g_app->m_renderer->ScreenH();
+      g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
       glDisable(GL_CULL_FACE);
+      g_imRenderer->Begin(PRIM_QUADS);
+      g_imRenderer->Vertex2i(0, 0);
+      g_imRenderer->Vertex2i(screenW, 0);
+      g_imRenderer->Vertex2i(screenW, screenH);
+      g_imRenderer->Vertex2i(0, screenH);
+      g_imRenderer->End();
+
       glBegin(GL_QUADS);
       glVertex2i(0, 0);
       glVertex2i(screenW, 0);
       glVertex2i(screenW, screenH);
       glVertex2i(0, screenH);
       glEnd();
+      g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
       glEnable(GL_CULL_FACE);
       g_app->m_renderer->SetupMatricesFor3D();
 
@@ -771,10 +846,24 @@ void Shockwave::Render(float predictionTime)
     LegacyVector3 predictedPos = m_pos;
     float size = (m_size * 2000.0f) / sqrtf(distToBang);
     float alpha = 1.0f - (m_size - predictedLife) / 1.0f;
+    g_imRenderer->Color4f(1.0f, 0.4f, 0.4f, alpha);
     glColor4f(1.0f, 0.4f, 0.4f, alpha);
     glEnable(GL_TEXTURE_2D);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
     glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable(GL_CULL_FACE);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
     glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
@@ -787,8 +876,21 @@ void Shockwave::Render(float predictionTime)
     glEnd();
 
     size *= 0.4f;
+    g_imRenderer->Color4f(1.0f, 1.0f, 0.0f, alpha);
     glColor4f(1.0f, 1.0f, 0.0f, alpha);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
     glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 1);
     glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
@@ -799,7 +901,9 @@ void Shockwave::Render(float predictionTime)
     glTexCoord2i(0, 0);
     glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
     glEnd();
+    g_imRenderer->UnbindTexture();
     glDisable(GL_TEXTURE_2D);
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable(GL_CULL_FACE);
   }
 }
@@ -851,13 +955,32 @@ void MuzzleFlash::Render(float _predictionTime)
   rightAngle *= m_size * 0.5f;
 
   glEnable(GL_TEXTURE_2D);
+  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/muzzleflash.bmp"));
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/muzzleflash.bmp"));
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
 
   float alpha = predictedLife;
   alpha = min(1.0f, alpha);
   alpha = max(0.0f, alpha);
+  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
   glColor4f(1.0f, 1.0f, 1.0f, alpha);
+
+  g_imRenderer->Begin(PRIM_QUADS);
+  for (int i = 0; i < 5; ++i)
+  {
+    rightAngle *= 0.8f;
+    toPosToFromPos *= 0.8f;
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((fromPos - rightAngle).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((fromPos + rightAngle).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((fromPos + toPosToFromPos + rightAngle).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((fromPos + toPosToFromPos - rightAngle).GetData());
+  }
+  g_imRenderer->End();
 
   glBegin(GL_QUADS);
   for (int i = 0; i < 5; ++i)
@@ -875,6 +998,7 @@ void MuzzleFlash::Render(float _predictionTime)
   }
   glEnd();
 
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
 }
 
@@ -978,19 +1102,25 @@ void Missile::Render(float _predictionTime)
   LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
   Matrix34 mat(m_front, m_up, predictedPos);
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
   g_app->m_renderer->SetObjectLighting();
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_COLOR_MATERIAL);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
 
   m_shape->Render(_predictionTime, mat);
   g_app->m_renderer->UnsetObjectLighting();
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
   glDisable(GL_COLOR_MATERIAL);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
 
   LegacyVector3 boosterPos = m_booster->GetWorldMatrix(mat).pos;
@@ -1154,9 +1284,11 @@ void TurretShell::Render(float predictionTime)
 
   Matrix34 shellMat(predictedFront, up, predictedPos);
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
   g_app->m_renderer->SetObjectLighting();
   shape->Render(predictionTime, shellMat);
   g_app->m_renderer->UnsetObjectLighting();
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
 }

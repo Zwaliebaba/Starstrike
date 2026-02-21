@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -567,14 +570,20 @@ static float s_nearPlaneStart;
 void Entity::BeginRenderShadow()
 {
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
 	glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
+    g_imRenderer->Color4f( 0.6f, 0.6f, 0.6f, 0.0f );
     glColor4f       ( 0.6f, 0.6f, 0.6f, 0.0f );
 
 	s_nearPlaneStart = g_app->m_renderer->GetNearPlane();
@@ -585,10 +594,14 @@ void Entity::BeginRenderShadow()
 
 void Entity::EndRenderShadow()
 {
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
     glDisable       ( GL_TEXTURE_2D );
 
@@ -623,6 +636,13 @@ void Entity::RenderShadow( LegacyVector3 const &_pos, float _size )
         // The object casting the shadow is beneath the ground
         return;
     }
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->TexCoord2f( 0.0f, 0.0f );     g_imRenderer->Vertex3fv( posA.GetData() );
+        g_imRenderer->TexCoord2f( 1.0f, 0.0f );     g_imRenderer->Vertex3fv( posB.GetData() );
+        g_imRenderer->TexCoord2f( 1.0f, 1.0f );     g_imRenderer->Vertex3fv( posC.GetData() );
+        g_imRenderer->TexCoord2f( 0.0f, 1.0f );     g_imRenderer->Vertex3fv( posD.GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glTexCoord2f( 0.0f, 0.0f );     glVertex3fv     ( posA.GetData() );

@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <math.h>
 
@@ -162,6 +165,7 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     glEnable            (GL_TEXTURE_2D);
 
     gglActiveTextureARB  (GL_TEXTURE0_ARB);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
     glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
 	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -172,6 +176,7 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     glEnable            (GL_TEXTURE_2D);
 
     gglActiveTextureARB  (GL_TEXTURE1_ARB);
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
     glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
 	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -181,13 +186,19 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_MODULATE);
     glEnable            (GL_TEXTURE_2D);
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable           (GL_CULL_FACE);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc         (GL_SRC_ALPHA, GL_ONE);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable            (GL_BLEND);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask         (false);
+    g_imRenderer->Color4f(1.0f,1.0f,1.0f,_alpha);
     glColor4f           (1.0f,1.0f,1.0f,_alpha);
 
 	glMatrixMode        (GL_MODELVIEW);
+	g_imRenderer->Translatef( startPos.x, startPos.y, startPos.z );
 	glTranslatef        ( startPos.x, startPos.y, startPos.z );
 	LegacyVector3 dishFront   = GetForwardsClippingDir(_predictionTime, receiver);
     double eqn1[4]      = { dishFront.x, dishFront.y, dishFront.z, -1.0f };
@@ -196,7 +207,9 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 
     LegacyVector3 receiverPos = receiver->GetDishPos( _predictionTime );
     LegacyVector3 receiverFront = receiver->GetForwardsClippingDir( _predictionTime, this );
+    g_imRenderer->Translatef( -startPos.x, -startPos.y, -startPos.z );
     glTranslatef        ( -startPos.x, -startPos.y, -startPos.z );
+    g_imRenderer->Translatef( receiverPos.x, receiverPos.y, receiverPos.z );
     glTranslatef        ( receiverPos.x, receiverPos.y, receiverPos.z );
 
     LegacyVector3 diff = receiverPos - startPos;
@@ -206,6 +219,7 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 
     double eqn2[4]      = { receiverFront.x, receiverFront.y, receiverFront.z, thisDistance };
     glClipPlane         (GL_CLIP_PLANE1, eqn2 );
+    g_imRenderer->Translatef( -receiverPos.x, -receiverPos.y, -receiverPos.z );
     glTranslatef        ( -receiverPos.x, -receiverPos.y, -receiverPos.z );
 
 
@@ -213,6 +227,7 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 	//RenderArrow(endPos, endPos + receiverFront * 100, 2.0f, RGBAColour( 255, 0, 0, 255 ) );
 	//RenderArrow(startPos, endPos, 2.0f );
 
+    g_imRenderer->Translatef( startPos.x, startPos.y, startPos.z );
     glTranslatef        ( startPos.x, startPos.y, startPos.z );
 
     glEnable            (GL_CLIP_PLANE0);
@@ -224,6 +239,34 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     //float texXInner = -1.0f/_radius;
     //float texXOuter = -1.0f;
 	if (true) {
+    g_imRenderer->Begin(PRIM_QUAD_STRIP);
+
+    for( int s = 0; s < numSteps; ++s )
+    {
+        LegacyVector3 deltaFrom = 1.2f * delta * (float) s / (float) numSteps;
+        LegacyVector3 deltaTo = 1.2f * delta * (float) (s+1) / (float) numSteps;
+
+        LegacyVector3 currentPos = (-delta*0.1f) + LegacyVector3(0,_radius,0);
+
+        for( int r = 0; r <= numRadii; ++r )
+        {
+            gglMultiTexCoord2fARB    ( GL_TEXTURE0_ARB, texXInner, r/numRadii );
+            gglMultiTexCoord2fARB    ( GL_TEXTURE1_ARB, texXOuter, r/numRadii );
+            g_imRenderer->Vertex3fv( (currentPos + deltaFrom).GetData() );
+
+            gglMultiTexCoord2fARB    ( GL_TEXTURE0_ARB, texXInner+10.0f/(float)numSteps, (r)/numRadii );
+            gglMultiTexCoord2fARB    ( GL_TEXTURE1_ARB, texXOuter+distance/(200.0f *(float)numSteps), (r)/numRadii );
+            g_imRenderer->Vertex3fv( (currentPos + deltaTo).GetData() );
+
+            currentPos.RotateAround( deltaNorm * ( 2.0f * M_PI / (float) numRadii ) );
+        }
+
+        texXInner += 10.0f / (float) numSteps;
+        texXOuter += distance/(200.0f * (float) numSteps);
+    }
+
+    g_imRenderer->End();
+
     glBegin( GL_QUAD_STRIP );
 
     for( int s = 0; s < numSteps; ++s )
@@ -252,13 +295,18 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 
     glEnd();
 	}
+	g_imRenderer->Translatef( -startPos.x, -startPos.y, -startPos.z );
 	glTranslatef        ( -startPos.x, -startPos.y, -startPos.z );
 
 	glDisable           (GL_CLIP_PLANE0);
 	glDisable           (GL_CLIP_PLANE1);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask         (true);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable           (GL_BLEND);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc         (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable            (GL_CULL_FACE);
 
     gglActiveTextureARB  (GL_TEXTURE1_ARB);

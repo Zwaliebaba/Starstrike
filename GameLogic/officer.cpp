@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "resource.h"
 #include "shape.h"
 #include "math_utils.h"
@@ -124,9 +127,18 @@ void Officer::RenderSpirit( LegacyVector3 const &_pos )
     float spiritGlowSize = 10;
 
     float size = spiritInnerSize;
+    g_imRenderer->Color4ub(100, 250, 100, innerAlpha );
     glColor4ub(100, 250, 100, innerAlpha );
 
+    g_imRenderer->UnbindTexture();
     glDisable( GL_TEXTURE_2D );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
@@ -136,7 +148,15 @@ void Officer::RenderSpirit( LegacyVector3 const &_pos )
     glEnd();
 
     size = spiritOuterSize;
+    g_imRenderer->Color4ub(100, 250, 100, outerAlpha );
     glColor4ub(100, 250, 100, outerAlpha );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
@@ -146,16 +166,26 @@ void Officer::RenderSpirit( LegacyVector3 const &_pos )
     glEnd();
 
     size = spiritGlowSize;
+    g_imRenderer->Color4ub(100,250,100, glowAlpha );
     glColor4ub(100,250,100, glowAlpha );
 
     glEnable( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
     glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    g_imRenderer->End();
+
     glBegin( GL_QUADS );
         glTexCoord2i(0,0);      glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
         glTexCoord2i(1,0);      glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
         glTexCoord2i(1,1);      glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
         glTexCoord2i(0,1);      glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
     glEnd();
+    g_imRenderer->UnbindTexture();
     glDisable( GL_TEXTURE_2D );
 }
 
@@ -164,9 +194,13 @@ void Officer::RenderShield( float _predictionTime )
 {
     float timeIndex = g_gameTime + m_id.GetUniqueId() * 20;
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable       ( GL_CULL_FACE );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask     ( false );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glEnable        ( GL_BLEND );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
 
     LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
@@ -182,9 +216,13 @@ void Officer::RenderShield( float _predictionTime )
         RenderSpirit( spiritPos );
     }
 
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     glDisable       ( GL_BLEND );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glDepthMask     ( true );
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     glEnable        ( GL_CULL_FACE );
 }
 
@@ -252,7 +290,9 @@ bool Officer::RenderPixelEffect( float _predictionTime )
         if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.2f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
+        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         glEnable( GL_BLEND );
+        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
         glBlendFunc( GL_ONE, GL_ONE );
     }
 
@@ -268,6 +308,7 @@ bool Officer::RenderPixelEffect( float _predictionTime )
 
     glShadeModel    (GL_FLAT);
     glEnable        (GL_TEXTURE_2D);
+    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     g_app->m_renderer->UnsetObjectLighting();
 
@@ -880,11 +921,21 @@ void OfficerOrders::Render( float _time )
     LegacyVector3 camUp = g_app->m_camera->GetUp() * size;
     LegacyVector3 camRight = g_app->m_camera->GetRight() * size;
 
+    g_imRenderer->Color4f( 1.0f, 0.3f, 1.0f, alpha );
     glColor4f( 1.0f, 0.3f, 1.0f, alpha );
 
     glEnable        ( GL_TEXTURE_2D );
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
     glDisable       ( GL_DEPTH_TEST );
+
+    g_imRenderer->Begin(PRIM_QUADS);
+        g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (predictedPos - camRight + camUp).GetData() );
+        g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (predictedPos + camRight + camUp).GetData() );
+        g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (predictedPos + camRight - camUp).GetData() );
+        g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (predictedPos - camRight - camUp).GetData() );
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glTexCoord2i( 0, 0 );       glVertex3fv( (predictedPos - camRight + camUp).GetData() );
@@ -893,6 +944,7 @@ void OfficerOrders::Render( float _time )
         glTexCoord2i( 0, 1 );       glVertex3fv( (predictedPos - camRight - camUp).GetData() );
     glEnd();
 
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     glEnable        ( GL_DEPTH_TEST );
     glDisable       ( GL_TEXTURE_2D );
 }

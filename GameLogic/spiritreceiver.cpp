@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "debug_utils.h"
 #include "file_writer.h"
 #include "hi_res_time.h"
@@ -99,8 +102,11 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
     LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
 
+    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     glDisable(GL_CULL_FACE);
+    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     glDepthMask(false);
+    g_imRenderer->Color4f(0.9f, 0.9f, 0.5f, 1.0f);
     glColor4f(0.9f, 0.9f, 0.5f, 1.0f);
 
     float size = 0.5f;
@@ -108,11 +114,14 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     if (buildingDetail == 1)
     {
       glEnable(GL_TEXTURE_2D);
+      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
       glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
       glEnable(GL_BLEND);
+      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
       size = 1.0f;
@@ -120,6 +129,17 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
 
     ourPosRight.SetLength(size);
     theirPosRight.SetLength(size);
+
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2f(0.1f, 0);
+    g_imRenderer->Vertex3fv((ourPos - ourPosRight).GetData());
+    g_imRenderer->TexCoord2f(0.1f, 1);
+    g_imRenderer->Vertex3fv((ourPos + ourPosRight).GetData());
+    g_imRenderer->TexCoord2f(0.9f, 1);
+    g_imRenderer->Vertex3fv((theirPos + theirPosRight).GetData());
+    g_imRenderer->TexCoord2f(0.9f, 0);
+    g_imRenderer->Vertex3fv((theirPos - theirPosRight).GetData());
+    g_imRenderer->End();
 
     glBegin(GL_QUADS);
     glTexCoord2f(0.1f, 0);
@@ -132,6 +152,7 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     glVertex3fv((theirPos - theirPosRight).GetData());
     glEnd();
 
+    g_imRenderer->UnbindTexture();
     glDisable(GL_TEXTURE_2D);
 
     //
@@ -228,13 +249,18 @@ static float s_nearPlaneStart;
 
 void ReceiverBuilding::BeginRenderUnprocessedSpirits()
 {
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
 
   int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
   if (buildingDetail == 1)
+    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/glow.bmp"));
     glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
 
   s_nearPlaneStart = g_app->m_renderer->GetNearPlane();
@@ -249,7 +275,27 @@ void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float 
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
+  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
   glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  g_imRenderer->Begin(PRIM_QUADS);
+  g_imRenderer->TexCoord2i(0, 0);
+  g_imRenderer->Vertex3fv((position + camUp * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 0);
+  g_imRenderer->Vertex3fv((position + camRight * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 1);
+  g_imRenderer->Vertex3fv((position - camUp * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 1);
+  g_imRenderer->Vertex3fv((position - camRight * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 0);
+  g_imRenderer->Vertex3fv((position + camUp * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 0);
+  g_imRenderer->Vertex3fv((position + camRight * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 1);
+  g_imRenderer->Vertex3fv((position - camUp * 3 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 1);
+  g_imRenderer->Vertex3fv((position - camRight * 3 * scale).GetData());
+  g_imRenderer->End();
+
   glBegin(GL_QUADS);
   glTexCoord2i(0, 0);
   glVertex3fv((position + camUp * 3 * scale).GetData());
@@ -269,7 +315,27 @@ void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float 
   glVertex3fv((position - camRight * 3 * scale).GetData());
   glEnd();
 
+  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
   glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  g_imRenderer->Begin(PRIM_QUADS);
+  g_imRenderer->TexCoord2i(0, 0);
+  g_imRenderer->Vertex3fv((position + camUp * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 0);
+  g_imRenderer->Vertex3fv((position + camRight * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 1);
+  g_imRenderer->Vertex3fv((position - camUp * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 1);
+  g_imRenderer->Vertex3fv((position - camRight * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 0);
+  g_imRenderer->Vertex3fv((position + camUp * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 0);
+  g_imRenderer->Vertex3fv((position + camRight * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(1, 1);
+  g_imRenderer->Vertex3fv((position - camUp * 1 * scale).GetData());
+  g_imRenderer->TexCoord2i(0, 1);
+  g_imRenderer->Vertex3fv((position - camRight * 1 * scale).GetData());
+  g_imRenderer->End();
+
   glBegin(GL_QUADS);
   glTexCoord2i(0, 0);
   glVertex3fv((position + camUp * 1 * scale).GetData());
@@ -293,7 +359,19 @@ void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float 
   if (buildingDetail == 1)
   {
     glEnable(GL_TEXTURE_2D);
+    g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
     glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((position + camUp * 30 * scale).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((position + camRight * 30 * scale).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((position - camUp * 30 * scale).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((position - camRight * 30 * scale).GetData());
+    g_imRenderer->End();
+
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
     glVertex3fv((position + camUp * 30 * scale).GetData());
@@ -304,6 +382,7 @@ void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float 
     glTexCoord2i(0, 1);
     glVertex3fv((position - camRight * 30 * scale).GetData());
     glEnd();
+    g_imRenderer->UnbindTexture();
     glDisable(GL_TEXTURE_2D);
   }
 }
@@ -316,6 +395,7 @@ void ReceiverBuilding::RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, 
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
+  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
   glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
   glTexCoord2i(0, 0);
   glVertex3fv((position + camUp * 3 * scale).GetData());
@@ -334,6 +414,7 @@ void ReceiverBuilding::RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, 
   glTexCoord2i(0, 1);
   glVertex3fv((position - camRight * 3 * scale).GetData());
 
+  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
   glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
   glTexCoord2i(0, 0);
   glVertex3fv((position + camUp * 1 * scale).GetData());
@@ -361,6 +442,7 @@ void ReceiverBuilding::RenderUnprocessedSpirit_detail(const LegacyVector3& _pos,
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
+  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
   glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
   glTexCoord2i(0, 0);
   glVertex3fv((position + camUp * 30 * scale).GetData());
@@ -376,10 +458,15 @@ void ReceiverBuilding::EndRenderUnprocessedSpirits()
 {
   g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart, g_app->m_renderer->GetFarPlane());
 
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
 }
 
@@ -672,11 +759,16 @@ LegacyVector3 SpiritReceiver::GetSpiritLocation()
 
 void SpiritReceiver::RenderPorts()
 {
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   glDisable(GL_CULL_FACE);
   glEnable(GL_TEXTURE_2D);
+  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   glDepthMask(false);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glEnable(GL_BLEND);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
   for (int i = 0; i < GetNumPorts(); ++i)
@@ -694,9 +786,26 @@ void SpiritReceiver::RenderPorts()
     LegacyVector3 statusPos = worldMat.pos;
 
     if (GetPortOccupant(i).IsValid())
+    {
+      g_imRenderer->Color4f(0.3f, 1.0f, 0.3f, 1.0f);
       glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
+    }
     else
+    {
+      g_imRenderer->Color4f(1.0f, 0.3f, 0.3f, 1.0f);
       glColor4f(1.0f, 0.3f, 0.3f, 1.0f);
+    }
+
+    g_imRenderer->Begin(PRIM_QUADS);
+    g_imRenderer->TexCoord2i(0, 0);
+    g_imRenderer->Vertex3fv((statusPos - camR - camU).GetData());
+    g_imRenderer->TexCoord2i(1, 0);
+    g_imRenderer->Vertex3fv((statusPos + camR - camU).GetData());
+    g_imRenderer->TexCoord2i(1, 1);
+    g_imRenderer->Vertex3fv((statusPos + camR + camU).GetData());
+    g_imRenderer->TexCoord2i(0, 1);
+    g_imRenderer->Vertex3fv((statusPos - camR + camU).GetData());
+    g_imRenderer->End();
 
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
@@ -710,10 +819,15 @@ void SpiritReceiver::RenderPorts()
     glEnd();
   }
 
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   glDisable(GL_BLEND);
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glDepthMask(true);
+  g_imRenderer->UnbindTexture();
   glDisable(GL_TEXTURE_2D);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   glEnable(GL_CULL_FACE);
 }
 
