@@ -19,7 +19,7 @@
 #include "particle_system.h"
 #include "renderer.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "souldestroyer.h"
 

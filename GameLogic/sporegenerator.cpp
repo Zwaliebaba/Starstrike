@@ -18,7 +18,7 @@
 #include "explosion.h"
 #include "camera.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 #define SPOREGENERATOR_HOVERHEIGHT          100.0f

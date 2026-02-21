@@ -5,7 +5,7 @@
 #include "debug_utils.h"
 #include "targetcursor.h"
 
-#include "interface/scrollbar.h"
+#include "scrollbar.h"
 
 #include "app.h"
 

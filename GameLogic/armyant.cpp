@@ -7,7 +7,7 @@
 #include "profiler.h"
 #include "preferences.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "app.h"
 #include "renderer.h"

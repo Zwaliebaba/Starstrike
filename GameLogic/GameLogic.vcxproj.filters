@@ -2,18 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="buildings_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="buynow_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_anim_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="camera_mount_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="cheat_window.h">
       <Filter>Interface</Filter>
     </ClInclude>
@@ -23,37 +11,10 @@
     <ClInclude Include="debugmenu.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="demoend_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="drop_down_menu.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="editor_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="filedialog.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="gesture_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="globalworldeditor_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="grabber_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="input_field.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="instant_unit_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="landscape_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="lights_window.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="mainmenus.h">
@@ -62,13 +23,7 @@
     <ClInclude Include="message_dialog.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="mods_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="network_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="pokey_window.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="prefs_graphics_window.h">
@@ -92,28 +47,7 @@
     <ClInclude Include="reallyquit_window.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="save_on_quit_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="scrollbar.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="sound_profile_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="soundeditor_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="soundparameter_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="soundstats_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="tree_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="updateavailable_window.h">
       <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="userprofile_window.h">
@@ -299,18 +233,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="buildings_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="buynow_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_anim_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="camera_mount_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="cheat_window.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
@@ -320,46 +242,16 @@
     <ClCompile Include="debugmenu.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
-    <ClCompile Include="demoend_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="drop_down_menu.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
-    <ClCompile Include="editor_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="filedialog.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="gesture_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="globalworldeditor_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="grabber_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="input_field.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="instant_unit_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="landscape_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="lights_window.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="mainmenus.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="message_dialog.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="mods_window.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="network_window.cpp">
@@ -386,28 +278,7 @@
     <ClCompile Include="reallyquit_window.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
-    <ClCompile Include="save_on_quit_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="scrollbar.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="sound_profile_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="soundeditor_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="soundparameter_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="soundstats_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="tree_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="updateavailable_window.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
     <ClCompile Include="userprofile_window.cpp">

@@ -9,7 +9,7 @@
 
 #include "eclipse.h"
 
-#include "interface/mainmenus.h"
+#include "mainmenus.h"
 
 #include "startsequence.h"
 #include "app.h"
@@ -18,7 +18,7 @@
 #include "renderer.h"
 #include "global_world.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 StartSequence::StartSequence()

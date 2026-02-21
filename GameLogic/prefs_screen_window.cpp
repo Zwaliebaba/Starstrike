@@ -7,9 +7,9 @@
 #include "window_manager.h"
 #include "language_table.h"
 
-#include "interface/prefs_screen_window.h"
-#include "interface/drop_down_menu.h"
-#include "interface/message_dialog.h"
+#include "prefs_screen_window.h"
+#include "drop_down_menu.h"
+#include "message_dialog.h"
 
 #include "app.h"
 #include "renderer.h"

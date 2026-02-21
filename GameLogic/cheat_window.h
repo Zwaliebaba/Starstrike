@@ -2,7 +2,7 @@
 #ifndef _included_cheatwindow_h
 #define _included_cheatwindow_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 

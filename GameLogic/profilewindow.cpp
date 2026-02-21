@@ -14,7 +14,7 @@
 
 #include "app.h"
 
-#include "interface/profilewindow.h"
+#include "profilewindow.h"
 
 
 #ifdef PROFILER_ENABLED

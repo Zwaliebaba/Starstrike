@@ -26,7 +26,7 @@
 #include "entity_grid.h"
 #include "water_reflection.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 // ****************************************************************************

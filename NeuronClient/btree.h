@@ -296,15 +296,6 @@ int BTree<T>::Size() const
 
 
 template <class T>
-void BTree<T>::Print()
-{
-    if (ltree) ltree->Print();
-    if (id) cout << id << " : " << data << "\n";
-    if (rtree) rtree->Print();
-}
-
-
-template <class T>
 BTree<T>* BTree<T>::Left() const
 {
     return(BTree<T>*) ltree;

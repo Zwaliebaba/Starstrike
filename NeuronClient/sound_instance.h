@@ -2,7 +2,7 @@
 #define INCLUDED_SOUND_INSTANCE_H
 
 #include "LegacyVector3.h"
-#include "sound/sound_parameter.h"
+#include "sound_parameter.h"
 #include "entity.h"
 
 class SoundInstance;

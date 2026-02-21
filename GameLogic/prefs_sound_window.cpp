@@ -5,12 +5,12 @@
 #include "system_info.h"
 #include "language_table.h"
 
-#include "interface/prefs_sound_window.h"
-#include "interface/drop_down_menu.h"
+#include "prefs_sound_window.h"
+#include "drop_down_menu.h"
 
-#include "sound/soundsystem.h"
-#include "sound/sound_library_3d.h"
-#include "sound/sample_cache.h"
+#include "soundsystem.h"
+#include "sound_library_3d.h"
+#include "sample_cache.h"
 
 #include "app.h"
 #include "renderer.h"

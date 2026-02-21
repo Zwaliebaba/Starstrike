@@ -109,11 +109,11 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)NeuronClient;$(SolutionDir)StarStrike</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)NeuronCore;$(SolutionDir)NeuronClient;$(SolutionDir)StarStrike</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -148,10 +148,6 @@
     <ClInclude Include="blueprintstore.h" />
     <ClInclude Include="bridge.h" />
     <ClInclude Include="building.h" />
-    <ClInclude Include="buildings_window.h" />
-    <ClInclude Include="buynow_window.h" />
-    <ClInclude Include="camera_anim_window.h" />
-    <ClInclude Include="camera_mount_window.h" />
     <ClInclude Include="cave.h" />
     <ClInclude Include="centipede.h" />
     <ClInclude Include="cheat_window.h" />
@@ -160,42 +156,31 @@
     <ClInclude Include="darwinian.h" />
     <ClInclude Include="darwinia_window.h" />
     <ClInclude Include="debugmenu.h" />
-    <ClInclude Include="demoend_window.h" />
     <ClInclude Include="drop_down_menu.h" />
-    <ClInclude Include="editor_window.h" />
     <ClInclude Include="egg.h" />
     <ClInclude Include="engineer.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="entity_leg.h" />
     <ClInclude Include="factory.h" />
     <ClInclude Include="feedingtube.h" />
-    <ClInclude Include="filedialog.h" />
     <ClInclude Include="flag.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="generichub.h" />
-    <ClInclude Include="gesture_window.h" />
-    <ClInclude Include="globalworldeditor_window.h" />
     <ClInclude Include="goddish.h" />
-    <ClInclude Include="grabber_window.h" />
     <ClInclude Include="gunturret.h" />
     <ClInclude Include="incubator.h" />
     <ClInclude Include="input_field.h" />
     <ClInclude Include="insertion_squad.h" />
-    <ClInclude Include="instant_unit_window.h" />
     <ClInclude Include="lander.h" />
-    <ClInclude Include="landscape_window.h" />
     <ClInclude Include="laserfence.h" />
     <ClInclude Include="lasertrooper.h" />
     <ClInclude Include="library.h" />
-    <ClInclude Include="lights_window.h" />
     <ClInclude Include="mainmenus.h" />
     <ClInclude Include="message_dialog.h" />
     <ClInclude Include="mine.h" />
-    <ClInclude Include="mods_window.h" />
     <ClInclude Include="network_window.h" />
     <ClInclude Include="officer.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="pokey_window.h" />
     <ClInclude Include="powerstation.h" />
     <ClInclude Include="prefs_graphics_window.h" />
     <ClInclude Include="prefs_keybindings_window.h" />
@@ -208,15 +193,10 @@
     <ClInclude Include="researchitem.h" />
     <ClInclude Include="rocket.h" />
     <ClInclude Include="safearea.h" />
-    <ClInclude Include="save_on_quit_window.h" />
     <ClInclude Include="scripttrigger.h" />
     <ClInclude Include="scrollbar.h" />
     <ClInclude Include="snow.h" />
     <ClInclude Include="souldestroyer.h" />
-    <ClInclude Include="soundeditor_window.h" />
-    <ClInclude Include="soundparameter_window.h" />
-    <ClInclude Include="soundstats_window.h" />
-    <ClInclude Include="sound_profile_window.h" />
     <ClInclude Include="spam.h" />
     <ClInclude Include="spawnpoint.h" />
     <ClInclude Include="spider.h" />
@@ -228,11 +208,9 @@
     <ClInclude Include="switch.h" />
     <ClInclude Include="teleport.h" />
     <ClInclude Include="tree.h" />
-    <ClInclude Include="tree_window.h" />
     <ClInclude Include="triffid.h" />
     <ClInclude Include="tripod.h" />
     <ClInclude Include="trunkport.h" />
-    <ClInclude Include="updateavailable_window.h" />
     <ClInclude Include="upgrade_port.h" />
     <ClInclude Include="userprofile_window.h" />
     <ClInclude Include="virii.h" />
@@ -249,10 +227,6 @@
     <ClCompile Include="blueprintstore.cpp" />
     <ClCompile Include="bridge.cpp" />
     <ClCompile Include="building.cpp" />
-    <ClCompile Include="buildings_window.cpp" />
-    <ClCompile Include="buynow_window.cpp" />
-    <ClCompile Include="camera_anim_window.cpp" />
-    <ClCompile Include="camera_mount_window.cpp" />
     <ClCompile Include="cave.cpp" />
     <ClCompile Include="centipede.cpp" />
     <ClCompile Include="cheat_window.cpp" />
@@ -261,38 +235,28 @@
     <ClCompile Include="darwinian.cpp" />
     <ClCompile Include="darwinia_window.cpp" />
     <ClCompile Include="debugmenu.cpp" />
-    <ClCompile Include="demoend_window.cpp" />
     <ClCompile Include="drop_down_menu.cpp" />
-    <ClCompile Include="editor_window.cpp" />
     <ClCompile Include="egg.cpp" />
     <ClCompile Include="engineer.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="entity_leg.cpp" />
     <ClCompile Include="factory.cpp" />
     <ClCompile Include="feedingtube.cpp" />
-    <ClCompile Include="filedialog.cpp" />
     <ClCompile Include="flag.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="generichub.cpp" />
-    <ClCompile Include="gesture_window.cpp" />
-    <ClCompile Include="globalworldeditor_window.cpp" />
     <ClCompile Include="goddish.cpp" />
-    <ClCompile Include="grabber_window.cpp" />
     <ClCompile Include="gunturret.cpp" />
     <ClCompile Include="incubator.cpp" />
     <ClCompile Include="input_field.cpp" />
     <ClCompile Include="insertion_squad.cpp" />
-    <ClCompile Include="instant_unit_window.cpp" />
     <ClCompile Include="lander.cpp" />
-    <ClCompile Include="landscape_window.cpp" />
     <ClCompile Include="laserfence.cpp" />
     <ClCompile Include="lasertrooper.cpp" />
     <ClCompile Include="library.cpp" />
-    <ClCompile Include="lights_window.cpp" />
     <ClCompile Include="mainmenus.cpp" />
     <ClCompile Include="message_dialog.cpp" />
     <ClCompile Include="mine.cpp" />
-    <ClCompile Include="mods_window.cpp" />
     <ClCompile Include="network_window.cpp" />
     <ClCompile Include="officer.cpp" />
     <ClCompile Include="pch.cpp">
@@ -313,15 +277,10 @@
     <ClCompile Include="researchitem.cpp" />
     <ClCompile Include="rocket.cpp" />
     <ClCompile Include="safearea.cpp" />
-    <ClCompile Include="save_on_quit_window.cpp" />
     <ClCompile Include="scripttrigger.cpp" />
     <ClCompile Include="scrollbar.cpp" />
     <ClCompile Include="snow.cpp" />
     <ClCompile Include="souldestroyer.cpp" />
-    <ClCompile Include="soundeditor_window.cpp" />
-    <ClCompile Include="soundparameter_window.cpp" />
-    <ClCompile Include="soundstats_window.cpp" />
-    <ClCompile Include="sound_profile_window.cpp" />
     <ClCompile Include="spam.cpp" />
     <ClCompile Include="spawnpoint.cpp" />
     <ClCompile Include="spider.cpp" />
@@ -333,11 +292,9 @@
     <ClCompile Include="switch.cpp" />
     <ClCompile Include="teleport.cpp" />
     <ClCompile Include="tree.cpp" />
-    <ClCompile Include="tree_window.cpp" />
     <ClCompile Include="triffid.cpp" />
     <ClCompile Include="tripod.cpp" />
     <ClCompile Include="trunkport.cpp" />
-    <ClCompile Include="updateavailable_window.cpp" />
     <ClCompile Include="upgrade_port.cpp" />
     <ClCompile Include="userprofile_window.cpp" />
     <ClCompile Include="virii.cpp" />

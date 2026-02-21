@@ -14,7 +14,7 @@
 
 #include "tree.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "app.h"
 #include "globals.h"

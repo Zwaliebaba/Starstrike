@@ -10,111 +10,108 @@ class QuickUnitButton;
 
 class TaskManagerInterfaceIcons : public TaskManagerInterface
 {
-protected:
+  protected:
     enum
     {
-        ScreenOverlay,                  // On all screens
-        ScreenTaskManager,
-        ScreenObjectives,
-        ScreenResearch
+      ScreenOverlay,
+      // On all screens
+      ScreenTaskManager,
+      ScreenObjectives,
+      ScreenResearch
     };
-    int     m_screenId;
 
-    float   m_screenY;
-    float   m_desiredScreenY;
-    float   m_screenW;
-    float   m_screenH;
+    int m_screenId;
 
-    float   m_chatLogY;
+    float m_screenY;
+    float m_desiredScreenY;
+    float m_screenW;
+    float m_screenH;
 
-    LList   <ScreenZone *>          m_screenZones;               // All clickable areas on-screen
-    LList   <ScreenZone *>          m_newScreenZones;            // New zones generated this frame
-	LList   <KeyboardShortcut *>    m_keyboardShortcuts;         // Keyboard shortcuts to screenzones
-    int     m_currentScreenZone;
-    int     m_currentMouseScreenZone;
-	int		m_currentScrollZone;
-    float   m_screenZoneTimer;
-    double  m_taskManagerDownTime;
+    float m_chatLogY;
 
-public:
-    int     m_currentQuickUnit;
-    int     m_quickUnitDirection;
-    LList   <QuickUnitButton *>     m_quickUnitButtons;
+    LList<ScreenZone*> m_screenZones; // All clickable areas on-screen
+    LList<ScreenZone*> m_newScreenZones; // New zones generated this frame
+    LList<KeyboardShortcut*> m_keyboardShortcuts; // Keyboard shortcuts to screenzones
+    int m_currentScreenZone;
+    int m_currentMouseScreenZone;
+    int m_currentScrollZone;
+    float m_screenZoneTimer;
+    double m_taskManagerDownTime;
 
-protected:
-    void    AdvanceScrolling            ();
-    void    AdvanceScreenEdges          ();
-    void    AdvanceScreenZones          ();
-    void    AdvanceKeyboardShortcuts    ();
-    void    AdvanceTerminate            ();
-    void    AdvanceQuickUnit            ();
+  public:
+    int m_currentQuickUnit;
+    int m_quickUnitDirection;
+    LList<QuickUnitButton*> m_quickUnitButtons;
 
-    void    HideTaskManager             ();
+  protected:
+    void AdvanceScrolling();
+    void AdvanceScreenEdges();
+    void AdvanceScreenZones();
+    void AdvanceKeyboardShortcuts();
+    void AdvanceTerminate();
+    void AdvanceQuickUnit();
 
-    bool    ScreenZoneHighlighted   ( ScreenZone *_zone );
-    void    RunScreenZone           ( const char *_name, int _data );          // Occurs during click or keypress
+    void HideTaskManager();
 
-    void    SetupRenderMatrices     ( int _screenId );
-    void    ConvertMousePosition    ( float &_x, float &_y );
-    void    RestoreRenderMatrices   ();
+    bool ScreenZoneHighlighted(ScreenZone* _zone);
+    void RunScreenZone(const char* _name, int _data); // Occurs during click or keypress
 
-    void    RenderTargetAreas   ();
-    void    RenderMessages      ();
-    void    RenderGestures      ();
-    void    RenderRunningTasks  ();
-    void    RenderOverview      ();
-    void    RenderTaskManager   ();
-    void    RenderObjectives    ();
-    void    RenderResearch      ();
-    void    RenderTitleBar      ();
-    void    RenderScreenZones   ();
-    void    RenderTooltip       ();
-    void    RenderCreateTaskMenu();
-    void    RenderQuickUnit     ();
+    void SetupRenderMatrices(int _screenId);
+    void ConvertMousePosition(float& _x, float& _y);
+    void RestoreRenderMatrices();
 
-    void    RenderCompass       ( float _screenX, float _screenY,
-                                  LegacyVector3 const &_worldPos, bool selected, float _size );
+    void RenderTargetAreas();
+    void RenderMessages();
+    void RenderRunningTasks();
+    void RenderOverview();
+    void RenderTaskManager();
+    void RenderObjectives();
+    void RenderResearch();
+    void RenderTitleBar();
+    void RenderScreenZones();
+    void RenderTooltip();
+    void RenderCreateTaskMenu();
+    void RenderQuickUnit();
 
-    int     GetQuickUnitTask    ( int _position = 2);
-	void	CreateQuickUnitInterface();
-	void	DestroyQuickUnitInterface();
+    void RenderCompass(float _screenX, float _screenY, const LegacyVector3& _worldPos, bool selected, float _size);
 
-	bool	ButtonHeld();
-	bool	ButtonHeldAndReleased();
+    int GetQuickUnitTask(int _position = 2);
+    void CreateQuickUnitInterface();
+    void DestroyQuickUnitInterface();
 
-public:
+    bool ButtonHeld();
+    bool ButtonHeldAndReleased();
+
+  public:
     TaskManagerInterfaceIcons();
 
-    virtual void Advance();
-    virtual void Render();
+    void Advance() override;
+    void Render() override;
 
-	bool ControlEvent( TMControl _type );
-	bool AdviseCreateControlHelpBlue();
-	bool AdviseCreateControlHelpGreen();
-	bool AdviseCloseControlHelp();
-	bool AdviseOverSelectableZone();
+    bool ControlEvent(TMControl _type) override;
+    bool AdviseCreateControlHelpBlue() override;
+    bool AdviseCreateControlHelpGreen() override;
+    bool AdviseCloseControlHelp() override;
+    bool AdviseOverSelectableZone() override;
 };
 
 class QuickUnitButton
 {
-public:
-    int     m_taskId;
-    int     m_positionId;
-    float   m_size;
+  public:
+    int m_taskId;
+    int m_positionId;
+    float m_size;
 
-    int     m_x;
-    int     m_y;
-    float   m_alpha;
+    int m_x;
+    int m_y;
+    float m_alpha;
 
-    bool    m_movable;
-
-public:
+    bool m_movable;
 
     QuickUnitButton();
     void Advance();
     void Render();
     void ActivateButton();
 };
-
 
 #endif

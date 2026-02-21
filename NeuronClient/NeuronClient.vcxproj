@@ -149,13 +149,6 @@
     <ClInclude Include="movement2d.h" />
     <ClInclude Include="NeuronClient.h" />
     <ClInclude Include="ogl_extensions.h" />
-    <ClInclude Include="opengl_directx.h" />
-    <ClInclude Include="opengl_directx_dlist.h" />
-    <ClInclude Include="opengl_directx_dlist_dev.h" />
-    <ClInclude Include="opengl_directx_inline.h" />
-    <ClInclude Include="opengl_directx_internals.h" />
-    <ClInclude Include="opengl_directx_matrix_stack.h" />
-    <ClInclude Include="opengl_trace.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
@@ -178,7 +171,6 @@
     <ClInclude Include="sound_library_2d.h" />
     <ClInclude Include="sound_library_3d.h" />
     <ClInclude Include="sound_library_3d_dsound.h" />
-    <ClInclude Include="sound_library_3d_software.h" />
     <ClInclude Include="sound_parameter.h" />
     <ClInclude Include="sound_stream_decoder.h" />
     <ClInclude Include="sphere_renderer.h" />
@@ -245,13 +237,6 @@
     <ClCompile Include="mouse_cursor.cpp" />
     <ClCompile Include="movement2d.cpp" />
     <ClCompile Include="ogl_extensions.cpp" />
-    <ClCompile Include="ogl_extensions_directx.cpp" />
-    <ClCompile Include="opengl_directx.cpp" />
-    <ClCompile Include="opengl_directx_dlist.cpp" />
-    <ClCompile Include="opengl_directx_dlist_dev.cpp" />
-    <ClCompile Include="opengl_directx_matrix_stack.cpp" />
-    <ClCompile Include="opengl_directx_stubs.cpp" />
-    <ClCompile Include="opengl_trace.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -271,10 +256,8 @@
     <ClCompile Include="sound_filter.cpp" />
     <ClCompile Include="sound_instance.cpp" />
     <ClCompile Include="sound_library_2d.cpp" />
-    <ClCompile Include="sound_library_2d_nosnd.cpp" />
     <ClCompile Include="sound_library_3d.cpp" />
     <ClCompile Include="sound_library_3d_dsound.cpp" />
-    <ClCompile Include="sound_library_3d_software.cpp" />
     <ClCompile Include="sound_parameter.cpp" />
     <ClCompile Include="sound_stream_decoder.cpp" />
     <ClCompile Include="sphere_renderer.cpp" />

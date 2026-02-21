@@ -2,7 +2,7 @@
 
 #include "app.h"
 #include "renderer.h"
-#include "interface/reallyquit_window.h"
+#include "reallyquit_window.h"
 
 ReallyQuitWindow::ReallyQuitWindow()
 	:   DarwiniaWindow(REALLYQUIT_WINDOWNAME)

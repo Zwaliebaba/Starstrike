@@ -22,7 +22,7 @@
 #include "level_file.h"
 #include "obstruction_grid.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "darwinian.h"
 #include "officer.h"

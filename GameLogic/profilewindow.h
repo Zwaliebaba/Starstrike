@@ -4,7 +4,7 @@
 #ifdef PROFILER_ENABLED
 
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class ProfiledElement;

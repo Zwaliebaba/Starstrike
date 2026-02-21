@@ -7,52 +7,35 @@
 #ifndef INCLUDED_NET_LIB_H
 #define INCLUDED_NET_LIB_H
 
-
-#ifdef __APPLE__
- #include "net_lib_apple.h"
-#endif
-
-#ifdef _WIN32
- #include "net_lib_win32.h"
-#endif
-
-#if (defined __linux__) 
- #include "net_lib_linux.h"
-#endif
+#include "net_lib_win32.h"
 
 #if (!defined MIN)
 #define MIN(a,b) ((a < b) ? a : b)
 #endif
 
-
-
 #define MAX_HOSTNAME_LEN   	256
 #define MAX_PACKET_SIZE  	512
 
-
-typedef struct sockaddr_in NetIpAddress;
-
+using NetIpAddress = struct sockaddr_in;
 
 enum NetRetCode
 {
-   NetFailed = -1,
-   NetOk,
-   NetTimedout,
-   NetBadArgs,
-   NetMoreData,
-   NetClientDisconnect,
-   NetNotSupported
+  NetFailed = -1,
+  NetOk,
+  NetTimedout,
+  NetBadArgs,
+  NetMoreData,
+  NetClientDisconnect,
+  NetNotSupported
 };
-
 
 class NetLib
 {
-public:
-	NetLib();
-	~NetLib();
+  public:
+    NetLib();
+    ~NetLib();
 
-	bool Initialise(); // Returns false on failure
+    bool Initialise(); // Returns false on failure
 };
-
 
 #endif

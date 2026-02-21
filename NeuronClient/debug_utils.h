@@ -18,8 +18,5 @@ void DarwiniaReleaseAssert(bool _condition, char const *_fmt, ...);
 	#define DarwiniaDebugAssert(x)
 #endif
 
-void PrintMemoryLeaks();
-void GenerateBlackBox( char *_msg );
-
 #endif
 

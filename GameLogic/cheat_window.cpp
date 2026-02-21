@@ -2,8 +2,8 @@
 #include "math_utils.h"
 #include "resource.h"
 
-#include "interface/cheat_window.h"
-#include "interface/debugmenu.h"
+#include "cheat_window.h"
+#include "debugmenu.h"
 
 #include "app.h"
 #include "global_world.h"

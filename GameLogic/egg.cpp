@@ -3,7 +3,7 @@
 #include "math_utils.h"
 #include "resource.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "egg.h"
 

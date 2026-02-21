@@ -2,7 +2,7 @@
 #ifndef _included_prefssoundwindow_h
 #define _included_prefssoundwindow_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class PrefsSoundWindow : public DarwiniaWindow

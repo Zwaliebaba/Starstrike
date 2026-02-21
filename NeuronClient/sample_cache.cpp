@@ -1,8 +1,8 @@
 #include "pch.h"
 
 #include "resource.h"
-#include "sound/sample_cache.h"
-#include "sound/sound_stream_decoder.h"
+#include "sample_cache.h"
+#include "sound_stream_decoder.h"
 #include "app.h"
 
 

@@ -2,7 +2,7 @@
 #ifndef _included_userprofilewindow_h
 #define _included_userprofilewindow_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class UserProfileWindow : public DarwiniaWindow

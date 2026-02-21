@@ -2,34 +2,22 @@
 #include "resource.h"
 #include "shape.h"
 #include "math_utils.h"
-#include "debug_render.h"
 #include "hi_res_time.h"
-#include "text_renderer.h"
-#include "preferences.h"
-#include "profiler.h"
-
 #include "input.h"
-#include "input_types.h"
-
 #include "officer.h"
 #include "teleport.h"
-
 #include "app.h"
 #include "location.h"
 #include "team.h"
 #include "renderer.h"
 #include "main.h"
-#include "taskmanager.h"
 #include "camera.h"
 #include "particle_system.h"
 #include "explosion.h"
 #include "obstruction_grid.h"
 #include "entity_grid.h"
-#include "user_input.h"
-#include "sepulveda.h"
 #include "global_world.h"
-
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 Officer::Officer()
@@ -573,134 +561,130 @@ void Officer::SetOrders( LegacyVector3 const &_orders )
 {
     static float lastOrderSet = 0.0f;
 
-    if( !g_app->m_location->IsWalkable( m_pos, _orders ) )
+    if( g_app->m_location->IsWalkable(m_pos, _orders) )
     {
-        g_app->m_sepulveda->Say( "officer_notwalkable" );
-    }
-    else
-    {
-        float distanceToOrders = ( _orders - m_pos ).Mag();
+      float distanceToOrders = ( _orders - m_pos ).Mag();
 
-        if( distanceToOrders > 20.0f )
+      if( distanceToOrders > 20.0f )
+      {
+        m_orderPosition = _orders;
+        m_orders = OrderGoto;
+        m_absorb = false;
+
+        //
+        // If there is a teleport nearby,
+        // assume he wants us to go in it
+
+        bool foundTeleport = false;
+
+        m_ordersBuildingId = -1;
+        LList<int> *nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings( m_orderPosition.x, m_orderPosition.z );
+        for( int i = 0; i < nearbyBuildings->Size(); ++i )
         {
-            m_orderPosition = _orders;
-            m_orders = OrderGoto;
-            m_absorb = false;
-
-            //
-            // If there is a teleport nearby,
-            // assume he wants us to go in it
-
-            bool foundTeleport = false;
-
-            m_ordersBuildingId = -1;
-            LList<int> *nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings( m_orderPosition.x, m_orderPosition.z );
-            for( int i = 0; i < nearbyBuildings->Size(); ++i )
+          int buildingId = nearbyBuildings->GetData(i);
+          Building *building = g_app->m_location->GetBuilding( buildingId );
+          if( building->m_type == Building::TypeRadarDish ||
+            building->m_type == Building::TypeBridge )
+          {
+            float distance = ( building->m_pos - _orders ).Mag();
+            if( distance < 5.0f )
             {
-                int buildingId = nearbyBuildings->GetData(i);
-                Building *building = g_app->m_location->GetBuilding( buildingId );
-                if( building->m_type == Building::TypeRadarDish ||
-                    building->m_type == Building::TypeBridge )
-                {
-                    float distance = ( building->m_pos - _orders ).Mag();
-                    if( distance < 5.0f )
-                    {
-                        Teleport *teleport = (Teleport *) building;
-                        m_ordersBuildingId = building->m_id.GetUniqueId();
-                        LegacyVector3 entrancePos, entranceFront;
-                        teleport->GetEntrance( entrancePos, entranceFront );
-                        m_orderPosition = entrancePos;
-                        foundTeleport = true;
-                        break;
-                    }
-                }
+              Teleport *teleport = (Teleport *) building;
+              m_ordersBuildingId = building->m_id.GetUniqueId();
+              LegacyVector3 entrancePos, entranceFront;
+              teleport->GetEntrance( entrancePos, entranceFront );
+              m_orderPosition = entrancePos;
+              foundTeleport = true;
+              break;
             }
-
-            if( !foundTeleport )
-            {
-                m_orderPosition = PushFromObstructions( m_orderPosition );
-            }
-
-
-            //
-            // Create the line using particles immediately,
-            // so the player can see what he's just done
-
-            float timeNow = GetHighResTime();
-            if( timeNow > lastOrderSet + 1.0f )
-            {
-                lastOrderSet = timeNow;
-                OfficerOrders orders;
-                orders.m_pos = m_pos;
-                orders.m_wayPoint = m_orderPosition;
-                while( true )
-                {
-                    if( orders.m_arrivedTimer < 0.0f )
-                    {
-                        g_app->m_particleSystem->CreateParticle( orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 50.0f );
-                        g_app->m_particleSystem->CreateParticle( orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 40.0f );
-                    }
-                    if( orders.Advance() ) break;
-                }
-
-                CancelOrderSounds();
-                g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderGoto" );
-            }
+          }
         }
-        else
+
+        if( !foundTeleport )
         {
-            float timeNow = GetHighResTime();
-            int researchLevel = g_app->m_globalWorld->m_research->CurrentLevel( GlobalResearch::TypeOfficer );
-
-            if( timeNow > lastOrderSet + 0.3f )
-            {
-                lastOrderSet = timeNow;
-
-                switch( researchLevel )
-                {
-                    case 0 :
-                    case 1 :
-                    case 2 :
-                        m_orders = OrderNone;
-                        break;
-
-                    case 3 :
-                        if      ( m_orders == OrderNone )       m_orders = OrderFollow;
-                        else if ( m_orders == OrderFollow )     m_orders = OrderNone;
-                        else if ( m_orders == OrderGoto )       m_orders = OrderNone;
-                        break;
-
-                    case 4 :
-                        if      ( m_orders == OrderNone )                   m_orders = OrderFollow;
-                        else if ( m_orders == OrderFollow && !m_absorb )
-                        {
-                            m_absorb = true;
-                            m_absorbTimer = 2.0f;
-                        }
-                        else if ( m_orders == OrderFollow && m_absorb )
-                        {
-                                                                            m_orders = OrderNone;
-                                                                            m_absorb = false;
-                        }
-                        else if ( m_orders == OrderGoto )                   m_orders = OrderNone;
-                        break;
-                }
-
-                CancelOrderSounds();
-
-                switch( m_orders )
-                {
-                    case OrderNone:     g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderNone" );       break;
-                    case OrderGoto:     g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderGoto" );       break;
-                    case OrderFollow:
-                        if( m_absorb )  g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderAbsorb" );
-                        else            g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderFollow" );
-                        break;
-                }
-
-                m_buildingId = -1;
-            }
+          m_orderPosition = PushFromObstructions( m_orderPosition );
         }
+
+
+        //
+        // Create the line using particles immediately,
+        // so the player can see what he's just done
+
+        float timeNow = GetHighResTime();
+        if( timeNow > lastOrderSet + 1.0f )
+        {
+          lastOrderSet = timeNow;
+          OfficerOrders orders;
+          orders.m_pos = m_pos;
+          orders.m_wayPoint = m_orderPosition;
+          while( true )
+          {
+            if( orders.m_arrivedTimer < 0.0f )
+            {
+              g_app->m_particleSystem->CreateParticle( orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 50.0f );
+              g_app->m_particleSystem->CreateParticle( orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 40.0f );
+            }
+            if( orders.Advance() ) break;
+          }
+
+          CancelOrderSounds();
+          g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderGoto" );
+        }
+      }
+      else
+      {
+        float timeNow = GetHighResTime();
+        int researchLevel = g_app->m_globalWorld->m_research->CurrentLevel( GlobalResearch::TypeOfficer );
+
+        if( timeNow > lastOrderSet + 0.3f )
+        {
+          lastOrderSet = timeNow;
+
+          switch( researchLevel )
+          {
+          case 0 :
+          case 1 :
+          case 2 :
+            m_orders = OrderNone;
+            break;
+
+          case 3 :
+            if      ( m_orders == OrderNone )       m_orders = OrderFollow;
+            else if ( m_orders == OrderFollow )     m_orders = OrderNone;
+            else if ( m_orders == OrderGoto )       m_orders = OrderNone;
+            break;
+
+          case 4 :
+            if      ( m_orders == OrderNone )                   m_orders = OrderFollow;
+            else if ( m_orders == OrderFollow && !m_absorb )
+            {
+              m_absorb = true;
+              m_absorbTimer = 2.0f;
+            }
+            else if ( m_orders == OrderFollow && m_absorb )
+            {
+              m_orders = OrderNone;
+              m_absorb = false;
+            }
+            else if ( m_orders == OrderGoto )                   m_orders = OrderNone;
+            break;
+          }
+
+          CancelOrderSounds();
+
+          switch( m_orders )
+          {
+          case OrderNone:     g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderNone" );       break;
+          case OrderGoto:     g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderGoto" );       break;
+          case OrderFollow:
+            if( m_absorb )  g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderAbsorb" );
+            else            g_app->m_soundSystem->TriggerEntityEvent( this, "SetOrderFollow" );
+            break;
+          }
+
+          m_buildingId = -1;
+        }
+      }
     }
 }
 

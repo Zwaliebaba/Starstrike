@@ -2,14 +2,9 @@
 #include "debug_utils.h"
 #include "math_utils.h"
 #include "profiler.h"
-
-#include "sound/soundsystem.h"
-#include "sound/sound_filter.h"
-
+#include "soundsystem.h"
+#include "sound_filter.h"
 #include "app.h"
-
-#include <string.h>
-
 
 //*****************************************************************************
 // Class DspResLowPass

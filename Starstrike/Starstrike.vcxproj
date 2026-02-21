@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level4</WarningLevel>
-      <LanguageStandard Condition="'$(VisualStudioVersion)' &gt;= '18.0'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(VisualStudioVersion)' &gt;= '18.0'">stdcpplatest</LanguageStandard>
       <LanguageStandard Condition="'$(VisualStudioVersion)' &lt; '18.0'">stdcpp17</LanguageStandard>
       <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
     </ClCompile>
@@ -86,6 +86,7 @@
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)NeuronCore;$(SolutionDir)NeuronClient;$(SolutionDir)GameLogic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
@@ -503,7 +504,6 @@
     <ClCompile Include="startsequence.cpp" />
     <ClCompile Include="taskmanager.cpp" />
     <ClCompile Include="taskmanager_interface.cpp" />
-    <ClCompile Include="taskmanager_interface_gestures.cpp" />
     <ClCompile Include="taskmanager_interface_icons.cpp" />
     <ClCompile Include="team.cpp" />
     <ClCompile Include="unit.cpp" />
@@ -540,7 +540,6 @@
     <ClInclude Include="startsequence.h" />
     <ClInclude Include="taskmanager.h" />
     <ClInclude Include="taskmanager_interface.h" />
-    <ClInclude Include="taskmanager_interface_gestures.h" />
     <ClInclude Include="taskmanager_interface_icons.h" />
     <ClInclude Include="team.h" />
     <ClInclude Include="unit.h" />

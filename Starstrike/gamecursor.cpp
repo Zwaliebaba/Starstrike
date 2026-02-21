@@ -23,10 +23,6 @@
 #include "unit.h"
 #include "camera.h"
 #include "location_input.h"
-#include "entity_grid.h"
-#include "sepulveda.h"
-
-#include "armour.h"
 #include "radardish.h"
 #include "insertion_squad.h"
 
@@ -289,7 +285,6 @@ void GameCursor::Render()
     mousePos.y = max( 1.0f, mousePos.y );
 
     bool cursorRendered = false;
-	bool chatLog = g_app->m_sepulveda->ChatLogVisible();
 
 	m_highlightingSomething = false;
 	m_validPlacementOpportunity = false;
@@ -302,10 +297,6 @@ void GameCursor::Render()
     if( g_app->m_editing || EclGetWindows()->Size() > 0 )
     {
         // Editing
-    }
-    else if( chatLog )
-    {
-        // Reading Sepulveda's history
     }
     else if( !g_app->m_camera->IsInteractive() )
     {

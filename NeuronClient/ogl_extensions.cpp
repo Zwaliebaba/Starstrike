@@ -1,89 +1,74 @@
 #include "pch.h"
 
 #if !defined USE_DIRECT3D
-#include "debug_utils.h"
 #include "ogl_extensions.h"
 
+MultiTexCoord2fARB gglMultiTexCoord2fARB = nullptr;
+ActiveTextureARB gglActiveTextureARB = nullptr;
 
-MultiTexCoord2fARB gglMultiTexCoord2fARB = NULL;
-ActiveTextureARB gglActiveTextureARB = NULL;
+glBindBufferARB gglBindBufferARB = nullptr;
+glDeleteBuffersARB gglDeleteBuffersARB = nullptr;
+glGenBuffersARB gglGenBuffersARB = nullptr;
+glIsBufferARB gglIsBufferARB = nullptr;
+glBufferDataARB gglBufferDataARB = nullptr;
+glBufferSubDataARB gglBufferSubDataARB = nullptr;
+glGetBufferSubDataARB gglGetBufferSubDataARB = nullptr;
+glMapBufferARB gglMapBufferARB = nullptr;
+glUnmapBufferARB gglUnmapBufferARB = nullptr;
+glGetBufferParameterivARB gglGetBufferParameterivARB = nullptr;
+glGetBufferPointervARB gglGetBufferPointervARB = nullptr;
 
-glBindBufferARB				gglBindBufferARB = NULL;
-glDeleteBuffersARB			gglDeleteBuffersARB = NULL;
-glGenBuffersARB				gglGenBuffersARB = NULL;
-glIsBufferARB				gglIsBufferARB = NULL;
-glBufferDataARB				gglBufferDataARB = NULL;
-glBufferSubDataARB			gglBufferSubDataARB = NULL;
-glGetBufferSubDataARB		gglGetBufferSubDataARB = NULL;
-glMapBufferARB				gglMapBufferARB = NULL;
-glUnmapBufferARB			gglUnmapBufferARB = NULL;
-glGetBufferParameterivARB	gglGetBufferParameterivARB = NULL;
-glGetBufferPointervARB		gglGetBufferPointervARB = NULL;
-
-ChoosePixelFormatARB gglChoosePixelFormatARB = NULL;
+ChoosePixelFormatARB gglChoosePixelFormatARB = nullptr;
 
 void InitialiseOGLExtensions()
 {
-//	char const *extensions = (char const *)glGetString(GL_EXTENSIONS);
-//	int len = strlen(extensions);
-//	char *c = new char[len];
-//	memcpy(c, extensions, len);
-//	extensions = c;
-//
-//	while(*c)
-//	{
-//		if (*c == ' ') *c = '\n';
-//		++c;
-//	}
-//
-//	FILE *out = fopen("blah.txt", "w");
-//	fprintf(out, "%s\n", extensions);
-//	fclose(out);
+  gglMultiTexCoord2fARB = reinterpret_cast<MultiTexCoord2fARB>(wglGetProcAddress("glMultiTexCoord2fARB"));
+  gglActiveTextureARB = reinterpret_cast<ActiveTextureARB>(wglGetProcAddress("glActiveTextureARB"));
 
-    gglMultiTexCoord2fARB = (MultiTexCoord2fARB)wglGetProcAddress("glMultiTexCoord2fARB");
-    gglActiveTextureARB = (ActiveTextureARB)wglGetProcAddress("glActiveTextureARB");
+  gglBindBufferARB = reinterpret_cast<glBindBufferARB>(wglGetProcAddress("glBindBufferARB"));
+  gglDeleteBuffersARB = reinterpret_cast<glDeleteBuffersARB>(wglGetProcAddress("glDeleteBuffersARB"));
+  gglGenBuffersARB = reinterpret_cast<glGenBuffersARB>(wglGetProcAddress("glGenBuffersARB"));
+  gglIsBufferARB = reinterpret_cast<glIsBufferARB>(wglGetProcAddress("glIsBufferARB"));
+  gglBufferDataARB = reinterpret_cast<glBufferDataARB>(wglGetProcAddress("glBufferDataARB"));
+  gglBufferSubDataARB = reinterpret_cast<glBufferSubDataARB>(wglGetProcAddress("glBufferSubDataARB"));
+  gglGetBufferSubDataARB = reinterpret_cast<glGetBufferSubDataARB>(wglGetProcAddress("glGetBufferSubDataARB"));
+  gglMapBufferARB = reinterpret_cast<glMapBufferARB>(wglGetProcAddress("glMapBufferARB"));
+  gglUnmapBufferARB = reinterpret_cast<glUnmapBufferARB>(wglGetProcAddress("glUnmapBufferARB"));
+  gglGetBufferParameterivARB = reinterpret_cast<glGetBufferParameterivARB>(wglGetProcAddress("glGetBufferParameterivARB"));
+  gglGetBufferPointervARB = reinterpret_cast<glGetBufferPointervARB>(wglGetProcAddress("glGetBufferPointervARB"));
 
-	gglBindBufferARB			= (glBindBufferARB)				wglGetProcAddress("glBindBufferARB");
-	gglDeleteBuffersARB			= (glDeleteBuffersARB)			wglGetProcAddress("glDeleteBuffersARB");
-	gglGenBuffersARB			= (glGenBuffersARB)				wglGetProcAddress("glGenBuffersARB");
-	gglIsBufferARB				= (glIsBufferARB)				wglGetProcAddress("glIsBufferARB");
-	gglBufferDataARB			= (glBufferDataARB)				wglGetProcAddress("glBufferDataARB");
-	gglBufferSubDataARB			= (glBufferSubDataARB)			wglGetProcAddress("glBufferSubDataARB");
-	gglGetBufferSubDataARB		= (glGetBufferSubDataARB)		wglGetProcAddress("glGetBufferSubDataARB");
-	gglMapBufferARB				= (glMapBufferARB)				wglGetProcAddress("glMapBufferARB");
-	gglUnmapBufferARB			= (glUnmapBufferARB)			wglGetProcAddress("glUnmapBufferARB");
-	gglGetBufferParameterivARB	= (glGetBufferParameterivARB)	wglGetProcAddress("glGetBufferParameterivARB");
-	gglGetBufferPointervARB		= (glGetBufferPointervARB)		wglGetProcAddress("glGetBufferPointervARB");
-
-    gglChoosePixelFormatARB = (ChoosePixelFormatARB)wglGetProcAddress("wglChoosePixelFormatARB");
+  gglChoosePixelFormatARB = reinterpret_cast<ChoosePixelFormatARB>(wglGetProcAddress("wglChoosePixelFormatARB"));
 }
 
-int IsOGLExtensionSupported(const char *extension)
+int IsOGLExtensionSupported(const char* extension)
 {
-	// From http://www.opengl.org/resources/features/OGLextensions/
-	const GLubyte *extensions = NULL;
-	const GLubyte *start;
-	GLubyte *where, *terminator;
+  // From http://www.opengl.org/resources/features/OGLextensions/
+  const GLubyte* extensions = nullptr;
+  const GLubyte* start;
+  GLubyte *where, *terminator;
 
-	/* Extension names should not have spaces. */
-	where = (GLubyte *) strchr(extension, ' ');
-	if (where || *extension == '\0')
-		return 0;
-	extensions = glGetString(GL_EXTENSIONS);
-	/* It takes a bit of care to be fool-proof about parsing the
-	   OpenGL extensions string. Don't be fooled by sub-strings,
-	   etc. */
-	start = extensions;
-	for (;;) {
-		where = (GLubyte *) strstr((const char *) start, extension);
-		if (!where)
-			break;
-		terminator = where + strlen(extension);
-		if (where == start || *(where - 1) == ' ')
-		if (*terminator == ' ' || *terminator == '\0')
-			return 1;
-		start = terminator;
-	}
-	return 0;
+  /* Extension names should not have spaces. */
+  where = (GLubyte*)strchr(extension, ' ');
+  if (where || *extension == '\0')
+    return 0;
+  extensions = glGetString(GL_EXTENSIONS);
+  /* It takes a bit of care to be fool-proof about parsing the
+     OpenGL extensions string. Don't be fooled by sub-strings,
+     etc. */
+  start = extensions;
+  for (;;)
+  {
+    where = (GLubyte*)strstr((const char*)start, extension);
+    if (!where)
+      break;
+    terminator = where + strlen(extension);
+    if (where == start || *(where - 1) == ' ')
+    {
+      if (*terminator == ' ' || *terminator == '\0')
+        return 1;
+    }
+    start = terminator;
+  }
+  return 0;
 }
 #endif // !defined USE_DIRECT3D

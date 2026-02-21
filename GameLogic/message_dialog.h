@@ -2,7 +2,7 @@
 #define INCLUDED_MESSAGE_DIALOG_H
 
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 class MessageDialog : public DarwiniaWindow
 {

@@ -3,6 +3,7 @@
 #define TARGET_MSVC
 #define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
 #if defined (_DEBUG) 
 #define PROFILER_ENABLED
@@ -49,8 +50,8 @@
 
 // DirectX apps don't need GDI
 #define NODRAWTEXT
-#define NOGDI
-#define NOBITMAP
+//#define NOGDI
+//#define NOBITMAP
 
 // Include <mcx.h> if you need this
 #define NOMCX
@@ -62,7 +63,7 @@
 #define NOHELP
 
 #if !defined WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 #endif
 
 #include <winsock2.h>

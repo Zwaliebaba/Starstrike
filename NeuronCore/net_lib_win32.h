@@ -1,17 +1,10 @@
 #ifndef INCLUDED_NET_LIB_WIN32_H
 #define INCLUDED_NET_LIB_WIN32_H
 
-
-#include <winsock2.h>
-#include <windows.h>
-
-
 class NetUdpPacket;
 
-
-typedef unsigned long (WINAPI *NetCallBack)(NetUdpPacket *data);
-typedef unsigned long (WINAPI *NetThreadFunc)(void *ptr);
-
+using NetCallBack = unsigned long(WINAPI *)(NetUdpPacket* data);
+using NetThreadFunc = unsigned long(WINAPI *)(void* ptr);
 
 // Define portable names for Win32 functions
 #define NetGetLastError() 			WSAGetLastError()
@@ -41,6 +34,5 @@ typedef unsigned long (WINAPI *NetThreadFunc)(void *ptr);
 #define NetIsBlockingError(a) 		((a == WSAEALREADY) || (a == WSAEWOULDBLOCK) || (a == WSAEINVAL))
 #define NetIsConnected(a) 			(a == WSAEISCONN)
 #define NetIsReset(a) 				((a == WSAECONNRESET) || (a == WSAESHUTDOWN))
-
 
 #endif

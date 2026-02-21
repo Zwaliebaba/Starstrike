@@ -1,8 +1,6 @@
 #ifndef MATHUTILS_H
 #define MATHUTILS_H
 
-#include <stdlib.h>
-
 #include "random.h"
 
 class LegacyVector3;
@@ -10,13 +8,17 @@ class Vector2;
 class Matrix34;
 class Plane;
 
-inline float frand(float range = 1.0f) { return range * ((float)darwiniaRandom() / (float)DARWINIA_RAND_MAX); }
-inline float sfrand(float range = 1.0f) { return (0.5f - (float)darwiniaRandom() / (float)(DARWINIA_RAND_MAX)) * range; }
+inline float frand(float range = 1.0f) { return range * (static_cast<float>(darwiniaRandom()) / static_cast<float>(DARWINIA_RAND_MAX)); }
+
+inline float sfrand(float range = 1.0f)
+{
+  return (0.5f - static_cast<float>(darwiniaRandom()) / static_cast<float>((DARWINIA_RAND_MAX))) * range;
+}
 
 // Network Syncronised versions (only call inside Net-Safe code)
 unsigned long syncrand();
-inline float syncfrand( float range = 1.0f ) { return syncrand()*(range/4294967296.0f); }
-inline float syncsfrand( float range = 1.0f ) { return (syncfrand() - 0.5f) * range; }
+inline float syncfrand(float range = 1.0f) { return syncrand() * (range / 4294967296.0f); }
+inline float syncsfrand(float range = 1.0f) { return (syncfrand() - 0.5f) * range; }
 
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626f
@@ -33,34 +35,13 @@ inline float syncsfrand( float range = 1.0f ) { return (syncfrand() - 0.5f) * ra
 #define sign(a)				((a) < 0 ? -1 : 1)
 #define signf(a)			((a) < 0.0f ? -1.0f : 1.0f)
 
-
 // Performs fast float to int conversion. It may round up or down, depending on
 // the current CPU rounding mode - so DON'T USE IT if you want repeatable results
-//#ifdef _DEBUG
-	#define Round(a) (int)(a)
-//#else
-//	#define Round(a) RoundFunc(a)
-//	inline int RoundFunc(float a)
-//	{
-//		int retval;
-//
-//		__asm
-//		{
-//			fld a
-//	//		fist retval
-//			fistp retval
-//		}
-//
-//		return retval;
-//	}
-//#endif
-
+#define Round(a) (int)(a)
 
 #define clamp(a, low, high)	if (a>high) a = high; else if (a<low) a = low;
 
 #define NearlyEquals(a, b)	(fabsf((a) - (b)) < 1e-6 ? 1 : 0)
-
-float Log2(float x);
 
 #define ASSERT_FLOAT_IS_SANE(x) \
 	DarwiniaDebugAssert((x + 1.0f) != x);
@@ -75,64 +56,56 @@ float Log2(float x);
 // fractional distance along the route. Used in the camera MoveToTarget routine.
 double RampUpAndDown(double _startTime, double _duration, double _timeNow);
 
-
 // **********************
 // General Geometry Utils
 // **********************
 
-void GetPlaneMatrix(LegacyVector3 const &t1, LegacyVector3 const &t2, LegacyVector3 const &t3, Matrix34 *mat);
-float ProjectPointOntoPlane(LegacyVector3 const &point, Matrix34 const &planeMat, LegacyVector3 *result);
-void ConvertWorldSpaceIntoPlaneSpace(LegacyVector3 const &point, Matrix34 const &plane, Vector2 *result);
-void ConvertPlaneSpaceIntoWorldSpace(Vector2 const &point, Matrix34 const &plane, LegacyVector3 *result);
-float CalcTriArea(Vector2 const &t1, Vector2 const &t2, Vector2 const &t3);
-
+void GetPlaneMatrix(const LegacyVector3& t1, const LegacyVector3& t2, const LegacyVector3& t3, Matrix34* mat);
+float ProjectPointOntoPlane(const LegacyVector3& point, const Matrix34& planeMat, LegacyVector3* result);
+void ConvertWorldSpaceIntoPlaneSpace(const LegacyVector3& point, const Matrix34& plane, Vector2* result);
+void ConvertPlaneSpaceIntoWorldSpace(const Vector2& point, const Matrix34& plane, LegacyVector3* result);
+float CalcTriArea(const Vector2& t1, const Vector2& t2, const Vector2& t3);
 
 // *********************
 // 2D Intersection Tests
 // *********************
 
-bool IsPointInTriangle(Vector2 const &pos, Vector2 const &t1, Vector2 const &t2, Vector2 const &t3);
-float PointSegDist2D(Vector2 const &p,	// Point
-				     Vector2 const &l0, Vector2 const &l1, // Line seg
-				     Vector2 *result=NULL);
-bool SegRayIntersection2D(Vector2 const &_lineStart, Vector2 const &_lineEnd,
-						  Vector2 const &_rayStart, Vector2 const &_rayDir,
-                          Vector2 *_result = NULL);
+bool IsPointInTriangle(const Vector2& pos, const Vector2& t1, const Vector2& t2, const Vector2& t3);
+float PointSegDist2D(const Vector2& p, // Point
+                     const Vector2& l0, const Vector2& l1, // Line seg
+                     Vector2* result = nullptr);
+bool SegRayIntersection2D(const Vector2& _lineStart, const Vector2& _lineEnd, const Vector2& _rayStart, const Vector2& _rayDir,
+                          Vector2* _result = nullptr);
 
 // *********************
 // 3D Intersection Tests
 // *********************
 
-float RayRayDist(LegacyVector3 const &a, LegacyVector3 const &aDir,
-				 LegacyVector3 const &b, LegacyVector3 const &bDir,
-				 LegacyVector3 *posOnA=NULL, LegacyVector3 *posOnB=NULL);
+float RayRayDist(const LegacyVector3& a, const LegacyVector3& aDir, const LegacyVector3& b, const LegacyVector3& bDir,
+                 LegacyVector3* posOnA = nullptr, LegacyVector3* posOnB = nullptr);
 
-float RaySegDist(LegacyVector3 const &pointOnLine, LegacyVector3 const &lineDir,
-				 LegacyVector3 const &segStart, LegacyVector3 const &segEnd,
-				 LegacyVector3 *posOnRay=NULL, LegacyVector3 *posInSeg=NULL);
+float RaySegDist(const LegacyVector3& pointOnLine, const LegacyVector3& lineDir, const LegacyVector3& segStart, const LegacyVector3& segEnd,
+                 LegacyVector3* posOnRay = nullptr, LegacyVector3* posInSeg = nullptr);
 
-bool RayTriIntersection         (LegacyVector3 const &orig, LegacyVector3 const &dir,
-						         LegacyVector3 const &vert0, LegacyVector3 const &vert1, LegacyVector3 const &vert2,
-						         float _rayLen=1e10, LegacyVector3 *result=NULL);
+bool RayTriIntersection(const LegacyVector3& orig, const LegacyVector3& dir, const LegacyVector3& vert0, const LegacyVector3& vert1,
+                        const LegacyVector3& vert2, float _rayLen = 1e10, LegacyVector3* result = nullptr);
 
-int RayPlaneIntersection(LegacyVector3 const &pOnLine, LegacyVector3 const &lineDir,
-						 Plane const &plane, LegacyVector3 *intersectionPoint=NULL);
+int RayPlaneIntersection(const LegacyVector3& pOnLine, const LegacyVector3& lineDir, const Plane& plane,
+                         LegacyVector3* intersectionPoint = nullptr);
 //bool RayPlaneIntersection       (LegacyVector3 const &rayStart, LegacyVector3 const &rayDir,
 //                                  LegacyVector3 const &planePos, LegacyVector3 const &planeNormal,
 //						         float _rayLen=1e10, LegacyVector3 *pos=NULL );
 
-bool RaySphereIntersection      ( LegacyVector3 const &rayStart, LegacyVector3 const &rayDir,
-	                              LegacyVector3 const &spherePos, float sphereRadius,
-			                      float _rayLen=1e10, LegacyVector3 *pos=NULL, LegacyVector3 *normal=NULL );
+bool RaySphereIntersection(const LegacyVector3& rayStart, const LegacyVector3& rayDir, const LegacyVector3& spherePos, float sphereRadius,
+                           float _rayLen = 1e10, LegacyVector3* pos = nullptr, LegacyVector3* normal = nullptr);
 
-bool SphereSphereIntersection   ( LegacyVector3 const &_sphere1Pos, float _sphere1Radius,
-                                  LegacyVector3 const &_sphere2Pos, float _sphere2Radius );
+bool SphereSphereIntersection(const LegacyVector3& _sphere1Pos, float _sphere1Radius, const LegacyVector3& _sphere2Pos,
+                              float _sphere2Radius);
 
-bool SphereTriangleIntersection(LegacyVector3 const &sphereCentre, float sphereRadius,
-								LegacyVector3 const &t1, LegacyVector3 const &t2, LegacyVector3 const &t3);
+bool SphereTriangleIntersection(const LegacyVector3& sphereCentre, float sphereRadius, const LegacyVector3& t1, const LegacyVector3& t2,
+                                const LegacyVector3& t3);
 
-bool TriTriIntersection(LegacyVector3 const &v0, LegacyVector3 const &v1, LegacyVector3 const &v2,
-						LegacyVector3 const &u0, LegacyVector3 const &u1, LegacyVector3 const &u2);
+bool TriTriIntersection(const LegacyVector3& v0, const LegacyVector3& v1, const LegacyVector3& v2, const LegacyVector3& u0,
+                        const LegacyVector3& u1, const LegacyVector3& u2);
 
 #endif
-

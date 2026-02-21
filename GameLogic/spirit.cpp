@@ -14,7 +14,7 @@
 #include "team.h"
 #include "global_world.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "spirit.h"
 #include "virii.h"

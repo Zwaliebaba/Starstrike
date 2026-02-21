@@ -13,7 +13,7 @@
 #define _included_scrollbar_h
 
 #include "eclipse.h"
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class ScrollBar

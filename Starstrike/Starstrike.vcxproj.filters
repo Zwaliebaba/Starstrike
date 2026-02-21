@@ -442,7 +442,6 @@
     <ClCompile Include="startsequence.cpp" />
     <ClCompile Include="taskmanager.cpp" />
     <ClCompile Include="taskmanager_interface.cpp" />
-    <ClCompile Include="taskmanager_interface_gestures.cpp" />
     <ClCompile Include="taskmanager_interface_icons.cpp" />
     <ClCompile Include="team.cpp" />
     <ClCompile Include="unit.cpp" />
@@ -480,7 +479,6 @@
     <ClInclude Include="startsequence.h" />
     <ClInclude Include="taskmanager.h" />
     <ClInclude Include="taskmanager_interface.h" />
-    <ClInclude Include="taskmanager_interface_gestures.h" />
     <ClInclude Include="taskmanager_interface_icons.h" />
     <ClInclude Include="team.h" />
     <ClInclude Include="unit.h" />

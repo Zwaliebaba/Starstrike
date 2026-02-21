@@ -1,40 +1,25 @@
 #include "pch.h"
-#include "hi_res_time.h"
-
 #include "limits.h"
-
-#include "bitmap.h"
 #include "debug_utils.h"
 #include "math_utils.h"
 #include "resource.h"
 #include "shape.h"
-#include "debug_render.h"
-#include "text_renderer.h"
-#include "rgb_colour.h"
-
 #include "input.h"
 #include "input_types.h"
-
 #include "app.h"
 #include "camera.h"
 #include "explosion.h"
 #include "location.h"
 #include "renderer.h"
 #include "team.h"
-#include "user_input.h"
 #include "taskmanager.h"
 #include "routing_system.h"
-#include "helpsystem.h"
 #include "particle_system.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "main.h"
-#include "gamecursor.h"
-
 #include "global_world.h"
-
-#include "sound/soundsystem.h"
-
+#include "soundsystem.h"
 #include "insertion_squad.h"
 #include "teleport.h"
 
@@ -728,7 +713,6 @@ void Squadie::FireSecondaryWeapon( LegacyVector3 const &_pos )
         {
             case GlobalResearch::TypeGrenade:
                 g_app->m_soundSystem->TriggerEntityEvent( this, "ThrowGrenade" );
-                g_app->m_helpSystem->PlayerDoneAction( HelpSystem::SquadThrowGrenade );
                 g_app->m_location->ThrowWeapon( laserPos, _pos, EffectThrowableGrenade, m_id.GetTeamId() );
                 m_secondaryTimer = 4.0f;
                 break;

@@ -1,42 +1,14 @@
 #ifndef INCLUDED_FILESYS_UTILS
 #define INCLUDED_FILESYS_UTILS
 
-#include <stdio.h>
+std::vector<std::string> ListDirectory(const char* _dir, const char* _filter, bool fullFilename = true);
+std::vector<std::string> ListSubDirectoryNames(const char* _dir);
 
-#include "llist.h"
+bool DoesFileExist(const char* _fullPath);
 
-
-//*****************************************************************************
-// Misc directory and filename functions
-//*****************************************************************************
-
-LList <char *> *ListDirectory           (char const *_dir, char const *_filter, bool fullFilename = true);
-LList <char *> *ListSubDirectoryNames   (char const *_dir);
-
-bool DoesFileExist(char const *_fullPath);
-
-char const *GetDirectoryPart    (char const *_fullFilePath);
-char const *GetFilenamePart     (char const *_fullFilePath);
-char const *GetExtensionPart    (char const *_fileFilePath);
-char const *RemoveExtension     (char const *_fullFileName);
-
-bool AreFilesIdentical          (char const *_name1, char const *_name2);
-
-bool CreateDirectory            (char const *_directory);
-void DeleteThisFile             (char const *_filename);
-
-
-class EncryptedFileWriter
-{
-protected:
-	int m_offsetIndex;
-	FILE *m_out;
-
-public:
-	EncryptedFileWriter(char const *_name);
-	~EncryptedFileWriter();
-
-	void WriteLine(char *_line);	// _line gets modified
-};
+const char* GetDirectoryPart(const char* _fullFilePath);
+const char* GetFilenamePart(const char* _fullFilePath);
+const char* GetExtensionPart(const char* _fileFilePath);
+const char* RemoveExtension(const char* _fullFileName);
 
 #endif

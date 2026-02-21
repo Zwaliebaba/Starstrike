@@ -6,7 +6,7 @@
 #include "preferences.h"
 #include "system_info.h"
 
-#include "sound/sound_library_2d.h"
+#include "sound_library_2d.h"
 
 
 static HWAVEOUT	s_device;
@@ -15,7 +15,7 @@ SoundLibrary2d *g_soundLibrary2d = NULL;
 
 #include "app.h"
 #include "hi_res_time.h"
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 //*****************************************************************************
@@ -97,7 +97,7 @@ SoundLibrary2d::SoundLibrary2d()
 	format.wBitsPerSample = 16;
 	format.nBlockAlign = 4;		// 2 channels * 2 bytes per sample
 	format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
-	int result = waveOutOpen(&s_device, WAVE_MAPPER, &format, (DWORD)&WaveOutProc, 0, CALLBACK_FUNCTION);
+	int result = waveOutOpen(&s_device, WAVE_MAPPER, &format, (DWORD_PTR)&WaveOutProc, 0, CALLBACK_FUNCTION);
 	char const *errString = NULL;
 	switch (result)
 	{

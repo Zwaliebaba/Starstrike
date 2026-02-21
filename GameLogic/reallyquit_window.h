@@ -1,7 +1,7 @@
 #ifndef _included_reallyquit_window_h
 #define _included_reallyquit_window_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 #define REALLYQUIT_WINDOWNAME "Really Quit?"
 

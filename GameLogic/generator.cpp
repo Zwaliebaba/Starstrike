@@ -28,7 +28,7 @@
 #include "entity_grid.h"
 #include "user_input.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 // ****************************************************************************

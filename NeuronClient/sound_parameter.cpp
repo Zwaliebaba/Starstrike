@@ -7,7 +7,7 @@
 #include "math_utils.h"
 #include "text_stream_readers.h"
 
-#include "sound/sound_parameter.h"
+#include "sound_parameter.h"
 
 
 SoundParameter::SoundParameter()

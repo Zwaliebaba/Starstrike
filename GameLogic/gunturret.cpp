@@ -28,7 +28,7 @@
 #include "darwinian.h"
 #include "ai.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 GunTurret::GunTurret()

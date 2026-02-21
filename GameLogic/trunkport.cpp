@@ -11,7 +11,7 @@
 
 #include "trunkport.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "app.h"
 #include "team.h"

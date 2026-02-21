@@ -18,7 +18,7 @@
 #include "particle_system.h"
 #include "renderer.h"
 #include "team.h"
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "virii.h"
 #include "egg.h"

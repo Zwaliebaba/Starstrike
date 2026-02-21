@@ -26,7 +26,7 @@
 
 #include "clienttoserver.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "building.h"
 #include "laserfence.h"

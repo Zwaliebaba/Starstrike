@@ -21,7 +21,7 @@
 #include "global_world.h"
 #include "unit.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "radardish.h"
 

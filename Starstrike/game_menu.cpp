@@ -1,27 +1,15 @@
 #include "pch.h"
-
-#include "hi_res_time.h"
-#include "input.h"
-#include "keydefs.h"
 #include "language_table.h"
-#include "preferences.h"
 #include "resource.h"
-#include "targetcursor.h"
 #include "text_renderer.h"
 #include "text_stream_readers.h"
-
-#include "interface/drop_down_menu.h"
-#include "interface/input_field.h"
-
+#include "drop_down_menu.h"
+#include "input_field.h"
 #include "game_menu.h"
-
 #include "app.h"
 #include "camera.h"
-#include "demoendsequence.h"
-#include "global_world.h"
 #include "global_internet.h"
 #include "renderer.h"
-#include "tutorial.h"
 
 // *************************
 // Button Classes
@@ -294,26 +282,6 @@ void GameMenu::CreateMenu()
     g_app->m_camera->SetDebugMode(Camera::DebugModeNever);
     g_app->m_camera->SetTarget(LegacyVector3(-900000, 3000000, 397000), LegacyVector3(0,0.5f,-1));
     g_app->m_camera->CutToTarget();
-
-    if( g_app->m_tutorial )
-    {
-        // its possible that the player has loaded the prologue, then returned to the main menu
-        // if so, delete the tutorial
-        delete g_app->m_tutorial;
-        g_app->m_tutorial = NULL;
-    }
-
-    if( g_app->m_demoEndSequence )
-    {
-        delete g_app->m_demoEndSequence;
-        g_app->m_demoEndSequence = NULL;
-    }
-
-    /*if( g_app->m_multiwinia )
-    {
-        delete g_app->m_multiwinia;
-        g_app->m_multiwinia = NULL;
-    }*/
 
     g_app->m_gameMode = App::GameModeNone;
 

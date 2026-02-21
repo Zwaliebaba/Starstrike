@@ -14,7 +14,7 @@
 #include "entity_leg.h"
 #include "spider.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "app.h"
 #include "entity_grid.h"

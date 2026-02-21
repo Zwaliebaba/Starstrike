@@ -10,18 +10,14 @@
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "language_table.h"
-
 #include "app.h"
 #include "camera.h"
 #include "location.h"
 #include "entity_grid.h"
 #include "team.h"
-#include "location_editor.h"
 #include "global_world.h"
 #include "main.h"
-
 #include "spawnpoint.h"
-#include "darwinian.h"
 
 
 SpawnBuilding::SpawnBuilding()

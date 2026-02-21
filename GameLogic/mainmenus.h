@@ -2,7 +2,7 @@
 #ifndef _included_mainmenus_h
 #define _included_mainmenus_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class MainMenuWindow : public DarwiniaWindow

@@ -21,9 +21,6 @@
     <ClInclude Include="sound_library_3d_dsound.h">
       <Filter>Audio</Filter>
     </ClInclude>
-    <ClInclude Include="sound_library_3d_software.h">
-      <Filter>Audio</Filter>
-    </ClInclude>
     <ClInclude Include="sound_parameter.h">
       <Filter>Audio</Filter>
     </ClInclude>
@@ -58,13 +55,6 @@
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
     <ClInclude Include="ogl_extensions.h" />
-    <ClInclude Include="opengl_directx.h" />
-    <ClInclude Include="opengl_directx_dlist.h" />
-    <ClInclude Include="opengl_directx_dlist_dev.h" />
-    <ClInclude Include="opengl_directx_inline.h" />
-    <ClInclude Include="opengl_directx_internals.h" />
-    <ClInclude Include="opengl_directx_matrix_stack.h" />
-    <ClInclude Include="opengl_trace.h" />
     <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
@@ -209,16 +199,10 @@
     <ClCompile Include="sound_library_2d.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
-    <ClCompile Include="sound_library_2d_nosnd.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
     <ClCompile Include="sound_library_3d.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="sound_library_3d_dsound.cpp">
-      <Filter>Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="sound_library_3d_software.cpp">
       <Filter>Audio</Filter>
     </ClCompile>
     <ClCompile Include="sound_parameter.cpp">
@@ -247,13 +231,6 @@
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
     <ClCompile Include="ogl_extensions.cpp" />
-    <ClCompile Include="ogl_extensions_directx.cpp" />
-    <ClCompile Include="opengl_directx.cpp" />
-    <ClCompile Include="opengl_directx_dlist.cpp" />
-    <ClCompile Include="opengl_directx_dlist_dev.cpp" />
-    <ClCompile Include="opengl_directx_matrix_stack.cpp" />
-    <ClCompile Include="opengl_directx_stubs.cpp" />
-    <ClCompile Include="opengl_trace.cpp" />
     <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />

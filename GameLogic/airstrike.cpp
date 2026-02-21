@@ -12,7 +12,7 @@
 #include "renderer.h"
 #include "camera.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 AirstrikeUnit::AirstrikeUnit(int teamId, int unitId, int numEntities, LegacyVector3 const &_pos)

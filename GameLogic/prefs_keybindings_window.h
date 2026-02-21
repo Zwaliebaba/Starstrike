@@ -4,7 +4,7 @@
 
 #include "auto_vector.h"
 #include "input.h"
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 typedef auto_vector<InputDescription> InputDescList;

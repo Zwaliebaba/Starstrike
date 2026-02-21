@@ -20,7 +20,7 @@
 #include "particle_system.h"
 #include "user_input.h"
 #include "renderer.h"
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 #include "team.h"
 #include "unit.h"
 #include "location.h"

@@ -22,7 +22,7 @@
 #include "taskmanager.h"
 #include "taskmanager_interface.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 ResearchItem::ResearchItem()

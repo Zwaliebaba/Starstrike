@@ -30,7 +30,7 @@
 #include "taskmanager.h"
 #include "gamecursor.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "mine.h"
 #include "constructionyard.h"

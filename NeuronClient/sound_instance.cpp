@@ -7,11 +7,11 @@
 #include "random.h"
 #include "preferences.h"
 
-#include "sound/sample_cache.h"
-#include "sound/sound_instance.h"
-#include "sound/soundsystem.h"
-#include "sound/sound_stream_decoder.h"
-#include "sound/sound_library_3d.h"
+#include "sample_cache.h"
+#include "sound_instance.h"
+#include "soundsystem.h"
+#include "sound_stream_decoder.h"
+#include "sound_library_3d.h"
 
 #include "app.h"
 #include "camera.h"

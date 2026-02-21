@@ -28,7 +28,7 @@
 #include "camera.h"
 #include "main.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "incubator.h"
 #include "controltower.h"

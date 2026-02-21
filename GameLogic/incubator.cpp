@@ -15,7 +15,7 @@
 #include "global_world.h"
 #include "camera.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "incubator.h"
 

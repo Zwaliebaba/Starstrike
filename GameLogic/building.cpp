@@ -27,7 +27,7 @@
 #include "particle_system.h"
 #include "explosion.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 #include "clienttoserver.h"
 

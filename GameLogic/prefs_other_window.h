@@ -2,7 +2,7 @@
 #ifndef _included_prefsotherwindow_h
 #define _included_prefsotherwindow_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class PrefsOtherWindow : public DarwiniaWindow

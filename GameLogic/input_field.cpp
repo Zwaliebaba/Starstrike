@@ -18,7 +18,7 @@
 #include "globals.h"
 #include "main.h"
 
-#include "interface/input_field.h"
+#include "input_field.h"
 
 
 #define PIXELS_PER_CHAR	7

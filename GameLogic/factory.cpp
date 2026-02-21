@@ -13,7 +13,7 @@
 #include "main.h"
 #include "location.h"
 #include "renderer.h"
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 #include "team.h"
 #include "unit.h"
 

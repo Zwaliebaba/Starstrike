@@ -2,7 +2,7 @@
 #ifndef _included_prefsgraphicswindow_h
 #define _included_prefsgraphicswindow_h
 
-#include "interface/darwinia_window.h"
+#include "darwinia_window.h"
 
 
 class PrefsGraphicsWindow : public DarwiniaWindow

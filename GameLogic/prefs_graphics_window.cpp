@@ -5,8 +5,8 @@
 #include "resource.h"
 #include "language_table.h"
 
-#include "interface/prefs_graphics_window.h"
-#include "interface/drop_down_menu.h"
+#include "prefs_graphics_window.h"
+#include "drop_down_menu.h"
 
 #include "app.h"
 #include "renderer.h"

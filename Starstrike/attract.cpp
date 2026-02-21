@@ -34,7 +34,6 @@ void AttractMode::Advance()
 void AttractMode::StartAttractMode()
 {
 	strcpy( m_userProfile, g_app->m_userProfileName );
-	g_app->SaveProfile(true, true);
 	g_app->SetProfileName( "AttractMode" );
     g_app->m_taskManagerInterface->m_lockTaskManager = true;
 	if( g_app->LoadProfile() )

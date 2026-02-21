@@ -29,7 +29,7 @@
 #include "renderer.h"
 #include "taskmanager_interface.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 Shape *FuelBuilding::s_fuelPipe = NULL;

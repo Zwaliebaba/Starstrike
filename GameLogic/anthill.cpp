@@ -21,7 +21,7 @@
 #include "darwinian.h"
 #include "spawnpoint.h"
 
-#include "sound/soundsystem.h"
+#include "soundsystem.h"
 
 
 AntHill::AntHill()

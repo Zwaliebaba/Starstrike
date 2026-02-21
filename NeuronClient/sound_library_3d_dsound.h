@@ -2,7 +2,7 @@
 #define INCLUDED_SOUND_LIBRARY_3D_DSOUND_H
 
 
-#include "sound/sound_library_3d.h"
+#include "sound_library_3d.h"
 
 
 class DirectSoundChannel;
