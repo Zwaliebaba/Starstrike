@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#if !defined USE_DIRECT3D
 #include "ogl_extensions.h"
 
 MultiTexCoord2fARB gglMultiTexCoord2fARB = nullptr;
@@ -71,4 +70,3 @@ int IsOGLExtensionSupported(const char* extension)
   }
   return 0;
 }
-#endif // !defined USE_DIRECT3D

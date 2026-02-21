@@ -872,10 +872,7 @@ void Location::Render(bool renderWaterAndClouds)
   RenderLandscape();
   CHECK_OPENGL_STATE();
   if (renderWaterAndClouds)
-    RenderWater();
-#ifdef USE_DIRECT3D
-		else glDisable(GL_CLIP_PLANE2);
-#endif
+	RenderWater();
   CHECK_OPENGL_STATE();
 
   // don't reflect buildings, teams etc.
@@ -924,9 +921,6 @@ void Location::RenderBuildings()
   SetupFog();
   glEnable(GL_FOG);
   g_app->m_renderer->SetObjectLighting();
-#ifdef USE_DIRECT3D
-  OpenGLD3D::g_pd3dDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
-#endif
 
   //
   // Special lighting mode used for Demo2
@@ -986,11 +980,8 @@ void Location::RenderBuildings()
     }
   }
 
-#ifdef USE_DIRECT3D
-  OpenGLD3D::g_pd3dDevice->SetRenderState(D3DRS_SPECULARENABLE, FALSE);
-#endif
-  glDisable(GL_FOG);
-  g_app->m_renderer->SetObjectLighting();
+glDisable(GL_FOG);
+g_app->m_renderer->SetObjectLighting();
   g_app->m_renderer->UnsetObjectLighting();
 
   END_PROFILE(g_app->m_profiler, "Render Buildings");
@@ -1816,14 +1807,6 @@ void Location::Bang(const LegacyVector3& _pos, float _range, float _damage)
 
   if (isVisible)
     CreateShockwave(_pos, _range / 20.0f);
-
-  //
-  // Punch effect
-
-#ifdef USE_DIRECT3D
-  if (g_deformEffect && isVisible)
-    g_deformEffect->AddPunch(_pos, _range);
-#endif
 
   //
   // Wow, that was a big bang. Maybe we killed a building

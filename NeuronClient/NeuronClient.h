@@ -72,7 +72,6 @@
 #ifdef TARGET_DEBUG
 #define DARWINIA_GAMETYPE "debug"
 #define CHEATMENU_ENABLED
-#define D3D_DEBUG_INFO
 #endif
 
 //#define PROMOTIONAL_BUILD                         // Their company logo is shown on screen

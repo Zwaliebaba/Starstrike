@@ -31,7 +31,7 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
@@ -49,14 +49,14 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -116,6 +116,7 @@
     <ClInclude Include="file_writer.h" />
     <ClInclude Include="hash_table.h" />
     <ClInclude Include="hi_res_time.h" />
+    <ClInclude Include="im_renderer.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputdriver.h" />
     <ClInclude Include="inputdriver_alias.h" />
@@ -157,11 +158,12 @@
     <ClInclude Include="presized_array.h" />
     <ClInclude Include="profiler.h" />
     <ClInclude Include="random.h" />
+    <ClInclude Include="render_device.h" />
+    <ClInclude Include="render_states.h" />
     <ClInclude Include="render_utils.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="rgb_colour.h" />
     <ClInclude Include="sample_cache.h" />
-    <ClInclude Include="shader.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="slice_darray.h" />
     <ClInclude Include="sorting_hash_table.h" />
@@ -177,7 +179,6 @@
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="system_info.h" />
     <ClInclude Include="targetcursor.h" />
-    <ClInclude Include="texture.h" />
     <ClInclude Include="texture_uv.h" />
     <ClInclude Include="text_renderer.h" />
     <ClInclude Include="text_stream_readers.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="file_paths.cpp" />
     <ClCompile Include="file_writer.cpp" />
     <ClCompile Include="hi_res_time.cpp" />
+    <ClCompile Include="im_renderer.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="inputdriver.cpp" />
     <ClCompile Include="inputdriver_alias.cpp" />
@@ -238,7 +240,7 @@
     <ClCompile Include="movement2d.cpp" />
     <ClCompile Include="ogl_extensions.cpp" />
     <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="persisting_debug_render.cpp" />
@@ -246,11 +248,12 @@
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
     <ClCompile Include="random.cpp" />
+    <ClCompile Include="render_device.cpp" />
+    <ClCompile Include="render_states.cpp" />
     <ClCompile Include="render_utils.cpp" />
     <ClCompile Include="resource.cpp" />
     <ClCompile Include="rgb_colour.cpp" />
     <ClCompile Include="sample_cache.cpp" />
-    <ClCompile Include="shader.cpp" />
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="sound_filter.cpp" />
@@ -264,7 +267,6 @@
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="targetcursor.cpp" />
-    <ClCompile Include="texture.cpp" />
     <ClCompile Include="texture_uv.cpp" />
     <ClCompile Include="text_renderer.cpp" />
     <ClCompile Include="text_stream_readers.cpp" />
@@ -275,7 +277,6 @@
     <ClCompile Include="vector3.cpp" />
     <ClCompile Include="win32_eventhandler.cpp" />
     <ClCompile Include="window_manager.cpp" />
-    <ClCompile Include="window_manager_directx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NeuronCore\NeuronCore.vcxproj">
@@ -286,6 +287,32 @@
     <None Include="control_types.inc" />
     <None Include="inputdriver_values.inc" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\im_coloredPS.hlsl">
+      <VariableName>g_pim_coloredPS</VariableName>
+      <HeaderFileOutput>$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\im_defaultVS.hlsl">
+      <VariableName>g_pim_defaultVS</VariableName>
+      <HeaderFileOutput>$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\im_texturedPS.hlsl">
+      <VariableName>g_pim_texturedPS</VariableName>
+      <HeaderFileOutput>$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

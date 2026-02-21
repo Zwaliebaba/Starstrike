@@ -28,9 +28,6 @@
     <Filter Include="Assets\Scripts">
       <UniqueIdentifier>{3d82f99d-acbb-4d79-8d76-b8f564ad367e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Shaders">
-      <UniqueIdentifier>{dcb707be-0f91-4327-a867-6c4014cfff7a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets\Shapes">
       <UniqueIdentifier>{8324dd6a-2e19-44cd-a3c5-402099c86abe}</UniqueIdentifier>
     </Filter>
@@ -379,30 +376,6 @@
     <None Include="Assets\Shapes\wheel.shp">
       <Filter>Assets\Shapes</Filter>
     </None>
-    <None Include="Assets\Shaders\deform.vs">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\deformDiamond.ps">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\deformFullscreen.ps">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\deformSphere.ps">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.ps">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.ps3">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.vs">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\globals.h">
-      <Filter>Assets\Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
@@ -419,7 +392,6 @@
     <ClCompile Include="attract.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="clouds.cpp" />
-    <ClCompile Include="deform.cpp" />
     <ClCompile Include="effect_processor.cpp" />
     <ClCompile Include="entity_grid.cpp" />
     <ClCompile Include="explosion.cpp" />
@@ -447,7 +419,6 @@
     <ClCompile Include="unit.cpp" />
     <ClCompile Include="user_input.cpp" />
     <ClCompile Include="water.cpp" />
-    <ClCompile Include="water_reflection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -456,7 +427,6 @@
     <ClInclude Include="attract.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="clouds.h" />
-    <ClInclude Include="deform.h" />
     <ClInclude Include="effect_processor.h" />
     <ClInclude Include="entity_grid.h" />
     <ClInclude Include="explosion.h" />
@@ -484,7 +454,6 @@
     <ClInclude Include="unit.h" />
     <ClInclude Include="user_input.h" />
     <ClInclude Include="water.h" />
-    <ClInclude Include="water_reflection.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\default_preferences.txt">

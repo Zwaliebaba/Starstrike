@@ -1,9 +1,10 @@
 #include "pch.h"
 
-#if !defined USE_DIRECT3D
-
 #include "win32_eventhandler.h"
 #include "debug_utils.h"
+#include "render_device.h"
+#include "render_states.h"
+#include "im_renderer.h"
 #include "window_manager.h"
 #include "window_manager_win32.h"
 
@@ -250,11 +251,32 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
   // Enable OpenGL for the window
   EnableOpenGL(_colourDepth, _zDepth);
 
+  // Initialise D3D11 device alongside OpenGL (Phase 1)
+  g_renderDevice = new RenderDevice();
+  if (!g_renderDevice->Initialise(m_win32Specific->m_hWnd, m_screenW, m_screenH, _windowed, _waitVRT))
+  {
+    DebugTrace("WARNING: D3D11 device creation failed, continuing with OpenGL only\n");
+    SAFE_DELETE(g_renderDevice);
+  }
+
+  // Initialise immediate-mode emulation layer (Phase 2)
+  if (g_renderDevice)
+  {
+    g_imRenderer = new ImRenderer();
+    g_imRenderer->Initialise(g_renderDevice->GetDevice(), g_renderDevice->GetContext());
+
+    g_renderStates = new RenderStates();
+    g_renderStates->Initialise(g_renderDevice->GetDevice());
+  }
+
   return true;
 }
 
 void WindowManager::DestroyWin()
 {
+  SAFE_DELETE(g_renderStates);
+  SAFE_DELETE(g_imRenderer);
+  SAFE_DELETE(g_renderDevice);
   DisableOpenGL();
   DestroyWindow(m_win32Specific->m_hWnd);
 }
@@ -388,7 +410,7 @@ void WindowManager::OpenWebsite(const char* _url) { ShellExecuteA(nullptr, "open
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _cmdLine, int _iCmdShow)
 {
 #if defined(_DEBUG)
-  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+//  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
   wchar_t filename[MAX_PATH];
@@ -406,4 +428,3 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _cmdLin
 
   return WM_QUIT;
 }
-#endif // !defined USE_DIRECT3D

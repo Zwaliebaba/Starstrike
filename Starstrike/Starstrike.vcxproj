@@ -120,27 +120,6 @@
     the Windows App SDK Nuget package has not yet been restored.
   -->
   <ItemGroup>
-    <None Include="Assets\Shaders\deform.vs">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\deformDiamond.ps">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\deformFullscreen.ps">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\deformSphere.ps">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.ps">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.ps3">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
-    <None Include="Assets\Shaders\water-meshwaves.vs">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
     <None Include="Assets\Shapes\aitarget.shp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
     </None>
@@ -478,7 +457,6 @@
     <ClCompile Include="attract.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="clouds.cpp" />
-    <ClCompile Include="deform.cpp" />
     <ClCompile Include="effect_processor.cpp" />
     <ClCompile Include="entity_grid.cpp" />
     <ClCompile Include="explosion.cpp" />
@@ -509,7 +487,6 @@
     <ClCompile Include="unit.cpp" />
     <ClCompile Include="user_input.cpp" />
     <ClCompile Include="water.cpp" />
-    <ClCompile Include="water_reflection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3d_sierpinski_gasket.h" />
@@ -517,7 +494,6 @@
     <ClInclude Include="attract.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="clouds.h" />
-    <ClInclude Include="deform.h" />
     <ClInclude Include="effect_processor.h" />
     <ClInclude Include="entity_grid.h" />
     <ClInclude Include="explosion.h" />
@@ -545,10 +521,6 @@
     <ClInclude Include="unit.h" />
     <ClInclude Include="user_input.h" />
     <ClInclude Include="water.h" />
-    <ClInclude Include="water_reflection.h" />
-    <None Include="Assets\Shaders\globals.h">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </None>
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

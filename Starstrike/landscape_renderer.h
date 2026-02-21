@@ -40,8 +40,6 @@ public:
 // Class LandscapeRenderer
 //*****************************************************************************
 
-struct IDirect3DVertexBuffer9;
-
 class LandscapeRenderer
 {
 protected:
@@ -49,8 +47,7 @@ protected:
 	{
 		RenderModeVertexArray,
 		RenderModeDisplayList,
-		RenderModeVertexBufferObject,
-		RenderModeVertexBufferDirect3D
+		RenderModeVertexBufferObject
 	};
 
     BitmapRGBA      *m_landscapeColour;
@@ -81,11 +78,6 @@ public:
 
 	LandscapeRenderer(SurfaceMap2D <float> *_heightMap);
 	~LandscapeRenderer();
-
-#ifdef USE_DIRECT3D
-	void ReleaseD3DPoolDefaultResources();
-	void ReleaseD3DResources();
-#endif
 
 	void BuildOpenGlState(SurfaceMap2D <float> *_heightMap);
 
