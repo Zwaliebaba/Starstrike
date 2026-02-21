@@ -15,7 +15,9 @@
 #include "camera.h"
 #include "text_renderer.h"
 #include "im_renderer.h"
+#include "render_device.h"
 #include "render_states.h"
+#include "texture_manager.h"
 
 
 TextRenderer g_gameFont;
@@ -150,25 +152,33 @@ void TextRenderer::DrawText2DUp( float _x, float _y, float _size, char const *_t
 {
 	float horiSize = _size * HORIZONTAL_SIZE;
 
-	if( m_renderShadow )    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-    else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+	if( m_renderShadow )    { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR); glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR ); }
+	else                    { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE); glBlendFunc( GL_SRC_ALPHA, GL_ONE ); }
 
-    glEnable        ( GL_TEXTURE_2D );
-    glEnable        ( GL_BLEND );
-    glBindTexture   ( GL_TEXTURE_2D, m_textureID );
+	g_imRenderer->BindTexture(m_textureID);
+	glEnable        ( GL_TEXTURE_2D );
+	glEnable        ( GL_BLEND );
+	glBindTexture   ( GL_TEXTURE_2D, m_textureID );
 
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
 	unsigned numChars = strlen(_text);
-    for( unsigned int i = 0; i < numChars; ++i )
-    {
-        unsigned char thisChar = _text[i];
+	for( unsigned int i = 0; i < numChars; ++i )
+	{
+		unsigned char thisChar = _text[i];
 
 		if (thisChar > 32)
 		{
 			float texX = GetTexCoordX( thisChar );
 			float texY = GetTexCoordY( thisChar );
+
+			g_imRenderer->Begin( PRIM_QUADS );
+				g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);		        g_imRenderer->Vertex2f( _x,				_y + horiSize);
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex2f( _x,	            _y );
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex2f( _x + _size,	    _y );
+				g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex2f( _x + _size,     _y + horiSize);
+			g_imRenderer->End();
 
 			glBegin( GL_QUADS );
 				glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x,				_y + horiSize);
@@ -178,12 +188,13 @@ void TextRenderer::DrawText2DUp( float _x, float _y, float _size, char const *_t
 			glEnd();
 		}
 
-        _y -= horiSize;
-    }
+		_y -= horiSize;
+	}
 
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //glDisable       ( GL_BLEND );                             // Not here, Blending is enabled during Eclipse render
-    glDisable       ( GL_TEXTURE_2D );
+	g_imRenderer->UnbindTexture();
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+	glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glDisable       ( GL_TEXTURE_2D );
 }
 
 
@@ -192,20 +203,21 @@ void TextRenderer::DrawText2DDown( float _x, float _y, float _size, char const *
 	float horiSize = _size * HORIZONTAL_SIZE;
 
 	if( m_renderShadow ||
-        m_renderOutline )   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-    else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+		m_renderOutline )   { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR); glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR ); }
+	else                    { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE); glBlendFunc( GL_SRC_ALPHA, GL_ONE ); }
 
-    glEnable        ( GL_TEXTURE_2D );
-    glEnable        ( GL_BLEND );
-    glBindTexture   ( GL_TEXTURE_2D, m_textureID );
+	g_imRenderer->BindTexture(m_textureID);
+	glEnable        ( GL_TEXTURE_2D );
+	glEnable        ( GL_BLEND );
+	glBindTexture   ( GL_TEXTURE_2D, m_textureID );
 
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
 	unsigned numChars = strlen(_text);
-    for( unsigned int i = 0; i < numChars; ++i )
-    {
-        unsigned char thisChar = _text[i];
+	for( unsigned int i = 0; i < numChars; ++i )
+	{
+		unsigned char thisChar = _text[i];
 
 		if (thisChar > 32)
 		{
@@ -220,33 +232,48 @@ void TextRenderer::DrawText2DDown( float _x, float _y, float _size, char const *
 					{
 						if( x != 0 || y != 0 )
 						{
-			                glBegin( GL_QUADS );
-				                glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x+x + _size,     _y+y);
-				                glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x+x + _size,	    _y+y+horiSize );
-				                glTexCoord2f(texX + TEX_WIDTH, texY);				glVertex2f( _x+x,	            _y+y+horiSize );
-				                glTexCoord2f(texX, texY);							glVertex2f( _x+x,             _y+y);
-			                glEnd();
-                        }
-                    }
-                }
-            }
-            else
-            {
-			    glBegin( GL_QUADS );
-				    glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x + _size,     _y);
-				    glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x + _size,	    _y+horiSize );
-				    glTexCoord2f(texX + TEX_WIDTH, texY);				glVertex2f( _x,	            _y+horiSize );
-				    glTexCoord2f(texX, texY);							glVertex2f( _x,             _y);
-			    glEnd();
-            }
+							g_imRenderer->Begin( PRIM_QUADS );
+								g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);		        g_imRenderer->Vertex2f( _x+x + _size,     _y+y);
+								g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex2f( _x+x + _size,	    _y+y+horiSize );
+								g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex2f( _x+x,	            _y+y+horiSize );
+								g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex2f( _x+x,             _y+y);
+							g_imRenderer->End();
+
+							glBegin( GL_QUADS );
+								glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x+x + _size,     _y+y);
+								glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x+x + _size,	    _y+y+horiSize );
+								glTexCoord2f(texX + TEX_WIDTH, texY);				glVertex2f( _x+x,	            _y+y+horiSize );
+								glTexCoord2f(texX, texY);							glVertex2f( _x+x,             _y+y);
+							glEnd();
+						}
+					}
+				}
+			}
+			else
+			{
+				g_imRenderer->Begin( PRIM_QUADS );
+					g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);		        g_imRenderer->Vertex2f( _x + _size,     _y);
+					g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex2f( _x + _size,	    _y+horiSize );
+					g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex2f( _x,	            _y+horiSize );
+					g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex2f( _x,             _y);
+				g_imRenderer->End();
+
+				glBegin( GL_QUADS );
+					glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x + _size,     _y);
+					glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x + _size,	    _y+horiSize );
+					glTexCoord2f(texX + TEX_WIDTH, texY);				glVertex2f( _x,	            _y+horiSize );
+					glTexCoord2f(texX, texY);							glVertex2f( _x,             _y);
+				glEnd();
+			}
 		}
 
-        _y += horiSize;
-    }
+		_y += horiSize;
+	}
 
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //glDisable       ( GL_BLEND );                             // Not here, Blending is enabled during Eclipse render
-    glDisable       ( GL_TEXTURE_2D );
+	g_imRenderer->UnbindTexture();
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+	glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glDisable       ( GL_TEXTURE_2D );
 }
 
 
@@ -266,25 +293,26 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
 {
 	// Compatibility wank - needed to achieve the same behaviour the old code had
 	_y -= 7.0f;
-    _x -= 3.0f;
+	_x -= 3.0f;
 
 	float horiSize = _size * HORIZONTAL_SIZE;
 
 	if( m_renderShadow ||
-        m_renderOutline )   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-    else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+		m_renderOutline )   { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR); glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR ); }
+	else                    { g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE); glBlendFunc( GL_SRC_ALPHA, GL_ONE ); }
 
-    glEnable        ( GL_TEXTURE_2D );
-    glEnable        ( GL_BLEND );
-    glBindTexture   ( GL_TEXTURE_2D, m_textureID );
+	g_imRenderer->BindTexture(m_textureID);
+	glEnable        ( GL_TEXTURE_2D );
+	glEnable        ( GL_BLEND );
+	glBindTexture   ( GL_TEXTURE_2D, m_textureID );
 
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
 	unsigned numChars = strlen(_text);
-    for( unsigned int i = 0; i < numChars; ++i )
-    {
-        unsigned char thisChar = _text[i];
+	for( unsigned int i = 0; i < numChars; ++i )
+	{
+		unsigned char thisChar = _text[i];
 
 		if (thisChar > 32)
 		{
@@ -299,6 +327,13 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
 					{
 						if( x != 0 || y != 0 )
 						{
+							g_imRenderer->Begin( PRIM_QUADS );
+								g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);		        g_imRenderer->Vertex2f( _x+x,				_y+y );
+								g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex2f( _x+x + horiSize,	_y+y );
+								g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex2f( _x+x + horiSize,	_y+y + _size );
+								g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex2f( _x+x,				_y+y + _size );
+							g_imRenderer->End();
+
 							glBegin( GL_QUADS );
 								glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x+x,				_y+y );
 								glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x+x + horiSize,	_y+y );
@@ -311,6 +346,13 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
 			}
 			else
 			{
+				g_imRenderer->Begin( PRIM_QUADS );
+					g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);		        g_imRenderer->Vertex2f( _x,				_y );
+					g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex2f( _x + horiSize,	_y );
+					g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex2f( _x + horiSize,	_y + _size );
+					g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex2f( _x,				_y + _size );
+				g_imRenderer->End();
+
 				glBegin( GL_QUADS );
 					glTexCoord2f(texX, texY + TEX_HEIGHT);		        glVertex2f( _x,				_y );
 					glTexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	glVertex2f( _x + horiSize,	_y );
@@ -321,11 +363,13 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
 		}
 
 		_x += horiSize;
-    }
+	}
 
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //glDisable       ( GL_BLEND );                             // Not here, Blending is enabled during Eclipse render
-    glDisable       ( GL_TEXTURE_2D );
+	g_imRenderer->UnbindTexture();
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+	glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	//glDisable       ( GL_BLEND );                             // Not here, Blending is enabled during Eclipse render
+	glDisable       ( GL_TEXTURE_2D );
 }
 
 // Draw the text, justified depending on the _xJustification parameter.
@@ -491,7 +535,7 @@ void TextRenderer::DrawText3DSimple( LegacyVector3 const &_pos, float _size, cha
 	SaveGLFontDrawAttributes saveAttribs;
 
 	Camera *cam = g_app->m_camera;
-    LegacyVector3 pos(_pos);
+	LegacyVector3 pos(_pos);
 	LegacyVector3 vertSize = cam->GetUp() * _size;
 	LegacyVector3 horiSize = -cam->GetRight() * _size * HORIZONTAL_SIZE;
 	unsigned int numChars = strlen(_text);
@@ -501,27 +545,38 @@ void TextRenderer::DrawText3DSimple( LegacyVector3 const &_pos, float _size, cha
 	//
 	// Render the text
 
-    glEnable        (GL_BLEND);
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), m_renderShadow ? BLEND_SUBTRACTIVE_COLOR : BLEND_ADDITIVE);
+	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
+	g_imRenderer->BindTexture(m_textureID);
+
+	glEnable        (GL_BLEND);
 	glDisable		(GL_CULL_FACE);
 	glDisable		(GL_LIGHTING);
 	glDisable		(GL_DEPTH_TEST);
-	//glColor3ub		(255,255,255);
 	glEnable		(GL_TEXTURE_2D);
 	glBindTexture   (GL_TEXTURE_2D, m_textureID);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
 	if( m_renderShadow )    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-    else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+	else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
-    for( unsigned int i = 0; i < numChars; ++i )
-    {
-        unsigned char thisChar = _text[i];
+	for( unsigned int i = 0; i < numChars; ++i )
+	{
+		unsigned char thisChar = _text[i];
 
 		if (thisChar > 32)
 		{
 			float texX = GetTexCoordX( thisChar );
 			float texY = GetTexCoordY( thisChar );
+
+			g_imRenderer->Begin( PRIM_QUADS );
+				g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);				g_imRenderer->Vertex3fv( (pos).GetData() );
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex3fv( (pos + horiSize).GetData() );
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex3fv( (pos + horiSize - vertSize).GetData() );
+				g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex3fv( (pos - vertSize).GetData() );
+			g_imRenderer->End();
 
 			glBegin( GL_QUADS );
 				glTexCoord2f(texX, texY + TEX_HEIGHT);				glVertex3fv( (pos).GetData() );
@@ -532,7 +587,9 @@ void TextRenderer::DrawText3DSimple( LegacyVector3 const &_pos, float _size, cha
 		}
 
 		pos += horiSize;
-    }
+	}
+
+	g_imRenderer->UnbindTexture();
 }
 
 
@@ -590,38 +647,49 @@ void TextRenderer::DrawText3D( LegacyVector3 const &_pos, LegacyVector3 const &_
 
 	Camera *cam = g_app->m_camera;
 
-    LegacyVector3 pos = _pos;
+	LegacyVector3 pos = _pos;
 	LegacyVector3 vertSize = _up * _size;
 	LegacyVector3 horiSize = ( _up ^ _front ) * _size * HORIZONTAL_SIZE;
 	unsigned int numChars = strlen(buf);
 	pos -= horiSize * numChars * 0.5f;
-    pos += vertSize * 0.5f;
+	pos += vertSize * 0.5f;
 
 
 	//
 	// Render the text
 
-    glEnable        (GL_BLEND);
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), m_renderShadow ? BLEND_SUBTRACTIVE_COLOR : BLEND_ADDITIVE);
+	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+	g_imRenderer->BindTexture(m_textureID);
+
+	glEnable        (GL_BLEND);
 	glDisable		(GL_CULL_FACE);
 	glDisable		(GL_LIGHTING);
 	//glDisable		(GL_DEPTH_TEST);
 	//glColor3ub		(255,255,255);
 	glEnable		(GL_TEXTURE_2D);
 	glBindTexture   (GL_TEXTURE_2D, m_textureID);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
 	if( m_renderShadow )    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-    else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+	else                    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
-    for( unsigned int i = 0; i < numChars; ++i )
-    {
-        unsigned char thisChar = buf[i];
+	for( unsigned int i = 0; i < numChars; ++i )
+	{
+		unsigned char thisChar = buf[i];
 
 		if (thisChar > 32)
 		{
 			float texX = GetTexCoordX( thisChar );
 			float texY = GetTexCoordY( thisChar );
+
+			g_imRenderer->Begin( PRIM_QUADS );
+				g_imRenderer->TexCoord2f(texX, texY + TEX_HEIGHT);				g_imRenderer->Vertex3fv( (pos).GetData() );
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY + TEX_HEIGHT);	g_imRenderer->Vertex3fv( (pos + horiSize).GetData() );
+				g_imRenderer->TexCoord2f(texX + TEX_WIDTH, texY);				g_imRenderer->Vertex3fv( (pos + horiSize - vertSize).GetData() );
+				g_imRenderer->TexCoord2f(texX, texY);							g_imRenderer->Vertex3fv( (pos - vertSize).GetData() );
+			g_imRenderer->End();
 
 			glBegin( GL_QUADS );
 				glTexCoord2f(texX, texY + TEX_HEIGHT);				glVertex3fv( (pos).GetData() );
@@ -632,7 +700,9 @@ void TextRenderer::DrawText3D( LegacyVector3 const &_pos, LegacyVector3 const &_
 		}
 
 		pos += horiSize;
-    }
+	}
+
+	g_imRenderer->UnbindTexture();
 }
 
 

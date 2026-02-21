@@ -6,6 +6,10 @@
 #include "text_renderer.h"
 #include "resource.h"
 #include "input.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
+#include "texture_manager.h"
 
 #include "darwinia_window.h"
 #include "input_field.h"
@@ -82,6 +86,18 @@ void DarwiniaButton::Render( int realX, int realY, bool highlighted, bool clicke
     if( highlighted || clicked )
     {
         glShadeModel( GL_SMOOTH );
+
+        g_imRenderer->Begin( PRIM_QUADS );
+            g_imRenderer->Color4ub( 199, 214, 220, 255 );
+            if( clicked ) g_imRenderer->Color4ub( 255, 255, 255, 255 );
+            g_imRenderer->Vertex2f( realX, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+            g_imRenderer->Color4ub( 112, 141, 168, 255 );
+            if( clicked ) g_imRenderer->Color4ub( 162, 191, 208, 255 );
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+        g_imRenderer->End();
+
         glBegin( GL_QUADS );
             glColor4ub( 199, 214, 220, 255 );
             if( clicked ) glColor4ub( 255, 255, 255, 255 );
@@ -116,8 +132,17 @@ void DarwiniaButton::Render( int realX, int realY, bool highlighted, bool clicke
     }
     else
     {
+        g_imRenderer->Color4ub( 107, 37, 39, 64 );
         glColor4ub( 107, 37, 39, 64 );
         //glColor4ub( 82, 56, 102, 64 );
+
+        g_imRenderer->Begin( PRIM_QUADS );
+            g_imRenderer->Vertex2f( realX, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+        g_imRenderer->End();
+
         glBegin( GL_QUADS );
             glVertex2f( realX, realY );
             glVertex2f( realX + m_w, realY );
@@ -126,6 +151,23 @@ void DarwiniaButton::Render( int realX, int realY, bool highlighted, bool clicke
         glEnd();
 
         glLineWidth(1.0f);
+
+        g_imRenderer->Begin( PRIM_LINES );
+            g_imRenderer->Color4ub( 100, 34, 34, 200 );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY );
+
+            g_imRenderer->Vertex2f( realX, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+
+            g_imRenderer->Color4f( 0.1f, 0.0f, 0.0f, 1.0f );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+        g_imRenderer->End();
+
         glBegin( GL_LINES );
             glColor4ub( 100, 34, 34, 200 );
             glVertex2f( realX, realY + m_h );
@@ -220,85 +262,117 @@ void BorderlessButton::Render( int realX, int realY, bool highlighted, bool clic
 	{
 		clicked = true;
 	}
-    if( clicked )
-    {
-        glShadeModel( GL_SMOOTH );
-        glBegin( GL_QUADS );
-            glColor4ub( 199, 214, 220, 255 );
-            glVertex2f( realX, realY );
-            glVertex2f( realX + m_w, realY );
-            glColor4ub( 112, 141, 168, 255 );
-            glVertex2f( realX + m_w, realY + m_h );
-            glVertex2f( realX, realY + m_h );
-        glEnd();
-        glShadeModel( GL_FLAT );
+	if( clicked )
+	{
+		glShadeModel( GL_SMOOTH );
 
-        g_editorFont.SetRenderShadow(true);
-        glColor4ub( 255, 255, 150, 30 );
-        if( m_centered )
-        {
-            g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-            g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-        }
-        else
-        {
-            g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-            g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-        }
-        g_editorFont.SetRenderShadow(false);
-    }
-    else
-    {
-        glColor4ub( 107, 37, 39, 64 );
+		g_imRenderer->Begin( PRIM_QUADS );
+			g_imRenderer->Color4ub( 199, 214, 220, 255 );
+			g_imRenderer->Vertex2f( realX, realY );
+			g_imRenderer->Vertex2f( realX + m_w, realY );
+			g_imRenderer->Color4ub( 112, 141, 168, 255 );
+			g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+			g_imRenderer->Vertex2f( realX, realY + m_h );
+		g_imRenderer->End();
 
-        if( highlighted )
-        {
+		glBegin( GL_QUADS );
+			glColor4ub( 199, 214, 220, 255 );
+			glVertex2f( realX, realY );
+			glVertex2f( realX + m_w, realY );
+			glColor4ub( 112, 141, 168, 255 );
+			glVertex2f( realX + m_w, realY + m_h );
+			glVertex2f( realX, realY + m_h );
+		glEnd();
+		glShadeModel( GL_FLAT );
+
+		g_editorFont.SetRenderShadow(true);
+		g_imRenderer->Color4ub( 255, 255, 150, 30 );
+		glColor4ub( 255, 255, 150, 30 );
+		if( m_centered )
+		{
+			g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+			g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+		}
+		else
+		{
+			g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+			g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+		}
+		g_editorFont.SetRenderShadow(false);
+	}
+	else
+	{
+		g_imRenderer->Color4ub( 107, 37, 39, 64 );
+		glColor4ub( 107, 37, 39, 64 );
+
+		if( highlighted )
+		{
 			parent->SetCurrentButton( this );
-            glLineWidth(1.0f);
-            glBegin( GL_LINES );
-                glColor4ub( 100, 34, 34, 250 );
-                glVertex2f( realX, realY + m_h );
-                glVertex2f( realX, realY );
+			glLineWidth(1.0f);
 
-                glVertex2f( realX, realY );
-                glVertex2f( realX + m_w, realY );
+			g_imRenderer->Begin( PRIM_LINES );
+				g_imRenderer->Color4ub( 100, 34, 34, 250 );
+				g_imRenderer->Vertex2f( realX, realY + m_h );
+				g_imRenderer->Vertex2f( realX, realY );
 
-                glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
-                glVertex2f( realX + m_w, realY );
-                glVertex2f( realX + m_w, realY + m_h );
+				g_imRenderer->Vertex2f( realX, realY );
+				g_imRenderer->Vertex2f( realX + m_w, realY );
 
-                glVertex2f( realX + m_w, realY + m_h );
-                glVertex2f( realX, realY + m_h );
-            glEnd();
-        }
+				g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, 1.0f );
+				g_imRenderer->Vertex2f( realX + m_w, realY );
+				g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
 
-        glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-        if( m_centered )
-        {
-            g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-        }
-        else
-        {
-            g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-        }
+				g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+				g_imRenderer->Vertex2f( realX, realY + m_h );
+			g_imRenderer->End();
 
-        if( highlighted )
-        {
-            glColor4f( 1.0f, 1.0f, 1.0f, 0.5f );
-            if( m_centered )
-            {
-                g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-            }
-            else
-            {
-                g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
-            }
-        }
-    }
+			glBegin( GL_LINES );
+				glColor4ub( 100, 34, 34, 250 );
+				glVertex2f( realX, realY + m_h );
+				glVertex2f( realX, realY );
 
-    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+				glVertex2f( realX, realY );
+				glVertex2f( realX + m_w, realY );
 
-    EclButton::Render( realX, realY, highlighted, clicked );
+				glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
+				glVertex2f( realX + m_w, realY );
+				glVertex2f( realX + m_w, realY + m_h );
+
+				glVertex2f( realX + m_w, realY + m_h );
+				glVertex2f( realX, realY + m_h );
+			glEnd();
+		}
+
+		g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+		glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+		if( m_centered )
+		{
+			g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+		}
+		else
+		{
+			g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+		}
+
+		if( highlighted )
+		{
+			g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.5f );
+			glColor4f( 1.0f, 1.0f, 1.0f, 0.5f );
+			if( m_centered )
+			{
+				g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+			}
+			else
+			{
+				g_editorFont.DrawText2D( realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
+			}
+		}
+	}
+
+	g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+	glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+
+	EclButton::Render( realX, realY, highlighted, clicked );
 }
 
 
@@ -450,8 +524,12 @@ void DarwiniaWindow::Render ( bool hasFocus )
     //
     // Main body fill
 
+    int texId = g_app->m_resource->GetTexture( "textures/interface_red.bmp" );
+    g_imRenderer->BindTexture(texId);
+    g_imRenderer->SetSampler(SAMPLER_LINEAR_WRAP);
+
     glEnable        ( GL_TEXTURE_2D );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/interface_red.bmp" ) );
+    glBindTexture   ( GL_TEXTURE_2D, texId );
     glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
     glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -459,6 +537,14 @@ void DarwiniaWindow::Render ( bool hasFocus )
 
     float texH = 1.0f;
     float texW = texH * 512.0f / 64.0f;
+
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.96f );
+    g_imRenderer->Begin( PRIM_QUADS );
+        g_imRenderer->TexCoord2f( 0.0f, 0.0f );     g_imRenderer->Vertex2f( m_x, m_y );
+        g_imRenderer->TexCoord2f( texW, 0.0f );     g_imRenderer->Vertex2f( m_x + m_w, m_y );
+        g_imRenderer->TexCoord2f( texW, texH );     g_imRenderer->Vertex2f( m_x + m_w, m_y + m_h );
+        g_imRenderer->TexCoord2f( 0.0f, texH );     g_imRenderer->Vertex2f( m_x, m_y + m_h );
+    g_imRenderer->End();
 
     //glColor4f( 0.3f, 0.3f, 0.4f, 0.95f );
     glColor4f( 1.0f, 1.0f, 1.0f, 0.96f );
@@ -469,6 +555,7 @@ void DarwiniaWindow::Render ( bool hasFocus )
         glTexCoord2f( 0.0f, texH );     glVertex2f( m_x, m_y + m_h );
     glEnd();
 
+    g_imRenderer->UnbindTexture();
     glDisable       ( GL_TEXTURE_2D );
 
     //
@@ -476,6 +563,16 @@ void DarwiniaWindow::Render ( bool hasFocus )
 
     float titleBarHeight = GetClientRectY1() - 1;
     glShadeModel( GL_SMOOTH );
+
+    g_imRenderer->Begin( PRIM_QUADS );
+        g_imRenderer->Color4ub( 199, 214, 220, 255 );
+        g_imRenderer->Vertex2f( m_x, m_y );
+        g_imRenderer->Vertex2f( m_x+m_w, m_y );
+        g_imRenderer->Color4ub( 112, 141, 168, 255 );
+        g_imRenderer->Vertex2f( m_x+m_w, m_y+titleBarHeight );
+        g_imRenderer->Vertex2f( m_x, m_y+titleBarHeight );
+    g_imRenderer->End();
+
     glBegin( GL_QUADS );
         glColor4ub( 199, 214, 220, 255 );
         glVertex2f( m_x, m_y );
@@ -486,18 +583,25 @@ void DarwiniaWindow::Render ( bool hasFocus )
     glEnd();
     glShadeModel( GL_FLAT );
 
-    //glColor4ub( 112, 141, 168, 120 );
-    //glBegin( GL_LINES );
-    //    glVertex2f( m_x, m_y+1 );
-    //    glVertex2f( m_x+m_w, m_y+1 );
-    //glEnd();
-
     //
     // Border lines
 
     glLineWidth(2.0f);
     //glColor4ub( 100, 34, 34, 255 );
+    g_imRenderer->Color4ub( 199, 214, 220, 255 );
     glColor4ub( 199, 214, 220, 255 );
+
+    g_imRenderer->Begin( PRIM_LINES );
+        g_imRenderer->Vertex2f( m_x, m_y );                     // top
+        g_imRenderer->Vertex2f( m_x + m_w, m_y );
+        g_imRenderer->Vertex2f( m_x, m_y );                     // left
+        g_imRenderer->Vertex2f( m_x, m_y+m_h );
+        g_imRenderer->Vertex2f( m_x + m_w, m_y );               // right
+        g_imRenderer->Vertex2f( m_x + m_w, m_y + m_h );
+        g_imRenderer->Vertex2f( m_x, m_y+m_h );                 // bottom
+        g_imRenderer->Vertex2f( m_x + m_w, m_y + m_h );
+    g_imRenderer->End();
+
     glBegin( GL_LINES );                        // top
         glVertex2f( m_x, m_y );
         glVertex2f( m_x + m_w, m_y );
@@ -520,7 +624,16 @@ void DarwiniaWindow::Render ( bool hasFocus )
     glEnd();
 
     glLineWidth(1.0f);
+    g_imRenderer->Color4ub( 42, 56, 82, 255 );
     glColor4ub( 42, 56, 82, 255 );
+
+    g_imRenderer->Begin( PRIM_LINE_LOOP );
+        g_imRenderer->Vertex2f( m_x-2, m_y-2 );
+        g_imRenderer->Vertex2f( m_x + m_w+1, m_y-2 );
+        g_imRenderer->Vertex2f( m_x + m_w+1, m_y + m_h+1 );
+        g_imRenderer->Vertex2f( m_x-2, m_y+m_h+1 );
+    g_imRenderer->End();
+
     glBegin( GL_LINE_LOOP );
         glVertex2f( m_x-2, m_y-2 );
         glVertex2f( m_x + m_w+1, m_y-2 );
@@ -663,8 +776,15 @@ void CloseButton::Render( int realX, int realY, bool highlighted, bool clicked )
 {
     if( m_iconised )
     {
-        if( highlighted || clicked )    glColor4ub( 160, 137, 139, 64 );
-        else                            glColor4ub( 60, 37, 39, 64 );
+        if( highlighted || clicked )    { g_imRenderer->Color4ub( 160, 137, 139, 64 ); glColor4ub( 160, 137, 139, 64 ); }
+        else                            { g_imRenderer->Color4ub( 60, 37, 39, 64 ); glColor4ub( 60, 37, 39, 64 ); }
+
+        g_imRenderer->Begin( PRIM_QUADS );
+            g_imRenderer->Vertex2f( realX, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+        g_imRenderer->End();
 
         glBegin( GL_QUADS );
             glVertex2f( realX, realY );
@@ -674,6 +794,23 @@ void CloseButton::Render( int realX, int realY, bool highlighted, bool clicked )
         glEnd();
 
         glLineWidth(1.0f);
+
+        g_imRenderer->Begin( PRIM_LINES );
+            g_imRenderer->Color4ub( 0, 0, 150, 100 );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY );
+
+            g_imRenderer->Vertex2f( realX, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+
+            g_imRenderer->Color4f( 0.1f, 0.0f, 0.0f, 1.0f );
+            g_imRenderer->Vertex2f( realX + m_w, realY );
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+
+            g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+            g_imRenderer->Vertex2f( realX, realY + m_h );
+        g_imRenderer->End();
+
         glBegin( GL_LINES );
             glColor4ub( 0, 0, 150, 100 );
             glVertex2f( realX, realY + m_h );
@@ -703,7 +840,13 @@ void CloseButton::Render( int realX, int realY, bool highlighted, bool clicked )
 
 void InvertedBox::Render( int realX, int realY, bool highlighted, bool clicked )
 {
-    //DarwiniaButton::Render( realX, realY, highlighted, clicked );
+    g_imRenderer->Color4f( 0.05f, 0.0f, 0.0f, 0.4f );
+    g_imRenderer->Begin( PRIM_QUADS );
+        g_imRenderer->Vertex2f( realX, realY );
+        g_imRenderer->Vertex2f( realX + m_w, realY );
+        g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+        g_imRenderer->Vertex2f( realX, realY + m_h );
+    g_imRenderer->End();
 
     glColor4f( 0.05f, 0.0f, 0.0f, 0.4f );
     glBegin( GL_QUADS );
@@ -715,6 +858,22 @@ void InvertedBox::Render( int realX, int realY, bool highlighted, bool clicked )
 
     //
     // Border lines
+
+    g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, 1.0f );
+    g_imRenderer->Begin( PRIM_LINES );
+        g_imRenderer->Vertex2f( realX, realY );                      // top
+        g_imRenderer->Vertex2f( realX + m_w, realY );
+        g_imRenderer->Vertex2f( realX, realY );                      // left
+        g_imRenderer->Vertex2f( realX, realY+m_h );
+    g_imRenderer->End();
+
+    g_imRenderer->Color4ub( 100, 34, 34, 150 );
+    g_imRenderer->Begin( PRIM_LINES );
+        g_imRenderer->Vertex2f( realX + m_w, realY );                // right
+        g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+        g_imRenderer->Vertex2f( realX, realY+m_h );                  // bottom
+        g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
+    g_imRenderer->End();
 
     glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
     glBegin( GL_LINES );                        // top
@@ -744,8 +903,8 @@ void InvertedBox::Render( int realX, int realY, bool highlighted, bool clicked )
 void LabelButton::Render( int realX, int realY, bool highlighted, bool clicked )
 {
 	if (m_disabled)
-		glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
+		{ g_imRenderer->Color4f( 0.5f, 0.5f, 0.5f, 1.0f ); glColor4f( 0.5f, 0.5f, 0.5f, 1.0f ); }
 	else
-		glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    g_editorFont.DrawText2D( realX + 5, realY + 10, 11.0f, m_caption );
+		{ g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f ); glColor4f( 1.0f, 1.0f, 1.0f, 1.0f ); }
+	g_editorFont.DrawText2D( realX + 5, realY + 10, 11.0f, m_caption );
 }

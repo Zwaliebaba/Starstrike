@@ -4,6 +4,9 @@
 
 #include "debug_utils.h"
 #include "targetcursor.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include "scrollbar.h"
 
@@ -140,6 +143,14 @@ void ScrollBarButton::Render( int realX, int realY, bool highlighted, bool click
 
     // Background
 
+    g_imRenderer->Color3ub( 85, 93, 78 );
+    g_imRenderer->Begin( PRIM_QUADS );
+        g_imRenderer->Vertex2i( realX, realY );
+        g_imRenderer->Vertex2i( realX + m_w, realY );
+        g_imRenderer->Vertex2i( realX + m_w, realY + m_h );
+        g_imRenderer->Vertex2i( realX, realY + m_h );
+    g_imRenderer->End();
+
     glColor3ub( 85, 93, 78 );
     glBegin( GL_QUADS );
         glVertex2i( realX, realY );
@@ -147,6 +158,14 @@ void ScrollBarButton::Render( int realX, int realY, bool highlighted, bool click
         glVertex2i( realX + m_w, realY + m_h );
         glVertex2i( realX, realY + m_h );
     glEnd();
+
+    g_imRenderer->Color3ub( 187, 187, 187 );
+    g_imRenderer->Begin( PRIM_LINE_LOOP );
+        g_imRenderer->Vertex2i( realX, realY );
+        g_imRenderer->Vertex2i( realX + m_w, realY );
+        g_imRenderer->Vertex2i( realX + m_w, realY + m_h );
+        g_imRenderer->Vertex2i( realX, realY + m_h );
+    g_imRenderer->End();
 
     glColor3ub( 187, 187, 187 );
     glBegin( GL_LINE_LOOP );
@@ -162,9 +181,16 @@ void ScrollBarButton::Render( int realX, int realY, bool highlighted, bool click
     if( barEnd >= m_h ) barEnd = m_h-1;
 
 
-    if( clicked )           glColor3ub(50,55,120);
-    else if( highlighted )  glColor3ub(55,60,120);
-    else                    glColor3ub(65,71,120);
+    if( clicked )           { g_imRenderer->Color3ub(50,55,120); glColor3ub(50,55,120); }
+    else if( highlighted )  { g_imRenderer->Color3ub(55,60,120); glColor3ub(55,60,120); }
+    else                    { g_imRenderer->Color3ub(65,71,120); glColor3ub(65,71,120); }
+
+    g_imRenderer->Begin( PRIM_QUADS );
+        g_imRenderer->Vertex2i( realX+1, realY+barTop+1 );
+        g_imRenderer->Vertex2i( realX+m_w, realY+barTop+1 );
+        g_imRenderer->Vertex2i( realX+m_w, realY+barEnd);
+        g_imRenderer->Vertex2i( realX+1, realY+barEnd);
+    g_imRenderer->End();
 
     glBegin( GL_QUADS );
         glVertex2i( realX+1, realY+barTop+1 );

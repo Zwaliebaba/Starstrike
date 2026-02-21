@@ -3,6 +3,9 @@
 #include "text_renderer.h"
 #include "profiler.h"
 #include "resource.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "language_table.h"
 
 #include "prefs_graphics_window.h"
@@ -200,9 +203,11 @@ void RenderCPUUsage( LList<char *> *elements, int x, int y )
     }
     else
     {
+        g_imRenderer->Color4f( 1.0f, 0.3f, 0.3f, 1.0f );
         glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
         g_editorFont.DrawText2DCentre( x, y, 15, "-" );
     }
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 #endif
 }

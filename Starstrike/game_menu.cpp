@@ -5,6 +5,9 @@
 #include "text_stream_readers.h"
 #include "drop_down_menu.h"
 #include "input_field.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "game_menu.h"
 #include "app.h"
 #include "camera.h"
@@ -31,10 +34,12 @@ void GameMenuButton::Render( int realX, int realY, bool highlighted, bool clicke
     UpdateButtonHighlight();
 
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.0f );
     glColor4f( 1.0f, 1.0f, 1.0f, 0.0f );
     g_gameFont.SetRenderOutline(true);
     g_gameFont.DrawText2DCentre( realX, realY, m_fontSize, m_iconName );
 
+    g_imRenderer->Color4f( 1.3f, 1.0f, 1.3f, 1.0f );
     glColor4f( 1.3f, 1.0f, 1.3f, 1.0f );
 
     if( !m_mouseHighlightMode )
@@ -49,6 +54,7 @@ void GameMenuButton::Render( int realX, int realY, bool highlighted, bool clicke
 
     if( highlighted  )
     {
+        g_imRenderer->Color4f( 1.0, 0.3f, 0.3, 1.0f );
         glColor4f( 1.0, 0.3f, 0.3, 1.0f );
     }
 
@@ -379,10 +385,12 @@ void GameMenuWindow::Render( bool _hasFocus )
     int w = g_app->m_renderer->ScreenW();
     int h = g_app->m_renderer->ScreenH();
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.0f );
     glColor4f( 1.0f, 1.0f, 1.0f, 0.0f );
     g_gameFont.SetRenderOutline(true);
     g_gameFont.DrawText2DCentre( w/2, 30, 80.0f, "DARWINIA" );
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     g_gameFont.SetRenderOutline(false);
     g_gameFont.DrawText2DCentre( w/2, 30, 80.0f, "DARWINIA" );

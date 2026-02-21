@@ -1,4 +1,7 @@
 #include "pch.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 #include <stdio.h>
 
@@ -20,6 +23,7 @@ void NetworkWindow::Render(bool hasFocus)
 {
   DarwiniaWindow::Render(hasFocus);
 
+  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   //

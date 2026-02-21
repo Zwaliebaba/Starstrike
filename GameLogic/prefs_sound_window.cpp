@@ -3,6 +3,9 @@
 #include "text_renderer.h"
 #include "profiler.h"
 #include "system_info.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "language_table.h"
 
 #include "prefs_sound_window.h"
@@ -294,16 +297,18 @@ void PrefsSoundWindow::Render( bool _hasFocus )
     if( element->m_lastNumCalls > 0 )
     {
         float occup = element->m_lastTotalTime * 100;
-        if( occup > 15 ) glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
+        if( occup > 15 ) { g_imRenderer->Color4f( 1.0f, 0.3f, 0.3f, 1.0f ); glColor4f( 1.0f, 0.3f, 0.3f, 1.0f ); }
         g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - GetMenuSize(50), GetMenuSize(17), "%s %d%%", LANGUAGEPHRASE("dialog_cpuusage"), int(occup) );
     }
     else
     {
+        g_imRenderer->Color4f( 1.0f, 0.3f, 0.3f, 1.0f );
         glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
         g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - GetMenuSize(50), size, LANGUAGEPHRASE("dialog_cpuusageunknown") );
     }
 #endif
 
+    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     float memoryUsage = g_cachedSampleManager.GetMemoryUsage();
     memoryUsage /= 1024.0f;

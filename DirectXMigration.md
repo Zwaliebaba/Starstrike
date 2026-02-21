@@ -483,57 +483,74 @@ Same situation as landscape — uses vertex arrays with `glVertexPointer` / `glC
 
 ---
 
-## 10. Phase 7 — 2D / UI Rendering Migration
+## 10. Phase 7 — 2D / UI Rendering Migration ✅ COMPLETED
 
-### 10.1 Text Renderer
+ImRenderer calls have been added **alongside** existing OpenGL calls in all Phase 7 files. OpenGL still does all visible rendering. The ImRenderer receives the same vertex data and state changes, preparing for the final switchover in Phase 9.
+
+### 10.1 Text Renderer ✅
 
 **File:** `NeuronClient\text_renderer.cpp`
 
-- `BeginText2D()` — Replace `glMatrixMode`/`glLoadIdentity`/`gluOrtho2D` with `g_imRenderer->SetProjectionMatrix(orthoMatrix)` and `g_imRenderer->SetViewMatrix(identity)`.
-- `DrawText2DSimple()`, `DrawText2DUp()`, `DrawText2DDown()`, all `DrawText2D*` variants — Replace `glBegin(GL_QUADS)`/`glTexCoord2f`/`glVertex2f`/`glEnd` with `g_imRenderer` equivalents.
-- `EndText2D()` — Restore previous matrices.
-- `BuildOpenGlState()` — Replace `ConvertToTexture()` result handling (should work once Phase 4 is complete).
+- `DrawText2DSimple()` — `glBegin(GL_QUADS)` / `glTexCoord2f` / `glVertex2f` / `glEnd()` duplicated with `g_imRenderer->Begin(PRIM_QUADS)` etc.
+- `DrawText2DUp()` — Same quad duplication.
+- `DrawText2DDown()` — Same quad duplication.
+- `DrawText3DSimple()` — Same quad duplication for 3D text.
+- `DrawText3D()` (with front/up vectors) — Same quad duplication.
+- `BeginText2D()` / `EndText2D()` — Matrix save/restore already done in Phase 5.
+- `BuildOpenGlState()` — Texture binding via `g_imRenderer->BindTexture()` added alongside `glBindTexture`.
+- All `glColor4f` calls duplicated with `g_imRenderer->Color4f`.
 
-### 10.2 Taskmanager Interface Icons (Heaviest File)
+### 10.2 Taskmanager Interface Icons (Heaviest File) ✅
 
-**File:** `Starstrike\taskmanager_interface_icons.cpp` — 633 GL calls
+**File:** `Starstrike\taskmanager_interface_icons.cpp` — 649 GL calls → 636 D3D11 calls
 
-This file is mostly 2D quads with textures and colours. Bulk search-and-replace:
-- `glBegin(GL_QUADS)` → `g_imRenderer->Begin(PRIM_QUADS)`
-- `glEnd()` → `g_imRenderer->End()`
-- `glVertex2f(x, y)` → `g_imRenderer->Vertex2f(x, y)`
-- `glTexCoord2f(u, v)` → `g_imRenderer->TexCoord2f(u, v)`
-- `glColor4f(r,g,b,a)` → `g_imRenderer->Color4f(r,g,b,a)`
-- `glEnable(GL_TEXTURE_2D)` → `g_imRenderer->BindTexture(...)`
-- `glDisable(GL_TEXTURE_2D)` → `g_imRenderer->UnbindTexture()`
-- `glEnable(GL_BLEND)` / `glBlendFunc(...)` → `g_renderDevice->SetBlendState(...)`
+Bulk migration via PowerShell scripts:
+- All 46 `glBegin`/`glEnd` blocks (quads, triangles, lines, line loops) duplicated with `g_imRenderer->Begin`/`End` equivalents.
+- All standalone `glColor4f`/`glColor4ub`/`glColor3ub` calls duplicated with `g_imRenderer->Color*`.
+- All `glBlendFunc` calls paired with `g_renderStates->SetBlendState()`.
+- All `glBindTexture` calls paired with `g_imRenderer->BindTexture()`.
+- All `glDisable(GL_TEXTURE_2D)` calls paired with `g_imRenderer->UnbindTexture()`.
+- All `glDepthMask` calls paired with `g_renderStates->SetDepthState()`.
+- `SetupRenderMatrices()` — added `g_imRenderer->SetProjectionMatrix(XMMatrixOrthographicOffCenterRH(...))` alongside `gluOrtho2D`.
+- `Render()` — Blend/cull state setup via `g_renderStates`.
+- `RenderIcon()` — Full dual-path for textured icon rendering with shadow (subtractive color blend) and foreground (additive blend).
+- `RenderScreenZones()` — Highlight quad and textured selection brackets.
+- 4 broken `if`/`else` patterns (braceless if with two statements) fixed with explicit braces.
 
-### 10.3 All UI Windows (GameLogic)
+### 10.3 All UI Windows (GameLogic) ✅
 
-**Files (partial list, all in GameLogic):**
-- `darwinia_window.cpp`, `mainmenus.cpp`, `scrollbar.cpp`, `drop_down_menu.cpp`, `input_field.cpp`, `profilewindow.cpp`, `prefs_graphics_window.cpp`, `prefs_screen_window.cpp`, `prefs_sound_window.cpp`, `prefs_other_window.cpp`, `network_window.cpp`, `userprofile_window.cpp`
+**Files migrated:**
+- `darwinia_window.cpp` — `DarwiniaButton::Render`, `DarwiniaWindow::Render`, `BorderlessButton::Render`, `CloseButton::Render`, `InvertedBox::Render` (consolidated 4 GL_LINES into 1 PRIM_LINES + color change), `LabelButton::Render`.
+- `mainmenus.cpp` — `ResetLocationWindow::Render`, `AboutDarwiniaWindow::Render`, `SkipPrologueWindow::Render`, `PlayPrologueWindow::Render`. Textured quads with additive blend.
+- `scrollbar.cpp` — Background quad, border line loop, bar quad.
+- `drop_down_menu.cpp` — Triangle indicator.
+- `input_field.cpp` — Edit area quad, border lines, `ColourWidget::Render`, `ColourWindow::Render`.
+- `profilewindow.cpp` — Performance bar quad and color calls.
+- `prefs_graphics_window.cpp`, `prefs_screen_window.cpp`, `prefs_sound_window.cpp`, `prefs_other_window.cpp`, `network_window.cpp`, `userprofile_window.cpp` — Color calls only.
 
-All follow the same pattern of `glBegin(GL_QUADS)` for UI elements. Apply the same mechanical replacement.
-
-### 10.4 Game Cursor
+### 10.4 Game Cursor ✅
 
 **File:** `Starstrike\gamecursor.cpp`
 
-Replace immediate-mode 2D drawing with `g_imRenderer`.
+- Arrow rendering functions, `RenderSelectionArrow`, `MouseCursor::Render`, `MouseCursor::Render3D` — all duplicated with `g_imRenderer` calls.
 
-### 10.5 Start Sequence
+### 10.5 Start Sequence ✅
 
 **File:** `Starstrike\startsequence.cpp`
 
-Replace `glBegin`/`glEnd` blocks.
+- Full `Render()` function duplicated with `g_imRenderer` calls.
 
-### 10.6 Game Menu
+### 10.6 Game Menu ✅
 
 **File:** `Starstrike\game_menu.cpp`
 
-Replace `glBegin`/`glEnd` blocks.
+- Color calls duplicated. The only `glBegin` block is inside a `/* */` comment (disabled code).
 
-**Verification:** All 2D UI renders correctly.
+### 10.7 Includes Added
+
+All Phase 7 files have `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"` (and `"texture_manager.h"` where sampler state IDs are referenced).
+
+**Verification:** Build passes. All Phase 7 files have ImRenderer calls alongside GL calls. OpenGL continues to handle all visible rendering.
 
 ---
 
@@ -729,7 +746,7 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 4:** Migrate texture system (`ConvertToTexture`, `TextureManager`, sampler states)
 - [x] **Phase 5:** Migrate matrix system (projection, modelview, `gluPerspective`, `gluLookAt`)
 - [x] **Phase 6:** Migrate core 3D rendering (shapes, landscape, spheres, particles, water, clouds)
-- [ ] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
+- [x] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [ ] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
 - [ ] **Phase 9:** Remove all OpenGL code, headers, libs
 - [ ] **Phase 10:** Polish, optimise batching, static VBs, final cleanup
