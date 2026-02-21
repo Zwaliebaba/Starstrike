@@ -818,8 +818,6 @@ void ShapeFragment::Render(float _predictionTime)
   {
     g_imRenderer->PushMatrix();
     g_imRenderer->MultMatrixf(predictedTransform.ConvertToOpenGLFormat());
-    glPushMatrix();
-    glMultMatrixf(predictedTransform.ConvertToOpenGLFormat());
   }
 
   RenderSlow();
@@ -831,7 +829,6 @@ void ShapeFragment::Render(float _predictionTime)
   if (!matrixIsIdentity)
   {
     g_imRenderer->PopMatrix();
-    glPopMatrix();
   }
 #endif
 }
@@ -867,7 +864,6 @@ void ShapeFragment::RenderSlow()
   }
   g_imRenderer->End();
 
-  glBegin(GL_TRIANGLES);
 
   norm = 0;
   for (int i = 0; i < m_numTriangles; i++)
@@ -878,20 +874,9 @@ void ShapeFragment::RenderSlow()
 
     constexpr unsigned char alpha = 255;
 
-    glNormal3fv(m_normals[norm].GetData());
-    glColor4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
-    glVertex3fv(m_positions[vertA->m_posId].GetData());
 
-    glNormal3fv(m_normals[norm].GetData());
-    glColor4ub(m_colours[vertB->m_colId].r, m_colours[vertB->m_colId].g, m_colours[vertB->m_colId].b, alpha);
-    glVertex3fv(m_positions[vertB->m_posId].GetData());
-
-    glNormal3fv(m_normals[norm].GetData());
-    glColor4ub(m_colours[vertC->m_colId].r, m_colours[vertC->m_colId].g, m_colours[vertC->m_colId].b, alpha);
-    glVertex3fv(m_positions[vertC->m_posId].GetData());
     norm++;
   }
-  glEnd();
 #endif
 }
 
@@ -978,7 +963,6 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
   int i;
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-  glDisable(GL_DEPTH_TEST);
 
   int numMarkers = m_childMarkers.Size();
   for (i = 0; i < numMarkers; ++i)
@@ -990,7 +974,6 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
   }
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  glEnable(GL_DEPTH_TEST);
 
   int numChildren = m_childFragments.Size();
   for (i = 0; i < numChildren; ++i)
@@ -1288,17 +1271,10 @@ void Shape::Render(float _predictionTime, const Matrix34& _transform)
 #ifndef EXPORTER_BUILD
   g_imRenderer->PushMatrix();
   g_imRenderer->MultMatrixf(_transform.ConvertToOpenGLFormat());
-  glEnable(GL_COLOR_MATERIAL);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glMultMatrixf(_transform.ConvertToOpenGLFormat());
 
   m_rootFragment->Render(_predictionTime);
 
   g_imRenderer->PopMatrix();
-  glDisable(GL_COLOR_MATERIAL);
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
 #endif
 }
 

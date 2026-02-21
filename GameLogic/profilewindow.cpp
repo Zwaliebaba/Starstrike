@@ -56,7 +56,6 @@ public:
 };
 
 
-
 // ****************************************************************************
 // Class ProfileWindow
 // ****************************************************************************
@@ -132,7 +131,6 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 			if (brightness < 105) brightness = 105;
 			else if (brightness > 255) brightness = 255;
 			g_imRenderer->Color3ub( brightness, brightness, brightness );
-			glColor3ub( brightness, brightness, brightness );
 
 			// Deal with mouse clicks to expand or unexpand a node
 			if ( g_inputManager->controlEvent( ControlEclipseLMousePressed ) ) // g_inputManager->GetRawLmbClicked()
@@ -162,13 +160,6 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 				g_imRenderer->Vertex2i( lineLeft, lineY + lineHeight );
 			g_imRenderer->End();
 
-			glColor4ub( 150, 150, 250, brightness );
-			glBegin( GL_QUADS );
-				glVertex2i( lineLeft, lineY);
-				glVertex2i( lineLeft + lineWidth, lineY);
-				glVertex2i( lineLeft + lineWidth, lineY + lineHeight );
-				glVertex2i( lineLeft, lineY + lineHeight );
-			glEnd();
 
 			if (m_yPos > m_h)
 			{
@@ -185,7 +176,6 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
     }
 
 	g_imRenderer->Color3ub(255,255,255);
-	glColor3ub(255,255,255);
 	g_editorFont.DrawText2D( left + (_indent+1) * 7.5f, m_yPos+=12, DEF_FONT_SIZE, "Total %.0f", totalTime );
 }
 

@@ -2123,7 +2123,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
 /*
     #ifdef DEBUG_RENDER_ENABLED
         g_imRenderer->UnbindTexture();
-        glDisable( GL_TEXTURE_2D );
     //    if( m_avoidObstruction != g_zeroVector )
     //    {
     //        RenderArrow( predictedPos, m_avoidObstruction, 1.0f );
@@ -2142,11 +2141,8 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
     //        RenderArrow( predictedPos, m_grenadeTarget, 1.0f, RGBAColour(255,0,0,255) );
     //        RenderSphere( m_grenadeTarget, 50.0f, RGBAColour(255,0,0,255) );
     //    }
-          glEnable( GL_TEXTURE_2D );
           g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-          glEnable( GL_BLEND );
     #endif*/
-
 
 
     //
@@ -2157,7 +2153,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         int alpha = 150 * _highDetail;
         alpha = min( alpha, 255 );
         g_imRenderer->Color4ub( 0, 0, 0, alpha  );
-        glColor4ub( 0, 0, 0, alpha  );
 
         LegacyVector3 pos1 = predictedPos - entityRight;
         LegacyVector3 pos2 = predictedPos + entityRight;
@@ -2170,8 +2165,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         pos4.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue( pos4.x, pos4.z );
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        glDepthMask( false );
-        glLineWidth( 1.0f );
         g_imRenderer->Begin(PRIM_QUADS);
             g_imRenderer->TexCoord2f(0.0f, 0.0f);       g_imRenderer->Vertex3fv(pos1.GetData());
             g_imRenderer->TexCoord2f(1.0f, 0.0f);       g_imRenderer->Vertex3fv(pos2.GetData());
@@ -2179,14 +2172,7 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
             g_imRenderer->TexCoord2f(0.0f, 1.0f);       g_imRenderer->Vertex3fv(pos4.GetData());
         g_imRenderer->End();
 
-        glBegin( GL_QUADS );
-            glTexCoord2f(0.0f, 0.0f);       glVertex3fv(pos1.GetData());
-            glTexCoord2f(1.0f, 0.0f);       glVertex3fv(pos2.GetData());
-            glTexCoord2f(1.0f, 1.0f);       glVertex3fv(pos3.GetData());
-            glTexCoord2f(0.0f, 1.0f);       glVertex3fv(pos4.GetData());
-        glEnd();
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        glDepthMask( true );
     }
 
     if( !m_dead || !m_onGround )
@@ -2204,7 +2190,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         if( m_dead )
         {
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glEnable( GL_BLEND );
             colour.a = 2.5f * (float) m_stats[StatHealth];
             colour.r *= 0.2f;
             colour.g *= 0.2f;
@@ -2220,7 +2205,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         }
 
         g_imRenderer->Color4ubv(colour.GetData());
-        glColor4ubv(colour.GetData());
         g_imRenderer->Begin(PRIM_QUADS);
             g_imRenderer->TexCoord2i(0, 1);     g_imRenderer->Vertex3fv( (predictedPos - entityRight + entityUp).GetData() );
             g_imRenderer->TexCoord2i(1, 1);     g_imRenderer->Vertex3fv( (predictedPos + entityRight + entityUp).GetData() );
@@ -2228,12 +2212,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
             g_imRenderer->TexCoord2i(0, 0);     g_imRenderer->Vertex3fv( (predictedPos - entityRight).GetData() );
         g_imRenderer->End();
 
-        glBegin(GL_QUADS);
-            glTexCoord2i(0, 1);     glVertex3fv( (predictedPos - entityRight + entityUp).GetData() );
-            glTexCoord2i(1, 1);     glVertex3fv( (predictedPos + entityRight + entityUp).GetData() );
-            glTexCoord2i(1, 0);     glVertex3fv( (predictedPos + entityRight).GetData() );
-            glTexCoord2i(0, 0);     glVertex3fv( (predictedPos - entityRight).GetData() );
-        glEnd();
 
         //glDisable( GL_BLEND );
 
@@ -2243,17 +2221,13 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         if( m_state == StateUnderControl )
         {
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glEnable    ( GL_BLEND );
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-            glDisable   ( GL_DEPTH_TEST );
             float scale = 1.1f;
             entityRight *= scale;
             entityUp *= scale;
             float alpha = fabs(sinf(g_gameTime * 2.0f));
             g_imRenderer->Color4f( 0.0f, 0.0f, 1.0f, alpha );
-            glColor4f   ( 0.0f, 0.0f, 1.0f, alpha );
             g_imRenderer->Begin(PRIM_QUADS);
                 g_imRenderer->TexCoord2i(0, 1);     g_imRenderer->Vertex3fv( (predictedPos - entityRight + entityUp).GetData() );
                 g_imRenderer->TexCoord2i(1, 1);     g_imRenderer->Vertex3fv( (predictedPos + entityRight + entityUp).GetData() );
@@ -2261,16 +2235,8 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                 g_imRenderer->TexCoord2i(0, 0);     g_imRenderer->Vertex3fv( (predictedPos - entityRight).GetData() );
             g_imRenderer->End();
 
-            glBegin(GL_QUADS);
-                glTexCoord2i(0, 1);     glVertex3fv( (predictedPos - entityRight + entityUp).GetData() );
-                glTexCoord2i(1, 1);     glVertex3fv( (predictedPos + entityRight + entityUp).GetData() );
-                glTexCoord2i(1, 0);     glVertex3fv( (predictedPos + entityRight).GetData() );
-                glTexCoord2i(0, 0);     glVertex3fv( (predictedPos - entityRight).GetData() );
-            glEnd();
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            glEnable    ( GL_DEPTH_TEST );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         }
 
         //
@@ -2323,11 +2289,8 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                     if( m_id.GetTeamId() == 0 )
                     {
                         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-                        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
                         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-                        glEnable    ( GL_BLEND );
                         g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, alpha);
-                        glColor4f   ( 0.0f, 0.0f, 0.0f, alpha);
                         LegacyVector3 shadowVector = length;
                         shadowVector.SetLength( 0.05f );
                         predictedPos += shadowVector;
@@ -2338,12 +2301,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                             g_imRenderer->TexCoord2i(0, 0);     g_imRenderer->Vertex3fv( (predictedPos - entityRight).GetData() );
                         g_imRenderer->End();
 
-                        glBegin(GL_QUADS);
-                            glTexCoord2i(0, 1);     glVertex3fv( (predictedPos - entityRight + entityUp).GetData() );
-                            glTexCoord2i(1, 1);     glVertex3fv( (predictedPos + entityRight + entityUp).GetData() );
-                            glTexCoord2i(1, 0);     glVertex3fv( (predictedPos + entityRight).GetData() );
-                            glTexCoord2i(0, 0);     glVertex3fv( (predictedPos - entityRight).GetData() );
-                        glEnd();
                     }
 
                     // Shadow on the ground
@@ -2361,9 +2318,7 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                     pos4.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue( pos4.x, pos4.z );
 
                     //glDisable( GL_DEPTH_TEST );
-                    glShadeModel( GL_SMOOTH );
                     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-                    glDepthMask ( false );
                     g_imRenderer->Begin(PRIM_QUADS);
                         g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, alpha);
                         g_imRenderer->TexCoord2f(0.0f, 0.0f);       g_imRenderer->Vertex3fv(pos1.GetData());
@@ -2373,23 +2328,12 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                         g_imRenderer->TexCoord2f(0.0f, 1.0f);       g_imRenderer->Vertex3fv(pos4.GetData());
                     g_imRenderer->End();
 
-                    glBegin( GL_QUADS );
-                        glColor4f   ( 0.0f, 0.0f, 0.0f, alpha);
-                        glTexCoord2f(0.0f, 0.0f);       glVertex3fv(pos1.GetData());
-                        glTexCoord2f(1.0f, 0.0f);       glVertex3fv(pos2.GetData());
-                        glColor4f   ( 0.0f, 0.0f, 0.0f, 0.1f*alpha);
-                        glTexCoord2f(1.0f, 1.0f);       glVertex3fv(pos3.GetData());
-                        glTexCoord2f(0.0f, 1.0f);       glVertex3fv(pos4.GetData());
-                    glEnd();
-                    glShadeModel( GL_FLAT );
                     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                    glDepthMask( true );
                 }
             }
         }
 
     }
-
 
 
     //
@@ -2401,9 +2345,7 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         {
             int santaHatId = g_app->m_resource->GetTexture( "sprites/santahat.bmp" );
             g_imRenderer->BindTexture(santaHatId );
-            glBindTexture( GL_TEXTURE_2D, santaHatId );
             g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-            glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
             predictedPos += entityUp * 0.95f;
             predictedPos += m_front * 0.01f;
             entityRight *= 0.65f;
@@ -2415,14 +2357,7 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                 g_imRenderer->TexCoord2i(0, 0);     g_imRenderer->Vertex3fv( (predictedPos - entityRight).GetData() );
             g_imRenderer->End();
 
-            glBegin(GL_QUADS);
-                glTexCoord2i(0, 1);     glVertex3fv( (predictedPos - entityRight + entityUp).GetData() );
-                glTexCoord2i(1, 1);     glVertex3fv( (predictedPos + entityRight + entityUp).GetData() );
-                glTexCoord2i(1, 0);     glVertex3fv( (predictedPos + entityRight).GetData() );
-                glTexCoord2i(0, 0);     glVertex3fv( (predictedPos - entityRight).GetData() );
-            glEnd();
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
-            glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
         }
     }
 
@@ -2459,7 +2394,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
         unsigned char alpha = (float)m_stats[StatHealth] * 2.55f;
 
         g_imRenderer->Color4ub( 0, 0, 0, alpha );
-        glColor4ub( 0, 0, 0, alpha );
 
         entityRight *= 0.5f;
         entityUp *= 0.5;
@@ -2506,12 +2440,6 @@ void Darwinian::Render( float _predictionTime, float _highDetail )
                 g_imRenderer->TexCoord2f(left, top);        g_imRenderer->Vertex3fv( (fragmentPos - entityRight).GetData() );
             g_imRenderer->End();
 
-            glBegin(GL_QUADS);
-                glTexCoord2f(left, bottom);     glVertex3fv( (fragmentPos - entityRight + entityUp).GetData() );
-                glTexCoord2f(right, bottom);    glVertex3fv( (fragmentPos + entityRight + entityUp).GetData() );
-                glTexCoord2f(right, top);       glVertex3fv( (fragmentPos + entityRight).GetData() );
-                glTexCoord2f(left, top);        glVertex3fv( (fragmentPos - entityRight).GetData() );
-            glEnd();
         }
     }
 }
@@ -2529,7 +2457,6 @@ void Darwinian::ListSoundEvents( LList<char *> *_list )
     _list->PutData( "VictoryJump" );
     _list->PutData( "OnFire" );
 }
-
 
 
 // ===========================================================================
@@ -2590,9 +2517,7 @@ void BoxKite::Release()
 void BoxKite::Render( float _predictionTime )
 {
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable   (GL_BLEND);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask (true);
 
     LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
 
@@ -2619,19 +2544,14 @@ void BoxKite::Render( float _predictionTime )
     // Candle in the middle
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable    (GL_BLEND);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask (false);
 
     LegacyVector3 camUp = g_app->m_camera->GetUp() * 3.0f * scale * m_brightness;
     LegacyVector3 camRight = g_app->m_camera->GetRight() * 3.0f * scale * m_brightness;
 
     g_imRenderer->Color4f( 1.0f, 0.75f, 0.2f, m_brightness );
-    glColor4f( 1.0f, 0.75f, 0.2f, m_brightness );
 
-    glEnable        ( GL_TEXTURE_2D );
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 
     g_imRenderer->Begin(PRIM_QUADS);
         g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (predictedPos-camRight+camUp).GetData() );
@@ -2640,12 +2560,6 @@ void BoxKite::Render( float _predictionTime )
         g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (predictedPos-camRight-camUp).GetData() );
     g_imRenderer->End();
 
-    glBegin( GL_QUADS );
-        glTexCoord2i(0,0);      glVertex3fv( (predictedPos-camRight+camUp).GetData() );
-        glTexCoord2i(1,0);      glVertex3fv( (predictedPos+camRight+camUp).GetData() );
-        glTexCoord2i(1,1);      glVertex3fv( (predictedPos+camRight-camUp).GetData() );
-        glTexCoord2i(0,1);      glVertex3fv( (predictedPos-camRight-camUp).GetData() );
-    glEnd();
 
     camUp *= 0.2f;
     camRight *= 0.2f;
@@ -2657,12 +2571,5 @@ void BoxKite::Render( float _predictionTime )
         g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (predictedPos-camRight-camUp).GetData() );
      g_imRenderer->End();
 
-    glBegin( GL_QUADS );
-        glTexCoord2i(0,0);      glVertex3fv( (predictedPos-camRight+camUp).GetData() );
-        glTexCoord2i(1,0);      glVertex3fv( (predictedPos+camRight+camUp).GetData() );
-        glTexCoord2i(1,1);      glVertex3fv( (predictedPos+camRight-camUp).GetData() );
-        glTexCoord2i(0,1);      glVertex3fv( (predictedPos-camRight-camUp).GetData() );
-     glEnd();
 
-    glDisable       ( GL_TEXTURE_2D );
 }

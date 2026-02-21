@@ -87,37 +87,13 @@ void WindowManager::RestoreDesktop()
 
 bool WindowManager::EnableOpenGL(int _colourDepth, int _zDepth)
 {
-  PIXELFORMATDESCRIPTOR pfd;
-  int format;
-
-  // Get the device context (DC)
-  m_win32Specific->m_hDC = GetDC(m_win32Specific->m_hWnd);
-
-  // Set the pixel format for the DC
-  ZeroMemory(&pfd, sizeof( pfd ));
-  pfd.nSize = sizeof(pfd);
-  pfd.nVersion = 1;
-  pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-  pfd.iPixelType = PFD_TYPE_RGBA;
-  pfd.cColorBits = _colourDepth;
-  pfd.cDepthBits = _zDepth;
-  pfd.iLayerType = PFD_MAIN_PLANE;
-  format = ChoosePixelFormat(m_win32Specific->m_hDC, &pfd);
-  SetPixelFormat(m_win32Specific->m_hDC, format, &pfd);
-
-  // Create and enable the render context (RC)
-  m_win32Specific->m_hRC = wglCreateContext(m_win32Specific->m_hDC);
-  wglMakeCurrent(m_win32Specific->m_hDC, m_win32Specific->m_hRC);
-
-  glClear(GL_COLOR_BUFFER_BIT);
+  // OpenGL context removed — D3D11 device is created in CreateWin()
   return true;
 }
 
 void WindowManager::DisableOpenGL()
 {
-  wglMakeCurrent(nullptr, nullptr);
-  wglDeleteContext(m_win32Specific->m_hRC);
-  ReleaseDC(m_win32Specific->m_hWnd, m_win32Specific->m_hDC);
+  // OpenGL context removed — D3D11 device is destroyed in DestroyWin()
 }
 
 // Returns an index into the list of already registered resolutions
@@ -249,15 +225,11 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
 
   m_mouseOffsetX = INT_MAX;
 
-  // Enable OpenGL for the window
-  EnableOpenGL(_colourDepth, _zDepth);
-
-  // Initialise D3D11 device alongside OpenGL (Phase 1)
+  // Initialise D3D11 device (Phase 1 / Phase 9: OpenGL removed)
   g_renderDevice = new RenderDevice();
   if (!g_renderDevice->Initialise(m_win32Specific->m_hWnd, m_screenW, m_screenH, _windowed, _waitVRT))
   {
-    DebugTrace("WARNING: D3D11 device creation failed, continuing with OpenGL only\n");
-    SAFE_DELETE(g_renderDevice);
+    Neuron::Fatal("D3D11 device creation failed");
   }
 
   // Initialise immediate-mode emulation layer (Phase 2)
@@ -282,11 +254,14 @@ void WindowManager::DestroyWin()
   SAFE_DELETE(g_renderStates);
   SAFE_DELETE(g_imRenderer);
   SAFE_DELETE(g_renderDevice);
-  DisableOpenGL();
   DestroyWindow(m_win32Specific->m_hWnd);
 }
 
-void WindowManager::Flip() { SwapBuffers(m_win32Specific->m_hDC); }
+void WindowManager::Flip()
+{
+  if (g_renderDevice)
+    g_renderDevice->EndFrame();
+}
 
 void WindowManager::NastyPollForMessages()
 {

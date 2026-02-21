@@ -188,9 +188,7 @@ void GlobalInternet::Render()
     /*static*/ float scale = 1000.0f;
 
     g_imRenderer->PushMatrix();
-    glPushMatrix();
     g_imRenderer->Scalef( scale, scale, scale );
-    glScalef    ( scale, scale, scale );
 
 
     float fog = 0.0f;
@@ -206,39 +204,24 @@ void GlobalInternet::Render()
 //        fogVal -= 100000;
 //    }
 
-    glFogf      ( GL_FOG_DENSITY, 1.0f );
-    glFogf      ( GL_FOG_START, 0.0f );
-    glFogf      ( GL_FOG_END, (float) fogVal );
-    glFogfv     ( GL_FOG_COLOR, fogCol );
-    glFogi      ( GL_FOG_MODE, GL_LINEAR );
-    glEnable    ( GL_FOG );
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable        ( GL_BLEND );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask     ( false );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable       ( GL_CULL_FACE );
-    glEnable        ( GL_TEXTURE_2D );
 
 
 	int linksId = g_app->m_resource->GetDisplayList(DISPLAY_LIST_NAME_LINKS);
     if( linksId >= 0 )
     {
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
-        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
 
-        glCallList( linksId );
     }
     else
     {
         linksId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_LINKS);
-        glNewList(linksId, GL_COMPILE);
 
         g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
-        glColor4f       ( 0.25f, 0.25f, 0.5f, 0.8f );
 
 		//
 		// Render Links
@@ -266,7 +249,6 @@ void GlobalInternet::Render()
         }
         g_imRenderer->End();
 
-        glBegin( GL_QUADS );
 
         for( int i = 0; i < m_numLinks; ++i )
         {
@@ -282,14 +264,8 @@ void GlobalInternet::Render()
 
             rightAngle *= link->m_size * 0.5f;
 
-            glTexCoord2i( 0, 0 );       glVertex3fv( (fromPos - rightAngle).GetData() );
-            glTexCoord2i( 0, 1 );       glVertex3fv( (fromPos + rightAngle).GetData() );
-            glTexCoord2i( 1, 1 );       glVertex3fv( (toPos + rightAngle).GetData() );
-            glTexCoord2i( 1, 0 );       glVertex3fv( (toPos - rightAngle).GetData() );
         }
-        glEnd();
 
-        glEndList();
     }
 
 
@@ -297,17 +273,13 @@ void GlobalInternet::Render()
     if( nodesId >= 0 )
     {
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp") );
-        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp") );
 
-        glCallList( nodesId );
     }
     else
     {
         nodesId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_NODES);
-        glNewList(nodesId, GL_COMPILE);
 
         g_imRenderer->Color4f( 0.8f, 0.8f, 1.0f, 0.6f );
-        glColor4f       ( 0.8f, 0.8f, 1.0f, 0.6f );
         float nodeSize = 10.0f;
 
         g_imRenderer->Begin(PRIM_QUADS);
@@ -327,7 +299,6 @@ void GlobalInternet::Render()
         }
         g_imRenderer->End();
 
-        glBegin         ( GL_QUADS );
         for( int i = 0; i < m_numNodes; ++i )
         {
             GlobalInternetNode *node = &m_nodes[i];
@@ -337,36 +308,22 @@ void GlobalInternet::Render()
             LegacyVector3 up              = right ^ camToMidPoint;
             right *= nodeSize;
             up *= nodeSize;
-            glTexCoord2i( 0, 0 );       glVertex3fv( (node->m_pos - up - right).GetData() );
-            glTexCoord2i( 1, 0 );       glVertex3fv( (node->m_pos - up + right).GetData() );
-            glTexCoord2i( 1, 1 );       glVertex3fv( (node->m_pos + up + right).GetData() );
-            glTexCoord2i( 0, 1 );       glVertex3fv( (node->m_pos + up - right).GetData() );
         }
-        glEnd();
 
-        glEndList();
     }
 
 
-    glDisable       ( GL_TEXTURE_2D );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable        ( GL_CULL_FACE );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask     ( true );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable       ( GL_BLEND );
-
 
 
     RenderPackets();
 
     g_app->m_globalWorld->SetupFog();
-    glDisable( GL_FOG );
 
     g_imRenderer->PopMatrix();
-    glPopMatrix ();
 
     END_PROFILE(g_app->m_profiler,  "Internet" );
 }
@@ -443,19 +400,12 @@ void GlobalInternet::RenderPackets()
     float posChange = g_advanceTime;
 
     g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
-    glColor4f( 0.25f, 0.25f, 0.5f, 0.8f );
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable       ( GL_CULL_FACE );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable        ( GL_BLEND );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-    glEnable        ( GL_TEXTURE_2D );
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask     ( false );
 
     for( int i = 0; i < m_numLinks; ++i )
     {
@@ -506,25 +456,12 @@ void GlobalInternet::RenderPackets()
                 g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (packetPos + camUp - camRight).GetData() );
             g_imRenderer->End();
 
-            glBegin( GL_QUADS );
-                glTexCoord2i( 0, 0 );       glVertex3fv( (packetPos - camUp - camRight).GetData() );
-                glTexCoord2i( 1, 0 );       glVertex3fv( (packetPos - camUp + camRight).GetData() );
-                glTexCoord2i( 1, 1 );       glVertex3fv( (packetPos + camUp + camRight).GetData() );
-                glTexCoord2i( 0, 1 );       glVertex3fv( (packetPos + camUp - camRight).GetData() );
-            glEnd();
         }
     }
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask ( true );
-    glDisable   ( GL_TEXTURE_2D );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable   ( GL_BLEND );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable    ( GL_CULL_FACE );
 
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 }

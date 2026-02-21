@@ -455,7 +455,6 @@ void ResetLocationWindow::Render(bool _hasFocus)
   float fontSize = GetMenuSize(13);
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset1"));
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset2"));
 
@@ -551,11 +550,6 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, texId);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   float texH = 1.0f;
   float texW = texH * 512.0f / 64.0f;
@@ -572,21 +566,9 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   g_imRenderer->Vertex2f(m_x + m_w / 2 - 25, m_y + GetMenuSize(80));
   g_imRenderer->End();
 
-  glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex2f(m_x + m_w / 2 - 25, m_y + 30);
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(m_x + m_w / 2 + 25, m_y + 30);
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex2f(m_x + m_w / 2 + 25, m_y + GetMenuSize(80));
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(m_x + m_w / 2 - 25, m_y + GetMenuSize(80));
-  glEnd();
 
   g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + 100;
   float h = GetMenuSize(18);
@@ -597,7 +579,6 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   sprintf(about, "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += 2 * h, fontSize, about);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "http://www.introversion.co.uk");
@@ -639,11 +620,6 @@ void SkipPrologueWindow::Render(bool _hasFocus)
   g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, texId);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   float texH = 1.0f;
   float texW = texH * 512.0f / 64.0f;
@@ -660,21 +636,9 @@ void SkipPrologueWindow::Render(bool _hasFocus)
   g_imRenderer->Vertex2f(m_x + 25, m_y + GetMenuSize(200));
   g_imRenderer->End();
 
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex2f(m_x + 25, m_y + 30);
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(m_x + m_w - 25, m_y + 30);
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(m_x + 25, m_y + GetMenuSize(200));
-  glEnd();
 
   g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + m_h - GetMenuSize(150);
   float h = GetMenuSize(18);
@@ -682,7 +646,6 @@ void SkipPrologueWindow::Render(bool _hasFocus)
   float fontSize = GetMenuSize(13);
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_skip1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
@@ -727,11 +690,6 @@ void PlayPrologueWindow::Render(bool _hasFocus)
   g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, texId);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   float texH = 1.0f;
   float texW = texH * 512.0f / 64.0f;
@@ -748,21 +706,9 @@ void PlayPrologueWindow::Render(bool _hasFocus)
   g_imRenderer->Vertex2f(m_x + 25, m_y + GetMenuSize(200));
   g_imRenderer->End();
 
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0f, 1.0f);
-  glVertex2f(m_x + 25, m_y + 30);
-  glTexCoord2f(1.0f, 1.0f);
-  glVertex2f(m_x + m_w - 25, m_y + 30);
-  glTexCoord2f(1.0f, 0.0f);
-  glVertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
-  glTexCoord2f(0.0f, 0.0f);
-  glVertex2f(m_x + 25, m_y + GetMenuSize(200));
-  glEnd();
 
   g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + m_h - GetMenuSize(150);
   float h = GetMenuSize(18);
@@ -770,7 +716,6 @@ void PlayPrologueWindow::Render(bool _hasFocus)
   float fontSize = GetMenuSize(13);
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_prologue1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)

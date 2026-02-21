@@ -41,22 +41,13 @@ void ViriiUnit::Render(float _predictionTime)
   float nearPlaneStart = g_app->m_renderer->GetNearPlane();
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.05f, g_app->m_renderer->GetFarPlane());
 
-  glEnable(GL_TEXTURE_2D);
   g_imRenderer->BindTexture(g_app->m_resource->GetTexture("sprites/viriifull.bmp"));
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/viriifull.bmp"));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  glEnable(GL_BLEND);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  glDepthMask(false);
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  glDisable(GL_CULL_FACE);
   g_imRenderer->Begin(PRIM_QUADS);
-  glBegin(GL_QUADS);
 
   //
   // Render high detail?
@@ -108,18 +99,10 @@ void ViriiUnit::Render(float _predictionTime)
   }
 
   g_imRenderer->End();
-  glEnd();
-  glDisable(GL_TEXTURE_2D);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  glDisable(GL_BLEND);
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-  glEnable(GL_CULL_FACE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  glDepthMask(true);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
 }
@@ -882,17 +865,8 @@ void Virii::Render(float predictionTime, int teamId, int _detail)
       newCol = 0;
     wormColour.a = newCol;
     g_imRenderer->Color4ubv(wormColour.GetData());
-    glColor4ubv(wormColour.GetData());
 
-    glTexCoord2f(0.0f, wormTexYpos);
-    glVertex3fv((prevPos.m_pos - wormRightAngle).GetData());
-    glTexCoord2f(wormTexW, wormTexYpos);
-    glVertex3fv((prevPos.m_pos + wormRightAngle).GetData());
     wormTexYpos += (distance * 6) / 512.0f;
-    glTexCoord2f(wormTexW, wormTexYpos);
-    glVertex3fv((pos + wormRightAngle).GetData());
-    glTexCoord2f(0.0f, wormTexYpos);
-    glVertex3fv((pos - wormRightAngle).GetData());
 
     //
     // Glow effect
@@ -904,17 +878,8 @@ void Virii::Render(float predictionTime, int teamId, int _detail)
         newCol = 0;
       glowColour.a = newCol;
       g_imRenderer->Color4ubv(glowColour.GetData());
-      glColor4ubv(glowColour.GetData());
 
-      glTexCoord2f(glowTexXpos, 0.0f);
-      glVertex3fv((prevPos.m_pos - glowRightAngle + glowDiff).GetData());
-      glTexCoord2f(1.0f, 0.0f);
-      glVertex3fv((prevPos.m_pos + glowRightAngle + glowDiff).GetData());
 
-      glTexCoord2f(1.0f, glowTexH);
-      glVertex3fv((pos + glowRightAngle - glowDiff).GetData());
-      glTexCoord2f(glowTexXpos, glowTexH);
-      glVertex3fv((pos - glowRightAngle - glowDiff).GetData());
     }
 
     prevPos = *history;

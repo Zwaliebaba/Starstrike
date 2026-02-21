@@ -1,8 +1,6 @@
 #ifndef INCLUDED_RENDERER_H
 #define INCLUDED_RENDERER_H
 
-#define CHECK_OPENGL_STATE()
-
 #define PIXEL_EFFECT_GRID_RES	16
 
 class Shape;

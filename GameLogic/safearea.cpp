@@ -20,7 +20,6 @@
 #include "global_world.h"
 
 
-
 SafeArea::SafeArea()
 :   Building(),
     m_size(50.0f),
@@ -112,8 +111,6 @@ void SafeArea::Render( float predictionTime )
         float angle = 0.0f;
 
         g_imRenderer->Color4ubv(colour.GetData() );
-        glColor4ubv(colour.GetData() );
-        glLineWidth( 2.0f );
         g_imRenderer->Begin(PRIM_LINE_LOOP);
         for( int i = 0; i <= numSteps; ++i )
         {
@@ -127,7 +124,6 @@ void SafeArea::Render( float predictionTime )
         }
         g_imRenderer->End();
 
-        glBegin( GL_LINE_LOOP );
         for( int i = 0; i <= numSteps; ++i )
         {
             float xDiff = m_size * sinf(angle);
@@ -135,10 +131,8 @@ void SafeArea::Render( float predictionTime )
             LegacyVector3 pos = m_pos + LegacyVector3(xDiff,5,zDiff);
 	        pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 10.0f;
             if( pos.y < 2 ) pos.y = 2;
-            glVertex3fv( pos.GetData() );
             angle += 2.0f * M_PI / (float) numSteps;
         }
-        glEnd();
     }
     else
     {

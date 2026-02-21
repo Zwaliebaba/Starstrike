@@ -148,7 +148,6 @@ void Resource::DeleteTexture(const char* _name)
   if (id > 0)
   {
     unsigned int id2 = id;
-    glDeleteTextures(1, &id2);
     if (g_textureManager)
       g_textureManager->DestroyTexture(id);
     m_textures.RemoveData(_name);
@@ -243,10 +242,11 @@ int Resource::WildCmp(const char* wild, const char* string)
 
 int Resource::CreateDisplayList(const char* _name)
 {
-  // Make sure name isn't NULL and isn't too long
   DarwiniaDebugAssert(_name && strlen(_name) < 20);
 
-  unsigned int id = glGenLists(1);
+  // Display lists removed (D3D11 migration) — return dummy ID
+  static int s_nextId = 1;
+  int id = s_nextId++;
   m_displayLists.PutData(_name, id);
 
   return id;
@@ -271,7 +271,6 @@ void Resource::DeleteDisplayList(const char* _name)
   int id = m_displayLists.GetData(_name, -1);
   if (id >= 0)
   {
-    glDeleteLists(id, 1);
     m_displayLists.RemoveData(_name);
   }
 }
@@ -279,20 +278,14 @@ void Resource::DeleteDisplayList(const char* _name)
 void Resource::FlushOpenGlState()
 {
 #if 1 // Try to catch crash on shutdown bug
-  // Tell OpenGL to delete the display lists
-  for (int i = 0; i < m_displayLists.Size(); ++i)
-  {
-    if (m_displayLists.ValidIndex(i))
-      glDeleteLists(m_displayLists[i], 1);
-  }
+  // Display lists no longer used (D3D11 migration)
+  m_displayLists.Empty();
 
-  // Tell OpenGL to delete the textures
+  // Delete D3D11 textures
   for (int i = 0; i < m_textures.Size(); ++i)
   {
     if (m_textures.ValidIndex(i))
     {
-      unsigned int id = m_textures[i];
-      glDeleteTextures(1, &id);
       if (g_textureManager)
         g_textureManager->DestroyTexture(m_textures[i]);
     }

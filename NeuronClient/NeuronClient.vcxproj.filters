@@ -54,7 +54,6 @@
     <ClInclude Include="matrix33.h" />
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
-    <ClInclude Include="ogl_extensions.h" />
     <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
@@ -232,7 +231,6 @@
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
-    <ClCompile Include="ogl_extensions.cpp" />
     <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />

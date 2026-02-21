@@ -137,7 +137,6 @@ double ProfiledElement::GetMaxChildTime()
 }
 
 
-
 // ****************************************************************************
 //  Class Profiler
 // ****************************************************************************
@@ -230,7 +229,6 @@ void Profiler::StartProfile(char const *_name)
 	{
 		if (m_doGlFinish && m_insideRenderSection)
 		{
-			glFinish();
 		}
  		pe->Start();
 	}
@@ -251,7 +249,6 @@ void Profiler::EndProfile(char const *_name)
 	{
 		if (m_doGlFinish && m_insideRenderSection)
 		{
-			glFinish();
 		}
 
 		DarwiniaDebugAssert(m_currentElement != m_rootElement);

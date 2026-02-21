@@ -295,8 +295,6 @@ void GameCursor::Render()
 	m_moveableEntitySelected = false;
 
 	// Set mip mapping for game cursor
-	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     if( g_app->m_editing || EclGetWindows()->Size() > 0 )
     {
@@ -533,11 +531,6 @@ void LeftArrow(int x, int y, int size)
 		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x - size, y + size/2 );
 	g_imRenderer->End();
 
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size, y - size/2 );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size, y + size/2 );
-	glEnd();
 }
 
 
@@ -549,11 +542,6 @@ void RightArrow(int x, int y, int size)
 		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x + size, y + size/2 );
 	g_imRenderer->End();
 
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size, y - size/2 );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size, y + size/2 );
-	glEnd();
 }
 
 
@@ -565,11 +553,6 @@ void TopArrow(int x, int y, int size)
 		g_imRenderer->TexCoord2f(1.0f, 0.5f);	g_imRenderer->Vertex2i( x,          y );
 	g_imRenderer->End();
 
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size/2, y - size );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size/2, y - size );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,          y );
-	glEnd();
 }
 
 
@@ -581,11 +564,6 @@ void BottomArrow(int x, int y, int size)
 		g_imRenderer->TexCoord2f(0.0f, 0.0f);	g_imRenderer->Vertex2i( x - size/2, y + size );
 	g_imRenderer->End();
 
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x, y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size/2, y + size );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size/2, y + size );
-	glEnd();
 }
 
 
@@ -667,18 +645,11 @@ void GameCursor::RenderSelectionArrow( float _screenX, float _screenY, float _sc
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-	glEnable        ( GL_BLEND );
-	glDisable       ( GL_CULL_FACE );
-	glDepthMask     ( false );
 
 	g_imRenderer->Color4f( _alpha, _alpha, _alpha, 0.0f );
-	glColor4f       ( _alpha, _alpha, _alpha, 0.0f );
-	glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
 
 	int shadowTexId = g_app->m_resource->GetTexture( m_selectionArrowShadowFilename );
 	g_imRenderer->BindTexture(shadowTexId);
-	glEnable        ( GL_TEXTURE_2D );
-	glBindTexture   ( GL_TEXTURE_2D, shadowTexId );
 
 	g_imRenderer->Begin( PRIM_QUADS );
 		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
@@ -687,20 +658,11 @@ void GameCursor::RenderSelectionArrow( float _screenX, float _screenY, float _sc
 		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
 	g_imRenderer->End();
 
-	glBegin( GL_QUADS );
-		glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-		glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-	glEnd();
 
 	g_imRenderer->Color4f( 1.0f, 1.0f, 0.3f, _alpha );
-	glColor4f       ( 1.0f, 1.0f, 0.3f, _alpha );
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
 	int arrowTexId = g_app->m_resource->GetTexture( m_selectionArrowFilename );
 	g_imRenderer->BindTexture(arrowTexId);
-	glBindTexture   ( GL_TEXTURE_2D, arrowTexId );
 
 	g_imRenderer->Begin( PRIM_QUADS );
 		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
@@ -709,21 +671,12 @@ void GameCursor::RenderSelectionArrow( float _screenX, float _screenY, float _sc
 		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
 	g_imRenderer->End();
 
-	glBegin( GL_QUADS );
-		glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-		glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-	glEnd();
 
 	g_imRenderer->UnbindTexture();
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
-	glDepthMask     ( true );
-	glDisable       ( GL_TEXTURE_2D );
-	glEnable        ( GL_CULL_FACE );
 
 }
 
@@ -952,15 +905,11 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     {
 	    // Get ready to render
         g_app->m_renderer->SetupMatricesFor2D();
-        glEnable        ( GL_BLEND );
-        glDisable       ( GL_CULL_FACE );
     //	glEnable		( GL_TEXTURE_2D );
     //	glBindTexture	( GL_TEXTURE_2D, g_app->m_resource->GetTexture("selection_arrow") );
 
 	    // Do subtractive pass
 	    {
-		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha/2.0f );
-		    glBlendFunc		( GL_ZERO, GL_ONE_MINUS_SRC_ALPHA );
 
 		    LeftArrow ( screenX - xOut, screenY, triSize );
 		    RightArrow( screenX + xOut, screenY, triSize );
@@ -974,8 +923,6 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 		    float myXOut = xOut + 5.0f;
 		    float myYOut = yOut + 5.0f;
 
-		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha );
-		    glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
 
 		    LeftArrow ( screenX - myXOut, screenY, myTriSize );
 		    RightArrow( screenX + myXOut, screenY, myTriSize );
@@ -983,8 +930,6 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 		    BottomArrow(screenX, screenY + myYOut, myTriSize );
 	    }
 
-        glDisable       ( GL_BLEND );
-        glEnable        ( GL_CULL_FACE );
     //	glDisable		( GL_TEXTURE_2D );
 
         g_app->m_renderer->SetupMatricesFor3D();
@@ -998,7 +943,6 @@ void GameCursor::RenderWeaponMarker ( LegacyVector3 _pos, LegacyVector3 _front, 
     m_cursorPlacement->SetAnimation( true );
     m_cursorPlacement->Render3D( _pos, _front, _up );
 }
-
 
 
 // ****************************************************************************
@@ -1091,63 +1035,36 @@ void MouseCursor::Render(float _x, float _y)
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-	glEnable        (GL_TEXTURE_2D);
-	glEnable        (GL_BLEND);
-	glDisable       (GL_CULL_FACE);
-	glDepthMask     (false);
 
 	if( m_shadowed )
 	{
 		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
 		g_imRenderer->BindTexture(shadowTexId);
-		glBindTexture   (GL_TEXTURE_2D, shadowTexId);
-		glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
 		g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.0f );
-		glColor4f       ( 1.0f, 1.0f, 1.0f, 0.0f );
 		g_imRenderer->Begin(PRIM_QUADS);
 			g_imRenderer->TexCoord2i(0,1);			g_imRenderer->Vertex2f(x, y);
 			g_imRenderer->TexCoord2i(1,1);			g_imRenderer->Vertex2f(x + s, y);
 			g_imRenderer->TexCoord2i(1,0);			g_imRenderer->Vertex2f(x + s, y + s);
 			g_imRenderer->TexCoord2i(0,0);			g_imRenderer->Vertex2f(x, y + s);
 		g_imRenderer->End();
-		glBegin         (GL_QUADS);
-			glTexCoord2i(0,1);			glVertex2f(x, y);
-			glTexCoord2i(1,1);			glVertex2f(x + s, y);
-			glTexCoord2i(1,0);			glVertex2f(x + s, y + s);
-			glTexCoord2i(0,0);			glVertex2f(x, y + s);
-		glEnd();
 	}
 
 	g_imRenderer->Color4ubv(m_colour.GetData());
-	glColor4ubv     (m_colour.GetData() );
 	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
 	g_imRenderer->BindTexture(mainTexId);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	glBindTexture   (GL_TEXTURE_2D, mainTexId);
-	glBlendFunc     (GL_SRC_ALPHA, GL_ONE);
 	g_imRenderer->Begin(PRIM_QUADS);
 		g_imRenderer->TexCoord2i(0,1);			g_imRenderer->Vertex2f(x, y);
 		g_imRenderer->TexCoord2i(1,1);			g_imRenderer->Vertex2f(x + s, y);
 		g_imRenderer->TexCoord2i(1,0);			g_imRenderer->Vertex2f(x + s, y + s);
 		g_imRenderer->TexCoord2i(0,0);			g_imRenderer->Vertex2f(x, y + s);
 	g_imRenderer->End();
-	glBegin         (GL_QUADS);
-		glTexCoord2i(0,1);			glVertex2f(x, y);
-		glTexCoord2i(1,1);			glVertex2f(x + s, y);
-		glTexCoord2i(1,0);			glVertex2f(x + s, y + s);
-		glTexCoord2i(0,0);			glVertex2f(x, y + s);
-	glEnd();
 
 	g_imRenderer->UnbindTexture();
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
-	glDepthMask     (true);
-	glDisable       (GL_BLEND);
-	glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable       (GL_TEXTURE_2D);
-	glEnable        (GL_CULL_FACE);
 }
 
 
@@ -1159,10 +1076,6 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-	glEnable        (GL_TEXTURE_2D);
-	glEnable        (GL_BLEND);
-	glDisable       (GL_CULL_FACE );
-	glDepthMask     (false);
 
 	float scale = GetSize();
 	if( _cameraScale )
@@ -1179,10 +1092,7 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 	{
 		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
 		g_imRenderer->BindTexture(shadowTexId);
-		glBindTexture   (GL_TEXTURE_2D, shadowTexId);
-		glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
 		g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
-		glColor4f       (1.0f, 1.0f, 1.0f, 0.0f);
 
 		g_imRenderer->Begin( PRIM_QUADS );
 			g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos).GetData() );
@@ -1191,21 +1101,12 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 			g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - _front * scale).GetData() );
 		g_imRenderer->End();
 
-		glBegin( GL_QUADS );
-			glTexCoord2i(0,1);      glVertex3fv( (pos).GetData() );
-			glTexCoord2i(1,1);      glVertex3fv( (pos + rightAngle * scale).GetData() );
-			glTexCoord2i(1,0);      glVertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
-			glTexCoord2i(0,0);      glVertex3fv( (pos - _front * scale).GetData() );
-		glEnd();
 	}
 
 	g_imRenderer->Color4ubv(m_colour.GetData());
-	glColor4ubv     (m_colour.GetData());
 	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
 	g_imRenderer->BindTexture(mainTexId);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	glBindTexture   (GL_TEXTURE_2D, mainTexId);
-	glBlendFunc     (GL_SRC_ALPHA, GL_ONE);
 
 	g_imRenderer->Begin( PRIM_QUADS );
 		g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos).GetData() );
@@ -1214,23 +1115,11 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 		g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - _front * scale).GetData() );
 	g_imRenderer->End();
 
-	glBegin( GL_QUADS );
-		glTexCoord2i(0,1);      glVertex3fv( (pos).GetData() );
-		glTexCoord2i(1,1);      glVertex3fv( (pos + rightAngle * scale).GetData() );
-		glTexCoord2i(1,0);      glVertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
-		glTexCoord2i(0,0);      glVertex3fv( (pos - _front * scale).GetData() );
-	glEnd();
 
 	g_imRenderer->UnbindTexture();
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
-	glDepthMask     (true);
-	glEnable        (GL_DEPTH_TEST );
-	glDisable       (GL_BLEND);
-	glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable       (GL_TEXTURE_2D);
-	glEnable        (GL_CULL_FACE);
 }
 

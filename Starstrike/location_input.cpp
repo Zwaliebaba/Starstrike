@@ -422,7 +422,6 @@ void LocationInput::Render()
   if (g_app->m_location->GetMyTeam())
   {
     g_imRenderer->Color4ubv(g_app->m_location->GetMyTeam()->m_colour.GetData());
-    glColor4ubv(g_app->m_location->GetMyTeam()->m_colour.GetData());
     //		glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     g_editorFont.DrawText2D(12, 19, DEF_FONT_SIZE, "You are TEAM %d", static_cast<int>(g_app->m_globalWorld->m_myTeamId));
   }

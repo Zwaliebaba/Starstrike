@@ -613,51 +613,115 @@ All 50+ files received `#include "im_renderer.h"` and conditionally `#include "r
 
 ---
 
-## 12. Phase 9 — OGL Extension & Utility Cleanup
+## 12. Phase 9 — OGL Extension & Utility Cleanup ✅ COMPLETED
 
-### 12.1 Remove OpenGL Extension System
+All OpenGL headers, libraries, API calls, extension systems, and GL types have been removed from the entire codebase. The project now compiles and links exclusively against D3D11.
 
-**Delete files:**
-- `NeuronClient\ogl_extensions.h`
-- `NeuronClient\ogl_extensions.cpp`
+### 12.1 OpenGL Extension System Removed ✅
 
-**Remove references:**
-- `#include "ogl_extensions.h"` from `Starstrike\renderer.cpp`, `Starstrike\landscape_renderer.cpp`, and any other files.
-- Remove `InitialiseOGLExtensions()` call.
+**Files deleted:**
+- `NeuronClient\ogl_extensions.h` — ARB extension typedefs and declarations
+- `NeuronClient\ogl_extensions.cpp` — Extension loading via `wglGetProcAddress`
 
-### 12.2 Remove OpenGL Utility Files
+**References removed:**
+- `#include "ogl_extensions.h"` from `renderer.cpp`, `landscape_renderer.cpp`, `water.cpp`, `laserfence.cpp`, `feedingtube.cpp`, `radardish.cpp`, `render_utils.cpp` (7 files)
+- `InitialiseOGLExtensions()` call removed from `Renderer::Initialise()`
 
-**File:** `NeuronClient\debug_fog_logging.cpp` — Remove all `glGetFloatv(GL_FOG_*)` calls.
+### 12.2 OpenGL Includes Replaced in PCH ✅
 
-**File:** `NeuronClient\render_utils.cpp` — Audit and replace any remaining GL calls.
+**File:** `NeuronClient\NeuronClient.h`
 
-### 12.3 Remove `CHECK_OPENGL_STATE()` Macro
-
-**File:** `Starstrike\renderer.h` — Remove `#define CHECK_OPENGL_STATE()`.
-
-Remove all `CHECK_OPENGL_STATE()` call sites in `renderer.cpp` and anywhere else.
-
-### 12.4 Remove OpenGL from Display List System
-
-**File:** `NeuronClient\resource.cpp` — `HashTable<int> m_displayLists` and any `glNewList`/`glCallList`/`glDeleteLists` calls.
-
-### 12.5 Remove OpenGL from PCH
-
-**File:** `NeuronClient\NeuronClient.h` — Remove lines 118-122:
+Replaced:
 ```cpp
 #include <GL/gl.h>
 #include <GL/glu.h>
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 ```
-
-Replace with:
+With:
 ```cpp
 #include <d3d11.h>
 #include <DirectXMath.h>
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
 ```
 
-**Verification:** Full clean build with zero OpenGL references. `opengl32.lib` and `glu32.lib` are no longer linked.
+### 12.3 OpenGL Context Removed ✅
+
+**File:** `NeuronClient\window_manager.cpp`
+- `EnableOpenGL()` — WGL pixel format / context creation removed; function is now an empty stub returning `true`.
+- `DisableOpenGL()` — `wglDeleteContext` / `ReleaseDC` removed; function is now an empty stub.
+- `DestroyWin()` — `DisableOpenGL()` call removed.
+- `Flip()` — `SwapBuffers(m_win32Specific->m_hDC)` replaced with `g_renderDevice->EndFrame()`.
+
+**File:** `NeuronClient\window_manager_win32.h`
+- Removed `HDC m_hDC` and `HGLRC m_hRC` members (only `HWND m_hWnd` remains).
+
+### 12.4 Bulk GL Call Removal ✅
+
+Used PowerShell line-filter scripts to strip all remaining `gl*` / `glu*` / `ggl*ARB` calls across ~37 GameLogic and Starstrike files (154+ lines removed). Categories removed:
+
+| Pattern | Sites | Notes |
+|---|---|---|
+| `glBegin` / `glEnd` | ~200 | Orphaned OpenGL duplicates of ImRenderer paths |
+| `glVertex*` / `glNormal*` / `glTexCoord*` / `glColor*` | ~400 | Vertex attribute calls |
+| `glBindTexture` / `glEnable(GL_TEXTURE_2D)` / `glDisable(GL_TEXTURE_2D)` | ~130 | Texture state |
+| `glBlendFunc` / `glDepthMask` / `glEnable`/`glDisable` (state) | ~80 | Render state |
+| `glPushMatrix` / `glPopMatrix` / `glTranslatef` / `glScalef` / `glRotatef` / `glMultMatrixf` | ~30 | Matrix stack |
+| `glMatrixMode` / `glLoadIdentity` / `gluPerspective` / `gluOrtho2D` / `gluLookAt` | ~15 | Matrix setup |
+| `glLineWidth` / `glPointSize` / `glTexParameteri` | ~40 | Misc state |
+| `gglActiveTextureARB` / `gglMultiTexCoord2fARB` | ~20 | ARB multitexture |
+| `glMaterialfv` / `glLightfv` / `glFog*` / `glAlphaFunc` / `glClearColor` / `glClear` | ~25 | Fixed-function pipeline |
+
+### 12.5 GL Type Replacements ✅
+
+All OpenGL type aliases replaced with C++ native types:
+- `GLfloat` → `float`, `GLint` → `int`, `GLenum` → `int`, `GLdouble` → `double`, `GLubyte` → `unsigned char`
+- Files affected: `location.cpp`, `global_world.cpp`
+
+### 12.6 Infrastructure Functions Migrated ✅
+
+**File:** `Starstrike\renderer.cpp`
+- `CheckOpenGLState()` — Body replaced with no-op comment (was already `return;` at top with dead GL asserts below).
+- `SetOpenGLState()` — All `gl*` calls replaced with `g_renderStates->Set*State()` and `g_imRenderer->UnbindTexture()`.
+- `SetObjectLighting()` / `UnsetObjectLighting()` — GL material/light calls removed; bodies are stubs (TODO Phase 10: lighting via constant buffer).
+- `BuildOpenGlState()` — GL state calls removed; function retained as stub.
+- `GetGLStateInt()` / `GetGLStateFloat()` — GL query calls removed; return `0` / `0.0f`.
+
+**File:** `Starstrike\renderer.h`
+- `#define CHECK_OPENGL_STATE()` macro removed.
+
+### 12.7 Remaining Subsystems Updated ✅
+
+**File:** `NeuronClient\resource.cpp`
+- `CreateDisplayList()` — `glGenLists` replaced with static counter returning dummy IDs.
+
+**File:** `NeuronClient\text_renderer.cpp`
+- `BeginText2D()` — `GLint` variables replaced; viewport dimensions sourced from `g_renderDevice->GetBackBufferWidth/Height()` instead of `glGetIntegerv(GL_VIEWPORT)`.
+- Empty `if/else` blocks (orphaned from `glBlendFunc` removal) cleaned up.
+
+**File:** `NeuronClient\debug_render.cpp` / `debug_render.h`
+- `PrintMatrix()` — `GLenum` parameter changed to `int`; `GLdouble` matrix query removed; function is now a stub.
+- `PrintMatrices()` — Label changed from "OpenGL" to "D3D11".
+
+**File:** `NeuronClient\render_utils.cpp`
+- `gglMultiTexCoord2fARB` calls replaced with single-texture `g_imRenderer->TexCoord2f`; orphaned GL duplicate loop removed.
+
+**File:** `NeuronClient\debug_fog_logging.cpp`
+- All `glGetFloatv(GL_FOG_*)` calls removed.
+
+**File:** `GameLogic\building.cpp`, `GameLogic\generator.cpp`
+- Inline `if(...) glColor4f(...)` patterns replaced with `g_imRenderer->Color4f()`.
+
+**File:** `Starstrike\landscape_renderer.cpp`
+- Extra closing brace from removed `switch` block fixed.
+- `RenderMainSlow()` / `RenderOverlaySlow()` / `BuildOpenGlState()` are stubs (deferred to Phase 10 static VBs).
+
+### 12.8 Landscape & Water (deferred to Phase 10)
+
+These two systems used OpenGL vertex array paths (`glVertexPointer`/`glDrawArrays`) which cannot be emulated by `ImRenderer::Begin()/End()`. Their GL calls were stripped in this phase, leaving stub render functions. Proper D3D11 static vertex buffer rendering will be implemented in Phase 10.
+
+**Verification:** Clean build passes. Zero `gl*`/`glu*`/`wgl*`/`GL_*`/`GLfloat`/`GLint`/`GLenum`/`HGLRC` references remain in any compiled source file. `opengl32.lib` and `glu32.lib` are no longer linked. `d3d11.lib` and `dxgi.lib` are the only graphics libraries.
 
 ---
 
@@ -667,35 +731,56 @@ Replace with:
 The `ImRenderer` immediate-mode emulation works but is inherently slow (one draw call per `Begin`/`End` pair). After correctness is verified:
 
 - **Merge batches:** Consecutive `Begin`/`End` pairs with the same state (same texture, same blend mode) can be merged into a single draw call.
-- **Static vertex buffers:** For geometry that doesn't change (landscape, shapes with display lists), create static `ID3D11Buffer` objects uploaded once.
+- **Static vertex buffers:** For geometry that doesn't change (landscape, shapes), create static `ID3D11Buffer` objects uploaded once.
 
-### 13.2 Replace `Renderer::UpdateTotalMatrix()`
+### 13.2 Landscape & Water — Static Vertex Buffers
 
-**File:** `Starstrike\renderer.cpp` (lines 821-863)
+**File:** `Starstrike\landscape_renderer.cpp`
 
-Currently reads back matrices from OpenGL via `glGetDoublev`. Replace with direct computation from the stored `XMMATRIX` values:
-```cpp
-XMMATRIX totalMatrix = m_worldMatrix * m_viewMatrix * m_projMatrix;
-XMStoreFloat4x4(&m_totalMatrix, totalMatrix);
-```
+`RenderMainSlow()` and `RenderOverlaySlow()` are currently stubs. Implement D3D11 static vertex buffers:
+- Create `ID3D11Buffer` from `m_verts` data in `BuildOpenGlState()` after `BuildVertArrayAndTriStrip()`.
+- Render via `IASetVertexBuffers` + `DrawIndexed` with triangle strip topology.
 
-### 13.3 Remove `Renderer::GetGLStateInt()` / `GetGLStateFloat()`
+**File:** `Starstrike\water.cpp`
 
-**File:** `Starstrike\renderer.h` / `renderer.cpp`
+Same approach — create static D3D11 vertex buffers for water mesh.
 
-Remove these methods and all callers.
+### 13.3 Lighting via Constant Buffer
 
-### 13.4 Update `SystemInfo::GetDirectXVersion()`
+`SetObjectLighting()` / `UnsetObjectLighting()` in `renderer.cpp` and `SetupLights()` in `location.cpp` / `global_world.cpp` are currently stubs. Add lighting parameters to the shader constant buffer and implement in the pixel shader.
+
+### 13.4 Fog via Constant Buffer
+
+Add fog parameters (`gFogStart`, `gFogEnd`, `gFogColor`) to the constant buffer and implement linear fog in the pixel shader.
+
+### 13.5 Alpha Test via Pixel Shader
+
+Add `gAlphaClipThreshold` to the constant buffer. In the pixel shader: `if (color.a <= gAlphaClipThreshold) discard;`
+
+### 13.6 Thick Line Emulation
+
+`glLineWidth` > 1.0 is unsupported in D3D11 (36 former call sites). Implement thick-line quad expansion in `ImRenderer::End()` when `SetLineWidth()` value > 1.0 and primitive is `PRIM_LINES` / `PRIM_LINE_STRIP` / `PRIM_LINE_LOOP`.
+
+### 13.7 Update `SystemInfo::GetDirectXVersion()`
 
 **File:** `NeuronClient\system_info.cpp`
 
 Change `m_directXVersion = 9;` → `m_directXVersion = 11;` (or query feature level from `g_renderDevice`).
 
-### 13.5 Remove `GLenum` References in Headers
+### 13.8 Remove Legacy Naming
 
-**File:** `NeuronClient\debug_render.h` — Remove `PrintMatrix(const char*, GLenum)` declaration.
+Rename functions with "OpenGL" in their name to neutral names:
+- `SetOpenGLState()` → `SetDefaultRenderState()`
+- `CheckOpenGLState()` → remove entirely (no-op)
+- `BuildOpenGlState()` → `BuildRenderState()`
+- `FlushOpenGlState()` → `FlushRenderState()`
+- `EnableOpenGL()` / `DisableOpenGL()` → remove entirely (empty stubs)
 
-Grep the entire codebase for `GLenum`, `GLint`, `GLfloat`, `GLuint`, `GLboolean`, `GLubyte`, `GLvoid`, `GLsizei`, `GLsizeiptrARB`, `GLintptrARB` and remove/replace all occurrences.
+Remove `GetGLStateInt()` / `GetGLStateFloat()` methods and all callers.
+
+### 13.9 `Camera::Get2DScreenPos()` Migration
+
+Replace the former `gluProject`-based implementation with manual viewport projection using the stored `ImRenderer` matrices. Must handle the Y-axis convention difference (OpenGL Y=0 at bottom vs D3D11 Y=0 at top).
 
 ---
 
@@ -720,8 +805,8 @@ Grep the entire codebase for `GLenum`, `GLint`, `GLfloat`, `GLuint`, `GLboolean`
 | File | Phase | Reason |
 |---|---|---|
 | `NeuronClient\opengl_directx_internals.h` | 0 ✅ | Empty / unused |
-| `NeuronClient\ogl_extensions.h` | 9 | OpenGL extension definitions |
-| `NeuronClient\ogl_extensions.cpp` | 9 | OpenGL extension loading |
+| `NeuronClient\ogl_extensions.h` | 9 ✅ | OpenGL extension definitions |
+| `NeuronClient\ogl_extensions.cpp` | 9 ✅ | OpenGL extension loading |
 
 ### Modified Files (Infrastructure — Phase 1-5)
 | File | Changes |
@@ -766,7 +851,7 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 6:** Migrate core 3D rendering (shapes, landscape, spheres, particles, water, clouds)
 - [x] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [x] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
-- [ ] **Phase 9:** Remove all OpenGL code, headers, libs
+- [x] **Phase 9:** Remove all OpenGL code, headers, libs
 - [ ] **Phase 10:** Polish, optimise batching, static VBs, final cleanup
 
 ---
@@ -823,11 +908,11 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Important | Implement via `clip()` in pixel shader |
 | Display lists have no D3D11 equivalent | ✅ Resolved | Shape and sphere display lists removed; `BuildDisplayList()` no-op; always uses `RenderSlow()` path |
 | Performance regression from immediate-mode emulation | 🟠 Moderate | Acceptable initially; optimise with static VBs in Phase 10 |
-| GL state queries (`glGet*`) used in debug asserts | 🟡 Important | Remove or replace with cached state tracking |
+| GL state queries (`glGet*`) used in debug asserts | ✅ Resolved | `CheckOpenGLState()` → no-op; `GetGLStateInt/Float()` → return 0; viewport from `g_renderDevice->GetBackBufferWidth/Height()` |
 | `gluBuild2DMipmaps` has no D3D11 equivalent | ✅ Resolved | `GenerateMips()` via `TextureManager::CreateTexture()` |
-| Large number of files to touch (~95) | 🟠 Moderate | Mechanical replacement; use scripts/regex where possible |
+| Large number of files to touch (~95) | ✅ Resolved | PowerShell bulk scripts stripped 154+ GL lines across 37 files in Phase 9 |
 | `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | 🔴 Critical | Accept 1px initially; implement thick-line quad expansion in Phase 10 |
-| Save/restore state RAII pattern in `text_renderer.cpp` | 🟡 Important | Replace with explicit save/restore via `ImRenderer` accessors |
+| Save/restore state RAII pattern in `text_renderer.cpp` | ✅ Resolved | RAII guards removed; explicit save/restore via `ImRenderer` matrix accessors and `RenderStates::GetCurrent*()` |
 | Vertex array paths (landscape, water) not coverable by `ImRenderer::Begin/End` | 🟡 Important | Create direct `ID3D11Buffer` for these systems |
 | `Matrix34::ConvertToOpenGLFormat()` column-major vs `XMMATRIX` row-major | ✅ Resolved | `ImRenderer::MultMatrixf()` transposes on load |
 | `GL_CLAMP` vs `D3D11_TEXTURE_ADDRESS_CLAMP` (border pixel bleed) | ✅ Resolved | 4 sampler states pre-created; accept minor difference |

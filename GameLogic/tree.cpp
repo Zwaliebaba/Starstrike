@@ -226,13 +226,11 @@ void Tree::DeleteDisplayLists()
 {
     if( m_branchDisplayListId != -1 )
     {
-        glDeleteLists( m_branchDisplayListId, 1 );
         m_branchDisplayListId = -1;
     }
 
     if( m_leafDisplayListId != -1 )
     {
-        glDeleteLists( m_leafDisplayListId, 1 );
         m_leafDisplayListId = -1;
     }
 }
@@ -259,29 +257,15 @@ void Tree::Generate()
         m_leafColourArray[3] = alpha;
     }
 
-    darwiniaSeedRandom( m_seed );
-    m_branchDisplayListId = glGenLists(1);
-	glNewList       ( m_branchDisplayListId, GL_COMPILE );
+	darwiniaSeedRandom( m_seed );
 	g_imRenderer->Begin(PRIM_QUADS);
 	RenderBranch    ( g_zeroVector, g_upVector, m_iterations, false, true, false );
 	g_imRenderer->End();
 
-	glBegin         ( GL_QUADS );
-	RenderBranch    ( g_zeroVector, g_upVector, m_iterations, false, true, false );
-	glEnd           ();
-	glEndList       ();
-
 	darwiniaSeedRandom( m_seed );
-	m_leafDisplayListId = glGenLists(1);
-	glNewList       ( m_leafDisplayListId, GL_COMPILE );
 	g_imRenderer->Begin(PRIM_QUADS);
 	RenderBranch    ( g_zeroVector, g_upVector, m_iterations, false, false, true );
-    g_imRenderer->End();
-
-	glBegin         ( GL_QUADS );
-	RenderBranch    ( g_zeroVector, g_upVector, m_iterations, false, false, true );
-    glEnd           ();
-    glEndList       ();
+	g_imRenderer->End();
 
 
     //
@@ -325,28 +309,16 @@ void Tree::RenderAlphas( float _predictionTime )
 
     float actualHeight = GetActualHeight( _predictionTime );
 
-    glEnable        ( GL_TEXTURE_2D );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable        ( GL_BLEND );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
-	glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable       ( GL_CULL_FACE );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask     ( false );
 
-    glMatrixMode    ( GL_MODELVIEW );
 	g_imRenderer->PushMatrix();
-	glPushMatrix    ();
     Matrix34 mat    ( m_front, g_upVector, m_pos );
     g_imRenderer->MultMatrixf( mat.ConvertToOpenGLFormat());
-    glMultMatrixf   ( mat.ConvertToOpenGLFormat());
     g_imRenderer->Scalef( actualHeight, actualHeight, actualHeight );
-    glScalef        ( actualHeight, actualHeight, actualHeight );
 
     if( Location::ChristmasModEnabled() == 1 )
     {
@@ -356,28 +328,18 @@ void Tree::RenderAlphas( float _predictionTime )
     }
 
     g_imRenderer->Color4ubv( m_branchColourArray );
-    glColor4ubv     ( m_branchColourArray );
-    glCallList      ( m_branchDisplayListId );
 
     if( Location::ChristmasModEnabled() != 1 )
     {
         g_imRenderer->Color4ubv( m_leafColourArray );
-        glColor4ubv     ( m_leafColourArray );
-        glCallList      ( m_leafDisplayListId );
     }
 
     g_imRenderer->PopMatrix();
-    glPopMatrix     ();
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask     ( true );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable        ( GL_CULL_FACE );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glDisable       ( GL_TEXTURE_2D );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable       ( GL_BLEND );
 }
 
 void Tree::RenderHitCheck ()
@@ -526,15 +488,7 @@ void Tree::RenderBranch( LegacyVector3 _from, LegacyVector3 _to, int _iterations
     if( (_iterations == 0 && _renderLeaf) ||
         (_iterations != 0 && _renderBranch) )
     {
-        glTexCoord2f( 0.0f, 0.0f );             glVertex3fv( (_from - camRightA).GetData() );
-        glTexCoord2f( 0.0f, 1.0f );             glVertex3fv( (_from + camRightA).GetData() );
-        glTexCoord2f( 1.0f, 1.0f );             glVertex3fv( (_to + camRightA).GetData() );
-        glTexCoord2f( 1.0f, 0.0f );             glVertex3fv( (_to - camRightA).GetData() );
 
-        glTexCoord2f( 0.0f, 0.0f );             glVertex3fv( (_from - camRightB).GetData() );
-        glTexCoord2f( 0.0f, 1.0f );             glVertex3fv( (_from + camRightB).GetData() );
-        glTexCoord2f( 1.0f, 1.0f );             glVertex3fv( (_to + camRightB).GetData() );
-        glTexCoord2f( 1.0f, 0.0f );             glVertex3fv( (_to - camRightB).GetData() );
     }
 
     int numBranches = 4;

@@ -177,17 +177,13 @@ void Particle::Render(float _predictionTime)
 	if( m_typeId == TypeMissileTrail )
 	{
 		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
 		float fraction = (float) alpha / 100.0f;
 		g_imRenderer->Color4ub(m_colour.r*fraction, m_colour.g*fraction, m_colour.b*fraction, 0);
-		glColor4ub(m_colour.r*fraction, m_colour.g*fraction, m_colour.b*fraction, 0.0f );
 	}
 	else
 	{
 		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-		glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
 		g_imRenderer->Color4ub(m_colour.r, m_colour.g, m_colour.b, alpha);
-		glColor4ub(m_colour.r, m_colour.g, m_colour.b, alpha );
 	}
 
 	g_imRenderer->Begin( PRIM_QUADS );
@@ -201,16 +197,6 @@ void Particle::Render(float _predictionTime)
 		g_imRenderer->Vertex3fv( (predictedPos - right).GetData() );
 	g_imRenderer->End();
 
-	glBegin( GL_QUADS );
-		glTexCoord2i(0, 0);
-		glVertex3fv( (predictedPos - up).GetData() );
-		glTexCoord2i(0, 1);
-		glVertex3fv( (predictedPos + right).GetData() );
-		glTexCoord2i(1, 1);
-		glVertex3fv( (predictedPos + up).GetData() );
-		glTexCoord2i(1, 0);
-		glVertex3fv( (predictedPos - right).GetData() );
-	glEnd();
 }
 
 
@@ -374,14 +360,6 @@ void ParticleSystem::Render()
 	g_imRenderer->BindTexture(texId);
 	g_imRenderer->SetSampler(SAMPLER_NEAREST_CLAMP);
 
-	glDisable   ( GL_CULL_FACE );
-	glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
-	glEnable    ( GL_BLEND );
-	glEnable	( GL_TEXTURE_2D );
-	glBindTexture(GL_TEXTURE_2D, texId);
-	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-	glDepthMask ( false );
-
 
 	// Render all the particles that are up-to-date with server advances
 	int lastUpdated = m_particles.GetLastUpdated();
@@ -409,12 +387,6 @@ void ParticleSystem::Render()
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
-	glDepthMask ( true );
-	glDisable	( GL_TEXTURE_2D );
-	glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glDisable   ( GL_BLEND );
-	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	glEnable    ( GL_CULL_FACE );
 
 	END_PROFILE(g_app->m_profiler, "Render Particles");
 }

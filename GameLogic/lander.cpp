@@ -18,7 +18,6 @@
 #include "lander.h"
 
 
-
 Lander::Lander()
 :   Entity(),
     m_state(StateSailing),
@@ -128,7 +127,6 @@ void Lander::Render( float predictionTime, int teamId )
             colour.b = ( colour.b == 255 ? 255 : 100 );
         }
         g_imRenderer->Color3ubv( colour.GetData() );
-        glColor3ubv( colour.GetData() );
 
         //
         // 3d Shape
@@ -136,22 +134,14 @@ void Lander::Render( float predictionTime, int teamId )
 		g_app->m_renderer->SetObjectLighting();
 
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-        glEnable        (GL_CULL_FACE);
-        glDisable       (GL_TEXTURE_2D);
-        glEnable        (GL_COLOR_MATERIAL);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        glDisable       (GL_BLEND);
 
         Matrix34 mat(entityFront, entityUp, predictedPos);
     	m_shape->Render(predictionTime, mat);
 
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable        (GL_BLEND);
-        glDisable       (GL_COLOR_MATERIAL);
-        glEnable        (GL_TEXTURE_2D);
 		g_app->m_renderer->UnsetObjectLighting();
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-        glEnable        (GL_CULL_FACE);
 
     }
 }

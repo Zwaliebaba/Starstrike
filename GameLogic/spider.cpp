@@ -723,7 +723,6 @@ void Spider::Render(float _predictionTime)
     if( m_dead ) return;
 
     g_imRenderer->UnbindTexture();
-    glDisable( GL_TEXTURE_2D );
 
 
 	//RenderArrow(m_pos, m_targetPos, 1.0f);
@@ -756,17 +755,13 @@ void Spider::Render(float _predictionTime)
         if( frand() > 0.5f ) mat.r *= ( 1.0f + sinf(timeIndex) * 0.5f );
         else                 mat.u *= ( 1.0f + sinf(timeIndex) * 0.5f );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable( GL_BLEND );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
     }
 
 	m_shape->Render(_predictionTime, mat);
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable( GL_BLEND );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	//
 	// Render Legs

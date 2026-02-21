@@ -6,7 +6,6 @@
 #include "binary_stream_readers.h"
 #include "bitmap.h"
 #include "math_utils.h"
-#include "ogl_extensions.h"
 #include "preferences.h"
 #include "profiler.h"
 #include "resource.h"
@@ -258,15 +257,8 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D <float> *_heightMap)
 	// Read render mode from prefs file
 	m_renderMode = g_prefsManager->GetInt("RenderLandscapeMode", 2);
 
-	// Make sure the selected mode is supported on the user's hardware
-	if (m_renderMode == RenderModeVertexBufferObject)
-	{
-		if (!gglBindBufferARB)
-		{
-			// Vertex Buffer Objects not supported, so fallback to display lists
-			m_renderMode = RenderModeDisplayList;
-		}
-	}
+	// Force fallback to slow path (VBOs and display lists removed for D3D11)
+	m_renderMode = RenderModeDisplayList;
 
 	BinaryReader *reader = g_app->m_resource->GetBinaryReader(fullFilname);
 	DarwiniaReleaseAssert(reader != NULL, "Failed to get resource %s", fullFilname);
@@ -295,186 +287,18 @@ void LandscapeRenderer::BuildOpenGlState(SurfaceMap2D <float> *_heightMap)
 	BuildColourArray();
 	BuildUVArray(_heightMap);
 
-	if (m_verts.NumUsed() <= 0)
-		return;
-
-
-	switch (m_renderMode) {
-		case RenderModeVertexBufferObject:
-			DarwiniaDebugAssert(!m_vertexBuffer);
-			gglGenBuffersARB( 1, &m_vertexBuffer );
-			gglBindBufferARB( GL_ARRAY_BUFFER_ARB, m_vertexBuffer );
-			gglBufferDataARB( GL_ARRAY_BUFFER_ARB, m_verts.Size() * sizeof(LandVertex), m_verts.GetPointer(0), GL_STATIC_DRAW_ARB );
-			gglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-			break;
-
-		case RenderModeDisplayList:
-			// Generate main display list
-			int id = g_app->m_resource->CreateDisplayList(MAIN_DISPLAY_LIST_NAME);
-			glNewList(id, GL_COMPILE);
-			RenderMainSlow();
-			glEndList();
-
-			// Generate overlay display list
-			id = g_app->m_resource->CreateDisplayList(OVERLAY_DISPLAY_LIST_NAME);
-			glNewList(id, GL_COMPILE);
-			RenderOverlaySlow();
-			glEndList();
-			break;
-	}
+	// TODO Phase 10: Create static D3D11 vertex buffers from m_verts
 }
 
 void LandscapeRenderer::RenderMainSlow()
 {
-    GLfloat materialSpecular[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-   	GLfloat materialDiffuse[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-	GLfloat materialShininess[] = { 100.0f };
-
-
-	glMaterialfv	(GL_FRONT, GL_SPECULAR, materialSpecular);
-	glMaterialfv	(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialDiffuse);
-	glMaterialfv	(GL_FRONT, GL_SHININESS, materialShininess);
-
-	glEnable		(GL_LIGHT0);
-	glEnable		(GL_LIGHT1);
-    glEnable		(GL_COLOR_MATERIAL);
-    glEnable		(GL_LIGHTING);
-
-
-    if( g_app->m_negativeRenderer )
-    {
-        glEnable        (GL_BLEND);
-        glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-    }
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	switch (m_renderMode) {
-		case RenderModeVertexBufferObject:
-			DarwiniaDebugAssert(m_vertexBuffer);
-			gglBindBufferARB	( GL_ARRAY_BUFFER_ARB, m_vertexBuffer );
-			glVertexPointer		( 3, GL_FLOAT, sizeof(LandVertex), (char*)m_posOffset );
-			glNormalPointer		( GL_FLOAT, sizeof(LandVertex), (char*)m_normOffset );
-			glColorPointer		( 4, GL_UNSIGNED_BYTE, sizeof(LandVertex), (char*)m_colOffset );
-			break;
-
-		default:
-		{
-			char *vertData = (char *)m_verts.GetPointer(0);
-			glVertexPointer		( 3, GL_FLOAT, sizeof(LandVertex), vertData + m_posOffset );
-			glNormalPointer		( GL_FLOAT, sizeof(LandVertex), vertData + m_normOffset );
-			glColorPointer		( 4, GL_UNSIGNED_BYTE, sizeof(LandVertex), vertData + m_colOffset );
-		}
-	}
-
-	for (int z = 0; z < m_strips.Size(); ++z)
-	{
-			LandTriangleStrip *strip = m_strips[z];
-			glDrawArrays(GL_TRIANGLE_STRIP, strip->m_firstVertIndex, strip->m_numVerts);
-	}
-
-	if (m_renderMode == RenderModeVertexBufferObject)
-    {
-		gglBindBufferARB( GL_ARRAY_BUFFER_ARB, NULL );
-	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-
-    glDisable		(GL_COLOR_MATERIAL);
-	glDisable		(GL_LIGHTING);
-	glDisable		(GL_LIGHT0);
-    glDisable		(GL_LIGHT1);
+	// TODO Phase 10: Implement D3D11 vertex buffer rendering for landscape
 }
 
 
 void LandscapeRenderer::RenderOverlaySlow()
 {
-	glEnable		(GL_COLOR_MATERIAL);
-    glEnable		(GL_BLEND);
-    glEnable		(GL_TEXTURE_2D);
-	glDepthMask		(false);
-
-    if( !g_app->m_negativeRenderer )    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    else								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-
-	int outlineTextureId  = g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false);
-    glBindTexture	(GL_TEXTURE_2D, outlineTextureId);
-	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-    glEnable        (GL_LIGHTING);
-    glEnable        (GL_LIGHT0);
-    glEnable        (GL_LIGHT1);
-    GLfloat materialSpecular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-   	GLfloat materialDiffuse[] = { 1.2f, 1.2f, 1.2f, 0.0f };
-	GLfloat materialShininess[] = { 40.0f };
-
-	glMaterialfv	(GL_FRONT, GL_SPECULAR, materialSpecular);
-	glMaterialfv	(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialDiffuse);
-	glMaterialfv	(GL_FRONT, GL_SHININESS, materialShininess);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	switch (m_renderMode) {
-		case RenderModeVertexBufferObject:
-			DarwiniaDebugAssert(m_vertexBuffer);
-			gglBindBufferARB	( GL_ARRAY_BUFFER_ARB, m_vertexBuffer );
-			glVertexPointer		( 3, GL_FLOAT, sizeof(LandVertex), (char*)m_posOffset );
-			glNormalPointer		( GL_FLOAT, sizeof(LandVertex), (char*)m_normOffset );
-			glColorPointer		( 4, GL_UNSIGNED_BYTE, sizeof(LandVertex), (char*)m_colOffset );
-			glTexCoordPointer	( 2, GL_FLOAT, sizeof(LandVertex), (char*)m_uvOffset);
-			break;
-
-		default:
-			{
-				char *vertData = (char *)m_verts.GetPointer(0);
-				glVertexPointer		( 3, GL_FLOAT, sizeof(LandVertex), vertData + m_posOffset );
-				glNormalPointer		( GL_FLOAT, sizeof(LandVertex), vertData + m_normOffset );
-				glColorPointer		( 4, GL_UNSIGNED_BYTE, sizeof(LandVertex), vertData + m_colOffset );
-				glTexCoordPointer	( 2, GL_FLOAT, sizeof(LandVertex), vertData + m_uvOffset);
-			}
-			break;
-	}
-
-	for (int z = 0; z < m_strips.Size(); ++z)
-	{
-		LandTriangleStrip *strip = m_strips[z];
-
-		glDrawArrays(GL_TRIANGLE_STRIP, strip->m_firstVertIndex, strip->m_numVerts);
-
-	}
-
-	switch (m_renderMode) {
-		case RenderModeVertexBufferObject:
-			gglBindBufferARB( GL_ARRAY_BUFFER_ARB, NULL );
-			break;
-	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-
-	glDisable		(GL_COLOR_MATERIAL);
-    glDisable		(GL_BLEND);
-    glDisable		(GL_TEXTURE_2D);
-	glDisable		(GL_COLOR_MATERIAL);
-    glDisable       (GL_LIGHTING);
-    glDisable       (GL_LIGHT0);
-    glDisable       (GL_LIGHT1);
-	glDepthMask		(true);
-	glBlendFunc		(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	// TODO Phase 10: Implement D3D11 vertex buffer rendering for landscape overlay
 }
 
 
@@ -484,7 +308,6 @@ void LandscapeRenderer::Render()
 		return;
 
     g_app->m_location->SetupFog();
-	glEnable		(GL_FOG);
 
 	START_PROFILE(g_app->m_profiler, "Render Landscape Main");
 
@@ -493,7 +316,6 @@ void LandscapeRenderer::Render()
 			{
 				int id = g_app->m_resource->GetDisplayList(MAIN_DISPLAY_LIST_NAME);
 				DarwiniaDebugAssert(id != -1);
-				glCallList(id);
 			}
 			break;
 
@@ -512,7 +334,6 @@ void LandscapeRenderer::Render()
 				{
 					int id = g_app->m_resource->GetDisplayList(OVERLAY_DISPLAY_LIST_NAME);
 					DarwiniaDebugAssert(id != -1);
-					glCallList(id);
 				}
 				break;
 
@@ -523,5 +344,4 @@ void LandscapeRenderer::Render()
 	    END_PROFILE(g_app->m_profiler, "Render Landscape Overlay");
     }
 
-    glDisable		(GL_FOG);
 }

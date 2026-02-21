@@ -285,7 +285,6 @@ void SpaceInvader::ListSoundEvents( LList<char *> *_list )
 void SpaceInvader::Render( float _predictionTime )
 {
     LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-    glDisable( GL_TEXTURE_2D );
 
 #ifdef DEBUG_RENDER_ENABLED
     //RenderSphere( m_targetPos, 5.0f );

@@ -101,18 +101,28 @@ void Camera::AdvanceDebugMode()
 
 void Camera::Get2DScreenPos(const LegacyVector3& _vector, float* _screenX, float* _screenY)
 {
-  double outX, outY, outZ;
+  using namespace DirectX;
 
-  int viewport[4];
-  double viewMatrix[16];
-  double projMatrix[16];
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_MODELVIEW_MATRIX, viewMatrix);
-  glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);
-  gluProject(_vector.x, _vector.y, _vector.z, viewMatrix, projMatrix, viewport, &outX, &outY, &outZ);
+  XMMATRIX view = g_imRenderer->GetViewMatrix();
+  XMMATRIX proj = g_imRenderer->GetProjectionMatrix();
+  XMMATRIX world = g_imRenderer->GetWorldMatrix();
+  XMMATRIX wvp = world * view * proj;
 
-  *_screenX = outX;
-  *_screenY = outY;
+  XMVECTOR v = XMVectorSet(_vector.x, _vector.y, _vector.z, 1.0f);
+  XMVECTOR clip = XMVector4Transform(v, wvp);
+
+  float w = XMVectorGetW(clip);
+  if (fabsf(w) < 1e-6f) w = 1e-6f;
+
+  float ndcX = XMVectorGetX(clip) / w;
+  float ndcY = XMVectorGetY(clip) / w;
+
+  int screenW = g_app->m_renderer->ScreenW();
+  int screenH = g_app->m_renderer->ScreenH();
+
+  // Match gluProject convention: Y=0 at bottom of screen
+  *_screenX = (ndcX * 0.5f + 0.5f) * screenW;
+  *_screenY = (ndcY * 0.5f + 0.5f) * screenH;
 }
 
 void Camera::SetHeight(float _height) { m_height = _height; }
@@ -135,7 +145,6 @@ void Camera::AdvanceSphereWorldMode()
   auto focusPos = LegacyVector3(0, m_height * -400, 0);
 
   // Set up viewing matrices
-  glPushMatrix();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -218,7 +227,6 @@ void Camera::AdvanceSphereWorldMode()
 
   // Apply the mouse cursor movement
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
 }
 
 void Camera::AdvanceSphereWorldScriptedMode()
@@ -236,7 +244,6 @@ void Camera::AdvanceSphereWorldScriptedMode()
   focusPos.z += sinf(g_gameTime * 0.3f) * 4000.0f;
 
   // Set up viewing matrices
-  glPushMatrix();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -272,7 +279,6 @@ void Camera::AdvanceSphereWorldScriptedMode()
   float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
-  glPopMatrix();
 }
 
 /*
@@ -542,7 +548,6 @@ void Camera::AdvanceFreeMovementMode()
   InputManager* im = g_inputManager;
 
   // Set up viewing matrices
-  glPushMatrix();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -710,7 +715,6 @@ void Camera::AdvanceFreeMovementMode()
 
     // Apply the mouse cursor movement
     g_target->SetMousePos(newMouseX, newMouseY);
-    glPopMatrix();
   }
 }
 
@@ -1244,7 +1248,6 @@ void Camera::AdvanceRadarAimMode()
   focusPos.y += m_height;
 
   // Set up viewing matrices
-  glPushMatrix();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -1318,7 +1321,6 @@ void Camera::AdvanceRadarAimMode()
   // Apply the mouse cursor movement
   //alleg    position_mouse(newMouseX, newMouseY);
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
 }
 
 void Camera::AdvanceTurretAimMode()
@@ -1340,7 +1342,6 @@ void Camera::AdvanceTurretAimMode()
   focusPos.y += m_height;
 
   // Set up viewing matrices
-  glPushMatrix();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -1414,7 +1415,6 @@ void Camera::AdvanceTurretAimMode()
   // Apply the mouse cursor movement
   //alleg    position_mouse(newMouseX, newMouseY);
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
 }
 
 void Camera::AdvanceFirstPersonMode()
@@ -1664,13 +1664,10 @@ void Camera::SetupModelviewMatrix()
   DarwiniaDebugAssert(NearlyEquals(m_up.MagSquared(), 1.0f));
   DarwiniaDebugAssert(NearlyEquals(dot, 0.0f));
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
   float magOfPos = m_pos.Mag();
   LegacyVector3 front = m_front * magOfPos;
   LegacyVector3 up = m_up * magOfPos;
   LegacyVector3 forwards = m_pos + front;
-  gluLookAt(m_pos.x, m_pos.y, m_pos.z, forwards.x, forwards.y, forwards.z, up.x, up.y, up.z);
 
   // D3D11: set view matrix on ImRenderer (RH to match OpenGL)
   if (g_imRenderer)
@@ -2185,29 +2182,37 @@ void Camera::Normalise()
 
 void Camera::GetClickRay(int _x, int _y, LegacyVector3* _rayStart, LegacyVector3* _rayDir)
 {
-  GLint viewport[4];
-  GLdouble mvMatrix[16], projMatrix[16];
-  GLdouble objx, objy, objz;
+  using namespace DirectX;
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
-  glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);
-  int realY = viewport[3] - _y - 1;
+  XMMATRIX view = g_imRenderer->GetViewMatrix();
+  XMMATRIX proj = g_imRenderer->GetProjectionMatrix();
+  XMMATRIX world = g_imRenderer->GetWorldMatrix();
+  XMMATRIX wvp = world * view * proj;
+  XMMATRIX invWVP = XMMatrixInverse(nullptr, wvp);
 
-  if ((mvMatrix[0] + mvMatrix[1] + mvMatrix[2] == 0) || (mvMatrix[5] + mvMatrix[6] + mvMatrix[7] == 0) || (mvMatrix[9] + mvMatrix[10] +
-    mvMatrix[11] == 0))
-  {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
-  }
+  int screenW = g_app->m_renderer->ScreenW();
+  int screenH = g_app->m_renderer->ScreenH();
 
-  gluUnProject(_x, realY, 0.0f, mvMatrix, projMatrix, viewport, &objx, &objy, &objz);
-  _rayStart->Set(objx, objy, objz);
+  // Convert screen coords to NDC (Y=0 at top in screen space, flip for NDC)
+  float ndcX = (2.0f * _x / screenW) - 1.0f;
+  float ndcY = 1.0f - (2.0f * _y / screenH);
 
-  gluUnProject(_x, realY, 1.0f, mvMatrix, projMatrix, viewport, &objx, &objy, &objz);
-  _rayDir->Set(objx, objy, objz);
-  *_rayDir -= *_rayStart;
+  // Unproject near plane (z=0 in NDC for RH projection)
+  XMVECTOR nearPoint = XMVector4Transform(XMVectorSet(ndcX, ndcY, 0.0f, 1.0f), invWVP);
+  float nw = XMVectorGetW(nearPoint);
+  if (fabsf(nw) < 1e-6f) nw = 1e-6f;
+  nearPoint = XMVectorScale(nearPoint, 1.0f / nw);
+
+  // Unproject far plane (z=1 in NDC)
+  XMVECTOR farPoint = XMVector4Transform(XMVectorSet(ndcX, ndcY, 1.0f, 1.0f), invWVP);
+  float fw = XMVectorGetW(farPoint);
+  if (fabsf(fw) < 1e-6f) fw = 1e-6f;
+  farPoint = XMVectorScale(farPoint, 1.0f / fw);
+
+  _rayStart->Set(XMVectorGetX(nearPoint), XMVectorGetY(nearPoint), XMVectorGetZ(nearPoint));
+  _rayDir->Set(XMVectorGetX(farPoint) - _rayStart->x,
+               XMVectorGetY(farPoint) - _rayStart->y,
+               XMVectorGetZ(farPoint) - _rayStart->z);
   _rayDir->Normalise();
 }
 

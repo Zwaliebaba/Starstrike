@@ -14,7 +14,6 @@
 #include "laserfence.h"
 
 
-
 ObstructionGrid::ObstructionGrid( float _cellSizeX, float _cellSizeZ )
 {
     float sizeX = g_app->m_location->m_landscape.GetWorldSizeX();
@@ -143,13 +142,9 @@ LList<int> *ObstructionGrid::GetBuildings( float _locationX, float _locationZ )
 
 void ObstructionGrid::Render()
 {
-    glLineWidth (2.0f);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable   ( GL_CULL_FACE );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable    ( GL_BLEND );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask ( false );
 
     float height = 150.0f;
 
@@ -164,7 +159,6 @@ void ObstructionGrid::Render()
 
             int numBuildings = GetBuildings( worldX, worldZ )->Size();
             g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, numBuildings/3.0f );
-            glColor4f( 1.0f, 1.0f, 1.0f, numBuildings/3.0f );
 
             g_imRenderer->Begin(PRIM_QUADS);
                 g_imRenderer->Vertex3f( worldX, height, worldZ );
@@ -173,20 +167,11 @@ void ObstructionGrid::Render()
                 g_imRenderer->Vertex3f( worldX, height, worldZ + h );
             g_imRenderer->End();
 
-            glBegin( GL_QUADS );
-                glVertex3f( worldX, height, worldZ );
-                glVertex3f( worldX + w, height, worldZ );
-                glVertex3f( worldX + w, height, worldZ + h );
-                glVertex3f( worldX, height, worldZ + h );
-            glEnd();
         }
     }
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask ( true );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable   ( GL_BLEND );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable    ( GL_CULL_FACE );
 }
 

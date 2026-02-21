@@ -301,12 +301,7 @@ void SporeGenerator::RenderTail( LegacyVector3 const &_from, LegacyVector3 const
     LegacyVector3 normal = right ^ lineVector;
     normal.Normalise();
 
-    glNormal3fv( normal.GetData() );
 
-    glVertex3fv( (_from - lineOurPos).GetData() );
-    glVertex3fv( (_from + lineOurPos).GetData() );
-    glVertex3fv( (_to - lineOurPos).GetData() );
-    glVertex3fv( (_to + lineOurPos).GetData() );
 }
 
 
@@ -326,9 +321,7 @@ void SporeGenerator::Render( float _predictionTime )
     // 3d Shape
 
 	g_app->m_renderer->SetObjectLighting();
-    glDisable       (GL_TEXTURE_2D);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable       (GL_BLEND);
 
     Matrix34 mat(entityFront, entityUp, predictedPos);
 
@@ -340,9 +333,7 @@ void SporeGenerator::Render( float _predictionTime )
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable( GL_BLEND );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
-        glBlendFunc( GL_ONE, GL_ONE );
     }
 
     m_shape->Render(_predictionTime, mat);
@@ -352,8 +343,6 @@ void SporeGenerator::Render( float _predictionTime )
     // Tails
 
     g_imRenderer->Color4f( 0.2f, 0.0f, 0.0f, 1.0f );
-    glColor4f       ( 0.2f, 0.0f, 0.0f, 1.0f );
-    glEnable        ( GL_COLOR_MATERIAL );
 
     int numTailParts = 3;
     static LegacyVector3 s_vel;
@@ -401,7 +390,6 @@ void SporeGenerator::Render( float _predictionTime )
 
         g_imRenderer->End();
 
-        glBegin( GL_QUAD_STRIP );
 
         for( int j = 0; j < numTailParts; ++j )
         {
@@ -435,14 +423,10 @@ void SporeGenerator::Render( float _predictionTime )
             prevTailPos = thisTailPos;
         }
 
-        glEnd();
     }
 
-    glDisable   ( GL_COLOR_MATERIAL );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable    ( GL_CULL_FACE );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	g_app->m_renderer->UnsetObjectLighting();
 
     //
@@ -459,7 +443,6 @@ bool SporeGenerator::IsInView()
 {
     return g_app->m_camera->SphereInViewFrustum( m_pos+m_centrePos, m_radius );
 }
-
 
 
 bool SporeGenerator::RenderPixelEffect( float _predictionTime )

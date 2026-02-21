@@ -277,20 +277,12 @@ void LaserTrooper::Render( float predictionTime, int teamId )
 
 		colour *= 0.5f + 0.5f * health;
         g_imRenderer->Color3ubv(colour.GetData());
-        glColor3ubv(colour.GetData());
         g_imRenderer->Begin(PRIM_QUADS);
             g_imRenderer->TexCoord2f(0.0f, 1.0f);     g_imRenderer->Vertex3fv( (predictedPos - entityRight + entityUp).GetData() );
             g_imRenderer->TexCoord2f(1.0f, 1.0f);     g_imRenderer->Vertex3fv( (predictedPos + entityRight + entityUp).GetData() );
             g_imRenderer->TexCoord2f(1.0f, 0.0f);     g_imRenderer->Vertex3fv( (predictedPos + entityRight).GetData() );
             g_imRenderer->TexCoord2f(0.0f, 0.0f);     g_imRenderer->Vertex3fv( (predictedPos - entityRight).GetData() );
         g_imRenderer->End();
-
-        glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 1.0f);     glVertex3fv( (predictedPos - entityRight + entityUp).GetData() );
-            glTexCoord2f(1.0f, 1.0f);     glVertex3fv( (predictedPos + entityRight + entityUp).GetData() );
-            glTexCoord2f(1.0f, 0.0f);     glVertex3fv( (predictedPos + entityRight).GetData() );
-            glTexCoord2f(0.0f, 0.0f);     glVertex3fv( (predictedPos - entityRight).GetData() );
-        glEnd();
 
 
         //
@@ -299,7 +291,6 @@ void LaserTrooper::Render( float predictionTime, int teamId )
         if( m_onGround )
         {
             g_imRenderer->Color4ub( 0, 0, 0, 90 );
-            glColor4ub( 0, 0, 0, 90 );
             LegacyVector3 pos1 = predictedPos - entityRight;
             LegacyVector3 pos2 = predictedPos + entityRight;
             LegacyVector3 pos4 = pos1 + LegacyVector3( 0.0f, 0.0f, size * 2.0f );
@@ -310,7 +301,6 @@ void LaserTrooper::Render( float predictionTime, int teamId )
             pos3.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue( pos3.x, pos3.z );
             pos4.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue( pos4.x, pos4.z );
 
-            glLineWidth( 1.0f );
             g_imRenderer->Begin(PRIM_QUADS);
                 g_imRenderer->TexCoord2f(0.0f, 0.0f);       g_imRenderer->Vertex3fv(pos1.GetData());
                 g_imRenderer->TexCoord2f(1.0f, 0.0f);       g_imRenderer->Vertex3fv(pos2.GetData());
@@ -318,12 +308,6 @@ void LaserTrooper::Render( float predictionTime, int teamId )
                 g_imRenderer->TexCoord2f(0.0f, 1.0f);       g_imRenderer->Vertex3fv(pos4.GetData());
             g_imRenderer->End();
 
-            glBegin( GL_QUADS );
-                glTexCoord2f(0.0f, 0.0f);       glVertex3fv(pos1.GetData());
-                glTexCoord2f(1.0f, 0.0f);       glVertex3fv(pos2.GetData());
-                glTexCoord2f(1.0f, 1.0f);       glVertex3fv(pos3.GetData());
-                glTexCoord2f(0.0f, 1.0f);       glVertex3fv(pos4.GetData());
-            glEnd();
         }
 
 
@@ -336,9 +320,7 @@ void LaserTrooper::Render( float predictionTime, int teamId )
             //colour.a = 255;
             colour.a = 255 * alpha;
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            glBlendFunc( GL_SRC_ALPHA, GL_ONE );
             g_imRenderer->Color4ubv(colour.GetData());
-            glColor4ubv(colour.GetData());
 			g_imRenderer->Begin(PRIM_QUADS);
 				g_imRenderer->TexCoord2f(0.0f, 1.0f);     g_imRenderer->Vertex3fv( (predictedPos - entityFront*1.5f + entityUp).GetData() );
 				g_imRenderer->TexCoord2f(1.0f, 1.0f);     g_imRenderer->Vertex3fv( (predictedPos + entityFront*1.5f + entityUp).GetData() );
@@ -346,14 +328,7 @@ void LaserTrooper::Render( float predictionTime, int teamId )
 				g_imRenderer->TexCoord2f(0.0f, 0.0f);     g_imRenderer->Vertex3fv( (predictedPos - entityFront*1.5f).GetData() );
 			g_imRenderer->End();
 
-			glBegin(GL_QUADS);
-				glTexCoord2f(0.0f, 1.0f);     glVertex3fv( (predictedPos - entityFront*1.5f + entityUp).GetData() );
-				glTexCoord2f(1.0f, 1.0f);     glVertex3fv( (predictedPos + entityFront*1.5f + entityUp).GetData() );
-				glTexCoord2f(1.0f, 0.0f);     glVertex3fv( (predictedPos + entityFront*1.5f).GetData() );
-				glTexCoord2f(0.0f, 0.0f);     glVertex3fv( (predictedPos - entityFront*1.5f).GetData() );
-			glEnd();
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         }
 
     }
@@ -369,7 +344,6 @@ void LaserTrooper::Render( float predictionTime, int teamId )
         unsigned char alpha = (float)m_stats[StatHealth] * 2.55f;
 
         g_imRenderer->Color4ub( 0, 0, 0, alpha );
-        glColor4ub( 0, 0, 0, alpha );
 
         entityRight *= 0.5f;
         entityUp *= 0.5;
@@ -415,12 +389,6 @@ void LaserTrooper::Render( float predictionTime, int teamId )
                 g_imRenderer->TexCoord2f(left, top);        g_imRenderer->Vertex3fv( (fragmentPos - entityRight).GetData() );
             g_imRenderer->End();
 
-            glBegin(GL_QUADS);
-                glTexCoord2f(left, bottom);     glVertex3fv( (fragmentPos - entityRight + entityUp).GetData() );
-                glTexCoord2f(right, bottom);    glVertex3fv( (fragmentPos + entityRight + entityUp).GetData() );
-                glTexCoord2f(right, top);       glVertex3fv( (fragmentPos + entityRight).GetData() );
-                glTexCoord2f(left, top);        glVertex3fv( (fragmentPos - entityRight).GetData() );
-            glEnd();
         }
     }
 }

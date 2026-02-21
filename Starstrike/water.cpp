@@ -9,7 +9,6 @@
 #include "debug_utils.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
-#include "ogl_extensions.h"
 #include "profiler.h"
 #include "preferences.h"
 #include "render_utils.h"
@@ -224,7 +223,6 @@ void Water::GenerateLightMap()
     g_app->m_resource->AddBitmap(LIGHTMAP_TEXTURE_NAME, finalImage);
 
 
-
 	//
 	// Create the water depth map
 
@@ -420,7 +418,6 @@ void Water::RenderFlatWaterTiles(
 	float texStepX2 = texSizeX2 / (float)steps;
 	float texStepZ2 = texSizeZ2 / (float)steps;
 
-    glBegin(GL_QUADS);
 		for (int j = 0; j < steps; ++j)
 		{
 			float pz = posNorth + j * posStepZ;
@@ -435,25 +432,8 @@ void Water::RenderFlatWaterTiles(
 
 				float tx1 = texEast1 + i * texStepX1;
 				float tx2 = texEast2 + i * texStepX2;
-
-				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1);
-				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2);
-				glVertex3f(px + posStepX, height, pz);
-
-				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1 + texStepZ1);
-				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2 + texStepZ2);
-				glVertex3f(px + posStepX, height, pz + posStepZ);
-
-				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1 + texStepZ1);
-				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2 + texStepZ2);
-				glVertex3f(px, height, pz + posStepZ);
-
-				gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1);
-				gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2);
-				glVertex3f(px, height, pz);
 			}
 		}
-	glEnd();
 }
 
 
@@ -461,20 +441,12 @@ void Water::RenderFlatWater()
 {
     Landscape *land = &g_app->m_location->m_landscape;
 
-	glDisable			(GL_CULL_FACE);
-	glEnable			(GL_FOG);
-    glDisable           (GL_BLEND);
-	glDepthMask			(false);
 
     if( g_app->m_negativeRenderer )
     {
-		glEnable		(GL_BLEND);
-        glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-	    glColor4ub		(255, 255, 255, 0);
     }
     else
     {
-        glColor4ub		(255, 255, 255, 255);
     }
 
 	char waterFilename[256];
@@ -485,24 +457,7 @@ void Water::RenderFlatWater()
         strcpy( waterFilename, "terrain/water_icecaps.bmp" );
     }
 
-    gglActiveTextureARB (GL_TEXTURE0_ARB);
-    glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture(waterFilename, true, true));
-	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	glEnable		    (GL_TEXTURE_2D);
-
 	// JAK HACK (DISABLED)
-	gglActiveTextureARB (GL_TEXTURE1_ARB);
-    glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture(LIGHTMAP_TEXTURE_NAME));
-	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
-    glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_MODULATE);
-	glEnable		    (GL_TEXTURE_2D);
 
     float landSizeX = land->GetWorldSizeX();
     float landSizeZ = land->GetWorldSizeZ();
@@ -516,22 +471,6 @@ void Water::RenderFlatWater()
 		timeFactor, timeFactor + 30.0f, timeFactor, timeFactor + 30.0f,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		m_flatWaterTiles->GetNumColumns());
-
-	gglActiveTextureARB  (GL_TEXTURE1_ARB);
-    glDisable		    (GL_TEXTURE_2D);
-
-    gglActiveTextureARB  (GL_TEXTURE0_ARB);
-    glDisable		    (GL_TEXTURE_2D);
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	glEnable		(GL_CULL_FACE);
-    glDisable       (GL_BLEND);
-    glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable       (GL_TEXTURE_2D);
-    glDisable       (GL_FOG);
-	glDepthMask		(true);
 }
 
 bool isIdentical(const LegacyVector3& a,const LegacyVector3& b,const LegacyVector3& c)
@@ -651,33 +590,7 @@ void Water::UpdateDynamicWater()
 
 void Water::RenderDynamicWater()
 {
-	glEnable		    (GL_BLEND);
-	glBlendFunc         (GL_SRC_ALPHA, GL_ONE);
-    glEnable            (GL_FOG);
-	glEnable			(GL_CULL_FACE);
-
-	glEnableClientState	(GL_VERTEX_ARRAY);
-	glEnableClientState	(GL_COLOR_ARRAY);
-
-	glVertexPointer	(3, GL_FLOAT, sizeof(WaterVertex), &m_renderVerts[0].m_pos);
-	glColorPointer	(4, GL_UNSIGNED_BYTE, sizeof(WaterVertex), &m_renderVerts[0].m_col);
-
-	int numStrips = m_strips.Size();
-	for (int i = 0; i < numStrips; ++i)
-	{
-		WaterTriangleStrip *strip = m_strips[i];
-
-		glDrawArrays(GL_TRIANGLE_STRIP,
-					 strip->m_startRenderVertIndex,
-					 strip->m_numVerts);
-	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-
-	glDisable           (GL_FOG);
-    glBlendFunc         (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glDisable           (GL_BLEND);
+	// TODO Phase 10: Implement D3D11 vertex buffer rendering for water strips
 }
 
 void Water::Render()
@@ -687,33 +600,8 @@ void Water::Render()
 	{
         START_PROFILE(g_app->m_profiler,  "Render Water" );
 
-	    glEnable		    (GL_TEXTURE_2D);
-        glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false));
-	    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 		Landscape *land = &g_app->m_location->m_landscape;
-		glEnable(GL_BLEND);
-		glColor4ub(250, 250, 250, 100);
         float size = 100.0f;
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f,0.0f);            glVertex3f(0, 0.0f, 0);
-			glTexCoord2f(size,0.0f);            glVertex3f(0, 0.0f, land->GetWorldSizeZ());
-			glTexCoord2f(size,size);            glVertex3f(land->GetWorldSizeX(), 0.0f, land->GetWorldSizeZ());
-			glTexCoord2f(0.0f,size);            glVertex3f(land->GetWorldSizeX(), 0.0f, 0);
-		glEnd();
-        glDisable           (GL_TEXTURE_2D);
-		glColor4ub(250, 250, 250, 30);
-		glBegin(GL_QUADS);
-			glTexCoord2f(0.0f,0.0f);            glVertex3f(0, 0.0f, 0);
-			glTexCoord2f(size,0.0f);            glVertex3f(0, 0.0f, land->GetWorldSizeZ());
-			glTexCoord2f(size,size);            glVertex3f(land->GetWorldSizeX(), 0.0f, land->GetWorldSizeZ());
-			glTexCoord2f(0.0f,size);            glVertex3f(land->GetWorldSizeX(), 0.0f, 0);
-		glEnd();
-		glDisable(GL_BLEND);
-        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-        glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
         END_PROFILE(g_app->m_profiler,  "Render Water" );
 	}

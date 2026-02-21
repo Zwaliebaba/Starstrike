@@ -308,7 +308,6 @@ void Spirit::Render( float predictionTime )
 
     float size = spiritInnerSize;
     g_imRenderer->Color4ub(colour.r, colour.g, colour.b, innerAlpha );
-    glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
 
     g_imRenderer->Begin(PRIM_QUADS);
         g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
@@ -317,16 +316,9 @@ void Spirit::Render( float predictionTime )
         g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
     g_imRenderer->End();
 
-    glBegin( GL_QUADS );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
 
     size = spiritOuterSize;
     g_imRenderer->Color4ub(colour.r, colour.g, colour.b, outerAlpha );
-    glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
     g_imRenderer->Begin(PRIM_QUADS);
         g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
         g_imRenderer->Vertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
@@ -334,12 +326,6 @@ void Spirit::Render( float predictionTime )
         g_imRenderer->Vertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
     g_imRenderer->End();
 
-    glBegin( GL_QUADS );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
 }
 
 int Spirit::NumNearbyEggs()

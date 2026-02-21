@@ -116,22 +116,12 @@ void StartSequence::Render()
 	g_imRenderer->SetViewMatrix(DirectX::XMMatrixIdentity());
 	g_imRenderer->LoadIdentity();
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, 800, screenH, 0);
-	glMatrixMode(GL_MODELVIEW);
 
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
 
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
 
 	g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-	glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 	float timeNow = GetHighResTime() - m_startTime;
 
@@ -146,13 +136,6 @@ void StartSequence::Render()
 			g_imRenderer->Vertex2i(0,screenH);
 		g_imRenderer->End();
 
-		glColor4f(0,0,0,alpha);
-		glBegin( GL_QUADS );
-			glVertex2i(0,0);
-			glVertex2i(800,0);
-			glVertex2i(800,screenH);
-			glVertex2i(0,screenH);
-		glEnd();
 	}
 
 	if( timeNow > 87 )
@@ -166,13 +149,6 @@ void StartSequence::Render()
 			g_imRenderer->Vertex2i(0,screenH);
 		g_imRenderer->End();
 
-		glColor4f(1,1,1,alpha);
-		glBegin( GL_QUADS );
-			glVertex2i(0,0);
-			glVertex2i(800,0);
-			glVertex2i(800,screenH);
-			glVertex2i(0,screenH);
-		glEnd();
 	}
 
 	Vector2 cursorPos;
@@ -195,7 +171,6 @@ void StartSequence::Render()
 			}
 
 			g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.8f );
-			glColor4f( 1.0f, 1.0f, 1.0f, 0.8f );
 			g_gameFont.DrawText2D( caption->m_x, caption->m_y, caption->m_size, theString );
 
 			int finishedLen = strlen(theString);
@@ -217,12 +192,6 @@ void StartSequence::Render()
 				g_imRenderer->Vertex2f( cursorPos.x, cursorPos.y + cursorSize * 0.88f );
 			g_imRenderer->End();
 
-			glBegin( GL_QUADS );
-				glVertex2f( cursorPos.x, cursorPos.y );
-				glVertex2f( cursorPos.x + cursorSize*0.7f, cursorPos.y );
-				glVertex2f( cursorPos.x + cursorSize*0.7f, cursorPos.y + cursorSize * 0.88f );
-				glVertex2f( cursorPos.x, cursorPos.y + cursorSize * 0.88f );
-			glEnd();
 		}
 	}
 
@@ -255,27 +224,12 @@ void StartSequence::Render()
 		g_imRenderer->PushMatrix();
 		g_imRenderer->Scalef( scale, scale, scale );
 
-		glPushMatrix();
-		glScalef    ( scale, scale, scale );
-
-		glFogf      ( GL_FOG_DENSITY, 1.0f );
-		glFogf      ( GL_FOG_START, 0.0f );
-		glFogf      ( GL_FOG_END, (float) fogVal );
-		glFogfv     ( GL_FOG_COLOR, fogCol );
-		glFogi      ( GL_FOG_MODE, GL_LINEAR );
-		glEnable    ( GL_FOG );
 
 		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 		g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 
-		glEnable		(GL_LINE_SMOOTH);
-		glEnable		(GL_BLEND);
-		glBlendFunc		(GL_SRC_ALPHA, GL_ONE);
-		glEnable        (GL_DEPTH_TEST);
-		glLineWidth		(1.0f);
 
 		g_imRenderer->Color4f(0.5, 0.5, 1.0, 0.5);
-		glColor4f		(0.5, 0.5, 1.0, 0.5);
 
 		float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;
 		percentDrawn = max( percentDrawn, 0.0f );
@@ -291,27 +245,15 @@ void StartSequence::Render()
 				g_imRenderer->Vertex3f( xEnd, height, x );
 			g_imRenderer->End();
 
-			glBegin( GL_LINES );
-				glVertex3f( x, height, zStart );
-				glVertex3f( x, height, zEnd );
-				glVertex3f( xStart, height, x );
-				glVertex3f( xEnd, height, x );
-			glEnd();
 		}
 
 		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 		g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 
-		glDisable		(GL_LINE_SMOOTH);
-		glDisable		(GL_BLEND);
-		glBlendFunc		(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDepthMask		(true);
 
 		g_app->m_globalWorld->SetupFog();
-		glDisable( GL_FOG );
 
 		g_imRenderer->PopMatrix();
-		glPopMatrix ();
 	}
 }
 

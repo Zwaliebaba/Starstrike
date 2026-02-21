@@ -74,11 +74,6 @@ void Sphere::ConsiderTriangle(int level, LegacyVector3 const &a, LegacyVector3 c
 			g_imRenderer->Vertex3f(b.x, b.y, b.z);
 			g_imRenderer->Vertex3f(c.x, c.y, c.z);
 		g_imRenderer->End();
-		glBegin(GL_TRIANGLES);
-			glVertex3f(a.x, a.y, a.z);
-			glVertex3f(b.x, b.y, b.z);
-			glVertex3f(c.x, c.y, c.z);
-		glEnd();
 	}
 	else
 	{
@@ -112,14 +107,6 @@ void Sphere::Render(LegacyVector3 const &pos, float radius)
 	g_imRenderer->PushMatrix();
 	g_imRenderer->Translatef(pos.x, pos.y, pos.z);
 	g_imRenderer->Scalef(radius, radius, radius);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glTranslatef(pos.x, pos.y, pos.z);
-	glScalef(radius, radius, radius);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glLineWidth(1.0f);
 	RenderLong();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	g_imRenderer->PopMatrix();
-	glPopMatrix();
 }

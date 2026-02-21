@@ -32,12 +32,10 @@ void GameMenuButton::Render(int realX, int realY, bool highlighted, bool clicked
   UpdateButtonHighlight();
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
   g_gameFont.SetRenderOutline(true);
   g_gameFont.DrawText2DCentre(realX, realY, m_fontSize, m_iconName);
 
   g_imRenderer->Color4f(1.3f, 1.0f, 1.3f, 1.0f);
-  glColor4f(1.3f, 1.0f, 1.3f, 1.0f);
 
   if (!m_mouseHighlightMode)
     highlighted = false;
@@ -48,7 +46,6 @@ void GameMenuButton::Render(int realX, int realY, bool highlighted, bool clicked
   if (highlighted)
   {
     g_imRenderer->Color4f(1.0, 0.3f, 0.3, 1.0f);
-    glColor4f(1.0, 0.3f, 0.3, 1.0f);
   }
 
   g_gameFont.SetRenderOutline(false);
@@ -177,12 +174,10 @@ void GameMenuWindow::Render(bool _hasFocus)
   int h = g_app->m_renderer->ScreenH();
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
   g_gameFont.SetRenderOutline(true);
   g_gameFont.DrawText2DCentre(w / 2, 30, 80.0f, "DARWINIA");
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.SetRenderOutline(false);
   g_gameFont.DrawText2DCentre(w / 2, 30, 80.0f, "DARWINIA");
 }

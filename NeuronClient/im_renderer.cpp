@@ -25,7 +25,7 @@ ImRenderer::ImRenderer()
     m_defaultSampler(nullptr),
     m_currentPrimitive(PRIM_TRIANGLES),
     m_inBeginEnd(false),
-    m_drawEnabled(false),
+    m_drawEnabled(true),
     m_currentColor(1.0f, 1.0f, 1.0f, 1.0f),
     m_currentTexCoord(0.0f, 0.0f),
     m_currentNormal(0.0f, 0.0f, 1.0f),

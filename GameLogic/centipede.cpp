@@ -665,7 +665,7 @@ void Centipede::Render( float _predictionTime )
 
     if( !m_dead && m_linked )
     {
-        glDisable( GL_TEXTURE_2D );
+
         //RenderSphere( m_targetPos, 5.0f );
 
         LegacyVector3 predictedFront = m_front;
@@ -684,7 +684,6 @@ void Centipede::Render( float _predictionTime )
         shape->Render(_predictionTime, mat);
         g_app->m_renderer->UnsetObjectLighting();
 
-        glDisable( GL_NORMALIZE );
     }
 }
 

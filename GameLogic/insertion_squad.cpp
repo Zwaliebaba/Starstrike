@@ -569,10 +569,7 @@ void Squadie::Render( float _predictionTime )
         // 3d Shape
 
 		g_app->m_renderer->SetObjectLighting();
-        glDisable       (GL_TEXTURE_2D);
-        glEnable        (GL_COLOR_MATERIAL);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        glDisable       (GL_BLEND);
 
         Matrix34 mat(entityFront, entityUp, predictedPos);
 
@@ -587,20 +584,14 @@ void Squadie::Render( float _predictionTime )
             else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.2f );
             else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glEnable( GL_BLEND );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
-            glBlendFunc( GL_ONE, GL_ONE );
         }
 
 
         m_shape->Render(_predictionTime, mat);
 
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable        (GL_BLEND);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-        glDisable       (GL_COLOR_MATERIAL);
-        glEnable        (GL_TEXTURE_2D);
 		g_app->m_renderer->UnsetObjectLighting();
     }
 }

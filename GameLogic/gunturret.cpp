@@ -434,18 +434,11 @@ void GunTurret::Render( float _predictionTime )
         targetPos += camUp * 5.0f;
 
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "icons/mouse_missiletarget.bmp" ) );
-        glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "icons/mouse_missiletarget.bmp" ) );
-        glEnable( GL_TEXTURE_2D );
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        glDisable( GL_CULL_FACE );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable( GL_BLEND );
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        glDepthMask( false );
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-        glDisable( GL_DEPTH_TEST );
 
         g_imRenderer->Begin(PRIM_QUADS);
             g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (targetPos - camRight * size - camUp * size).GetData() );
@@ -454,25 +447,13 @@ void GunTurret::Render( float _predictionTime )
             g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (targetPos - camRight * size + camUp * size).GetData() );
         g_imRenderer->End();
 
-        glBegin( GL_QUADS );
-            glTexCoord2i(0,0);      glVertex3fv( (targetPos - camRight * size - camUp * size).GetData() );
-            glTexCoord2i(1,0);      glVertex3fv( (targetPos + camRight * size - camUp * size).GetData() );
-            glTexCoord2i(1,1);      glVertex3fv( (targetPos + camRight * size + camUp * size).GetData() );
-            glTexCoord2i(0,1);      glVertex3fv( (targetPos - camRight * size + camUp * size).GetData() );
-        glEnd();
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        glEnable( GL_DEPTH_TEST );
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        glDepthMask( true );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        glDisable( GL_BLEND );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-        glEnable( GL_CULL_FACE );
         g_imRenderer->UnbindTexture();
-        glDisable( GL_TEXTURE_2D );
     }*/
 
 
@@ -482,16 +463,10 @@ void GunTurret::Render( float _predictionTime )
 void GunTurret::RenderPorts()
 {
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable       ( GL_CULL_FACE );
-    glEnable        ( GL_TEXTURE_2D );
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    glDepthMask     ( false );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable        ( GL_BLEND );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
 
     for( int i = 0; i < GetNumPorts(); ++i )
     {
@@ -511,13 +486,11 @@ void GunTurret::RenderPorts()
         if( !occupantId.IsValid() )
         {
             g_imRenderer->Color4ub( 150, 150, 150, 255 );
-            glColor4ub( 150, 150, 150, 255 );
         }
         else
         {
             RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
             g_imRenderer->Color4ubv( teamColour.GetData() );
-            glColor4ubv( teamColour.GetData() );
         }
 
         g_imRenderer->Begin(PRIM_QUADS);
@@ -527,23 +500,12 @@ void GunTurret::RenderPorts()
             g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
         g_imRenderer->End();
 
-        glBegin( GL_QUADS );
-            glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
-            glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
-            glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
-            glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
-        glEnd();
     }
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable       ( GL_BLEND );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glDepthMask     ( true );
-    glDisable       ( GL_TEXTURE_2D );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable        ( GL_CULL_FACE );
 }
 
 bool GunTurret::DoesRayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,

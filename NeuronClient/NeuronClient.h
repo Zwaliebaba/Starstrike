@@ -114,11 +114,11 @@
 #define HAVE_DSOUND
 #endif
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <d3d11.h>
+#include <DirectXMath.h>
 
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glu32.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
 
 #define SAFE_FREE(x) {free(x);x=NULL;}
 #define SAFE_DELETE(x) {delete x;x=NULL;}

@@ -54,7 +54,6 @@ void InputField::SetCallback(DarwiniaButton *button)
 void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 {
 	g_imRenderer->Color4f( 0.1f, 0.0f, 0.0f, 0.5f );
-	glColor4f( 0.1f, 0.0f, 0.0f, 0.5f );
 	float editAreaWidth = m_w * 0.4f;
 
 	g_imRenderer->Begin( PRIM_QUADS );
@@ -64,12 +63,6 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 		g_imRenderer->Vertex2f( realX + m_w - editAreaWidth, realY+m_h );
 	g_imRenderer->End();
 
-	glBegin( GL_QUADS );
-		glVertex2f( realX + m_w - editAreaWidth, realY );
-		glVertex2f( realX + m_w, realY );
-		glVertex2f( realX + m_w, realY+m_h );
-		glVertex2f( realX + m_w - editAreaWidth, realY+m_h );
-	glEnd();
 
 	g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, 1.0f );
 	g_imRenderer->Begin( PRIM_LINES );
@@ -79,16 +72,6 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 		g_imRenderer->Vertex2f( realX + m_w - editAreaWidth, realY+m_h );
 	g_imRenderer->End();
 
-	glColor4f( 0.0f, 0.0f, 0.0f, 1.0f );
-	glBegin( GL_LINES );                        // top
-		glVertex2f( realX + m_w - editAreaWidth, realY );
-		glVertex2f( realX + m_w, realY );
-	glEnd();
-
-	glBegin( GL_LINES );                        // left
-		glVertex2f( realX + m_w - editAreaWidth, realY );
-		glVertex2f( realX + m_w - editAreaWidth, realY+m_h );
-	glEnd();
 
 	g_imRenderer->Color4ub( 100, 34, 34, 150 );
 	g_imRenderer->Begin( PRIM_LINES );
@@ -98,17 +81,8 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 		g_imRenderer->Vertex2f( realX + m_w, realY + m_h );
 	g_imRenderer->End();
 
-	glColor4ub( 100, 34, 34, 150 );
 	//glColor4f( 0.9f, 0.3f, 0.3f, 0.3f );        // right
-	glBegin( GL_LINES );
-		glVertex2f( realX + m_w, realY );
-		glVertex2f( realX + m_w, realY + m_h );
-	glEnd();
 
-	glBegin( GL_LINES );                        // bottom
-		glVertex2f( realX + m_w - editAreaWidth, realY+m_h );
-		glVertex2f( realX + m_w, realY + m_h );
-	glEnd();
 
 	int fieldX = realX + m_w - m_inputBoxWidth;
 
@@ -124,10 +98,6 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 				g_imRenderer->Vertex2f( fieldX + cursorOffset, realY + m_h - 2 );
 			g_imRenderer->End();
 
-			glBegin( GL_LINES );
-				glVertex2f( fieldX + cursorOffset, realY + 2 );
-				glVertex2f( fieldX + cursorOffset, realY + m_h - 2 );
-			glEnd();
 		}
 	}
 	else
@@ -425,13 +395,6 @@ void ColourWidget::Render( int realX, int realY, bool highlighted, bool clicked 
 		g_imRenderer->Vertex2i( realX + m_w - 30, realY + m_h - 3 );
 	g_imRenderer->End();
 
-	glColor4ubv( (unsigned char *) m_value );
-	glBegin( GL_QUADS );
-		glVertex2i( realX + m_w - 30, realY + 4 );
-		glVertex2i( realX + m_w - 5, realY + 4 );
-		glVertex2i( realX + m_w - 5, realY + m_h - 3 );
-		glVertex2i( realX + m_w - 30, realY + m_h - 3 );
-	glEnd();
 }
 
 
@@ -455,7 +418,6 @@ void ColourWidget::SetCallback(DarwiniaButton *button)
 {
     m_callback = button;
 }
-
 
 
 // ****************************************************************************
@@ -513,11 +475,4 @@ void ColourWindow::Render( bool hasFocus )
 		g_imRenderer->Vertex2i( m_x + m_w - 60, m_y + m_h - 10 );
 	g_imRenderer->End();
 
-	glColor4ubv( (unsigned char *) m_value );
-	glBegin( GL_QUADS );
-		glVertex2i( m_x + m_w - 60, m_y + 25 );
-		glVertex2i( m_x + m_w - 10, m_y + 25 );
-		glVertex2i( m_x + m_w - 10, m_y + m_h - 10 );
-		glVertex2i( m_x + m_w - 60, m_y + m_h - 10 );
-	glEnd();
 }

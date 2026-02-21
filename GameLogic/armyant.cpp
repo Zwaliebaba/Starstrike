@@ -567,7 +567,6 @@ void ArmyAnt::Render( float _predictionTime )
     LegacyVector3 predictedUp = g_upVector;
 
     g_app->m_renderer->SetObjectLighting();
-    glDisable( GL_TEXTURE_2D );
 
     Matrix34 mat( m_front, predictedUp, predictedPos );
     mat.u *= m_scale;

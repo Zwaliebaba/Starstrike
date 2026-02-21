@@ -23,7 +23,6 @@
 void RenderSquare2d(float x, float y, float size, RGBAColour const &_col)
 {
 	int v[4];
-	glGetIntegerv(GL_VIEWPORT, &v[0]);
 	float left = v[0];
 	float right = v[0] + v[2];
 	float bottom = v[1] + v[3];
@@ -53,34 +52,6 @@ void RenderSquare2d(float x, float y, float size, RGBAColour const &_col)
 	g_imRenderer->SetProjectionMatrix(savedProj);
 	g_imRenderer->SetViewMatrix(savedView);
 	g_imRenderer->SetWorldMatrix(savedWorld);
-
-	// OpenGL path
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(left, right, bottom, top);
-	glMatrixMode(GL_MODELVIEW);
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	if (_col.a != 255)
-		glEnable(GL_BLEND);
-
-	glColor4ubv(_col.GetData());
-	glBegin(GL_QUADS);
-		glVertex2f(x - size, y - size);
-		glVertex2f(x + size, y - size);
-		glVertex2f(x + size, y + size);
-		glVertex2f(x - size, y + size);
-	glEnd();
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
 }
 
 
@@ -118,50 +89,12 @@ void RenderCube(LegacyVector3 const &_centre, float _sizeX, float _sizeY, float 
 	g_imRenderer->End();
 
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-
-	// OpenGL path
-	if (_col.a != 255)
-		glEnable(GL_BLEND);
-	glColor4ubv(_col.GetData());
-	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(2.0f);
-	glBegin(GL_LINE_LOOP);
-		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
-		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
-		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
-	glEnd();
-	glDisable(GL_LINE_SMOOTH);
-	glDisable(GL_BLEND);
 }
 
 
 void RenderSphereRings(LegacyVector3 const &_centre, float _radius, RGBAColour const &_col)
 {
 	g_imRenderer->Color3ubv(_col.GetData());
-	glColor3ubv(_col.GetData());
 
 	int const _segs = 20;
 	float thetaIncrement = M_PI * 2.0f / (float)_segs;
@@ -181,7 +114,6 @@ void RenderSphereRings(LegacyVector3 const &_centre, float _radius, RGBAColour c
 		}
 	}
 
-	glLineWidth(2.0f);
 	g_imRenderer->Begin(PRIM_LINE_LOOP);
 	for (i = 0; i < _segs; i++)
 	{
@@ -210,33 +142,24 @@ void RenderSphereRings(LegacyVector3 const &_centre, float _radius, RGBAColour c
 	}
 	g_imRenderer->End();
 
-	glBegin(GL_LINE_LOOP);
 		for (i = 0; i < _segs; i++)
 		{
 			LegacyVector3 pos = _centre;
 			pos.x += sx[i] * _radius;
 			pos.z += cx[i] * _radius;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
-	glBegin(GL_LINE_LOOP);
 		for (i = 0; i < _segs; i++)
 		{
 			LegacyVector3 pos = _centre;
 			pos.y += sx[i] * _radius;
 			pos.z += cx[i] * _radius;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
-	glBegin(GL_LINE_LOOP);
 		for (i = 0; i < _segs; i++)
 		{
 			LegacyVector3 pos = _centre;
 			pos.x += sx[i] * _radius;
 			pos.y += cx[i] * _radius;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
 }
 
 
@@ -245,7 +168,6 @@ void RenderSphere(LegacyVector3 const &_centre, float _radius, RGBAColour const 
 	static Sphere aSphere;
 
 	g_imRenderer->Color3ubv(_col.GetData());
-	glColor3ubv(_col.GetData());
 	aSphere.Render(_centre, _radius);
 }
 
@@ -265,11 +187,6 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 	axis2 = axis1 ^ axis3;
 
 	g_imRenderer->Color3ubv(_col.GetData());
-	glDisable(GL_LIGHTING);
-	glDisable(GL_COLOR_MATERIAL);
-	glDisable(GL_TEXTURE_2D);
-	glLineWidth(1.0f);
-	glColor3ubv(_col.GetData());
 
 	int const numEdges = 16;
 
@@ -308,40 +225,29 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 	g_imRenderer->End();
 
 	// OpenGL path
-	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
 			LegacyVector3 pos = _centreBase;
 			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
 			pos += axis2 * sinf(theta) * _radius;
 			pos += axis3 * cosf(theta) * _radius;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
-	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
 			LegacyVector3 pos = _centreBase + axis1 * _height;
 			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
 			pos += axis2 * sinf(theta) * _radius;
 			pos += axis3 * cosf(theta) * _radius;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
-	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
 			LegacyVector3 pos = _centreBase;
 			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
 			pos += axis2 * sinf(theta) * _radius;
 			pos += axis3 * cosf(theta) * _radius;
-			glVertex3fv(pos.GetData());
 			pos += axis1 * _height;
-			glVertex3fv(pos.GetData());
 		}
-	glEnd();
 
-	glEnable(GL_LIGHTING);
 }
 
 
@@ -372,25 +278,6 @@ void RenderArrow(LegacyVector3 const &start, LegacyVector3 const &end, float wid
 	g_imRenderer->End();
 
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-
-	// OpenGL path
-	if (_col.a != 255)
-		glEnable(GL_BLEND);
-
-	glLineWidth(width / midPointToCameraDist * arrowLen);
-	glColor3ubv(_col.GetData());
-
-	glBegin(GL_LINES);
-		glVertex3fv(start.GetDataConst());
-		glVertex3fv(end.GetDataConst());
-		glVertex3fv(p1.GetDataConst());
-		glVertex3fv(end.GetDataConst());
-		glVertex3fv(p2.GetDataConst());
-		glVertex3fv(end.GetDataConst());
-	glEnd();
-
-	glDisable( GL_LINE_SMOOTH );
-	glDisable( GL_BLEND );
 }
 
 
@@ -407,20 +294,10 @@ void RenderPointMarker(LegacyVector3 const &point, char const *_fmt, ...)
 }
 
 
-void PrintMatrix( const char *_name, GLenum _whichMatrix )
+void PrintMatrix( const char *_name, int _whichMatrix )
 {
-	GLdouble matrix[16];
-
-	glGetDoublev( _whichMatrix, matrix );
-
-	DebugTrace( "\tMatrix: %s\n", _name );
-	for (int row = 0; row < 4; row++) {
-		DebugTrace("\t\t");
-		for (int col = 0; col < 4; col++)
-			DebugTrace("% 13.1f ", matrix[col * 4 + row]);
-		DebugTrace("\n");
-	}
-	DebugTrace("\n");
+	// OpenGL matrix query removed — function retained as stub
+	DebugTrace( "\tMatrix: %s (query not available)\n", _name );
 }
 
 void PrintMatrices( const char *_title )
@@ -431,10 +308,10 @@ void PrintMatrices( const char *_title )
 		return;
 
 	DebugTrace(
-		"OpenGL:   "
+		"D3D11:   "
 		"%s\n", _title);
-	PrintMatrix( "Model View", GL_MODELVIEW_MATRIX );
-	PrintMatrix( "Projection", GL_PROJECTION_MATRIX );
+	PrintMatrix( "Model View", 0 );
+	PrintMatrix( "Projection", 1 );
 
 }
 

@@ -694,7 +694,6 @@ bool EntityGrid::AreFriendsPresent(float _worldX, float _worldZ, float _range, u
 }
 
 
-
 #if 1
 void EntityGrid::Render ()
 {
@@ -705,9 +704,7 @@ void EntityGrid::Render ()
     float cellSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ() / (float) m_numCellsZ;
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    glDisable( GL_CULL_FACE );
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    glEnable( GL_BLEND );
 
     for ( x = 0; x < m_numCellsX; ++x )
     {
@@ -728,7 +725,6 @@ void EntityGrid::Render ()
                      float alpha = 128;
                      RGBAColour col = g_app->m_location->m_teams[t].m_colour;
                      g_imRenderer->Color4ub(col.r, col.g, col.b, alpha);
-                     glColor4ub(col.r, col.g, col.b, alpha);
 
                      g_imRenderer->Begin(PRIM_QUADS);
                         g_imRenderer->Vertex3f( worldX, worldY, worldZ );
@@ -737,12 +733,6 @@ void EntityGrid::Render ()
                         g_imRenderer->Vertex3f( worldX, worldY, worldZ + cellSizeZ );
                      g_imRenderer->End();
 
-                     glBegin(GL_QUADS);
-                        glVertex3f( worldX, worldY, worldZ );
-                        glVertex3f( worldX + cellSizeX, worldY, worldZ );
-                        glVertex3f( worldX + cellSizeX, worldY, worldZ + cellSizeZ );
-                        glVertex3f( worldX, worldY, worldZ + cellSizeZ );
-                     glEnd();
 
                      g_editorFont.DrawText3DCentre( LegacyVector3(worldX,worldY,worldZ), 5.0f, "%d", numEntities );
                 }
@@ -751,9 +741,7 @@ void EntityGrid::Render ()
     }
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    glDisable( GL_BLEND );
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    glEnable( GL_CULL_FACE );
 
 #ifdef DEBUG_ENTITY_GRID
     if( s_entityGridErrors.Size() > 0 )
@@ -763,16 +751,11 @@ void EntityGrid::Render ()
             EntityGridError *theError = s_entityGridErrors[i];
             LegacyVector3 pos = theError->m_pos;
             g_imRenderer->Color4f( 1.0f, 0.0f, 0.0f, 1.0f );
-            glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
             g_imRenderer->Begin(PRIM_LINES);
                 g_imRenderer->Vertex3fv( (pos - LegacyVector3(0,500,0)).GetData() );
                 g_imRenderer->Vertex3fv( (pos + LegacyVector3(0,500,0)).GetData() );
             g_imRenderer->End();
 
-            glBegin( GL_LINES );
-                glVertex3fv( (pos - LegacyVector3(0,500,0)).GetData() );
-                glVertex3fv( (pos + LegacyVector3(0,500,0)).GetData() );
-            glEnd();
 
             int index = theError->m_id.GetIndex();
             int uniqueIndex = theError->m_id.GetUniqueId();

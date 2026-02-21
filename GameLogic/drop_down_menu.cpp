@@ -76,7 +76,6 @@ void DropDownWindow::RemoveDropDownWindow()
 }
 
 
-
 // ****************************************************************************
 // Class DropDownMenu
 // ****************************************************************************
@@ -231,12 +230,6 @@ void DropDownMenu::Render( int realX, int realY, bool highlighted, bool clicked 
         g_imRenderer->Vertex2i( realX + m_w - 7, realY + 9 );
     g_imRenderer->End();
 
-    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    glBegin( GL_TRIANGLES );
-        glVertex2i( realX + m_w - 12, realY + 5 );
-        glVertex2i( realX + m_w - 3, realY + 5 );
-        glVertex2i( realX + m_w - 7, realY + 9 );
-    glEnd();
 }
 
 

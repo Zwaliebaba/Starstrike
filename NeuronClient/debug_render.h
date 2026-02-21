@@ -19,7 +19,7 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 void RenderArrow(LegacyVector3 const &start, LegacyVector3 const &end, float width, RGBAColour const &_col=RGBAColour(255,255,255));
 void RenderPointMarker(LegacyVector3 const &point, char const *text, ...);
 
-void PrintMatrix( const char *_name, GLenum _whichMatrix );
+void PrintMatrix( const char *_name, int _whichMatrix );
 void PrintMatrices( const char *_title );
 
 #endif // DEBUG_RENDER_ENABLED

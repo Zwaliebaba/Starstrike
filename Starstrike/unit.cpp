@@ -1,5 +1,8 @@
 #include "pch.h"
 
+#include "render_device.h"
+#include "render_states.h"
+
 #include <math.h>
 
 #include "debug_utils.h"
@@ -153,7 +156,7 @@ void Unit::Render( float _predictionTime )
         }
 	}
 
-    glEnable        ( GL_CULL_FACE );
+	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 }
 
 bool Unit::Advance( int _slice )

@@ -186,7 +186,6 @@ void Route::Render()
     LegacyVector3 lastPos;
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-    glDisable( GL_DEPTH_TEST );
 
     for( int i = 0; i < m_wayPoints.Size(); ++i )
     {
@@ -200,7 +199,6 @@ void Route::Render()
     }
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    glEnable( GL_DEPTH_TEST );
 #endif
 }
 

@@ -179,22 +179,14 @@ void FuelBuilding::RenderAlphas( float _predictionTime )
             rightAngle.SetLength( 25.0f );
 
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/fuel.bmp" ) );
-            glBindTexture       ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/fuel.bmp" ) );
-            glEnable            ( GL_TEXTURE_2D );
-            glTexParameteri     ( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-            glTexParameteri     ( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glEnable            ( GL_BLEND );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            glBlendFunc         ( GL_SRC_ALPHA, GL_ONE );
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-            glDepthMask         ( false );
 
             float tx = g_gameTime * -0.5f;
             float tw = 1.0f;
 
             g_imRenderer->Color4f( 1.0f, 0.4f, 0.1f, 0.4f * m_currentLevel );
-            glColor4f( 1.0f, 0.4f, 0.1f, 0.4f * m_currentLevel );
 
 	        float nearPlaneStart = g_app->m_renderer->GetNearPlane();
 	        g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f,
@@ -214,12 +206,6 @@ void FuelBuilding::RenderAlphas( float _predictionTime )
                     g_imRenderer->TexCoord2f( tx+tw, 0 );   g_imRenderer->Vertex3fv( (endPos - rightAngle).GetData() );
                 g_imRenderer->End();
 
-                glBegin( GL_QUADS );
-                    glTexCoord2f( tx, 0 );      glVertex3fv( (startPos - rightAngle).GetData() );
-                    glTexCoord2f( tx, 1 );      glVertex3fv( (startPos + rightAngle).GetData() );
-                    glTexCoord2f( tx+tw, 1 );   glVertex3fv( (endPos + rightAngle).GetData() );
-                    glTexCoord2f( tx+tw, 0 );   glVertex3fv( (endPos - rightAngle).GetData() );
-                glEnd();
                 rightAngle *= 0.7f;
             }
 
@@ -227,9 +213,7 @@ void FuelBuilding::RenderAlphas( float _predictionTime )
 								 		           g_app->m_renderer->GetFarPlane());
 
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            glEnable( GL_DEPTH_TEST );
             g_imRenderer->UnbindTexture();
-            glDisable( GL_TEXTURE_2D );
         }
     }
 
@@ -430,7 +414,6 @@ char *FuelGenerator::GetObjectiveCounter()
 }
 
 
-
 // ============================================================================
 
 
@@ -600,7 +583,6 @@ void FuelStation::RenderAlphas( float _predictionTime )
     // Prevent FuelBuilding::RenderAlphas from being called
 
 
-
     //
     // Render countdown
 
@@ -624,17 +606,9 @@ void FuelStation::RenderAlphas( float _predictionTime )
             // Render lines for over effect
 
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/interface_grey.bmp" ) );
-            glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/interface_grey.bmp" ) );
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-            glEnable( GL_TEXTURE_2D );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glEnable( GL_BLEND );
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-            glDepthMask( false );
-            glShadeModel( GL_SMOOTH );
             g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-            glDisable( GL_CULL_FACE );
 
             float texX = 0.0f;
             float texW = 3.0f;
@@ -642,9 +616,7 @@ void FuelStation::RenderAlphas( float _predictionTime )
             float texH = 0.3f;
 
             g_imRenderer->Color4f( 0.0f, 0.0f, 0.0f, 0.5f );
-            glColor4f( 0.0f, 0.0f, 0.0f, 0.5f );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
             g_imRenderer->Begin(PRIM_QUADS);
                 g_imRenderer->Vertex3fv( screenPos.GetData() );
@@ -653,18 +625,10 @@ void FuelStation::RenderAlphas( float _predictionTime )
                 g_imRenderer->Vertex3fv( (screenPos + screenUp * screenSize).GetData() );
             g_imRenderer->End();
 
-            glBegin( GL_QUADS );
-                glVertex3fv( screenPos.GetData() );
-                glVertex3fv( (screenPos + screenRight * screenSize).GetData() );
-                glVertex3fv( (screenPos + screenRight * screenSize + screenUp * screenSize).GetData() );
-                glVertex3fv( (screenPos + screenUp * screenSize).GetData() );
-            glEnd();
 
             g_imRenderer->Color4f( 1.0f, 0.4f, 0.2f, 1.0f );
-            glColor4f( 1.0f, 0.4f, 0.2f, 1.0f );
 
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
             for( int i = 0; i < 2; ++i )
             {
@@ -682,19 +646,6 @@ void FuelStation::RenderAlphas( float _predictionTime )
                     g_imRenderer->Vertex3fv( (screenPos + screenUp * screenSize).GetData() );
                 g_imRenderer->End();
 
-                glBegin( GL_QUADS );
-                    glTexCoord2f(texX,texY);
-                    glVertex3fv( screenPos.GetData() );
-
-                    glTexCoord2f(texX+texW,texY);
-                    glVertex3fv( (screenPos + screenRight * screenSize).GetData() );
-
-                    glTexCoord2f(texX+texW,texY+texH);
-                    glVertex3fv( (screenPos + screenRight * screenSize + screenUp * screenSize).GetData() );
-
-                    glTexCoord2f(texX,texY+texH);
-                    glVertex3fv( (screenPos + screenUp * screenSize).GetData() );
-                glEnd();
 
                 texY *= 1.5f;
                 texH = 0.1f;
@@ -702,13 +653,11 @@ void FuelStation::RenderAlphas( float _predictionTime )
 
 
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-            glDepthMask( false );
 
             //
             // Render countdown
 
             g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-            glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
             LegacyVector3 textPos = screenPos
                                 + screenRight * screenSize * 0.5f
                                 + screenUp * screenSize * 0.5f;
@@ -727,12 +676,10 @@ void FuelStation::RenderAlphas( float _predictionTime )
             }
 
 
-
             //
             // Render projection effect
 
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
-            glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
 
             LegacyVector3 ourPos = m_pos + LegacyVector3(0,90,0);
             LegacyVector3 theirPos = m_pos + LegacyVector3(0,200,0);
@@ -760,27 +707,13 @@ void FuelStation::RenderAlphas( float _predictionTime )
                     g_imRenderer->TexCoord2f(0,0);      g_imRenderer->Vertex3fv( (pos - lineTheirPos).GetData() );
                 g_imRenderer->End();
 
-                glBegin( GL_QUADS );
-                    glColor4f( 1.0f, 0.4f, 0.2f, 0.4f );
-                    glTexCoord2f(1,0);      glVertex3fv( (ourPos - lineTheirPos).GetData() );
-                    glTexCoord2f(1,1);      glVertex3fv( (ourPos + lineTheirPos).GetData() );
-                    glColor4f( 1.0f, 0.4f, 0.2f, 0.2f );
-                    glTexCoord2f(0,1);      glVertex3fv( (pos + lineTheirPos).GetData() );
-                    glTexCoord2f(0,0);      glVertex3fv( (pos - lineTheirPos).GetData() );
-                glEnd();
             }
 
 
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            glDepthMask     ( true );
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            glEnable        ( GL_DEPTH_TEST );
-            glDisable       ( GL_TEXTURE_2D );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-            glDisable       ( GL_BLEND );
-            glShadeModel    ( GL_FLAT );
         }
     }
 
@@ -792,7 +725,6 @@ bool FuelStation::PerformDepthSort( LegacyVector3 &_centrePos )
     _centrePos = m_centrePos;
     return true;
 }
-
 
 
 // ============================================================================
@@ -1406,7 +1338,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
     LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
 
     g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 //    g_editorFont.DrawText3DCentre( predictedPos+LegacyVector3(0,120,0), 10, "Fuel : %2.2f", m_fuel );
 //    g_editorFont.DrawText3DCentre( predictedPos+LegacyVector3(0,130,0), 10, "Passengers : %d", m_passengers );
 //    g_editorFont.DrawText3DCentre( predictedPos+LegacyVector3(0,140,0), 10, "Damage : %2.2f", m_damage );
@@ -1416,7 +1347,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
 //    {
 //        g_editorFont.DrawText3DCentre( predictedPos+LegacyVector3(0,200,0), 100, "%d", int(m_countdown) );
 //    }
-
 
 
     //
@@ -1433,14 +1363,9 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
         LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.75f;
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        glDepthMask     ( false );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        glEnable        ( GL_BLEND );
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-        glEnable        ( GL_TEXTURE_2D );
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
         //glDisable       ( GL_DEPTH_TEST );
 
         float timeIndex = g_gameTime * 2;
@@ -1472,7 +1397,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
             {
                 size *= 0.75f;
                 g_imRenderer->Color4f( 1.0f, 0.6f, 0.2f, alpha);
-                glColor4f( 1.0f, 0.6f, 0.2f, alpha);
                 g_imRenderer->Begin(PRIM_QUADS);
                     g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
                     g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
@@ -1480,12 +1404,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
                     g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
                 g_imRenderer->End();
 
-                glBegin( GL_QUADS );
-                    glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
-                    glTexCoord2i(1,0);      glVertex3fv( (pos + camRight * size + camUp * size).GetData() );
-                    glTexCoord2i(1,1);      glVertex3fv( (pos + camRight * size - camUp * size).GetData() );
-                    glTexCoord2i(0,1);      glVertex3fv( (pos - camRight * size - camUp * size).GetData() );
-                glEnd();
             }
         }
 
@@ -1494,7 +1412,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
         // Central starbursts
 
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 
         int numStars = 10;
         if( buildingDetail == 2 ) numStars = 5;
@@ -1510,7 +1427,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
             float size = i * 30.0f;
 
             g_imRenderer->Color4f( 1.0f, 0.4f, 0.2f, alpha );
-            glColor4f( 1.0f, 0.4f, 0.2f, alpha );
             g_imRenderer->Begin(PRIM_QUADS);
                 g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
                 g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
@@ -1518,18 +1434,10 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
                 g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
             g_imRenderer->End();
 
-            glBegin( GL_QUADS );
-                glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
-                glTexCoord2i(1,0);      glVertex3fv( (pos + camRight * size + camUp * size).GetData() );
-                glTexCoord2i(1,1);      glVertex3fv( (pos + camRight * size - camUp * size).GetData() );
-                glTexCoord2i(0,1);      glVertex3fv( (pos - camRight * size - camUp * size).GetData() );
-            glEnd();
         }
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        glEnable( GL_DEPTH_TEST );
         g_imRenderer->UnbindTexture();
-        glDisable( GL_TEXTURE_2D );
 
     }
 
@@ -1577,6 +1485,5 @@ int EscapeRocket::GetStateId( char *_state )
 
     return -1;
 }
-
 
 

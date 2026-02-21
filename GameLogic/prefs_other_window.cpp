@@ -308,13 +308,12 @@ void PrefsOtherWindow::Render(bool _hasFocus)
 
 #ifndef DEMOBUILD
   if (g_app->m_locationId != -1)
-    { g_imRenderer->Color4f(0.5f, 0.5f, 0.5f, 1.0f); glColor4f(0.5f, 0.5f, 0.5f, 1.0f); }
+    { g_imRenderer->Color4f(0.5f, 0.5f, 0.5f, 1.0f); }
 
   g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_difficulty"));
 #endif // DEMOBUILD
 
   g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   if (Location::ChristmasModEnabled())
     g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_christmas"));
 

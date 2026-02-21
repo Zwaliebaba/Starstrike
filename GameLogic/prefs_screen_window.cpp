@@ -58,7 +58,6 @@ class FullscreenRequiredMenu : public DropDownMenu
     else
     {
       g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.5f);
-      glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
       auto parent = static_cast<DarwiniaWindow*>(m_parent);
       g_editorFont.DrawText2D(realX + 10, realY + 9, parent->GetMenuSize(13), LANGUAGEPHRASE("dialog_windowedmode"));
     }

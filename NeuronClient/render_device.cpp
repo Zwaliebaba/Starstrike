@@ -161,9 +161,20 @@ void RenderDevice::Shutdown()
 
 void RenderDevice::BeginFrame(float r, float g, float b, float a)
 {
+  m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
   float clearColor[4] = { r, g, b, a };
   m_context->ClearRenderTargetView(m_backBufferRTV, clearColor);
   m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+  // Re-apply viewport each frame
+  D3D11_VIEWPORT vp;
+  vp.TopLeftX = 0.0f;
+  vp.TopLeftY = 0.0f;
+  vp.Width    = static_cast<float>(m_width);
+  vp.Height   = static_cast<float>(m_height);
+  vp.MinDepth = 0.0f;
+  vp.MaxDepth = 1.0f;
+  m_context->RSSetViewports(1, &vp);
 }
 
 void RenderDevice::EndFrame()
