@@ -6,6 +6,7 @@
 #include "LegacyVector3.h"
 
 #include "sphere_renderer.h"
+#include "im_renderer.h"
 
 
 // ******************
@@ -62,17 +63,17 @@ Sphere::Sphere()
 	m_topLevelTriangle[17] = Triangle( c[2],c[11], c[9]);
 	m_topLevelTriangle[18] = Triangle( c[5], c[2], c[9]);
 	m_topLevelTriangle[19] = Triangle(c[11], c[2], c[7]);
-
-    m_displayListId = glGenLists(1);
-	glNewList(m_displayListId, GL_COMPILE);
-		RenderLong();
-	glEndList();
 }
 
 void Sphere::ConsiderTriangle(int level, LegacyVector3 const &a, LegacyVector3 const &b, LegacyVector3 const &c)
 {
 	if (level > 0)
 	{
+		g_imRenderer->Begin(PRIM_TRIANGLES);
+			g_imRenderer->Vertex3f(a.x, a.y, a.z);
+			g_imRenderer->Vertex3f(b.x, b.y, b.z);
+			g_imRenderer->Vertex3f(c.x, c.y, c.z);
+		g_imRenderer->End();
 		glBegin(GL_TRIANGLES);
 			glVertex3f(a.x, a.y, a.z);
 			glVertex3f(b.x, b.y, b.z);
@@ -108,13 +109,17 @@ void Sphere::RenderLong()
 
 void Sphere::Render(LegacyVector3 const &pos, float radius)
 {
+	g_imRenderer->PushMatrix();
+	g_imRenderer->Translatef(pos.x, pos.y, pos.z);
+	g_imRenderer->Scalef(radius, radius, radius);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glTranslatef(pos.x, pos.y, pos.z);
 	glScalef(radius, radius, radius);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1.0f);
-	glCallList(m_displayListId);
+	RenderLong();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	g_imRenderer->PopMatrix();
 	glPopMatrix();
 }

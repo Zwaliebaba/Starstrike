@@ -12,6 +12,9 @@
 #include "camera.h"
 #include "debug_render.h"
 #include "renderer.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
 
 
 #ifdef DEBUG_RENDER_ENABLED
@@ -19,31 +22,54 @@
 
 void RenderSquare2d(float x, float y, float size, RGBAColour const &_col)
 {
+	int v[4];
+	glGetIntegerv(GL_VIEWPORT, &v[0]);
+	float left = v[0];
+	float right = v[0] + v[2];
+	float bottom = v[1] + v[3];
+	float top = v[1];
+
+	// D3D11 path
+	auto savedProj = g_imRenderer->GetProjectionMatrix();
+	auto savedView = g_imRenderer->GetViewMatrix();
+	auto savedWorld = g_imRenderer->GetWorldMatrix();
+	g_imRenderer->SetProjectionMatrix(DirectX::XMMatrixOrthographicOffCenterRH(left, right, bottom, top, -1.0f, 1.0f));
+	g_imRenderer->SetViewMatrix(DirectX::XMMatrixIdentity());
+	g_imRenderer->SetWorldMatrix(DirectX::XMMatrixIdentity());
+
+	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
+	if (_col.a != 255)
+		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+
+	g_imRenderer->Color4ubv(_col.GetData());
+	g_imRenderer->Begin(PRIM_QUADS);
+		g_imRenderer->Vertex2f(x - size, y - size);
+		g_imRenderer->Vertex2f(x + size, y - size);
+		g_imRenderer->Vertex2f(x + size, y + size);
+		g_imRenderer->Vertex2f(x - size, y + size);
+	g_imRenderer->End();
+
+	g_imRenderer->SetProjectionMatrix(savedProj);
+	g_imRenderer->SetViewMatrix(savedView);
+	g_imRenderer->SetWorldMatrix(savedWorld);
+
+	// OpenGL path
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-
-	int v[4];
-	glGetIntegerv(GL_VIEWPORT, &v[0]);
-    float left = v[0];
-	float right = v[0] + v[2];
-	float bottom = v[1] + v[3];
-	float top = v[1];
 	gluOrtho2D(left, right, bottom, top);
-    glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	if (_col.a != 255)
-	{
 		glEnable(GL_BLEND);
-	}
 
 	glColor4ubv(_col.GetData());
-
 	glBegin(GL_QUADS);
 		glVertex2f(x - size, y - size);
 		glVertex2f(x + size, y - size);
@@ -65,10 +91,37 @@ void RenderCube(LegacyVector3 const &_centre, float _sizeX, float _sizeY, float 
 	float halfZ = _sizeZ * 0.5f;
 
 	if (_col.a != 255)
-	{
-		glEnable(GL_BLEND);
-	}
+		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
+	g_imRenderer->Color4ubv(_col.GetData());
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINES);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
+		g_imRenderer->Vertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
+	g_imRenderer->End();
+
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+
+	// OpenGL path
+	if (_col.a != 255)
+		glEnable(GL_BLEND);
 	glColor4ubv(_col.GetData());
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(2.0f);
@@ -78,34 +131,28 @@ void RenderCube(LegacyVector3 const &_centre, float _sizeX, float _sizeY, float 
 		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
 		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
 	glEnd();
-
 	glBegin(GL_LINE_LOOP);
 		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
 		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
 		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
 		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
 	glEnd();
-
 	glBegin(GL_LINES);
 		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z - halfZ);
 		glVertex3f(_centre.x - halfX, _centre.y - halfY, _centre.z + halfZ);
 	glEnd();
-
 	glBegin(GL_LINES);
 		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z - halfZ);
 		glVertex3f(_centre.x - halfX, _centre.y + halfY, _centre.z + halfZ);
 	glEnd();
-
 	glBegin(GL_LINES);
 		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z - halfZ);
 		glVertex3f(_centre.x + halfX, _centre.y + halfY, _centre.z + halfZ);
 	glEnd();
-
 	glBegin(GL_LINES);
 		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z - halfZ);
 		glVertex3f(_centre.x + halfX, _centre.y - halfY, _centre.z + halfZ);
 	glEnd();
-
 	glDisable(GL_LINE_SMOOTH);
 	glDisable(GL_BLEND);
 }
@@ -113,6 +160,7 @@ void RenderCube(LegacyVector3 const &_centre, float _sizeX, float _sizeY, float 
 
 void RenderSphereRings(LegacyVector3 const &_centre, float _radius, RGBAColour const &_col)
 {
+	g_imRenderer->Color3ubv(_col.GetData());
 	glColor3ubv(_col.GetData());
 
 	int const _segs = 20;
@@ -134,6 +182,34 @@ void RenderSphereRings(LegacyVector3 const &_centre, float _radius, RGBAColour c
 	}
 
 	glLineWidth(2.0f);
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+	for (i = 0; i < _segs; i++)
+	{
+		LegacyVector3 pos = _centre;
+		pos.x += sx[i] * _radius;
+		pos.z += cx[i] * _radius;
+		g_imRenderer->Vertex3fv(pos.GetData());
+	}
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+	for (i = 0; i < _segs; i++)
+	{
+		LegacyVector3 pos = _centre;
+		pos.y += sx[i] * _radius;
+		pos.z += cx[i] * _radius;
+		g_imRenderer->Vertex3fv(pos.GetData());
+	}
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+	for (i = 0; i < _segs; i++)
+	{
+		LegacyVector3 pos = _centre;
+		pos.x += sx[i] * _radius;
+		pos.y += cx[i] * _radius;
+		g_imRenderer->Vertex3fv(pos.GetData());
+	}
+	g_imRenderer->End();
+
 	glBegin(GL_LINE_LOOP);
 		for (i = 0; i < _segs; i++)
 		{
@@ -168,6 +244,7 @@ void RenderSphere(LegacyVector3 const &_centre, float _radius, RGBAColour const 
 {
 	static Sphere aSphere;
 
+	g_imRenderer->Color3ubv(_col.GetData());
 	glColor3ubv(_col.GetData());
 	aSphere.Render(_centre, _radius);
 }
@@ -187,6 +264,7 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 	axis3 = axis1 ^ axis2;
 	axis2 = axis1 ^ axis3;
 
+	g_imRenderer->Color3ubv(_col.GetData());
 	glDisable(GL_LIGHTING);
 	glDisable(GL_COLOR_MATERIAL);
 	glDisable(GL_TEXTURE_2D);
@@ -195,7 +273,41 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 
 	int const numEdges = 16;
 
-	// Base
+	// D3D11 path
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+		for (int i = 0; i < numEdges; ++i)
+		{
+			LegacyVector3 pos = _centreBase;
+			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
+			pos += axis2 * sinf(theta) * _radius;
+			pos += axis3 * cosf(theta) * _radius;
+			g_imRenderer->Vertex3fv(pos.GetData());
+		}
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINE_LOOP);
+		for (int i = 0; i < numEdges; ++i)
+		{
+			LegacyVector3 pos = _centreBase + axis1 * _height;
+			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
+			pos += axis2 * sinf(theta) * _radius;
+			pos += axis3 * cosf(theta) * _radius;
+			g_imRenderer->Vertex3fv(pos.GetData());
+		}
+	g_imRenderer->End();
+	g_imRenderer->Begin(PRIM_LINES);
+		for (int i = 0; i < numEdges; ++i)
+		{
+			LegacyVector3 pos = _centreBase;
+			float theta = M_PI * 2.0f * (float)i / (float)numEdges;
+			pos += axis2 * sinf(theta) * _radius;
+			pos += axis3 * cosf(theta) * _radius;
+			g_imRenderer->Vertex3fv(pos.GetData());
+			pos += axis1 * _height;
+			g_imRenderer->Vertex3fv(pos.GetData());
+		}
+	g_imRenderer->End();
+
+	// OpenGL path
 	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
@@ -206,8 +318,6 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 			glVertex3fv(pos.GetData());
 		}
 	glEnd();
-
-	// Top
 	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
@@ -218,8 +328,6 @@ void RenderVerticalCylinder(LegacyVector3 const &_centreBase, LegacyVector3 cons
 			glVertex3fv(pos.GetData());
 		}
 	glEnd();
-
-	// Middle
 	glBegin(GL_LINE_LOOP);
 		for (int i = 0; i < numEdges; ++i)
 		{
@@ -249,9 +357,25 @@ void RenderArrow(LegacyVector3 const &start, LegacyVector3 const &end, float wid
 	invDir.SetLength(arrowLen * 0.2f);
 
 	if (_col.a != 255)
-	{
+		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+
+	g_imRenderer->Color3ubv(_col.GetData());
+	LegacyVector3 p1 = end + invDir + sidewaysDir * arrowLen * 0.1f;
+	LegacyVector3 p2 = end + invDir - sidewaysDir * arrowLen * 0.1f;
+	g_imRenderer->Begin(PRIM_LINES);
+		g_imRenderer->Vertex3fv(start.GetDataConst());
+		g_imRenderer->Vertex3fv(end.GetDataConst());
+		g_imRenderer->Vertex3fv(p1.GetDataConst());
+		g_imRenderer->Vertex3fv(end.GetDataConst());
+		g_imRenderer->Vertex3fv(p2.GetDataConst());
+		g_imRenderer->Vertex3fv(end.GetDataConst());
+	g_imRenderer->End();
+
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+
+	// OpenGL path
+	if (_col.a != 255)
 		glEnable(GL_BLEND);
-	}
 
 	glLineWidth(width / midPointToCameraDist * arrowLen);
 	glColor3ubv(_col.GetData());
@@ -259,16 +383,13 @@ void RenderArrow(LegacyVector3 const &start, LegacyVector3 const &end, float wid
 	glBegin(GL_LINES);
 		glVertex3fv(start.GetDataConst());
 		glVertex3fv(end.GetDataConst());
-
-		LegacyVector3 p1 = end + invDir + sidewaysDir * arrowLen * 0.1f;
-		LegacyVector3 p2 = end + invDir - sidewaysDir * arrowLen * 0.1f;
 		glVertex3fv(p1.GetDataConst());
 		glVertex3fv(end.GetDataConst());
 		glVertex3fv(p2.GetDataConst());
 		glVertex3fv(end.GetDataConst());
 	glEnd();
 
-    glDisable( GL_LINE_SMOOTH );
+	glDisable( GL_LINE_SMOOTH );
 	glDisable( GL_BLEND );
 }
 

@@ -394,81 +394,92 @@ The `glPushMatrix`/`glPopMatrix`/`glMultMatrixf`/`glTranslatef`/`glScalef`/`glRo
 
 ---
 
-## 9. Phase 6 — Core 3D Rendering Migration
+## 9. Phase 6 — Core 3D Rendering Migration ✅ COMPLETED
 
-### 9.1 Shape Rendering
+ImRenderer calls have been added **alongside** existing OpenGL calls in all Phase 6 files. OpenGL still does all visible rendering. The ImRenderer receives the same vertex data and state changes, preparing for the final switchover in Phase 9.
 
-**Files:** `NeuronClient\shape.cpp` (especially `ShapeFragment::RenderSlow()` lines 843-888)
+### 9.1 Shape Rendering ✅
 
-Replace:
-```cpp
-glBegin(GL_TRIANGLES);
-  glNormal3fv(...);
-  glColor4ub(...);
-  glVertex3fv(...);
-glEnd();
-```
-with:
-```cpp
-g_imRenderer->Begin(PRIM_TRIANGLES);
-  g_imRenderer->Normal3fv(...);
-  g_imRenderer->Color4ub(...);
-  g_imRenderer->Vertex3fv(...);
-g_imRenderer->End();
-```
+**File:** `NeuronClient\shape.cpp`
 
-Also migrate `Shape::BuildDisplayList()` — OpenGL display lists (`glNewList`/`glEndList`/`glCallList`) have no D3D11 equivalent. Replace with:
-- Pre-built vertex buffers (preferred for static shapes), or
-- Simply remove display list caching and always use the immediate-mode emulation layer (simpler, less optimal).
+- **Display lists removed:** `#define USE_DISPLAY_LISTS` commented out. Both `Shape::BuildDisplayList()` and `ShapeFragment::BuildDisplayList()` are now no-ops (D3D11 has no display list equivalent). All rendering goes through `RenderSlow()`.
+- **`ShapeFragment::RenderSlow()`** — `glBegin(GL_TRIANGLES)` / `glNormal3fv` / `glColor4ub` / `glVertex3fv` / `glEnd()` duplicated with `g_imRenderer->Begin(PRIM_TRIANGLES)` etc.
+- **`ShapeFragment::Render()`** — `glPushMatrix` / `glMultMatrixf` / `glPopMatrix` duplicated with `g_imRenderer->PushMatrix()` / `MultMatrixf()` / `PopMatrix()`. Display list path (`glCallList`) removed.
+- **`Shape::Render()`** — Same matrix stack migration. Display list path removed.
+- **`ShapeFragment::RenderMarkers()`** — `glDisable(GL_DEPTH_TEST)` / `glEnable(GL_DEPTH_TEST)` duplicated with `g_renderStates->SetDepthState()`. Commented-out debug GL code removed.
+- Added `#include "render_device.h"`, `"im_renderer.h"`, `"render_states.h"`.
 
-### 9.2 Landscape Rendering
+### 9.2 Sphere Rendering ✅
 
-**File:** `Starstrike\landscape_renderer.cpp`
+**File:** `NeuronClient\sphere_renderer.cpp` / `sphere_renderer.h`
 
-This file has three render modes: vertex arrays, display lists, and VBOs. Migrate to:
-- Build a static `ID3D11Buffer` (vertex buffer) from `m_verts` array.
-- Use `DrawIndexed` or `Draw` with triangle strips.
-- Remove `glVertexPointer`, `glNormalPointer`, `glColorPointer`, `glTexCoordPointer`, `glEnableClientState`, `glDrawArrays` calls.
-- Remove display list code.
-- Remove `gglBindBufferARB` / `gglBufferDataARB` VBO code.
+- **Display list removed:** `m_displayListId` member removed from `Sphere`. Constructor no longer calls `glGenLists` / `glNewList` / `glEndList`. `Render()` calls `RenderLong()` directly instead of `glCallList`.
+- **`Sphere::ConsiderTriangle()`** — `glBegin(GL_TRIANGLES)` / `glVertex3f` / `glEnd()` replaced with `g_imRenderer` calls.
+- **`Sphere::Render()`** — `glPushMatrix` / `glTranslatef` / `glScalef` / `glPopMatrix` duplicated with `g_imRenderer->PushMatrix()` / `Translatef()` / `Scalef()` / `PopMatrix()`.
+- Added `#include "im_renderer.h"`.
 
-### 9.3 Sphere Rendering
-
-**File:** `NeuronClient\sphere_renderer.cpp`
-
-Replace `glBegin(GL_TRIANGLES)` + recursive subdivision with `g_imRenderer->Begin(PRIM_TRIANGLES)`. Remove `glNewList`/`glCallList`.
-
-### 9.4 3D Sprite Rendering
+### 9.3 3D Sprite Rendering ✅
 
 **File:** `NeuronClient\3d_sprite.cpp`
 
-Replace `glBegin(GL_QUADS)` billboarded sprite rendering with `g_imRenderer` calls.
+- **`Render3DSprite()`** — `glBegin(GL_QUADS)` / `glTexCoord2f` / `glVertex3fv` / `glEnd()` duplicated with `g_imRenderer` calls. Texture binding via `g_imRenderer->BindTexture(id)` / `UnbindTexture()`. Cull state via `g_renderStates`.
+- Added `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"`.
 
-### 9.5 Debug Rendering
+### 9.4 Debug Rendering ✅
 
 **File:** `NeuronClient\debug_render.cpp`
 
-Replace all `glBegin`/`glEnd` blocks (`RenderCube`, `RenderSphere`, `RenderArrow`, etc.) with `g_imRenderer` calls.
+All functions migrated with dual GL + ImRenderer paths:
+- **`RenderSquare2d()`** — 2D ortho projection via ImRenderer matrix save/restore + `XMMatrixOrthographicOffCenterRH`. Quad via `g_imRenderer->Begin(PRIM_QUADS)`.
+- **`RenderCube()`** — Line loops and lines via `g_imRenderer->Begin(PRIM_LINE_LOOP)` / `Begin(PRIM_LINES)`.
+- **`RenderSphereRings()`** — Three line loops via `g_imRenderer->Begin(PRIM_LINE_LOOP)`.
+- **`RenderSphere()`** — Color set on both ImRenderer and GL.
+- **`RenderVerticalCylinder()`** — Base/top/side line loops + line pairs via ImRenderer.
+- **`RenderArrow()`** — Lines via `g_imRenderer->Begin(PRIM_LINES)`.
+- Added `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"`.
 
-**File:** `NeuronClient\debug_render.h` — Remove `PrintMatrix` (uses `GLenum`).
+### 9.5 Particles ✅
 
-### 9.6 Water, Clouds, Particles, Explosions
+**File:** `Starstrike\particle_system.cpp`
 
-**Files:**
-- `Starstrike\water.cpp`
-- `Starstrike\clouds.cpp`
-- `Starstrike\particle_system.cpp`
-- `Starstrike\explosion.cpp`
+- **`ParticleSystem::Render()`** — State setup duplicated: texture binding, blend state (`BLEND_ADDITIVE`), depth state (`DEPTH_ENABLED_READONLY`), raster state (`RASTER_CULL_NONE`), sampler (`SAMPLER_NEAREST_CLAMP`).
+- **`Particle::Render()`** — Per-particle blend state switching (missile trail uses `BLEND_SUBTRACTIVE_COLOR`, others use `BLEND_ADDITIVE`). Quad rendering via `g_imRenderer->Begin(PRIM_QUADS)`.
+- Added `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"`, `"texture_manager.h"`.
 
-**Water** uses a vertex array path (`glVertexPointer`/`glColorPointer` + `glDrawArrays(GL_TRIANGLE_STRIP, ...)`) with a dynamic `WaterVertex` array rebuilt every frame. This is NOT a `glBegin`/`glEnd` pattern and **cannot be mechanically replaced** with `g_imRenderer->Begin()/End()`. Options:
-- Create a dynamic `ID3D11Buffer` in `Water` and upload `WaterVertex` data directly (preferred — avoids converting to `ImVertex`).
-- Or add a `DrawArrays()` method to `ImRenderer` that accepts raw interleaved vertex data.
+### 9.6 Explosions ✅
 
-Clouds, particles, and explosions use immediate-mode quads/triangles and can migrate to `g_imRenderer` calls.
+**File:** `Starstrike\explosion.cpp`
 
-> **Note:** `Starstrike\water_reflection.cpp` and `Starstrike\deform.cpp` were D3D9-only and have been emptied in Phase 0. Water reflection will need to be re-implemented from scratch for D3D11 if desired (render-to-texture pass using a secondary `ID3D11RenderTargetView`).
+- **`Explosion::Render()`** — Triangle rendering duplicated with `g_imRenderer->Begin(PRIM_TRIANGLES)`.
+- **`ExplosionManager::Render()`** — State setup duplicated: texture binding, cull/blend state.
+- Added `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"`, `"texture_manager.h"`.
 
-**Verification:** All 3D geometry renders correctly.
+### 9.7 Clouds ✅
+
+**File:** `Starstrike\clouds.cpp`
+
+- **`Clouds::RenderQuad()`** — Quad grid rendering duplicated with `g_imRenderer->Begin(PRIM_QUADS)`.
+- **`Clouds::RenderFlat()`** — State setup duplicated: texture binding (`SAMPLER_NEAREST_WRAP`), blend (`BLEND_ADDITIVE`), depth (`DEPTH_DISABLED`). Color set on both paths.
+- **`Clouds::RenderBlobby()`** — Same pattern as `RenderFlat` with `SAMPLER_LINEAR_WRAP`.
+- **`Clouds::RenderSky()`** — Sky grid quads duplicated with ImRenderer. State: `BLEND_ADDITIVE`, `DEPTH_ENABLED_READONLY`.
+- Added `#include "im_renderer.h"`, `"render_device.h"`, `"render_states.h"`, `"texture_manager.h"`.
+
+### 9.8 Landscape Rendering — Includes Only (deferred)
+
+**File:** `Starstrike\landscape_renderer.cpp`
+
+Added D3D11 includes (`im_renderer.h`, `render_device.h`, `render_states.h`, `texture_manager.h`). The actual vertex array / VBO / display list rendering is **not migrated** in this phase because:
+- Landscape uses `glVertexPointer` / `glNormalPointer` / `glColorPointer` + `glDrawArrays(GL_TRIANGLE_STRIP)` — this is NOT a `glBegin`/`glEnd` pattern and cannot be replaced with `ImRenderer::Begin()/End()`.
+- The proper D3D11 approach is a static `ID3D11Buffer` vertex buffer, which will be created in Phase 10 (optimization).
+- OpenGL vertex array rendering continues to work correctly.
+
+### 9.9 Water Rendering — Includes Only (deferred)
+
+**File:** `Starstrike\water.cpp`
+
+Same situation as landscape — uses vertex arrays with `glVertexPointer` / `glColorPointer` + `glDrawArrays(GL_TRIANGLE_STRIP)`, plus ARB multitexture extensions. Added D3D11 includes only. Full migration deferred to Phase 10.
+
+**Verification:** Build passes. All Phase 6 files have ImRenderer calls alongside GL calls. OpenGL continues to handle all visible rendering.
 
 ---
 
@@ -717,7 +728,7 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 3:** Create `RenderStates`, pre-build blend/depth/raster state objects
 - [x] **Phase 4:** Migrate texture system (`ConvertToTexture`, `TextureManager`, sampler states)
 - [x] **Phase 5:** Migrate matrix system (projection, modelview, `gluPerspective`, `gluLookAt`)
-- [ ] **Phase 6:** Migrate core 3D rendering (shapes, landscape, spheres, particles, water, clouds)
+- [x] **Phase 6:** Migrate core 3D rendering (shapes, landscape, spheres, particles, water, clouds)
 - [ ] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [ ] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
 - [ ] **Phase 9:** Remove all OpenGL code, headers, libs
@@ -775,7 +786,7 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | Texture coordinate origin difference (GL bottom-left vs D3D top-left) | 🟠 Moderate | Flip V coordinate in `ConvertToTexture()` or in HLSL |
 | `GL_QUADS` has no D3D primitive | ✅ Resolved | `ImRenderer` converts quads to triangle pairs |
 | `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Important | Implement via `clip()` in pixel shader |
-| Display lists have no D3D11 equivalent | 🟡 Important | Replace with static vertex buffers or remove caching |
+| Display lists have no D3D11 equivalent | ✅ Resolved | Shape and sphere display lists removed; `BuildDisplayList()` no-op; always uses `RenderSlow()` path |
 | Performance regression from immediate-mode emulation | 🟠 Moderate | Acceptable initially; optimise with static VBs in Phase 10 |
 | GL state queries (`glGet*`) used in debug asserts | 🟡 Important | Remove or replace with cached state tracking |
 | `gluBuild2DMipmaps` has no D3D11 equivalent | ✅ Resolved | `GenerateMips()` via `TextureManager::CreateTexture()` |

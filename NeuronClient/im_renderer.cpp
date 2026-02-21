@@ -25,6 +25,7 @@ ImRenderer::ImRenderer()
     m_defaultSampler(nullptr),
     m_currentPrimitive(PRIM_TRIANGLES),
     m_inBeginEnd(false),
+    m_drawEnabled(false),
     m_currentColor(1.0f, 1.0f, 1.0f, 1.0f),
     m_currentTexCoord(0.0f, 0.0f),
     m_currentNormal(0.0f, 0.0f, 1.0f),
@@ -283,6 +284,13 @@ void ImRenderer::End()
 
   if (m_batch.empty())
     return;
+
+  // During transition: accept vertices (exercises the API) but don't draw
+  if (!m_drawEnabled)
+  {
+    m_batch.clear();
+    return;
+  }
 
   switch (m_currentPrimitive)
   {

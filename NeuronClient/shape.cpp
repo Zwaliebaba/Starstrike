@@ -9,10 +9,14 @@
 
 #ifndef EXPORTER_BUILD
 #include "resource.h"
+#include "render_device.h"
+#include "im_renderer.h"
+#include "render_states.h"
 #include "app.h"
 #endif
 
-#define USE_DISPLAY_LISTS
+// Display lists are not supported in D3D11 — always use RenderSlow path
+// #define USE_DISPLAY_LISTS
 
 // ****************************************************************************
 // Class ShapeMarker
@@ -339,12 +343,7 @@ ShapeFragment::~ShapeFragment()
 void ShapeFragment::BuildDisplayList()
 {
 #ifndef EXPORTER_BUILD
-  DarwiniaDebugAssert(m_displayListName == NULL);
-  m_displayListName = g_app->m_resource->GenerateName();
-  int id = g_app->m_resource->CreateDisplayList(m_displayListName);
-  glNewList(id, GL_COMPILE);
-  RenderSlow();
-  glEndList();
+  // Display lists not supported in D3D11 — RenderSlow() is called directly
 #endif
 }
 
@@ -817,26 +816,23 @@ void ShapeFragment::Render(float _predictionTime)
   bool matrixIsIdentity = predictedTransform == g_identityMatrix34;
   if (!matrixIsIdentity)
   {
+    g_imRenderer->PushMatrix();
+    g_imRenderer->MultMatrixf(predictedTransform.ConvertToOpenGLFormat());
     glPushMatrix();
     glMultMatrixf(predictedTransform.ConvertToOpenGLFormat());
   }
 
-#ifdef USE_DISPLAY_LISTS
-  int id = -1;
-  if (m_displayListName)
-    id = g_app->m_resource->GetDisplayList(m_displayListName);
-  if (id != -1)
-    glCallList(id);
-  else
-#endif
-    RenderSlow();
+  RenderSlow();
 
   int numChildren = m_childFragments.Size();
   for (int i = 0; i < numChildren; ++i)
     m_childFragments.GetData(i)->Render(_predictionTime);
 
   if (!matrixIsIdentity)
+  {
+    g_imRenderer->PopMatrix();
     glPopMatrix();
+  }
 #endif
 }
 
@@ -845,7 +841,7 @@ void ShapeFragment::RenderSlow()
 #ifndef EXPORTER_BUILD
   if (!m_numTriangles)
     return;
-  glBegin(GL_TRIANGLES);
+  g_imRenderer->Begin(PRIM_TRIANGLES);
 
   int norm = 0;
   for (int i = 0; i < m_numTriangles; i++)
@@ -856,20 +852,31 @@ void ShapeFragment::RenderSlow()
 
     constexpr unsigned char alpha = 255;
 
-    /*/ calculate normal
-    float u[3],v[3],n[3],l;
-    u[0]=m_positions[vertB->m_posId].x-m_positions[vertA->m_posId].x;
-    u[1]=m_positions[vertB->m_posId].y-m_positions[vertA->m_posId].y;
-    u[2]=m_positions[vertB->m_posId].z-m_positions[vertA->m_posId].z;
-    v[0]=m_positions[vertC->m_posId].x-m_positions[vertA->m_posId].x;
-    v[1]=m_positions[vertC->m_posId].y-m_positions[vertA->m_posId].y;
-    v[2]=m_positions[vertC->m_posId].z-m_positions[vertA->m_posId].z;
-    n[0]=u[1]*v[2]-u[2]*v[1];
-    n[1]=-u[0]*v[2]+u[2]*v[0];
-    n[2]=u[0]*v[1]-u[1]*v[0];
-    l=(float)sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
-    n[0]/=l; n[1]/=l; n[2]/=l;
-    glNormal3fv(n);*/
+    g_imRenderer->Normal3fv(m_normals[norm].GetData());
+    g_imRenderer->Color4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
+    g_imRenderer->Vertex3fv(m_positions[vertA->m_posId].GetData());
+
+    g_imRenderer->Normal3fv(m_normals[norm].GetData());
+    g_imRenderer->Color4ub(m_colours[vertB->m_colId].r, m_colours[vertB->m_colId].g, m_colours[vertB->m_colId].b, alpha);
+    g_imRenderer->Vertex3fv(m_positions[vertB->m_posId].GetData());
+
+    g_imRenderer->Normal3fv(m_normals[norm].GetData());
+    g_imRenderer->Color4ub(m_colours[vertC->m_colId].r, m_colours[vertC->m_colId].g, m_colours[vertC->m_colId].b, alpha);
+    g_imRenderer->Vertex3fv(m_positions[vertC->m_posId].GetData());
+    norm++;
+  }
+  g_imRenderer->End();
+
+  glBegin(GL_TRIANGLES);
+
+  norm = 0;
+  for (int i = 0; i < m_numTriangles; i++)
+  {
+    const VertexPosCol* vertA = &m_vertices[m_triangles[i].v1];
+    const VertexPosCol* vertB = &m_vertices[m_triangles[i].v2];
+    const VertexPosCol* vertC = &m_vertices[m_triangles[i].v3];
+
+    constexpr unsigned char alpha = 255;
 
     glNormal3fv(m_normals[norm].GetData());
     glColor4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
@@ -970,6 +977,7 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
 #ifdef DEBUG_RENDER_ENABLED
   int i;
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
   glDisable(GL_DEPTH_TEST);
 
   int numMarkers = m_childMarkers.Size();
@@ -979,19 +987,9 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
     Matrix34 mat = marker->GetWorldMatrix(_rootTransform);
     RenderArrow(mat.pos, mat.pos + mat.f * 20.0f, 2.0f);
     RenderArrow(mat.pos, mat.pos + mat.u * 10.0f, 2.0f);
-    //		glLineWidth(2.0f);
-    //		glColor3f(1,0,0);
-    //        glBegin(GL_LINES);
-    //			glVertex3fv(mat.pos.GetData());
-    //			glVertex3fv((mat.pos + mat.f * 20.0f).GetData());
-    //		glEnd();
-    //		glColor3f(0,1,0);
-    //		glBegin(GL_LINES);
-    //			glVertex3fv(mat.pos.GetData());
-    //			glVertex3fv((mat.pos + mat.u * 10.0f).GetData());
-    //		glEnd();
   }
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   glEnable(GL_DEPTH_TEST);
 
   int numChildren = m_childFragments.Size();
@@ -1198,14 +1196,7 @@ Shape::~Shape()
 void Shape::BuildDisplayList()
 {
 #ifndef EXPORTER_BUILD
-  if (!m_animating)
-  {
-    m_displayListName = g_app->m_resource->GenerateName();
-    int id = g_app->m_resource->CreateDisplayList(m_displayListName);
-    glNewList(id, GL_COMPILE);
-    m_rootFragment->Render(0.0f);
-    glEndList();
-  }
+  // Display lists not supported in D3D11 — shapes always use RenderSlow() path
 #endif
 }
 
@@ -1295,26 +1286,19 @@ void Shape::WriteToFile(FILE* _out) const { m_rootFragment->WriteToFile(_out); }
 void Shape::Render(float _predictionTime, const Matrix34& _transform)
 {
 #ifndef EXPORTER_BUILD
+  g_imRenderer->PushMatrix();
+  g_imRenderer->MultMatrixf(_transform.ConvertToOpenGLFormat());
   glEnable(GL_COLOR_MATERIAL);
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glMultMatrixf(_transform.ConvertToOpenGLFormat());
 
-#ifdef USE_DISPLAY_LISTS
-  int id = -1;
-  if (m_displayListName)
-    id = g_app->m_resource->GetDisplayList(m_displayListName);
-  if (id != -1)
-    glCallList(id);
-  else
-#endif
-    m_rootFragment->Render(_predictionTime);
+  m_rootFragment->Render(_predictionTime);
 
+  g_imRenderer->PopMatrix();
   glDisable(GL_COLOR_MATERIAL);
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
-
-  //	RenderHitCheck(_transform);
 #endif
 }
 

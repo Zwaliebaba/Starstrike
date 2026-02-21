@@ -80,6 +80,10 @@ public:
   // Sampler state
   void SetSampler(SamplerId id);            // selects sampler from g_textureManager
 
+  // During transition: suppress actual D3D11 draw calls
+  void SetDrawEnabled(bool enabled) { m_drawEnabled = enabled; }
+  bool IsDrawEnabled() const { return m_drawEnabled; }
+
 private:
   struct ImVertex
   {
@@ -114,6 +118,7 @@ private:
   std::vector<ImVertex>    m_batch;
   PrimitiveType            m_currentPrimitive;
   bool                     m_inBeginEnd;
+  bool                     m_drawEnabled;
 
   // Current vertex attributes (set before each Vertex call)
   DirectX::XMFLOAT4       m_currentColor;

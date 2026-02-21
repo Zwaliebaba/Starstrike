@@ -13,6 +13,10 @@
 #include "rgb_colour.h"
 #include "texture_uv.h"
 #include "LegacyVector3.h"
+#include "im_renderer.h"
+#include "render_device.h"
+#include "render_states.h"
+#include "texture_manager.h"
 
 #include "app.h"
 #include "camera.h"
