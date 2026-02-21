@@ -1,6 +1,8 @@
 #ifndef TEXT_RENDERER_H
 #define TEXT_RENDERER_H
 
+#include <DirectXMath.h>
+
 class RGBAColour;
 class LegacyVector3;
 
@@ -22,8 +24,13 @@ protected:
 	unsigned int    m_textureID;
 	unsigned int	m_bitmapWidth;
 	unsigned int	m_bitmapHeight;
-    bool            m_renderShadow;
-    bool            m_renderOutline;
+	bool            m_renderShadow;
+	bool            m_renderOutline;
+
+	// D3D11 saved matrices for BeginText2D/EndText2D
+	DirectX::XMMATRIX m_savedProjMatrix;
+	DirectX::XMMATRIX m_savedViewMatrix;
+	DirectX::XMMATRIX m_savedWorldMatrix;
 
     float GetTexCoordX  ( unsigned char theChar );
     float GetTexCoordY  ( unsigned char theChar );

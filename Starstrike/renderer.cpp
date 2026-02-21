@@ -23,6 +23,9 @@
 #include "renderer.h"
 #include "taskmanager_interface.h"
 #include "user_input.h"
+#include "render_device.h"
+#include "render_states.h"
+#include "im_renderer.h"
 #include "gamecursor.h"
 #include "startsequence.h"
 #include "soundsystem.h"
@@ -543,6 +546,14 @@ void Renderer::SetupProjMatrixFor3D() const
 
   gluPerspective(g_app->m_camera->GetFov(), static_cast<float>(m_screenW) / static_cast<float>(m_screenH), // Aspect ratio
                  m_nearPlane, m_farPlane);
+
+  // D3D11: set projection on ImRenderer (RH to match OpenGL coordinate convention)
+  if (g_imRenderer)
+  {
+    float fovY = DirectX::XMConvertToRadians(g_app->m_camera->GetFov());
+    float aspect = static_cast<float>(m_screenW) / static_cast<float>(m_screenH);
+    g_imRenderer->SetProjectionMatrix(DirectX::XMMatrixPerspectiveFovRH(fovY, aspect, m_nearPlane, m_farPlane));
+  }
 }
 
 void Renderer::SetupMatricesFor3D() const
@@ -569,6 +580,14 @@ void Renderer::SetupMatricesFor2D() const
   //	glOrtho(left, right, bottom, top, -m_nearPlane, -m_farPlane);
   gluOrtho2D(left, right, bottom, top);
   glMatrixMode(GL_MODELVIEW);
+
+  // D3D11: set ortho projection + identity modelview
+  if (g_imRenderer)
+  {
+    g_imRenderer->SetProjectionMatrix(DirectX::XMMatrixOrthographicOffCenterRH(left, right, bottom, top, -1.0f, 1.0f));
+    g_imRenderer->SetViewMatrix(DirectX::XMMatrixIdentity());
+    g_imRenderer->SetWorldMatrix(DirectX::XMMatrixIdentity());
+  }
 }
 
 void Renderer::FPSMeterAdvance()
@@ -820,6 +839,22 @@ void Renderer::UnsetObjectLighting() const
 
 void Renderer::UpdateTotalMatrix()
 {
+  // D3D11: compute total matrix from ImRenderer's stored matrices
+  if (g_imRenderer)
+  {
+    using namespace DirectX;
+    XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+    // Store as column-major doubles (OpenGL layout) for compatibility with Get2DScreenPos
+    XMFLOAT4X4 f;
+    XMStoreFloat4x4(&f, wvp);
+    // Transpose to column-major (OpenGL convention used by Get2DScreenPos)
+    m_totalMatrix[0]  = f._11; m_totalMatrix[1]  = f._21; m_totalMatrix[2]  = f._31; m_totalMatrix[3]  = f._41;
+    m_totalMatrix[4]  = f._12; m_totalMatrix[5]  = f._22; m_totalMatrix[6]  = f._32; m_totalMatrix[7]  = f._42;
+    m_totalMatrix[8]  = f._13; m_totalMatrix[9]  = f._23; m_totalMatrix[10] = f._33; m_totalMatrix[11] = f._43;
+    m_totalMatrix[12] = f._14; m_totalMatrix[13] = f._24; m_totalMatrix[14] = f._34; m_totalMatrix[15] = f._44;
+    return;
+  }
+
   double m[16];
   double p[16];
   glGetDoublev(GL_MODELVIEW_MATRIX, m);

@@ -185,6 +185,7 @@
     <ClInclude Include="render_device.h" />
     <ClInclude Include="im_renderer.h" />
     <ClInclude Include="render_states.h" />
+    <ClInclude Include="texture_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -349,6 +350,7 @@
     <ClCompile Include="render_device.cpp" />
     <ClCompile Include="im_renderer.cpp" />
     <ClCompile Include="render_states.cpp" />
+    <ClCompile Include="texture_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

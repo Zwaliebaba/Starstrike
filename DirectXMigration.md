@@ -289,135 +289,108 @@ The text renderer uses RAII classes (`SaveGLBlendFunc`, `SaveGLColour`, `SaveGLE
 
 ---
 
-## 7. Phase 4 — Texture System Migration
+## 7. Phase 4 — Texture System Migration ✅ COMPLETED
 
-### 7.1 Replace `BitmapRGBA::ConvertToTexture()`
+### 7.1 New Files Created
 
-**File:** `NeuronClient\bitmap.cpp` — `ConvertToTexture()` (line 706+)
-
-Currently calls `glGenTextures`, `glBindTexture`, `glTexImage2D`, `gluBuild2DMipmaps`.
-
-Replace with:
-1. Create `ID3D11Texture2D` from pixel data (`D3D11_SUBRESOURCE_DATA`).
-2. Create `ID3D11ShaderResourceView`.
-3. If `_mipmapping`, either use `D3D11_RESOURCE_MISC_GENERATE_MIPS` + `GenerateMips()` or pre-generate mip chain on CPU.
-4. Return a handle/index into a texture registry (keep returning `int` for API compatibility).
-
-### 7.2 Texture Registry
-
-Create a global texture table in `RenderDevice` (or a new `TextureManager`):
-```cpp
-struct TextureEntry
-{
-  ID3D11Texture2D*          texture;
-  ID3D11ShaderResourceView* srv;
-  ID3D11SamplerState*       sampler;
-};
-```
-The `int` texture IDs returned by `ConvertToTexture()` and used by `Resource::GetTexture()` become indices into this table.
-
-### 7.3 Replace `glBindTexture` / `glTexParameteri`
-
-Every call site that does:
-```cpp
-glBindTexture(GL_TEXTURE_2D, textureId);
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-```
-becomes:
-```cpp
-g_imRenderer->BindTexture(textureId);
-```
-The sampler state (linear, nearest, mipmap, clamp/wrap) should be set once per texture in the registry, or via a small set of pre-created `ID3D11SamplerState` objects.
-
-**Sampler variety found in codebase:**
-- Filter: `GL_LINEAR` (89 sites), `GL_NEAREST` (9 sites), `GL_LINEAR_MIPMAP_LINEAR` (in `ConvertToTexture`)
-- Wrap: `GL_CLAMP` (36 sites), `GL_REPEAT` (42 sites)
-
-Pre-create 4 sampler states:
-| Sampler | Filter | Address Mode |
+| File | Project | Purpose |
 |---|---|---|
-| `LinearClamp` | `MIN_MAG_MIP_LINEAR` | `CLAMP` |
-| `LinearWrap` | `MIN_MAG_MIP_LINEAR` | `WRAP` |
-| `NearestClamp` | `MIN_MAG_MIP_POINT` | `CLAMP` |
-| `NearestWrap` | `MIN_MAG_MIP_POINT` | `WRAP` |
+| `NeuronClient\texture_manager.h` | NeuronClient | `TextureManager` class, `SamplerId` enum |
+| `NeuronClient\texture_manager.cpp` | NeuronClient | D3D11 texture creation, SRV management, sampler states |
 
-> **Note:** OpenGL's `GL_CLAMP` clamps to [0,1] with border bleed; D3D11's `D3D11_TEXTURE_ADDRESS_CLAMP` behaves like `GL_CLAMP_TO_EDGE` (no border bleed). This may cause subtle 1-pixel differences on UI texture edges. Accept this minor visual difference.
+### 7.2 Implementation Details
 
-### 7.4 Remove `glEnable(GL_TEXTURE_2D)` / `glDisable(GL_TEXTURE_2D)`
+- **`TextureManager`** class with `CreateTexture()`, `DestroyTexture()`, `DestroyAll()`, `GetSRV()`, `GetSampler()`.
+- **Texture registry**: `std::vector<TextureEntry>` indexed by `int` handles (index 0 reserved as invalid). Free-list for ID reuse.
+- **`CreateTexture(pixels, width, height, mipmapping)`**: Creates `ID3D11Texture2D` + `ID3D11ShaderResourceView`. For mipmapped textures, uses `D3D11_RESOURCE_MISC_GENERATE_MIPS` + `GenerateMips()`.
+- **4 pre-built sampler states** (`SamplerId` enum):
+  - `SAMPLER_LINEAR_CLAMP` — `MIN_MAG_MIP_LINEAR`, `CLAMP`
+  - `SAMPLER_LINEAR_WRAP` — `MIN_MAG_MIP_LINEAR`, `WRAP`
+  - `SAMPLER_NEAREST_CLAMP` — `MIN_MAG_MIP_POINT`, `CLAMP`
+  - `SAMPLER_NEAREST_WRAP` — `MIN_MAG_MIP_POINT`, `WRAP`
+- Global `g_textureManager` pointer, created/destroyed in `window_manager.cpp`.
 
-In D3D11, texturing is enabled simply by binding an SRV. Replace these calls with `g_imRenderer->BindTexture(id)` / `g_imRenderer->UnbindTexture()`.
+### 7.3 `BitmapRGBA::ConvertToTexture()` Modified
 
-**Verification:** Build and run. Textured quads should now render correctly.
+**File:** `NeuronClient\bitmap.cpp`
+
+Always creates the **OpenGL texture first** (since OpenGL still renders during the transition), then mirrors the pixel data into a D3D11 texture at the **same ID** via `g_textureManager->CreateTextureAt(glTexId, ...)`. Returns the OpenGL texture ID. This ensures:
+- `glBindTexture(GL_TEXTURE_2D, id)` works for current OpenGL rendering
+- `g_imRenderer->BindTexture(id)` will work for D3D11 rendering (when game code is migrated)
+
+> **Note:** An earlier version used a D3D11-only early-return path that broke OpenGL rendering (textures appeared as white cubes). The dual-creation approach fixes this.
+
+### 7.4 `ImRenderer` Extended
+
+**File:** `NeuronClient\im_renderer.h` / `im_renderer.cpp`
+
+- `BindTexture(int textureId)` — looks up SRV from `g_textureManager->GetSRV(id)`.
+- `SetSampler(SamplerId id)` — sets a sampler state from `g_textureManager->GetSampler(id)`.
+
+### 7.4.1 `TextureManager` Extended
+
+**File:** `NeuronClient\texture_manager.h` / `texture_manager.cpp`
+
+- `CreateTextureAt(int id, ...)` — creates a D3D11 texture stored at a **specific ID** (the OpenGL texture ID). Grows the internal vector as needed. Used during the transition period so both OpenGL and D3D11 textures share the same handle.
+
+### 7.5 `Resource` Updated
+
+**File:** `NeuronClient\resource.cpp`
+
+- `DeleteTexture()` — always deletes via `glDeleteTextures` AND `g_textureManager->DestroyTexture()` (both sides cleaned up).
+- `FlushOpenGlState()` — same dual cleanup: deletes GL textures and D3D11 textures for each entry.
+
+### 7.6 Remaining Phase 4 Work (deferred to Phase 6–8)
+
+The following will be done as part of the per-file migration in later phases:
+- Replacing `glBindTexture(GL_TEXTURE_2D, id)` → `g_imRenderer->BindTexture(id)` at ~130 call sites
+- Replacing `glTexParameteri` filter/wrap calls → `g_imRenderer->SetSampler(...)` at ~78 call sites
+- Replacing `glEnable(GL_TEXTURE_2D)` / `glDisable(GL_TEXTURE_2D)` → `BindTexture`/`UnbindTexture`
+
+**Verification:** Build passes. Textures are now created as D3D11 resources via `TextureManager` and are ready for use by `ImRenderer::BindTexture(int)` when game code migration begins.
 
 ---
 
-## 8. Phase 5 — Matrix System Migration
+## 8. Phase 5 — Matrix System Migration ✅ COMPLETED
 
-### 8.1 Replace OpenGL Matrix Stack
+### 8.1 Implementation Details
 
-OpenGL calls used:
-- `glMatrixMode(GL_PROJECTION)` / `glMatrixMode(GL_MODELVIEW)`
-- `glLoadIdentity()`
-- `glLoadMatrixd()`
-- `glPushMatrix()` / `glPopMatrix()`
-- `gluPerspective()`
-- `gluOrtho2D()`
-- `gluLookAt()`
-- `glGetDoublev(GL_MODELVIEW_MATRIX, ...)`
-- `glGetDoublev(GL_PROJECTION_MATRIX, ...)`
+All D3D11 matrix paths are set **alongside** the existing OpenGL matrix calls, keeping OpenGL rendering functional while the `ImRenderer` matrices are prepared for future phases.
 
-Replace with **DirectXMath** (`DirectX::XMMATRIX`):
+**Coordinate convention:** All `XMMatrix*RH` variants are used (Option A from the original plan) to preserve OpenGL's right-handed coordinate system and existing winding order. No vertex data changes required.
 
-| OpenGL | DirectXMath Replacement |
-|---|---|
-| `gluPerspective(fov, aspect, near, far)` | `XMMatrixPerspectiveFovLH(fovY, aspect, near, far)` — NOTE: DX uses LH by default; verify winding. |
-| `gluOrtho2D(l, r, b, t)` | `XMMatrixOrthographicOffCenterLH(l, r, b, t, -1, 1)` |
-| `gluLookAt(...)` | `XMMatrixLookAtLH(eye, target, up)` |
-| `glLoadIdentity()` | `XMMatrixIdentity()` |
-| `glLoadMatrixd(m)` | Construct `XMMATRIX` from the 16 doubles |
+### 8.2 Files Modified
 
-### 8.2 Files to Migrate
+**`Starstrike\renderer.cpp`:**
+- `SetupProjMatrixFor3D()` — After the OpenGL `gluPerspective`, calls `g_imRenderer->SetProjectionMatrix(XMMatrixPerspectiveFovRH(...))` with the same FOV, aspect, near, far parameters. FOV converted from degrees to radians.
+- `SetupMatricesFor2D()` — After the OpenGL `gluOrtho2D`, calls `g_imRenderer->SetProjectionMatrix(XMMatrixOrthographicOffCenterRH(...))` and resets view/world to identity.
+- `UpdateTotalMatrix()` — When `g_imRenderer` is available, computes `WVP = world * view * proj` from the stored ImRenderer matrices, transposes to column-major doubles (OpenGL layout), and stores in `m_totalMatrix[]`. Falls back to `glGetDoublev` otherwise.
+- Added `#include "render_device.h"`, `"render_states.h"`, `"im_renderer.h"`.
 
-- **`Starstrike\renderer.cpp`** — `SetupProjMatrixFor3D()`, `SetupMatricesFor2D()`, `UpdateTotalMatrix()`, `Get2DScreenPos()`
-- **`Starstrike\camera.cpp`** — `SetupModelviewMatrix()` (line 1659-1673)
-- **`NeuronClient\text_renderer.cpp`** — `BeginText2D()`, `EndText2D()`
-- Various `glPushMatrix` / `glPopMatrix` in GameLogic files
+**`Starstrike\camera.cpp`:**
+- `SetupModelviewMatrix()` — After the OpenGL `gluLookAt`, calls `g_imRenderer->SetViewMatrix(XMMatrixLookAtRH(...))` and resets world matrix to identity. Uses the same eye/target/up values.
+- `Get2DScreenPos()` — Kept using `gluProject` exclusively. An earlier D3D11 path was removed because (a) `gluProject` uses OpenGL's Y-up screen convention (Y=0 at bottom) while the D3D11 replacement used Y=0 at top, inverting mouse controls, and (b) the ImRenderer matrices may be stale when `Get2DScreenPos` is called during input processing (outside the render loop). Will be migrated in Phase 9 when OpenGL is fully removed.
+- Added `#include "im_renderer.h"`.
 
-### 8.3 Coordinate System Difference
+**`NeuronClient\text_renderer.h`:**
+- Added `#include <DirectXMath.h>`.
+- Added `DirectX::XMMATRIX m_savedProjMatrix`, `m_savedViewMatrix`, `m_savedWorldMatrix` members for save/restore.
 
-OpenGL uses **right-handed** coordinates; DirectX 11 conventionally uses **left-handed**. Two options:
-- **Option A (recommended):** Use `XMMatrix*RH` variants (`XMMatrixLookAtRH`, `XMMatrixPerspectiveFovRH`) to preserve existing coordinate conventions and winding order. This avoids touching vertex data.
-- **Option B:** Convert to LH and flip winding order (`FrontCounterClockwise = FALSE` in rasteriser state).
+**`NeuronClient\text_renderer.cpp`:**
+- `BeginText2D()` — Saves current `g_imRenderer` matrices, sets ortho projection matching the OpenGL `gluOrtho2D` call (with the -0.325 pixel offset), and resets view/world to identity.
+- `EndText2D()` — Restores the saved matrices.
+- Added `#include "im_renderer.h"`, `"render_states.h"`.
 
-**Recommendation:** Use Option A to minimise changes.
+**`NeuronClient\im_renderer.h`:**
+- Added `GetViewMatrix()` accessor (was missing; `GetProjectionMatrix()` and `GetWorldMatrix()` already existed).
 
-### 8.4 `Matrix34::ConvertToOpenGLFormat()` — Column-Major Transpose
+### 8.3 Remaining OpenGL Matrix Calls (deferred to Phase 6–8)
 
-`Matrix34::ConvertToOpenGLFormat()` outputs a **column-major** `float[16]` for `glMultMatrixf`. DirectXMath `XMMATRIX` is **row-major** in memory. The `ImRenderer::MultMatrixf()` method already handles this transpose (swaps rows/columns on load). When migrating call sites:
+The OpenGL `glMatrixMode`, `glLoadIdentity`, `glLoadMatrixd`, `gluPerspective`, `gluOrtho2D`, `gluLookAt`, `glGetDoublev` calls are **preserved** alongside the new D3D11 paths. They will be removed in Phase 9 when OpenGL is fully stripped.
 
-```cpp
-// OpenGL:
-glMultMatrixf(mat.ConvertToOpenGLFormat());
-// D3D11:
-g_imRenderer->MultMatrixf(mat.ConvertToOpenGLFormat());  // transpose handled internally
-```
+The `glPushMatrix`/`glPopMatrix`/`glMultMatrixf`/`glTranslatef`/`glScalef`/`glRotatef` calls in game code (~30 sites) will be migrated to `g_imRenderer->PushMatrix()` etc. as part of the per-file migration in Phases 6–8.
 
-No changes needed to `Matrix34` itself. The transpose is encapsulated in `ImRenderer::MultMatrixf()`.
-
-### 8.5 `Camera::SetupModelviewMatrix()` — `gluLookAt` Scaling Quirk
-
-In `Camera::SetupModelviewMatrix()`, the `front` and `up` vectors are **scaled by `magOfPos`** before being passed to `gluLookAt`. The `gluLookAt` function normalizes the forward/up vectors internally, so this doesn't affect the result. However, `XMMatrixLookAtRH` does NOT normalize — it expects a target POINT, not a direction. The current code computes `forwards = m_pos + front * magOfPos`, which is fine as a target point. But the `up` vector is also scaled — this works because `XMMatrixLookAtRH` normalises the cross products internally. Verify this during implementation.
-
-### 8.6 Store Matrices in `ImRenderer`
-
-```cpp
-DirectX::XMMATRIX m_projMatrix;
-DirectX::XMMATRIX m_viewMatrix;
-DirectX::XMMATRIX m_worldMatrix;
-```
-On `End()`, compute `WVP = m_worldMatrix * m_viewMatrix * m_projMatrix` and upload to constant buffer.
-
-**Verification:** 3D perspective rendering should now show correct geometry.
+**Verification:** Build passes. Both OpenGL and D3D11 matrix paths coexist. The `ImRenderer` now has correct projection, view, and world matrices set at the same points in the frame as the OpenGL matrix calls.
 
 ---
 
@@ -694,6 +667,8 @@ Grep the entire codebase for `GLenum`, `GLint`, `GLfloat`, `GLuint`, `GLboolean`
 | `Shaders\im_texturedPS.hlsl` | Textured pixel shader (FxCompile → `CompiledShaders\im_texturedPS.h`) |
 | `render_states.h` | Pre-built blend/depth/raster state cache |
 | `render_states.cpp` | State object creation |
+| `texture_manager.h` | D3D11 texture registry + sampler states |
+| `texture_manager.cpp` | Texture creation, SRV management, sampler creation |
 
 ### Deleted Files
 | File | Phase | Reason |
@@ -740,8 +715,8 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 1:** Create `RenderDevice`, init D3D11, swap chain, integrate into `WindowManager`
 - [x] **Phase 2:** Create `ImRenderer` with built-in shaders
 - [x] **Phase 3:** Create `RenderStates`, pre-build blend/depth/raster state objects
-- [ ] **Phase 4:** Migrate texture system (`ConvertToTexture`, `Resource`, `glBindTexture`)
-- [ ] **Phase 5:** Migrate matrix system (projection, modelview, `gluPerspective`, `gluLookAt`)
+- [x] **Phase 4:** Migrate texture system (`ConvertToTexture`, `TextureManager`, sampler states)
+- [x] **Phase 5:** Migrate matrix system (projection, modelview, `gluPerspective`, `gluLookAt`)
 - [ ] **Phase 6:** Migrate core 3D rendering (shapes, landscape, spheres, particles, water, clouds)
 - [ ] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [ ] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
@@ -796,19 +771,19 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Coordinate handedness mismatch (RH→LH) | 🟠 Moderate | Use `XMMatrix*RH` variants to preserve existing vertex data and winding |
+| Coordinate handedness mismatch (RH→LH) | ✅ Resolved | `XMMatrix*RH` variants used throughout — existing vertex data and winding preserved |
 | Texture coordinate origin difference (GL bottom-left vs D3D top-left) | 🟠 Moderate | Flip V coordinate in `ConvertToTexture()` or in HLSL |
 | `GL_QUADS` has no D3D primitive | ✅ Resolved | `ImRenderer` converts quads to triangle pairs |
 | `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Important | Implement via `clip()` in pixel shader |
 | Display lists have no D3D11 equivalent | 🟡 Important | Replace with static vertex buffers or remove caching |
 | Performance regression from immediate-mode emulation | 🟠 Moderate | Acceptable initially; optimise with static VBs in Phase 10 |
 | GL state queries (`glGet*`) used in debug asserts | 🟡 Important | Remove or replace with cached state tracking |
-| `gluBuild2DMipmaps` has no D3D11 equivalent | 🟠 Moderate | Use `GenerateMips()` or CPU-side mip generation |
+| `gluBuild2DMipmaps` has no D3D11 equivalent | ✅ Resolved | `GenerateMips()` via `TextureManager::CreateTexture()` |
 | Large number of files to touch (~95) | 🟠 Moderate | Mechanical replacement; use scripts/regex where possible |
 | `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | 🔴 Critical | Accept 1px initially; implement thick-line quad expansion in Phase 10 |
 | Save/restore state RAII pattern in `text_renderer.cpp` | 🟡 Important | Replace with explicit save/restore via `ImRenderer` accessors |
 | Vertex array paths (landscape, water) not coverable by `ImRenderer::Begin/End` | 🟡 Important | Create direct `ID3D11Buffer` for these systems |
 | `Matrix34::ConvertToOpenGLFormat()` column-major vs `XMMATRIX` row-major | ✅ Resolved | `ImRenderer::MultMatrixf()` transposes on load |
-| `GL_CLAMP` vs `D3D11_TEXTURE_ADDRESS_CLAMP` (border pixel bleed) | 🟢 Minor | Accept subtle 1-pixel difference at texture edges |
-| `Camera::SetupModelviewMatrix()` scales vectors by `magOfPos` before `gluLookAt` | 🟢 Minor | Verify `XMMatrixLookAtRH` produces same result (it normalises internally) |
+| `GL_CLAMP` vs `D3D11_TEXTURE_ADDRESS_CLAMP` (border pixel bleed) | ✅ Resolved | 4 sampler states pre-created; accept minor difference |
+| `Camera::SetupModelviewMatrix()` scales vectors by `magOfPos` before `gluLookAt` | ✅ Resolved | `XMMatrixLookAtRH` receives same eye/target/up — normalises cross products internally |
 | Missing modelview matrix stack in `ImRenderer` | ✅ Resolved | `PushMatrix`/`PopMatrix`/`MultMatrixf`/`Translatef`/`Rotatef`/`Scalef` added |

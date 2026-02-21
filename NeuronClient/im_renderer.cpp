@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "im_renderer.h"
+#include "texture_manager.h"
 #include "debug_utils.h"
 
 #include "CompiledShaders/im_defaultVS.h"
@@ -189,7 +190,26 @@ void ImRenderer::Scalef(float sx, float sy, float sz)
 // ---------------------------------------------------------------------------
 
 void ImRenderer::BindTexture(ID3D11ShaderResourceView* srv)   { m_boundSRV = srv; }
+
+void ImRenderer::BindTexture(int textureId)
+{
+  if (g_textureManager)
+    m_boundSRV = g_textureManager->GetSRV(textureId);
+  else
+    m_boundSRV = nullptr;
+}
+
 void ImRenderer::UnbindTexture()                               { m_boundSRV = nullptr; }
+
+void ImRenderer::SetSampler(SamplerId id)
+{
+  if (g_textureManager)
+  {
+    ID3D11SamplerState* sampler = g_textureManager->GetSampler(id);
+    if (sampler)
+      m_context->PSSetSamplers(0, 1, &sampler);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Immediate-mode vertex attribute setters

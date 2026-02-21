@@ -10,6 +10,7 @@
 #include "text_stream_readers.h"
 #include "preferences.h"
 #include "sound_stream_decoder.h"
+#include "texture_manager.h"
 #include "app.h"
 #include "location.h"
 #include "renderer.h"
@@ -148,6 +149,8 @@ void Resource::DeleteTexture(const char* _name)
   {
     unsigned int id2 = id;
     glDeleteTextures(1, &id2);
+    if (g_textureManager)
+      g_textureManager->DestroyTexture(id);
     m_textures.RemoveData(_name);
   }
 }
@@ -288,8 +291,10 @@ void Resource::FlushOpenGlState()
   {
     if (m_textures.ValidIndex(i))
     {
-      unsigned int id = i;
+      unsigned int id = m_textures[i];
       glDeleteTextures(1, &id);
+      if (g_textureManager)
+        g_textureManager->DestroyTexture(m_textures[i]);
     }
   }
 #endif

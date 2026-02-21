@@ -4,6 +4,7 @@
 #include "debug_utils.h"
 #include "render_device.h"
 #include "render_states.h"
+#include "texture_manager.h"
 #include "im_renderer.h"
 #include "window_manager.h"
 #include "window_manager_win32.h"
@@ -267,6 +268,9 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
 
     g_renderStates = new RenderStates();
     g_renderStates->Initialise(g_renderDevice->GetDevice());
+
+    g_textureManager = new TextureManager();
+    g_textureManager->Initialise(g_renderDevice->GetDevice(), g_renderDevice->GetContext());
   }
 
   return true;
@@ -274,6 +278,7 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
 
 void WindowManager::DestroyWin()
 {
+  SAFE_DELETE(g_textureManager);
   SAFE_DELETE(g_renderStates);
   SAFE_DELETE(g_imRenderer);
   SAFE_DELETE(g_renderDevice);

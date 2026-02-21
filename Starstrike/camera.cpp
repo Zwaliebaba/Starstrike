@@ -27,6 +27,7 @@
 #include "user_input.h"
 #include "teleport.h"
 #include "insertion_squad.h"
+#include "im_renderer.h"
 
 #define MIN_GROUND_CLEARANCE	10.0f	// Minimum height relative to land
 #define MIN_HEIGHT				10.0f	// Height above sea level (which is y=0)
@@ -1670,6 +1671,17 @@ void Camera::SetupModelviewMatrix()
   LegacyVector3 up = m_up * magOfPos;
   LegacyVector3 forwards = m_pos + front;
   gluLookAt(m_pos.x, m_pos.y, m_pos.z, forwards.x, forwards.y, forwards.z, up.x, up.y, up.z);
+
+  // D3D11: set view matrix on ImRenderer (RH to match OpenGL)
+  if (g_imRenderer)
+  {
+    using namespace DirectX;
+    XMVECTOR eye    = XMVectorSet(m_pos.x, m_pos.y, m_pos.z, 0.0f);
+    XMVECTOR target = XMVectorSet(forwards.x, forwards.y, forwards.z, 0.0f);
+    XMVECTOR upVec  = XMVectorSet(up.x, up.y, up.z, 0.0f);
+    g_imRenderer->SetViewMatrix(XMMatrixLookAtRH(eye, target, upVec));
+    g_imRenderer->SetWorldMatrix(XMMatrixIdentity());
+  }
 }
 
 bool Camera::PosInViewFrustum(const LegacyVector3& _pos)

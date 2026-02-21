@@ -7,6 +7,7 @@
 #include "profiler.h"
 #include "rgb_colour.h"
 #include "preferences.h"
+#include "texture_manager.h"
 #include "app.h"
 
 #define BMP_RGB				0
@@ -705,6 +706,7 @@ void BitmapRGBA::Clear(const RGBAColour& colour)
 
 int BitmapRGBA::ConvertToTexture(bool _mipmapping) const
 {
+  // --- Always create OpenGL texture (OpenGL still renders during transition) ---
   unsigned int texId;
 
   glEnable(GL_TEXTURE_2D);
@@ -752,10 +754,11 @@ int BitmapRGBA::ConvertToTexture(bool _mipmapping) const
   else
     glTexImage2D(GL_TEXTURE_2D, 0, 4, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixels);
 
-  //    if (!texturingWasEnabled)
-  //    {
-  //        glDisable(GL_TEXTURE_2D);
-  //    }
+  // --- Also create D3D11 texture at the same ID for future use ---
+  if (g_textureManager)
+  {
+    g_textureManager->CreateTextureAt(static_cast<int>(texId), m_pixels, m_width, m_height, _mipmapping);
+  }
 
   return static_cast<int>(texId);
 }

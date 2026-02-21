@@ -179,6 +179,7 @@
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="system_info.h" />
     <ClInclude Include="targetcursor.h" />
+    <ClInclude Include="texture_manager.h" />
     <ClInclude Include="texture_uv.h" />
     <ClInclude Include="text_renderer.h" />
     <ClInclude Include="text_stream_readers.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="targetcursor.cpp" />
+    <ClCompile Include="texture_manager.cpp" />
     <ClCompile Include="texture_uv.cpp" />
     <ClCompile Include="text_renderer.cpp" />
     <ClCompile Include="text_stream_readers.cpp" />

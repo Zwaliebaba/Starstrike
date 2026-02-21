@@ -6,6 +6,8 @@
 #include <vector>
 #include <stack>
 
+enum SamplerId;  // forward declare from texture_manager.h
+
 enum PrimitiveType
 {
   PRIM_POINTS,
@@ -58,6 +60,7 @@ public:
 
   // Matrix state — modelview (replaces GL_MODELVIEW stack)
   void SetViewMatrix(const DirectX::XMMATRIX& view);
+  const DirectX::XMMATRIX& GetViewMatrix() const { return m_viewMatrix; }
   void SetWorldMatrix(const DirectX::XMMATRIX& world);
 
   void PushMatrix();
@@ -71,7 +74,11 @@ public:
 
   // Texture binding
   void BindTexture(ID3D11ShaderResourceView* srv);
+  void BindTexture(int textureId);          // looks up from g_textureManager
   void UnbindTexture();
+
+  // Sampler state
+  void SetSampler(SamplerId id);            // selects sampler from g_textureManager
 
 private:
   struct ImVertex

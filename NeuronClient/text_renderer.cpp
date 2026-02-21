@@ -14,6 +14,8 @@
 #include "app.h"
 #include "camera.h"
 #include "text_renderer.h"
+#include "im_renderer.h"
+#include "render_states.h"
 
 
 TextRenderer g_gameFont;
@@ -75,15 +77,31 @@ void TextRenderer::BeginText2D()
 	glLoadIdentity();
 	gluOrtho2D(v[0] - 0.325, v[0] + v[2] - 0.325, v[1] + v[3] - 0.325, v[1] - 0.325);
 
-    glDisable( GL_LIGHTING );
-    glColor3f(1.0f, 1.0f, 1.0f);
+	glDisable( GL_LIGHTING );
+	glColor3f(1.0f, 1.0f, 1.0f);
 
-    glEnable    ( GL_BLEND );
-    glDisable   ( GL_CULL_FACE );
-    glDisable   ( GL_DEPTH_TEST );
-    glDepthMask ( false );
+	glEnable    ( GL_BLEND );
+	glDisable   ( GL_CULL_FACE );
+	glDisable   ( GL_DEPTH_TEST );
+	glDepthMask ( false );
 
 	glMatrixMode(matrixMode);
+
+	// D3D11: save current matrices, set ortho projection for 2D text
+	if (g_imRenderer)
+	{
+		m_savedProjMatrix = g_imRenderer->GetProjectionMatrix();
+		m_savedViewMatrix = g_imRenderer->GetViewMatrix();
+		m_savedWorldMatrix = g_imRenderer->GetWorldMatrix();
+
+		float left   = v[0] - 0.325f;
+		float right  = v[0] + v[2] - 0.325f;
+		float bottom = v[1] + v[3] - 0.325f;
+		float top    = v[1] - 0.325f;
+		g_imRenderer->SetProjectionMatrix(DirectX::XMMatrixOrthographicOffCenterRH(left, right, bottom, top, -1.0f, 1.0f));
+		g_imRenderer->SetViewMatrix(DirectX::XMMatrixIdentity());
+		g_imRenderer->SetWorldMatrix(DirectX::XMMatrixIdentity());
+	}
 }
 
 
@@ -94,10 +112,18 @@ void TextRenderer::EndText2D()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixd(m_modelviewMatrix);
 
-    glDepthMask ( true );
-    glEnable    ( GL_DEPTH_TEST );
-    glEnable    ( GL_CULL_FACE );
-    glDisable   ( GL_BLEND );
+	glDepthMask ( true );
+	glEnable    ( GL_DEPTH_TEST );
+	glEnable    ( GL_CULL_FACE );
+	glDisable   ( GL_BLEND );
+
+	// D3D11: restore saved matrices
+	if (g_imRenderer)
+	{
+		g_imRenderer->SetProjectionMatrix(m_savedProjMatrix);
+		g_imRenderer->SetViewMatrix(m_savedViewMatrix);
+		g_imRenderer->SetWorldMatrix(m_savedWorldMatrix);
+	}
 }
 
 
