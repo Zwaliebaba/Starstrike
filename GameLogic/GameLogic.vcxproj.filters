@@ -1,0 +1,602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="buildings_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="buynow_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_anim_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="camera_mount_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="cheat_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="darwinia_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="debugmenu.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="demoend_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="drop_down_menu.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="editor_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="filedialog.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="gesture_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="globalworldeditor_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="grabber_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="input_field.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="instant_unit_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="landscape_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="lights_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="mainmenus.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="message_dialog.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="mods_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="network_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="pokey_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="prefs_graphics_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="prefs_keybindings_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="prefs_other_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="prefs_screen_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="prefs_sound_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="profilewindow.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="reallyquit_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="save_on_quit_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="scrollbar.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_profile_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="soundeditor_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="soundparameter_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="soundstats_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="tree_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="updateavailable_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="userprofile_window.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ai.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="airstrike.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="anthill.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="armour.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="armyant.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="blueprintstore.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="building.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="cave.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="centipede.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="constructionyard.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="controltower.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="darwinian.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="egg.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="engineer.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="entity.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_leg.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="factory.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="feedingtube.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="flag.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="generator.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="generichub.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="goddish.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="gunturret.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="incubator.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="insertion_squad.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="lander.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="laserfence.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="lasertrooper.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="library.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="mine.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="officer.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="powerstation.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="radardish.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="researchitem.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="rocket.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="safearea.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="scripttrigger.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="snow.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="souldestroyer.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spam.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spawnpoint.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spider.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spirit.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spiritreceiver.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="spiritstore.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="sporegenerator.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="staticshape.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="switch.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="teleport.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="tree.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="triffid.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="tripod.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="trunkport.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="upgrade_port.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="virii.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="wall.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="weapons.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="worldobject.h">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="buildings_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="buynow_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_anim_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_mount_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="cheat_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="darwinia_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="debugmenu.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="demoend_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="drop_down_menu.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="editor_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="filedialog.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="gesture_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="globalworldeditor_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="grabber_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="input_field.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="instant_unit_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="landscape_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="lights_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="mainmenus.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="message_dialog.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="mods_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="network_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="prefs_graphics_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="prefs_keybindings_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="prefs_other_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="prefs_screen_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="prefs_sound_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="profilewindow.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="reallyquit_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="save_on_quit_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="scrollbar.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_profile_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="soundeditor_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="soundparameter_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="soundstats_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="tree_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="updateavailable_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="userprofile_window.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="ai.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="airstrike.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="anthill.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="armour.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="armyant.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="blueprintstore.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="building.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="cave.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="centipede.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="constructionyard.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="controltower.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="darwinian.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="egg.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="engineer.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="entity.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="entity_leg.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="factory.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="feedingtube.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="flag.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="generator.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="generichub.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="goddish.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="gunturret.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="incubator.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="insertion_squad.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="lander.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="laserfence.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="lasertrooper.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="library.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="mine.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="officer.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="powerstation.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="radardish.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="researchitem.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="rocket.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="safearea.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="scripttrigger.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="snow.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="souldestroyer.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spam.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spawnpoint.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spider.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spirit.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spiritreceiver.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="spiritstore.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="sporegenerator.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="staticshape.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="switch.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="teleport.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="tree.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="triffid.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="tripod.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="trunkport.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="upgrade_port.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="virii.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="wall.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="weapons.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="worldobject.cpp">
+      <Filter>GameObjects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{6f1ed760-275b-4661-aece-83928683857a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{03d8f1ab-662b-41fc-9007-d473c07f4190}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

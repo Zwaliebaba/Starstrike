@@ -2,19 +2,151 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="clienttoserver.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="generic.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="networkupdate.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="server.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="servertoclient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="servertoclientletter.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="net_lib.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="net_mutex_win32.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="net_socket.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="net_socket_listener.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="net_thread_win32.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="net_udp_packet.cpp">
+      <Filter>NetLib</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="WndProcManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="NeuronCore.h" />
+    <ClInclude Include="bytestream.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="clienttoserver.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="generic.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="networkupdate.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="server.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="servertoclient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="servertoclientletter.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="net_lib.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_lib_win32.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_mutex.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_socket.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_socket_listener.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_thread.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="net_udp_packet.h">
+      <Filter>NetLib</Filter>
+    </ClInclude>
+    <ClInclude Include="ASyncLoader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DataReader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DataWriter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceNotify.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerCore.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="WndProcManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuronHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMath.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MathCommon.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
       <UniqueIdentifier>{3c52bda5-6882-4d04-9a33-6a8f71fce029}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{1478491b-211a-4a59-b7f3-71aee1efbdcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetLib">
+      <UniqueIdentifier>{2c107cc6-eb7e-40ce-98a9-90c0c7921726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{a07bd4f2-f63d-4ca4-bd5a-1e01f87467a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
       <Filter>Project Files</Filter>
+    </None>
+    <None Include="networkupdate.inc">
+      <Filter>Network</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -3,18 +3,398 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="NeuronClient.h" />
+    <ClInclude Include="sample_cache.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_filter.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_instance.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_library_2d.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_library_3d.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_library_3d_dsound.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_library_3d_software.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_parameter.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="sound_stream_decoder.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="soundsystem.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="2d_array.h" />
+    <ClInclude Include="2d_surface_map.h" />
+    <ClInclude Include="3d_sprite.h" />
+    <ClInclude Include="auto_vector.h" />
+    <ClInclude Include="binary_stream_readers.h" />
+    <ClInclude Include="bitmap.h" />
+    <ClInclude Include="bounded_array.h" />
+    <ClInclude Include="btree.h" />
+    <ClInclude Include="darray.h" />
+    <ClInclude Include="debug_logging.h" />
+    <ClInclude Include="debug_render.h" />
+    <ClInclude Include="debug_utils.h" />
+    <ClInclude Include="fast_darray.h" />
+    <ClInclude Include="file_writer.h" />
+    <ClInclude Include="filesys_utils.h" />
+    <ClInclude Include="hash_table.h" />
+    <ClInclude Include="hi_res_time.h" />
+    <ClInclude Include="invert_matrix.h" />
+    <ClInclude Include="language_table.h" />
+    <ClInclude Include="llist.h" />
+    <ClInclude Include="math_utils.h" />
+    <ClInclude Include="matrix33.h" />
+    <ClInclude Include="matrix34.h" />
+    <ClInclude Include="mouse_cursor.h" />
+    <ClInclude Include="ogl_extensions.h" />
+    <ClInclude Include="opengl_directx.h" />
+    <ClInclude Include="opengl_directx_dlist.h" />
+    <ClInclude Include="opengl_directx_dlist_dev.h" />
+    <ClInclude Include="opengl_directx_inline.h" />
+    <ClInclude Include="opengl_directx_internals.h" />
+    <ClInclude Include="opengl_directx_matrix_stack.h" />
+    <ClInclude Include="opengl_trace.h" />
+    <ClInclude Include="persisting_debug_render.h" />
+    <ClInclude Include="plane.h" />
+    <ClInclude Include="preference_names.h" />
+    <ClInclude Include="preferences.h" />
+    <ClInclude Include="presized_array.h" />
+    <ClInclude Include="profiler.h" />
+    <ClInclude Include="random.h" />
+    <ClInclude Include="render_utils.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="rgb_colour.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="shape.h" />
+    <ClInclude Include="slice_darray.h" />
+    <ClInclude Include="sorting_hash_table.h" />
+    <ClInclude Include="sphere_renderer.h" />
+    <ClInclude Include="string_utils.h" />
+    <ClInclude Include="system_info.h" />
+    <ClInclude Include="targetcursor.h" />
+    <ClInclude Include="text_renderer.h" />
+    <ClInclude Include="text_stream_readers.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="texture_uv.h" />
+    <ClInclude Include="user_info.h" />
+    <ClInclude Include="vector2.h" />
+    <ClInclude Include="LegacyVector3.h" />
+    <ClInclude Include="window_manager.h" />
+    <ClInclude Include="window_manager_win32.h" />
+    <ClInclude Include="control_bindings.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="control_types.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="eventhandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="file_paths.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_types.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_alias.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_chord.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_conjoin.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_idle.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_invert.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_pipe.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_prefs.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_simple.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_value.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_win32.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputdriver_xinput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter_direction.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilter_withdelta.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfiltermanager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputfilterspec.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputspec.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="inputspeclist.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="keydefs.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="keynames.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="movement2d.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="transform.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="win32_eventhandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="win32_eventproc.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="eclbutton.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="eclipse.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="eclwindow.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="sample_cache.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_filter.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_instance.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_library_2d.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_library_2d_nosnd.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_library_3d.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_library_3d_dsound.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_library_3d_software.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_parameter.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="sound_stream_decoder.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="soundsystem.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="3d_sprite.cpp" />
+    <ClCompile Include="binary_stream_readers.cpp" />
+    <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="debug_fog_logging.cpp" />
+    <ClCompile Include="debug_logging.cpp" />
+    <ClCompile Include="debug_render.cpp" />
+    <ClCompile Include="debug_utils.cpp" />
+    <ClCompile Include="file_writer.cpp" />
+    <ClCompile Include="filesys_utils.cpp" />
+    <ClCompile Include="hi_res_time.cpp" />
+    <ClCompile Include="invert_matrix.cpp" />
+    <ClCompile Include="language_table.cpp" />
+    <ClCompile Include="math_utils.cpp" />
+    <ClCompile Include="matrix33.cpp" />
+    <ClCompile Include="matrix34.cpp" />
+    <ClCompile Include="mouse_cursor.cpp" />
+    <ClCompile Include="ogl_extensions.cpp" />
+    <ClCompile Include="ogl_extensions_directx.cpp" />
+    <ClCompile Include="opengl_directx.cpp" />
+    <ClCompile Include="opengl_directx_dlist.cpp" />
+    <ClCompile Include="opengl_directx_dlist_dev.cpp" />
+    <ClCompile Include="opengl_directx_matrix_stack.cpp" />
+    <ClCompile Include="opengl_directx_stubs.cpp" />
+    <ClCompile Include="opengl_trace.cpp" />
+    <ClCompile Include="persisting_debug_render.cpp" />
+    <ClCompile Include="plane.cpp" />
+    <ClCompile Include="preferences.cpp" />
+    <ClCompile Include="profiler.cpp" />
+    <ClCompile Include="random.cpp" />
+    <ClCompile Include="render_utils.cpp" />
+    <ClCompile Include="resource.cpp" />
+    <ClCompile Include="rgb_colour.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="shape.cpp" />
+    <ClCompile Include="sphere_renderer.cpp" />
+    <ClCompile Include="string_utils.cpp" />
+    <ClCompile Include="system_info.cpp" />
+    <ClCompile Include="targetcursor.cpp" />
+    <ClCompile Include="text_renderer.cpp" />
+    <ClCompile Include="text_stream_readers.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="texture_uv.cpp" />
+    <ClCompile Include="tri_tri.cpp" />
+    <ClCompile Include="user_info.cpp" />
+    <ClCompile Include="vector2.cpp" />
+    <ClCompile Include="vector3.cpp" />
+    <ClCompile Include="window_manager.cpp" />
+    <ClCompile Include="window_manager_directx.cpp" />
+    <ClCompile Include="control_bindings.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="control_types.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="eventhandler.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="file_paths.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_types.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_alias.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_chord.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_conjoin.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_idle.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_invert.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_pipe.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_prefs.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_simple.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_value.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_win32.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputdriver_xinput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter_direction.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilter_withdelta.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfiltermanager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputfilterspec.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="inputspec.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="keynames.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="movement2d.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_eventhandler.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="eclbutton.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="eclipse.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="eclwindow.cpp">
+      <Filter>Canvas</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
       <UniqueIdentifier>{6bf0dc4b-461c-46b2-a796-9e0ae4729e30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{2bbec555-1527-4af0-9261-547804478941}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{8dee1fd7-16b3-4a6d-9c57-5e6c80fb0b2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Canvas">
+      <UniqueIdentifier>{062425be-f9fd-49a6-a08e-112390dccd54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
       <Filter>Project Files</Filter>
+    </None>
+    <None Include="control_types.inc">
+      <Filter>Input</Filter>
+    </None>
+    <None Include="inputdriver_values.inc">
+      <Filter>Input</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
+  <Project Path="GameLogic/GameLogic.vcxproj" Id="bd9afe8a-a1a3-4965-ba73-4722b25ec6fa" />
   <Project Path="NeuronClient/NeuronClient.vcxproj" Id="734da3fb-1b67-4a07-ba69-328c9babdd61" />
   <Project Path="NeuronCore/NeuronCore.vcxproj" Id="ca4e142b-aa7e-4696-84aa-5398e9a4b5bf" />
   <Project Path="NeuronServer/NeuronServer.vcxproj" Id="b03b22da-cb82-4ef2-a86b-298bb5c5b79d" />

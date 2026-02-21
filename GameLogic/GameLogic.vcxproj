@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{bd9afe8a-a1a3-4965-ba73-4722b25ec6fa}</ProjectGuid>
+    <RootNamespace>GameLogic</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)NeuronClient;$(SolutionDir)StarStrike</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ai.h" />
+    <ClInclude Include="airstrike.h" />
+    <ClInclude Include="anthill.h" />
+    <ClInclude Include="armour.h" />
+    <ClInclude Include="armyant.h" />
+    <ClInclude Include="blueprintstore.h" />
+    <ClInclude Include="bridge.h" />
+    <ClInclude Include="building.h" />
+    <ClInclude Include="buildings_window.h" />
+    <ClInclude Include="buynow_window.h" />
+    <ClInclude Include="camera_anim_window.h" />
+    <ClInclude Include="camera_mount_window.h" />
+    <ClInclude Include="cave.h" />
+    <ClInclude Include="centipede.h" />
+    <ClInclude Include="cheat_window.h" />
+    <ClInclude Include="constructionyard.h" />
+    <ClInclude Include="controltower.h" />
+    <ClInclude Include="darwinian.h" />
+    <ClInclude Include="darwinia_window.h" />
+    <ClInclude Include="debugmenu.h" />
+    <ClInclude Include="demoend_window.h" />
+    <ClInclude Include="drop_down_menu.h" />
+    <ClInclude Include="editor_window.h" />
+    <ClInclude Include="egg.h" />
+    <ClInclude Include="engineer.h" />
+    <ClInclude Include="entity.h" />
+    <ClInclude Include="entity_leg.h" />
+    <ClInclude Include="factory.h" />
+    <ClInclude Include="feedingtube.h" />
+    <ClInclude Include="filedialog.h" />
+    <ClInclude Include="flag.h" />
+    <ClInclude Include="generator.h" />
+    <ClInclude Include="generichub.h" />
+    <ClInclude Include="gesture_window.h" />
+    <ClInclude Include="globalworldeditor_window.h" />
+    <ClInclude Include="goddish.h" />
+    <ClInclude Include="grabber_window.h" />
+    <ClInclude Include="gunturret.h" />
+    <ClInclude Include="incubator.h" />
+    <ClInclude Include="input_field.h" />
+    <ClInclude Include="insertion_squad.h" />
+    <ClInclude Include="instant_unit_window.h" />
+    <ClInclude Include="lander.h" />
+    <ClInclude Include="landscape_window.h" />
+    <ClInclude Include="laserfence.h" />
+    <ClInclude Include="lasertrooper.h" />
+    <ClInclude Include="library.h" />
+    <ClInclude Include="lights_window.h" />
+    <ClInclude Include="mainmenus.h" />
+    <ClInclude Include="message_dialog.h" />
+    <ClInclude Include="mine.h" />
+    <ClInclude Include="mods_window.h" />
+    <ClInclude Include="network_window.h" />
+    <ClInclude Include="officer.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="pokey_window.h" />
+    <ClInclude Include="powerstation.h" />
+    <ClInclude Include="prefs_graphics_window.h" />
+    <ClInclude Include="prefs_keybindings_window.h" />
+    <ClInclude Include="prefs_other_window.h" />
+    <ClInclude Include="prefs_screen_window.h" />
+    <ClInclude Include="prefs_sound_window.h" />
+    <ClInclude Include="profilewindow.h" />
+    <ClInclude Include="radardish.h" />
+    <ClInclude Include="reallyquit_window.h" />
+    <ClInclude Include="researchitem.h" />
+    <ClInclude Include="rocket.h" />
+    <ClInclude Include="safearea.h" />
+    <ClInclude Include="save_on_quit_window.h" />
+    <ClInclude Include="scripttrigger.h" />
+    <ClInclude Include="scrollbar.h" />
+    <ClInclude Include="snow.h" />
+    <ClInclude Include="souldestroyer.h" />
+    <ClInclude Include="soundeditor_window.h" />
+    <ClInclude Include="soundparameter_window.h" />
+    <ClInclude Include="soundstats_window.h" />
+    <ClInclude Include="sound_profile_window.h" />
+    <ClInclude Include="spam.h" />
+    <ClInclude Include="spawnpoint.h" />
+    <ClInclude Include="spider.h" />
+    <ClInclude Include="spirit.h" />
+    <ClInclude Include="spiritreceiver.h" />
+    <ClInclude Include="spiritstore.h" />
+    <ClInclude Include="sporegenerator.h" />
+    <ClInclude Include="staticshape.h" />
+    <ClInclude Include="switch.h" />
+    <ClInclude Include="teleport.h" />
+    <ClInclude Include="tree.h" />
+    <ClInclude Include="tree_window.h" />
+    <ClInclude Include="triffid.h" />
+    <ClInclude Include="tripod.h" />
+    <ClInclude Include="trunkport.h" />
+    <ClInclude Include="updateavailable_window.h" />
+    <ClInclude Include="upgrade_port.h" />
+    <ClInclude Include="userprofile_window.h" />
+    <ClInclude Include="virii.h" />
+    <ClInclude Include="wall.h" />
+    <ClInclude Include="weapons.h" />
+    <ClInclude Include="worldobject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ai.cpp" />
+    <ClCompile Include="airstrike.cpp" />
+    <ClCompile Include="anthill.cpp" />
+    <ClCompile Include="armour.cpp" />
+    <ClCompile Include="armyant.cpp" />
+    <ClCompile Include="blueprintstore.cpp" />
+    <ClCompile Include="bridge.cpp" />
+    <ClCompile Include="building.cpp" />
+    <ClCompile Include="buildings_window.cpp" />
+    <ClCompile Include="buynow_window.cpp" />
+    <ClCompile Include="camera_anim_window.cpp" />
+    <ClCompile Include="camera_mount_window.cpp" />
+    <ClCompile Include="cave.cpp" />
+    <ClCompile Include="centipede.cpp" />
+    <ClCompile Include="cheat_window.cpp" />
+    <ClCompile Include="constructionyard.cpp" />
+    <ClCompile Include="controltower.cpp" />
+    <ClCompile Include="darwinian.cpp" />
+    <ClCompile Include="darwinia_window.cpp" />
+    <ClCompile Include="debugmenu.cpp" />
+    <ClCompile Include="demoend_window.cpp" />
+    <ClCompile Include="drop_down_menu.cpp" />
+    <ClCompile Include="editor_window.cpp" />
+    <ClCompile Include="egg.cpp" />
+    <ClCompile Include="engineer.cpp" />
+    <ClCompile Include="entity.cpp" />
+    <ClCompile Include="entity_leg.cpp" />
+    <ClCompile Include="factory.cpp" />
+    <ClCompile Include="feedingtube.cpp" />
+    <ClCompile Include="filedialog.cpp" />
+    <ClCompile Include="flag.cpp" />
+    <ClCompile Include="generator.cpp" />
+    <ClCompile Include="generichub.cpp" />
+    <ClCompile Include="gesture_window.cpp" />
+    <ClCompile Include="globalworldeditor_window.cpp" />
+    <ClCompile Include="goddish.cpp" />
+    <ClCompile Include="grabber_window.cpp" />
+    <ClCompile Include="gunturret.cpp" />
+    <ClCompile Include="incubator.cpp" />
+    <ClCompile Include="input_field.cpp" />
+    <ClCompile Include="insertion_squad.cpp" />
+    <ClCompile Include="instant_unit_window.cpp" />
+    <ClCompile Include="lander.cpp" />
+    <ClCompile Include="landscape_window.cpp" />
+    <ClCompile Include="laserfence.cpp" />
+    <ClCompile Include="lasertrooper.cpp" />
+    <ClCompile Include="library.cpp" />
+    <ClCompile Include="lights_window.cpp" />
+    <ClCompile Include="mainmenus.cpp" />
+    <ClCompile Include="message_dialog.cpp" />
+    <ClCompile Include="mine.cpp" />
+    <ClCompile Include="mods_window.cpp" />
+    <ClCompile Include="network_window.cpp" />
+    <ClCompile Include="officer.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="powerstation.cpp" />
+    <ClCompile Include="prefs_graphics_window.cpp" />
+    <ClCompile Include="prefs_keybindings_window.cpp" />
+    <ClCompile Include="prefs_other_window.cpp" />
+    <ClCompile Include="prefs_screen_window.cpp" />
+    <ClCompile Include="prefs_sound_window.cpp" />
+    <ClCompile Include="profilewindow.cpp" />
+    <ClCompile Include="radardish.cpp" />
+    <ClCompile Include="reallyquit_window.cpp" />
+    <ClCompile Include="researchitem.cpp" />
+    <ClCompile Include="rocket.cpp" />
+    <ClCompile Include="safearea.cpp" />
+    <ClCompile Include="save_on_quit_window.cpp" />
+    <ClCompile Include="scripttrigger.cpp" />
+    <ClCompile Include="scrollbar.cpp" />
+    <ClCompile Include="snow.cpp" />
+    <ClCompile Include="souldestroyer.cpp" />
+    <ClCompile Include="soundeditor_window.cpp" />
+    <ClCompile Include="soundparameter_window.cpp" />
+    <ClCompile Include="soundstats_window.cpp" />
+    <ClCompile Include="sound_profile_window.cpp" />
+    <ClCompile Include="spam.cpp" />
+    <ClCompile Include="spawnpoint.cpp" />
+    <ClCompile Include="spider.cpp" />
+    <ClCompile Include="spirit.cpp" />
+    <ClCompile Include="spiritreceiver.cpp" />
+    <ClCompile Include="spiritstore.cpp" />
+    <ClCompile Include="sporegenerator.cpp" />
+    <ClCompile Include="staticshape.cpp" />
+    <ClCompile Include="switch.cpp" />
+    <ClCompile Include="teleport.cpp" />
+    <ClCompile Include="tree.cpp" />
+    <ClCompile Include="tree_window.cpp" />
+    <ClCompile Include="triffid.cpp" />
+    <ClCompile Include="tripod.cpp" />
+    <ClCompile Include="trunkport.cpp" />
+    <ClCompile Include="updateavailable_window.cpp" />
+    <ClCompile Include="upgrade_port.cpp" />
+    <ClCompile Include="userprofile_window.cpp" />
+    <ClCompile Include="virii.cpp" />
+    <ClCompile Include="wall.cpp" />
+    <ClCompile Include="weapons.cpp" />
+    <ClCompile Include="worldobject.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NeuronClient\NeuronClient.vcxproj">
+      <Project>{734da3fb-1b67-4a07-ba69-328c9babdd61}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\NeuronCore\NeuronCore.vcxproj">
+      <Project>{ca4e142b-aa7e-4696-84aa-5398e9a4b5bf}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,34 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Image Include="Assets\Wide310x150Logo.scale-200.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\StoreLogo.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\Square150x150Logo.scale-200.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\Square44x44Logo.scale-200.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\SplashScreen.scale-200.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Assets\LockScreenLogo.scale-200.png">
-      <Filter>Assets</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{bfde9463-4a90-49d6-b4c6-5525f2d3fc91}</UniqueIdentifier>
     </Filter>
     <Filter Include="Project Files">
       <UniqueIdentifier>{5b52ae76-c485-4cc0-b23e-74365875bb13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Icons">
+      <UniqueIdentifier>{b0ef9a28-7d9e-4221-83c0-6be1d5016dbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Input">
+      <UniqueIdentifier>{806e8b77-4ee9-4e70-978b-ed87029ca961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Input\Keyboards">
+      <UniqueIdentifier>{7dd729e4-a00d-4cca-991f-9f1952ed8af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Language">
+      <UniqueIdentifier>{87453330-7b29-46b2-9a6e-b9ab4373ea27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Levels">
+      <UniqueIdentifier>{6e57c756-8821-46ee-b91c-65226be06e30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Logos">
+      <UniqueIdentifier>{e63ace06-6099-4f4d-872a-0754b0c0f668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Scripts">
+      <UniqueIdentifier>{3d82f99d-acbb-4d79-8d76-b8f564ad367e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shaders">
+      <UniqueIdentifier>{dcb707be-0f91-4327-a867-6c4014cfff7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shapes">
+      <UniqueIdentifier>{8324dd6a-2e19-44cd-a3c5-402099c86abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Sounds">
+      <UniqueIdentifier>{b63d7401-e28f-4a15-a336-9f6a5835a8f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Sprites">
+      <UniqueIdentifier>{3216133b-a784-46ee-ab29-afacd6e36fd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Terrain">
+      <UniqueIdentifier>{f9dfef17-fe71-4730-8089-55f2e333074e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Textures">
+      <UniqueIdentifier>{3d0dd214-95fc-4e2a-be3e-b0485da3701f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +61,348 @@
     <None Include="packages.config">
       <Filter>Project Files</Filter>
     </None>
+    <None Include="Assets\Shapes\aitarget.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\anthill.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\ark.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\armour.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\armyant.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\armyant2.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\armyant3.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\battlecannonbarrel.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\battlecannonbase.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\battlecannonfull.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\battlecannonturret.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\blueprintconsole.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\blueprintrelay.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\blueprintstore.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\boxkite.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\bridgeend.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\bridgetower.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\camera.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\cave.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\centipede.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\centipedehead.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\constructionyard.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\constructionyardrung.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\controlpad.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\controltower.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\controltowerdish.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\darwinian.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\displayscreen.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\engineer.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\factory.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\feedingtube.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fenceswitch.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fieldgun.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fieldgun_shell.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\flying_egg.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fuelgenerator.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fuelgeneratorpump.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fuelpipe.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fuelpipebase.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\fuelstation.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\garbagecollector.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\generator.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\globalworld_inner.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\globalworld_middle.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\globalworld_outer.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\goddish.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\goldenscroll.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\gunturret.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\help.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\incubator.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\lander.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\laser_troop.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\laserfence.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\library.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\masterspawnpoint.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\mine.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\minecart.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\minepolygon1.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\mineprimitive1.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\missile.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\officer.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\plant.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\powerstation.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\primaryupgradeport.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\pylon.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\radardish.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\receiverlink.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\refinery.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\researchitem.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\rocket.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\rockhead.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\solarpanel.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\souldestroyerhead.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\souldestroyertail.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spaceinvader.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spam.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spawnlink.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spawnpoint.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spider.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spider_leg_lower.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spider_leg_part.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spider_leg_upper.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spiritprocessor.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spiritreceiver.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\spiritreceiverhead.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\sporegenerator.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\squad.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\tank_body.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\tank_turret.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\temple1.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\temple2.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\temple3.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\temple4.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\throwable.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\tracklink.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\triffidegg.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\triffidhead.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\tripod.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\tripod_leg_part.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\trunkport.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\turretbarrel.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\turretbase.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\turretshell.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\upgrade_port.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\wall.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shapes\wheel.shp">
+      <Filter>Assets\Shapes</Filter>
+    </None>
+    <None Include="Assets\Shaders\deform.vs">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\deformDiamond.ps">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\deformFullscreen.ps">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\deformSphere.ps">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\water-meshwaves.ps">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\water-meshwaves.ps3">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\water-meshwaves.vs">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\globals.h">
+      <Filter>Assets\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
@@ -56,8 +414,3618 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="3d_sierpinski_gasket.cpp" />
+    <ClCompile Include="app.cpp" />
+    <ClCompile Include="attract.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="clouds.cpp" />
+    <ClCompile Include="deform.cpp" />
+    <ClCompile Include="effect_processor.cpp" />
+    <ClCompile Include="entity_grid.cpp" />
+    <ClCompile Include="explosion.cpp" />
+    <ClCompile Include="game_menu.cpp" />
+    <ClCompile Include="gamecursor.cpp" />
+    <ClCompile Include="global_internet.cpp" />
+    <ClCompile Include="global_world.cpp" />
+    <ClCompile Include="landscape.cpp" />
+    <ClCompile Include="landscape_renderer.cpp" />
+    <ClCompile Include="level_file.cpp" />
+    <ClCompile Include="location.cpp" />
+    <ClCompile Include="location_input.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="obstruction_grid.cpp" />
+    <ClCompile Include="particle_system.cpp" />
+    <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="routing_system.cpp" />
+    <ClCompile Include="script.cpp" />
+    <ClCompile Include="sepulveda_strings.cpp" />
+    <ClCompile Include="startsequence.cpp" />
+    <ClCompile Include="taskmanager.cpp" />
+    <ClCompile Include="taskmanager_interface.cpp" />
+    <ClCompile Include="taskmanager_interface_gestures.cpp" />
+    <ClCompile Include="taskmanager_interface_icons.cpp" />
+    <ClCompile Include="team.cpp" />
+    <ClCompile Include="unit.cpp" />
+    <ClCompile Include="user_input.cpp" />
+    <ClCompile Include="water.cpp" />
+    <ClCompile Include="water_reflection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="3d_sierpinski_gasket.h" />
+    <ClInclude Include="app.h" />
+    <ClInclude Include="attract.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="clouds.h" />
+    <ClInclude Include="deform.h" />
+    <ClInclude Include="effect_processor.h" />
+    <ClInclude Include="entity_grid.h" />
+    <ClInclude Include="explosion.h" />
+    <ClInclude Include="game_menu.h" />
+    <ClInclude Include="gamecursor.h" />
+    <ClInclude Include="global_internet.h" />
+    <ClInclude Include="global_world.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="landscape.h" />
+    <ClInclude Include="landscape_renderer.h" />
+    <ClInclude Include="level_file.h" />
+    <ClInclude Include="location.h" />
+    <ClInclude Include="location_input.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="obstruction_grid.h" />
+    <ClInclude Include="particle_system.h" />
+    <ClInclude Include="renderer.h" />
+    <ClInclude Include="routing_system.h" />
+    <ClInclude Include="script.h" />
+    <ClInclude Include="startsequence.h" />
+    <ClInclude Include="taskmanager.h" />
+    <ClInclude Include="taskmanager_interface.h" />
+    <ClInclude Include="taskmanager_interface_gestures.h" />
+    <ClInclude Include="taskmanager_interface_icons.h" />
+    <ClInclude Include="team.h" />
+    <ClInclude Include="unit.h" />
+    <ClInclude Include="user_input.h" />
+    <ClInclude Include="water.h" />
+    <ClInclude Include="water_reflection.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Assets\default_preferences.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\effects.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\egames.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\game.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\game_unlockall.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\locations.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\sounds.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\stats.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\Input\Keyboards\de_DE.txt">
+      <Filter>Assets\Input\Keyboards</Filter>
+    </Text>
+    <Text Include="Assets\Input\Keyboards\fr_FR.txt">
+      <Filter>Assets\Input\Keyboards</Filter>
+    </Text>
+    <Text Include="Assets\Input\input_preferences.txt">
+      <Filter>Assets\Input</Filter>
+    </Text>
+    <Text Include="Assets\Input\locales.txt">
+      <Filter>Assets\Input</Filter>
+    </Text>
+    <Text Include="Assets\Language\english.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Language\french.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Language\german.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Language\italian.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Language\russian.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Language\spanish.txt">
+      <Filter>Assets\Language</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_biosphere.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_containment.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_escort.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_garden.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_generator.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_launchpad.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_mine.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_pattern_buffer.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_receiver.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_sandbox.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_temple.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\map_yard.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_biosphere_attract.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_biosphere_recapture.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_containment_enable.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_escort_escort.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_garden_liberate.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_generator_enable.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_launchpad.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_mine_attract.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_mine_demo.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_mine_enable.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_pattern_buffer_attract.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_pattern_buffer_recapture.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_receiver_recapture.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_sandbox_tutorial.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_temple_cutscene.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_temple_recapture.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Levels\mission_yard_enable.txt">
+      <Filter>Assets\Levels</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\attractmode.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\biosphere_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\biospherealpha_primary.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\containment_end.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\containment_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\containment_officer.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\containment_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\endattract.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\gameover.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\gamestart.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\garden_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\garden_opentrunkport.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\generator_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_finalisland.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_primary_rocket.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_primary2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_primary3.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_purpose.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\launchpad_victory.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\mine_demo_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\mine_minehelp.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\mine_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\mine_primary2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\music1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\music2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\music3.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\music4.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\music5.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\patternbuffer_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\patternbuffer_primary2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\receiver_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\receiver_primary2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\temple_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\temple_primary.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_armour.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_end.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_intro.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_primary1.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_primary2.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+    <Text Include="Assets\Scripts\yard_primary3.txt">
+      <Filter>Assets\Scripts</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Icons\background.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_absorb.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_deploy.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_follow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_goto.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_none.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\banner_unload.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_a.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_abxy_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_b.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_control_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_dpad.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_dpad_lr.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_la.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_lb.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_lb_rb.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_lb_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_lt.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_lt_ra.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_ra.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_rb.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_rb_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_rt.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_rt_ra.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_trigger_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_x.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\button_y.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\compass.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\darwin_research_associates.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_airstrike.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_alpha.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_armour.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_controller.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_engineer.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_grenade.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_officer.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_rocket.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gesture_squad.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\gestureguide.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_airstrike.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_armour.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_controller.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_darwinian.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_delete.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_engineer.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_grenade.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_laser.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_notask.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_officer.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_rocket.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_shadow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_squad.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_taskmanager.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\icon_template.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_3dposition.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_disabled.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_highlight.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_main.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_missiletarget.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_movehere.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_placement.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_selection.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\mouse_turrettarget.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\scrollbar.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Icons\selectionarrow.bmp">
+      <Filter>Assets\Icons</Filter>
+    </Image>
+    <Image Include="Assets\Logos\LockScreenLogo.scale-200.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\SplashScreen.scale-200.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\Square44x44Logo.scale-200.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\Square150x150Logo.scale-200.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\StoreLogo.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Logos\Wide310x150Logo.scale-200.png">
+      <Filter>Assets\Logos</Filter>
+    </Image>
+    <Image Include="Assets\Textures\campaign.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\clouds.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\cloudyglow.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\deform1c.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\deform36c.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\dmacrew.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font_french.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font_german.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font_italian.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font_normal.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\editor_font_russian.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\fuel.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\glow.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\godray.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\interface_divider.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\interface_grey.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\interface_red.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\ivlogo.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\laser.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\laserfence.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\laserfence2.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\msn_oberon_combosplash.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\muzzleflash.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\particle.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\program_darwinia.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\prologue.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\radarsignal.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\shapewireframe.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\skywireframe.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\speccy_font_french.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\speccy_font_italian.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\speccy_font_normal.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\speccy_font_russian.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\speccy_screen.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\starburst.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Textures\triangleoutline.bmp">
+      <Filter>Assets\Textures</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_containment.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_default.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_desert.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_earth.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_icecaps.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_launchpad.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_mine.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\landscape_mine2.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\water_default.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\water_icecaps.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\water_launchpad.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_containmentfield.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_default.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_desert.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_earth.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_generator.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_icecaps.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Terrain\waves_launchpad.bmp">
+      <Filter>Assets\Terrain</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\darwinian.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\egg.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\ghost.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\lasertrooper.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\santahat.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\sound.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+    <Image Include="Assets\Sprites\virii.bmp">
+      <Filter>Assets\Sprites</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\Sounds\ablaster.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_alarm.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_boom1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_boom2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_boom3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_boom4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_boom5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_drop.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\airstrike_hover2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\alien_lands1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\alien_lands3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\altitude1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_attack6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ant_lose_health7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\anthill_damage10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ants_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\aquire_research7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\armour_to_turret6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\battle_cannon_damage10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\bigmetal1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\bigmetal2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\bigmetal3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\bigmetal4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\bigmetal5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\blueprint_sateilte.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\blueprint_sateilte2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\blueprint_sateilte3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\blueprint_sateilte4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_attack8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_losehealth.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_losehealth2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_losehealth3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_losehealth4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\centipede_losehealth5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\choir6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\chug6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_burn_death7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_create18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_death9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_jump9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_losehealth18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwin_on_fire13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\darwinian_threat_run10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\deselect1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\dma_sc-visitors_from_dreams.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\eggsplat7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\elec_cackle6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineburn.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_die.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_die2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_die3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_die4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_die5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_hover.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_losehealth9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_repog_radar_loop_end.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineer_reprog_radar_loop.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engineexplode.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\engneignite1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\enter_teleport6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\evil.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\exit_teleport6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_damage16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fence_hum.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\flag_wave12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fodder.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuel_load_passenger.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuel_load_passenger2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuel_load_passenger3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuel_load_passenger4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuel_load_passenger5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpipe1_loop.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpipe2_loop.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpipe3_loop.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpump1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpumpdown1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpumpexhale1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\fuelpumpup1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_burst.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_burst2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_burst3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_burst4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_burst5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\generator_online.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gesturefail.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gesturestart.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gesturesuccess.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dish_disconnect.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dish_disconnect2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dish_disconnect3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dishconnect.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dishconnect2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\god_dishconnect3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\goddish_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\goddish_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\goddish_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\goddish_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\goddish_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_boom1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_boom2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_boom3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_boom4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_boom5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_bounce6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_fire1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_fire2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_fire3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_fire4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gren_fire5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\grenade_beep.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\grenade_return3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\gun_turret_fire6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\hypno_loop_run.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ident1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ignitionzap1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_addspirit6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\incubator_birth6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\kickverb1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\kickverb2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\kickverb3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hit_building10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitent8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser_hitgnd9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser22.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser23.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\laser24.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\matrix.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\menuscroll1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\menuscroll2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak22.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak23.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak24.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak25.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak26.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak27.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak28.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak29.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak30.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak31.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak32.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak33.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak34.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak35.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak36.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak37.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak38.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak39.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak40.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak41.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cart_creak42.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mine_cog7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\mouse6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\ocean1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_create11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order_goto.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order_goto2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order_goto3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order_goto4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\officer_order17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pang.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\power_station_online.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\pylon_surge22.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_lose_connection.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_lose_connection2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_lose_connection3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_lose_connection4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_motor_run.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_reprog_complete.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_start_turn.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_stop_turn.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_transmission.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_transmission2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_transmission3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\radar_transmission4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_losehealth.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_losehealth2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_losehealth3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_losehealth4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\redvirus_losehealth7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\refinery_cog8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\research_create10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocket_boom1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocket_boom2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocket_boom3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocket_boom4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocket_fire4_run.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rocketlauncher.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\rumble1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\sepulveda_appear.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\sepulveda_disappear.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shipheartbeat1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shiphungry7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shipmalfunction1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shippurr1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shippurr2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shippurr3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shippurr4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shippurr5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shipscream1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\shipscream2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\silence7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solar_panel.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solar_panel2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solar_panel3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solar_panel4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solar_panel5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\solarcharge.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\sonar.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_attack7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_dest_create11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soul_enemy_sighted9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\souldeath10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\soulpain10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_attack7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_damage7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spam_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\speccyloader.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create1e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create2e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create4e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create5e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create6e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create7e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create8e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_create9e.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_death7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_egg_lay10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_foot13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spider_pounce6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent22.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent23.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent24.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spirit_descent25.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_groan2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_groan3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_groan4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\spore_gen_pain6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_death.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_lose_health1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_lose_health3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_lose_health4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squad_lose_health6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squaddie_chatter21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\squadlasers8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_create6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_damage10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_death10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tank_hover.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\taskin.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\taskout.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trash80_-_pain-fade-down.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_atmos8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_fire14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tree_on_fire.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tresk_-_excuses.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tresk_-_faces-of-a-fashion.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tresk_-_impact-of-silence.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tresk_-weeklies-_schroeders-failure.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_burn.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_burn2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_burn3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_bounce.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_bounce2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_bounce3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_bounce4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_bounce5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_burst10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_launch.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_launch2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_launch3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_launch4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\triffid_egg_launch5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_attack1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_death1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_death2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_death3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_death4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\tripod_lose_health7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trunk_create.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trunk_create2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trunk_create3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trunk_create4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\trunk_create5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\twoataris.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_attack8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd9.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd10.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd11.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd12.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd13.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd14.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd15.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd16.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd17.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd18.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd19.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd20.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd21.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd22.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd23.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd24.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd25.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd26.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd27.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd28.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd29.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_cd30.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_lose_health.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_lose_health2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\virus_lose_health3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\white_noise.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\world8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry1.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry2.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry3.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry4.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry5.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry6.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry7.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\worlddry8.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
+    <Media Include="Assets\Sounds\yard.wav">
+      <Filter>Assets\Sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>
