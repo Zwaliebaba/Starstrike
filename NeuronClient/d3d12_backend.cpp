@@ -354,7 +354,11 @@ void D3D12Backend::CreateRootSignature()
                 "Failed to create root signature");
 }
 
-void D3D12Backend::CreateUploadBuffer() { m_uploadBuffer.Init(m_device.Get(), UPLOAD_BUFFER_SIZE); }
+void D3D12Backend::CreateUploadBuffer()
+{
+  for (UINT i = 0; i < FRAME_COUNT; i++)
+    m_uploadBuffers[i].Init(m_device.Get(), UPLOAD_BUFFER_SIZE);
+}
 
 void D3D12Backend::CreateConstantBuffer()
 {
@@ -405,7 +409,7 @@ void D3D12Backend::CreateDefaultTexture()
   D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
   m_device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, nullptr, nullptr, &uploadSize);
 
-  auto alloc = m_uploadBuffer.Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
+  auto alloc = m_uploadBuffers[m_frameIndex].Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
   auto dest = static_cast<UINT8*>(alloc.cpuPtr);
   // RGBA white
   dest[0] = 255;
@@ -414,7 +418,7 @@ void D3D12Backend::CreateDefaultTexture()
   dest[3] = 255;
 
   D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
-  srcLoc.pResource = m_uploadBuffer.GetResource();
+  srcLoc.pResource = m_uploadBuffers[m_frameIndex].GetResource();
   srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
   srcLoc.PlacedFootprint = footprint;
   srcLoc.PlacedFootprint.Offset = alloc.offset;
@@ -624,9 +628,6 @@ void D3D12Backend::BeginFrame()
 
   // Set root signature
   m_commandList->SetGraphicsRootSignature(m_rootSignature.Get());
-
-  // Reset upload buffer for the frame
-  m_uploadBuffer.Reset();
 }
 
 void D3D12Backend::EndFrame()
@@ -672,9 +673,10 @@ void D3D12Backend::MoveToNextFrame()
 
   m_fenceValues[m_frameIndex] = currentFenceValue + 1;
 
-  // Reset allocator and command list for the new frame
+  // Reset allocator, command list and upload buffer for the new frame
   ThrowIfFailed(m_commandAllocators[m_frameIndex]->Reset(), "Failed to reset command allocator");
   ThrowIfFailed(m_commandList->Reset(m_commandAllocators[m_frameIndex].Get(), nullptr), "Failed to reset command list");
+  m_uploadBuffers[m_frameIndex].Reset();
 }
 
 void D3D12Backend::WaitForGpu()

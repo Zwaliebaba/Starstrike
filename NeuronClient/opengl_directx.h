@@ -32,6 +32,7 @@
 #define GL_TEXTURE_2D					  0x0DE1
 
 // Alpha function
+#define GL_LESS                           0x0201
 #define GL_LEQUAL                         0x0203
 #define GL_GREATER                        0x0204
 

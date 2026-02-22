@@ -97,6 +97,7 @@ const char *glEnumToString(GLenum id)
 		case GL_SMOOTH: return "GL_SMOOTH"; break;
 		case GL_TEXTURE_2D: return "GL_TEXTURE_2D"; break;
 		case GL_LEQUAL: return "GL_LEQUAL"; break;
+		case GL_LESS: return "GL_LESS"; break;
 		case GL_GREATER: return "GL_GREATER"; break;
 		case GL_MULT: return "GL_MULT"; break;
 		case GL_TEXTURE_MAG_FILTER: return "GL_TEXTURE_MAG_FILTER"; break;

@@ -228,9 +228,10 @@ static D3D12_COMPARISON_FUNC glFuncToD3D12(GLenum func)
 {
     switch (func)
     {
+    case GL_LESS:    return D3D12_COMPARISON_FUNC_LESS;
     case GL_LEQUAL:  return D3D12_COMPARISON_FUNC_LESS_EQUAL;
     case GL_GREATER: return D3D12_COMPARISON_FUNC_GREATER;
-    default:         return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    default:         return D3D12_COMPARISON_FUNC_LESS;
     }
 }
 

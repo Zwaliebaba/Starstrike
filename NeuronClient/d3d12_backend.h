@@ -145,7 +145,7 @@ namespace OpenGLD3D {
         ID3D12Device* GetDevice() const { return m_device.Get(); }
         ID3D12GraphicsCommandList* GetCommandList() const { return m_commandList.Get(); }
         ID3D12RootSignature* GetRootSignature() const { return m_rootSignature.Get(); }
-        UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffer; }
+        UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[m_frameIndex]; }
 
         // PSO management
         ID3D12PipelineState* GetOrCreatePSO(const PSOKey& key);
@@ -232,8 +232,8 @@ namespace OpenGLD3D {
         // PSO cache
         std::unordered_map<PSOKey, ComPtr<ID3D12PipelineState>, PSOKeyHash> m_psoCache;
 
-        // Upload ring buffer
-        UploadRingBuffer m_uploadBuffer;
+        // Upload ring buffers (one per frame to avoid GPU data races)
+        UploadRingBuffer m_uploadBuffers[FRAME_COUNT];
 
         // Per-frame constant buffer
         ComPtr<ID3D12Resource> m_constantBuffer;

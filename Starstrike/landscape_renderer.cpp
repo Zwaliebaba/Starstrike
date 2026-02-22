@@ -10,7 +10,7 @@
 #include "LegacyVector3.h"
 #include "app.h"
 #include "landscape_renderer.h"
-#include "location.h"	// For SetupFog
+#include "location.h"	
 #include "level_file.h"
 
 //*****************************************************************************
@@ -33,6 +33,14 @@ void LandscapeRenderer::BuildVertArrayAndTriStrip(SurfaceMap2D<float>* _heightMa
   for (int z = 0; z < cols; ++z)
   {
     float fz = static_cast<float>(z) * _heightMap->m_cellSizeY;
+
+    // Break the strip between rows to avoid ghost triangles
+    if (degen == 2)
+    {
+      m_verts.PutData(vertex2);
+      m_verts.PutData(vertex2);
+      degen = 1;
+    }
 
     for (int x = 0; x < rows; ++x)
     {
@@ -293,6 +301,9 @@ void LandscapeRenderer::RenderMainSlow()
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
 
+  if (g_app->m_negativeRenderer)
+    glDisable(GL_BLEND);
+
   glDisable(GL_COLOR_MATERIAL);
   glDisable(GL_LIGHTING);
   glDisable(GL_LIGHT0);
@@ -305,6 +316,7 @@ void LandscapeRenderer::RenderOverlaySlow()
   glEnable(GL_BLEND);
   glEnable(GL_TEXTURE_2D);
   glDepthMask(false);
+  glDepthFunc(GL_LEQUAL);
 
   if (!g_app->m_negativeRenderer)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -360,6 +372,7 @@ void LandscapeRenderer::RenderOverlaySlow()
   glDisable(GL_LIGHT0);
   glDisable(GL_LIGHT1);
   glDepthMask(true);
+  glDepthFunc(GL_LEQUAL);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

@@ -457,7 +457,6 @@
     <ClCompile Include="attract.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="clouds.cpp" />
-    <ClCompile Include="effect_processor.cpp" />
     <ClCompile Include="entity_grid.cpp" />
     <ClCompile Include="explosion.cpp" />
     <ClCompile Include="gamecursor.cpp" />
@@ -494,7 +493,6 @@
     <ClInclude Include="attract.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="clouds.h" />
-    <ClInclude Include="effect_processor.h" />
     <ClInclude Include="entity_grid.h" />
     <ClInclude Include="explosion.h" />
     <ClInclude Include="gamecursor.h" />
