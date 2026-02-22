@@ -132,24 +132,24 @@ void TrunkPort::Render( float predictionTime )
     Matrix34 portMat( m_front, g_upVector, m_pos );
 
     Matrix34 destMat = m_destination1->GetWorldMatrix(portMat);
-    g_imRenderer->Color4f( 0.9f, 0.8f, 0.8f, 1.0f );
+    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 1.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += ( destMat.f ^ destMat.u ) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
-    g_imRenderer->Color4f( 0.9f, 0.8f, 0.8f, 0.0f );
+    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 0.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
 
     g_gameFont.SetRenderShadow(false);
-    g_imRenderer->Color4f( 0.9f, 0.8f, 0.8f, 1.0f );
+    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 1.0f );
     destMat = m_destination2->GetWorldMatrix(portMat);
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += ( destMat.f ^ destMat.u ) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
-    g_imRenderer->Color4f( 0.9f, 0.8f, 0.8f, 0.0f );
+    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 0.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
 
     g_gameFont.SetRenderShadow(false);

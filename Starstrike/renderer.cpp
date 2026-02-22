@@ -195,10 +195,11 @@ void Renderer::RenderLogo()
   g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
-  g_imRenderer->Color4f(1.0f, 0.75f, 0.75f, 1.0f);
+  g_gameFont.SetColour(1.0f, 0.75f, 0.75f, 1.0f);
   g_gameFont.DrawText2D(20, m_screenH - 70, 25, LANGUAGEPHRASE("privatedemo1"));
   g_gameFont.DrawText2D(20, m_screenH - 40, 25, LANGUAGEPHRASE("privatedemo2"));
   g_gameFont.DrawText2D(20, m_screenH - 10, 10, LANGUAGEPHRASE("privatedemo2"));
+  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void Renderer::Render()
@@ -293,11 +294,11 @@ void Renderer::RenderPaused()
 
   // Black Background
   g_gameFont.SetRenderShadow(true);
-  g_imRenderer->Color4f(0.3f, 0.3f, 0.3f, 0.0f);
+  g_gameFont.SetColour(0.3f, 0.3f, 0.3f, 0.0f);
   font.DrawText2DCentre(x, y, 80, msg);
 
   // White Foreground
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
   font.SetRenderShadow(false);
   font.DrawText2DCentre(x, y, 80, msg);
 
@@ -408,8 +409,9 @@ void Renderer::RenderFrame(bool withFlip)
       g_imRenderer->Vertex2f(m_screenW / 2 - 200, 80);
       g_imRenderer->End();
 
-      g_imRenderer->Color4f(1.0f, 0.0f, 0.0f, 1.0f);
+      g_editorFont.SetColour(1.0f, 0.0f, 0.0f, 1.0f);
       g_editorFont.DrawText2DCentre(m_screenW / 2, 100, 20, "Client LAG %dms behind Server ", latency * 100);
+      g_editorFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
     }
   }
 
@@ -496,10 +498,10 @@ void Renderer::RenderFrame(bool withFlip)
 
     float textSize = m_screenH / 9.0f;
     g_gameFont.SetRenderOutline(true);
-    g_imRenderer->Color4f(alpha, alpha, alpha, 0.0f);
+    g_gameFont.SetColour(alpha, alpha, alpha, 0.0f);
     g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
     g_gameFont.SetRenderOutline(false);
-    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
+    g_gameFont.SetColour(1.0f, 1.0f, 1.0f, alpha);
     g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
   }
 

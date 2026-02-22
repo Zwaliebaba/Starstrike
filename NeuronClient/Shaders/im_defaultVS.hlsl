@@ -3,22 +3,18 @@ cbuffer CBPerDraw : register(b0)
 {
   float4x4 gWorldViewProj;
   float4x4 gWorld;
-
-  // Lighting (2 directional lights)
-  float4 gLightDir[2];     // xyz = normalised direction, w = unused
-  float4 gLightColor[2];   // rgb = diffuse color, a = unused
-  float4 gAmbientColor;    // rgb = ambient, a = unused
-  int    gLightingEnabled;
-  int    gNumLights;
-
-  // Fog
+  float4 gLightDir[2];
+  float4 gLightColor[2];
+  float4 gAmbientColor;
+  float4 gFogColor;
+  float4 gCameraPos;
   float  gFogStart;
   float  gFogEnd;
-  float4 gFogColor;        // rgb = fog color, a = unused
-  int    gFogEnabled;
-
-  // Alpha clip
   float  gAlphaClipThreshold;
+  int    gNumLights;
+  int    gLightingEnabled;
+  int    gFogEnabled;
+  float2 _pad0;
 };
 
 struct VSInput

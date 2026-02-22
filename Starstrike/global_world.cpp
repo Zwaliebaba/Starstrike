@@ -1,36 +1,36 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "debug_utils.h"
-#include "language_table.h"
-#include "filesys_utils.h"
-#include "file_writer.h"
-#include "input.h"
-#include "targetcursor.h"
-#include "math_utils.h"
-#include "profiler.h"
-#include "resource.h"
-#include "shape.h"
-#include "string_utils.h"
-#include "text_renderer.h"
-#include "text_stream_readers.h"
-#include "LegacyVector3.h"
-#include "eclipse.h"
-#include "app.h"
-#include "camera.h"
-#include "global_internet.h"
 #include "global_world.h"
+#include "LegacyVector3.h"
+#include "app.h"
+#include "building.h"
+#include "camera.h"
+#include "debug_utils.h"
+#include "eclipse.h"
+#include "file_writer.h"
+#include "filesys_utils.h"
+#include "global_internet.h"
+#include "im_renderer.h"
+#include "input.h"
 #include "landscape.h"
+#include "language_table.h"
 #include "level_file.h"
 #include "location.h"
 #include "main.h"
+#include "math_utils.h"
+#include "profiler.h"
+#include "render_device.h"
+#include "render_states.h"
 #include "renderer.h"
+#include "resource.h"
 #include "script.h"
-#include "user_input.h"
+#include "shape.h"
+#include "string_utils.h"
+#include "targetcursor.h"
 #include "taskmanager_interface.h"
-#include "building.h"
+#include "text_renderer.h"
+#include "text_stream_readers.h"
 #include "trunkport.h"
+#include "user_input.h"
 
 // ****************************************************************************
 // Class GlobalLocation
@@ -161,30 +161,6 @@ bool GlobalEventCondition::Evaluate()
   return false;
 }
 
-void GlobalEventCondition::Save(FileWriter* _out)
-{
-  _out->printf("%s ", GetTypeName(m_type));
-
-  switch (m_type)
-  {
-  case AlwaysTrue:
-    break;
-
-  case BuildingOnline:
-  case BuildingOffline:
-    _out->printf(":%s,%d ", g_app->m_globalWorld->GetLocationName(m_locationId), m_id);
-    break;
-
-  case ResearchOwned:
-    _out->printf(":%s ", GlobalResearch::GetTypeName(m_id));
-    break;
-
-  case DebugKey:
-    _out->printf(":%d ", m_id);
-    break;
-  }
-}
-
 // ****************************************************************************
 // Class GlobalEventAction
 // ****************************************************************************
@@ -225,62 +201,8 @@ void GlobalEventAction::Read(TextReader* _in)
   else { DarwiniaDebugAssert(false); }
 }
 
-void GlobalEventAction::Write(FileWriter* _out)
-{
-  _out->printf("\t\tAction %-10s ", GetTypeName(m_type));
-
-  char* locationName = g_app->m_globalWorld->GetLocationName(m_locationId);
-
-  switch (m_type)
-  {
-  case SetMission:
-    _out->printf("%s %s", locationName, m_filename);
-    break;
-  case RunScript:
-    _out->printf("%s", m_filename);
-    break;
-  case MakeAvailable:
-    _out->printf("%s", locationName);
-    break;
-
-  default: DarwiniaDebugAssert(false);
-  }
-
-  _out->printf("\n");
-}
-
 void GlobalEventAction::Execute()
 {
-#ifdef TEST_HARNESS_ENABLED
-  switch (m_type)
-  {
-  case SetMission:
-    {
-      if (g_app->m_testHarness)
-      {
-        fprintf(g_app->m_testHarness->m_out, "%sSetting Mission: %s in location %s\n", g_app->m_testHarness->m_indent, m_filename,
-                g_app->m_globalWorld->GetLocationName(m_locationId));
-      }
-      break;
-    }
-  case RunScript:
-    if (g_app->m_testHarness)
-    {
-      fprintf(g_app->m_testHarness->m_out, "%sRunning script: %s\n", g_app->m_testHarness->m_indent, m_filename);
-    }
-    break;
-  case MakeAvailable:
-    if (g_app->m_testHarness)
-    {
-      fprintf(g_app->m_testHarness->m_out, "%sMaking location available: %s\n", g_app->m_testHarness->m_indent,
-              g_app->m_globalWorld->GetLocationName(m_locationId));
-    }
-    break;
-  default:
-    break;
-  }
-#endif // TEST_HARNESS_ENABLED
-
   switch (m_type)
   {
   case SetMission:
@@ -431,27 +353,6 @@ void GlobalEvent::Read(TextReader* _in)
   }
 }
 
-void GlobalEvent::Write(FileWriter* _out)
-{
-  _out->printf("\tEvent ");
-
-  for (int i = 0; i < m_conditions.Size(); ++i)
-  {
-    GlobalEventCondition* gec = m_conditions[i];
-    gec->Save(_out);
-  }
-
-  _out->printf("\n");
-
-  for (int i = 0; i < m_actions.Size(); ++i)
-  {
-    GlobalEventAction* gea = m_actions[i];
-    gea->Write(_out);
-  }
-
-  _out->printf("\t\tEnd\n");
-}
-
 // ****************************************************************************
 // Class GlobalResearch
 // ****************************************************************************
@@ -584,18 +485,6 @@ int GlobalResearch::CurrentLevel(int _type)
   DarwiniaDebugAssert(_type >= 0 && _type < NumResearchItems);
 
   return m_researchLevel[_type];
-}
-
-void GlobalResearch::Write(FileWriter* _out)
-{
-  _out->printf("Research_StartDefinition\n");
-
-  for (int i = 0; i < NumResearchItems; ++i)
-    _out->printf("\tResearch %s %d %d\n", GetTypeName(i), CurrentProgress(i), CurrentLevel(i));
-
-  _out->printf("\tCurrentResearch %s\n", GetTypeName(m_currentResearch));
-  _out->printf("\tCurrentPoints %d\n", m_researchPoints);
-  _out->printf("Research_EndDefinition\n\n");
 }
 
 void GlobalResearch::Read(TextReader* _in)
@@ -916,29 +805,23 @@ void SphereWorld::RenderWorldShape()
 
   g_app->m_globalWorld->SetupLights();
 
-
-  float spec = 0.5f;
-  float diffuse = 1.0f;
-  float amb = 0.0f;
-  float materialShininess[] = {10.0f};
-  float materialSpecular[] = {spec, spec, spec, 1.0f};
-  float materialDiffuse[] = {diffuse, diffuse, diffuse, 1.0f};
-  float ambCol[] = {amb, amb, amb, 1.0f};
-
-
   g_imRenderer->PushMatrix();
   g_imRenderer->Scalef(120.0f, 120.0f, 120.0f);
 
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 
-  //
-  // Render outer
+  g_app->m_renderer->SetObjectLighting();
 
   m_shapeOuter->Render(0.0f, g_identityMatrix34);
   m_shapeMiddle->Render(0.0f, g_identityMatrix34);
   m_shapeInner->Render(0.0f, g_identityMatrix34);
+
+  g_app->m_renderer->UnsetObjectLighting();
+
+  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
   g_imRenderer->PopMatrix();
 
@@ -1193,7 +1076,7 @@ void SphereWorld::RenderIslands()
       size = 1000.0f;
 
       g_gameFont.SetRenderShadow(true);
-      g_imRenderer->Color4f(0.7f, 0.7f, 0.7f, 0.0f);
+      g_gameFont.SetColour(0.7f, 0.7f, 0.7f, 0.0f);
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
       if (g_app->m_editing)
@@ -1206,9 +1089,9 @@ void SphereWorld::RenderIslands()
       islandPos += camRight * size * 0.1f;
 
       g_gameFont.SetRenderShadow(false);
-      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+      g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
       if (stricmp(loc->m_missionFilename, "null") == 0)
-        g_imRenderer->Color4f(0.5f, 0.5f, 0.5f, 1.0f);
+        g_gameFont.SetColour(0.5f, 0.5f, 0.5f, 1.0f);
 
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
@@ -1830,10 +1713,12 @@ void GlobalWorld::SetupLights()
   LegacyVector3 light0(0, 1, 0);
   light0.Normalise();
 
-  DirectX::XMFLOAT4 dirs[2]   = { { light0.x, light0.y, light0.z, 0.0f }, { 0,0,0,0 } };
-  DirectX::XMFLOAT4 colors[2] = { { colour1[0], colour1[1], colour1[2], colour1[3] }, { 0,0,0,0 } };
+  // Two opposing lights replicate OpenGL two-sided lighting:
+  // max(dot(N,L),0) + max(dot(N,-L),0) == |dot(N,L)| for any N.
+  DirectX::XMFLOAT4 dirs[2]   = { { light0.x, light0.y, light0.z, 0.0f }, { -light0.x, -light0.y, -light0.z, 0.0f } };
+  DirectX::XMFLOAT4 colors[2] = { { colour1[0], colour1[1], colour1[2], colour1[3] }, { colour1[0], colour1[1], colour1[2], colour1[3] } };
   DirectX::XMFLOAT4 ambient   = { 0.0f, 0.0f, 0.0f, 0.0f };
-  g_imRenderer->SetLightParams(1, dirs, colors, ambient);
+  g_imRenderer->SetLightParams(2, dirs, colors, ambient);
 }
 
 void GlobalWorld::SetupFog()

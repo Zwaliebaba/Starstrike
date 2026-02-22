@@ -18,41 +18,42 @@ class LegacyVector3;
 class TextRenderer
 {
 protected:
-	double			m_projectionMatrix[16];
-	double			m_modelviewMatrix[16];
 	char			*m_filename;
 	unsigned int    m_textureID;
 	unsigned int	m_bitmapWidth;
 	unsigned int	m_bitmapHeight;
 	bool            m_renderShadow;
 	bool            m_renderOutline;
+	DirectX::XMFLOAT4 m_colour;
 
-	// D3D11 saved matrices for BeginText2D/EndText2D
+	// Saved ImRenderer matrices for BeginText2D/EndText2D (for callers that
+	// still use g_imRenderer between the bracket)
 	DirectX::XMMATRIX m_savedProjMatrix;
 	DirectX::XMMATRIX m_savedViewMatrix;
 	DirectX::XMMATRIX m_savedWorldMatrix;
 
-    float GetTexCoordX  ( unsigned char theChar );
-    float GetTexCoordY  ( unsigned char theChar );
+	float GetTexCoordX  ( unsigned char theChar );
+	float GetTexCoordY  ( unsigned char theChar );
 
 public:
 	void Initialise(char const *_filename);
 
 	void BuildRenderState();
 
-    void BeginText2D	 ();
-    void EndText2D		 ();
+	void BeginText2D	 ();
+	void EndText2D		 ();
 
-    void SetRenderShadow ( bool _renderShadow );
-    void SetRenderOutline( bool _renderOutline );
+	void SetRenderShadow ( bool _renderShadow );
+	void SetRenderOutline( bool _renderOutline );
+	void SetColour       ( float _r, float _g, float _b, float _a = 1.0f );
 
-    void DrawText2DSimple( float _x, float _y, float _size, char const *_text );
-    void DrawText2D      ( float _x, float _y, float _size, char const *_text, ... );	// Like simple but with variable args
-    void DrawText2DRight ( float _x, float _y, float _size, char const *_text, ... );	// Like above but with right justify
-    void DrawText2DCentre( float _x, float _y, float _size, char const *_text, ... );	// Like above but with centre justify
+	void DrawText2DSimple( float _x, float _y, float _size, char const *_text );
+	void DrawText2D      ( float _x, float _y, float _size, char const *_text, ... );	// Like simple but with variable args
+	void DrawText2DRight ( float _x, float _y, float _size, char const *_text, ... );	// Like above but with right justify
+	void DrawText2DCentre( float _x, float _y, float _size, char const *_text, ... );	// Like above but with centre justify
 	void DrawText2DJustified( float _x, float _y, float _size, int _xJustification, char const *_text, ... );	// Like above but with variable justification
-    void DrawText2DUp    ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 ccw
-    void DrawText2DDown  ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 cw
+	void DrawText2DUp    ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 ccw
+	void DrawText2DDown  ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 cw
 
 
 	void DrawText3DSimple( LegacyVector3 const &_pos, float _size, char const *_text );
@@ -60,10 +61,10 @@ public:
 	void DrawText3DCentre( LegacyVector3 const &_pos, float _size, char const *_text, ... );
 	void DrawText3DRight ( LegacyVector3 const &_pos, float _size, char const *_text, ... );
 
-    void DrawText3D      ( LegacyVector3 const &_pos, LegacyVector3 const &_front, LegacyVector3 const &_up,
-                           float _size, char const *_text, ... );
+	void DrawText3D      ( LegacyVector3 const &_pos, LegacyVector3 const &_front, LegacyVector3 const &_up,
+						   float _size, char const *_text, ... );
 
-    float GetTextWidth   ( unsigned int _numChars, float _size=13.0f );
+	float GetTextWidth   ( unsigned int _numChars, float _size=13.0f );
 };
 
 

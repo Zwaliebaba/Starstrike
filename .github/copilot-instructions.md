@@ -90,6 +90,52 @@ These projects contain ported legacy code. When modifying:
 - Home directory set to `Assets\` subdirectory
 - Legacy file readers: `TextStreamReaders`, `BinaryStreamReaders`
 
+## Rendering Architecture
+
+### Current State
+
+The rendering pipeline is built on **Direct3D 11**. Key components:
+
+| Component | File(s) | Role |
+|---|---|---|
+| `RenderDevice` | `render_device.h/.cpp` | D3D11 device, swap chain, back buffer management |
+| `RenderStates` | `render_states.h/.cpp` | Pre-built blend, depth, and rasteriser states |
+| `TextureManager` | `texture_manager.h/.cpp` | D3D11 texture creation, SRV lookup, sampler states |
+| `ImRenderer` | `im_renderer.h/.cpp` | **Legacy** — OpenGL-style immediate-mode emulation over D3D11 |
+| `TextRenderer` | `text_renderer.h/.cpp` | Bitmap font rendering (currently uses `ImRenderer`) |
+| `SpriteBatch` | `sprite_batch.h/.cpp` | **Planned** — batched 2D/3D sprite and text rendering |
+
+### `ImRenderer` — Legacy (Do Not Extend)
+
+`ImRenderer` (`g_imRenderer`) is an **OpenGL immediate-mode emulation layer** over D3D11. It was created as a transitional bridge during the OpenGL → D3D11 port. **Do not add new functionality to `ImRenderer` or write new code that depends on it.** Specifically:
+
+- **Do not** add new `Begin(PRIM_QUADS)` / `End()` sequences for textured quads or sprites — use `SpriteBatch` instead (once available) or note the code as pending migration.
+- **Do not** extend the `ImRenderer` constant buffer, vertex format, or shader pair.
+- **Do not** use `ImRenderer` matrix state (`SetProjectionMatrix`, `SetViewMatrix`, `SetWorldMatrix`) for new rendering paths.
+- Existing `ImRenderer` usage for **line rendering**, **debug wireframes**, and **lit 3D mesh rendering** is acceptable until those subsystems are individually migrated.
+
+The full migration plan is documented in [`DX11Text.md`](../DX11Text.md).
+
+### `SpriteBatch` — Replacement for Sprite/Text Rendering
+
+All new 2D/3D textured-quad rendering (text glyphs, UI sprites, cursor, logos) should target the `SpriteBatch` API:
+- `g_spriteBatch->Begin2D()` / `End2D()` for screen-space quads
+- `g_spriteBatch->Begin3D()` / `End3D()` for world-space billboards
+- `g_spriteBatch->AddQuad2D()` / `AddQuad3D()` to batch geometry
+- Uses a dedicated lightweight shader pair (no lighting/fog), pre-built index buffer, and single `DrawIndexed()` per batch.
+
+### Shaders
+
+HLSL shaders live in `NeuronClient/Shaders/` and are compiled offline into byte arrays in `NeuronClient/CompiledShaders/`.
+
+| Shader | Purpose |
+|---|---|
+| `im_defaultVS.hlsl` | Vertex shader for `ImRenderer` (full WVP + lighting + fog) |
+| `im_texturedPS.hlsl` | Pixel shader for `ImRenderer` textured draws |
+| `im_coloredPS.hlsl` | Pixel shader for `ImRenderer` untextured draws |
+| `sprite_vs.hlsl` | **Planned** — Vertex shader for `SpriteBatch` (ViewProj only) |
+| `sprite_ps.hlsl` | **Planned** — Pixel shader for `SpriteBatch` (tex × color) |
+
 ## Important Notes
 
 - Do not add `#include` directives that are already covered by `pch.h`.

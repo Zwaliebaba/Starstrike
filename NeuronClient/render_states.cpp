@@ -98,6 +98,7 @@ void RenderStates::Initialise(ID3D11Device* device)
   // Rasteriser states
   m_rasterStates[RASTER_CULL_BACK]      = CreateRaster(device, D3D11_CULL_BACK);
   m_rasterStates[RASTER_CULL_NONE]      = CreateRaster(device, D3D11_CULL_NONE);
+  m_rasterStates[RASTER_CULL_FRONT]     = CreateRaster(device, D3D11_CULL_FRONT);
 
   DebugTrace("RenderStates initialised ({} blend, {} depth, {} raster)\n",
     static_cast<int>(BLEND_COUNT), static_cast<int>(DEPTH_COUNT), static_cast<int>(RASTER_COUNT));

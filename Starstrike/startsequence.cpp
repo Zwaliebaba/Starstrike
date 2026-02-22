@@ -269,7 +269,7 @@ void StartSequence::Render()
       if (maxTimeLength < stringLength)
         theString[maxTimeLength] = '\x0';
 
-      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.8f);
+      g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.8f);
       g_gameFont.DrawText2D(caption->m_x, caption->m_y, caption->m_size, theString);
 
       int finishedLen = strlen(theString);

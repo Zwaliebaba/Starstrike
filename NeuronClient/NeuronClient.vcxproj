@@ -173,6 +173,7 @@
     <ClInclude Include="sound_parameter.h" />
     <ClInclude Include="sound_stream_decoder.h" />
     <ClInclude Include="sphere_renderer.h" />
+    <ClInclude Include="sprite_batch.h" />
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="system_info.h" />
     <ClInclude Include="targetcursor.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="sound_parameter.cpp" />
     <ClCompile Include="sound_stream_decoder.cpp" />
     <ClCompile Include="sphere_renderer.cpp" />
+    <ClCompile Include="sprite_batch.cpp" />
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="targetcursor.cpp" />
@@ -291,6 +293,7 @@
       </ObjectFileOutput>
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
     </FxCompile>
     <FxCompile Include="Shaders\im_defaultVS.hlsl">
       <VariableName>g_pim_defaultVS</VariableName>
@@ -299,6 +302,7 @@
       </ObjectFileOutput>
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
     </FxCompile>
     <FxCompile Include="Shaders\im_texturedPS.hlsl">
       <VariableName>g_pim_texturedPS</VariableName>
@@ -307,6 +311,23 @@
       </ObjectFileOutput>
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
+    </FxCompile>
+    <FxCompile Include="Shaders\sprite_ps.hlsl">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\sprite_vs.hlsl">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

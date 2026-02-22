@@ -966,7 +966,7 @@ void TaskManagerInterfaceIcons::RenderScreenZones()
 void TaskManagerInterfaceIcons::RenderTooltip()
 {
   g_gameFont.SetRenderShadow(true);
-  g_imRenderer->Color4ub(255, 255, 150, 30);
+  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
 
   if (m_screenZones.ValidIndex(m_currentScreenZone))
   {
@@ -1110,11 +1110,11 @@ void TaskManagerInterfaceIcons::RenderMessages()
     float outlineAlpha = alpha * alpha * alpha;
 
     g_gameFont.SetRenderOutline(true);
-    g_imRenderer->Color4f(outlineAlpha, outlineAlpha, outlineAlpha, 0.0f);
+    g_gameFont.SetColour(outlineAlpha, outlineAlpha, outlineAlpha, 0.0f);
     g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
 
     g_gameFont.SetRenderOutline(false);
-    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
+    g_gameFont.SetColour(1.0f, 1.0f, 1.0f, alpha);
     g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
   }
 }
@@ -1224,10 +1224,10 @@ void TaskManagerInterfaceIcons::RenderTaskManager()
   SetupRenderMatrices(ScreenTaskManager);
 
   g_gameFont.SetRenderOutline(true);
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_taskmanager"));
   g_gameFont.SetRenderOutline(false);
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_taskmanager"));
 
   //
@@ -1322,7 +1322,7 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
   g_imRenderer->Color4ub(112, 141, 168, 255);
 
   g_gameFont.SetRenderShadow(true);
-  g_imRenderer->Color4ub(255, 255, 150, 30);
+  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
   g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
   g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
   g_gameFont.SetRenderShadow(false);
@@ -1374,10 +1374,10 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
       // Render task name and F-key shortcut
 
       g_gameFont.SetRenderOutline(true);
-      g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(x + 70, y + 5, 18, GlobalResearch::GetTypeNameTranslated(taskType));
       g_gameFont.SetRenderOutline(false);
-      g_imRenderer->Color4f(0.8f, 0.8f, 1.0f, 1.0f);
+      g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(x + 70, y + 5, 18, GlobalResearch::GetTypeNameTranslated(taskType));
 
       //
@@ -1614,12 +1614,12 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
           int numSpirits = engineer->GetNumSpirits();
 
           g_gameFont.SetRenderShadow(true);
-          g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
+          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.0f);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
 
           g_gameFont.SetRenderShadow(false);
-          g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.9f);
+          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.9f);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
         }
@@ -1631,11 +1631,11 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
         {
           int numSquaddies = squad->NumAliveEntities();
 
-          g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
+          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.0f);
           g_gameFont.SetRenderShadow(true);
           g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
 
-          g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.9f);
+          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.9f);
           g_gameFont.SetRenderShadow(false);
           g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
         }
@@ -1904,7 +1904,7 @@ void TaskManagerInterfaceIcons::RenderOverview()
   float screenCentre = m_screenW / 2.0f;
 
   g_gameFont.SetRenderShadow(true);
-  g_imRenderer->Color4ub(255, 255, 150, 30);
+  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
   g_gameFont.DrawText2DCentre(screenCentre - boxW, 105, 12, LANGUAGEPHRASE("taskmanager_research"));
   g_gameFont.DrawText2DCentre(screenCentre, 105, 12, LANGUAGEPHRASE("taskmanager_taskmanager"));
   g_gameFont.DrawText2DCentre(screenCentre + boxW, 105, 12, LANGUAGEPHRASE("taskmanager_objectives"));
@@ -1937,9 +1937,9 @@ void TaskManagerInterfaceIcons::RenderObjectives()
   // Render title
 
   g_gameFont.SetRenderOutline(true);
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_objectives"));
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.SetRenderOutline(false);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_objectives"));
 
@@ -1995,7 +1995,7 @@ void TaskManagerInterfaceIcons::RenderObjectives()
     g_imRenderer->Color4ub(112, 141, 168, 255);
 
     g_gameFont.SetRenderShadow(true);
-    g_imRenderer->Color4ub(255, 255, 150, 30);
+    g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
     const char* theString = (o == 0 ? LANGUAGEPHRASE("taskmanager_primarys") : LANGUAGEPHRASE("taskmanager_secondarys"));
     g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
     g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
@@ -2046,31 +2046,31 @@ void TaskManagerInterfaceIcons::RenderObjectives()
       char* descriptor = LANGUAGEPHRASE(condition->m_stringId);
 
       g_gameFont.SetRenderOutline(true);
-      g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(textX, textY, textH * 0.65f, "%s", descriptor);
       g_gameFont.SetRenderOutline(false);
       if (completed)
       {
-        g_imRenderer->Color4f(0.8f, 0.8f, 1.0f, 1.0f);
+        g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
       }
       else
       {
-        g_imRenderer->Color4f(1.0f, 0.2f, 0.2f, 1.0f);
+        g_gameFont.SetColour(1.0f, 0.2f, 0.2f, 1.0f);
       }
       g_gameFont.DrawText2D(textX, textY, textH * 0.65f, "%s", descriptor);
 
       const char* completedString = (completed ? LANGUAGEPHRASE("taskmanager_complete") : LANGUAGEPHRASE("taskmanager_incomplete"));
       g_gameFont.SetRenderOutline(true);
-      g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(completeX, textY, textH * 0.75f, completedString);
       g_gameFont.SetRenderOutline(false);
       if (completed)
       {
-        g_imRenderer->Color4f(0.8f, 0.8f, 1.0f, 1.0f);
+        g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
       }
       else
       {
-        g_imRenderer->Color4f(1.0f, 0.2f, 0.2f, 1.0f);
+        g_gameFont.SetColour(1.0f, 0.2f, 0.2f, 1.0f);
       }
       g_gameFont.DrawText2D(completeX, textY, textH * 0.75f, completedString);
 
@@ -2127,10 +2127,10 @@ void TaskManagerInterfaceIcons::RenderResearch()
   // Render title text
 
   g_gameFont.SetRenderOutline(true);
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_research"));
   g_gameFont.SetRenderOutline(false);
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_research"));
   //g_gameFont.DrawText2DCentre( m_screenW/2.0f, 80, 20, "ResearchPoints : %d", g_app->m_globalWorld->m_research->m_researchPoints );
 
@@ -2170,7 +2170,7 @@ void TaskManagerInterfaceIcons::RenderResearch()
   g_imRenderer->Color4ub(112, 141, 168, 255);
 
   g_gameFont.SetRenderShadow(true);
-  g_imRenderer->Color4ub(255, 255, 150, 30);
+  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
   const char* theString = LANGUAGEPHRASE("taskmanager_research");
   g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
   g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
@@ -2308,10 +2308,10 @@ void TaskManagerInterfaceIcons::RenderResearch()
       int researchProgress = g_app->m_globalWorld->m_research->CurrentProgress(i);
 
       g_gameFont.SetRenderOutline(true);
-      g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(iconX + iconSize + 10, iconY + iconSize / 2, 20, "%s", GlobalResearch::GetTypeNameTranslated(i));
       g_gameFont.SetRenderOutline(false);
-      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+      g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(iconX + iconSize + 10, iconY + iconSize / 2, 20, "%s", GlobalResearch::GetTypeNameTranslated(i));
 
       float boxX = 300;

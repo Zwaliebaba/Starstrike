@@ -2,11 +2,8 @@
 #define _included_global_world_h
 
 #include "llist.h"
-#include "fast_darray.h"
-#include "sphere_renderer.h"
 #include "matrix34.h"
 
-class FileWriter;
 class TextReader;
 class LegacyVector3;
 class Shape;
@@ -96,8 +93,6 @@ class GlobalEventCondition
     void SetStringId(char* _stringId);
     void SetCutScene(char* _cutScene);
 
-    void Save(FileWriter* _out);
-
     static char* GetTypeName(int _type);
     static int GetType(const char* _typeName);
 };
@@ -120,7 +115,6 @@ class GlobalEventAction
     GlobalEventAction();
 
     void Read(TextReader* _in);
-    void Write(FileWriter* _file);
     void Execute();
 
     static char* GetTypeName(int _type);
@@ -136,7 +130,6 @@ class GlobalEvent
     GlobalEvent(GlobalEvent& _other); // Copy constructor only used by TestHarness
 
     void Read(TextReader* _in);
-    void Write(FileWriter* _file);
     bool Evaluate();
     bool Execute(); // Returns true when all done
 
@@ -194,7 +187,6 @@ class GlobalResearch
     void GiveResearchPoints(int _numPoints);
     void AdvanceResearch();
 
-    void Write(FileWriter* _out);
     void Read(TextReader* _in);
 
     static char* GetTypeName(int _type);

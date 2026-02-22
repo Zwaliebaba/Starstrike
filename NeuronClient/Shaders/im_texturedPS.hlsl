@@ -29,13 +29,14 @@ struct PSInput
   float3 posWS     : TEXCOORD1;
 };
 
-float4 main(PSInput input) : SV_Target
+float4 main(PSInput input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
   float4 color = gTexture.Sample(gSampler, input.texcoord) * input.color;
 
   if (gLightingEnabled)
   {
     float3 N = normalize(input.normalWS);
+    if (!isFrontFace) N = -N;
     float3 lit = gAmbientColor.rgb;
     for (int i = 0; i < gNumLights; i++)
     {

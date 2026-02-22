@@ -30,6 +30,7 @@ enum RasterStateId
 {
   RASTER_CULL_BACK,                     // glEnable(GL_CULL_FACE) CCW front
   RASTER_CULL_NONE,                     // glDisable(GL_CULL_FACE)
+  RASTER_CULL_FRONT,                    // Cull front faces, render back faces only
   RASTER_COUNT
 };
 

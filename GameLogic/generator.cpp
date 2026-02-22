@@ -346,13 +346,13 @@ void Generator::Render( float _predictionTime )
     Matrix34 generatorMat( m_front, g_upVector, m_pos );
     Matrix34 counterMat = m_counter->GetWorldMatrix(generatorMat);
 
-    g_imRenderer->Color4f( 0.6f, 0.8f, 0.9f, 1.0f );
+    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 1.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", int(m_throughput*10.0f));
     counterMat.pos += counterMat.f * 0.1f;
     counterMat.pos += ( counterMat.f ^ counterMat.u ) * 0.2f;
     counterMat.pos += counterMat.u * 0.2f;
     g_gameFont.SetRenderShadow(true);
-    g_imRenderer->Color4f( 0.6f, 0.8f, 0.9f, 0.0f );
+    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 0.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", int(m_throughput*10.0f));
     g_gameFont.SetRenderShadow(false);
 }

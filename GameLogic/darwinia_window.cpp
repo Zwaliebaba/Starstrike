@@ -233,7 +233,7 @@ void BorderlessButton::Render( int realX, int realY, bool highlighted, bool clic
 
 
 		g_editorFont.SetRenderShadow(true);
-		g_imRenderer->Color4ub( 255, 255, 150, 30 );
+		g_editorFont.SetColour( 1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f );
 		if( m_centered )
 		{
 			g_editorFont.DrawText2DCentre( realX + m_w/2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption );
@@ -727,8 +727,8 @@ void InvertedBox::Render( int realX, int realY, bool highlighted, bool clicked )
 void LabelButton::Render( int realX, int realY, bool highlighted, bool clicked )
 {
 	if (m_disabled)
-		{ g_imRenderer->Color4f( 0.5f, 0.5f, 0.5f, 1.0f ); }
+		{ g_editorFont.SetColour( 0.5f, 0.5f, 0.5f, 1.0f ); }
 	else
-		{ g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f ); }
+		{ g_editorFont.SetColour( 1.0f, 1.0f, 1.0f, 1.0f ); }
 	g_editorFont.DrawText2D( realX + 5, realY + 10, 11.0f, m_caption );
 }

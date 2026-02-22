@@ -2,6 +2,31 @@
 
 This file describes available Copilot agent modes and when to use each for the Starstrike project.
 
+## Codebase Status
+
+### Rendering Pipeline
+
+The renderer runs on **Direct3D 11**. The codebase is mid-migration from an OpenGL immediate-mode emulation layer (`ImRenderer`) to native D3D11 rendering paths.
+
+| Component | Status |
+|---|---|
+| `RenderDevice` | ✅ Stable — D3D11 device, swap chain, back buffer |
+| `RenderStates` | ✅ Stable — pre-built blend, depth, rasteriser states |
+| `TextureManager` | ✅ Stable — D3D11 texture creation and SRV management |
+| `ImRenderer` | ⚠️ **Legacy — do not extend.** OpenGL immediate-mode emulation over D3D11. Used for line rendering, debug wireframes, and some 3D mesh draws. Being phased out for sprite/text work. |
+| `TextRenderer` | 🔄 **Pending migration** — bitmap font renderer, currently depends on `ImRenderer`. Will be rewritten to use `SpriteBatch`. |
+| `SpriteBatch` | 📋 **Planned** — batched 2D/3D sprite and text renderer. See [`DX11Text.md`](../DX11Text.md) for the full design. |
+| Sprite/quad call sites | 🔄 **Pending migration** — `mainmenus.cpp`, `renderer.cpp`, `gamecursor.cpp`, `debug_render.cpp` all use `ImRenderer` for textured quads. Will migrate to `SpriteBatch`. |
+
+### Other Subsystems
+
+| Subsystem | Status |
+|---|---|
+| Audio (DirectSound) | ✅ Stable |
+| Networking (WinSock2) | ✅ Stable |
+| UI (Eclipse widgets) | ✅ Stable |
+| File I/O (`Neuron::FileSys`) | ✅ Stable |
+
 ## Code Agent (default)
 
 Use the default code agent for everyday tasks:
@@ -17,9 +42,10 @@ Use the default code agent for everyday tasks:
 ### Key project conventions to follow
 
 - **NeuronCore**: Modern C++20/23 — use `std::format`, `std::string_view`, `constexpr`, `[[nodiscard]]`, `noexcept`, C++/WinRT
-- **NeuronClient / GameLogic**: Legacy C++ — use `char*`, `new`/`delete`, `strdup`, `DarwiniaReleaseAssert`/`DarwiniaDebugAssert`
+- **NeuronClient / GameLogic**: Legacy C++ — use `char*`, `new`/`delete`, `strdup`, `ASSERT`/`DEBUG_ASSERT`
 - **Starstrike**: App-level glue — 2-space indent, PascalCase methods, `g_` globals
 - Match the existing file's indentation style (spaces vs tabs) when editing
+- **Do not** add new `g_imRenderer` Begin/End sequences for textured quads — `ImRenderer` is legacy. Use `SpriteBatch` (once available) or flag as pending migration.
 
 ## Modernization Agent
 

@@ -965,13 +965,13 @@ void Refinery::Render( float _predictionTime )
     if( gb ) numRefined = gb->m_link;
 
     Matrix34 counterMat = m_counter1->GetWorldMatrix(refineryMat);
-    g_imRenderer->Color4f( 0.6f, 0.8f, 0.9f, 1.0f );
+    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 1.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined );
     counterMat.pos += counterMat.f * 0.1f;
     counterMat.pos += ( counterMat.f ^ counterMat.u ) * 0.2f;
     counterMat.pos += counterMat.u * 0.2f;
     g_gameFont.SetRenderShadow(true);
-    g_imRenderer->Color4f( 0.6f, 0.8f, 0.9f, 0.0f );
+    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 0.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined );
     g_gameFont.SetRenderShadow(false);
 }

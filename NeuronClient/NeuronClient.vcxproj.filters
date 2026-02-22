@@ -183,6 +183,7 @@
     <ClInclude Include="im_renderer.h" />
     <ClInclude Include="render_states.h" />
     <ClInclude Include="texture_manager.h" />
+    <ClInclude Include="sprite_batch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -344,6 +345,7 @@
     <ClCompile Include="im_renderer.cpp" />
     <ClCompile Include="render_states.cpp" />
     <ClCompile Include="texture_manager.cpp" />
+    <ClCompile Include="sprite_batch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
@@ -392,6 +394,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\im_texturedPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\sprite_ps.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\sprite_vs.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

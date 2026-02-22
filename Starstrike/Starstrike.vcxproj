@@ -526,9 +526,7 @@
   <ItemGroup>
     <Text Include="Assets\default_preferences.txt" />
     <Text Include="Assets\effects.txt" />
-    <Text Include="Assets\egames.txt" />
     <Text Include="Assets\game.txt" />
-    <Text Include="Assets\game_unlockall.txt" />
     <Text Include="Assets\Input\input_preferences.txt" />
     <Text Include="Assets\Input\Keyboards\de_DE.txt" />
     <Text Include="Assets\Input\Keyboards\fr_FR.txt" />
