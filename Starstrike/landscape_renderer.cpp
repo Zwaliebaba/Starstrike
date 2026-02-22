@@ -343,20 +343,9 @@ void LandscapeRenderer::RenderMainSlow()
 
 	g_imRenderer->UnbindTexture();
 
-	// Use ImRenderer's current WVP matrix — computed the same way as Flush()
-	DirectX::XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
-	wvp = DirectX::XMMatrixTranspose(wvp);
-
-	// Upload WVP to ImRenderer's constant buffer
+	// Upload full constant buffer (matrices, lighting, fog, etc.)
+	g_imRenderer->UpdateConstantBuffer();
 	ID3D11Buffer* cb = g_imRenderer->GetConstantBuffer();
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	HRESULT hr = ctx->Map(cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-	if (SUCCEEDED(hr))
-	{
-		auto* data = static_cast<DirectX::XMMATRIX*>(mapped.pData);
-		*data = wvp;
-		ctx->Unmap(cb, 0);
-	}
 
 	// Bind pipeline — same shaders as ImRenderer colored path
 	UINT stride = sizeof(DirectX::XMFLOAT3) + sizeof(DirectX::XMFLOAT4) + sizeof(DirectX::XMFLOAT2) + sizeof(DirectX::XMFLOAT3); // 48
@@ -368,6 +357,7 @@ void LandscapeRenderer::RenderMainSlow()
 	ctx->VSSetShader(g_imRenderer->GetVertexShader(), nullptr, 0);
 	ctx->VSSetConstantBuffers(0, 1, &cb);
 	ctx->PSSetShader(g_imRenderer->GetColoredPixelShader(), nullptr, 0);
+	ctx->PSSetConstantBuffers(0, 1, &cb);
 
 	// Draw each strip
 	for (int z = 0; z < m_strips.Size(); ++z)
@@ -400,19 +390,9 @@ void LandscapeRenderer::RenderOverlaySlow()
 	g_imRenderer->BindTexture(outlineTextureId);
 	g_imRenderer->SetSampler(SAMPLER_LINEAR_WRAP);
 
-	// Upload WVP
-	DirectX::XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
-	wvp = DirectX::XMMatrixTranspose(wvp);
-
+	// Upload full constant buffer
+	g_imRenderer->UpdateConstantBuffer();
 	ID3D11Buffer* cb = g_imRenderer->GetConstantBuffer();
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	HRESULT hr = ctx->Map(cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-	if (SUCCEEDED(hr))
-	{
-		auto* data = static_cast<DirectX::XMMATRIX*>(mapped.pData);
-		*data = wvp;
-		ctx->Unmap(cb, 0);
-	}
 
 	// Bind pipeline — textured path
 	UINT stride = sizeof(DirectX::XMFLOAT3) + sizeof(DirectX::XMFLOAT4) + sizeof(DirectX::XMFLOAT2) + sizeof(DirectX::XMFLOAT3);
@@ -423,6 +403,7 @@ void LandscapeRenderer::RenderOverlaySlow()
 
 	ctx->VSSetShader(g_imRenderer->GetVertexShader(), nullptr, 0);
 	ctx->VSSetConstantBuffers(0, 1, &cb);
+	ctx->PSSetConstantBuffers(0, 1, &cb);
 
 	ID3D11ShaderResourceView* srv = g_textureManager->GetSRV(outlineTextureId);
 	if (srv)

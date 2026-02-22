@@ -4,14 +4,12 @@
 #include "hi_res_time.h"
 #include "win32_eventhandler.h"
 #include "math_utils.h"
-#include "persisting_debug_render.h"
 #include "preferences.h"
 #include "profiler.h"
 #include "resource.h"
 #include "text_renderer.h"
 #include "window_manager.h"
 #include "language_table.h"
-#include "debug_render.h"
 #include "app.h"
 #include "camera.h"
 #include "explosion.h"
@@ -347,10 +345,6 @@ void Renderer::RenderFrame(bool withFlip)
   g_app->m_taskManagerInterface->Render();
   g_app->m_camera->Render();
 
-#ifdef DEBUG_RENDER_ENABLED
-  g_debugRenderer.Render();
-#endif
-
   g_editorFont.BeginText2D();
 
   RenderFadeOut();
@@ -617,71 +611,27 @@ void Renderer::SetDefaultRenderState() const
 
 void Renderer::SetObjectLighting() const
 {
-  // TODO Phase 10: Lighting via constant buffer update
+  g_imRenderer->SetLightingEnabled(true);
 }
 
 void Renderer::UnsetObjectLighting() const
 {
-  // TODO Phase 10: Disable lighting via constant buffer update
+  g_imRenderer->SetLightingEnabled(false);
 }
 
 void Renderer::UpdateTotalMatrix()
 {
-  // D3D11: compute total matrix from ImRenderer's stored matrices
-  if (g_imRenderer)
-  {
-    using namespace DirectX;
-    XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
-    // Store as column-major doubles (OpenGL layout) for compatibility with Get2DScreenPos
-    XMFLOAT4X4 f;
-    XMStoreFloat4x4(&f, wvp);
-    // Transpose to column-major (OpenGL convention used by Get2DScreenPos)
-    m_totalMatrix[0]  = f._11; m_totalMatrix[1]  = f._21; m_totalMatrix[2]  = f._31; m_totalMatrix[3]  = f._41;
-    m_totalMatrix[4]  = f._12; m_totalMatrix[5]  = f._22; m_totalMatrix[6]  = f._32; m_totalMatrix[7]  = f._42;
-    m_totalMatrix[8]  = f._13; m_totalMatrix[9]  = f._23; m_totalMatrix[10] = f._33; m_totalMatrix[11] = f._43;
-    m_totalMatrix[12] = f._14; m_totalMatrix[13] = f._24; m_totalMatrix[14] = f._34; m_totalMatrix[15] = f._44;
-    return;
-  }
+  using namespace DirectX;
+  XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
 
-  double m[16];
-  double p[16];
+  XMFLOAT4X4 f;
+  XMStoreFloat4x4(&f, wvp);
 
-  DarwiniaDebugAssert(m[3] == 0.0);
-  DarwiniaDebugAssert(m[7] == 0.0);
-  DarwiniaDebugAssert(m[11] == 0.0);
-  DarwiniaDebugAssert(NearlyEquals(m[15], 1.0));
-
-  DarwiniaDebugAssert(p[1] == 0.0);
-  DarwiniaDebugAssert(p[2] == 0.0);
-  DarwiniaDebugAssert(p[3] == 0.0);
-  DarwiniaDebugAssert(p[4] == 0.0);
-  DarwiniaDebugAssert(p[6] == 0.0);
-  DarwiniaDebugAssert(p[7] == 0.0);
-  DarwiniaDebugAssert(p[8] == 0.0);
-  DarwiniaDebugAssert(p[9] == 0.0);
-  DarwiniaDebugAssert(p[12] == 0.0);
-  DarwiniaDebugAssert(p[13] == 0.0);
-  DarwiniaDebugAssert(p[15] == 0.0);
-
-  m_totalMatrix[0] = m[0] * p[0] + m[1] * p[4] + m[2] * p[8] + m[3] * p[12];
-  m_totalMatrix[1] = m[0] * p[1] + m[1] * p[5] + m[2] * p[9] + m[3] * p[13];
-  m_totalMatrix[2] = m[0] * p[2] + m[1] * p[6] + m[2] * p[10] + m[3] * p[14];
-  m_totalMatrix[3] = m[0] * p[3] + m[1] * p[7] + m[2] * p[11] + m[3] * p[15];
-
-  m_totalMatrix[4] = m[4] * p[0] + m[5] * p[4] + m[6] * p[8] + m[7] * p[12];
-  m_totalMatrix[5] = m[4] * p[1] + m[5] * p[5] + m[6] * p[9] + m[7] * p[13];
-  m_totalMatrix[6] = m[4] * p[2] + m[5] * p[6] + m[6] * p[10] + m[7] * p[14];
-  m_totalMatrix[7] = m[4] * p[3] + m[5] * p[7] + m[6] * p[11] + m[7] * p[15];
-
-  m_totalMatrix[8] = m[8] * p[0] + m[9] * p[4] + m[10] * p[8] + m[11] * p[12];
-  m_totalMatrix[9] = m[8] * p[1] + m[9] * p[5] + m[10] * p[9] + m[11] * p[13];
-  m_totalMatrix[10] = m[8] * p[2] + m[9] * p[6] + m[10] * p[10] + m[11] * p[14];
-  m_totalMatrix[11] = m[8] * p[3] + m[9] * p[7] + m[10] * p[11] + m[11] * p[15];
-
-  m_totalMatrix[12] = m[12] * p[0] + m[13] * p[4] + m[14] * p[8] + m[15] * p[12];
-  m_totalMatrix[13] = m[12] * p[1] + m[13] * p[5] + m[14] * p[9] + m[15] * p[13];
-  m_totalMatrix[14] = m[12] * p[2] + m[13] * p[6] + m[14] * p[10] + m[15] * p[14];
-  m_totalMatrix[15] = m[12] * p[3] + m[13] * p[7] + m[14] * p[11] + m[15] * p[15];
+  // Store as column-major doubles for Get2DScreenPos
+  m_totalMatrix[0]  = f._11; m_totalMatrix[1]  = f._21; m_totalMatrix[2]  = f._31; m_totalMatrix[3]  = f._41;
+  m_totalMatrix[4]  = f._12; m_totalMatrix[5]  = f._22; m_totalMatrix[6]  = f._32; m_totalMatrix[7]  = f._42;
+  m_totalMatrix[8]  = f._13; m_totalMatrix[9]  = f._23; m_totalMatrix[10] = f._33; m_totalMatrix[11] = f._43;
+  m_totalMatrix[12] = f._14; m_totalMatrix[13] = f._24; m_totalMatrix[14] = f._34; m_totalMatrix[15] = f._44;
 }
 
 void Renderer::Get2DScreenPos(const LegacyVector3& v, LegacyVector3* _out)

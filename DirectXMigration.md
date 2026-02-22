@@ -6,7 +6,7 @@ The Starstrike codebase has been **fully migrated from OpenGL 1.x to DirectX 11*
 
 The migration was completed in 10 phases, replacing ~95 source files worth of `gl*`/`glu*` calls with a thin D3D11 abstraction layer (`RenderDevice`, `ImRenderer`, `RenderStates`, `TextureManager`). The landscape uses a static `ID3D11Buffer` vertex buffer; all other rendering goes through `ImRenderer`'s immediate-mode emulation.
 
-**Remaining work** (Phase 10 deferred items): batch optimisation, lighting/fog/alpha-test constant buffer, thick line emulation, `Camera::Get2DScreenPos()` migration, water multitexture lightmap.
+**Remaining work** (Phase 10 deferred items): batch optimisation, thick line emulation, `Camera::Get2DScreenPos()` migration, water multitexture lightmap, `ConvertToOpenGLFormat()` rename.
 
 ---
 
@@ -747,17 +747,37 @@ The `ImRenderer` immediate-mode emulation works but is inherently slow (one draw
 - **`RenderFlatWater()`** — Sets cull/depth/blend states, binds water colour texture with `SAMPLER_LINEAR_WRAP`, calls `RenderFlatWaterTiles()`, restores state.
 - **`RenderDynamicWater()`** — Renders animated wave triangle strips per-frame via `g_imRenderer->Begin(PRIM_TRIANGLE_STRIP)` with per-vertex colors and normals from `m_renderVerts`. Each `WaterTriangleStrip` is a separate `Begin`/`End` pair.
 
-### 13.3 Lighting via Constant Buffer (deferred)
+### 13.3 Lighting via Constant Buffer ✅
 
-`SetObjectLighting()` / `UnsetObjectLighting()` in `renderer.cpp` and `SetupLights()` in `location.cpp` / `global_world.cpp` are currently stubs. Add lighting parameters to the shader constant buffer and implement in the pixel shader.
+`SetObjectLighting()` / `UnsetObjectLighting()` in `renderer.cpp` now call `g_imRenderer->SetLightingEnabled(true/false)`. `SetupLights()` in `location.cpp` and `global_world.cpp` now call `g_imRenderer->SetLightParams()` to upload light direction, color, and ambient to the expanded `CBPerDraw` constant buffer.
 
-### 13.4 Fog via Constant Buffer (deferred)
+**Shader changes:**
+- `im_defaultVS.hlsl` — Added `gWorld` matrix to constant buffer. Outputs world-space position (`posWS`) and world-transformed normal (`normalWS`) for per-pixel lighting and fog.
+- `im_coloredPS.hlsl` / `im_texturedPS.hlsl` — Added N·L diffuse lighting: `color.rgb *= ambient + sum(max(dot(N, lightDir), 0) * lightColor)`. Up to 2 directional lights supported. Lighting is gated by `gLightingEnabled` flag.
 
-Add fog parameters (`gFogStart`, `gFogEnd`, `gFogColor`) to the constant buffer and implement linear fog in the pixel shader.
+**`ImRenderer` additions:**
+- `SetLightingEnabled(bool)` — toggles lighting in the pixel shader
+- `SetLightParams(numLights, dirs[], colors[], ambient)` — stores up to 2 directional light directions/colors and ambient color
+- `SetCameraPos(x, y, z)` — stores camera world position for fog distance calculation
+- `UpdateConstantBuffer()` — public method that uploads the full `CBPerDraw` (matrices + lighting + fog + alpha clip) for external renderers (landscape, water)
 
-### 13.5 Alpha Test via Pixel Shader (deferred)
+**Constant buffer now also bound to PS stage** via `PSSetConstantBuffers(0, 1, &cb)` in both `Flush()` and landscape/water direct rendering.
 
-Add `gAlphaClipThreshold` to the constant buffer. In the pixel shader: `if (color.a <= gAlphaClipThreshold) discard;`
+### 13.4 Fog via Constant Buffer ✅
+
+`SetupFog()` in `location.cpp` now calls `g_imRenderer->SetFogParams(1000.0f, 4000.0f, r, g, b)` with the background color. `SetupFog()` in `global_world.cpp` calls `g_imRenderer->SetFogParams(0.0f, 19000.0f, 0.1f, 0.1f, 0.1f)`. Fog is enabled/disabled per render section via `g_imRenderer->SetFogEnabled(true/false)` in `Location::RenderBuildings()` and `Location::RenderBuildingAlphas()`, matching the original `glEnable(GL_FOG)` / `glDisable(GL_FOG)` pattern.
+
+**Pixel shader:** Linear fog computed as `saturate((gFogEnd - dist) / (gFogEnd - gFogStart))` where `dist = length(posWS - gCameraPos)`. Result: `lerp(gFogColor, color, fogFactor)`. Gated by `gFogEnabled` flag.
+
+**`ImRenderer` additions:**
+- `SetFogEnabled(bool)` — toggles fog in the pixel shader
+- `SetFogParams(start, end, r, g, b)` — stores fog range and color
+
+### 13.5 Alpha Test via Pixel Shader ✅
+
+Both pixel shaders now include `if (color.a <= gAlphaClipThreshold) discard;`. Default threshold is `-1.0` (disabled). Call `g_imRenderer->SetAlphaClipThreshold(0.01f)` to mimic `glAlphaFunc(GL_GREATER, 0.01f)`.
+
+**`ImRenderer` addition:** `SetAlphaClipThreshold(float)` — sets the clip threshold in the constant buffer.
 
 ### 13.6 Thick Line Emulation (deferred)
 
@@ -866,7 +886,7 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
 - [x] **Phase 9:** Remove all OpenGL code, headers, libs
 - [x] **Phase 10:** Landscape static VB, water rendering, legacy naming cleanup, `m_directXVersion = 11`
-- [ ] **Phase 10 remaining:** Batch optimisation, lighting, fog, alpha test, thick lines, `Get2DScreenPos`
+- [ ] **Phase 10 remaining:** Batch optimisation, thick lines, `Get2DScreenPos`, `ConvertToOpenGLFormat` rename
 
 ---
 
@@ -919,7 +939,7 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | Coordinate handedness mismatch (RH→LH) | ✅ Resolved | `XMMatrix*RH` variants used throughout — existing vertex data and winding preserved |
 | Texture coordinate origin difference (GL bottom-left vs D3D top-left) | 🟠 Moderate | Flip V coordinate in `ConvertToTexture()` or in HLSL |
 | `GL_QUADS` has no D3D primitive | ✅ Resolved | `ImRenderer` converts quads to triangle pairs |
-| `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Deferred | Implement via `clip()` in pixel shader — Phase 10 remaining |
+| `glAlphaFunc` / alpha test has no D3D11 fixed function | ✅ Resolved | `if (color.a <= gAlphaClipThreshold) discard;` in both pixel shaders; `-1.0` default disables |
 | Display lists have no D3D11 equivalent | ✅ Resolved | Shape and sphere display lists removed; `BuildDisplayList()` no-op; always uses `RenderSlow()` path |
 | Performance regression from immediate-mode emulation | 🟠 Moderate | Landscape uses static VB; water dynamic uses `ImRenderer`; shapes and batch merge deferred |
 | GL state queries (`glGet*`) used in debug asserts | ✅ Resolved | `CheckOpenGLState()` removed; `GetGLStateInt/Float()` removed; viewport from `g_renderDevice->GetBackBufferWidth/Height()` |

@@ -1678,6 +1678,7 @@ void Camera::SetupModelviewMatrix()
     XMVECTOR upVec  = XMVectorSet(up.x, up.y, up.z, 0.0f);
     g_imRenderer->SetViewMatrix(XMMatrixLookAtRH(eye, target, upVec));
     g_imRenderer->SetWorldMatrix(XMMatrixIdentity());
+    g_imRenderer->SetCameraPos(m_pos.x, m_pos.y, m_pos.z);
   }
 }
 

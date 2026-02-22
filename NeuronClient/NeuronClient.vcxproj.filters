@@ -39,7 +39,6 @@
     <ClInclude Include="bounded_array.h" />
     <ClInclude Include="btree.h" />
     <ClInclude Include="darray.h" />
-    <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
     <ClInclude Include="debug_utils.h" />
     <ClInclude Include="fast_darray.h" />
@@ -54,7 +53,6 @@
     <ClInclude Include="matrix33.h" />
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
-    <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
     <ClInclude Include="preferences.h" />
@@ -218,8 +216,6 @@
     <ClCompile Include="3d_sprite.cpp" />
     <ClCompile Include="binary_stream_readers.cpp" />
     <ClCompile Include="bitmap.cpp" />
-    <ClCompile Include="debug_fog_logging.cpp" />
-    <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
     <ClCompile Include="debug_utils.cpp" />
     <ClCompile Include="file_writer.cpp" />
@@ -231,7 +227,6 @@
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
-    <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
@@ -365,6 +360,9 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{7a1d775d-f17b-457e-aa15-0abbc7835186}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{a90305e3-076c-4f7b-a2e7-cb698690339c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

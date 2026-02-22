@@ -909,6 +909,7 @@ void Location::RenderBuildings()
   float timeSinceAdvance = g_predictionTime;
 
   SetupFog();
+  g_imRenderer->SetFogEnabled(true);
   g_app->m_renderer->SetObjectLighting();
 
   //
@@ -958,6 +959,7 @@ void Location::RenderBuildings()
     }
   }
 
+g_imRenderer->SetFogEnabled(false);
 g_app->m_renderer->SetObjectLighting();
   g_app->m_renderer->UnsetObjectLighting();
 
@@ -1002,6 +1004,7 @@ void Location::RenderBuildingAlphas()
   // Also record all depth sorted Alphas
 
   SetupFog();
+  g_imRenderer->SetFogEnabled(true);
 
   for (int i = 0; i < m_buildings.Size(); ++i)
   {
@@ -1059,6 +1062,7 @@ void Location::RenderBuildingAlphas()
     END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
   }
 
+  g_imRenderer->SetFogEnabled(false);
 
   END_PROFILE(g_app->m_profiler, "Render Building Alphas");
 }
@@ -1813,7 +1817,7 @@ void Location::CreateShockwave(const LegacyVector3& _pos, float _size, unsigned 
 void Location::SetupFog()
 {
   float fogCol[] = {g_app->m_backgroundColour.r / 255.0f, g_app->m_backgroundColour.g / 255.0f, g_app->m_backgroundColour.b / 255.0f, 0};
-
+  g_imRenderer->SetFogParams(1000.0f, 4000.0f, fogCol[0], fogCol[1], fogCol[2]);
 }
 
 void Location::WaterReflect()
@@ -1833,7 +1837,12 @@ void Location::SetupLights()
   float tmp[] = {0, 0, -1, 0};
   float black[] = {0, 0, 0, 0};
 
-  for (int i = 0; i < m_lights.Size(); i++)
+  DirectX::XMFLOAT4 dirs[2]   = { {0,0,-1,0}, {0,0,-1,0} };
+  DirectX::XMFLOAT4 colors[2] = { {0,0,0,0},  {0,0,0,0}  };
+  DirectX::XMFLOAT4 ambient   = { 0.0f, 0.0f, 0.0f, 1.0f };
+  int numLights = 0;
+
+  for (int i = 0; i < m_lights.Size() && i < 2; i++)
   {
     Light* light = m_lights.GetData(i);
 
@@ -1841,7 +1850,6 @@ void Location::SetupLights()
 
     LegacyVector3 front(light->m_front[0], light->m_front[1], light->m_front[2]);
     front.Normalise();
-    float frontAsFourFloats[] = {front.x, front.y, front.z, 0.0f};
     float colourAsFourFloats[] = {light->m_colour[0], light->m_colour[1], light->m_colour[2], light->m_colour[3]};
 
     if (ChristmasModEnabled() == 1)
@@ -1851,8 +1859,12 @@ void Location::SetupLights()
       colourAsFourFloats[2] = 1.2f;
     }
 
+    dirs[i]   = { front.x, front.y, front.z, 0.0f };
+    colors[i] = { colourAsFourFloats[0], colourAsFourFloats[1], colourAsFourFloats[2], colourAsFourFloats[3] };
+    numLights = i + 1;
   }
 
+  g_imRenderer->SetLightParams(numLights, dirs, colors, ambient);
 }
 
 int Location::ChristmasModEnabled()

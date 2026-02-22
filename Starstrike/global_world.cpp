@@ -1830,17 +1830,17 @@ void GlobalWorld::SetupLights()
 
   LegacyVector3 light0(0, 1, 0);
   light0.Normalise();
-  float light0AsFourFloats[] = {light0.x, light0.y, light0.z, 0.0f};
 
-
+  DirectX::XMFLOAT4 dirs[2]   = { { light0.x, light0.y, light0.z, 0.0f }, { 0,0,0,0 } };
+  DirectX::XMFLOAT4 colors[2] = { { colour1[0], colour1[1], colour1[2], colour1[3] }, { 0,0,0,0 } };
+  DirectX::XMFLOAT4 ambient   = { 0.0f, 0.0f, 0.0f, 0.0f };
+  g_imRenderer->SetLightParams(1, dirs, colors, ambient);
 }
 
 void GlobalWorld::SetupFog()
 {
   float fog = 0.1f;
-  float fogCol[] = {fog, fog, fog, fog};
-
-  //glEnable    (GL_FOG);
+  g_imRenderer->SetFogParams(0.0f, 19000.0f, fog, fog, fog);
 }
 
 float GlobalWorld::GetSize()

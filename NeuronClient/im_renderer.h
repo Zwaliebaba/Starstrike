@@ -80,6 +80,26 @@ public:
   // Sampler state
   void SetSampler(SamplerId id);            // selects sampler from g_textureManager
 
+  // Lighting
+  void SetLightingEnabled(bool enabled);
+  void SetLightParams(int numLights,
+                      const DirectX::XMFLOAT4 dirs[],
+                      const DirectX::XMFLOAT4 colors[],
+                      const DirectX::XMFLOAT4& ambient);
+
+  // Fog
+  void SetFogEnabled(bool enabled);
+  void SetFogParams(float start, float end, float r, float g, float b);
+
+  // Alpha clip (-1.0 to disable)
+  void SetAlphaClipThreshold(float threshold);
+
+  // Camera position (for fog distance calculation)
+  void SetCameraPos(float x, float y, float z);
+
+  // Upload constant buffer with current matrices and state (for external renderers)
+  void UpdateConstantBuffer();
+
   // During transition: suppress actual D3D11 draw calls
   void SetDrawEnabled(bool enabled) { m_drawEnabled = enabled; }
   bool IsDrawEnabled() const { return m_drawEnabled; }
@@ -102,8 +122,21 @@ private:
 
   struct CBPerDraw
   {
-    DirectX::XMMATRIX worldViewProj;
-  };
+    DirectX::XMMATRIX worldViewProj;        // 64
+    DirectX::XMMATRIX world;                // 64
+    DirectX::XMFLOAT4 lightDir[2];          // 32
+    DirectX::XMFLOAT4 lightColor[2];        // 32
+    DirectX::XMFLOAT4 ambientColor;         // 16
+    DirectX::XMFLOAT4 fogColor;             // 16
+    DirectX::XMFLOAT4 cameraPos;            // 16
+    float fogStart;                          // 4
+    float fogEnd;                            // 4
+    float alphaClipThreshold;                // 4
+    int numLights;                           // 4
+    int lightingEnabled;                     // 4
+    int fogEnabled;                          // 4
+    float _pad[2];                           // 8
+  };                                         // Total: 272
 
   void Flush(D3D11_PRIMITIVE_TOPOLOGY topology, const std::vector<ImVertex>& verts);
 
@@ -142,6 +175,25 @@ private:
 
   // Bound texture
   ID3D11ShaderResourceView* m_boundSRV;
+
+  // Lighting state
+  bool                     m_lightingEnabled;
+  int                      m_numLights;
+  DirectX::XMFLOAT4        m_lightDir[2];
+  DirectX::XMFLOAT4        m_lightColor[2];
+  DirectX::XMFLOAT4        m_ambientColor;
+
+  // Fog state
+  bool                     m_fogEnabled;
+  float                    m_fogStart;
+  float                    m_fogEnd;
+  DirectX::XMFLOAT4        m_fogColor;
+
+  // Alpha clip
+  float                    m_alphaClipThreshold;
+
+  // Camera position
+  DirectX::XMFLOAT3        m_cameraPos;
 };
 
 extern ImRenderer* g_imRenderer;

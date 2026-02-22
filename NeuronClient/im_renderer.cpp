@@ -29,11 +29,25 @@ ImRenderer::ImRenderer()
     m_currentColor(1.0f, 1.0f, 1.0f, 1.0f),
     m_currentTexCoord(0.0f, 0.0f),
     m_currentNormal(0.0f, 0.0f, 1.0f),
-    m_boundSRV(nullptr)
+    m_boundSRV(nullptr),
+    m_lightingEnabled(false),
+    m_numLights(0),
+    m_ambientColor(0.0f, 0.0f, 0.0f, 0.0f),
+    m_fogEnabled(false),
+    m_fogStart(0.0f),
+    m_fogEnd(1.0f),
+    m_fogColor(0.0f, 0.0f, 0.0f, 0.0f),
+    m_alphaClipThreshold(-1.0f),
+    m_cameraPos(0.0f, 0.0f, 0.0f)
 {
   m_projMatrix  = DirectX::XMMatrixIdentity();
   m_viewMatrix  = DirectX::XMMatrixIdentity();
   m_worldMatrix = DirectX::XMMatrixIdentity();
+  for (int i = 0; i < 2; ++i)
+  {
+    m_lightDir[i]   = { 0.0f, 0.0f, 0.0f, 0.0f };
+    m_lightColor[i] = { 0.0f, 0.0f, 0.0f, 0.0f };
+  }
 }
 
 ImRenderer::~ImRenderer()
@@ -403,15 +417,32 @@ void ImRenderer::Flush(D3D11_PRIMITIVE_TOPOLOGY topology, const std::vector<ImVe
   memcpy(mapped.pData, verts.data(), vertCount * sizeof(ImVertex));
   m_context->Unmap(m_vertexBuffer, 0);
 
-  // Upload WVP matrix
+  // Upload constant buffer
   DirectX::XMMATRIX wvp = m_worldMatrix * m_viewMatrix * m_projMatrix;
+  DirectX::XMMATRIX worldT = DirectX::XMMatrixTranspose(m_worldMatrix);
   wvp = DirectX::XMMatrixTranspose(wvp); // HLSL expects column-major
 
   hr = m_context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   if (FAILED(hr))
     return;
   auto* cb = static_cast<CBPerDraw*>(mapped.pData);
-  cb->worldViewProj = wvp;
+  cb->worldViewProj    = wvp;
+  cb->world            = worldT;
+  cb->lightDir[0]      = m_lightDir[0];
+  cb->lightDir[1]      = m_lightDir[1];
+  cb->lightColor[0]    = m_lightColor[0];
+  cb->lightColor[1]    = m_lightColor[1];
+  cb->ambientColor     = m_ambientColor;
+  cb->fogColor         = m_fogColor;
+  cb->cameraPos        = { m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, 0.0f };
+  cb->fogStart         = m_fogStart;
+  cb->fogEnd           = m_fogEnd;
+  cb->alphaClipThreshold = m_alphaClipThreshold;
+  cb->numLights        = m_numLights;
+  cb->lightingEnabled  = m_lightingEnabled ? 1 : 0;
+  cb->fogEnabled       = m_fogEnabled ? 1 : 0;
+  cb->_pad[0]          = 0.0f;
+  cb->_pad[1]          = 0.0f;
   m_context->Unmap(m_constantBuffer, 0);
 
   // Bind pipeline state
@@ -423,6 +454,7 @@ void ImRenderer::Flush(D3D11_PRIMITIVE_TOPOLOGY topology, const std::vector<ImVe
 
   m_context->VSSetShader(m_vsDefault, nullptr, 0);
   m_context->VSSetConstantBuffers(0, 1, &m_constantBuffer);
+  m_context->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
   if (m_boundSRV)
   {
@@ -443,4 +475,87 @@ void ImRenderer::Flush(D3D11_PRIMITIVE_TOPOLOGY topology, const std::vector<ImVe
     ID3D11ShaderResourceView* nullSRV = nullptr;
     m_context->PSSetShaderResources(0, 1, &nullSRV);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Lighting
+// ---------------------------------------------------------------------------
+
+void ImRenderer::SetLightingEnabled(bool enabled) { m_lightingEnabled = enabled; }
+
+void ImRenderer::SetLightParams(int numLights,
+                                const DirectX::XMFLOAT4 dirs[],
+                                const DirectX::XMFLOAT4 colors[],
+                                const DirectX::XMFLOAT4& ambient)
+{
+  m_numLights = (numLights > 2) ? 2 : numLights;
+  for (int i = 0; i < m_numLights; ++i)
+  {
+    m_lightDir[i]   = dirs[i];
+    m_lightColor[i] = colors[i];
+  }
+  m_ambientColor = ambient;
+}
+
+// ---------------------------------------------------------------------------
+// Fog
+// ---------------------------------------------------------------------------
+
+void ImRenderer::SetFogEnabled(bool enabled) { m_fogEnabled = enabled; }
+
+void ImRenderer::SetFogParams(float start, float end, float r, float g, float b)
+{
+  m_fogStart = start;
+  m_fogEnd   = end;
+  m_fogColor = { r, g, b, 0.0f };
+}
+
+// ---------------------------------------------------------------------------
+// Alpha clip
+// ---------------------------------------------------------------------------
+
+void ImRenderer::SetAlphaClipThreshold(float threshold) { m_alphaClipThreshold = threshold; }
+
+// ---------------------------------------------------------------------------
+// Camera position
+// ---------------------------------------------------------------------------
+
+void ImRenderer::SetCameraPos(float x, float y, float z) { m_cameraPos = { x, y, z }; }
+
+// ---------------------------------------------------------------------------
+// UpdateConstantBuffer — for external renderers (landscape, water)
+// ---------------------------------------------------------------------------
+
+void ImRenderer::UpdateConstantBuffer()
+{
+  using namespace DirectX;
+
+  XMMATRIX wvp = m_worldMatrix * m_viewMatrix * m_projMatrix;
+  XMMATRIX worldT = XMMatrixTranspose(m_worldMatrix);
+  wvp = XMMatrixTranspose(wvp);
+
+  D3D11_MAPPED_SUBRESOURCE mapped;
+  HRESULT hr = m_context->Map(m_constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+  if (FAILED(hr))
+    return;
+
+  auto* cb = static_cast<CBPerDraw*>(mapped.pData);
+  cb->worldViewProj    = wvp;
+  cb->world            = worldT;
+  cb->lightDir[0]      = m_lightDir[0];
+  cb->lightDir[1]      = m_lightDir[1];
+  cb->lightColor[0]    = m_lightColor[0];
+  cb->lightColor[1]    = m_lightColor[1];
+  cb->ambientColor     = m_ambientColor;
+  cb->fogColor         = m_fogColor;
+  cb->cameraPos        = { m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, 0.0f };
+  cb->fogStart         = m_fogStart;
+  cb->fogEnd           = m_fogEnd;
+  cb->alphaClipThreshold = m_alphaClipThreshold;
+  cb->numLights        = m_numLights;
+  cb->lightingEnabled  = m_lightingEnabled ? 1 : 0;
+  cb->fogEnabled       = m_fogEnabled ? 1 : 0;
+  cb->_pad[0]          = 0.0f;
+  cb->_pad[1]          = 0.0f;
+  m_context->Unmap(m_constantBuffer, 0);
 }

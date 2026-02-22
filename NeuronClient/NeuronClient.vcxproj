@@ -103,7 +103,6 @@
     <ClInclude Include="control_bindings.h" />
     <ClInclude Include="control_types.h" />
     <ClInclude Include="darray.h" />
-    <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
     <ClInclude Include="debug_utils.h" />
     <ClInclude Include="eclbutton.h" />
@@ -150,7 +149,6 @@
     <ClInclude Include="movement2d.h" />
     <ClInclude Include="NeuronClient.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preferences.h" />
     <ClInclude Include="preference_names.h" />
@@ -197,8 +195,6 @@
     <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="control_bindings.cpp" />
     <ClCompile Include="control_types.cpp" />
-    <ClCompile Include="debug_fog_logging.cpp" />
-    <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
     <ClCompile Include="debug_utils.cpp" />
     <ClCompile Include="eclbutton.cpp" />
@@ -242,7 +238,6 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
