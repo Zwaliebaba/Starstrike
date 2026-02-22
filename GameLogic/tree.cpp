@@ -272,7 +272,7 @@ void Tree::RenderAlphas(float _predictionTime)
 
   g_imRenderer->PushMatrix();
   Matrix34 mat(m_front, g_upVector, m_pos);
-  g_imRenderer->MultMatrixf(mat.ConvertToOpenGLFormat());
+  g_imRenderer->MultMatrixf(mat.ConvertToColumnMajor());
   g_imRenderer->Scalef(actualHeight, actualHeight, actualHeight);
 
   if (Location::ChristmasModEnabled() == 1)

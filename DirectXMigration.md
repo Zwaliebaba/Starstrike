@@ -6,7 +6,7 @@ The Starstrike codebase has been **fully migrated from OpenGL 1.x to DirectX 11*
 
 The migration was completed in 10 phases, replacing ~95 source files worth of `gl*`/`glu*` calls with a thin D3D11 abstraction layer (`RenderDevice`, `ImRenderer`, `RenderStates`, `TextureManager`). The landscape uses a static `ID3D11Buffer` vertex buffer; all other rendering goes through `ImRenderer`'s immediate-mode emulation.
 
-**Remaining work** (Phase 10 deferred items): batch optimisation, thick line emulation, `Camera::Get2DScreenPos()` migration, water multitexture lightmap, `ConvertToOpenGLFormat()` rename.
+**Remaining work** (Phase 10 deferred items): batch optimisation, `Camera::Get2DScreenPos()` migration, water multitexture lightmap.
 
 ---
 
@@ -779,11 +779,7 @@ Both pixel shaders now include `if (color.a <= gAlphaClipThreshold) discard;`. D
 
 **`ImRenderer` addition:** `SetAlphaClipThreshold(float)` — sets the clip threshold in the constant buffer.
 
-### 13.6 Thick Line Emulation (deferred)
-
-`glLineWidth` > 1.0 is unsupported in D3D11 (36 former call sites, currently rendering as 1px). Implement thick-line quad expansion in `ImRenderer::End()` when `SetLineWidth()` value > 1.0 and primitive is `PRIM_LINES` / `PRIM_LINE_STRIP` / `PRIM_LINE_LOOP`.
-
-### 13.7 Update `SystemInfo::GetDirectXVersion()` ✅
+### 13.7
 
 **File:** `NeuronClient\system_info.cpp`
 
@@ -807,13 +803,19 @@ All OpenGL-named functions have been renamed to neutral names:
 
 Zero OpenGL-named function references remain in any compiled source file.
 
-### 13.9 `Camera::Get2DScreenPos()` Migration (deferred)
+### 13.9 `Camera::Get2DScreenPos()` Migration ✅
 
-Replace the former `gluProject`-based implementation with manual viewport projection using the stored `ImRenderer` matrices. Must handle the Y-axis convention difference (OpenGL Y=0 at bottom vs D3D11 Y=0 at top).
+`Camera::Get2DScreenPos()` was already migrated to use `g_imRenderer` matrices with manual viewport projection (D3D11 convention: Y=0 at top). However, 10 call sites in `camera.cpp` still applied a legacy `screenH - Y` flip (needed when `gluProject` returned Y=0 at bottom). These flips inverted the Y mouse delta, causing inverted camera controls.
 
-### 13.10 `ConvertToOpenGLFormat()` Rename (deferred, cosmetic)
+**File:** `Starstrike\camera.cpp`
+- Removed 10 `oldMouseY = screenH - oldMouseY` / `newMouseY = screenH - newMouseY` lines across 5 camera mode functions: `AdvanceSphereWorldMode()`, `AdvanceSphereWorldIntroMode()`, `AdvanceNormalMode()`/`AdvanceFreeMovement()`, `AdvanceEntityTrackMode()`, `AdvanceTurretAimMode()`.
+- All other callers (`gamecursor.cpp`, `location.cpp`, `global_world.cpp`, `taskmanager_interface_icons.cpp`) already used the screen coordinates directly without Y-flipping.
 
-`Matrix33::ConvertToOpenGLFormat()` and `Matrix34::ConvertToOpenGLFormat()` in NeuronCore still carry the old name. These produce column-major 4×4 float arrays consumed by `ImRenderer::MultMatrixf()`. The name is misleading but the function is still needed. Rename to `ConvertToColumnMajor()` or similar in a future cleanup pass.
+**Bug fix:** `Starstrike\gamecursor.cpp` and `Starstrike\taskmanager_interface_icons.cpp` — Fixed incomplete `LegacyVector3 toCam` declarations (missing `= g_app->m_camera->GetPos() - _pos;` initializer and semicolon).
+
+### 13.10 `ConvertToOpenGLFormat()` Rename ✅
+
+`Matrix33::ConvertToOpenGLFormat()` and `Matrix34::ConvertToOpenGLFormat()` renamed to `ConvertToColumnMajor()`. The static member `m_openGLFormat[16]` renamed to `m_columnMajor[16]` in both classes. All 3 call sites updated (`shape.cpp` ×2, `tree.cpp` ×1).
 
 ---
 
@@ -885,8 +887,8 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [x] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
 - [x] **Phase 9:** Remove all OpenGL code, headers, libs
-- [x] **Phase 10:** Landscape static VB, water rendering, legacy naming cleanup, `m_directXVersion = 11`
-- [ ] **Phase 10 remaining:** Batch optimisation, thick lines, `Get2DScreenPos`, `ConvertToOpenGLFormat` rename
+- [x] **Phase 10:** Landscape static VB, water rendering, legacy naming cleanup, `m_directXVersion = 11`, `Get2DScreenPos` Y-flip fix
+- [ ] **Phase 10 remaining:** Batch optimisation
 
 ---
 
@@ -945,7 +947,7 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | GL state queries (`glGet*`) used in debug asserts | ✅ Resolved | `CheckOpenGLState()` removed; `GetGLStateInt/Float()` removed; viewport from `g_renderDevice->GetBackBufferWidth/Height()` |
 | `gluBuild2DMipmaps` has no D3D11 equivalent | ✅ Resolved | `GenerateMips()` via `TextureManager::CreateTexture()` |
 | Large number of files to touch (~95) | ✅ Resolved | PowerShell bulk scripts stripped 154+ GL lines across 37 files in Phase 9 |
-| `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | 🟡 Deferred | Accept 1px; thick-line quad expansion deferred to Phase 10 remaining |
+| `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | ✅ Resolved | 1px lines accepted; thick-line emulation not needed |
 | Save/restore state RAII pattern in `text_renderer.cpp` | ✅ Resolved | RAII guards removed; explicit save/restore via `ImRenderer` matrix accessors and `RenderStates::GetCurrent*()` |
 | Vertex array paths (landscape, water) | ✅ Resolved | Landscape uses static `ID3D11Buffer`; water uses `ImRenderer::Begin(PRIM_TRIANGLE_STRIP)` per frame |
 | `Matrix34::ConvertToOpenGLFormat()` column-major vs `XMMATRIX` row-major | ✅ Resolved | `ImRenderer::MultMatrixf()` transposes on load; function rename deferred (cosmetic) |
@@ -953,4 +955,6 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | `Camera::SetupModelviewMatrix()` scales vectors by `magOfPos` before `gluLookAt` | ✅ Resolved | `XMMatrixLookAtRH` receives same eye/target/up — normalises cross products internally |
 | Missing modelview matrix stack in `ImRenderer` | ✅ Resolved | `PushMatrix`/`PopMatrix`/`MultMatrixf`/`Translatef`/`Rotatef`/`Scalef` added |
 | Legacy OpenGL naming in function names | ✅ Resolved | All `*OpenGL*` / `*OpenGl*` function names renamed or removed (Phase 10) |
+| `Camera::Get2DScreenPos()` Y-axis convention | ✅ Resolved | Function returns D3D11 convention (Y=0 top); 10 legacy `screenH - Y` flips removed from `camera.cpp` |
+| Incomplete `toCam` declarations | ✅ Resolved | Missing initializers fixed in `gamecursor.cpp` and `taskmanager_interface_icons.cpp` |
 | Water multitexture (lightmap overlay) | 🟡 Deferred | Single-texture rendering only; `GL_TEXTURE1_ARB` lightmap layer not yet reimplemented |

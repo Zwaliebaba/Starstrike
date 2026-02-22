@@ -654,9 +654,9 @@ void Renderer::Get2DScreenPos(const LegacyVector3& v, LegacyVector3* _out)
 
   // Map x, y and z to range 0-1
   out[0] += 0.5;
-  out[1] += 0.5;
+  out[1] = 0.5 - out[1];
 
-  // Map x, y to viewport
+  // Map x, y to viewport (Y=0 at top)
   _out->x = out[0] * m_screenW;
   _out->y = out[1] * m_screenH;
   _out->z = out[3];
@@ -678,8 +678,8 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
 
   int x1 = floorf(topLeft.x * screenToGridFactor);
   int x2 = ceilf(bottomRight.x * screenToGridFactor);
-  int y1 = floorf(bottomRight.y * screenToGridFactor);
-  int y2 = ceilf(topLeft.y * screenToGridFactor);
+  int y1 = floorf(topLeft.y * screenToGridFactor);
+  int y2 = ceilf(bottomRight.y * screenToGridFactor);
 
   clamp(x1, 0, PIXEL_EFFECT_GRID_RES);
   clamp(x2, 0, PIXEL_EFFECT_GRID_RES);

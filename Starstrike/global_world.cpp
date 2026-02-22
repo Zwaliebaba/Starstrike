@@ -1354,7 +1354,6 @@ void GlobalWorld::Advance()
         GlobalLocation* loc = GetLocation(locId);
         float locX, locY;
         g_app->m_camera->Get2DScreenPos(loc->m_pos, &locX, &locY);
-        locY = g_app->m_renderer->ScreenH() - locY;
         int movX = static_cast<int>(locX - g_target->X());
         int movY = static_cast<int>(locY - g_target->Y());
         int movMag2 = movX * movX + movY * movY;

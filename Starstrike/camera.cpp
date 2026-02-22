@@ -120,9 +120,9 @@ void Camera::Get2DScreenPos(const LegacyVector3& _vector, float* _screenX, float
   int screenW = g_app->m_renderer->ScreenW();
   int screenH = g_app->m_renderer->ScreenH();
 
-  // Match gluProject convention: Y=0 at bottom of screen
+  // D3D11 convention: Y=0 at top of screen
   *_screenX = (ndcX * 0.5f + 0.5f) * screenW;
-  *_screenY = (ndcY * 0.5f + 0.5f) * screenH;
+  *_screenY = (0.5f - ndcY * 0.5f) * screenH;
 }
 
 void Camera::SetHeight(float _height) { m_height = _height; }
@@ -152,7 +152,6 @@ void Camera::AdvanceSphereWorldMode()
   LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
   float oldMouseX, oldMouseY;
   Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-  oldMouseY = screenH - oldMouseY;
 
   InputDetails details;
   if (g_inputManager->controlEvent(ControlCameraMove, details))
@@ -161,7 +160,6 @@ void Camera::AdvanceSphereWorldMode()
     g_app->m_userInput->RecalcMousePos3d();
     mousePos3D = g_app->m_userInput->GetMousePos3d();
     Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-    oldMouseY = screenH - oldMouseY;
   }
 
   float factor1 = 2.0f * g_advanceTime;
@@ -199,7 +197,6 @@ void Camera::AdvanceSphereWorldMode()
   // Get the 2D mouse coordinates now that we have moved the camera
   float newMouseX, newMouseY;
   Get2DScreenPos(mousePos3D, &newMouseX, &newMouseY);
-  newMouseY = screenH - newMouseY;
 
   // Calculate how much to move the cursor to make it look like it is
   // locked to a point on the landscape (we need to take account of
@@ -251,7 +248,6 @@ void Camera::AdvanceSphereWorldScriptedMode()
   LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
   float oldMouseX, oldMouseY;
   Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-  oldMouseY = screenH - oldMouseY;
 
   float factor1 = 1.0f * g_advanceTime;
   float factor2 = 1.0f - factor1;
@@ -555,7 +551,6 @@ void Camera::AdvanceFreeMovementMode()
   LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
   float oldMouseX, oldMouseY;
   Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-  oldMouseY = screenH - oldMouseY;
 
   // Allow quake keys to move us
   if (!g_app->m_taskManagerInterface->m_visible)
@@ -686,7 +681,6 @@ void Camera::AdvanceFreeMovementMode()
     float newMouseX, newMouseY;
     mousePos3D += deltaPos;
     Get2DScreenPos(mousePos3D, &newMouseX, &newMouseY);
-    newMouseY = screenH - newMouseY;
 
     // Calculate how much to move the cursor to make it look like it is
     // locked to a point on the landscape (we need to take account of
@@ -1255,7 +1249,6 @@ void Camera::AdvanceRadarAimMode()
   LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
   float oldMouseX, oldMouseY;
   Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-  oldMouseY = screenH - oldMouseY;
 
   float factor1 = 4.0f * g_advanceTime;
   float factor2 = 1.0f - factor1;
@@ -1292,7 +1285,6 @@ void Camera::AdvanceRadarAimMode()
   // Get the 2D mouse coordinates now that we have moved the camera
   float newMouseX, newMouseY;
   Get2DScreenPos(mousePos3D, &newMouseX, &newMouseY);
-  newMouseY = screenH - newMouseY;
 
   // Calculate how much to move the cursor to make it look like it is
   // locked to a point on the landscape (we need to take account of
@@ -1349,7 +1341,6 @@ void Camera::AdvanceTurretAimMode()
   LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
   float oldMouseX, oldMouseY;
   Get2DScreenPos(mousePos3D, &oldMouseX, &oldMouseY);
-  oldMouseY = screenH - oldMouseY;
 
   float factor1 = 4.0f * g_advanceTime;
   float factor2 = 1.0f - factor1;
@@ -1386,7 +1377,6 @@ void Camera::AdvanceTurretAimMode()
   // Get the 2D mouse coordinates now that we have moved the camera
   float newMouseX, newMouseY;
   Get2DScreenPos(mousePos3D, &newMouseX, &newMouseY);
-  newMouseY = screenH - newMouseY;
 
   // Calculate how much to move the cursor to make it look like it is
   // locked to a point on the landscape (we need to take account of

@@ -351,7 +351,7 @@ void GameCursor::Render()
                 m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
                 m_cursorSelection->SetAnimation( false );
                 g_app->m_renderer->SetupMatricesFor2D();
-                m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
+                m_cursorSelection->Render( posX, posY );
                 g_app->m_renderer->SetupMatricesFor3D();
             }
 
@@ -415,7 +415,7 @@ void GameCursor::Render()
                     m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
                     m_cursorSelection->SetAnimation( false );
                     g_app->m_renderer->SetupMatricesFor2D();
-                    m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
+                    m_cursorSelection->Render( posX, posY );
                     g_app->m_renderer->SetupMatricesFor3D();
 
 					m_highlightingSomething = true;
@@ -452,7 +452,7 @@ void GameCursor::Render()
                             g_app->m_renderer->SetupMatricesFor2D();
                             m_cursorPlacement->SetSize( 60.0f );
                             m_cursorPlacement->SetAnimation( true );
-                            m_cursorPlacement->Render( posX, g_app->m_renderer->ScreenH() - posY );
+                            m_cursorPlacement->Render( posX, posY );
                             g_app->m_renderer->SetupMatricesFor3D();
                         }
                     }
@@ -701,8 +701,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     // Is the _pos on screen or not?
 
     float screenX, screenY;
-    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
-    screenY = screenH - screenY;
+	g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
 
 	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
 	float angle = toCam * g_app->m_camera->GetFront();
@@ -753,7 +752,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
         lineNormal.x *= -1;
 
         g_app->m_renderer->SetupMatricesFor2D();
-        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize * 1.5f, 0.9f );
+        RenderSelectionArrow( edgeX, edgeY, lineNormal.x, lineNormal.y, triSize * 1.5f, 0.9f );
         g_app->m_renderer->SetupMatricesFor3D();
 
         onScreen = false;
@@ -774,8 +773,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     int screenH = g_app->m_renderer->ScreenH();
     int screenW = g_app->m_renderer->ScreenW();
     float screenX, screenY;
-    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
-    screenY = screenH - screenY;
+	g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
 
 	// Calculate alpha
 	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
@@ -897,7 +895,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 
         g_app->m_renderer->SetupMatricesFor2D();
 
-        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize, 1.0f );
+        RenderSelectionArrow( edgeX, edgeY, lineNormal.x, lineNormal.y, triSize, 1.0f );
 
         g_app->m_renderer->SetupMatricesFor3D();
     }

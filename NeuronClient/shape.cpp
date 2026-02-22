@@ -817,7 +817,7 @@ void ShapeFragment::Render(float _predictionTime)
   if (!matrixIsIdentity)
   {
     g_imRenderer->PushMatrix();
-    g_imRenderer->MultMatrixf(predictedTransform.ConvertToOpenGLFormat());
+    g_imRenderer->MultMatrixf(predictedTransform.ConvertToColumnMajor());
   }
 
   RenderSlow();
@@ -1270,7 +1270,7 @@ void Shape::Render(float _predictionTime, const Matrix34& _transform)
 {
 #ifndef EXPORTER_BUILD
   g_imRenderer->PushMatrix();
-  g_imRenderer->MultMatrixf(_transform.ConvertToOpenGLFormat());
+  g_imRenderer->MultMatrixf(_transform.ConvertToColumnMajor());
 
   m_rootFragment->Render(_predictionTime);
 

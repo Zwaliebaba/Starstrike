@@ -1815,7 +1815,6 @@ void TaskManagerInterfaceIcons::RenderCompass(float _screenX, float _screenY, co
 
   float screenX, screenY;
   g_app->m_camera->Get2DScreenPos(_worldPos, &screenX, &screenY);
-  screenY = screenH - screenY;
 
   LegacyVector3 toCam = g_app->m_camera->GetPos() - _worldPos;
   float angle = toCam * g_app->m_camera->GetFront();
@@ -1842,7 +1841,6 @@ void TaskManagerInterfaceIcons::RenderCompass(float _screenX, float _screenY, co
 
     float posX, posY;
     g_app->m_camera->Get2DScreenPos(camPos + camToTarget, &posX, &posY);
-    posY = screenH - posY;
     posX *= (m_screenW / screenW);
     posY *= (m_screenH / screenH);
 
