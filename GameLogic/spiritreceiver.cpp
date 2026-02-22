@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "debug_utils.h"
 #include "file_writer.h"
 #include "hi_res_time.h"
@@ -102,17 +99,21 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
     LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_imRenderer->Color4f(0.9f, 0.9f, 0.5f, 1.0f);
+    glDisable(GL_CULL_FACE);
+    glDepthMask(false);
+    glColor4f(0.9f, 0.9f, 0.5f, 1.0f);
 
     float size = 0.5f;
 
     if (buildingDetail == 1)
     {
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
       size = 1.0f;
     }
@@ -120,19 +121,18 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     ourPosRight.SetLength(size);
     theirPosRight.SetLength(size);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2f(0.1f, 0);
-    g_imRenderer->Vertex3fv((ourPos - ourPosRight).GetData());
-    g_imRenderer->TexCoord2f(0.1f, 1);
-    g_imRenderer->Vertex3fv((ourPos + ourPosRight).GetData());
-    g_imRenderer->TexCoord2f(0.9f, 1);
-    g_imRenderer->Vertex3fv((theirPos + theirPosRight).GetData());
-    g_imRenderer->TexCoord2f(0.9f, 0);
-    g_imRenderer->Vertex3fv((theirPos - theirPosRight).GetData());
-    g_imRenderer->End();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.1f, 0);
+    glVertex3fv((ourPos - ourPosRight).GetData());
+    glTexCoord2f(0.1f, 1);
+    glVertex3fv((ourPos + ourPosRight).GetData());
+    glTexCoord2f(0.9f, 1);
+    glVertex3fv((theirPos + theirPosRight).GetData());
+    glTexCoord2f(0.9f, 0);
+    glVertex3fv((theirPos - theirPosRight).GetData());
+    glEnd();
 
-
-    g_imRenderer->UnbindTexture();
+    glDisable(GL_TEXTURE_2D);
 
     //
     // Render any surges
@@ -228,13 +228,14 @@ static float s_nearPlaneStart;
 
 void ReceiverBuilding::BeginRenderUnprocessedSpirits()
 {
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glDepthMask(false);
 
   int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
   if (buildingDetail == 1)
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/glow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
 
   s_nearPlaneStart = g_app->m_renderer->GetNearPlane();
   g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart * 1.1f, g_app->m_renderer->GetFarPlane());
@@ -248,64 +249,62 @@ void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float 
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex3fv((position + camUp * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex3fv((position + camRight * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex3fv((position - camUp * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex3fv((position - camRight * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex3fv((position + camUp * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex3fv((position + camRight * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex3fv((position - camUp * 3 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex3fv((position - camRight * 3 * scale).GetData());
-  g_imRenderer->End();
+  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 3 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 3 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 3 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 3 * scale).GetData());
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 3 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 3 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 3 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 3 * scale).GetData());
+  glEnd();
 
-
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex3fv((position + camUp * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex3fv((position + camRight * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex3fv((position - camUp * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex3fv((position - camRight * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex3fv((position + camUp * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex3fv((position + camRight * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex3fv((position - camUp * 1 * scale).GetData());
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex3fv((position - camRight * 1 * scale).GetData());
-  g_imRenderer->End();
-
+  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 1 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 1 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 1 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 1 * scale).GetData());
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 1 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 1 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 1 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 1 * scale).GetData());
+  glEnd();
 
   int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
   if (buildingDetail == 1)
   {
-    g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex3fv((position + camUp * 30 * scale).GetData());
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex3fv((position + camRight * 30 * scale).GetData());
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex3fv((position - camUp * 30 * scale).GetData());
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex3fv((position - camRight * 30 * scale).GetData());
-    g_imRenderer->End();
-
-    g_imRenderer->UnbindTexture();
+    glEnable(GL_TEXTURE_2D);
+    glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3fv((position + camUp * 30 * scale).GetData());
+    glTexCoord2i(1, 0);
+    glVertex3fv((position + camRight * 30 * scale).GetData());
+    glTexCoord2i(1, 1);
+    glVertex3fv((position - camUp * 30 * scale).GetData());
+    glTexCoord2i(0, 1);
+    glVertex3fv((position - camRight * 30 * scale).GetData());
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
   }
 }
 
@@ -317,9 +316,41 @@ void ReceiverBuilding::RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, 
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 3 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 3 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 3 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 3 * scale).GetData());
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 3 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 3 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 3 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 3 * scale).GetData());
 
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 1 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 1 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 1 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 1 * scale).GetData());
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 1 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 1 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 1 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 1 * scale).GetData());
 }
 
 void ReceiverBuilding::RenderUnprocessedSpirit_detail(const LegacyVector3& _pos, float _life)
@@ -330,17 +361,26 @@ void ReceiverBuilding::RenderUnprocessedSpirit_detail(const LegacyVector3& _pos,
   float scale = 2.0f * _life;
   float alphaValue = _life;
 
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
+  glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
+  glTexCoord2i(0, 0);
+  glVertex3fv((position + camUp * 30 * scale).GetData());
+  glTexCoord2i(1, 0);
+  glVertex3fv((position + camRight * 30 * scale).GetData());
+  glTexCoord2i(1, 1);
+  glVertex3fv((position - camUp * 30 * scale).GetData());
+  glTexCoord2i(0, 1);
+  glVertex3fv((position - camRight * 30 * scale).GetData());
 }
 
 void ReceiverBuilding::EndRenderUnprocessedSpirits()
 {
   g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart, g_app->m_renderer->GetFarPlane());
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glDisable(GL_TEXTURE_2D);
+  glDepthMask(true);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
+  glEnable(GL_CULL_FACE);
 }
 
 // ****************************************************************************
@@ -454,13 +494,7 @@ bool SpiritProcessor::Advance()
   return ReceiverBuilding::Advance();
 }
 
-void SpiritProcessor::Render(float _predictionTime)
-{
-  ReceiverBuilding::Render(_predictionTime);
-
-  //g_gameFont.DrawText3DCentre( m_pos + LegacyVector3(0,215,0), 10.0f, "NumThisSecond : %d", m_numThisSecond );
-  //g_gameFont.DrawText3DCentre( m_pos + LegacyVector3(0,200,0), 10.0f, "Throughput    : %2.2f", m_throughput );
-}
+void SpiritProcessor::Render(float _predictionTime) { ReceiverBuilding::Render(_predictionTime); }
 
 void SpiritProcessor::RenderAlphas(float _predictionTime)
 {
@@ -632,10 +666,12 @@ LegacyVector3 SpiritReceiver::GetSpiritLocation()
 
 void SpiritReceiver::RenderPorts()
 {
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glDepthMask(false);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
   for (int i = 0; i < GetNumPorts(); ++i)
   {
@@ -652,31 +688,27 @@ void SpiritReceiver::RenderPorts()
     LegacyVector3 statusPos = worldMat.pos;
 
     if (GetPortOccupant(i).IsValid())
-    {
-      g_imRenderer->Color4f(0.3f, 1.0f, 0.3f, 1.0f);
-    }
+      glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
     else
-    {
-      g_imRenderer->Color4f(1.0f, 0.3f, 0.3f, 1.0f);
-    }
+      glColor4f(1.0f, 0.3f, 0.3f, 1.0f);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex3fv((statusPos - camR - camU).GetData());
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex3fv((statusPos + camR - camU).GetData());
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex3fv((statusPos + camR + camU).GetData());
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex3fv((statusPos - camR + camU).GetData());
-    g_imRenderer->End();
-
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3fv((statusPos - camR - camU).GetData());
+    glTexCoord2i(1, 0);
+    glVertex3fv((statusPos + camR - camU).GetData());
+    glTexCoord2i(1, 1);
+    glVertex3fv((statusPos + camR + camU).GetData());
+    glTexCoord2i(0, 1);
+    glVertex3fv((statusPos - camR + camU).GetData());
+    glEnd();
   }
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
+  glDepthMask(true);
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_CULL_FACE);
 }
 
 void SpiritReceiver::RenderAlphas(float _predictionTime)

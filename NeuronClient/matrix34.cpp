@@ -8,7 +8,7 @@
 #include "debug_utils.h"
 
 
-float Matrix34::m_columnMajor[16];
+float Matrix34::m_openGLFormat[16];
 
 Matrix34 const g_identityMatrix34(0);
 

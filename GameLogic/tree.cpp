@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "debug_render.h"
 #include "file_writer.h"
 #include "math_utils.h"
@@ -9,6 +6,7 @@
 #include "text_stream_readers.h"
 #include "debug_utils.h"
 #include "shape.h"
+#include "hi_res_time.h"
 #include "preferences.h"
 #include "tree.h"
 #include "soundsystem.h"
@@ -196,14 +194,22 @@ static void intToArray(unsigned x, unsigned char* a)
 void Tree::DeleteDisplayLists()
 {
   if (m_branchDisplayListId != -1)
+  {
+    glDeleteLists(m_branchDisplayListId, 1);
     m_branchDisplayListId = -1;
+  }
 
   if (m_leafDisplayListId != -1)
+  {
+    glDeleteLists(m_leafDisplayListId, 1);
     m_leafDisplayListId = -1;
+  }
 }
 
 void Tree::Generate()
 {
+  float timeNow = GetHighResTime();
+
   m_hitcheckCentre.Zero();
   m_hitcheckRadius = 0.0f;
   m_numLeafs = 0;
@@ -223,14 +229,20 @@ void Tree::Generate()
   }
 
   darwiniaSeedRandom(m_seed);
-  g_imRenderer->Begin(PRIM_QUADS);
+  m_branchDisplayListId = glGenLists(1);
+  glNewList(m_branchDisplayListId, GL_COMPILE);
+  glBegin(GL_QUADS);
   RenderBranch(g_zeroVector, g_upVector, m_iterations, false, true, false);
-  g_imRenderer->End();
+  glEnd();
+  glEndList();
 
   darwiniaSeedRandom(m_seed);
-  g_imRenderer->Begin(PRIM_QUADS);
+  m_leafDisplayListId = glGenLists(1);
+  glNewList(m_leafDisplayListId, GL_COMPILE);
+  glBegin(GL_QUADS);
   RenderBranch(g_zeroVector, g_upVector, m_iterations, false, false, true);
-  g_imRenderer->End();
+  glEnd();
+  glEndList();
 
   //
   // We now have all the leaf positions accumulated in m_hitcheckCentre
@@ -239,6 +251,9 @@ void Tree::Generate()
   m_hitcheckCentre /= static_cast<float>(m_numLeafs);
   RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, true);
   m_hitcheckRadius *= 0.8f;
+
+  float totalTime = GetHighResTime() - timeNow;
+  DebugTrace("Tree generated in %dms\n", static_cast<int>(totalTime * 1000.0f));
 }
 
 void Tree::Render(float _predictionTime)
@@ -265,15 +280,20 @@ void Tree::RenderAlphas(float _predictionTime)
 
   float actualHeight = GetActualHeight(_predictionTime);
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glEnable(GL_TEXTURE_2D);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glDisable(GL_CULL_FACE);
+  glDepthMask(false);
 
-  g_imRenderer->PushMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
   Matrix34 mat(m_front, g_upVector, m_pos);
-  g_imRenderer->MultMatrixf(mat.ConvertToColumnMajor());
-  g_imRenderer->Scalef(actualHeight, actualHeight, actualHeight);
+  glMultMatrixf(mat.ConvertToOpenGLFormat());
+  glScalef(actualHeight, actualHeight, actualHeight);
 
   if (Location::ChristmasModEnabled() == 1)
   {
@@ -282,16 +302,22 @@ void Tree::RenderAlphas(float _predictionTime)
     m_branchColourArray[2] = 50;
   }
 
-  g_imRenderer->Color4ubv(m_branchColourArray);
+  glColor4ubv(m_branchColourArray);
+  glCallList(m_branchDisplayListId);
 
   if (Location::ChristmasModEnabled() != 1)
-    g_imRenderer->Color4ubv(m_leafColourArray);
+  {
+    glColor4ubv(m_leafColourArray);
+    glCallList(m_leafDisplayListId);
+  }
 
-  g_imRenderer->PopMatrix();
+  glPopMatrix();
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+  glDepthMask(true);
+  glEnable(GL_CULL_FACE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_BLEND);
 }
 
 void Tree::RenderHitCheck()
@@ -415,7 +441,26 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
   LegacyVector3 camRightA = rightAngleA * thickness * budsize;
   LegacyVector3 camRightB = rightAngleB * thickness * budsize;
 
-  if ((_iterations == 0 && _renderLeaf) || (_iterations != 0 && _renderBranch)) {}
+  if ((_iterations == 0 && _renderLeaf) || (_iterations != 0 && _renderBranch))
+  {
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3fv((_from - camRightA).GetData());
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3fv((_from + camRightA).GetData());
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3fv((_to + camRightA).GetData());
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3fv((_to - camRightA).GetData());
+
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3fv((_from - camRightB).GetData());
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3fv((_from + camRightB).GetData());
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3fv((_to + camRightB).GetData());
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3fv((_to - camRightB).GetData());
+  }
 
   int numBranches = 4;
 

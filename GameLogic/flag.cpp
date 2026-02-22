@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "profiler.h"
 #include "text_renderer.h"
 
@@ -108,29 +105,32 @@ void Flag::Render()
     //
     // Render the flag pole
 
-    g_imRenderer->Color4ub( 255, 255, 100, 255 );
+    glColor4ub( 255, 255, 100, 255 );
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+    glDisable       ( GL_CULL_FACE );
+    glDisable       ( GL_TEXTURE_2D );
 
     LegacyVector3 right = m_up ^ ( g_app->m_camera->GetFront() );
     right.SetLength( 0.2f );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex3fv( (m_pos-right).GetData() );
-        g_imRenderer->Vertex3fv( (m_pos+right).GetData() );
-        g_imRenderer->Vertex3fv( (m_pos+m_up*m_size*1.5f+right).GetData() );
-        g_imRenderer->Vertex3fv( (m_pos+m_up*m_size*1.5f-right).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glVertex3fv( (m_pos-right).GetData() );
+        glVertex3fv( (m_pos+right).GetData() );
+        glVertex3fv( (m_pos+m_up*m_size*1.5f+right).GetData() );
+        glVertex3fv( (m_pos+m_up*m_size*1.5f-right).GetData() );
+    glEnd();
 
     //
     // Render the flag
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_imRenderer->BindTexture(m_texId );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable        ( GL_BLEND );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, m_texId );
+    glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.8f );
+    glColor4f( 1.0f, 1.0f, 1.0f, 0.8f );
     for( int x = 0; x < FLAG_RESOLUTION-1; ++x )
     {
         for( int y = 0; y < FLAG_RESOLUTION-1; ++y )
@@ -139,19 +139,19 @@ void Flag::Render()
             float texY = (float) y / (float) (FLAG_RESOLUTION-1);
             float texW = 1.0f / (FLAG_RESOLUTION-1);
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(texX,texY);            g_imRenderer->Vertex3fv( m_flag[x][y].GetData() );
-                g_imRenderer->TexCoord2f(texX+texW,texY);       g_imRenderer->Vertex3fv( m_flag[x+1][y].GetData() );
-                g_imRenderer->TexCoord2f(texX+texW,texY+texW);  g_imRenderer->Vertex3fv( m_flag[x+1][y+1].GetData() );
-                g_imRenderer->TexCoord2f(texX,texY+texW);       g_imRenderer->Vertex3fv( m_flag[x][y+1].GetData() );
-            g_imRenderer->End();
-
+            glBegin( GL_QUADS );
+                glTexCoord2f(texX,texY);            glVertex3fv( m_flag[x][y].GetData() );
+                glTexCoord2f(texX+texW,texY);       glVertex3fv( m_flag[x+1][y].GetData() );
+                glTexCoord2f(texX+texW,texY+texW);  glVertex3fv( m_flag[x+1][y+1].GetData() );
+                glTexCoord2f(texX,texY+texW);       glVertex3fv( m_flag[x][y+1].GetData() );
+            glEnd();
         }
     }
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDepthMask     ( true );
+    glDisable       ( GL_BLEND );
+    glDisable       ( GL_TEXTURE_2D );
+    glEnable        ( GL_CULL_FACE );
 
     END_PROFILE( g_app->m_profiler, "RenderFlag" );
 }

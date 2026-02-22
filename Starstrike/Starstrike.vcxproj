@@ -526,7 +526,9 @@
   <ItemGroup>
     <Text Include="Assets\default_preferences.txt" />
     <Text Include="Assets\effects.txt" />
+    <Text Include="Assets\egames.txt" />
     <Text Include="Assets\game.txt" />
+    <Text Include="Assets\game_unlockall.txt" />
     <Text Include="Assets\Input\input_preferences.txt" />
     <Text Include="Assets\Input\Keyboards\de_DE.txt" />
     <Text Include="Assets\Input\Keyboards\fr_FR.txt" />
@@ -714,8 +716,6 @@
     <Image Include="Assets\Textures\campaign.bmp" />
     <Image Include="Assets\Textures\clouds.bmp" />
     <Image Include="Assets\Textures\cloudyglow.bmp" />
-    <Image Include="Assets\Textures\deform1c.bmp" />
-    <Image Include="Assets\Textures\deform36c.bmp" />
     <Image Include="Assets\Textures\dmacrew.bmp" />
     <Image Include="Assets\Textures\editor_font.bmp" />
     <Image Include="Assets\Textures\editor_font_french.bmp" />

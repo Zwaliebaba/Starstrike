@@ -5,10 +5,6 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
 
 #include "app.h"
 #include "explosion.h"
@@ -197,7 +193,7 @@ void Explosion::Render()
 
 	float age = (EXPLOSION_LIFETIME + (g_gameTime - m_timeToDie)) / EXPLOSION_LIFETIME;
 
-	g_imRenderer->Begin(PRIM_TRIANGLES);
+	glBegin(GL_TRIANGLES);
 	for (int i = 0; i < m_numTris; ++i)
 	{
 		if (g_gameTime > m_tris[i].m_timeToDie) continue;
@@ -207,18 +203,18 @@ void Explosion::Render()
 		LegacyVector3 const v2(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_v2 + m_tris[i].m_pos);
 		LegacyVector3 const v3(m_tris[i].m_tumbler->m_rotMat * m_tris[i].m_v3 + m_tris[i].m_pos);
 
-		g_imRenderer->Color4ub(m_tris[i].m_colour.r,
-				   m_tris[i].m_colour.g,
-				   m_tris[i].m_colour.b,
-				   (unsigned char)((1.0f-age) * 255));
+		glColor4ub(m_tris[i].m_colour.r,
+                   m_tris[i].m_colour.g,
+                   m_tris[i].m_colour.b,
+                   (1.0f-age) * 255);
 
-		g_imRenderer->Normal3fv(norm.GetDataConst());
+		glNormal3fv(norm.GetDataConst());
 
-		g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv(v1.GetDataConst());
-		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv(v2.GetDataConst());
-		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv(v3.GetDataConst());
+        glTexCoord2i( 0, 0 );       glVertex3fv(v1.GetDataConst());
+		glTexCoord2i( 0, 1 );       glVertex3fv(v2.GetDataConst());
+		glTexCoord2i( 1, 1 );       glVertex3fv(v3.GetDataConst());
 	}
-	g_imRenderer->End();
+	glEnd();
 }
 
 LegacyVector3 Explosion::GetCenter() const
@@ -321,27 +317,33 @@ void ExplosionManager::Render()
 
 	if (numExplosions > 0) {
 
+		CHECK_OPENGL_STATE();
 
-		int texId = g_app->m_resource->GetTexture("textures/shapewireframe.bmp");
-		g_imRenderer->BindTexture(texId);
-		g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-
+		glEnable        (GL_TEXTURE_2D );
+		glBindTexture   (GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/shapewireframe.bmp" ) );
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexEnvf       (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 		g_app->m_renderer->SetObjectLighting();
 
+		glEnable        (GL_COLOR_MATERIAL);
+		glDisable       (GL_CULL_FACE);
+		glEnable        (GL_BLEND );
 
 		for (unsigned int i = 0; i < numExplosions; ++i)
 		{
 			m_explosions[i]->Render();
 		}
 
-		g_imRenderer->UnbindTexture();
-		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-		g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-
+		glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glDisable       (GL_BLEND );
+		glEnable        (GL_CULL_FACE);
+		glDisable       (GL_COLOR_MATERIAL);
 		g_app->m_renderer->UnsetObjectLighting();
 
+		glTexEnvf       (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glDisable       (GL_TEXTURE_2D );
 
 	}
 

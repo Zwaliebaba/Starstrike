@@ -795,7 +795,7 @@ void Initialise()
     }
   }
 
-  g_app->m_renderer->SetDefaultRenderState();
+  g_app->m_renderer->SetOpenGLState();
 }
 
 void Finalise()
@@ -901,14 +901,6 @@ void EnterLocation()
 
   if (g_app->m_editing)
   {
-#ifdef LOCATION_EDITOR
-#ifndef PURITY_CONTROL
-    g_app->m_locationEditor = new LocationEditor();
-    g_app->m_camera->SetDebugMode(Camera::DebugModeAlways);
-
-    LocationEditorLoop();
-#endif  // PURITY_CONTROL
-#endif // LOCATION_EDITOR
   }
   else
   {
@@ -916,11 +908,6 @@ void EnterLocation()
     g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
 
     LocationGameLoop();
-#ifdef DEMOBUILD
-#ifndef DEMO2
-    PrintMemoryLeaks(); g_windowManager->OpenWebsite("http://www.darwinia.co.uk/demoend/"); Finalise(); exit(0);
-#endif // DEMO2
-#endif // DEMOBUILD
   }
 }
 

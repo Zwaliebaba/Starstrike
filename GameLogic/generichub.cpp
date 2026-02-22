@@ -424,7 +424,9 @@ void DynamicNode::Render( float _predictionTime )
         m_front = right ^ m_up;
     }
 
+    glShadeModel( GL_SMOOTH );
     DynamicBase::Render( _predictionTime );
+    glShadeModel( GL_FLAT );
 }
 
 

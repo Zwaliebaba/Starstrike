@@ -3,9 +3,6 @@
 #include "text_renderer.h"
 #include "language_table.h"
 #include "filesys_utils.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "resource.h"
 
 #include "prefs_other_window.h"
@@ -308,12 +305,12 @@ void PrefsOtherWindow::Render(bool _hasFocus)
 
 #ifndef DEMOBUILD
   if (g_app->m_locationId != -1)
-    { g_editorFont.SetColour(0.5f, 0.5f, 0.5f, 1.0f); }
+    glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
   g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_difficulty"));
 #endif // DEMOBUILD
 
-  g_editorFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   if (Location::ChristmasModEnabled())
     g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_christmas"));
 

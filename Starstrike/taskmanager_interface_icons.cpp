@@ -13,10 +13,6 @@
 #include "preferences.h"
 #include "eclipse.h"
 #include "clienttoserver.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
 #include "app.h"
 #include "gamecursor.h"
 #include "global_world.h"
@@ -295,6 +291,10 @@ void TaskManagerInterfaceIcons::SetupRenderMatrices(int _screenId)
    *  And 960x600 on a widescreen screen
    */
 
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
 
   float screenRatio = static_cast<float>(g_app->m_renderer->ScreenW()) / static_cast<float>(g_app->m_renderer->ScreenH());
   m_screenH = 600.0f;
@@ -324,10 +324,8 @@ void TaskManagerInterfaceIcons::SetupRenderMatrices(int _screenId)
   float right = left + m_screenW;
   float bottom = top + m_screenH;
 
-  g_imRenderer->SetProjectionMatrix(DirectX::XMMatrixOrthographicOffCenterRH(left, right, bottom, top, -1, 1));
-  g_imRenderer->SetViewMatrix(DirectX::XMMatrixIdentity());
-  g_imRenderer->LoadIdentity();
-
+  gluOrtho2D(left, right, bottom, top);
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void TaskManagerInterfaceIcons::ConvertMousePosition(float& _x, float& _y)
@@ -348,9 +346,8 @@ void TaskManagerInterfaceIcons::Render()
 
   START_PROFILE(g_app->m_profiler, "Render Taskman");
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-
+  glEnable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
 
   if (g_app->m_locationId != -1)
     RenderTargetAreas();
@@ -376,38 +373,27 @@ void TaskManagerInterfaceIcons::Render()
     //
     // Render silver bar
 
-    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    int divTexId = g_app->m_resource->GetTexture("textures/interface_divider.bmp");
-    g_imRenderer->BindTexture(divTexId);
-    g_imRenderer->SetSampler(SAMPLER_NEAREST_WRAP);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_divider.bmp"));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    g_imRenderer->BindTexture(divTexId);
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex2i(0, m_screenH - 26);
+    glTexCoord2i(100, 0);
+    glVertex2i(m_screenW, m_screenH - 26);
+    glTexCoord2i(100, 1);
+    glVertex2i(m_screenW, m_screenH);
+    glTexCoord2i(0, 1);
+    glVertex2i(0, m_screenH);
+    glEnd();
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex2i(0, m_screenH - 26);
-    g_imRenderer->TexCoord2i(100, 0);
-    g_imRenderer->Vertex2i(m_screenW, m_screenH - 26);
-    g_imRenderer->TexCoord2i(100, 1);
-    g_imRenderer->Vertex2i(m_screenW, m_screenH);
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex2i(0, m_screenH);
-    g_imRenderer->End();
-
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex2i(0, m_screenH - 26);
-    g_imRenderer->TexCoord2i(100, 0);
-    g_imRenderer->Vertex2i(m_screenW, m_screenH - 26);
-    g_imRenderer->TexCoord2i(100, 1);
-    g_imRenderer->Vertex2i(m_screenW, m_screenH);
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex2i(0, m_screenH);
-    g_imRenderer->End();
-
-
-    g_imRenderer->UnbindTexture();
+    glDisable(GL_TEXTURE_2D);
 
     RenderTooltip();
     RenderScreenZones();
@@ -434,9 +420,8 @@ void TaskManagerInterfaceIcons::Render()
 
   g_gameFont.EndText2D();
 
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-
+  glEnable(GL_CULL_FACE);
+  glDisable(GL_BLEND);
 
   END_PROFILE(g_app->m_profiler, "Render Taskman");
 }
@@ -867,15 +852,14 @@ void TaskManagerInterfaceIcons::RenderScreenZones()
   
           hX -= m_screenY * m_screenW;
   
-          g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+          glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
   
-          g_imRenderer->Begin(PRIM_LINE_LOOP);
-              g_imRenderer->Vertex2f( hX, hY );
-              g_imRenderer->Vertex2f( hX+hW, hY );
-              g_imRenderer->Vertex2f( hX+hW, hY+hH );
-              g_imRenderer->Vertex2f( hX, hY+hH );
-          g_imRenderer->End();
-
+          glBegin( GL_LINE_LOOP );
+              glVertex2f( hX, hY );
+              glVertex2f( hX+hW, hY );
+              glVertex2f( hX+hW, hY+hH );
+              glVertex2f( hX, hY+hH );
+          glEnd();
       }
   
   */
@@ -884,7 +868,7 @@ void TaskManagerInterfaceIcons::RenderScreenZones()
   {
     ScreenZone* zone = m_screenZones[m_currentScreenZone];
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
     float overSpill = zone->m_h * 0.1f;
     float hX = zone->m_x - overSpill;
@@ -895,78 +879,48 @@ void TaskManagerInterfaceIcons::RenderScreenZones()
     //hX -= m_screenY * m_screenW;
     hY -= m_screenY * m_screenH;
 
-    g_imRenderer->Color4f(0.05f, 0.05f, 0.5f, 0.3f);
+    glColor4f(0.05f, 0.05f, 0.5f, 0.3f);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->Vertex2f(hX, hY);
-    g_imRenderer->Vertex2f(hX + hW, hY);
-    g_imRenderer->Vertex2f(hX + hW, hY + hH);
-    g_imRenderer->Vertex2f(hX, hY + hH);
-    g_imRenderer->End();
+    glBegin(GL_QUADS);
+    glVertex2f(hX, hY);
+    glVertex2f(hX + hW, hY);
+    glVertex2f(hX + hW, hY + hH);
+    glVertex2f(hX, hY + hH);
+    glEnd();
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->Vertex2f(hX, hY);
-    g_imRenderer->Vertex2f(hX + hW, hY);
-    g_imRenderer->Vertex2f(hX + hW, hY + hH);
-    g_imRenderer->Vertex2f(hX, hY + hH);
-    g_imRenderer->End();
+    glColor4f(1.0f, 1.0f, 0.3f, 1.0f);
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/mouse_selection.bmp"));
+    glEnable(GL_TEXTURE_2D);
 
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(hX, hY);
+    glTexCoord2f(0.5f, 0.0f);
+    glVertex2f(hX + hH / 2, hY);
+    glTexCoord2f(0.5f, 1.0f);
+    glVertex2f(hX + hH / 2, hY + hH);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(hX, hY + hH);
 
-    g_imRenderer->Color4f(1.0f, 1.0f, 0.3f, 1.0f);
-    int selTexId = g_app->m_resource->GetTexture("icons/mouse_selection.bmp");
-    g_imRenderer->BindTexture(selTexId);
+    glTexCoord2f(0.5f, 0.0f);
+    glVertex2f(hX + hW - hH / 2, hY);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(hX + hW, hY);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(hX + hW, hY + hH);
+    glTexCoord2f(0.5f, 1.0f);
+    glVertex2f(hX + hW - hH / 2, hY + hH);
+    glEnd();
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2f(0.0f, 0.0f);
-    g_imRenderer->Vertex2f(hX, hY);
-    g_imRenderer->TexCoord2f(0.5f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hH / 2, hY);
-    g_imRenderer->TexCoord2f(0.5f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hH / 2, hY + hH);
-    g_imRenderer->TexCoord2f(0.0f, 1.0f);
-    g_imRenderer->Vertex2f(hX, hY + hH);
-
-    g_imRenderer->TexCoord2f(0.5f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hW - hH / 2, hY);
-    g_imRenderer->TexCoord2f(1.0f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hW, hY);
-    g_imRenderer->TexCoord2f(1.0f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hW, hY + hH);
-    g_imRenderer->TexCoord2f(0.5f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hW - hH / 2, hY + hH);
-    g_imRenderer->End();
-
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2f(0.0f, 0.0f);
-    g_imRenderer->Vertex2f(hX, hY);
-    g_imRenderer->TexCoord2f(0.5f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hH / 2, hY);
-    g_imRenderer->TexCoord2f(0.5f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hH / 2, hY + hH);
-    g_imRenderer->TexCoord2f(0.0f, 1.0f);
-    g_imRenderer->Vertex2f(hX, hY + hH);
-
-    g_imRenderer->TexCoord2f(0.5f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hW - hH / 2, hY);
-    g_imRenderer->TexCoord2f(1.0f, 0.0f);
-    g_imRenderer->Vertex2f(hX + hW, hY);
-    g_imRenderer->TexCoord2f(1.0f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hW, hY + hH);
-    g_imRenderer->TexCoord2f(0.5f, 1.0f);
-    g_imRenderer->Vertex2f(hX + hW - hH / 2, hY + hH);
-    g_imRenderer->End();
-
-
-    g_imRenderer->UnbindTexture();
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_imRenderer->UnbindTexture();
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_TEXTURE_2D);
   }
 }
 
 void TaskManagerInterfaceIcons::RenderTooltip()
 {
   g_gameFont.SetRenderShadow(true);
-  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
+  glColor4ub(255, 255, 150, 30);
 
   if (m_screenZones.ValidIndex(m_currentScreenZone))
   {
@@ -1110,11 +1064,11 @@ void TaskManagerInterfaceIcons::RenderMessages()
     float outlineAlpha = alpha * alpha * alpha;
 
     g_gameFont.SetRenderOutline(true);
-    g_gameFont.SetColour(outlineAlpha, outlineAlpha, outlineAlpha, 0.0f);
+    glColor4f(outlineAlpha, outlineAlpha, outlineAlpha, 0.0f);
     g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
 
     g_gameFont.SetRenderOutline(false);
-    g_gameFont.SetColour(1.0f, 1.0f, 1.0f, alpha);
+    glColor4f(1.0f, 1.0f, 1.0f, alpha);
     g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
   }
 }
@@ -1151,72 +1105,40 @@ void TaskManagerInterfaceIcons::RenderTargetAreas()
 static void RenderIcon(const char* _foreground, const char* _background, int _x, int _y, float _iconSize, unsigned _alpha)
 {
   // Render the shadow
-  int bgTexId = g_app->m_resource->GetTexture(_background);
-  g_imRenderer->BindTexture(bgTexId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_imRenderer->Color4ub(_alpha, _alpha, _alpha, 0);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(_background));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+  glDepthMask(false);
+  glColor4ub(_alpha, _alpha, _alpha, 0.0f);
 
-  g_imRenderer->BindTexture(bgTexId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_imRenderer->Color4ub(_alpha, _alpha, _alpha, 0.0f);
-
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(_x, _y);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y + _iconSize);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(_x, _y + _iconSize);
-  g_imRenderer->End();
-
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(_x, _y);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y + _iconSize);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(_x, _y + _iconSize);
-  g_imRenderer->End();
-
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(_x, _y);
+  glTexCoord2i(1, 1);
+  glVertex2f(_x + _iconSize, _y);
+  glTexCoord2i(1, 0);
+  glVertex2f(_x + _iconSize, _y + _iconSize);
+  glTexCoord2i(0, 0);
+  glVertex2f(_x, _y + _iconSize);
+  glEnd();
 
   // Render the icon
-  int fgTexId = g_app->m_resource->GetTexture(_foreground);
-  g_imRenderer->BindTexture(fgTexId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->Color4ub(255, 255, 255, _alpha);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(_foreground));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-  g_imRenderer->BindTexture(fgTexId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->Color4ub(255, 255, 255, _alpha);
+  glColor4ub(255, 255, 255, _alpha);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(_x, _y);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y + _iconSize);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(_x, _y + _iconSize);
-  g_imRenderer->End();
-
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(_x, _y);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(_x + _iconSize, _y + _iconSize);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(_x, _y + _iconSize);
-  g_imRenderer->End();
-
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(_x, _y);
+  glTexCoord2i(1, 1);
+  glVertex2f(_x + _iconSize, _y);
+  glTexCoord2i(1, 0);
+  glVertex2f(_x + _iconSize, _y + _iconSize);
+  glTexCoord2i(0, 0);
+  glVertex2f(_x, _y + _iconSize);
+  glEnd();
 }
 
 void TaskManagerInterfaceIcons::RenderTaskManager()
@@ -1224,10 +1146,10 @@ void TaskManagerInterfaceIcons::RenderTaskManager()
   SetupRenderMatrices(ScreenTaskManager);
 
   g_gameFont.SetRenderOutline(true);
-  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+  glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_taskmanager"));
   g_gameFont.SetRenderOutline(false);
-  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_taskmanager"));
 
   //
@@ -1256,19 +1178,17 @@ void TaskManagerInterfaceIcons::RenderTaskManager()
     }
     else
     {
-      g_imRenderer->Color4ub(199, 214, 220, alpha);
+      glColor4ub(199, 214, 220, alpha);
 
-      g_imRenderer->Begin(PRIM_TRIANGLES);
-      g_imRenderer->Vertex2f(m_screenW - 40, 10);
-      g_imRenderer->Vertex2f(m_screenW - 20, 30);
-      g_imRenderer->Vertex2f(m_screenW - 60, 30);
+      glBegin(GL_TRIANGLES);
+      glVertex2f(m_screenW - 40, 10);
+      glVertex2f(m_screenW - 20, 30);
+      glVertex2f(m_screenW - 60, 30);
 
-      g_imRenderer->Vertex2f(m_screenW - 40, m_screenH - 30);
-      g_imRenderer->Vertex2f(m_screenW - 20, m_screenH - 50);
-      g_imRenderer->Vertex2f(m_screenW - 60, m_screenH - 50);
-      g_imRenderer->End();
-
-
+      glVertex2f(m_screenW - 40, m_screenH - 30);
+      glVertex2f(m_screenW - 20, m_screenH - 50);
+      glVertex2f(m_screenW - 60, m_screenH - 50);
+      glEnd();
     }
 
     auto zoneLeft = new ScreenZone("ScreenUp", LANGUAGEPHRASE("newcontrols_showresearch"), m_screenW - 60, 10, 40, 20, -1);
@@ -1309,20 +1229,19 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
   float titleHeight = 20.0f;
   float boxH = numAvailable * (h + 5);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Vertex2f(x, y - titleHeight);
-  g_imRenderer->Vertex2f(x + w, y - titleHeight);
-  g_imRenderer->Color4ub(112, 141, 168, 255);
-  g_imRenderer->Vertex2f(x + w, y);
-  g_imRenderer->Vertex2f(x, y);
-  g_imRenderer->End();
-
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Color4ub(112, 141, 168, 255);
+  glShadeModel(GL_SMOOTH);
+  glBegin(GL_QUADS);
+  glColor4ub(199, 214, 220, 255);
+  glVertex2f(x, y - titleHeight);
+  glVertex2f(x + w, y - titleHeight);
+  glColor4ub(112, 141, 168, 255);
+  glVertex2f(x + w, y);
+  glVertex2f(x, y);
+  glEnd();
+  glShadeModel(GL_FLAT);
 
   g_gameFont.SetRenderShadow(true);
-  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
+  glColor4ub(255, 255, 150, 30);
   g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
   g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
   g_gameFont.SetRenderShadow(false);
@@ -1330,31 +1249,36 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
   //
   // Background box
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.8f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0, 0);
-  g_imRenderer->Vertex2f(x, y);
-  g_imRenderer->TexCoord2f(1, 0);
-  g_imRenderer->Vertex2f(x + w, y);
-  g_imRenderer->TexCoord2f(1, boxH / m_screenH * 1.5);
-  g_imRenderer->Vertex2f(x + w, y + boxH);
-  g_imRenderer->TexCoord2f(0, boxH / m_screenH * 1.5);
-  g_imRenderer->Vertex2f(x, y + boxH);
-  g_imRenderer->End();
+  glColor4f(0.8f, 0.8f, 0.8f, 0.8f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0);
+  glVertex2f(x, y);
+  glTexCoord2f(1, 0);
+  glVertex2f(x + w, y);
+  glTexCoord2f(1, boxH / m_screenH * 1.5);
+  glVertex2f(x + w, y + boxH);
+  glTexCoord2f(0, boxH / m_screenH * 1.5);
+  glVertex2f(x, y + boxH);
+  glEnd();
 
+  glDisable(GL_TEXTURE_2D);
 
-  g_imRenderer->UnbindTexture();
-
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Begin(PRIM_LINE_LOOP);
-  g_imRenderer->Vertex2f(x, y - titleHeight);
-  g_imRenderer->Vertex2f(x + w, y - titleHeight);
-  g_imRenderer->Vertex2f(x + w, y + boxH);
-  g_imRenderer->Vertex2f(x, y + boxH);
-  g_imRenderer->End();
-
+  glColor4ub(199, 214, 220, 255);
+  glLineWidth(2.0f);
+  glBegin(GL_LINE_LOOP);
+  glVertex2f(x, y - titleHeight);
+  glVertex2f(x + w, y - titleHeight);
+  glVertex2f(x + w, y + boxH);
+  glVertex2f(x, y + boxH);
+  glEnd();
+  glLineWidth(1.0f);
 
   y += titleHeight;
 
@@ -1374,19 +1298,20 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
       // Render task name and F-key shortcut
 
       g_gameFont.SetRenderOutline(true);
-      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+      glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(x + 70, y + 5, 18, GlobalResearch::GetTypeNameTranslated(taskType));
       g_gameFont.SetRenderOutline(false);
-      g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
+      glColor4f(0.8f, 0.8f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(x + 70, y + 5, 18, GlobalResearch::GetTypeNameTranslated(taskType));
 
       //
       // Render the shadow
 
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-      g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-      g_imRenderer->Color4f(0.5f, 0.5f, 0.5f, 0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+      glDepthMask(false);
+      glColor4f(0.5f, 0.5f, 0.5f, 0.0f);
 
       float iconSize = (h - 6);
       float iconX = x + 10;
@@ -1394,19 +1319,18 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
 
       float shadowSize = iconSize * 1.1f;
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2i(0, 1);
-      g_imRenderer->Vertex2f(iconX, iconY);
-      g_imRenderer->TexCoord2i(1, 1);
-      g_imRenderer->Vertex2f(iconX + shadowSize, iconY);
-      g_imRenderer->TexCoord2i(1, 0);
-      g_imRenderer->Vertex2f(iconX + shadowSize, iconY + shadowSize);
-      g_imRenderer->TexCoord2i(0, 0);
-      g_imRenderer->Vertex2f(iconX, iconY + shadowSize);
-      g_imRenderer->End();
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 1);
+      glVertex2f(iconX, iconY);
+      glTexCoord2i(1, 1);
+      glVertex2f(iconX + shadowSize, iconY);
+      glTexCoord2i(1, 0);
+      glVertex2f(iconX + shadowSize, iconY + shadowSize);
+      glTexCoord2i(0, 0);
+      glVertex2f(iconX, iconY + shadowSize);
+      glEnd();
 
-
-      g_imRenderer->UnbindTexture();
+      glDisable(GL_TEXTURE_2D);
 
       //
       // Render the task symbol
@@ -1416,24 +1340,26 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
       unsigned int texId = g_app->m_resource->GetTexture(iconFilename);
       if (texId != -1)
       {
-        g_imRenderer->BindTexture(texId);
-        g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0, 1);
-        g_imRenderer->Vertex2f(iconX, iconY);
-        g_imRenderer->TexCoord2i(1, 1);
-        g_imRenderer->Vertex2f(iconX + iconSize, iconY);
-        g_imRenderer->TexCoord2i(1, 0);
-        g_imRenderer->Vertex2f(iconX + iconSize, iconY + iconSize);
-        g_imRenderer->TexCoord2i(0, 0);
-        g_imRenderer->Vertex2f(iconX, iconY + iconSize);
-        g_imRenderer->End();
+        glBegin(GL_QUADS);
+        glTexCoord2i(0, 1);
+        glVertex2f(iconX, iconY);
+        glTexCoord2i(1, 1);
+        glVertex2f(iconX + iconSize, iconY);
+        glTexCoord2i(1, 0);
+        glVertex2f(iconX + iconSize, iconY + iconSize);
+        glTexCoord2i(0, 0);
+        glVertex2f(iconX, iconY + iconSize);
+        glEnd();
 
-
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_imRenderer->UnbindTexture();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_TEXTURE_2D);
       }
     }
 
@@ -1448,36 +1374,37 @@ void TaskManagerInterfaceIcons::RenderTitleBar()
   //
   // Render panel
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  g_imRenderer->Color4f(0.5f, 0.5f, 1.0f, 0.7f);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+  glColor4f(0.5f, 0.5f, 1.0f, 0.7f);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   float panelW = 80;
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2i(m_screenW, -m_screenH);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2i(m_screenW, m_screenH * 2);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2i(m_screenW - panelW, m_screenH * 2);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2i(m_screenW - panelW, -m_screenH);
-  g_imRenderer->End();
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 0);
+  glVertex2i(m_screenW, -m_screenH);
+  glTexCoord2i(1, 0);
+  glVertex2i(m_screenW, m_screenH * 2);
+  glTexCoord2i(1, 1);
+  glVertex2i(m_screenW - panelW, m_screenH * 2);
+  glTexCoord2i(0, 1);
+  glVertex2i(m_screenW - panelW, -m_screenH);
+  glEnd();
 
-
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->UnbindTexture();
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glDisable(GL_TEXTURE_2D);
 
   //
   // Render dividing line
 
-  g_imRenderer->Begin(PRIM_LINES);
-  g_imRenderer->Vertex2i(m_screenW - panelW, -m_screenH);
-  g_imRenderer->Vertex2i(m_screenW - panelW, m_screenH * 2);
-  g_imRenderer->End();
-
+  glBegin(GL_LINES);
+  glVertex2i(m_screenW - panelW, -m_screenH);
+  glVertex2i(m_screenW - panelW, m_screenH * 2);
+  glEnd();
 }
 
 void TaskManagerInterfaceIcons::RenderRunningTasks()
@@ -1517,34 +1444,34 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
   //
   // Render shadows for available task slots
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_imRenderer->Color4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+  glDepthMask(false);
+  glColor4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
 
   for (int i = 0; i < numSlots; ++i)
   {
     Vector2 iconCentre(iconX, iconY);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-    g_imRenderer->End();
-
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 1);
+    glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+    glTexCoord2i(1, 1);
+    glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+    glTexCoord2i(1, 0);
+    glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+    glTexCoord2i(0, 0);
+    glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+    glEnd();
 
     iconY += iconSize;
     iconY += iconGap;
   }
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_TEXTURE_2D);
+  glDepthMask(true);
 
   iconY = s_iconY;
 
@@ -1578,32 +1505,28 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
     if (!invisible)
     {
-      g_imRenderer->BindTexture(texId);
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, texId);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
       if (task->m_id == g_app->m_taskManager->m_currentTaskId)
-      {
-        g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, iconAlpha);
-      }
+        glColor4f(1.0f, 1.0f, 1.0f, iconAlpha);
       else
-      {
-        g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, iconAlpha * 0.3f);
-      }
+        glColor4f(1.0f, 1.0f, 1.0f, iconAlpha * 0.3f);
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2i(0, 1);
-      g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
-      g_imRenderer->TexCoord2i(1, 1);
-      g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
-      g_imRenderer->TexCoord2i(1, 0);
-      g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
-      g_imRenderer->TexCoord2i(0, 0);
-      g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
-      g_imRenderer->End();
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 1);
+      glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+      glTexCoord2i(1, 1);
+      glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+      glTexCoord2i(1, 0);
+      glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+      glTexCoord2i(0, 0);
+      glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+      glEnd();
 
-
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-      g_imRenderer->UnbindTexture();
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glDisable(GL_TEXTURE_2D);
 
       if (task->m_type == GlobalResearch::TypeEngineer)
       {
@@ -1614,12 +1537,12 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
           int numSpirits = engineer->GetNumSpirits();
 
           g_gameFont.SetRenderShadow(true);
-          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.0f);
+          glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
 
           g_gameFont.SetRenderShadow(false);
-          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.9f);
+          glColor4f(1.0f, 1.0f, 1.0f, 0.9f);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
           g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
         }
@@ -1631,11 +1554,11 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
         {
           int numSquaddies = squad->NumAliveEntities();
 
-          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.0f);
+          glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
           g_gameFont.SetRenderShadow(true);
           g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
 
-          g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 0.9f);
+          glColor4f(1.0f, 1.0f, 1.0f, 0.9f);
           g_gameFont.SetRenderShadow(false);
           g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
         }
@@ -1684,6 +1607,7 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
           float weaponX = iconCentre.x + iconSize / 1.2f;
           float weaponY = iconCentre.y + iconSize / 5;
 
+          glEnable(GL_TEXTURE_2D);
 
           if (availableWeapons.Size() > 0)
             zone->m_subZones = true;
@@ -1694,39 +1618,37 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
             sprintf(bmpFilename, "icons/icon_%s.bmp", Task::GetTaskName(weaponType));
             texId = g_app->m_resource->GetTexture(bmpFilename);
 
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-            g_imRenderer->Color4f(0.9f, 0.9f, 0.9f, 0.0f);
-            g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-            g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i(0, 1);
-            g_imRenderer->Vertex2f(weaponX - weaponSize / 2, weaponY - weaponSize / 2);
-            g_imRenderer->TexCoord2i(1, 1);
-            g_imRenderer->Vertex2f(weaponX + weaponSize / 2, weaponY - weaponSize / 2);
-            g_imRenderer->TexCoord2i(1, 0);
-            g_imRenderer->Vertex2f(weaponX + weaponSize / 2, weaponY + weaponSize / 2);
-            g_imRenderer->TexCoord2i(0, 0);
-            g_imRenderer->Vertex2f(weaponX - weaponSize / 2, weaponY + weaponSize / 2);
-            g_imRenderer->End();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+            glColor4f(0.9f, 0.9f, 0.9f, 0.0f);
+            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+            glBegin(GL_QUADS);
+            glTexCoord2i(0, 1);
+            glVertex2f(weaponX - weaponSize / 2, weaponY - weaponSize / 2);
+            glTexCoord2i(1, 1);
+            glVertex2f(weaponX + weaponSize / 2, weaponY - weaponSize / 2);
+            glTexCoord2i(1, 0);
+            glVertex2f(weaponX + weaponSize / 2, weaponY + weaponSize / 2);
+            glTexCoord2i(0, 0);
+            glVertex2f(weaponX - weaponSize / 2, weaponY + weaponSize / 2);
+            glEnd();
 
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-
-            g_imRenderer->BindTexture(texId);
-            g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, iconAlpha * 0.3f);
+            glBindTexture(GL_TEXTURE_2D, texId);
+            glColor4f(1.0f, 1.0f, 1.0f, iconAlpha * 0.3f);
             if (weaponType == currentWeapon)
-              g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, iconAlpha);
+              glColor4f(1.0f, 1.0f, 1.0f, iconAlpha);
 
-            g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i(0, 1);
-            g_imRenderer->Vertex2f(weaponX - weaponSize / 2, weaponY - weaponSize / 2);
-            g_imRenderer->TexCoord2i(1, 1);
-            g_imRenderer->Vertex2f(weaponX + weaponSize / 2, weaponY - weaponSize / 2);
-            g_imRenderer->TexCoord2i(1, 0);
-            g_imRenderer->Vertex2f(weaponX + weaponSize / 2, weaponY + weaponSize / 2);
-            g_imRenderer->TexCoord2i(0, 0);
-            g_imRenderer->Vertex2f(weaponX - weaponSize / 2, weaponY + weaponSize / 2);
-            g_imRenderer->End();
-
+            glBegin(GL_QUADS);
+            glTexCoord2i(0, 1);
+            glVertex2f(weaponX - weaponSize / 2, weaponY - weaponSize / 2);
+            glTexCoord2i(1, 1);
+            glVertex2f(weaponX + weaponSize / 2, weaponY - weaponSize / 2);
+            glTexCoord2i(1, 0);
+            glVertex2f(weaponX + weaponSize / 2, weaponY + weaponSize / 2);
+            glTexCoord2i(0, 0);
+            glVertex2f(weaponX - weaponSize / 2, weaponY + weaponSize / 2);
+            glEnd();
 
             char captionId[256];
             sprintf(captionId, "newcontrols_select_%s", Task::GetTaskName(weaponType));
@@ -1739,8 +1661,8 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
             weaponX += weaponGap;
           }
 
-          g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-          g_imRenderer->UnbindTexture();
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glDisable(GL_TEXTURE_2D);
         }
       }
     }
@@ -1754,41 +1676,40 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
       float deleteY = iconCentre.y - iconSize / 1.7f;
       float deleteSize = iconSize * 0.4f;
 
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-      g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-      g_imRenderer->Color4f(0.9f, 0.9f, 0.9f, 0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+      glDepthMask(false);
+      glColor4f(0.9f, 0.9f, 0.9f, 0.0f);
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2i(0, 0);
-      g_imRenderer->Vertex2f(deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(1, 0);
-      g_imRenderer->Vertex2f(deleteX + deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(1, 1);
-      g_imRenderer->Vertex2f(deleteX + deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(0, 1);
-      g_imRenderer->Vertex2f(deleteX - deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
-      g_imRenderer->End();
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 0);
+      glVertex2f(deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
+      glTexCoord2i(1, 0);
+      glVertex2f(deleteX + deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
+      glTexCoord2i(1, 1);
+      glVertex2f(deleteX + deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
+      glTexCoord2i(0, 1);
+      glVertex2f(deleteX - deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
+      glEnd();
 
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_delete.bmp"));
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_delete.bmp"));
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 0);
+      glVertex2f(deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
+      glTexCoord2i(1, 0);
+      glVertex2f(deleteX + deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
+      glTexCoord2i(1, 1);
+      glVertex2f(deleteX + deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
+      glTexCoord2i(0, 1);
+      glVertex2f(deleteX - deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
+      glEnd();
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2i(0, 0);
-      g_imRenderer->Vertex2f(deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(1, 0);
-      g_imRenderer->Vertex2f(deleteX + deleteSize / 2.0f, deleteY - deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(1, 1);
-      g_imRenderer->Vertex2f(deleteX + deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
-      g_imRenderer->TexCoord2i(0, 1);
-      g_imRenderer->Vertex2f(deleteX - deleteSize / 2.0f, deleteY + deleteSize / 2.0f);
-      g_imRenderer->End();
-
-
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-      g_imRenderer->UnbindTexture();
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glDisable(GL_TEXTURE_2D);
 
       char captionId[256];
       sprintf(captionId, "newcontrols_delete_%s", Task::GetTaskName(task->m_type));
@@ -1815,6 +1736,7 @@ void TaskManagerInterfaceIcons::RenderCompass(float _screenX, float _screenY, co
 
   float screenX, screenY;
   g_app->m_camera->Get2DScreenPos(_worldPos, &screenX, &screenY);
+  screenY = screenH - screenY;
 
   LegacyVector3 toCam = g_app->m_camera->GetPos() - _worldPos;
   float angle = toCam * g_app->m_camera->GetFront();
@@ -1841,6 +1763,7 @@ void TaskManagerInterfaceIcons::RenderCompass(float _screenX, float _screenY, co
 
     float posX, posY;
     g_app->m_camera->Get2DScreenPos(camPos + camToTarget, &posX, &posY);
+    posY = screenH - posY;
     posX *= (m_screenW / screenW);
     posY *= (m_screenH / screenH);
 
@@ -1857,42 +1780,45 @@ void TaskManagerInterfaceIcons::RenderCompass(float _screenX, float _screenY, co
   compassRight.x = compassRight.y;
   compassRight.y = temp * -1.0f;
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/compass.bmp", true, false));
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/compass.bmp", true, false));
+  glEnable(GL_TEXTURE_2D);
 
   g_app->m_renderer->SetupMatricesFor2D();
   SetupRenderMatrices(ScreenTaskManager);
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.0f);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+  glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->End();
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2fv((screenPos - compassRight * _size + compassVector * _size).GetData());
+  glTexCoord2i(1, 1);
+  glVertex2fv((screenPos + compassRight * _size + compassVector * _size).GetData());
+  glTexCoord2i(1, 0);
+  glVertex2fv((screenPos + compassRight * _size - compassVector * _size).GetData());
+  glTexCoord2i(0, 0);
+  glVertex2fv((screenPos - compassRight * _size - compassVector * _size).GetData());
+  glEnd();
 
-
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   if (_selected)
-  {
-    g_imRenderer->Color4f(1.0f, 1.0f, 0.3f, 0.8f);
-  }
+    glColor4f(1.0f, 1.0f, 0.3f, 0.8f);
   else
-  {
-    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.6f);
-  }
+    glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->End();
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2fv((screenPos - compassRight * _size + compassVector * _size).GetData());
+  glTexCoord2i(1, 1);
+  glVertex2fv((screenPos + compassRight * _size + compassVector * _size).GetData());
+  glTexCoord2i(1, 0);
+  glVertex2fv((screenPos + compassRight * _size - compassVector * _size).GetData());
+  glTexCoord2i(0, 0);
+  glVertex2fv((screenPos - compassRight * _size - compassVector * _size).GetData());
+  glEnd();
 
-
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_imRenderer->UnbindTexture();
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_TEXTURE_2D);
 }
 
 void TaskManagerInterfaceIcons::RenderOverview()
@@ -1904,29 +1830,29 @@ void TaskManagerInterfaceIcons::RenderOverview()
   float screenCentre = m_screenW / 2.0f;
 
   g_gameFont.SetRenderShadow(true);
-  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
+  glColor4ub(255, 255, 150, 30);
   g_gameFont.DrawText2DCentre(screenCentre - boxW, 105, 12, LANGUAGEPHRASE("taskmanager_research"));
   g_gameFont.DrawText2DCentre(screenCentre, 105, 12, LANGUAGEPHRASE("taskmanager_taskmanager"));
   g_gameFont.DrawText2DCentre(screenCentre + boxW, 105, 12, LANGUAGEPHRASE("taskmanager_objectives"));
   g_gameFont.SetRenderShadow(false);
 
-  g_imRenderer->Color4f(0.0f, 0.0f, 0.5f, 0.6f);
-  g_imRenderer->Begin(PRIM_LINE_LOOP);
-  g_imRenderer->Vertex2f(boxX, boxY);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-  g_imRenderer->Vertex2f(boxX, boxY + boxH);
-  g_imRenderer->End();
+  glColor4f(0.0f, 0.0f, 0.5f, 0.6f);
+  glLineWidth(1.0f);
+  glBegin(GL_LINE_LOOP);
+  glVertex2f(boxX, boxY);
+  glVertex2f(boxX + boxW, boxY);
+  glVertex2f(boxX + boxW, boxY + boxH);
+  glVertex2f(boxX, boxY + boxH);
+  glEnd();
+  glLineWidth(1.0f);
 
-
-  g_imRenderer->Color4f(0.0f, 0.0f, 0.5f, 0.2f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->Vertex2f(boxX, boxY);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-  g_imRenderer->Vertex2f(boxX, boxY + boxH);
-  g_imRenderer->End();
-
+  glColor4f(0.0f, 0.0f, 0.5f, 0.2f);
+  glBegin(GL_QUADS);
+  glVertex2f(boxX, boxY);
+  glVertex2f(boxX + boxW, boxY);
+  glVertex2f(boxX + boxW, boxY + boxH);
+  glVertex2f(boxX, boxY + boxH);
+  glEnd();
 }
 
 void TaskManagerInterfaceIcons::RenderObjectives()
@@ -1937,9 +1863,9 @@ void TaskManagerInterfaceIcons::RenderObjectives()
   // Render title
 
   g_gameFont.SetRenderOutline(true);
-  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+  glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_objectives"));
-  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.SetRenderOutline(false);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_objectives"));
 
@@ -1982,20 +1908,19 @@ void TaskManagerInterfaceIcons::RenderObjectives()
     float boxH = numObjectives * (textH * 1.5f) + textH * 0.75f;
     float titleHeight = 20.0f;
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->Color4ub(199, 214, 220, 255);
-    g_imRenderer->Vertex2f(boxX, boxY - titleHeight);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY - titleHeight);
-    g_imRenderer->Color4ub(112, 141, 168, 255);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY);
-    g_imRenderer->Vertex2f(boxX, boxY);
-    g_imRenderer->End();
-
-    g_imRenderer->Color4ub(199, 214, 220, 255);
-    g_imRenderer->Color4ub(112, 141, 168, 255);
+    glShadeModel(GL_SMOOTH);
+    glBegin(GL_QUADS);
+    glColor4ub(199, 214, 220, 255);
+    glVertex2f(boxX, boxY - titleHeight);
+    glVertex2f(boxX + boxW, boxY - titleHeight);
+    glColor4ub(112, 141, 168, 255);
+    glVertex2f(boxX + boxW, boxY);
+    glVertex2f(boxX, boxY);
+    glEnd();
+    glShadeModel(GL_FLAT);
 
     g_gameFont.SetRenderShadow(true);
-    g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
+    glColor4ub(255, 255, 150, 30);
     const char* theString = (o == 0 ? LANGUAGEPHRASE("taskmanager_primarys") : LANGUAGEPHRASE("taskmanager_secondarys"));
     g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
     g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
@@ -2004,31 +1929,36 @@ void TaskManagerInterfaceIcons::RenderObjectives()
     //
     // Background box
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.9f);
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2f(0, 0);
-    g_imRenderer->Vertex2f(boxX, boxY);
-    g_imRenderer->TexCoord2f(1, 0);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY);
-    g_imRenderer->TexCoord2f(1, boxH / m_screenH * 1.5);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-    g_imRenderer->TexCoord2f(0, boxH / m_screenH * 1.5);
-    g_imRenderer->Vertex2f(boxX, boxY + boxH);
-    g_imRenderer->End();
+    glColor4f(0.8f, 0.8f, 0.8f, 0.9f);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    glVertex2f(boxX, boxY);
+    glTexCoord2f(1, 0);
+    glVertex2f(boxX + boxW, boxY);
+    glTexCoord2f(1, boxH / m_screenH * 1.5);
+    glVertex2f(boxX + boxW, boxY + boxH);
+    glTexCoord2f(0, boxH / m_screenH * 1.5);
+    glVertex2f(boxX, boxY + boxH);
+    glEnd();
 
+    glDisable(GL_TEXTURE_2D);
 
-    g_imRenderer->UnbindTexture();
-
-    g_imRenderer->Color4ub(199, 214, 220, 255);
-    g_imRenderer->Begin(PRIM_LINE_LOOP);
-    g_imRenderer->Vertex2f(boxX, boxY - titleHeight);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY - titleHeight);
-    g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-    g_imRenderer->Vertex2f(boxX, boxY + boxH);
-    g_imRenderer->End();
-
+    glColor4ub(199, 214, 220, 255);
+    glLineWidth(2.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(boxX, boxY - titleHeight);
+    glVertex2f(boxX + boxW, boxY - titleHeight);
+    glVertex2f(boxX + boxW, boxY + boxH);
+    glVertex2f(boxX, boxY + boxH);
+    glEnd();
+    glLineWidth(1.0f);
 
     for (int i = 0; i < numObjectives; ++i)
     {
@@ -2046,32 +1976,24 @@ void TaskManagerInterfaceIcons::RenderObjectives()
       char* descriptor = LANGUAGEPHRASE(condition->m_stringId);
 
       g_gameFont.SetRenderOutline(true);
-      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+      glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(textX, textY, textH * 0.65f, "%s", descriptor);
       g_gameFont.SetRenderOutline(false);
       if (completed)
-      {
-        g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
-      }
+        glColor4f(0.8f, 0.8f, 1.0f, 1.0f);
       else
-      {
-        g_gameFont.SetColour(1.0f, 0.2f, 0.2f, 1.0f);
-      }
+        glColor4f(1.0f, 0.2f, 0.2f, 1.0f);
       g_gameFont.DrawText2D(textX, textY, textH * 0.65f, "%s", descriptor);
 
       const char* completedString = (completed ? LANGUAGEPHRASE("taskmanager_complete") : LANGUAGEPHRASE("taskmanager_incomplete"));
       g_gameFont.SetRenderOutline(true);
-      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+      glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(completeX, textY, textH * 0.75f, completedString);
       g_gameFont.SetRenderOutline(false);
       if (completed)
-      {
-        g_gameFont.SetColour(0.8f, 0.8f, 1.0f, 1.0f);
-      }
+        glColor4f(0.8f, 0.8f, 1.0f, 1.0f);
       else
-      {
-        g_gameFont.SetColour(1.0f, 0.2f, 0.2f, 1.0f);
-      }
+        glColor4f(1.0f, 0.2f, 0.2f, 1.0f);
       g_gameFont.DrawText2D(completeX, textY, textH * 0.75f, completedString);
 
       if (condition->m_type == GlobalEventCondition::BuildingOnline)
@@ -2103,14 +2025,13 @@ void TaskManagerInterfaceIcons::RenderObjectives()
       RenderIcon("icons/button_lb.bmp", "icons/button_lb_shadow.bmp", m_screenW - 60, 10, 40, alpha);
     else
     {
-      g_imRenderer->Color4ub(199, 214, 220, alpha);
+      glColor4ub(199, 214, 220, alpha);
 
-      g_imRenderer->Begin(PRIM_TRIANGLES);
-      g_imRenderer->Vertex2f(m_screenW - 40, 10);
-      g_imRenderer->Vertex2f(m_screenW - 20, 30);
-      g_imRenderer->Vertex2f(m_screenW - 60, 30);
-      g_imRenderer->End();
-
+      glBegin(GL_TRIANGLES);
+      glVertex2f(m_screenW - 40, 10);
+      glVertex2f(m_screenW - 20, 30);
+      glVertex2f(m_screenW - 60, 30);
+      glEnd();
     }
 
     auto zoneLeft = new ScreenZone("ScreenUp", LANGUAGEPHRASE("newcontrols_showtaskmanager"), m_screenW - 60, m_screenH + 10, 40, 20, -1);
@@ -2127,10 +2048,10 @@ void TaskManagerInterfaceIcons::RenderResearch()
   // Render title text
 
   g_gameFont.SetRenderOutline(true);
-  g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+  glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_research"));
   g_gameFont.SetRenderOutline(false);
-  g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_research"));
   //g_gameFont.DrawText2DCentre( m_screenW/2.0f, 80, 20, "ResearchPoints : %d", g_app->m_globalWorld->m_research->m_researchPoints );
 
@@ -2157,20 +2078,19 @@ void TaskManagerInterfaceIcons::RenderResearch()
   float boxH = numItemsResearched * (textH * 1.7f) + textH * 1.0f;
   float titleHeight = 20.0f;
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Vertex2f(boxX, boxY - titleHeight);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY - titleHeight);
-  g_imRenderer->Color4ub(112, 141, 168, 255);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY);
-  g_imRenderer->Vertex2f(boxX, boxY);
-  g_imRenderer->End();
-
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Color4ub(112, 141, 168, 255);
+  glShadeModel(GL_SMOOTH);
+  glBegin(GL_QUADS);
+  glColor4ub(199, 214, 220, 255);
+  glVertex2f(boxX, boxY - titleHeight);
+  glVertex2f(boxX + boxW, boxY - titleHeight);
+  glColor4ub(112, 141, 168, 255);
+  glVertex2f(boxX + boxW, boxY);
+  glVertex2f(boxX, boxY);
+  glEnd();
+  glShadeModel(GL_FLAT);
 
   g_gameFont.SetRenderShadow(true);
-  g_gameFont.SetColour(1.0f, 1.0f, 150.0f/255.0f, 30.0f/255.0f);
+  glColor4ub(255, 255, 150, 30);
   const char* theString = LANGUAGEPHRASE("taskmanager_research");
   g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
   g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
@@ -2179,31 +2099,36 @@ void TaskManagerInterfaceIcons::RenderResearch()
   //
   // Background box
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  g_imRenderer->Color4f(0.8f, 0.8f, 0.8f, 0.8f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0, 0);
-  g_imRenderer->Vertex2f(boxX, boxY);
-  g_imRenderer->TexCoord2f(1, 0);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY);
-  g_imRenderer->TexCoord2f(1, boxH / m_screenH * 1.5);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-  g_imRenderer->TexCoord2f(0, boxH / m_screenH * 1.5);
-  g_imRenderer->Vertex2f(boxX, boxY + boxH);
-  g_imRenderer->End();
+  glColor4f(0.8f, 0.8f, 0.8f, 0.8f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0);
+  glVertex2f(boxX, boxY);
+  glTexCoord2f(1, 0);
+  glVertex2f(boxX + boxW, boxY);
+  glTexCoord2f(1, boxH / m_screenH * 1.5);
+  glVertex2f(boxX + boxW, boxY + boxH);
+  glTexCoord2f(0, boxH / m_screenH * 1.5);
+  glVertex2f(boxX, boxY + boxH);
+  glEnd();
 
+  glDisable(GL_TEXTURE_2D);
 
-  g_imRenderer->UnbindTexture();
-
-  g_imRenderer->Color4ub(199, 214, 220, 255);
-  g_imRenderer->Begin(PRIM_LINE_LOOP);
-  g_imRenderer->Vertex2f(boxX, boxY - titleHeight);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY - titleHeight);
-  g_imRenderer->Vertex2f(boxX + boxW, boxY + boxH);
-  g_imRenderer->Vertex2f(boxX, boxY + boxH);
-  g_imRenderer->End();
-
+  glColor4ub(199, 214, 220, 255);
+  glLineWidth(2.0f);
+  glBegin(GL_LINE_LOOP);
+  glVertex2f(boxX, boxY - titleHeight);
+  glVertex2f(boxX + boxW, boxY - titleHeight);
+  glVertex2f(boxX + boxW, boxY + boxH);
+  glVertex2f(boxX, boxY + boxH);
+  glEnd();
+  glLineWidth(1.0f);
 
   //
   // Render each item
@@ -2225,22 +2150,20 @@ void TaskManagerInterfaceIcons::RenderResearch()
 
       if (g_app->m_globalWorld->m_research->m_currentResearch == i)
       {
-        g_imRenderer->Color4f(0.05f, 0.05f, 0.5f, 0.4f);
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex2i(40, iconY - 1);
-        g_imRenderer->Vertex2i(m_screenW - 120, iconY - 1);
-        g_imRenderer->Vertex2i(m_screenW - 120, iconY + iconSize + 1);
-        g_imRenderer->Vertex2i(40, iconY + iconSize + 1);
-        g_imRenderer->End();
-
-        g_imRenderer->Color4f(0.5f, 0.5f, 0.7f, 0.8f);
-        g_imRenderer->Begin(PRIM_LINE_LOOP);
-        g_imRenderer->Vertex2i(40, iconY - 1);
-        g_imRenderer->Vertex2i(m_screenW - 120, iconY - 1);
-        g_imRenderer->Vertex2i(m_screenW - 120, iconY + iconSize + 1);
-        g_imRenderer->Vertex2i(40, iconY + iconSize + 1);
-        g_imRenderer->End();
-
+        glColor4f(0.05f, 0.05f, 0.5f, 0.4f);
+        glBegin(GL_QUADS);
+        glVertex2i(40, iconY - 1);
+        glVertex2i(m_screenW - 120, iconY - 1);
+        glVertex2i(m_screenW - 120, iconY + iconSize + 1);
+        glVertex2i(40, iconY + iconSize + 1);
+        glEnd();
+        glColor4f(0.5f, 0.5f, 0.7f, 0.8f);
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(40, iconY - 1);
+        glVertex2i(m_screenW - 120, iconY - 1);
+        glVertex2i(m_screenW - 120, iconY + iconSize + 1);
+        glVertex2i(40, iconY + iconSize + 1);
+        glEnd();
       }
 
       char tooltipId[256];
@@ -2252,26 +2175,26 @@ void TaskManagerInterfaceIcons::RenderResearch()
       //
       // Render the shadow
 
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-      g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-      g_imRenderer->Color4f(0.5f, 0.5f, 0.5f, 0.0f);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+      glDepthMask(false);
+      glColor4f(0.5f, 0.5f, 0.5f, 0.0f);
 
       float shadowSize = iconSize * 1.1f;
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2i(0, 1);
-      g_imRenderer->Vertex2f(iconX, iconY);
-      g_imRenderer->TexCoord2i(1, 1);
-      g_imRenderer->Vertex2f(iconX + shadowSize, iconY);
-      g_imRenderer->TexCoord2i(1, 0);
-      g_imRenderer->Vertex2f(iconX + shadowSize, iconY + shadowSize);
-      g_imRenderer->TexCoord2i(0, 0);
-      g_imRenderer->Vertex2f(iconX, iconY + shadowSize);
-      g_imRenderer->End();
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 1);
+      glVertex2f(iconX, iconY);
+      glTexCoord2i(1, 1);
+      glVertex2f(iconX + shadowSize, iconY);
+      glTexCoord2i(1, 0);
+      glVertex2f(iconX + shadowSize, iconY + shadowSize);
+      glTexCoord2i(0, 0);
+      glVertex2f(iconX, iconY + shadowSize);
+      glEnd();
 
-
-      g_imRenderer->UnbindTexture();
+      glDisable(GL_TEXTURE_2D);
 
       //
       // Render the task symbol
@@ -2281,24 +2204,26 @@ void TaskManagerInterfaceIcons::RenderResearch()
       unsigned int texId = g_app->m_resource->GetTexture(iconFilename);
       if (texId != -1)
       {
-        g_imRenderer->BindTexture(texId);
-        g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0, 1);
-        g_imRenderer->Vertex2f(iconX, iconY);
-        g_imRenderer->TexCoord2i(1, 1);
-        g_imRenderer->Vertex2f(iconX + iconSize, iconY);
-        g_imRenderer->TexCoord2i(1, 0);
-        g_imRenderer->Vertex2f(iconX + iconSize, iconY + iconSize);
-        g_imRenderer->TexCoord2i(0, 0);
-        g_imRenderer->Vertex2f(iconX, iconY + iconSize);
-        g_imRenderer->End();
+        glBegin(GL_QUADS);
+        glTexCoord2i(0, 1);
+        glVertex2f(iconX, iconY);
+        glTexCoord2i(1, 1);
+        glVertex2f(iconX + iconSize, iconY);
+        glTexCoord2i(1, 0);
+        glVertex2f(iconX + iconSize, iconY + iconSize);
+        glTexCoord2i(0, 0);
+        glVertex2f(iconX, iconY + iconSize);
+        glEnd();
 
-
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_imRenderer->UnbindTexture();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_TEXTURE_2D);
       }
 
       //
@@ -2308,10 +2233,10 @@ void TaskManagerInterfaceIcons::RenderResearch()
       int researchProgress = g_app->m_globalWorld->m_research->CurrentProgress(i);
 
       g_gameFont.SetRenderOutline(true);
-      g_gameFont.SetColour(0.8f, 0.8f, 0.8f, 0.0f);
+      glColor4f(0.8f, 0.8f, 0.8f, 0.0f);
       g_gameFont.DrawText2D(iconX + iconSize + 10, iconY + iconSize / 2, 20, "%s", GlobalResearch::GetTypeNameTranslated(i));
       g_gameFont.SetRenderOutline(false);
-      g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(iconX + iconSize + 10, iconY + iconSize / 2, 20, "%s", GlobalResearch::GetTypeNameTranslated(i));
 
       float boxX = 300;
@@ -2319,108 +2244,109 @@ void TaskManagerInterfaceIcons::RenderResearch()
       float boxH = iconSize * 0.4f;
       float boxScale = 0.85f;
 
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
       for (int level = 1; level < 4; ++level)
       {
         int requiredProgress = g_app->m_globalWorld->m_research->RequiredProgress(level);
 
         float shadowOffset = 2.0f;
-        g_imRenderer->Color4f(0.0f, 0.0f, 0.0f, 0.5f);
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex2i(boxX, boxY);
-        g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY);
-        g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY + boxH + shadowOffset);
-        g_imRenderer->Vertex2i(boxX, boxY + boxH + shadowOffset);
-        g_imRenderer->End();
-
+        glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+        glBegin(GL_QUADS);
+        glVertex2i(boxX, boxY);
+        glVertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY);
+        glVertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY + boxH + shadowOffset);
+        glVertex2i(boxX, boxY + boxH + shadowOffset);
+        glEnd();
 
         if (researchLevel > level)
         {
-          g_imRenderer->Color4f(0.7f, 0.7f, 0.9f, 1.0f);
-          g_imRenderer->Begin(PRIM_QUADS);
-          g_imRenderer->TexCoord2i(0, 0);
-          g_imRenderer->Vertex2i(boxX, boxY);
-          g_imRenderer->TexCoord2i(10, 0);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY);
-          g_imRenderer->TexCoord2i(10, 1);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
-          g_imRenderer->TexCoord2i(0, 1);
-          g_imRenderer->Vertex2i(boxX, boxY + boxH);
-          g_imRenderer->End();
-
+          glColor4f(0.7f, 0.7f, 0.9f, 1.0f);
+          glEnable(GL_TEXTURE_2D);
+          glBegin(GL_QUADS);
+          glTexCoord2i(0, 0);
+          glVertex2i(boxX, boxY);
+          glTexCoord2i(10, 0);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glTexCoord2i(10, 1);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glTexCoord2i(0, 1);
+          glVertex2i(boxX, boxY + boxH);
+          glEnd();
           float alpha = 1.0f;
           if (g_app->m_globalWorld->m_research->m_currentResearch == i)
             alpha = fabs(sinf(g_gameTime * 2));
-          g_imRenderer->Color4f(0.9f, 0.9f, 1.0f, alpha);
-          g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-          g_imRenderer->Begin(PRIM_QUADS);
-          g_imRenderer->TexCoord2i(0, 0);
-          g_imRenderer->Vertex2i(boxX, boxY);
-          g_imRenderer->TexCoord2i(10, 0);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY);
-          g_imRenderer->TexCoord2i(10, 1);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
-          g_imRenderer->TexCoord2i(0, 1);
-          g_imRenderer->Vertex2i(boxX, boxY + boxH);
-          g_imRenderer->TexCoord2i(0, 0);
-          g_imRenderer->Vertex2i(boxX, boxY);
-          g_imRenderer->TexCoord2i(10, 0);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY);
-          g_imRenderer->TexCoord2i(10, 1);
-          g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
-          g_imRenderer->TexCoord2i(0, 1);
-          g_imRenderer->Vertex2i(boxX, boxY + boxH);
-          g_imRenderer->End();
-
-          g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-          g_imRenderer->UnbindTexture();
+          glColor4f(0.9f, 0.9f, 1.0f, alpha);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+          glBegin(GL_QUADS);
+          glTexCoord2i(0, 0);
+          glVertex2i(boxX, boxY);
+          glTexCoord2i(10, 0);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glTexCoord2i(10, 1);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glTexCoord2i(0, 1);
+          glVertex2i(boxX, boxY + boxH);
+          glTexCoord2i(0, 0);
+          glVertex2i(boxX, boxY);
+          glTexCoord2i(10, 0);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glTexCoord2i(10, 1);
+          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glTexCoord2i(0, 1);
+          glVertex2i(boxX, boxY + boxH);
+          glEnd();
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glDisable(GL_TEXTURE_2D);
         }
 
         if (researchLevel == level && researchProgress > 0)
         {
-          g_imRenderer->Color4f(0.7f, 0.7f, 1.0f, 1.0f);
-          g_imRenderer->Begin(PRIM_QUADS);
-          g_imRenderer->TexCoord2i(0, 0);
-          g_imRenderer->Vertex2i(boxX, boxY);
-          g_imRenderer->TexCoord2i(10, 0);
-          g_imRenderer->Vertex2i(boxX + researchProgress * boxScale, boxY);
-          g_imRenderer->TexCoord2i(10, 1);
-          g_imRenderer->Vertex2i(boxX + researchProgress * boxScale, boxY + boxH);
-          g_imRenderer->TexCoord2i(0, 1);
-          g_imRenderer->Vertex2i(boxX, boxY + boxH);
-          g_imRenderer->End();
-
+          glColor4f(0.7f, 0.7f, 1.0f, 1.0f);
+          glEnable(GL_TEXTURE_2D);
+          glBegin(GL_QUADS);
+          glTexCoord2i(0, 0);
+          glVertex2i(boxX, boxY);
+          glTexCoord2i(10, 0);
+          glVertex2i(boxX + researchProgress * boxScale, boxY);
+          glTexCoord2i(10, 1);
+          glVertex2i(boxX + researchProgress * boxScale, boxY + boxH);
+          glTexCoord2i(0, 1);
+          glVertex2i(boxX, boxY + boxH);
+          glEnd();
           if (g_app->m_globalWorld->m_research->m_currentResearch == i)
           {
             float alpha = fabs(sinf(g_gameTime * 2));
-            g_imRenderer->Color4f(0.9f, 0.9f, 1.0f, alpha);
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i(0, 0);
-            g_imRenderer->Vertex2i(boxX, boxY);
-            g_imRenderer->TexCoord2i(10, 0);
-            g_imRenderer->Vertex2i(boxX + researchProgress * boxScale, boxY);
-            g_imRenderer->TexCoord2i(10, 1);
-            g_imRenderer->Vertex2i(boxX + researchProgress * boxScale, boxY + boxH);
-            g_imRenderer->TexCoord2i(0, 1);
-            g_imRenderer->Vertex2i(boxX, boxY + boxH);
-            g_imRenderer->End();
-
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+            glColor4f(0.9f, 0.9f, 1.0f, alpha);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            glBegin(GL_QUADS);
+            glTexCoord2i(0, 0);
+            glVertex2i(boxX, boxY);
+            glTexCoord2i(10, 0);
+            glVertex2i(boxX + researchProgress * boxScale, boxY);
+            glTexCoord2i(10, 1);
+            glVertex2i(boxX + researchProgress * boxScale, boxY + boxH);
+            glTexCoord2i(0, 1);
+            glVertex2i(boxX, boxY + boxH);
+            glEnd();
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
           }
 
-          g_imRenderer->UnbindTexture();
+          glDisable(GL_TEXTURE_2D);
         }
 
-        g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.8f);
-        g_imRenderer->Begin(PRIM_LINE_LOOP);
-        g_imRenderer->Vertex2i(boxX, boxY);
-        g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY);
-        g_imRenderer->Vertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
-        g_imRenderer->Vertex2i(boxX, boxY + boxH);
-        g_imRenderer->End();
-
+        glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
+        glLineWidth(1.0f);
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(boxX, boxY);
+        glVertex2i(boxX + requiredProgress * boxScale, boxY);
+        glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+        glVertex2i(boxX, boxY + boxH);
+        glEnd();
 
         boxX += requiredProgress * boxScale;
         boxX += 3;
@@ -2428,7 +2354,7 @@ void TaskManagerInterfaceIcons::RenderResearch()
 
       float texX = 630;
 
-      g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(texX, iconY + iconSize / 2, 12, "v%d.0", researchLevel);
 
       iconY += totalSize;
@@ -2448,14 +2374,13 @@ void TaskManagerInterfaceIcons::RenderResearch()
       RenderIcon("icons/button_rb.bmp", "icons/button_rb_shadow.bmp", m_screenW - 60, m_screenH - 70, 40, alpha);
     else
     {
-      g_imRenderer->Color4ub(199, 214, 220, alpha);
+      glColor4ub(199, 214, 220, alpha);
 
-      g_imRenderer->Begin(PRIM_TRIANGLES);
-      g_imRenderer->Vertex2f(m_screenW - 40, m_screenH - 30);
-      g_imRenderer->Vertex2f(m_screenW - 20, m_screenH - 50);
-      g_imRenderer->Vertex2f(m_screenW - 60, m_screenH - 50);
-      g_imRenderer->End();
-
+      glBegin(GL_TRIANGLES);
+      glVertex2f(m_screenW - 40, m_screenH - 30);
+      glVertex2f(m_screenW - 20, m_screenH - 50);
+      glVertex2f(m_screenW - 60, m_screenH - 50);
+      glEnd();
     }
 
     auto zoneRight = new ScreenZone("ScreenDown", LANGUAGEPHRASE("newcontrols_showtaskmanager"), m_screenW - 60, -50, 40, 20, -1);
@@ -2607,45 +2532,45 @@ void TaskManagerInterfaceIcons::RenderQuickUnit()
   char shadowFileName[256];
   sprintf(shadowFileName, "shadow_icons/mouse_selection.bmp");
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture(shadowFileName));
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_imRenderer->Color4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-  g_imRenderer->End();
-
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(shadowFileName));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+  glDepthMask(false);
+  glColor4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glTexCoord2i(1, 1);
+  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glTexCoord2i(1, 0);
+  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glTexCoord2i(0, 0);
+  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glEnd();
 
   char bmpFilename[256];
   sprintf(bmpFilename, "icons/mouse_selection.bmp");
   unsigned int texId = g_app->m_resource->GetTexture(bmpFilename);
 
-  g_imRenderer->BindTexture(texId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texId);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 0.0f, iconAlpha);
+  glColor4f(1.0f, 1.0f, 0.0f, iconAlpha);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
-  g_imRenderer->End();
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+  glTexCoord2i(1, 1);
+  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+  glTexCoord2i(1, 0);
+  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+  glTexCoord2i(0, 0);
+  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+  glEnd();
 
-
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_imRenderer->UnbindTexture();
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_TEXTURE_2D);
 }
 
 int TaskManagerInterfaceIcons::GetQuickUnitTask(int _position)
@@ -2847,21 +2772,21 @@ void QuickUnitButton::Render()
 
   auto iconCentre = Vector2(m_x, m_y);
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_imRenderer->Color4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
-  g_imRenderer->End();
-
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+  glDepthMask(false);
+  glColor4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glTexCoord2i(1, 1);
+  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glTexCoord2i(1, 0);
+  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glTexCoord2i(0, 0);
+  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glEnd();
 
   char bmpFilename[256];
   if (m_taskId == -1)
@@ -2870,23 +2795,23 @@ void QuickUnitButton::Render()
     sprintf(bmpFilename, "icons/icon_%s.bmp", Task::GetTaskName(m_taskId));
   unsigned int texId = g_app->m_resource->GetTexture(bmpFilename);
 
-  g_imRenderer->BindTexture(texId);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texId);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, iconAlpha);
+  glColor4f(1.0f, 1.0f, 1.0f, iconAlpha);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2i(0, 1);
-  g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
-  g_imRenderer->TexCoord2i(1, 1);
-  g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
-  g_imRenderer->TexCoord2i(1, 0);
-  g_imRenderer->Vertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
-  g_imRenderer->TexCoord2i(0, 0);
-  g_imRenderer->Vertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
-  g_imRenderer->End();
+  glBegin(GL_QUADS);
+  glTexCoord2i(0, 1);
+  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+  glTexCoord2i(1, 1);
+  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+  glTexCoord2i(1, 0);
+  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+  glTexCoord2i(0, 0);
+  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+  glEnd();
 
-
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_imRenderer->UnbindTexture();
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_TEXTURE_2D);
 }

@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <math.h>
 
@@ -71,8 +68,10 @@
 #include "feedingtube.h"
 
 
+
 Shape *Building::s_controlPad = NULL;
 ShapeMarker *Building::s_controlPadStatus = NULL;
+
 
 
 Building::Building()
@@ -223,6 +222,7 @@ void Building::SetShapePorts( ShapeFragment *_fragment )
     }
 
 
+
     //
     // Recurse to all child fragments
 
@@ -357,35 +357,40 @@ void Building::RenderLights()
 
                 if( m_id.GetTeamId() == 255 )
 	            {
-		            g_imRenderer->Color3f( 0.5f, 0.5f, 0.5f );
+		            glColor3f( 0.5f, 0.5f, 0.5f );
 	            }
 	            else
 	            {
-		            g_imRenderer->Color3ubv( g_app->m_location->m_teams[ m_id.GetTeamId() ].m_colour.GetData() );
+		            glColor3ubv( g_app->m_location->m_teams[ m_id.GetTeamId() ].m_colour.GetData() );
 	            }
 
-                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-                g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-                g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+                glEnable        ( GL_TEXTURE_2D );
+                glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+	            glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	            glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+                glDisable       ( GL_CULL_FACE );
+                glDepthMask     ( false );
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+                glEnable        ( GL_BLEND );
+                glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
 
                 for( int i = 0; i < 10; ++i )
                 {
                     float size = signalSize * (float) i / 10.0f;
-                    g_imRenderer->Begin(PRIM_QUADS);
-                        g_imRenderer->TexCoord2f( 0.0f, 0.0f );             g_imRenderer->Vertex3fv( (lightPos - camR * size - camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 1.0f, 0.0f );             g_imRenderer->Vertex3fv( (lightPos + camR * size - camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 1.0f, 1.0f );             g_imRenderer->Vertex3fv( (lightPos + camR * size + camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 0.0f, 1.0f );             g_imRenderer->Vertex3fv( (lightPos - camR * size + camU * size).GetData() );
-                    g_imRenderer->End();
-
+                    glBegin( GL_QUADS );
+                        glTexCoord2f    ( 0.0f, 0.0f );             glVertex3fv     ( (lightPos - camR * size - camU * size).GetData() );
+                        glTexCoord2f    ( 1.0f, 0.0f );             glVertex3fv     ( (lightPos + camR * size - camU * size).GetData() );
+                        glTexCoord2f    ( 1.0f, 1.0f );             glVertex3fv     ( (lightPos + camR * size + camU * size).GetData() );
+                        glTexCoord2f    ( 0.0f, 1.0f );             glVertex3fv     ( (lightPos - camR * size + camU * size).GetData() );
+                    glEnd();
                 }
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+                glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                glDisable       ( GL_BLEND );
 
-                g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+                glDepthMask     ( true );
+                glEnable        ( GL_CULL_FACE );
+                glDisable       ( GL_TEXTURE_2D );
             }
         }
     }
@@ -480,23 +485,26 @@ void Building::RenderPorts()
 
         LegacyVector3 statusPos = s_controlPadStatus->GetWorldMatrix( mat ).pos;
 
-        if( GetPortOccupant(i).IsValid() )
-            g_imRenderer->Color4f( 0.3f, 1.0f, 0.3f, 1.0f );
+        if( GetPortOccupant(i).IsValid() )      glColor4f( 0.3f, 1.0f, 0.3f, 1.0f );
+        else                                    glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i( 0, 0 );           g_imRenderer->Vertex3fv( (statusPos - camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );           g_imRenderer->Vertex3fv( (statusPos + camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );           g_imRenderer->Vertex3fv( (statusPos + camR + camU).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
-        g_imRenderer->End();
-
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+        glDisable       ( GL_CULL_FACE );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+        glDepthMask     ( false );
+        glEnable        ( GL_BLEND );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+        glBegin( GL_QUADS );
+            glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
+            glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
+            glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
+            glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
+        glEnd();
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable       ( GL_BLEND );
+        glDepthMask     ( true );
+        glDisable       ( GL_TEXTURE_2D );
+        glEnable        ( GL_CULL_FACE );
     }
 
     END_PROFILE( g_app->m_profiler, "RenderPorts" );

@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
 #include "eclipse.h"
 #include "matrix34.h"
 #include "shape.h"
@@ -421,10 +420,9 @@ void LocationInput::Render()
   g_editorFont.BeginText2D();
   if (g_app->m_location->GetMyTeam())
   {
-    const auto* teamCol = g_app->m_location->GetMyTeam()->m_colour.GetData();
-    g_editorFont.SetColour(teamCol[0] / 255.0f, teamCol[1] / 255.0f, teamCol[2] / 255.0f, teamCol[3] / 255.0f);
+    glColor4ubv(g_app->m_location->GetMyTeam()->m_colour.GetData());
+    //		glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
     g_editorFont.DrawText2D(12, 19, DEF_FONT_SIZE, "You are TEAM %d", static_cast<int>(g_app->m_globalWorld->m_myTeamId));
-    g_editorFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
   }
 
   g_editorFont.EndText2D();

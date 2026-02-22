@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "debug_utils.h"
 #include "input.h"
 #include "profiler.h"
@@ -804,6 +801,7 @@ void Location::RenderParticles() {}
 // *** Render Teams
 void Location::RenderTeams()
 {
+  CHECK_OPENGL_STATE();
 
   for (int i = 0; i < NUM_TEAMS; ++i)
   {
@@ -811,6 +809,7 @@ void Location::RenderTeams()
     team->Render();
   }
 
+  CHECK_OPENGL_STATE();
 }
 
 // *** Render Spirits
@@ -818,10 +817,10 @@ void Location::RenderSpirits()
 {
   START_PROFILE(g_app->m_profiler, "Render Spirits");
 
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glDisable(GL_CULL_FACE);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+  glDepthMask(false);
 
   float timeSinceAdvance = g_predictionTime;
   float numPerSlice = m_spirits.Size() / static_cast<float>(NUM_SLICES_PER_FRAME);
@@ -839,9 +838,10 @@ void Location::RenderSpirits()
     }
   }
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glDepthMask(true);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_CULL_FACE);
 
   END_PROFILE(g_app->m_profiler, "Render Spirits");
 }
@@ -863,15 +863,16 @@ void Location::Render(bool renderWaterAndClouds)
     RenderClouds();
   else
   {
-    // Degenerate quads (reflection hack — originally OpenGL-specific)
-    g_imRenderer->Begin(PRIM_QUADS);
+    glBegin(GL_QUADS);
     for (unsigned i = 0; i < 4; i++)
-      g_imRenderer->Vertex2f(0, 0);
-    g_imRenderer->End();
+      glVertex2f(0, 0);
+    glEnd();
   } // necessary for correct reflection. why???
+
   RenderLandscape();
+
   if (renderWaterAndClouds)
-	RenderWater();
+    RenderWater();
 
   // don't reflect buildings, teams etc.
   //  makes nearly no difference on GPU bound setups (22 -> 23fps on athlon_x2_3600 + x300)
@@ -883,6 +884,7 @@ void Location::Render(bool renderWaterAndClouds)
   if (!g_app->m_editing && m_teams)
   {
     RenderTeams();
+    CHECK_OPENGL_STATE();
   }
 
   //if( m_entityGrid ) m_entityGrid->Render();
@@ -892,14 +894,20 @@ void Location::Render(bool renderWaterAndClouds)
   // Render all alpha'd objects
 
   RenderBuildingAlphas();
+  CHECK_OPENGL_STATE();
 
   if (!g_app->m_editing)
   {
+    CHECK_OPENGL_STATE();
     RenderParticles();
+    CHECK_OPENGL_STATE();
     RenderWeapons();
+    CHECK_OPENGL_STATE();
     RenderSpirits();
+    CHECK_OPENGL_STATE();
   }
 
+  CHECK_OPENGL_STATE();
 }
 
 // *** Render Buildings
@@ -909,7 +917,7 @@ void Location::RenderBuildings()
   float timeSinceAdvance = g_predictionTime;
 
   SetupFog();
-  g_imRenderer->SetFogEnabled(true);
+  glEnable(GL_FOG);
   g_app->m_renderer->SetObjectLighting();
 
   //
@@ -920,20 +928,31 @@ void Location::RenderBuildings()
     float spec = 1.0f;
     float diffuse = 1.0f;
     float amb = 0.0f;
-    float materialShininess[] = {10.0f};
-    float materialSpecular[] = {spec, spec, spec, 1.0f};
-    float materialDiffuse[] = {diffuse, diffuse, diffuse, 1.0f};
-    float ambCol[] = {amb, amb, amb, 1.0f};
+    GLfloat materialShininess[] = {10.0f};
+    GLfloat materialSpecular[] = {spec, spec, spec, 1.0f};
+    GLfloat materialDiffuse[] = {diffuse, diffuse, diffuse, 1.0f};
+    GLfloat ambCol[] = {amb, amb, amb, 1.0f};
 
+    glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+    glMaterialfv(GL_FRONT, GL_SHININESS, materialShininess);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambCol);
 
     float black[] = {0, 0, 0, 0};
     float colour1[] = {2.0f, 1.5f, 0.75f, 1.0f};
 
     LegacyVector3 light0(0, 1, 0.5);
     light0.Normalise();
-    float light0AsFourFloats[] = {light0.x, light0.y, light0.z, 0.0f};
+    GLfloat light0AsFourFloats[] = {light0.x, light0.y, light0.z, 0.0f};
 
+    glLightfv(GL_LIGHT0, GL_POSITION, light0AsFourFloats);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, colour1);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, colour1);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, black);
 
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glDisable(GL_LIGHT1);
   }
 
 #ifdef CHEATMENU_ENABLED
@@ -959,12 +978,13 @@ void Location::RenderBuildings()
     }
   }
 
-g_imRenderer->SetFogEnabled(false);
-g_app->m_renderer->SetObjectLighting();
+  glDisable(GL_FOG);
+  g_app->m_renderer->SetObjectLighting();
   g_app->m_renderer->UnsetObjectLighting();
 
   END_PROFILE(g_app->m_profiler, "Render Buildings");
 
+  CHECK_OPENGL_STATE();
 }
 
 struct DepthSortedBuilding
@@ -1004,7 +1024,7 @@ void Location::RenderBuildingAlphas()
   // Also record all depth sorted Alphas
 
   SetupFog();
-  g_imRenderer->SetFogEnabled(true);
+  glEnable(GL_FOG);
 
   for (int i = 0; i < m_buildings.Size(); ++i)
   {
@@ -1062,7 +1082,7 @@ void Location::RenderBuildingAlphas()
     END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
   }
 
-  g_imRenderer->SetFogEnabled(false);
+  glDisable(GL_FOG);
 
   END_PROFILE(g_app->m_profiler, "Render Building Alphas");
 }
@@ -1094,10 +1114,10 @@ void Location::RenderWeapons()
   //
   // Render effects
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
+  glDepthMask(false);
 
   for (int i = 0; i < m_effects.Size(); ++i)
   {
@@ -1111,13 +1131,15 @@ void Location::RenderWeapons()
         w->Render(timeSinceAdvance);
     }
   }
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glEnable(GL_CULL_FACE);
 
   //
   // Render lasers
 
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp", false));
+  glEnable(GL_LINE_SMOOTH);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp", false));
 
   float nearPlaneStart = g_app->m_renderer->GetNearPlane();
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_app->m_renderer->GetFarPlane());
@@ -1135,10 +1157,12 @@ void Location::RenderWeapons()
     }
   }
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_CULL_FACE);
+  glDepthMask(true);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_LINE_SMOOTH);
 
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
 
@@ -1817,7 +1841,14 @@ void Location::CreateShockwave(const LegacyVector3& _pos, float _size, unsigned 
 void Location::SetupFog()
 {
   float fogCol[] = {g_app->m_backgroundColour.r / 255.0f, g_app->m_backgroundColour.g / 255.0f, g_app->m_backgroundColour.b / 255.0f, 0};
-  g_imRenderer->SetFogParams(1000.0f, 4000.0f, fogCol[0], fogCol[1], fogCol[2]);
+
+  glHint(GL_FOG_HINT, GL_DONT_CARE);
+  glFogf(GL_FOG_DENSITY, 1.0f);
+  glFogf(GL_FOG_START, 1000.0f);
+  glFogf(GL_FOG_END, 4000.0f);
+  glFogfv(GL_FOG_COLOR, fogCol);
+  glFogi(GL_FOG_MODE, GL_LINEAR);
+  glDisable(GL_FOG);
 }
 
 void Location::WaterReflect()
@@ -1835,22 +1866,22 @@ void Location::WaterReflect()
 void Location::SetupLights()
 {
   float tmp[] = {0, 0, -1, 0};
+  glLightfv(GL_LIGHT1, GL_POSITION, tmp);
   float black[] = {0, 0, 0, 0};
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, black);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, black);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, black);
 
-  DirectX::XMFLOAT4 dirs[2]   = { {0,0,-1,0}, {0,0,-1,0} };
-  DirectX::XMFLOAT4 colors[2] = { {0,0,0,0},  {0,0,0,0}  };
-  DirectX::XMFLOAT4 ambient   = { 0.0f, 0.0f, 0.0f, 1.0f };
-  int numLights = 0;
-
-  for (int i = 0; i < m_lights.Size() && i < 2; i++)
+  for (int i = 0; i < m_lights.Size(); i++)
   {
     Light* light = m_lights.GetData(i);
 
-    float ambCol[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    GLfloat ambCol[] = {0.0f, 0.0f, 0.0f, 1.0f};
 
     LegacyVector3 front(light->m_front[0], light->m_front[1], light->m_front[2]);
     front.Normalise();
-    float colourAsFourFloats[] = {light->m_colour[0], light->m_colour[1], light->m_colour[2], light->m_colour[3]};
+    GLfloat frontAsFourFloats[] = {front.x, front.y, front.z, 0.0f};
+    GLfloat colourAsFourFloats[] = {light->m_colour[0], light->m_colour[1], light->m_colour[2], light->m_colour[3]};
 
     if (ChristmasModEnabled() == 1)
     {
@@ -1859,12 +1890,15 @@ void Location::SetupLights()
       colourAsFourFloats[2] = 1.2f;
     }
 
-    dirs[i]   = { front.x, front.y, front.z, 0.0f };
-    colors[i] = { colourAsFourFloats[0], colourAsFourFloats[1], colourAsFourFloats[2], colourAsFourFloats[3] };
-    numLights = i + 1;
+    glLightfv(GL_LIGHT0 + i, GL_POSITION, frontAsFourFloats);
+    glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, colourAsFourFloats);
+    glLightfv(GL_LIGHT0 + i, GL_SPECULAR, colourAsFourFloats);
+    glLightfv(GL_LIGHT0 + i, GL_AMBIENT, ambCol);
   }
 
-  g_imRenderer->SetLightParams(numLights, dirs, colors, ambient);
+  glDisable(GL_LIGHT0);
+  glDisable(GL_LIGHT1);
+  glDisable(GL_LIGHTING);
 }
 
 int Location::ChristmasModEnabled()
@@ -1922,7 +1956,7 @@ bool Location::IsFriend(unsigned char _teamId1, unsigned char _teamId2)
   return friends[_teamId1][_teamId2];
 }
 
-void Location::FlushRenderState()
+void Location::FlushOpenGlState()
 {
   int treeTypeId = Building::GetTypeId("Tree");
   for (int i = 0; i < m_buildings.Size(); ++i)
@@ -1939,11 +1973,11 @@ void Location::FlushRenderState()
   }
 }
 
-void Location::RegenerateRenderState()
+void Location::RegenerateOpenGlState()
 {
   // Tell the landscape
-  g_app->m_location->m_landscape.BuildRenderState();
+  g_app->m_location->m_landscape.BuildOpenGlState();
 
   // Tell the water
-  g_app->m_location->m_water->BuildRenderState();
+  g_app->m_location->m_water->BuildOpenGlState();
 }

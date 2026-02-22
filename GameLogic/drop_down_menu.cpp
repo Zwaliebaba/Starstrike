@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "text_renderer.h"
 #include "string_utils.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <string.h>
 
@@ -74,6 +71,7 @@ void DropDownWindow::RemoveDropDownWindow()
         s_window = NULL;
     }
 }
+
 
 
 // ****************************************************************************
@@ -223,13 +221,12 @@ void DropDownMenu::Render( int realX, int realY, bool highlighted, bool clicked 
         DarwiniaButton::Render( realX, realY, highlighted, clicked );
     }
 
-    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    g_imRenderer->Begin( PRIM_TRIANGLES );
-        g_imRenderer->Vertex2i( realX + m_w - 12, realY + 5 );
-        g_imRenderer->Vertex2i( realX + m_w - 3, realY + 5 );
-        g_imRenderer->Vertex2i( realX + m_w - 7, realY + 9 );
-    g_imRenderer->End();
-
+    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+    glBegin( GL_TRIANGLES );
+        glVertex2i( realX + m_w - 12, realY + 5 );
+        glVertex2i( realX + m_w - 3, realY + 5 );
+        glVertex2i( realX + m_w - 7, realY + 9 );
+    glEnd();
 }
 
 

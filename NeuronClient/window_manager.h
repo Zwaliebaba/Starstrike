@@ -52,6 +52,8 @@ class WindowManager
     int m_desktopRefresh; // Original starting values
 
     void ListAllDisplayModes();
+    bool EnableOpenGL(int _colourDepth, int _zDepth);
+    void DisableOpenGL();
 
   public:
     WindowManager();
@@ -89,8 +91,6 @@ class WindowManager
     void WindowMoved();
 
     void SuggestDefaultRes(int* _width, int* _height, int* _refresh, int* _depth);
-
-    static void OpenWebsite(const char* _url);
 };
 
 void AppMain();

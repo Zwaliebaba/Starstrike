@@ -307,6 +307,7 @@ void AI::Render(float _predictionTime)
     int numGreen = g_app->m_location->m_teams[0].m_others.NumUsed();
     int numRed = g_app->m_location->m_teams[1].m_others.NumUsed();
 
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     g_editorFont.DrawText3DCentre(pos - LegacyVector3(0, 30, 0), 25, "Green : %d", numGreen);
     g_editorFont.DrawText3DCentre(pos - LegacyVector3(0, 60, 0), 25, "Red  : %d", numRed);
   }
@@ -679,6 +680,7 @@ void AISpawnPoint::RenderAlphas(float _predictionTime)
 
     RenderSphere(m_pos, 10.0f, colour);
 
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 30, 0), 5.0f, "Spawn %d %s's", m_count, Entity::GetTypeName(m_entityType));
     g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 25, 0), 5.0f, "Every %d seconds", m_period);
     g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 20, 0), 5.0f, "Next spawn in %d seconds", static_cast<int>(m_timer));

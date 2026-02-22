@@ -4,10 +4,10 @@ Locations_StartDefinition
 	   1    0       map_sandbox.txt              	null
 	   2	1		map_garden.txt				 	mission_garden_liberate.txt
 	   3	0		map_containment.txt             null
-       4    1       map_generator.txt               null
+       4    0       map_generator.txt               null
        5    0       map_mine.txt                    null
        6    0       map_yard.txt                    null
-	   7	1		map_escort.txt			        mission_escort_escort.txt
+	   7	0		map_escort.txt			        mission_escort_escort.txt
        8    0       map_pattern_buffer.txt          null
 	   9	0		map_biosphere.txt			    null
        10   0       map_receiver.txt                null

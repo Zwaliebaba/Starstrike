@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "file_writer.h"
 #include "resource.h"
 #include "shape.h"
@@ -113,26 +110,24 @@ void SpawnBuilding::RenderSpirit( LegacyVector3 const &_pos )
     int spiritOuterSize = 6;
 
     float size = spiritInnerSize;
-    g_imRenderer->Color4ub(150, 50, 25, innerAlpha );
+    glColor4ub(150, 50, 25, innerAlpha );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    glEnd();
 
     size = spiritOuterSize;
-    g_imRenderer->Color4ub(150, 50, 25, outerAlpha );
+    glColor4ub(150, 50, 25, outerAlpha );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    glEnd();
 }
 
 
@@ -156,17 +151,21 @@ void SpawnBuilding::RenderAlphas( float _predictionTime )
             LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
             LegacyVector3 theirPosRight = camToTheirPos ^ ( theirPos - ourPos );
 
-            g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-            g_imRenderer->Color4f( 0.9f, 0.9f, 0.5f, 1.0f );
+            glDisable   ( GL_CULL_FACE );
+            glDepthMask ( false );
+            glColor4f   ( 0.9f, 0.9f, 0.5f, 1.0f );
 
             float size = 0.5f;
 
             if( buildingDetail == 1 )
             {
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+                glEnable    ( GL_BLEND );
+                glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
 
-                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+                glEnable        ( GL_TEXTURE_2D );
+                glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
                 size = 1.0f;
             }
@@ -174,12 +173,14 @@ void SpawnBuilding::RenderAlphas( float _predictionTime )
             theirPosRight.SetLength( size );
             ourPosRight.SetLength( size );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(0.1f, 0);      g_imRenderer->Vertex3fv( (ourPos - ourPosRight).GetData() );
-                g_imRenderer->TexCoord2f(0.1f, 1);      g_imRenderer->Vertex3fv( (ourPos + ourPosRight).GetData() );
-                g_imRenderer->TexCoord2f(0.9f, 1);      g_imRenderer->Vertex3fv( (theirPos + theirPosRight).GetData() );
-                g_imRenderer->TexCoord2f(0.9f, 0);      g_imRenderer->Vertex3fv( (theirPos - theirPosRight).GetData() );
-            g_imRenderer->End();
+            glBegin( GL_QUADS );
+                glTexCoord2f(0.1f, 0);      glVertex3fv( (ourPos - ourPosRight).GetData() );
+                glTexCoord2f(0.1f, 1);      glVertex3fv( (ourPos + ourPosRight).GetData() );
+                glTexCoord2f(0.9f, 1);      glVertex3fv( (theirPos + theirPosRight).GetData() );
+                glTexCoord2f(0.9f, 0);      glVertex3fv( (theirPos - theirPosRight).GetData() );
+            glEnd();
+
+            glDisable       ( GL_TEXTURE_2D );
 
 
             //
@@ -463,6 +464,7 @@ void MasterSpawnPoint::RenderAlphas ( float _predictionTime )
 }
 
 
+
 char *MasterSpawnPoint::GetObjectiveCounter()
 {
     static char result[256];
@@ -681,9 +683,11 @@ void SpawnPoint::RenderAlphas( float _predictionTime )
     LegacyVector3 camUp = g_app->m_camera->GetUp();
     LegacyVector3 camRight = g_app->m_camera->GetRight();
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
+    glDepthMask     ( false );
+    glEnable        ( GL_BLEND );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
 
     float timeIndex = g_gameTime + m_id.GetUniqueId() * 10.0f;
 
@@ -705,28 +709,30 @@ void SpawnPoint::RenderAlphas( float _predictionTime )
         float size = 10.0f + sinf(timeIndex+i*10) * 10.0f;
         size = max( size, 5.0f );
 
-        g_imRenderer->Color4f( 0.6f, 0.2f, 0.1f, alpha);
+        glColor4f( 0.6f, 0.2f, 0.1f, alpha);
 
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - camRight * size + camUp * size).GetData() );
-            g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos + camRight * size + camUp * size).GetData() );
-            g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + camRight * size - camUp * size).GetData() );
-            g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos - camRight * size - camUp * size).GetData() );
-        g_imRenderer->End();
-
+        glBegin( GL_QUADS );
+            glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
+            glTexCoord2i(1,0);      glVertex3fv( (pos + camRight * size + camUp * size).GetData() );
+            glTexCoord2i(1,1);      glVertex3fv( (pos + camRight * size - camUp * size).GetData() );
+            glTexCoord2i(0,1);      glVertex3fv( (pos - camRight * size - camUp * size).GetData() );
+        glEnd();
     }
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+    glDisable       ( GL_TEXTURE_2D );
+    glDepthMask     ( true );
 }
 
 
 void SpawnPoint::RenderPorts()
 {
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_imRenderer->Begin(PRIM_QUADS);
+    glDisable       ( GL_CULL_FACE );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+    glDepthMask     ( false );
+    glEnable        ( GL_BLEND );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    glBegin         ( GL_QUADS );
 
     for( int i = 0; i < GetNumPorts(); ++i )
     {
@@ -751,57 +757,26 @@ void SpawnPoint::RenderPorts()
         WorldObjectId occupantId = GetPortOccupant(i);
         if( !occupantId.IsValid() )
         {
-            g_imRenderer->Color4ub( 150, 150, 150, 255 );
+            glColor4ub( 150, 150, 150, 255 );
         }
         else
         {
             RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
-            g_imRenderer->Color4ubv( teamColour.GetData() );
+            glColor4ubv( teamColour.GetData() );
         }
 
-        g_imRenderer->TexCoord2i( 0, 0 );           g_imRenderer->Vertex3fv( (statusPos - camR - camU).GetData() );
-        g_imRenderer->TexCoord2i( 1, 0 );           g_imRenderer->Vertex3fv( (statusPos + camR - camU).GetData() );
-        g_imRenderer->TexCoord2i( 1, 1 );           g_imRenderer->Vertex3fv( (statusPos + camR + camU).GetData() );
-        g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
+        glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
+        glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
+        glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
+        glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
     }
 
-    g_imRenderer->End();
-
-
-    for( int i = 0; i < GetNumPorts(); ++i )
-    {
-        LegacyVector3 portPos;
-        LegacyVector3 portFront;
-        GetPortPosition( i, portPos, portFront );
-
-        LegacyVector3 portUp = g_upVector;
-        Matrix34 mat( portFront, portUp, portPos );
-
-        //
-        // Render the status light
-
-        float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-        LegacyVector3 statusPos = s_controlPadStatus->GetWorldMatrix( mat ).pos;
-        statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
-        statusPos.y += 5.0f;
-
-        WorldObjectId occupantId = GetPortOccupant(i);
-        if( !occupantId.IsValid() )
-        {
-        }
-        else
-        {
-            RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
-        }
-
-    }
-
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glEnd           ();
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glDisable       ( GL_BLEND );
+    glDepthMask     ( true );
+    glDisable       ( GL_TEXTURE_2D );
+    glEnable        ( GL_CULL_FACE );
 
 }
 

@@ -23,6 +23,7 @@ public:
 
 private:
 	Triangle	m_topLevelTriangle[20];
+	int m_displayListId;
 
 	void ConsiderTriangle(int level, LegacyVector3 const &a, LegacyVector3 const &b, LegacyVector3 const &c);
 };

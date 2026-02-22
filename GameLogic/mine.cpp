@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include "text_stream_readers.h"
 #include "shape.h"
@@ -143,7 +140,7 @@ void MineBuilding::RenderAlphas( float _predictionTime )
             LegacyVector3 ourPos2 = GetTrackMarker2();
             LegacyVector3 theirPos2 = mineBuilding->GetTrackMarker2();
 
-            g_imRenderer->Color4f( 0.85f, 0.4f, 0.4f, 1.0f );
+            glColor4f( 0.85f, 0.4f, 0.4f, 1.0f );
 
             float size = 2.0f;
             if( buildingDetail > 1 ) size = 1.0f;
@@ -156,38 +153,40 @@ void MineBuilding::RenderAlphas( float _predictionTime )
             LegacyVector3 lineTheirPos1 = camToTheirPos1 ^ ( ourPos1 - theirPos1 );
             lineTheirPos1.SetLength( size );
 
-            g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+            glDisable       ( GL_CULL_FACE );
 
             if( buildingDetail == 1 )
             {
-                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+                glEnable        ( GL_TEXTURE_2D );
+                glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+                glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+                glEnable        ( GL_BLEND );
             }
 
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+            glDepthMask     ( false );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(0.1,0);      g_imRenderer->Vertex3fv( (ourPos1 - lineOurPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.1,1);      g_imRenderer->Vertex3fv( (ourPos1 + lineOurPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.9,1);      g_imRenderer->Vertex3fv( (theirPos1 + lineTheirPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.9,0);      g_imRenderer->Vertex3fv( (theirPos1 - lineTheirPos1).GetData() );
-            g_imRenderer->End();
+            glBegin( GL_QUADS );
+                glTexCoord2f(0.1,0);      glVertex3fv( (ourPos1 - lineOurPos1).GetData() );
+                glTexCoord2f(0.1,1);      glVertex3fv( (ourPos1 + lineOurPos1).GetData() );
+                glTexCoord2f(0.9,1);      glVertex3fv( (theirPos1 + lineTheirPos1).GetData() );
+                glTexCoord2f(0.9,0);      glVertex3fv( (theirPos1 - lineTheirPos1).GetData() );
+            glEnd();
 
+            glBegin( GL_QUADS );
+                glTexCoord2f(0.1,0);      glVertex3fv( (ourPos2 - lineOurPos1).GetData() );
+                glTexCoord2f(0.1,1);      glVertex3fv( (ourPos2 + lineOurPos1).GetData() );
+                glTexCoord2f(0.9,1);      glVertex3fv( (theirPos2 + lineTheirPos1).GetData() );
+                glTexCoord2f(0.9,0);      glVertex3fv( (theirPos2 - lineTheirPos1).GetData() );
+            glEnd();
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(0.1,0);      g_imRenderer->Vertex3fv( (ourPos2 - lineOurPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.1,1);      g_imRenderer->Vertex3fv( (ourPos2 + lineOurPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.9,1);      g_imRenderer->Vertex3fv( (theirPos2 + lineTheirPos1).GetData() );
-                g_imRenderer->TexCoord2f(0.9,0);      g_imRenderer->Vertex3fv( (theirPos2 - lineTheirPos1).GetData() );
-            g_imRenderer->End();
+            glDepthMask ( true );
+            glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-
-            g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+            glDisable   ( GL_TEXTURE_2D );
+            glEnable    ( GL_CULL_FACE );
         }
     }
 }
@@ -253,19 +252,17 @@ void MineBuilding::RenderCart( MineCart *_cart, float _predictionTime )
 
             //START_PROFILE(g_app->m_profiler, "RenderLines" );
             LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.5f;
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->Vertex3fv( (trackLeft - camRight).GetData() );
-                g_imRenderer->Vertex3fv( (trackLeft + camRight).GetData() );
-                g_imRenderer->Vertex3fv( (cartLinkLeft + camRight).GetData() );
-                g_imRenderer->Vertex3fv( (cartLinkLeft - camRight).GetData() );
+            glBegin( GL_QUADS );
+                glVertex3fv( (trackLeft - camRight).GetData() );
+                glVertex3fv( (trackLeft + camRight).GetData() );
+                glVertex3fv( (cartLinkLeft + camRight).GetData() );
+                glVertex3fv( (cartLinkLeft - camRight).GetData() );
 
-                g_imRenderer->Vertex3fv( (trackRight - camRight).GetData() );
-                g_imRenderer->Vertex3fv( (trackRight + camRight).GetData() );
-                g_imRenderer->Vertex3fv( (cartLinkRight + camRight).GetData() );
-                g_imRenderer->Vertex3fv( (cartLinkRight - camRight).GetData() );
-            g_imRenderer->End();
-
-
+                glVertex3fv( (trackRight - camRight).GetData() );
+                glVertex3fv( (trackRight + camRight).GetData() );
+                glVertex3fv( (cartLinkRight + camRight).GetData() );
+                glVertex3fv( (cartLinkRight - camRight).GetData() );
+            glEnd();
             //END_PROFILE(g_app->m_profiler, "RenderLines" );
 
             //START_PROFILE(g_app->m_profiler, "RenderPolygons" );
@@ -284,11 +281,13 @@ void MineBuilding::RenderCart( MineCart *_cart, float _predictionTime )
 
                     if( buildingDetail < 3 )
                     {
-                        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-                        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+                        glEnable( GL_BLEND );
+                        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+                        glDepthMask( false );
                         //glDisable( GL_DEPTH_TEST );
+                        glDisable( GL_LIGHTING );
 
-                        g_imRenderer->Color4f( 1.0f, 0.7f, 0.0f, 0.75f );
+                        glColor4f( 1.0f, 0.7f, 0.0f, 0.75f );
 
 	                    float nearPlaneStart = g_app->m_renderer->GetNearPlane();
 	                    g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.1f,
@@ -299,8 +298,11 @@ void MineBuilding::RenderCart( MineCart *_cart, float _predictionTime )
                         g_app->m_camera->SetupProjectionMatrix(nearPlaneStart,
 								 		                       g_app->m_renderer->GetFarPlane());
 
-                        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+                        glEnable( GL_LIGHTING );
+                        glEnable( GL_DEPTH_TEST );
+                        glDepthMask( true );
+                        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                        glDisable( GL_BLEND );
                     }
                 }
             }
@@ -965,13 +967,13 @@ void Refinery::Render( float _predictionTime )
     if( gb ) numRefined = gb->m_link;
 
     Matrix34 counterMat = m_counter1->GetWorldMatrix(refineryMat);
-    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 1.0f );
+    glColor4f( 0.6f, 0.8f, 0.9f, 1.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined );
     counterMat.pos += counterMat.f * 0.1f;
     counterMat.pos += ( counterMat.f ^ counterMat.u ) * 0.2f;
     counterMat.pos += counterMat.u * 0.2f;
     g_gameFont.SetRenderShadow(true);
-    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 0.0f );
+    glColor4f( 0.6f, 0.8f, 0.9f, 0.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined );
     g_gameFont.SetRenderShadow(false);
 }

@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include "resource.h"
 #include "shape.h"
@@ -119,11 +116,11 @@ void BlueprintBuilding::RenderAlphas( float _predictionTime )
         float ourTime = g_gameTime + m_id.GetUniqueId() + m_id.GetIndex();
         if( fabs( infected - linkInfected ) < 0.01f )
         {
-            g_imRenderer->Color4f( infected, 0.7f-infected*0.7f, 0.0f, 0.1f+fabs(sinf(ourTime))*0.2f );
+            glColor4f( infected, 0.7f-infected*0.7f, 0.0f, 0.1f+fabs(sinf(ourTime))*0.2f );
         }
         else
         {
-            g_imRenderer->Color4f( infected, 0.7f-infected*0.7f, 0.0f, 0.5f+fabs(sinf(ourTime))*0.5f );
+            glColor4f( infected, 0.7f-infected*0.7f, 0.0f, 0.5f+fabs(sinf(ourTime))*0.5f );
         }
 
         LegacyVector3 ourPos = GetMarker(_predictionTime).pos;
@@ -132,23 +129,24 @@ void BlueprintBuilding::RenderAlphas( float _predictionTime )
         LegacyVector3 rightAngle = ( g_app->m_camera->GetPos() - ourPos ) ^ ( theirPos - ourPos );
         rightAngle.SetLength( 20.0f );
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+        glDisable( GL_CULL_FACE );
+        glEnable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
 
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+        glDepthMask( false );
 
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (ourPos - rightAngle).GetData() );
-            g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (ourPos + rightAngle).GetData() );
-            g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (theirPos + rightAngle).GetData() );
-            g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (theirPos - rightAngle).GetData() );
-        g_imRenderer->End();
+        glBegin( GL_QUADS );
+            glTexCoord2i(0,0);      glVertex3fv( (ourPos - rightAngle).GetData() );
+            glTexCoord2i(0,1);      glVertex3fv( (ourPos + rightAngle).GetData() );
+            glTexCoord2i(1,1);      glVertex3fv( (theirPos + rightAngle).GetData() );
+            glTexCoord2i(1,0);      glVertex3fv( (theirPos - rightAngle).GetData() );
+        glEnd();
 
-
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_imRenderer->UnbindTexture();
+        glDepthMask( true );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable( GL_TEXTURE_2D );
     }
 
     //g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,50,0), 10.0f, "%d Infected %2.2f", m_segment, m_infected );
@@ -378,11 +376,12 @@ void BlueprintStore::RenderAlphas( float _predictionTime )
     float screenSize;
     GetDisplay( screenPos, screenRight, screenUp, screenSize );
 
-    g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.75f );
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glColor4f( 1.0f, 1.0f, 1.0f, 0.75f );
+    glDisable( GL_CULL_FACE );
+    glEnable( GL_BLEND );
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
+    glDepthMask( false );
 
     int numSteps = sqrt(BLUEPRINTSTORE_NUMSEGMENTS);
 
@@ -400,20 +399,19 @@ void BlueprintStore::RenderAlphas( float _predictionTime )
             LegacyVector3 height = screenUp * screenSize;
 
             float infected = m_segments[y*numSteps+x] / 100.0f;
-            g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+            glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(tx,ty);            g_imRenderer->Vertex3fv( pos.GetData() );
-                g_imRenderer->TexCoord2f(tx+size,ty);       g_imRenderer->Vertex3fv( (pos+width).GetData() );
-                g_imRenderer->TexCoord2f(tx+size,ty+size);  g_imRenderer->Vertex3fv( (pos+width+height).GetData() );
-                g_imRenderer->TexCoord2f(tx,ty+size);       g_imRenderer->Vertex3fv( (pos+height).GetData() );
-            g_imRenderer->End();
-
+            glBegin( GL_QUADS );
+                glTexCoord2f(tx,ty);            glVertex3fv( pos.GetData() );
+                glTexCoord2f(tx+size,ty);       glVertex3fv( (pos+width).GetData() );
+                glTexCoord2f(tx+size,ty+size);  glVertex3fv( (pos+width+height).GetData() );
+                glTexCoord2f(tx,ty+size);       glVertex3fv( (pos+height).GetData() );
+            glEnd();
         }
     }
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_imRenderer->UnbindTexture();
+    glDepthMask( true );
+    glDisable( GL_TEXTURE_2D );
 }*/
 
 
@@ -428,44 +426,48 @@ void BlueprintStore::RenderAlphas( float _predictionTime )
     //
     // Render main darwinian
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glEnable( GL_TEXTURE_2D );
+    glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "sprites/darwinian.bmp" ) );
+    glDisable( GL_CULL_FACE );
+    glEnable( GL_BLEND );
+    glDepthMask( false );
 
     float texX = 0.0f;
     float texY = 0.0f;
     float texH = 1.0f;
     float texW = 1.0f;
 
+    glShadeModel( GL_SMOOTH );
 
-    g_imRenderer->Begin(PRIM_QUADS);
+    glBegin( GL_QUADS );
         float infected = m_segments[0] / 100.0f;
-        g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-        g_imRenderer->TexCoord2f(texX,texY);
-        g_imRenderer->Vertex3fv( screenPos.GetData() );
+        glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+        glTexCoord2f(texX,texY);
+        glVertex3fv( screenPos.GetData() );
 
         infected = m_segments[1] / 100.0f;
-        g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-        g_imRenderer->TexCoord2f(texX+texW,texY);
-        g_imRenderer->Vertex3fv( (screenPos + screenRight * screenSize * 2).GetData() );
+        glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+        glTexCoord2f(texX+texW,texY);
+        glVertex3fv( (screenPos + screenRight * screenSize * 2).GetData() );
 
         infected = m_segments[2] / 100.0f;
-        g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-        g_imRenderer->TexCoord2f(texX+texW,texY+texH);
-        g_imRenderer->Vertex3fv( (screenPos + screenRight * screenSize * 2 + screenUp * screenSize * 2).GetData() );
+        glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+        glTexCoord2f(texX+texW,texY+texH);
+        glVertex3fv( (screenPos + screenRight * screenSize * 2 + screenUp * screenSize * 2).GetData() );
 
         infected = m_segments[3] / 100.0f;
-        g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-        g_imRenderer->TexCoord2f(texX,texY+texH);
-        g_imRenderer->Vertex3fv( (screenPos + screenUp * screenSize * 2).GetData() );
-    g_imRenderer->End();
+        glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+        glTexCoord2f(texX,texY+texH);
+        glVertex3fv( (screenPos + screenUp * screenSize * 2).GetData() );
+    glEnd();
 
     //
     // Render lines for over effect
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/interface_grey.bmp" ) );
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+    glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/interface_grey.bmp" ) );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
     texX = 0.0f;
     texW = 3.0f;
@@ -474,35 +476,36 @@ void BlueprintStore::RenderAlphas( float _predictionTime )
 
     for( int i = 0; i < 2; ++i )
     {
-        g_imRenderer->Begin(PRIM_QUADS);
+        glBegin( GL_QUADS );
             float infected = m_segments[0] / 100.0f;
-            g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-            g_imRenderer->TexCoord2f(texX,texY);
-            g_imRenderer->Vertex3fv( screenPos.GetData() );
+            glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+            glTexCoord2f(texX,texY);
+            glVertex3fv( screenPos.GetData() );
 
             infected = m_segments[1] / 100.0f;
-            g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-            g_imRenderer->TexCoord2f(texX+texW,texY);
-            g_imRenderer->Vertex3fv( (screenPos + screenRight * screenSize * 2).GetData() );
+            glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+            glTexCoord2f(texX+texW,texY);
+            glVertex3fv( (screenPos + screenRight * screenSize * 2).GetData() );
 
             infected = m_segments[2] / 100.0f;
-            g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-            g_imRenderer->TexCoord2f(texX+texW,texY+texH);
-            g_imRenderer->Vertex3fv( (screenPos + screenRight * screenSize * 2 + screenUp * screenSize * 2).GetData() );
+            glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+            glTexCoord2f(texX+texW,texY+texH);
+            glVertex3fv( (screenPos + screenRight * screenSize * 2 + screenUp * screenSize * 2).GetData() );
 
             infected = m_segments[3] / 100.0f;
-            g_imRenderer->Color4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
-            g_imRenderer->TexCoord2f(texX,texY+texH);
-            g_imRenderer->Vertex3fv( (screenPos + screenUp * screenSize * 2).GetData() );
-        g_imRenderer->End();
+            glColor4f( infected*0.8f, 0.8f-infected*0.8f, 0.0f, 1.0f );
+            glTexCoord2f(texX,texY+texH);
+            glVertex3fv( (screenPos + screenUp * screenSize * 2).GetData() );
+        glEnd();
 
         texY *= 1.5f;
         texH = 0.1f;
     }
 
+    glShadeModel( GL_FLAT );
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_imRenderer->UnbindTexture();
+    glDepthMask( true );
+    glDisable( GL_TEXTURE_2D );
 }
 
 
@@ -632,28 +635,31 @@ void BlueprintConsole::RenderPorts()
         WorldObjectId occupantId = GetPortOccupant(i);
         if( !occupantId.IsValid() )
         {
-            g_imRenderer->Color4ub( 150, 150, 150, 255 );
+            glColor4ub( 150, 150, 150, 255 );
         }
         else
         {
             RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
-            g_imRenderer->Color4ubv( teamColour.GetData() );
+            glColor4ubv( teamColour.GetData() );
         }
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i( 0, 0 );           g_imRenderer->Vertex3fv( (statusPos - camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );           g_imRenderer->Vertex3fv( (statusPos + camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );           g_imRenderer->Vertex3fv( (statusPos + camR + camU).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
-        g_imRenderer->End();
-
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+        glDisable       ( GL_CULL_FACE );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+        glDepthMask     ( false );
+        glEnable        ( GL_BLEND );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+        glBegin( GL_QUADS );
+            glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
+            glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
+            glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
+            glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
+        glEnd();
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable       ( GL_BLEND );
+        glDepthMask     ( true );
+        glDisable       ( GL_TEXTURE_2D );
+        glEnable        ( GL_CULL_FACE );
 
     }
 }

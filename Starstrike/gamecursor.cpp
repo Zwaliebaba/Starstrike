@@ -7,11 +7,6 @@
 #include "hi_res_time.h"
 #include "debug_render.h"
 #include "binary_stream_readers.h"
-#include "im_renderer.h"
-#include "sprite_batch.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
 
 #include "eclipse.h"
 
@@ -296,6 +291,8 @@ void GameCursor::Render()
 	m_moveableEntitySelected = false;
 
 	// Set mip mapping for game cursor
+	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     if( g_app->m_editing || EclGetWindows()->Size() > 0 )
     {
@@ -352,7 +349,7 @@ void GameCursor::Render()
                 m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
                 m_cursorSelection->SetAnimation( false );
                 g_app->m_renderer->SetupMatricesFor2D();
-                m_cursorSelection->Render( posX, posY );
+                m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
                 g_app->m_renderer->SetupMatricesFor3D();
             }
 
@@ -416,7 +413,7 @@ void GameCursor::Render()
                     m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
                     m_cursorSelection->SetAnimation( false );
                     g_app->m_renderer->SetupMatricesFor2D();
-                    m_cursorSelection->Render( posX, posY );
+                    m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
                     g_app->m_renderer->SetupMatricesFor3D();
 
 					m_highlightingSomething = true;
@@ -453,7 +450,7 @@ void GameCursor::Render()
                             g_app->m_renderer->SetupMatricesFor2D();
                             m_cursorPlacement->SetSize( 60.0f );
                             m_cursorPlacement->SetAnimation( true );
-                            m_cursorPlacement->Render( posX, posY );
+                            m_cursorPlacement->Render( posX, g_app->m_renderer->ScreenH() - posY );
                             g_app->m_renderer->SetupMatricesFor3D();
                         }
                     }
@@ -526,45 +523,41 @@ void GameCursor::RenderStandardCursor( float _screenX, float _screenY )
 
 void LeftArrow(int x, int y, int size)
 {
-	g_imRenderer->Begin( PRIM_TRIANGLES );
-		g_imRenderer->TexCoord2f(0.0f, 0.0f);	g_imRenderer->Vertex2i( x - size, y - size/2 );
-		g_imRenderer->TexCoord2f(1.0f, 0.5f);	g_imRenderer->Vertex2i( x,        y );
-		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x - size, y + size/2 );
-	g_imRenderer->End();
-
+	glBegin( GL_TRIANGLES );
+		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size, y - size/2 );
+		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
+		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size, y + size/2 );
+	glEnd();
 }
 
 
 void RightArrow(int x, int y, int size)
 {
-	g_imRenderer->Begin( PRIM_TRIANGLES );
-		g_imRenderer->TexCoord2f(0.0f, 0.0f);	g_imRenderer->Vertex2i( x + size, y - size/2 );
-		g_imRenderer->TexCoord2f(1.0f, 0.5f);	g_imRenderer->Vertex2i( x,        y );
-		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x + size, y + size/2 );
-	g_imRenderer->End();
-
+	glBegin( GL_TRIANGLES );
+		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size, y - size/2 );
+		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
+		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size, y + size/2 );
+	glEnd();
 }
 
 
 void TopArrow(int x, int y, int size)
 {
-	g_imRenderer->Begin( PRIM_TRIANGLES );
-		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x - size/2, y - size );
-		g_imRenderer->TexCoord2f(0.0f, 0.0f);	g_imRenderer->Vertex2i( x + size/2, y - size );
-		g_imRenderer->TexCoord2f(1.0f, 0.5f);	g_imRenderer->Vertex2i( x,          y );
-	g_imRenderer->End();
-
+	glBegin( GL_TRIANGLES );
+		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size/2, y - size );
+		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size/2, y - size );
+		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,          y );
+	glEnd();
 }
 
 
 void BottomArrow(int x, int y, int size)
 {
-	g_imRenderer->Begin( PRIM_TRIANGLES );
-		g_imRenderer->TexCoord2f(1.0f, 0.5f);	g_imRenderer->Vertex2i( x, y );
-		g_imRenderer->TexCoord2f(0.0f, 1.0f);	g_imRenderer->Vertex2i( x + size/2, y + size );
-		g_imRenderer->TexCoord2f(0.0f, 0.0f);	g_imRenderer->Vertex2i( x - size/2, y + size );
-	g_imRenderer->End();
-
+	glBegin( GL_TRIANGLES );
+		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x, y );
+		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size/2, y + size );
+		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size/2, y + size );
+	glEnd();
 }
 
 
@@ -635,49 +628,44 @@ void GameCursor::FindScreenEdge( Vector2 const &_line, float *_posX, float *_pos
 
 void GameCursor::RenderSelectionArrow( float _screenX, float _screenY, float _screenDX, float _screenDY, float _size, float _alpha )
 {
-	Vector2 pos( _screenX, _screenY );
-	Vector2 gradient( _screenDX, _screenDY );
-	Vector2 rightAngle = gradient;
-	float tempX = rightAngle.x;
-	rightAngle.x = rightAngle.y;
-	rightAngle.y = tempX * -1;
+    Vector2 pos( _screenX, _screenY );
+    Vector2 gradient( _screenDX, _screenDY );
+    Vector2 rightAngle = gradient;
+    float tempX = rightAngle.x;
+    rightAngle.x = rightAngle.y;
+    rightAngle.y = tempX * -1;
 
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glEnable        ( GL_BLEND );
+    glDisable       ( GL_CULL_FACE );
+    glDepthMask     ( false );
 
+    glColor4f       ( _alpha, _alpha, _alpha, 0.0f );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
 
-	g_imRenderer->Color4f( _alpha, _alpha, _alpha, 0.0f );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( m_selectionArrowShadowFilename ) );
 
-	int shadowTexId = g_app->m_resource->GetTexture( m_selectionArrowShadowFilename );
-	g_imRenderer->BindTexture(shadowTexId);
+    glBegin( GL_QUADS );
+        glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
+        glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
+        glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
+        glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
+    glEnd();
 
-	g_imRenderer->Begin( PRIM_QUADS );
-		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-		g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-	g_imRenderer->End();
+    glColor4f       ( 1.0f, 1.0f, 0.3f, _alpha );
+	glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( m_selectionArrowFilename ) );
 
+    glBegin( GL_QUADS );
+        glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
+        glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
+        glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
+        glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
+    glEnd();
 
-	g_imRenderer->Color4f( 1.0f, 1.0f, 0.3f, _alpha );
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	int arrowTexId = g_app->m_resource->GetTexture( m_selectionArrowFilename );
-	g_imRenderer->BindTexture(arrowTexId);
-
-	g_imRenderer->Begin( PRIM_QUADS );
-		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-		g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-	g_imRenderer->End();
-
-
-	g_imRenderer->UnbindTexture();
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-
+    glDepthMask     ( true );
+    glDisable       ( GL_TEXTURE_2D );
+    glEnable        ( GL_CULL_FACE );
 
 }
 
@@ -702,7 +690,8 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     // Is the _pos on screen or not?
 
     float screenX, screenY;
-	g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
+    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
+    screenY = screenH - screenY;
 
 	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
 	float angle = toCam * g_app->m_camera->GetFront();
@@ -753,7 +742,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
         lineNormal.x *= -1;
 
         g_app->m_renderer->SetupMatricesFor2D();
-        RenderSelectionArrow( edgeX, edgeY, lineNormal.x, lineNormal.y, triSize * 1.5f, 0.9f );
+        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize * 1.5f, 0.9f );
         g_app->m_renderer->SetupMatricesFor3D();
 
         onScreen = false;
@@ -774,7 +763,8 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     int screenH = g_app->m_renderer->ScreenH();
     int screenW = g_app->m_renderer->ScreenW();
     float screenX, screenY;
-	g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
+    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
+    screenY = screenH - screenY;
 
 	// Calculate alpha
 	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
@@ -896,7 +886,7 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 
         g_app->m_renderer->SetupMatricesFor2D();
 
-        RenderSelectionArrow( edgeX, edgeY, lineNormal.x, lineNormal.y, triSize, 1.0f );
+        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize, 1.0f );
 
         g_app->m_renderer->SetupMatricesFor3D();
     }
@@ -904,11 +894,15 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
     {
 	    // Get ready to render
         g_app->m_renderer->SetupMatricesFor2D();
+        glEnable        ( GL_BLEND );
+        glDisable       ( GL_CULL_FACE );
     //	glEnable		( GL_TEXTURE_2D );
     //	glBindTexture	( GL_TEXTURE_2D, g_app->m_resource->GetTexture("selection_arrow") );
 
 	    // Do subtractive pass
 	    {
+		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha/2.0f );
+		    glBlendFunc		( GL_ZERO, GL_ONE_MINUS_SRC_ALPHA );
 
 		    LeftArrow ( screenX - xOut, screenY, triSize );
 		    RightArrow( screenX + xOut, screenY, triSize );
@@ -922,6 +916,8 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 		    float myXOut = xOut + 5.0f;
 		    float myYOut = yOut + 5.0f;
 
+		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha );
+		    glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
 
 		    LeftArrow ( screenX - myXOut, screenY, myTriSize );
 		    RightArrow( screenX + myXOut, screenY, myTriSize );
@@ -929,6 +925,8 @@ void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &
 		    BottomArrow(screenX, screenY + myYOut, myTriSize );
 	    }
 
+        glDisable       ( GL_BLEND );
+        glEnable        ( GL_CULL_FACE );
     //	glDisable		( GL_TEXTURE_2D );
 
         g_app->m_renderer->SetupMatricesFor3D();
@@ -942,6 +940,7 @@ void GameCursor::RenderWeaponMarker ( LegacyVector3 _pos, LegacyVector3 _front, 
     m_cursorPlacement->SetAnimation( true );
     m_cursorPlacement->Render3D( _pos, _front, _up );
 }
+
 
 
 // ****************************************************************************
@@ -1030,96 +1029,94 @@ void MouseCursor::Render(float _x, float _y)
 	float x = (float)_x - s * m_hotspotX;
 	float y = (float)_y - s * m_hotspotY;
 
-	int screenW = g_renderDevice->GetBackBufferWidth();
-	int screenH = g_renderDevice->GetBackBufferHeight();
+	glEnable        (GL_TEXTURE_2D);
+	glEnable        (GL_BLEND);
+    glDisable       (GL_CULL_FACE);
+    glDepthMask     (false);
 
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    if( m_shadowed )
+    {
+		glBindTexture   (GL_TEXTURE_2D, g_app->m_resource->GetTexture(m_shadowFilename));
+	    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
+        glColor4f       ( 1.0f, 1.0f, 1.0f, 0.0f );
+	    glBegin         (GL_QUADS);
+		    glTexCoord2i(0,1);			glVertex2f(x, y);
+		    glTexCoord2i(1,1);			glVertex2f(x + s, y);
+		    glTexCoord2i(1,0);			glVertex2f(x + s, y + s);
+		    glTexCoord2i(0,0);			glVertex2f(x, y + s);
+	    glEnd();
+    }
 
-	if( m_shadowed )
-	{
-		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
-		g_spriteBatch->Begin2D(screenW, screenH, BLEND_SUBTRACTIVE_COLOR);
-		g_spriteBatch->SetTexture(shadowTexId);
-		g_spriteBatch->SetColor( 1.0f, 1.0f, 1.0f, 0.0f );
-		g_spriteBatch->AddQuad2D(x, y, s, s, 0.0f, 1.0f, 1.0f, 0.0f);
-		g_spriteBatch->End2D();
-	}
+    glColor4ubv     (m_colour.GetData() );
+	glBindTexture   (GL_TEXTURE_2D, g_app->m_resource->GetTexture(m_mainFilename));
+	glBlendFunc     (GL_SRC_ALPHA, GL_ONE);
+	glBegin         (GL_QUADS);
+		glTexCoord2i(0,1);			glVertex2f(x, y);
+		glTexCoord2i(1,1);			glVertex2f(x + s, y);
+		glTexCoord2i(1,0);			glVertex2f(x + s, y + s);
+		glTexCoord2i(0,0);			glVertex2f(x, y + s);
+	glEnd();
 
-	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
-	g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
-	g_spriteBatch->SetTexture(mainTexId);
-	g_spriteBatch->SetColor(m_colour.r / 255.0f, m_colour.g / 255.0f, m_colour.b / 255.0f, m_colour.a / 255.0f);
-	g_spriteBatch->AddQuad2D(x, y, s, s, 0.0f, 1.0f, 1.0f, 0.0f);
-	g_spriteBatch->End2D();
-
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-
+    glDepthMask     (true);
+    glDisable       (GL_BLEND);
+	glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable       (GL_TEXTURE_2D);
+    glEnable        (GL_CULL_FACE);
 }
 
 
 void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_front, LegacyVector3 const &_up, bool _cameraScale)
 {
-	LegacyVector3 rightAngle = (_front ^ _up).Normalise();
+    LegacyVector3 rightAngle = (_front ^ _up).Normalise();
 
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+	glEnable        (GL_TEXTURE_2D);
 
+	glEnable        (GL_BLEND);
+    glDisable       (GL_CULL_FACE );
+    //glDisable       (GL_DEPTH_TEST );
+    glDepthMask     (false);
 
-	float scale = GetSize();
-	if( _cameraScale )
-	{
-		float camDist = ( g_app->m_camera->GetPos() - _pos ).Mag();
-		scale *= sqrtf(camDist) / 40.0f;
-	}
+    float scale = GetSize();
+    if( _cameraScale )
+    {
+        float camDist = ( g_app->m_camera->GetPos() - _pos ).Mag();
+        scale *= sqrtf(camDist) / 40.0f;
+    }
 
-	LegacyVector3 pos = _pos;
-	pos -= m_hotspotX * rightAngle * scale;
-	pos += m_hotspotY * _front * scale;
+    LegacyVector3 pos = _pos;
+    pos -= m_hotspotX * rightAngle * scale;
+    pos += m_hotspotY * _front * scale;
 
-	DirectX::XMMATRIX viewProj = g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+    if( m_shadowed )
+    {
+		glBindTexture   (GL_TEXTURE_2D, g_app->m_resource->GetTexture(m_shadowFilename));
+	    glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+        glColor4f       (1.0f, 1.0f, 1.0f, 0.0f);
 
-	if( m_shadowed )
-	{
-		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
+        glBegin( GL_QUADS );
+            glTexCoord2i(0,1);      glVertex3fv( (pos).GetData() );
+            glTexCoord2i(1,1);      glVertex3fv( (pos + rightAngle * scale).GetData() );
+            glTexCoord2i(1,0);      glVertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
+            glTexCoord2i(0,0);      glVertex3fv( (pos - _front * scale).GetData() );
+        glEnd();
+    }
 
-		LegacyVector3 p0 = pos;
-		LegacyVector3 p1 = pos + rightAngle * scale;
-		LegacyVector3 p2 = pos - _front * scale + rightAngle * scale;
-		LegacyVector3 p3 = pos - _front * scale;
+    glColor4ubv     (m_colour.GetData());
+	glBindTexture   (GL_TEXTURE_2D, g_app->m_resource->GetTexture(m_mainFilename));
+	glBlendFunc     (GL_SRC_ALPHA, GL_ONE);
 
-		g_spriteBatch->Begin3D(viewProj, BLEND_SUBTRACTIVE_COLOR);
-		g_spriteBatch->SetTexture(shadowTexId);
-		g_spriteBatch->SetColor(1.0f, 1.0f, 1.0f, 0.0f);
-		g_spriteBatch->AddQuad3D(
-			{ p0.x, p0.y, p0.z }, { p1.x, p1.y, p1.z },
-			{ p2.x, p2.y, p2.z }, { p3.x, p3.y, p3.z },
-			0.0f, 1.0f, 1.0f, 0.0f);
-		g_spriteBatch->End3D();
-	}
+    glBegin( GL_QUADS );
+        glTexCoord2i(0,1);      glVertex3fv( (pos).GetData() );
+        glTexCoord2i(1,1);      glVertex3fv( (pos + rightAngle * scale).GetData() );
+        glTexCoord2i(1,0);      glVertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
+        glTexCoord2i(0,0);      glVertex3fv( (pos - _front * scale).GetData() );
+    glEnd();
 
-	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
-
-	LegacyVector3 p0 = pos;
-	LegacyVector3 p1 = pos + rightAngle * scale;
-	LegacyVector3 p2 = pos - _front * scale + rightAngle * scale;
-	LegacyVector3 p3 = pos - _front * scale;
-
-	g_spriteBatch->Begin3D(viewProj, BLEND_ADDITIVE);
-	g_spriteBatch->SetTexture(mainTexId);
-	g_spriteBatch->SetColor(m_colour.r / 255.0f, m_colour.g / 255.0f, m_colour.b / 255.0f, m_colour.a / 255.0f);
-	g_spriteBatch->AddQuad3D(
-		{ p0.x, p0.y, p0.z }, { p1.x, p1.y, p1.z },
-		{ p2.x, p2.y, p2.z }, { p3.x, p3.y, p3.z },
-		0.0f, 1.0f, 1.0f, 0.0f);
-	g_spriteBatch->End3D();
-
-
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-
+    glDepthMask     (true);
+    glEnable        (GL_DEPTH_TEST );
+    glDisable       (GL_BLEND);
+	glBlendFunc     (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable       (GL_TEXTURE_2D);
+    glEnable        (GL_CULL_FACE);
 }
 

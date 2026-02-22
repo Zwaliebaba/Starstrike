@@ -7,7 +7,7 @@
 #include "debug_utils.h"
 
 
-float Matrix33::m_columnMajor[16];
+float Matrix33::m_openGLFormat[16];
 
 
 // ****************************************************************************
@@ -443,36 +443,36 @@ void Matrix33::OutputToDebugStream()
 	DebugTrace("%4.1f %4.1f %4.1f\n", u.x, u.y, u.z );
 }
 
-float *Matrix33::ConvertToColumnMajor(LegacyVector3 const *_pos)
+float *Matrix33::ConvertToOpenGLFormat(LegacyVector3 const *_pos)
 {
-	m_columnMajor[0] = r.x;
-	m_columnMajor[1] = r.y;
-	m_columnMajor[2] = r.z;
-	m_columnMajor[3] = 0.0f;
-	m_columnMajor[4] = u.x;
-	m_columnMajor[5] = u.y;
-	m_columnMajor[6] = u.z;
-	m_columnMajor[7] = 0.0f;
-	m_columnMajor[8] = f.x;
-	m_columnMajor[9] = f.y;
-	m_columnMajor[10] = f.z;
-	m_columnMajor[11] = 0.0f;
+	m_openGLFormat[0] = r.x;
+	m_openGLFormat[1] = r.y;
+	m_openGLFormat[2] = r.z;
+	m_openGLFormat[3] = 0.0f;
+	m_openGLFormat[4] = u.x;
+	m_openGLFormat[5] = u.y;
+	m_openGLFormat[6] = u.z;
+	m_openGLFormat[7] = 0.0f;
+	m_openGLFormat[8] = f.x;
+	m_openGLFormat[9] = f.y;
+	m_openGLFormat[10] = f.z;
+	m_openGLFormat[11] = 0.0f;
 
 	if (_pos)
 	{
-		m_columnMajor[12] = _pos->x;
-		m_columnMajor[13] = _pos->y;
-		m_columnMajor[14] = _pos->z;
+		m_openGLFormat[12] = _pos->x;
+		m_openGLFormat[13] = _pos->y;
+		m_openGLFormat[14] = _pos->z;
 	}
 	else
 	{
-		m_columnMajor[12] = 0.0f;
-		m_columnMajor[13] = 0.0f;
-		m_columnMajor[14] = 0.0f;
+		m_openGLFormat[12] = 0.0f;
+		m_openGLFormat[13] = 0.0f;
+		m_openGLFormat[14] = 0.0f;
 	}
-	m_columnMajor[15] = 1.0f;
+	m_openGLFormat[15] = 1.0f;
 
-	return m_columnMajor;
+	return m_openGLFormat;
 }
 
 

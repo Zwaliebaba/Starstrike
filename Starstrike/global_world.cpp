@@ -1,36 +1,33 @@
 #include "pch.h"
-#include "global_world.h"
-#include "LegacyVector3.h"
-#include "app.h"
-#include "building.h"
-#include "camera.h"
 #include "debug_utils.h"
-#include "eclipse.h"
-#include "file_writer.h"
-#include "filesys_utils.h"
-#include "global_internet.h"
-#include "im_renderer.h"
-#include "input.h"
-#include "landscape.h"
 #include "language_table.h"
+#include "filesys_utils.h"
+#include "file_writer.h"
+#include "input.h"
+#include "targetcursor.h"
+#include "math_utils.h"
+#include "profiler.h"
+#include "resource.h"
+#include "shape.h"
+#include "string_utils.h"
+#include "text_renderer.h"
+#include "text_stream_readers.h"
+#include "LegacyVector3.h"
+#include "eclipse.h"
+#include "app.h"
+#include "camera.h"
+#include "global_internet.h"
+#include "global_world.h"
+#include "landscape.h"
 #include "level_file.h"
 #include "location.h"
 #include "main.h"
-#include "math_utils.h"
-#include "profiler.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "renderer.h"
-#include "resource.h"
 #include "script.h"
-#include "shape.h"
-#include "string_utils.h"
-#include "targetcursor.h"
-#include "taskmanager_interface.h"
-#include "text_renderer.h"
-#include "text_stream_readers.h"
-#include "trunkport.h"
 #include "user_input.h"
+#include "taskmanager_interface.h"
+#include "building.h"
+#include "trunkport.h"
 
 // ****************************************************************************
 // Class GlobalLocation
@@ -161,6 +158,30 @@ bool GlobalEventCondition::Evaluate()
   return false;
 }
 
+void GlobalEventCondition::Save(FileWriter* _out)
+{
+  _out->printf("%s ", GetTypeName(m_type));
+
+  switch (m_type)
+  {
+  case AlwaysTrue:
+    break;
+
+  case BuildingOnline:
+  case BuildingOffline:
+    _out->printf(":%s,%d ", g_app->m_globalWorld->GetLocationName(m_locationId), m_id);
+    break;
+
+  case ResearchOwned:
+    _out->printf(":%s ", GlobalResearch::GetTypeName(m_id));
+    break;
+
+  case DebugKey:
+    _out->printf(":%d ", m_id);
+    break;
+  }
+}
+
 // ****************************************************************************
 // Class GlobalEventAction
 // ****************************************************************************
@@ -201,8 +222,62 @@ void GlobalEventAction::Read(TextReader* _in)
   else { DarwiniaDebugAssert(false); }
 }
 
+void GlobalEventAction::Write(FileWriter* _out)
+{
+  _out->printf("\t\tAction %-10s ", GetTypeName(m_type));
+
+  char* locationName = g_app->m_globalWorld->GetLocationName(m_locationId);
+
+  switch (m_type)
+  {
+  case SetMission:
+    _out->printf("%s %s", locationName, m_filename);
+    break;
+  case RunScript:
+    _out->printf("%s", m_filename);
+    break;
+  case MakeAvailable:
+    _out->printf("%s", locationName);
+    break;
+
+  default: DarwiniaDebugAssert(false);
+  }
+
+  _out->printf("\n");
+}
+
 void GlobalEventAction::Execute()
 {
+#ifdef TEST_HARNESS_ENABLED
+  switch (m_type)
+  {
+  case SetMission:
+    {
+      if (g_app->m_testHarness)
+      {
+        fprintf(g_app->m_testHarness->m_out, "%sSetting Mission: %s in location %s\n", g_app->m_testHarness->m_indent, m_filename,
+                g_app->m_globalWorld->GetLocationName(m_locationId));
+      }
+      break;
+    }
+  case RunScript:
+    if (g_app->m_testHarness)
+    {
+      fprintf(g_app->m_testHarness->m_out, "%sRunning script: %s\n", g_app->m_testHarness->m_indent, m_filename);
+    }
+    break;
+  case MakeAvailable:
+    if (g_app->m_testHarness)
+    {
+      fprintf(g_app->m_testHarness->m_out, "%sMaking location available: %s\n", g_app->m_testHarness->m_indent,
+              g_app->m_globalWorld->GetLocationName(m_locationId));
+    }
+    break;
+  default:
+    break;
+  }
+#endif // TEST_HARNESS_ENABLED
+
   switch (m_type)
   {
   case SetMission:
@@ -353,6 +428,27 @@ void GlobalEvent::Read(TextReader* _in)
   }
 }
 
+void GlobalEvent::Write(FileWriter* _out)
+{
+  _out->printf("\tEvent ");
+
+  for (int i = 0; i < m_conditions.Size(); ++i)
+  {
+    GlobalEventCondition* gec = m_conditions[i];
+    gec->Save(_out);
+  }
+
+  _out->printf("\n");
+
+  for (int i = 0; i < m_actions.Size(); ++i)
+  {
+    GlobalEventAction* gea = m_actions[i];
+    gea->Write(_out);
+  }
+
+  _out->printf("\t\tEnd\n");
+}
+
 // ****************************************************************************
 // Class GlobalResearch
 // ****************************************************************************
@@ -487,6 +583,18 @@ int GlobalResearch::CurrentLevel(int _type)
   return m_researchLevel[_type];
 }
 
+void GlobalResearch::Write(FileWriter* _out)
+{
+  _out->printf("Research_StartDefinition\n");
+
+  for (int i = 0; i < NumResearchItems; ++i)
+    _out->printf("\tResearch %s %d %d\n", GetTypeName(i), CurrentProgress(i), CurrentLevel(i));
+
+  _out->printf("\tCurrentResearch %s\n", GetTypeName(m_currentResearch));
+  _out->printf("\tCurrentPoints %d\n", m_researchPoints);
+  _out->printf("Research_EndDefinition\n\n");
+}
+
 void GlobalResearch::Read(TextReader* _in)
 {
   while (_in->ReadLine())
@@ -587,13 +695,6 @@ SphereWorld::SphereWorld()
   m_shapeOuter = g_app->m_resource->GetShape("globalworld_outer.shp");
   m_shapeMiddle = g_app->m_resource->GetShape("globalworld_middle.shp");
   m_shapeInner = g_app->m_resource->GetShape("globalworld_inner.shp");
-
-  if (m_shapeOuter)
-    ColourShapeFragment(m_shapeOuter->m_rootFragment, RGBAColour(255, 200, 100, 60));
-  if (m_shapeMiddle)
-    ColourShapeFragment(m_shapeMiddle->m_rootFragment, RGBAColour(255, 200, 100, 100));
-  if (m_shapeInner)
-    ColourShapeFragment(m_shapeInner->m_rootFragment, RGBAColour(255, 200, 100, 180));
   //#endif
 }
 
@@ -666,6 +767,8 @@ void SphereWorld::Render()
     RenderHeaven();
   }
 
+  glEnable(GL_CULL_FACE); // CRASH WORKAROUND - FIX AND DELETE ASAP
+  CHECK_OPENGL_STATE();
 }
 
 void SphereWorld::RenderSpirits()
@@ -714,11 +817,13 @@ void SphereWorld::RenderSpirits()
   //
   // Render all spirits
 
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glDepthMask(false);
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/glow.bmp"));
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
 
   LegacyVector3 camRight = g_app->m_camera->GetRight();
   LegacyVector3 camUp = g_app->m_camera->GetUp();
@@ -748,53 +853,53 @@ void SphereWorld::RenderSpirits()
 
         float scale = 0.4f;
 
-        g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position + camUp * 300 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position + camRight * 300 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position - camUp * 300 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position - camRight * 300 * scale).GetData());
-        g_imRenderer->End();
+        glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position + camUp * 300 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position + camRight * 300 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position - camUp * 300 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position - camRight * 300 * scale).GetData());
+        glEnd();
 
+        glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position + camUp * 100 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position + camRight * 100 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position - camUp * 100 * scale).GetData());
+        glTexCoord2f(0.5f, 0.5f);
+        glVertex3fv((position - camRight * 100 * scale).GetData());
+        glEnd();
 
-        g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue);
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position + camUp * 100 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position + camRight * 100 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position - camUp * 100 * scale).GetData());
-        g_imRenderer->TexCoord2f(0.5f, 0.5f);
-        g_imRenderer->Vertex3fv((position - camRight * 100 * scale).GetData());
-        g_imRenderer->End();
-
-
-        g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, alphaValue / 4.0f);
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0, 0);
-        g_imRenderer->Vertex3fv((position + camUp * 6000 * scale).GetData());
-        g_imRenderer->TexCoord2i(1, 0);
-        g_imRenderer->Vertex3fv((position + camRight * 6000 * scale).GetData());
-        g_imRenderer->TexCoord2i(1, 1);
-        g_imRenderer->Vertex3fv((position - camUp * 6000 * scale).GetData());
-        g_imRenderer->TexCoord2i(0, 1);
-        g_imRenderer->Vertex3fv((position - camRight * 6000 * scale).GetData());
-        g_imRenderer->End();
-
+        glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 4.0f);
+        glBegin(GL_QUADS);
+        glTexCoord2i(0, 0);
+        glVertex3fv((position + camUp * 6000 * scale).GetData());
+        glTexCoord2i(1, 0);
+        glVertex3fv((position + camRight * 6000 * scale).GetData());
+        glTexCoord2i(1, 1);
+        glVertex3fv((position - camUp * 6000 * scale).GetData());
+        glTexCoord2i(0, 1);
+        glVertex3fv((position - camRight * 6000 * scale).GetData());
+        glEnd();
       }
     }
   }
 
-  g_imRenderer->UnbindTexture();
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glDisable(GL_TEXTURE_2D);
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glDepthMask(true);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
+  glEnable(GL_CULL_FACE);
 
   END_PROFILE(g_app->m_profiler, "Spirits");
 }
@@ -805,26 +910,45 @@ void SphereWorld::RenderWorldShape()
 
   g_app->m_globalWorld->SetupLights();
 
-  g_imRenderer->PushMatrix();
-  g_imRenderer->Scalef(120.0f, 120.0f, 120.0f);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+  float spec = 0.5f;
+  float diffuse = 1.0f;
+  float amb = 0.0f;
+  GLfloat materialShininess[] = {10.0f};
+  GLfloat materialSpecular[] = {spec, spec, spec, 1.0f};
+  GLfloat materialDiffuse[] = {diffuse, diffuse, diffuse, 1.0f};
+  GLfloat ambCol[] = {amb, amb, amb, 1.0f};
 
-  g_app->m_renderer->SetObjectLighting();
+  glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE, materialDiffuse);
+  glMaterialfv(GL_FRONT, GL_SHININESS, materialShininess);
+  glMaterialfv(GL_FRONT, GL_AMBIENT, ambCol);
+
+  glPushMatrix();
+  glScalef(120.0f, 120.0f, 120.0f);
+  glEnable(GL_NORMALIZE);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  glDisable(GL_CULL_FACE);
+
+  //
+  // Render outer
 
   m_shapeOuter->Render(0.0f, g_identityMatrix34);
   m_shapeMiddle->Render(0.0f, g_identityMatrix34);
   m_shapeInner->Render(0.0f, g_identityMatrix34);
 
-  g_app->m_renderer->UnsetObjectLighting();
+  glDisable(GL_NORMALIZE);
+  glPopMatrix();
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-
-  g_imRenderer->PopMatrix();
-
+  glDisable(GL_COLOR_MATERIAL);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_LIGHT0);
+  glDisable(GL_LIGHT1);
 
   END_PROFILE(g_app->m_profiler, "Shape");
 }
@@ -835,48 +959,11 @@ void SphereWorld::RenderTrunkLinks()
 
   Matrix34 rootMat(0);
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glDepthMask(false);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-
-  for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
-  {
-    GlobalBuilding* building = g_app->m_globalWorld->m_buildings[i];
-    if (building->m_type == Building::TypeTrunkPort && building->m_link != -1)
-    {
-      GlobalLocation* fromLoc = g_app->m_globalWorld->GetLocation(building->m_locationId);
-      GlobalLocation* toLoc = g_app->m_globalWorld->GetLocation(building->m_link);
-
-      if (fromLoc && toLoc && (fromLoc->m_available && toLoc->m_available) || g_app->m_editing)
-      {
-        LegacyVector3 fromPos = g_app->m_globalWorld->GetLocationPosition(building->m_locationId);
-        LegacyVector3 toPos = g_app->m_globalWorld->GetLocationPosition(building->m_link);
-
-        if (building->m_online)
-          g_imRenderer->Color4f(0.4f, 0.3f, 1.0f, 1.0f);
-        else
-          g_imRenderer->Color4f(0.4f, 0.3f, 1.0f, 0.4f);
-
-        //fromPos *= 120.0f;
-        //toPos *= 120.0f;
-
-        LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-        LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
-        LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
-
-        rightAngle *= 200.0f;
-
-        g_imRenderer->Vertex3fv((fromPos - rightAngle).GetData());
-        g_imRenderer->Vertex3fv((fromPos + rightAngle).GetData());
-        g_imRenderer->Vertex3fv((toPos + rightAngle).GetData());
-        g_imRenderer->Vertex3fv((toPos - rightAngle).GetData());
-      }
-    }
-  }
-
-  g_imRenderer->End();
-
+  glBegin(GL_QUADS);
 
   for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
   {
@@ -892,9 +979,9 @@ void SphereWorld::RenderTrunkLinks()
         LegacyVector3 toPos = g_app->m_globalWorld->GetLocationPosition(building->m_link);
 
         if (building->m_online)
-          g_imRenderer->Color4f(0.5f, 0.5f, 1.0f, 0.9f);
+          glColor4f(0.4f, 0.3f, 1.0f, 1.0f);
         else
-          g_imRenderer->Color4f(0.5f, 0.5f, 1.0f, 0.3f);
+          glColor4f(0.4f, 0.3f, 1.0f, 0.4f);
 
         //fromPos *= 120.0f;
         //toPos *= 120.0f;
@@ -905,12 +992,18 @@ void SphereWorld::RenderTrunkLinks()
 
         rightAngle *= 200.0f;
 
+        glVertex3fv((fromPos - rightAngle).GetData());
+        glVertex3fv((fromPos + rightAngle).GetData());
+        glVertex3fv((toPos + rightAngle).GetData());
+        glVertex3fv((toPos - rightAngle).GetData());
       }
     }
   }
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+  glEnd();
+  glDepthMask(true);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
 }
 
 void SphereWorld::RenderHeaven()
@@ -922,15 +1015,17 @@ void SphereWorld::RenderHeaven()
   //
   // Render the central repository of spirits
 
-  g_imRenderer->PushMatrix();
-  g_imRenderer->Scalef(120.0f, 120.0f, 120.0f);
+  glPushMatrix();
+  glScalef(120.0f, 120.0f, 120.0f);
 
   LegacyVector3 camUp = g_app->m_camera->GetUp();
   LegacyVector3 camRight = g_app->m_camera->GetRight();
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/glow.bmp"));
+  glDepthMask(false);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
 
   for (int i = 0; i < 50; ++i)
   {
@@ -938,28 +1033,27 @@ void SphereWorld::RenderHeaven()
 
     float size = i;
 
-    g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, 0.9f);
+    glColor4f(0.6f, 0.2f, 0.1f, 0.9f);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex3fv((pos - camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex3fv((pos + camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex3fv((pos + camRight * size - camUp * size).GetData());
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex3fv((pos - camRight * size - camUp * size).GetData());
-    g_imRenderer->End();
-
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3fv((pos - camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 0);
+    glVertex3fv((pos + camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 1);
+    glVertex3fv((pos + camRight * size - camUp * size).GetData());
+    glTexCoord2i(0, 1);
+    glVertex3fv((pos - camRight * size - camUp * size).GetData());
+    glEnd();
   }
 
-  g_imRenderer->PopMatrix();
+  glPopMatrix();
 
   //
   // Render god rays going down
 
   /*
-      g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/godray.bmp" ) );
+      glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/godray.bmp" ) );
   
     for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
     {
@@ -979,23 +1073,23 @@ void SphereWorld::RenderHeaven()
               LegacyVector3 lineToCentre = camToCentre ^ ( centrePos - godRayPos );
               lineToCentre.Normalise();
   
-              g_imRenderer->Color4f( 0.6f, 0.2f, 0.1f, 0.8f);
+              glColor4f( 0.6f, 0.2f, 0.1f, 0.8f);
   
-              g_imRenderer->Begin(PRIM_QUADS);
-                  g_imRenderer->TexCoord2f(0.75f,0);      g_imRenderer->Vertex3fv( (centrePos - lineToCentre * 1000).GetData() );
-                  g_imRenderer->TexCoord2f(0.75f,1);      g_imRenderer->Vertex3fv( (centrePos + lineToCentre * 1000).GetData() );
-                  g_imRenderer->TexCoord2f(0.05f,1);      g_imRenderer->Vertex3fv( (godRayPos + lineToCentre * 1000).GetData() );
-                  g_imRenderer->TexCoord2f(0.05f,0);      g_imRenderer->Vertex3fv( (godRayPos - lineToCentre * 1000).GetData() );
-              g_imRenderer->End();
-
+              glBegin( GL_QUADS );
+                  glTexCoord2f(0.75f,0);      glVertex3fv( (centrePos - lineToCentre * 1000).GetData() );
+                  glTexCoord2f(0.75f,1);      glVertex3fv( (centrePos + lineToCentre * 1000).GetData() );
+                  glTexCoord2f(0.05f,1);      glVertex3fv( (godRayPos + lineToCentre * 1000).GetData() );
+                  glTexCoord2f(0.05f,0);      glVertex3fv( (godRayPos - lineToCentre * 1000).GetData() );
+              glEnd();
           }
       }
   
   */
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  glDisable(GL_TEXTURE_2D);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
+  glDepthMask(true);
 
   END_PROFILE(g_app->m_profiler, "Heaven");
 }
@@ -1010,6 +1104,7 @@ void SphereWorld::RenderIslands()
 
   START_PROFILE(g_app->m_profiler, "Islands");
 
+  glMatrixMode(GL_MODELVIEW);
 
   LegacyVector3 rayStart, rayDir;
   g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
@@ -1018,10 +1113,13 @@ void SphereWorld::RenderIslands()
   LegacyVector3 camUp = g_app->m_camera->GetUp();
 
   //    glColor4f       ( 1.0f, 1.0f, 1.0f, 1.0f );
-  g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, 1.0f);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glColor4f(0.6f, 0.2f, 0.1f, 1.0f);
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(false);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_BLEND);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
 
   for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
   {
@@ -1034,34 +1132,32 @@ void SphereWorld::RenderIslands()
       if (!loc->m_missionCompleted && stricmp(loc->m_missionFilename, "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
         numRedraws = 10;
 
-      g_imRenderer->Begin(PRIM_QUADS);
+      glBegin(GL_QUADS);
       for (int j = 0; j <= numRedraws; ++j)
       {
-        g_imRenderer->TexCoord2i(0, 0);
-        g_imRenderer->Vertex3fv((islandPos + camUp * 1000 * j).GetData());
-        g_imRenderer->TexCoord2i(1, 0);
-        g_imRenderer->Vertex3fv((islandPos + camRight * 1000 * j).GetData());
-        g_imRenderer->TexCoord2i(1, 1);
-        g_imRenderer->Vertex3fv((islandPos - camUp * 1000 * j).GetData());
-        g_imRenderer->TexCoord2i(0, 1);
-        g_imRenderer->Vertex3fv((islandPos - camRight * 1000 * j).GetData());
+        glTexCoord2i(0, 0);
+        glVertex3fv((islandPos + camUp * 1000 * j).GetData());
+        glTexCoord2i(1, 0);
+        glVertex3fv((islandPos + camRight * 1000 * j).GetData());
+        glTexCoord2i(1, 1);
+        glVertex3fv((islandPos - camUp * 1000 * j).GetData());
+        glTexCoord2i(0, 1);
+        glVertex3fv((islandPos - camRight * 1000 * j).GetData());
       }
-      g_imRenderer->End();
-
-      for (int j = 0; j <= numRedraws; ++j)
-      {
-      }
+      glEnd();
     }
   }
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDepthMask(true);
+  glEnable(GL_DEPTH_TEST);
 
   //
   // Render the islands names
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
   {
@@ -1076,7 +1172,7 @@ void SphereWorld::RenderIslands()
       size = 1000.0f;
 
       g_gameFont.SetRenderShadow(true);
-      g_gameFont.SetColour(0.7f, 0.7f, 0.7f, 0.0f);
+      glColor4f(0.7f, 0.7f, 0.7f, 0.0f);
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
       if (g_app->m_editing)
@@ -1089,9 +1185,9 @@ void SphereWorld::RenderIslands()
       islandPos += camRight * size * 0.1f;
 
       g_gameFont.SetRenderShadow(false);
-      g_gameFont.SetColour(1.0f, 1.0f, 1.0f, 1.0f);
+      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
       if (stricmp(loc->m_missionFilename, "null") == 0)
-        g_gameFont.SetColour(0.5f, 0.5f, 0.5f, 1.0f);
+        glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
@@ -1237,6 +1333,7 @@ void GlobalWorld::Advance()
         GlobalLocation* loc = GetLocation(locId);
         float locX, locY;
         g_app->m_camera->Get2DScreenPos(loc->m_pos, &locX, &locY);
+        locY = g_app->m_renderer->ScreenH() - locY;
         int movX = static_cast<int>(locX - g_target->X());
         int movY = static_cast<int>(locY - g_target->Y());
         int movMag2 = movX * movX + movY * movY;
@@ -1265,7 +1362,9 @@ void GlobalWorld::Render()
 
   if (!g_app->m_editing)
     m_globalInternet->Render();
+  CHECK_OPENGL_STATE();
   m_sphereWorld->Render();
+  CHECK_OPENGL_STATE();
 
   END_PROFILE(g_app->m_profiler, "Render Global World");
 }
@@ -1712,19 +1811,29 @@ void GlobalWorld::SetupLights()
 
   LegacyVector3 light0(0, 1, 0);
   light0.Normalise();
+  GLfloat light0AsFourFloats[] = {light0.x, light0.y, light0.z, 0.0f};
 
-  // Two opposing lights replicate OpenGL two-sided lighting:
-  // max(dot(N,L),0) + max(dot(N,-L),0) == |dot(N,L)| for any N.
-  DirectX::XMFLOAT4 dirs[2]   = { { light0.x, light0.y, light0.z, 0.0f }, { -light0.x, -light0.y, -light0.z, 0.0f } };
-  DirectX::XMFLOAT4 colors[2] = { { colour1[0], colour1[1], colour1[2], colour1[3] }, { colour1[0], colour1[1], colour1[2], colour1[3] } };
-  DirectX::XMFLOAT4 ambient   = { 0.0f, 0.0f, 0.0f, 0.0f };
-  g_imRenderer->SetLightParams(2, dirs, colors, ambient);
+  glLightfv(GL_LIGHT0, GL_POSITION, light0AsFourFloats);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, colour1);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, colour1);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, black);
+
+  glDisable(GL_LIGHT0);
+  glDisable(GL_LIGHT1);
+  glDisable(GL_LIGHTING);
 }
 
 void GlobalWorld::SetupFog()
 {
   float fog = 0.1f;
-  g_imRenderer->SetFogParams(0.0f, 19000.0f, fog, fog, fog);
+  float fogCol[] = {fog, fog, fog, fog};
+
+  glFogf(GL_FOG_DENSITY, 1.0f);
+  glFogf(GL_FOG_START, 0.0f);
+  glFogf(GL_FOG_END, 19000.0f);
+  glFogfv(GL_FOG_COLOR, fogCol);
+  glFogi(GL_FOG_MODE, GL_LINEAR);
+  //glEnable    (GL_FOG);
 }
 
 float GlobalWorld::GetSize()

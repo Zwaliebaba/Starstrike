@@ -5,11 +5,6 @@
 #include "resource.h"
 #include "language_table.h"
 #include "win32_eventhandler.h"
-#include "im_renderer.h"
-#include "sprite_batch.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
 #include "mainmenus.h"
 #include "prefs_screen_window.h"
 #include "prefs_graphics_window.h"
@@ -268,8 +263,8 @@ class WebsiteButton : public DarwiniaButton
         g_app->m_renderer = new Renderer();
         g_app->m_renderer->Initialise();
         getW32EventHandler()->ResetWindowHandle();
-        g_app->m_resource->FlushRenderState();
-        g_app->m_resource->RegenerateRenderState();
+        g_app->m_resource->FlushOpenGlState();
+        g_app->m_resource->RegenerateOpenGlState();
 
         g_prefsManager->Save();
 
@@ -277,7 +272,6 @@ class WebsiteButton : public DarwiniaButton
 
         m_parent->SetPosition(g_app->m_renderer->ScreenW() / 2 - m_parent->m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_parent->m_h / 2);
       }
-      g_windowManager->OpenWebsite(m_website);
     }
 };
 
@@ -455,7 +449,7 @@ void ResetLocationWindow::Render(bool _hasFocus)
 
   float fontSize = GetMenuSize(13);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset1"));
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset2"));
 
@@ -546,18 +540,28 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
 {
   DarwiniaWindow::Render(_hasFocus);
 
-  int texId = g_app->m_resource->GetTexture("sprites/darwinian.bmp");
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-  int screenW = g_renderDevice->GetBackBufferWidth();
-  int screenH = g_renderDevice->GetBackBufferHeight();
-  g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
-  g_spriteBatch->SetTexture(texId);
-  g_spriteBatch->SetColor(0.3f, 1.0f, 0.3f, 1.0f);
-  g_spriteBatch->AddQuad2D(m_x + m_w / 2 - 25, m_y + 30, 50, GetMenuSize(80) - 30,
-                            0.0f, 1.0f, 1.0f, 0.0f);
-  g_spriteBatch->End2D();
+  float texH = 1.0f;
+  float texW = texH * 512.0f / 64.0f;
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(m_x + m_w / 2 - 25, m_y + 30);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(m_x + m_w / 2 + 25, m_y + 30);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex2f(m_x + m_w / 2 + 25, m_y + GetMenuSize(80));
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(m_x + m_w / 2 - 25, m_y + GetMenuSize(80));
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + 100;
   float h = GetMenuSize(18);
@@ -567,7 +571,7 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   char about[512];
   sprintf(about, "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += 2 * h, fontSize, about);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "http://www.introversion.co.uk");
@@ -604,37 +608,35 @@ void SkipPrologueWindow::Render(bool _hasFocus)
 {
   DarwiniaWindow::Render(_hasFocus);
 
-  int texId = g_app->m_resource->GetTexture("textures/campaign.bmp");
-  g_imRenderer->BindTexture(texId);
-  g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/campaign.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   float texH = 1.0f;
   float texW = texH * 512.0f / 64.0f;
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + m_w - 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
-  g_imRenderer->TexCoord2f(0.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + 25, m_y + GetMenuSize(200));
-  g_imRenderer->End();
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(m_x + 25, m_y + 30);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(m_x + m_w - 25, m_y + 30);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(m_x + 25, m_y + GetMenuSize(200));
+  glEnd();
 
-
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + m_h - GetMenuSize(150);
   float h = GetMenuSize(18);
 
   float fontSize = GetMenuSize(13);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_skip1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
@@ -674,37 +676,35 @@ void PlayPrologueWindow::Render(bool _hasFocus)
 {
   DarwiniaWindow::Render(_hasFocus);
 
-  int texId = g_app->m_resource->GetTexture("textures/prologue.bmp");
-  g_imRenderer->BindTexture(texId);
-  g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/prologue.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   float texH = 1.0f;
   float texW = texH * 512.0f / 64.0f;
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + m_w - 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
-  g_imRenderer->TexCoord2f(0.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + 25, m_y + GetMenuSize(200));
-  g_imRenderer->End();
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex2f(m_x + 25, m_y + 30);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex2f(m_x + m_w - 25, m_y + 30);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex2f(m_x + m_w - 25, m_y + GetMenuSize(200));
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex2f(m_x + 25, m_y + GetMenuSize(200));
+  glEnd();
 
-
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glDisable(GL_TEXTURE_2D);
 
   float y = m_y + m_h - GetMenuSize(150);
   float h = GetMenuSize(18);
 
   float fontSize = GetMenuSize(13);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_prologue1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)

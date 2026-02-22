@@ -939,7 +939,7 @@ void SoundSystem::TriggerDuplicateSound(SoundInstance* _instance)
     ShutdownSound(newInstance);
 }
 
-void SoundSystem::StopAllSounds(WorldObjectId _id, const char* _eventName)
+void SoundSystem::StopAllSounds(WorldObjectId _id, char* _eventName)
 {
   if (strstr(_eventName, "Music"))
   {

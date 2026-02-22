@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <math.h>
 
@@ -278,28 +275,31 @@ void FenceSwitch::RenderConnection( LegacyVector3 _targetPos, bool _active )
     LegacyVector3 theirPosRight = camToTheirPos ^ ( theirPos - ourPos );
     theirPosRight.SetLength( 2.0f );
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glDisable   ( GL_CULL_FACE );
+    glEnable    ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
+    glDepthMask ( false );
 
     if( _active )
     {
-        g_imRenderer->Color4f( 0.9f, 0.9f, 0.5f, 1.0f );
+        glColor4f   ( 0.9f, 0.9f, 0.5f, 1.0f );
     }
     else
     {
-        g_imRenderer->Color4f( 0.5f, 0.5f, 0.5f, 1.0f );
+        glColor4f( 0.5f, 0.5f, 0.5f, 1.0f );
     }
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2f(0.1f, 0);      g_imRenderer->Vertex3fv( (ourPos - ourPosRight).GetData() );
-        g_imRenderer->TexCoord2f(0.1f, 1);      g_imRenderer->Vertex3fv( (ourPos + ourPosRight).GetData() );
-        g_imRenderer->TexCoord2f(0.9f, 1);      g_imRenderer->Vertex3fv( (theirPos + theirPosRight).GetData() );
-        g_imRenderer->TexCoord2f(0.9f, 0);      g_imRenderer->Vertex3fv( (theirPos - theirPosRight).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glTexCoord2f(0.1f, 0);      glVertex3fv( (ourPos - ourPosRight).GetData() );
+        glTexCoord2f(0.1f, 1);      glVertex3fv( (ourPos + ourPosRight).GetData() );
+        glTexCoord2f(0.9f, 1);      glVertex3fv( (theirPos + theirPosRight).GetData() );
+        glTexCoord2f(0.9f, 0);      glVertex3fv( (theirPos - theirPosRight).GetData() );
+    glEnd();
 }
 
 // *** GetBuildingLink
@@ -439,35 +439,40 @@ void FenceSwitch::RenderLights()
 
                 if( m_switchValue == m_linkedBuildingId )
 	            {
-		            g_imRenderer->Color3f( 0.0f, 1.0f, 0.0f );
+		            glColor3f( 0.0f, 1.0f, 0.0f );
 	            }
 	            else
 	            {
-		            g_imRenderer->Color3f( 1.0f, 0.0f, 0.0f );
+		            glColor3f( 1.0f, 0.0f, 0.0f );
 	            }
 
-                g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-                g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-                g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+                glEnable        ( GL_TEXTURE_2D );
+                glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+	            glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	            glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+                glDisable       ( GL_CULL_FACE );
+                glDepthMask     ( false );
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+                glEnable        ( GL_BLEND );
+                glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
 
                 for( int i = 0; i < 10; ++i )
                 {
                     float size = signalSize * (float) i / 10.0f;
-                    g_imRenderer->Begin(PRIM_QUADS);
-                        g_imRenderer->TexCoord2f( 0.0f, 0.0f );             g_imRenderer->Vertex3fv( (lightPos - camR * size - camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 1.0f, 0.0f );             g_imRenderer->Vertex3fv( (lightPos + camR * size - camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 1.0f, 1.0f );             g_imRenderer->Vertex3fv( (lightPos + camR * size + camU * size).GetData() );
-                        g_imRenderer->TexCoord2f( 0.0f, 1.0f );             g_imRenderer->Vertex3fv( (lightPos - camR * size + camU * size).GetData() );
-                    g_imRenderer->End();
-
+                    glBegin( GL_QUADS );
+                        glTexCoord2f    ( 0.0f, 0.0f );             glVertex3fv     ( (lightPos - camR * size - camU * size).GetData() );
+                        glTexCoord2f    ( 1.0f, 0.0f );             glVertex3fv     ( (lightPos + camR * size - camU * size).GetData() );
+                        glTexCoord2f    ( 1.0f, 1.0f );             glVertex3fv     ( (lightPos + camR * size + camU * size).GetData() );
+                        glTexCoord2f    ( 0.0f, 1.0f );             glVertex3fv     ( (lightPos - camR * size + camU * size).GetData() );
+                    glEnd();
                 }
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+                glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+                glDisable       ( GL_BLEND );
 
-                g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+                glDepthMask     ( true );
+                glEnable        ( GL_CULL_FACE );
+                glDisable       ( GL_TEXTURE_2D );
             }
         }
     }

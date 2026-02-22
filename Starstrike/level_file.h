@@ -165,6 +165,19 @@ class LevelFile
 
   void GenerateAutomaticObjectives();
 
+  void WriteCameraMounts(FileWriter* _out);
+  void WriteCameraAnims(FileWriter* _out);
+  void WriteBuildings(FileWriter* _out, bool _dynamic);
+  void WriteInstantUnits(FileWriter* _out);
+  void WriteLights(FileWriter* _out);
+  void WriteLandscapeData(FileWriter* _out);
+  void WriteLandscapeTiles(FileWriter* _out);
+  void WriteLandFlattenAreas(FileWriter* _out);
+  void WriteRoutes(FileWriter* _out);
+  void WritePrimaryObjectives(FileWriter* _out);
+  void WriteRunningPrograms(FileWriter* _out);
+  void WriteDifficulty(FileWriter* _out);
+
   public:
     char m_missionFilename[MAX_FILENAME_LEN];
     char m_mapFilename[MAX_FILENAME_LEN];

@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <math.h>
 
@@ -38,6 +35,7 @@
 #include "engineer.h"
 #include "bridge.h"
 #include "researchitem.h"
+
 
 
 Engineer::Engineer()
@@ -607,6 +605,7 @@ void Engineer::CollectSpirit( int _spiritId )
 }
 
 
+
 bool Engineer::SearchForIncubator()
 {
     //
@@ -1028,8 +1027,10 @@ void Engineer::RenderShape( float predictionTime )
 
 	g_app->m_renderer->SetObjectLighting();
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+    glEnable        (GL_CULL_FACE);
+    glDisable       (GL_TEXTURE_2D);
+    glEnable        (GL_COLOR_MATERIAL);
+    glDisable       (GL_BLEND);
 
 	if (entityFront.y > 0.5f)
 	{
@@ -1038,9 +1039,11 @@ void Engineer::RenderShape( float predictionTime )
     Matrix34 mat(entityFront, entityUp, predictedPos);
 	m_shape->Render(predictionTime, mat);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+    glEnable        (GL_BLEND);
+    glDisable       (GL_COLOR_MATERIAL);
+    glEnable        (GL_TEXTURE_2D);
 	g_app->m_renderer->UnsetObjectLighting();
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glEnable        (GL_CULL_FACE);
 
     g_app->m_renderer->MarkUsedCells(m_shape, mat);
 
@@ -1111,23 +1114,25 @@ void Engineer::Render( float predictionTime )
 
             rightAngle *= 0.5f;
 
-            g_imRenderer->Color4f( 0.2f, 0.4f, 1.0f, fabs(sinf(g_gameTime * 3.0f)) );
+            glColor4f( 0.2f, 0.4f, 1.0f, fabs(sinf(g_gameTime * 3.0f)) );
 
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-            g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+            glEnable        ( GL_BLEND );
+            glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+            glDepthMask     ( false );
+            glEnable        ( GL_TEXTURE_2D );
+            glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (fromPos - rightAngle).GetData() );
-                g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (fromPos + rightAngle).GetData() );
-                g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (toPos + rightAngle).GetData() );
-                g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (toPos - rightAngle).GetData() );
-            g_imRenderer->End();
+            glBegin( GL_QUADS );
+                glTexCoord2i(0,0);      glVertex3fv( (fromPos - rightAngle).GetData() );
+                glTexCoord2i(0,1);      glVertex3fv( (fromPos + rightAngle).GetData() );
+                glTexCoord2i(1,1);      glVertex3fv( (toPos + rightAngle).GetData() );
+                glTexCoord2i(1,0);      glVertex3fv( (toPos - rightAngle).GetData() );
+            glEnd();
 
-
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+            glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+            glDisable       ( GL_TEXTURE_2D );
+            glDepthMask     ( true );
+            glDisable       ( GL_BLEND );
         }
     }
 }

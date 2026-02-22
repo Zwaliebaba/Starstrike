@@ -1,6 +1,8 @@
 #ifndef INCLUDED_RENDERER_H
 #define INCLUDED_RENDERER_H
 
+#define CHECK_OPENGL_STATE()
+
 #define PIXEL_EFFECT_GRID_RES	16
 
 class Shape;
@@ -35,6 +37,9 @@ class Renderer
     float m_pixelEffectGrid[PIXEL_EFFECT_GRID_RES][PIXEL_EFFECT_GRID_RES]; // -1.0 means cell not used
     int m_pixelSize;
 
+    int GetGLStateInt(int pname) const;
+    float GetGLStateFloat(int pname) const;
+
     void RenderFlatTexture();
     void RenderLogo();
 
@@ -51,13 +56,14 @@ class Renderer
     void Render();
     void FPSMeterAdvance();
 
-    void BuildRenderState();
+    void BuildOpenGlState();
 
     float GetNearPlane() const;
     float GetFarPlane() const;
     void SetNearAndFar(float _nearPlane, float _farPlane);
 
-    void SetDefaultRenderState() const;
+    void CheckOpenGLState() const;
+    void SetOpenGLState() const;
 
     void SetObjectLighting() const;
     void UnsetObjectLighting() const;

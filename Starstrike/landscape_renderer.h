@@ -8,7 +8,6 @@
 #include "texture_uv.h"
 #include "LegacyVector3.h"
 
-#include <d3d11.h>
 
 class BitmapRGBA;
 
@@ -41,16 +40,26 @@ public:
 // Class LandscapeRenderer
 //*****************************************************************************
 
+struct IDirect3DVertexBuffer9;
+
 class LandscapeRenderer
 {
 protected:
-	BitmapRGBA      *m_landscapeColour;
+	enum
+	{
+		RenderModeVertexArray,
+		RenderModeDisplayList,
+		RenderModeVertexBufferObject,
+		RenderModeVertexBufferDirect3D
+	};
+
+    BitmapRGBA      *m_landscapeColour;
 	float			m_highest;
+	int				m_renderMode;
 
 	FastDArray		<LandVertex> m_verts;
 
-	ID3D11Buffer*	m_d3dVertexBuffer;
-	int				m_d3dVertexCount;
+	unsigned int	m_vertexBuffer;
 
 	FastDArray		<LandTriangleStrip *> m_strips;
 
@@ -60,7 +69,12 @@ protected:
 	void GetLandscapeColour(float _height, float _gradient,
 							unsigned int _x, unsigned int _y, RGBAColour *_colour);
 	void BuildColourArray();
-	void CreateD3DVertexBuffer();
+
+public:
+	static const unsigned int	m_posOffset;
+	static const unsigned int	m_normOffset;
+	static const unsigned int	m_colOffset;
+	static const unsigned int	m_uvOffset;
 
 public:
 	int				m_numTriangles;
@@ -68,7 +82,9 @@ public:
 	LandscapeRenderer(SurfaceMap2D <float> *_heightMap);
 	~LandscapeRenderer();
 
-	void BuildRenderState(SurfaceMap2D <float> *_heightMap);
+	void BuildOpenGlState(SurfaceMap2D <float> *_heightMap);
+
+	void Initialise();
 
 	void RenderMainSlow();
 	void RenderOverlaySlow();

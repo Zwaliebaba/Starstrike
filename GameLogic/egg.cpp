@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "debug_render.h"
 #include "math_utils.h"
 #include "resource.h"
@@ -48,16 +45,20 @@ void Egg::ChangeHealth( int amount )
 
 void Egg::Render( float predictionTime )
 {
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "sprites/egg.bmp" ) );
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "sprites/egg.bmp" ) );
+	glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+ 	glEnable		( GL_BLEND );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+    glDepthMask     ( false );
+    glDisable       ( GL_CULL_FACE );
 
     RGBAColour colour;
     if( m_id.GetTeamId() >= 0 ) colour = g_app->m_location->m_teams[ m_id.GetTeamId() ].m_colour;
     float alpha = m_stats[StatHealth] / EntityBlueprint::GetStat( Entity::TypeEgg, StatHealth );
     if( alpha < 0.1f ) alpha = 0.1f;
-    g_imRenderer->Color4ub( 255, 255, 255, 255 * alpha );
+    glColor4ub   ( 255, 255, 255, 255 * alpha );
 
     LegacyVector3 pos = m_pos + m_vel * predictionTime;
     pos.y += 3.0f;
@@ -71,12 +72,12 @@ void Egg::Render( float predictionTime )
     if( !m_dead )
     {
 
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (pos - right * size - up * size).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (pos - right * size + up * size).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (pos + right * size + up * size).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (pos + right * size - up * size).GetData() );
-        g_imRenderer->End();
+        glBegin( GL_QUADS );
+            glTexCoord2i( 0, 0 );       glVertex3fv( (pos - right * size - up * size).GetData() );
+            glTexCoord2i( 0, 1 );       glVertex3fv( (pos - right * size + up * size).GetData() );
+            glTexCoord2i( 1, 1 );       glVertex3fv( (pos + right * size + up * size).GetData() );
+            glTexCoord2i( 1, 0 );       glVertex3fv( (pos + right * size - up * size).GetData() );
+        glEnd();
 
 
         //
@@ -90,14 +91,14 @@ void Egg::Render( float predictionTime )
             if( throb > 255 ) throb = 255;
             if( throb < 0 ) throb = 0;
             size *= 1.3f;
-            g_imRenderer->Color4ub( 255, 255, 255, throb );
+            glColor4ub  ( 255, 255, 255, throb );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (pos - right * size - up * size).GetData() );
-                g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (pos - right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (pos + right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (pos + right * size - up * size).GetData() );
-            g_imRenderer->End();
+            glBegin( GL_QUADS );
+                glTexCoord2i( 0, 0 );       glVertex3fv( (pos - right * size - up * size).GetData() );
+                glTexCoord2i( 0, 1 );       glVertex3fv( (pos - right * size + up * size).GetData() );
+                glTexCoord2i( 1, 1 );       glVertex3fv( (pos + right * size + up * size).GetData() );
+                glTexCoord2i( 1, 0 );       glVertex3fv( (pos + right * size - up * size).GetData() );
+            glEnd();
 
 
             throb = fabs(sinf( predictedTimer )) * 8 * predictedTimer;
@@ -106,15 +107,14 @@ void Egg::Render( float predictionTime )
             if( throb < 0 ) throb = 0;
             size *= 0.5f;
             pos.y += 2.0f;
-            g_imRenderer->Color4ub( 255, 255, 255, throb );
+            glColor4ub  ( 255, 255, 255, throb );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (pos - right * size - up * size).GetData() );
-                g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (pos - right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (pos + right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (pos + right * size - up * size).GetData() );
-            g_imRenderer->End();
-
+            glBegin( GL_QUADS );
+                glTexCoord2i( 0, 0 );       glVertex3fv( (pos - right * size - up * size).GetData() );
+                glTexCoord2i( 0, 1 );       glVertex3fv( (pos - right * size + up * size).GetData() );
+                glTexCoord2i( 1, 1 );       glVertex3fv( (pos + right * size + up * size).GetData() );
+                glTexCoord2i( 1, 0 );       glVertex3fv( (pos + right * size - up * size).GetData() );
+            glEnd();
         }
     }
     else
@@ -126,7 +126,7 @@ void Egg::Render( float predictionTime )
 
         size *= 0.5f;
 
-        g_imRenderer->Color4ub( 255, 255, 255, predictedHealth * 2.0f );
+        glColor4ub  ( 255, 255, 255, predictedHealth * 2.0f );
 
         for( int i = 0; i < 3; ++i )
         {
@@ -157,13 +157,12 @@ void Egg::Render( float predictionTime )
                 tleft += (tright-tleft)/2;
             }
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2f(tleft, tbottom);     g_imRenderer->Vertex3fv( (fragmentPos - right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2f(tright, tbottom);    g_imRenderer->Vertex3fv( (fragmentPos + right * size + up * size).GetData() );
-                g_imRenderer->TexCoord2f(tright, ttop);       g_imRenderer->Vertex3fv( (fragmentPos + right * size - up * size).GetData() );
-                g_imRenderer->TexCoord2f(tleft, ttop);        g_imRenderer->Vertex3fv( (fragmentPos - right * size - up * size).GetData() );
-            g_imRenderer->End();
-
+            glBegin(GL_QUADS);
+                glTexCoord2f(tleft, tbottom);     glVertex3fv( (fragmentPos - right * size + up * size).GetData() );
+                glTexCoord2f(tright, tbottom);    glVertex3fv( (fragmentPos + right * size + up * size).GetData() );
+                glTexCoord2f(tright, ttop);       glVertex3fv( (fragmentPos + right * size - up * size).GetData() );
+                glTexCoord2f(tleft, ttop);        glVertex3fv( (fragmentPos - right * size - up * size).GetData() );
+            glEnd();
         }
     }
 
@@ -173,10 +172,11 @@ void Egg::Render( float predictionTime )
     EndRenderShadow();
 
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+    glEnable        ( GL_CULL_FACE );
+	glDisable       ( GL_BLEND );
+    glDisable       ( GL_TEXTURE_2D );
+    glDepthMask     ( true );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
 
 bool Egg::Advance( Unit *_unit )

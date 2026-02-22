@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
 
 #include <float.h>
 #include <math.h>
@@ -499,28 +498,20 @@ void Landscape::GenerateNormals()
 
 void Landscape::RenderHitNormals() const
 {
-	g_imRenderer->Color3ub(255,90,90);
-	g_imRenderer->Begin(PRIM_LINES);
+	glColor3ub(255,90,90);
+	glLineWidth(1.0f);
+	glBegin(GL_LINES);
 		for (int z = 0; z < m_heightMap->GetNumRows(); z++)
 		{
 			for (int x = 0; x < m_heightMap->GetNumColumns(); x++)
 			{
 				LegacyVector3 pos(x * m_heightMap->m_cellSizeX, m_heightMap->GetData(x, z), z * m_heightMap->m_cellSizeX);
-				g_imRenderer->Vertex3fv(pos.GetData());
+				glVertex3fv(pos.GetData());
 				pos += m_normalMap->GetData(x, z) * 20.0f;
-				g_imRenderer->Vertex3fv(pos.GetData());
+				glVertex3fv(pos.GetData());
 			}
 		}
-	g_imRenderer->End();
-
-		for (int z = 0; z < m_heightMap->GetNumRows(); z++)
-		{
-			for (int x = 0; x < m_heightMap->GetNumColumns(); x++)
-			{
-				LegacyVector3 pos(x * m_heightMap->m_cellSizeX, m_heightMap->GetData(x, z), z * m_heightMap->m_cellSizeX);
-				pos += m_normalMap->GetData(x, z) * 20.0f;
-			}
-		}
+	glEnd();
 }
 
 
@@ -546,7 +537,7 @@ Landscape::~Landscape()
 }
 
 
-void Landscape::BuildRenderState()
+void Landscape::BuildOpenGlState()
 {
 	delete m_renderer;
 	m_renderer = new LandscapeRenderer(m_heightMap);
@@ -594,7 +585,7 @@ void Landscape::Init(LandscapeDef *_def, bool _justMakeTheHeightMap)
 	}
 
     GenerateNormals();
-	BuildRenderState();
+    BuildOpenGlState();
 
 	if( g_app->m_location->m_water )
 	{

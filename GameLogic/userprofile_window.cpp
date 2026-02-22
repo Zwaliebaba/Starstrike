@@ -2,9 +2,6 @@
 #include "filesys_utils.h"
 #include "text_renderer.h"
 #include "language_table.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "userprofile_window.h"
 #include "server.h"
 #include "app.h"
@@ -39,7 +36,7 @@ void UserProfileWindow::Render(bool hasFocus)
 {
   DarwiniaWindow::Render(hasFocus);
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_editorFont.DrawText2DCentre(m_x + m_w / 2, m_y + GetMenuSize(30), GetMenuSize(12), LANGUAGEPHRASE("dialog_currentprofilename"));
   g_editorFont.DrawText2DCentre(m_x + m_w / 2, m_y + GetMenuSize(45), GetMenuSize(16), g_app->m_userProfileName);
 }

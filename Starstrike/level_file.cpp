@@ -13,6 +13,7 @@
 #include "radardish.h"
 #include "rocket.h"
 #include "engineer.h"
+#include "insertion_squad.h"
 #include "spawnpoint.h"
 #include "ai.h"
 #include "triffid.h"
@@ -780,6 +781,205 @@ void LevelFile::GenerateAutomaticObjectives()
   }
 }
 
+void LevelFile::WriteInstantUnits(FileWriter* _out)
+{
+  _out->printf("InstantUnits_StartDefinition\n");
+  _out->printf("\t# Type         team    x       z   count  inUnit state   spread  waypointX waypointZ  routeId\n");
+  _out->printf("\t# ==================================================================================\n");
+
+  for (int i = 0; i < m_instantUnits.Size(); i++)
+  {
+    InstantUnit* iu = m_instantUnits.GetData(i);
+    _out->printf("\t%-15s %2d %7.1f %7.1f %6d %4d %7d %7.1f %7.1f %7.1f %4d %4d\n", Entity::GetTypeName(iu->m_type), iu->m_teamId,
+                 iu->m_posX, iu->m_posZ, iu->m_number, iu->m_inAUnit, iu->m_state, iu->m_spread, iu->m_waypointX, iu->m_waypointZ,
+                 iu->m_routeId, iu->m_routeWaypointId);
+  }
+  _out->printf("InstantUnits_EndDefinition\n\n");
+}
+
+void LevelFile::WriteLights(FileWriter* _out)
+{
+  _out->printf("Lights_StartDefinition\n");
+  _out->printf("\t# x      y      z        r      g      b\n");
+  _out->printf("\t# =========================================\n");
+
+  if (g_app->m_location)
+  {
+    for (int i = 0; i < g_app->m_location->m_lights.Size(); ++i)
+    {
+      Light* light = g_app->m_location->m_lights.GetData(i);
+      _out->printf("\t%6.2f %6.2f %6.2f   %6.2f %6.2f %6.2f\n", light->m_front[0], light->m_front[1], light->m_front[2], light->m_colour[0],
+                   light->m_colour[1], light->m_colour[2]);
+    }
+  }
+
+  _out->printf("Lights_EndDefinition\n\n");
+}
+
+void LevelFile::WriteCameraMounts(FileWriter* _out)
+{
+  _out->printf("CameraMounts_StartDefinition\n");
+  _out->printf("\t# Name	          Pos                   Front          Up\n");
+  _out->printf("\t# =========================================================================\n");
+
+  for (int i = 0; i < m_cameraMounts.Size(); i++)
+  {
+    CameraMount* cmnt = m_cameraMounts.GetData(i);
+    _out->printf("\t%-15s %7.2f %7.2f %7.2f %4.2f %4.2f %4.2f %4.2f %4.2f %4.2f\n", cmnt->m_name, cmnt->m_pos.x, cmnt->m_pos.y,
+                 cmnt->m_pos.z, cmnt->m_front.x, cmnt->m_front.y, cmnt->m_front.z, cmnt->m_up.x, cmnt->m_up.y, cmnt->m_up.z);
+  }
+
+  _out->printf("CameraMounts_EndDefinition\n\n");
+}
+
+void LevelFile::WriteCameraAnims(FileWriter* _out)
+{
+  _out->printf("CameraAnimations_StartDefinition\n");
+
+  for (int i = 0; i < m_cameraAnimations.Size(); i++)
+  {
+    CameraAnimation* anim = m_cameraAnimations.GetData(i);
+    _out->printf("\t%s\n", anim->m_name);
+
+    for (int j = 0; j < anim->m_nodes.Size(); ++j)
+    {
+      CamAnimNode* node = anim->m_nodes[j];
+      const char* camModeName = CamAnimNode::GetTransitModeName(node->m_transitionMode);
+      _out->printf("\t\t%-8s %-15s %.2f\n", camModeName, node->m_mountName, node->m_duration);
+    }
+    _out->printf("\t\tEnd\n");
+  }
+
+  _out->printf("CameraAnimations_EndDefinition\n\n");
+}
+
+void LevelFile::WriteBuildings(FileWriter* _out, bool _dynamic)
+{
+  _out->printf("Buildings_StartDefinition\n");
+  _out->printf("\t# Type              id      x       z       tm      rx      rz      isGlobal\n");
+  _out->printf("\t# ==========================================================================\n");
+
+  for (int i = 0; i < m_buildings.Size(); i++)
+  {
+    Building* building = m_buildings.GetData(i);
+    if (building->m_dynamic == _dynamic)
+    {
+      building->Write(_out);
+      _out->printf("\n");
+    }
+  }
+  _out->printf("Buildings_EndDefinition\n\n");
+}
+
+void LevelFile::WriteLandscapeData(FileWriter* _out)
+{
+  _out->printf("Landscape_StartDefinition\n");
+  _out->printf("\tworldSizeX %d\n", m_landscape.m_worldSizeX);
+  _out->printf("\tworldSizeZ %d\n", m_landscape.m_worldSizeZ);
+  _out->printf("\tcellSize %.2f\n", m_landscape.m_cellSize);
+  _out->printf("\toutsideHeight %.2f\n", m_landscape.m_outsideHeight);
+  _out->printf("\tlandColourFile %s\n", m_landscapeColourFilename);
+  _out->printf("\twavesColourFile %s\n", m_wavesColourFilename);
+  _out->printf("\twaterColourFile %s\n", m_waterColourFilename);
+  _out->printf("Landscape_EndDefinition\n\n");
+}
+
+void LevelFile::WriteLandscapeTiles(FileWriter* _out)
+{
+  _out->printf("LandscapeTiles_StartDefinition\n");
+  _out->printf("\t#                            frac  height desired gen         lowland\n");
+  _out->printf("\t# x       y       z    size   dim  scale  height  method seed smooth  guideGrid\n");
+  _out->printf("\t# =============================================================================\n");
+
+  for (int i = 0; i < m_landscape.m_tiles.Size(); ++i)
+  {
+    LandscapeTile* _def = m_landscape.m_tiles.GetData(i);
+    _out->printf("\t%6d %6.2f %6d ", _def->m_posX, _def->m_posY, _def->m_posZ);
+    _out->printf("%6d ", _def->m_size);
+    _out->printf("%5.2f ", _def->m_fractalDimension);
+    _out->printf("%6.2f ", _def->m_heightScale);
+    _out->printf("%6.0f ", _def->m_desiredHeight);
+    _out->printf("%6d ", _def->m_generationMethod);
+    _out->printf("%6d ", _def->m_randomSeed);
+    _out->printf("%6.2f", _def->m_lowlandSmoothingFactor);
+    _out->printf("%6d", _def->m_guideGridPower);
+
+    if (_def->m_guideGridPower > 0)
+      _out->printf("   %s", _def->GuideGridToString());
+
+    _out->printf("\n");
+  }
+  _out->printf("LandscapeTiles_EndDefinition\n\n");
+}
+
+void LevelFile::WriteLandFlattenAreas(FileWriter* _out)
+{
+  _out->printf("LandFlattenAreas_StartDefinition\n");
+  _out->printf("\t# x      y       z      size\n");
+  _out->printf("\t# ==========================\n");
+  for (int i = 0; i < m_landscape.m_flattenAreas.Size(); ++i)
+  {
+    LandscapeFlattenArea* area = m_landscape.m_flattenAreas.GetData(i);
+    _out->printf("\t%6.1f %6.1f %6.1f %6.1f\n", area->m_centre.x, area->m_centre.y, area->m_centre.z, area->m_size);
+  }
+  _out->printf("LandFlattenAreas_EndDefinition\n\n");
+}
+
+void LevelFile::WriteRoutes(FileWriter* _out)
+{
+  _out->printf("Routes_StartDefinition\n");
+  for (int i = 0; i < m_routes.Size(); ++i)
+  {
+    if (!m_routes.ValidIndex(i))
+      continue;
+
+    Route* r = m_routes.GetData(i);
+
+    _out->printf("\tRoute %d\n", r->m_id);
+
+    for (int j = 0; j < r->m_wayPoints.Size(); ++j)
+    {
+      WayPoint* wp = r->m_wayPoints.GetData(j);
+      LegacyVector3 pos = wp->GetPos();
+      if (wp->m_type == WayPoint::Type3DPos)
+        _out->printf("\t\t%-3d %6.2f %6.2f %6.2f\n", wp->m_type, pos.x, pos.y, pos.z);
+      else if (wp->m_type == WayPoint::TypeGroundPos)
+        _out->printf("\t\t%-3d %6.2f %6.2f\n", wp->m_type, pos.x, pos.z);
+      else if (wp->m_type == WayPoint::TypeBuilding)
+        _out->printf("\t\t%-3d %6d\n", wp->m_type, wp->m_buildingId);
+    }
+
+    _out->printf("\t\tEnd\n");
+  }
+  _out->printf("Routes_EndDefinition\n\n");
+}
+
+void LevelFile::WritePrimaryObjectives(FileWriter* _out)
+{
+  _out->printf("PrimaryObjectives_StartDefinition\n");
+
+  for (int i = 0; i < m_primaryObjectives.Size(); ++i)
+  {
+    GlobalEventCondition* gec = m_primaryObjectives[i];
+    //_out->printf( "\t%s:%d", gec->GetTypeName(gec->m_type), gec->m_id);
+    _out->printf("\t");
+    gec->Save(_out);
+
+    if (gec->m_stringId)
+      _out->printf("\t%s", gec->m_stringId);
+    if (gec->m_cutScene)
+      _out->printf("\t%s", gec->m_cutScene);
+
+    _out->printf("\n");
+  }
+
+  _out->printf("PrimaryObjectives_EndDefinition\n");
+}
+
+// **************
+// Public Methods
+// **************
+
 LevelFile::LevelFile()
 {
   sprintf(m_landscapeColourFilename, "landscape_default.bmp");
@@ -1226,6 +1426,64 @@ void LevelFile::ParseRunningPrograms(TextReader* _in)
   }
 }
 
+void LevelFile::WriteRunningPrograms(FileWriter* _out)
+{
+  if (!g_app->m_editing)
+  {
+    Team* team = g_app->m_location->GetMyTeam();
+
+    _out->printf("\nRunningPrograms_StartDefinition\n");
+    //_out->printf( "\t# x      y       z      size\n");
+    _out->printf("\t# ==========================\n");
+
+    //
+    // Engineer     count   state   numSpirits  waypointX waypointZ    (positionX positionZ health)
+    // Squaddie     count   state   weaponType  waypointX waypointZ    (positionX positionZ health)
+
+    for (int t = 0; t < g_app->m_taskManager->m_tasks.Size(); ++t)
+    {
+      Task* task = g_app->m_taskManager->m_tasks[t];
+      if (task->m_state == Task::StateRunning)
+      {
+        if (task->m_type == GlobalResearch::TypeEngineer)
+        {
+          auto engineer = static_cast<Engineer*>(g_app->m_location->GetEntitySafe(task->m_objId, Entity::TypeEngineer));
+          if (engineer)
+          {
+            _out->printf("\t%-15s %6d %6d %6d %8.2f %8.2f %8.2f %8.2f %d\n", Entity::GetTypeName(Entity::TypeEngineer), 1,
+                         engineer->m_state, engineer->GetNumSpirits(), engineer->m_wayPoint.x, engineer->m_wayPoint.z, engineer->m_pos.x,
+                         engineer->m_pos.z, engineer->m_stats[Entity::StatHealth]);
+          }
+        }
+
+        if (task->m_type == GlobalResearch::TypeSquad)
+        {
+          auto squad = static_cast<InsertionSquad*>(g_app->m_location->GetUnit(task->m_objId));
+          if (squad && squad->m_troopType == Entity::TypeInsertionSquadie)
+          {
+            _out->printf("\t%-15s %6d %6d %6d %8.2f %8.2f", Entity::GetTypeName(Entity::TypeInsertionSquadie), squad->m_entities.NumUsed(),
+                         0, squad->m_weaponType, squad->GetWayPoint().x, squad->GetWayPoint().z);
+
+            for (int e = 0; e < squad->m_entities.Size(); ++e)
+            {
+              if (squad->m_entities.ValidIndex(e))
+              {
+                Entity* entity = squad->m_entities[e];
+
+                _out->printf(" %8.2f %8.2f %6d", entity->m_pos.x, entity->m_pos.z, entity->m_stats[Entity::StatHealth]);
+              }
+            }
+
+            _out->printf("\n");
+          }
+        }
+      }
+    }
+
+    _out->printf("RunningPrograms_EndDefinition\n");
+  }
+}
+
 void LevelFile::ParseDifficulty(TextReader* _in)
 {
   m_levelDifficulty = -1;
@@ -1245,4 +1503,13 @@ void LevelFile::ParseDifficulty(TextReader* _in)
         m_levelDifficulty = 0;
     }
   }
+}
+
+void LevelFile::WriteDifficulty(FileWriter* _out)
+{
+  // When we write the difficulty setting to a file it should be 1-based
+  // (internally it is 0 based).
+  _out->printf("Difficulty_StartDefinition\n");
+  _out->printf("\tCreatedAsDifficulty %d\n", m_levelDifficulty + 1);
+  _out->printf("Difficulty_EndDefinition\n\n");
 }

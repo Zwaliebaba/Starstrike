@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include "debug_utils.h"
 #include "file_writer.h"
@@ -113,31 +110,35 @@ void PowerBuilding::RenderAlphas ( float _predictionTime )
         LegacyVector3 theirPosRight = camToTheirPos ^ ( theirPos - ourPos );
         theirPosRight.SetLength( 2.0f );
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_imRenderer->Color4f( 0.9f, 0.9f, 0.5f, 1.0f );
+        glDisable   ( GL_CULL_FACE );
+        glEnable    ( GL_BLEND );
+        glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
+        glDepthMask ( false );
+        glColor4f   ( 0.9f, 0.9f, 0.5f, 1.0f );
 
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
+        glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2f(0.1f, 0);      g_imRenderer->Vertex3fv( (ourPos - ourPosRight).GetData() );
-            g_imRenderer->TexCoord2f(0.1f, 1);      g_imRenderer->Vertex3fv( (ourPos + ourPosRight).GetData() );
-            g_imRenderer->TexCoord2f(0.9f, 1);      g_imRenderer->Vertex3fv( (theirPos + theirPosRight).GetData() );
-            g_imRenderer->TexCoord2f(0.9f, 0);      g_imRenderer->Vertex3fv( (theirPos - theirPosRight).GetData() );
-        g_imRenderer->End();
-
+        glBegin( GL_QUADS );
+            glTexCoord2f(0.1f, 0);      glVertex3fv( (ourPos - ourPosRight).GetData() );
+            glTexCoord2f(0.1f, 1);      glVertex3fv( (ourPos + ourPosRight).GetData() );
+            glTexCoord2f(0.9f, 1);      glVertex3fv( (theirPos + theirPosRight).GetData() );
+            glTexCoord2f(0.9f, 0);      glVertex3fv( (theirPos - theirPosRight).GetData() );
+        glEnd();
 
         //
         // Render any surges
 
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
 
         float surgeSize = 25.0f;
-        g_imRenderer->Color4f( 0.5f, 0.5f, 1.0f, 1.0f );
+        glColor4f( 0.5f, 0.5f, 1.0f, 1.0f );
         LegacyVector3 camUp = g_app->m_camera->GetUp() * surgeSize;
         LegacyVector3 camRight = g_app->m_camera->GetRight() * surgeSize;
-        g_imRenderer->Begin(PRIM_QUADS);
+        glBegin( GL_QUADS );
         for( int i = 0; i < m_surges.Size(); ++i )
         {
             float thisSurge = m_surges[i];
@@ -145,25 +146,18 @@ void PowerBuilding::RenderAlphas ( float _predictionTime )
             if( thisSurge < 0.0f ) thisSurge = 0.0f;
             if( thisSurge > 1.0f ) thisSurge = 1.0f;
             LegacyVector3 thisSurgePos = ourPos + (theirPos-ourPos) * thisSurge;
-            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (thisSurgePos - camUp - camRight).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (thisSurgePos - camUp + camRight).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (thisSurgePos + camUp + camRight).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (thisSurgePos + camUp - camRight).GetData() );
+            glTexCoord2i( 0, 0 );       glVertex3fv( (thisSurgePos - camUp - camRight).GetData() );
+            glTexCoord2i( 1, 0 );       glVertex3fv( (thisSurgePos - camUp + camRight).GetData() );
+            glTexCoord2i( 1, 1 );       glVertex3fv( (thisSurgePos + camUp + camRight).GetData() );
+            glTexCoord2i( 0, 1 );       glVertex3fv( (thisSurgePos + camUp - camRight).GetData() );
         }
-        g_imRenderer->End();
+        glEnd();
 
-        for( int i = 0; i < m_surges.Size(); ++i )
-        {
-            float thisSurge = m_surges[i];
-            thisSurge += _predictionTime * 2;
-            if( thisSurge < 0.0f ) thisSurge = 0.0f;
-            if( thisSurge > 1.0f ) thisSurge = 1.0f;
-            LegacyVector3 thisSurgePos = ourPos + (theirPos-ourPos) * thisSurge;
-        }
-
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+        glDisable   ( GL_TEXTURE_2D );
+        glDepthMask ( true );
+        glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable   ( GL_BLEND );
+        glEnable    ( GL_CULL_FACE );
     }
 }
 
@@ -227,6 +221,7 @@ void PowerBuilding::SetBuildingLink( int _buildingId )
 {
     m_powerLink = _buildingId;
 }
+
 
 
 // ****************************************************************************
@@ -346,16 +341,17 @@ void Generator::Render( float _predictionTime )
     Matrix34 generatorMat( m_front, g_upVector, m_pos );
     Matrix34 counterMat = m_counter->GetWorldMatrix(generatorMat);
 
-    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 1.0f );
+    glColor4f( 0.6f, 0.8f, 0.9f, 1.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", int(m_throughput*10.0f));
     counterMat.pos += counterMat.f * 0.1f;
     counterMat.pos += ( counterMat.f ^ counterMat.u ) * 0.2f;
     counterMat.pos += counterMat.u * 0.2f;
     g_gameFont.SetRenderShadow(true);
-    g_gameFont.SetColour( 0.6f, 0.8f, 0.9f, 0.0f );
+    glColor4f( 0.6f, 0.8f, 0.9f, 0.0f );
     g_gameFont.DrawText3D( counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", int(m_throughput*10.0f));
     g_gameFont.SetRenderShadow(false);
 }
+
 
 
 // ****************************************************************************
@@ -576,10 +572,12 @@ bool SolarPanel::Advance()
 
 void SolarPanel::RenderPorts()
 {
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+    glDisable       ( GL_CULL_FACE );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
+    glDepthMask     ( false );
+    glEnable        ( GL_BLEND );
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
 
     for( int i = 0; i < GetNumPorts(); ++i )
     {
@@ -597,21 +595,22 @@ void SolarPanel::RenderPorts()
 
         LegacyVector3 statusPos = worldMat.pos;
 
-        if( GetPortOccupant(i).IsValid() )
-            g_imRenderer->Color4f( 0.3f, 1.0f, 0.3f, 1.0f );
+        if( GetPortOccupant(i).IsValid() )      glColor4f( 0.3f, 1.0f, 0.3f, 1.0f );
+        else                                    glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
 
-        g_imRenderer->Begin(PRIM_QUADS);
-            g_imRenderer->TexCoord2i( 0, 0 );           g_imRenderer->Vertex3fv( (statusPos - camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );           g_imRenderer->Vertex3fv( (statusPos + camR - camU).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );           g_imRenderer->Vertex3fv( (statusPos + camR + camU).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
-        g_imRenderer->End();
-
+        glBegin( GL_QUADS );
+            glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
+            glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
+            glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
+            glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
+        glEnd();
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glDisable       ( GL_BLEND );
+    glDepthMask     ( true );
+    glDisable       ( GL_TEXTURE_2D );
+    glEnable        ( GL_CULL_FACE );
 }
 
 
@@ -624,7 +623,9 @@ void SolarPanel::Render( float _predictionTime )
         m_front = right ^ m_up;
     }
 
+    glShadeModel( GL_SMOOTH );
     PowerBuilding::Render( _predictionTime );
+    glShadeModel( GL_FLAT );
 }
 
 
@@ -641,28 +642,31 @@ void SolarPanel::RenderAlphas( float _predictionTime )
         float glowHeight = 40.0f;
         float alphaValue = fabs(sinf(g_gameTime)) * fractionOccupied;
 
-        g_imRenderer->Color4f( 0.2f, 0.4f, 0.9f, alphaValue );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+        glColor4f       ( 0.2f, 0.4f, 0.9f, alphaValue );
+        glEnable        ( GL_BLEND );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
+        glDepthMask     ( false );
+        glDisable       ( GL_CULL_FACE );
 
         for( int i = 0; i < SOLARPANEL_NUMGLOWS; ++i )
         {
             Matrix34 thisGlow = m_glowMarker[i]->GetWorldMatrix( mat );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->TexCoord2i( 0, 0 );   g_imRenderer->Vertex3fv( (thisGlow.pos - thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData() );
-                g_imRenderer->TexCoord2i( 0, 1 );   g_imRenderer->Vertex3fv( (thisGlow.pos + thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData() );
-                g_imRenderer->TexCoord2i( 1, 1 );   g_imRenderer->Vertex3fv( (thisGlow.pos + thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData() );
-                g_imRenderer->TexCoord2i( 1, 0 );   g_imRenderer->Vertex3fv( (thisGlow.pos - thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData() );
-            g_imRenderer->End();
-
+            glBegin( GL_QUADS );
+                glTexCoord2i( 0, 0 );   glVertex3fv( (thisGlow.pos - thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData() );
+                glTexCoord2i( 0, 1 );   glVertex3fv( (thisGlow.pos + thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData() );
+                glTexCoord2i( 1, 1 );   glVertex3fv( (thisGlow.pos + thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData() );
+                glTexCoord2i( 1, 0 );   glVertex3fv( (thisGlow.pos - thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData() );
+            glEnd();
         }
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+        glEnable        ( GL_CULL_FACE );
+        glDepthMask     ( true );
+        glDisable       ( GL_TEXTURE_2D );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable       ( GL_BLEND );
     }
 }
 

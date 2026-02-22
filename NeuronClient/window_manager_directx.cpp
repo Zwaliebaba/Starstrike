@@ -1,20 +1,19 @@
 #include "pch.h"
-
-#include "win32_eventhandler.h"
 #include "debug_utils.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
-#include "im_renderer.h"
-#include "sprite_batch.h"
 #include "window_manager.h"
 #include "window_manager_win32.h"
+#include "inputdriver_win32.h"
+#include "win32_eventhandler.h"
 
 static HINSTANCE g_hInstance;
 
 #define WH_KEYBOARD_LL 13
 
 WindowManager* g_windowManager = nullptr;
+
+bool Direct3DInit(HWND _hWnd, bool _windowed, int _width, int _height, int _colourDepth, int _zDepth, bool _waitVRT);
+void Direct3DShutdown();
+void Direct3DSwapBuffers();
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -39,7 +38,12 @@ WindowManager::WindowManager()
   SaveDesktop();
 }
 
-WindowManager::~WindowManager() { DestroyWin(); }
+WindowManager::~WindowManager()
+{
+  DestroyWin();
+  delete m_win32Specific;
+  m_resolutions.EmptyAndDelete();
+}
 
 void WindowManager::SaveDesktop()
 {
@@ -56,34 +60,22 @@ void WindowManager::SaveDesktop()
 
 void WindowManager::RestoreDesktop()
 {
-  //
-  // Get current settings
+}
 
-  DEVMODE mode;
-  ZeroMemory(&mode, sizeof(mode));
-  mode.dmSize = sizeof(mode);
-  bool success = EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &mode);
+bool WindowManager::EnableOpenGL(int _colourDepth, int _zDepth)
+{
+  if (!Direct3DInit(m_win32Specific->m_hWnd, m_windowed, m_screenW, m_screenH, _colourDepth, _zDepth, m_waitVRT))
+    return false;
+  glClear(GL_COLOR_BUFFER_BIT);
+  return true;
+}
 
-  //
-  // has anything changed?
-
-  bool changed = (m_desktopScreenW != mode.dmPelsWidth || m_desktopScreenH != mode.dmPelsHeight || m_desktopColourDepth != mode.dmBitsPerPel
-    || m_desktopRefresh != mode.dmDisplayFrequency);
-
-  //
-  // Restore if required
-
-  if (changed)
-  {
-    DEVMODE devmode;
-    devmode.dmSize = sizeof(DEVMODE);
-    devmode.dmBitsPerPel = m_desktopColourDepth;
-    devmode.dmPelsWidth = m_desktopScreenW;
-    devmode.dmPelsHeight = m_desktopScreenH;
-    devmode.dmDisplayFrequency = m_desktopRefresh;
-    devmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY | DM_BITSPERPEL;
-    long result = ChangeDisplaySettings(&devmode, CDS_FULLSCREEN);
-  }
+void WindowManager::DisableOpenGL()
+{
+  Direct3DShutdown();
+  //	wglMakeCurrent( NULL, NULL );
+  //	wglDeleteContext( m_win32Specific->m_hRC );
+  //	ReleaseDC( m_win32Specific->m_hWnd, m_win32Specific->m_hDC );
 }
 
 // Returns an index into the list of already registered resolutions
@@ -139,20 +131,21 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
   m_screenW = _width;
   m_screenH = _height;
   m_windowed = _windowed;
+  m_waitVRT = _waitVRT;
 
   // Register window class
-  WNDCLASSA wc;
+  WNDCLASS wc;
   wc.style = CS_OWNDC;
   wc.lpfnWndProc = WndProc;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
   wc.hInstance = g_hInstance;
-  wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-  wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+  wc.hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(101));
+  wc.hCursor = nullptr;
   wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
   wc.lpszMenuName = nullptr;
-  wc.lpszClassName = "Darwinia";
-  RegisterClassA(&wc);
+  wc.lpszClassName = L"Darwinia";
+  RegisterClass(&wc);
 
   int posX, posY;
   unsigned int windowStyle = WS_VISIBLE;
@@ -166,8 +159,6 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
     AdjustWindowRect(&windowRect, windowStyle, false);
     m_borderWidth = ((windowRect.right - windowRect.left) - _width) / 2;
     m_titleHeight = ((windowRect.bottom - windowRect.top) - _height) - m_borderWidth * 2;
-    _width += m_borderWidth * 2;
-    _height += m_borderWidth * 2 + m_titleHeight;
 
     HWND desktopWindow = GetDesktopWindow();
     RECT desktopRect;
@@ -178,13 +169,17 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
     if (_width > desktopWidth || _height > desktopHeight)
       return false;
 
+    _width += m_borderWidth * 2;
+    _height += m_borderWidth * 2 + m_titleHeight;
+
     posX = (desktopRect.right - _width) / 2;
     posY = (desktopRect.bottom - _height) / 2;
   }
   else
   {
-    windowStyle |= WS_POPUP;
+    windowStyle |= WS_POPUP; //|WS_MAXIMIZE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
+    /*
     DEVMODE devmode;
     devmode.dmSize = sizeof(DEVMODE);
     devmode.dmBitsPerPel = _colourDepth;
@@ -193,8 +188,8 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
     devmode.dmDisplayFrequency = _refreshRate;
     devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
     long result = ChangeDisplaySettings(&devmode, CDS_FULLSCREEN);
-    if (result != DISP_CHANGE_SUCCESSFUL)
-      return false;
+        if( result != DISP_CHANGE_SUCCESSFUL ) return false;
+    */
 
     //		DarwiniaReleaseAssert(result == DISP_CHANGE_SUCCESSFUL, "Couldn't set full screen mode of %dx%d",
     //														_width, _height);
@@ -207,35 +202,20 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
   }
 
   // Create main window
-  m_win32Specific->m_hWnd = CreateWindowA(wc.lpszClassName, wc.lpszClassName, windowStyle, posX, posY, _width, _height, NULL, NULL,
-                                          g_hInstance, NULL);
+  m_win32Specific->m_hWnd = CreateWindow(wc.lpszClassName, wc.lpszClassName, windowStyle, posX, posY, _width, _height, NULL, NULL,
+                                         g_hInstance, NULL);
 
   if (!m_win32Specific->m_hWnd)
     return false;
 
   m_mouseOffsetX = INT_MAX;
 
-  // Initialise D3D11 device (Phase 1 / Phase 9: OpenGL removed)
-  g_renderDevice = new RenderDevice();
-  if (!g_renderDevice->Initialise(m_win32Specific->m_hWnd, m_screenW, m_screenH, _windowed, _waitVRT))
+  // Enable OpenGL for the window
+  if (!EnableOpenGL(_colourDepth, _zDepth))
   {
-    Neuron::Fatal("D3D11 device creation failed");
-  }
-
-  // Initialise immediate-mode emulation layer (Phase 2)
-  if (g_renderDevice)
-  {
-    g_imRenderer = new ImRenderer();
-    g_imRenderer->Initialise(g_renderDevice->GetDevice(), g_renderDevice->GetContext());
-
-    g_renderStates = new RenderStates();
-    g_renderStates->Initialise(g_renderDevice->GetDevice());
-
-    g_textureManager = new TextureManager();
-    g_textureManager->Initialise(g_renderDevice->GetDevice(), g_renderDevice->GetContext());
-
-    g_spriteBatch = new SpriteBatch();
-    g_spriteBatch->Initialise(g_renderDevice->GetDevice(), g_renderDevice->GetContext());
+    DestroyWindow(m_win32Specific->m_hWnd);
+    m_win32Specific->m_hWnd = nullptr;
+    return false;
   }
 
   return true;
@@ -243,19 +223,12 @@ bool WindowManager::CreateWin(int _width, int _height, bool _windowed, int _colo
 
 void WindowManager::DestroyWin()
 {
-  SAFE_DELETE(g_spriteBatch);
-  SAFE_DELETE(g_textureManager);
-  SAFE_DELETE(g_renderStates);
-  SAFE_DELETE(g_imRenderer);
-  SAFE_DELETE(g_renderDevice);
+  DisableOpenGL();
   DestroyWindow(m_win32Specific->m_hWnd);
+  m_win32Specific->m_hWnd = nullptr;
 }
 
-void WindowManager::Flip()
-{
-  if (g_renderDevice)
-    g_renderDevice->EndFrame();
-}
+void WindowManager::Flip() { Direct3DSwapBuffers(); }
 
 void WindowManager::NastyPollForMessages()
 {
@@ -275,8 +248,8 @@ void WindowManager::NastySetMousePos(int x, int y)
     RECT rect1;
     GetWindowRect(m_win32Specific->m_hWnd, &rect1);
 
-    //RECT rect2;
-    //GetClientRect(m_win32Specific->m_hWnd, &rect2);
+    RECT rect2;
+    GetClientRect(m_win32Specific->m_hWnd, &rect2);
 
     //int borderWidth = (m_screenW - rect2.right) / 2;
     //int menuHeight = (m_screenH - rect2.bottom) - (borderWidth * 2);
@@ -308,12 +281,13 @@ void WindowManager::NastyMoveMouse(int x, int y)
   g_win32InputDriver->SetMousePosNoVelocity(x, y);
 }
 
+void WindowManager::WindowMoved() { m_mouseOffsetX = INT_MAX; }
+
 bool WindowManager::Captured() { return m_mouseCaptured; }
 
 void WindowManager::CaptureMouse()
 {
   SetCapture(m_win32Specific->m_hWnd);
-
   m_mouseCaptured = true;
 }
 
@@ -330,8 +304,8 @@ void WindowManager::EnsureMouseCaptured()
   // code, since that calls CaptureMouse / UncaptureMouse
   // on various input events
 
-  if (!m_mouseCaptured)
-    CaptureMouse();
+  // 	if (!m_mouseCaptured)
+  // 		CaptureMouse();
 }
 
 void WindowManager::UncaptureMouse()
@@ -353,23 +327,25 @@ void WindowManager::EnsureMouseUncaptured()
   // code, since that calls CaptureMouse / UncaptureMouse
   // on various input events
 
-  if (m_mouseCaptured)
-    UncaptureMouse();
+  // 	if (m_mouseCaptured)
+  // 		UncaptureMouse();
 }
 
 void WindowManager::HideMousePointer()
 {
-  ShowCursor(false);
+  // TODO: Delete me
+  //	if (m_mousePointerVisible)
+  //		ShowCursor(false);
   m_mousePointerVisible = false;
 }
 
 void WindowManager::UnhideMousePointer()
 {
-  ShowCursor(true);
+  // TODO: Delete me
+  //	if (!m_mousePointerVisible)
+  //		ShowCursor(true);
   m_mousePointerVisible = true;
 }
-
-void WindowManager::WindowMoved() { m_mouseOffsetX = INT_MAX; }
 
 void WindowManager::SuggestDefaultRes(int* _width, int* _height, int* _refresh, int* _depth)
 {
@@ -379,20 +355,14 @@ void WindowManager::SuggestDefaultRes(int* _width, int* _height, int* _refresh, 
   *_depth = m_desktopColourDepth;
 }
 
-void WindowManager::OpenWebsite(const char* _url) { ShellExecuteA(nullptr, "open", _url, nullptr, nullptr, SW_SHOWNORMAL); }
-
 int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _cmdLine, int _iCmdShow)
 {
-#if defined(_DEBUG)
-//  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
+    wchar_t filename[MAX_PATH];
+    GetModuleFileNameW(nullptr, filename, MAX_PATH);
+    auto path = std::wstring(filename);
+    path = path.substr(0, path.find_last_of('\\'));
 
-  wchar_t filename[MAX_PATH];
-  GetModuleFileNameW(nullptr, filename, MAX_PATH);
-  auto path = std::wstring(filename);
-  path = path.substr(0, path.find_last_of('\\'));
-
-  FileSys::SetHomeDirectory(path);
+    FileSys::SetHomeDirectory(path);
 
   g_hInstance = _hInstance;
 

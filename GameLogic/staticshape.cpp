@@ -117,7 +117,9 @@ void StaticShape::Render(float _predictionTime)
     mat.r *= m_scale;
     mat.f *= m_scale;
 
+    glEnable(GL_NORMALIZE);
     m_shape->Render(_predictionTime, mat);
+    glDisable(GL_NORMALIZE);
   }
   else
     RenderSphere(m_pos, 40.0f);

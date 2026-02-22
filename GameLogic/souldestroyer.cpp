@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "resource.h"
 #include "matrix34.h"
 #include "shape.h"
@@ -434,7 +431,8 @@ void SoulDestroyer::RenderShapes( float _predictionTime )
     predictedUp.Normalise();
 	Matrix34 mat(predictedFront, predictedUp, predictedPos);
 
-    g_imRenderer->UnbindTexture();
+    glEnable( GL_NORMALIZE );
+    glDisable( GL_TEXTURE_2D );
 
     g_app->m_renderer->SetObjectLighting();
 
@@ -468,6 +466,7 @@ void SoulDestroyer::RenderShapes( float _predictionTime )
 
     g_app->m_renderer->UnsetObjectLighting();
 
+    glDisable( GL_NORMALIZE );
 }
 
 
@@ -515,7 +514,7 @@ void SoulDestroyer::Render( float _predictionTime )
 
     if( !m_dead )
     {
-        g_imRenderer->UnbindTexture();
+        glDisable( GL_TEXTURE_2D );
 
         LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
         LegacyVector3 predictedFront = m_front;
@@ -562,11 +561,11 @@ void SoulDestroyer::Render( float _predictionTime )
         //
         // Render our spirits
 
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+        glDisable       ( GL_DEPTH_TEST );
+        glDisable       ( GL_CULL_FACE );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+        glEnable        ( GL_BLEND );
+        glDepthMask     ( false );
 
         float timeNow = GetHighResTime();
         for( int i = 0; i < m_spirits.Size(); ++i )
@@ -590,10 +589,11 @@ void SoulDestroyer::Render( float _predictionTime )
             }
         }
 
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+        glDepthMask     ( true );
+        glDisable       ( GL_BLEND );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glEnable        ( GL_CULL_FACE );
+        glEnable        ( GL_DEPTH_TEST );
 
 
         //glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
@@ -615,25 +615,23 @@ void SoulDestroyer::RenderSpirit( LegacyVector3 const &_pos, float _alpha )
     float distToParticle = (g_app->m_camera->GetPos() - pos).Mag();
 
     float size = spiritInnerSize / sqrtf(sqrtf(distToParticle));
-    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, innerAlpha );
+    glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    glEnd();
 
     size = spiritOuterSize / sqrtf(sqrtf(distToParticle));
-    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, outerAlpha );
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        g_imRenderer->Vertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    g_imRenderer->End();
-
+    glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
+    glBegin( GL_QUADS );
+        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
+        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
+        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
+    glEnd();
 }
 
 
@@ -730,28 +728,28 @@ void Zombie::Render( float _predictionTime )
         outerAlpha *= timeRemaining * 0.01f;
     }
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_imRenderer->Color4f( 0.9f, 0.9f, 1.0f, alpha );
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "sprites/ghost.bmp" ) );
+    glDisable       ( GL_CULL_FACE );
+    glColor4f       ( 0.9f, 0.9f, 1.0f, alpha );
+    glEnable        ( GL_TEXTURE_2D );
+    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "sprites/ghost.bmp" ) );
 
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (predictedPos - size*predictedRight - size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (predictedPos + size*predictedRight - size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (predictedPos + size*predictedRight + size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (predictedPos - size*predictedRight + size*predictedUp).GetData() );
-    g_imRenderer->End();
-
+    glBegin( GL_QUADS );
+        glTexCoord2i(0,0);      glVertex3fv( (predictedPos - size*predictedRight - size*predictedUp).GetData() );
+        glTexCoord2i(1,0);      glVertex3fv( (predictedPos + size*predictedRight - size*predictedUp).GetData() );
+        glTexCoord2i(1,1);      glVertex3fv( (predictedPos + size*predictedRight + size*predictedUp).GetData() );
+        glTexCoord2i(0,1);      glVertex3fv( (predictedPos - size*predictedRight + size*predictedUp).GetData() );
+    glEnd();
 
     size *= 2.0f;
-    g_imRenderer->Color4f( 0.9f, 0.9f, 1.0f, outerAlpha );
-    g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (predictedPos - size*predictedRight - size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (predictedPos + size*predictedRight - size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (predictedPos + size*predictedRight + size*predictedUp).GetData() );
-        g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (predictedPos - size*predictedRight + size*predictedUp).GetData() );
-    g_imRenderer->End();
+    glColor4f       ( 0.9f, 0.9f, 1.0f, outerAlpha );
+    glBegin( GL_QUADS );
+        glTexCoord2i(0,0);      glVertex3fv( (predictedPos - size*predictedRight - size*predictedUp).GetData() );
+        glTexCoord2i(1,0);      glVertex3fv( (predictedPos + size*predictedRight - size*predictedUp).GetData() );
+        glTexCoord2i(1,1);      glVertex3fv( (predictedPos + size*predictedRight + size*predictedUp).GetData() );
+        glTexCoord2i(0,1);      glVertex3fv( (predictedPos - size*predictedRight + size*predictedUp).GetData() );
+    glEnd();
 
-
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDisable       ( GL_TEXTURE_2D );
+    glEnable        ( GL_CULL_FACE );
 }
 

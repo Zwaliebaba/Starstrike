@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "hi_res_time.h"
 #include "debug_render.h"
 #include "debug_utils.h"
@@ -12,6 +9,7 @@
 #include "obstruction_grid.h"
 
 #include "laserfence.h"
+
 
 
 ObstructionGrid::ObstructionGrid( float _cellSizeX, float _cellSizeZ )
@@ -142,9 +140,10 @@ LList<int> *ObstructionGrid::GetBuildings( float _locationX, float _locationZ )
 
 void ObstructionGrid::Render()
 {
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glLineWidth (2.0f);
+    glDisable   ( GL_CULL_FACE );
+    glEnable    ( GL_BLEND );
+    glDepthMask ( false );
 
     float height = 150.0f;
 
@@ -158,20 +157,19 @@ void ObstructionGrid::Render()
             float h = m_cells.m_cellSizeY;
 
             int numBuildings = GetBuildings( worldX, worldZ )->Size();
-            g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, numBuildings/3.0f );
+            glColor4f( 1.0f, 1.0f, 1.0f, numBuildings/3.0f );
 
-            g_imRenderer->Begin(PRIM_QUADS);
-                g_imRenderer->Vertex3f( worldX, height, worldZ );
-                g_imRenderer->Vertex3f( worldX + w, height, worldZ );
-                g_imRenderer->Vertex3f( worldX + w, height, worldZ + h );
-                g_imRenderer->Vertex3f( worldX, height, worldZ + h );
-            g_imRenderer->End();
-
+            glBegin( GL_QUADS );
+                glVertex3f( worldX, height, worldZ );
+                glVertex3f( worldX + w, height, worldZ );
+                glVertex3f( worldX + w, height, worldZ + h );
+                glVertex3f( worldX, height, worldZ + h );
+            glEnd();
         }
     }
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDepthMask ( true );
+    glDisable   ( GL_BLEND );
+    glEnable    ( GL_CULL_FACE );
 }
 

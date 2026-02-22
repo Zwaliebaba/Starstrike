@@ -6,17 +6,7 @@
 #include "matrix34.h"
 #include "shape.h"
 #include "text_stream_readers.h"
-
-#ifndef EXPORTER_BUILD
 #include "resource.h"
-#include "render_device.h"
-#include "im_renderer.h"
-#include "render_states.h"
-#include "app.h"
-#endif
-
-// Display lists are not supported in D3D11 — always use RenderSlow path
-// #define USE_DISPLAY_LISTS
 
 // ****************************************************************************
 // Class ShapeMarker
@@ -25,7 +15,7 @@
 // *** Constructor
 // This constructor is used in the export process. The m_parents array is never
 // populated in the exporter, so it is intentionally left blank
-ShapeMarker::ShapeMarker(const char* _name, char* _parentName, int _depth, const Matrix34& _transform)
+ShapeMarker::ShapeMarker(const char* _name, const char* _parentName, int _depth, const Matrix34& _transform)
   : m_transform(_transform),
     m_depth(_depth),
     m_parents(nullptr)
@@ -151,8 +141,7 @@ void ShapeMarker::WriteToFile(FILE* _out) const
 
 // This constructor is used to load a shape from a file.
 ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
-  : m_displayListName(nullptr),
-    m_numPositions(0),
+  : m_numPositions(0),
     m_positions(nullptr),
     m_positionsInWS(nullptr),
     m_numNormals(0),
@@ -262,8 +251,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
 // This constructor is used when you want to build a shape from scratch yourself,
 // eg in the exporter.
 ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
-  : m_displayListName(nullptr),
-    m_numPositions(0),
+  : m_numPositions(0),
     m_positions(nullptr),
     m_positionsInWS(nullptr),
     m_numNormals(0),
@@ -333,18 +321,6 @@ ShapeFragment::~ShapeFragment()
   m_triangles = nullptr;
   m_childFragments.EmptyAndDelete();
   m_childMarkers.EmptyAndDelete();
-#ifndef EXPORTER_BUILD
-  g_app->m_resource->DeleteDisplayList(m_displayListName);
-  delete [] m_displayListName;
-  m_displayListName = nullptr;
-#endif
-}
-
-void ShapeFragment::BuildDisplayList()
-{
-#ifndef EXPORTER_BUILD
-  // Display lists not supported in D3D11 — RenderSlow() is called directly
-#endif
 }
 
 void ShapeFragment::WriteToFile(FILE* _out) const
@@ -393,7 +369,8 @@ void ShapeFragment::WriteToFile(FILE* _out) const
 
     // Write out the triangles
     fprintf(_out, "\tTriangles: %d\n", m_numTriangles);
-    for (i = 0; i < m_numTriangles; ++i) { fprintf(_out, "\t\t%d,%d,%d\n", m_triangles[i].v1, m_triangles[i].v2, m_triangles[i].v3); }
+    for (i = 0; i < m_numTriangles; ++i)
+      fprintf(_out, "\t\t%d,%d,%d\n", m_triangles[i].v1, m_triangles[i].v2, m_triangles[i].v3);
 
     fprintf(_out, "\n");
   }
@@ -816,8 +793,8 @@ void ShapeFragment::Render(float _predictionTime)
   bool matrixIsIdentity = predictedTransform == g_identityMatrix34;
   if (!matrixIsIdentity)
   {
-    g_imRenderer->PushMatrix();
-    g_imRenderer->MultMatrixf(predictedTransform.ConvertToColumnMajor());
+    glPushMatrix();
+    glMultMatrixf(predictedTransform.ConvertToOpenGLFormat());
   }
 
   RenderSlow();
@@ -827,9 +804,7 @@ void ShapeFragment::Render(float _predictionTime)
     m_childFragments.GetData(i)->Render(_predictionTime);
 
   if (!matrixIsIdentity)
-  {
-    g_imRenderer->PopMatrix();
-  }
+    glPopMatrix();
 #endif
 }
 
@@ -838,7 +813,7 @@ void ShapeFragment::RenderSlow()
 #ifndef EXPORTER_BUILD
   if (!m_numTriangles)
     return;
-  g_imRenderer->Begin(PRIM_TRIANGLES);
+  glBegin(GL_TRIANGLES);
 
   int norm = 0;
   for (int i = 0; i < m_numTriangles; i++)
@@ -849,34 +824,35 @@ void ShapeFragment::RenderSlow()
 
     constexpr unsigned char alpha = 255;
 
-    g_imRenderer->Normal3fv(m_normals[norm].GetData());
-    g_imRenderer->Color4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
-    g_imRenderer->Vertex3fv(m_positions[vertA->m_posId].GetData());
+    /*/ calculate normal
+    float u[3],v[3],n[3],l;
+    u[0]=m_positions[vertB->m_posId].x-m_positions[vertA->m_posId].x;
+    u[1]=m_positions[vertB->m_posId].y-m_positions[vertA->m_posId].y;
+    u[2]=m_positions[vertB->m_posId].z-m_positions[vertA->m_posId].z;
+    v[0]=m_positions[vertC->m_posId].x-m_positions[vertA->m_posId].x;
+    v[1]=m_positions[vertC->m_posId].y-m_positions[vertA->m_posId].y;
+    v[2]=m_positions[vertC->m_posId].z-m_positions[vertA->m_posId].z;
+    n[0]=u[1]*v[2]-u[2]*v[1];
+    n[1]=-u[0]*v[2]+u[2]*v[0];
+    n[2]=u[0]*v[1]-u[1]*v[0];
+    l=(float)sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
+    n[0]/=l; n[1]/=l; n[2]/=l;
+    glNormal3fv(n);*/
 
-    g_imRenderer->Normal3fv(m_normals[norm].GetData());
-    g_imRenderer->Color4ub(m_colours[vertB->m_colId].r, m_colours[vertB->m_colId].g, m_colours[vertB->m_colId].b, alpha);
-    g_imRenderer->Vertex3fv(m_positions[vertB->m_posId].GetData());
+    glNormal3fv(m_normals[norm].GetData());
+    glColor4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
+    glVertex3fv(m_positions[vertA->m_posId].GetData());
 
-    g_imRenderer->Normal3fv(m_normals[norm].GetData());
-    g_imRenderer->Color4ub(m_colours[vertC->m_colId].r, m_colours[vertC->m_colId].g, m_colours[vertC->m_colId].b, alpha);
-    g_imRenderer->Vertex3fv(m_positions[vertC->m_posId].GetData());
+    glNormal3fv(m_normals[norm].GetData());
+    glColor4ub(m_colours[vertB->m_colId].r, m_colours[vertB->m_colId].g, m_colours[vertB->m_colId].b, alpha);
+    glVertex3fv(m_positions[vertB->m_posId].GetData());
+
+    glNormal3fv(m_normals[norm].GetData());
+    glColor4ub(m_colours[vertC->m_colId].r, m_colours[vertC->m_colId].g, m_colours[vertC->m_colId].b, alpha);
+    glVertex3fv(m_positions[vertC->m_posId].GetData());
     norm++;
   }
-  g_imRenderer->End();
-
-
-  norm = 0;
-  for (int i = 0; i < m_numTriangles; i++)
-  {
-    const VertexPosCol* vertA = &m_vertices[m_triangles[i].v1];
-    const VertexPosCol* vertB = &m_vertices[m_triangles[i].v2];
-    const VertexPosCol* vertC = &m_vertices[m_triangles[i].v3];
-
-    constexpr unsigned char alpha = 255;
-
-
-    norm++;
-  }
+  glEnd();
 #endif
 }
 
@@ -962,7 +938,7 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
 #ifdef DEBUG_RENDER_ENABLED
   int i;
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
+  glDisable(GL_DEPTH_TEST);
 
   int numMarkers = m_childMarkers.Size();
   for (i = 0; i < numMarkers; ++i)
@@ -971,9 +947,20 @@ void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
     Matrix34 mat = marker->GetWorldMatrix(_rootTransform);
     RenderArrow(mat.pos, mat.pos + mat.f * 20.0f, 2.0f);
     RenderArrow(mat.pos, mat.pos + mat.u * 10.0f, 2.0f);
+    //		glLineWidth(2.0f);
+    //		glColor3f(1,0,0);
+    //        glBegin(GL_LINES);
+    //			glVertex3fv(mat.pos.GetData());
+    //			glVertex3fv((mat.pos + mat.f * 20.0f).GetData());
+    //		glEnd();
+    //		glColor3f(0,1,0);
+    //		glBegin(GL_LINES);
+    //			glVertex3fv(mat.pos.GetData());
+    //			glVertex3fv((mat.pos + mat.u * 10.0f).GetData());
+    //		glEnd();
   }
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  glEnable(GL_DEPTH_TEST);
 
   int numChildren = m_childFragments.Size();
   for (i = 0; i < numChildren; ++i)
@@ -1145,42 +1132,24 @@ Shape::Shape() {}
 
 Shape::Shape(const char* filename, bool _animating)
   : m_animating(_animating),
-    m_displayListName(nullptr),
     m_rootFragment(nullptr),
     m_name(nullptr)
 {
   TextFileReader in(filename);
   Load(&in);
-#ifdef USE_DISPLAY_LISTS
-  BuildDisplayList();
-#endif
 }
 
 Shape::Shape(TextReader* in, bool _animating)
   : m_animating(_animating),
-    m_displayListName(nullptr),
     m_rootFragment(nullptr)
 {
   Load(in);
-  BuildDisplayList();
 }
 
 Shape::~Shape()
 {
   delete m_rootFragment;
   free(m_name);
-#ifndef EXPORTER_BUILD
-  g_app->m_resource->DeleteDisplayList(m_displayListName);
-  delete [] m_displayListName;
-  m_displayListName = nullptr;
-#endif
-}
-
-void Shape::BuildDisplayList()
-{
-#ifndef EXPORTER_BUILD
-  // Display lists not supported in D3D11 — shapes always use RenderSlow() path
-#endif
 }
 
 void Shape::Load(TextReader* _in)
@@ -1269,12 +1238,17 @@ void Shape::WriteToFile(FILE* _out) const { m_rootFragment->WriteToFile(_out); }
 void Shape::Render(float _predictionTime, const Matrix34& _transform)
 {
 #ifndef EXPORTER_BUILD
-  g_imRenderer->PushMatrix();
-  g_imRenderer->MultMatrixf(_transform.ConvertToColumnMajor());
+  glEnable(GL_COLOR_MATERIAL);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glMultMatrixf(_transform.ConvertToOpenGLFormat());
 
   m_rootFragment->Render(_predictionTime);
 
-  g_imRenderer->PopMatrix();
+  glDisable(GL_COLOR_MATERIAL);
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+
 #endif
 }
 

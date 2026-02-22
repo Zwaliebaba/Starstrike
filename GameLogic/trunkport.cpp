@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "resource.h"
 #include "debug_utils.h"
 #include "file_writer.h"
@@ -132,24 +129,24 @@ void TrunkPort::Render( float predictionTime )
     Matrix34 portMat( m_front, g_upVector, m_pos );
 
     Matrix34 destMat = m_destination1->GetWorldMatrix(portMat);
-    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 1.0f );
+    glColor4f( 0.9f, 0.8f, 0.8f, 1.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += ( destMat.f ^ destMat.u ) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
-    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 0.0f );
+    glColor4f( 0.9f, 0.8f, 0.8f, 0.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
 
     g_gameFont.SetRenderShadow(false);
-    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 1.0f );
+    glColor4f( 0.9f, 0.8f, 0.8f, 1.0f );
     destMat = m_destination2->GetWorldMatrix(portMat);
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += ( destMat.f ^ destMat.u ) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
-    g_gameFont.SetColour( 0.9f, 0.8f, 0.8f, 0.0f );
+    glColor4f( 0.9f, 0.8f, 0.8f, 0.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
 
     g_gameFont.SetRenderShadow(false);
@@ -215,16 +212,17 @@ void TrunkPort::RenderAlphas( float predictionTime )
 
         START_PROFILE( g_app->m_profiler, "Render Heightmap" );
 
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+        glDisable       ( GL_CULL_FACE );
+        glEnable        ( GL_BLEND );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDepthMask     ( false );
 
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence.bmp" ) );
+        glEnable        ( GL_TEXTURE_2D );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laserfence.bmp" ) );
 
         float alphaValue = timeOpen;
         if( alphaValue > 0.7f ) alphaValue = 0.7f;
-        g_imRenderer->Color4f( 0.8f, 0.8f, 1.0f, alphaValue );
+        glColor4f       ( 0.8f, 0.8f, 1.0f, alphaValue );
 
         for( int x = 0; x < m_heightMapSize-1; ++x )
         {
@@ -239,19 +237,18 @@ void TrunkPort::RenderAlphas( float predictionTime )
                 float fractionZ = (float) z / (float) m_heightMapSize;
                 float width = 1.0f / m_heightMapSize;
 
-                g_imRenderer->Begin(PRIM_QUADS);
-                    g_imRenderer->TexCoord2f( fractionX, fractionZ );               g_imRenderer->Vertex3fv( thisPos1.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX+width, fractionZ );         g_imRenderer->Vertex3fv( thisPos2.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX+width, fractionZ+width );   g_imRenderer->Vertex3fv( thisPos3.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX, fractionZ+width );         g_imRenderer->Vertex3fv( thisPos4.GetData() );
-                g_imRenderer->End();
-
+                glBegin( GL_QUADS );
+                    glTexCoord2f( fractionX, fractionZ );               glVertex3fv( thisPos1.GetData() );
+                    glTexCoord2f( fractionX+width, fractionZ );         glVertex3fv( thisPos2.GetData() );
+                    glTexCoord2f( fractionX+width, fractionZ+width );   glVertex3fv( thisPos3.GetData() );
+                    glTexCoord2f( fractionX, fractionZ+width );         glVertex3fv( thisPos4.GetData() );
+                glEnd();
             }
         }
 
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
-        g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 1.0f );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
+        glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
+        glColor4f       ( 1.0f, 1.0f, 1.0f, 1.0f );
 
         for( int x = 0; x < m_heightMapSize-1; ++x )
         {
@@ -266,20 +263,21 @@ void TrunkPort::RenderAlphas( float predictionTime )
                 float fractionZ = (float) z / (float) m_heightMapSize;
                 float width = 1.0f / m_heightMapSize;
 
-                g_imRenderer->Begin(PRIM_QUADS);
-                    g_imRenderer->TexCoord2f( fractionX, fractionZ );               g_imRenderer->Vertex3fv( thisPos1.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX+width, fractionZ );         g_imRenderer->Vertex3fv( thisPos2.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX+width, fractionZ+width );   g_imRenderer->Vertex3fv( thisPos3.GetData() );
-                    g_imRenderer->TexCoord2f( fractionX, fractionZ+width );         g_imRenderer->Vertex3fv( thisPos4.GetData() );
-                g_imRenderer->End();
-
+                glBegin( GL_QUADS );
+                    glTexCoord2f( fractionX, fractionZ );               glVertex3fv( thisPos1.GetData() );
+                    glTexCoord2f( fractionX+width, fractionZ );         glVertex3fv( thisPos2.GetData() );
+                    glTexCoord2f( fractionX+width, fractionZ+width );   glVertex3fv( thisPos3.GetData() );
+                    glTexCoord2f( fractionX, fractionZ+width );         glVertex3fv( thisPos4.GetData() );
+                glEnd();
             }
         }
 
+        glDisable       ( GL_TEXTURE_2D );
 
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-        g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+        glDepthMask     ( true );
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable       ( GL_BLEND );
+        glEnable        ( GL_CULL_FACE );
 
         END_PROFILE( g_app->m_profiler, "Render Heightmap" );
 

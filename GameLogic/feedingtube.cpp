@@ -1,12 +1,10 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <math.h>
 
 #include "debug_render.h"
 #include "math_utils.h"
+#include "ogl_extensions.h"
 #include "profiler.h"
 #include "resource.h"
 #include "shape.h"
@@ -22,6 +20,7 @@
 #include "global_world.h"
 
 #include "feedingtube.h"
+
 
 
 FeedingTube::FeedingTube()
@@ -159,24 +158,46 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     float numRadii = 20.0f;
     int numSteps = int( distance / 200.0f );
     numSteps = max( 1, numSteps );
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_imRenderer->Color4f(1.0f,1.0f,1.0f,_alpha);
+    glEnable            (GL_TEXTURE_2D);
 
-	g_imRenderer->Translatef( startPos.x, startPos.y, startPos.z );
+    gglActiveTextureARB  (GL_TEXTURE0_ARB);
+    glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
+	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
+    glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
+    glEnable            (GL_TEXTURE_2D);
+
+    gglActiveTextureARB  (GL_TEXTURE1_ARB);
+    glBindTexture	    (GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
+	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
+    glTexEnvf           (GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_MODULATE);
+    glEnable            (GL_TEXTURE_2D);
+
+    glDisable           (GL_CULL_FACE);
+    glBlendFunc         (GL_SRC_ALPHA, GL_ONE);
+    glEnable            (GL_BLEND);
+    glDepthMask         (false);
+    glColor4f           (1.0f,1.0f,1.0f,_alpha);
+
+    glMatrixMode        (GL_MODELVIEW);
+    glTranslatef        ( startPos.x, startPos.y, startPos.z );
 	LegacyVector3 dishFront   = GetForwardsClippingDir(_predictionTime, receiver);
     double eqn1[4]      = { dishFront.x, dishFront.y, dishFront.z, -1.0f };
+    glClipPlane         (GL_CLIP_PLANE0, eqn1 );
 
 
     LegacyVector3 receiverPos = receiver->GetDishPos( _predictionTime );
     LegacyVector3 receiverFront = receiver->GetForwardsClippingDir( _predictionTime, this );
-    g_imRenderer->Translatef( -startPos.x, -startPos.y, -startPos.z );
-    g_imRenderer->Translatef( receiverPos.x, receiverPos.y, receiverPos.z );
+    glTranslatef        ( -startPos.x, -startPos.y, -startPos.z );
+    glTranslatef        ( receiverPos.x, receiverPos.y, receiverPos.z );
 
     LegacyVector3 diff = receiverPos - startPos;
     float thisDistance = -(receiverFront * diff);
@@ -184,15 +205,14 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     thisDistance = -1.0f;
 
     double eqn2[4]      = { receiverFront.x, receiverFront.y, receiverFront.z, thisDistance };
-    g_imRenderer->Translatef( -receiverPos.x, -receiverPos.y, -receiverPos.z );
+    glClipPlane         (GL_CLIP_PLANE1, eqn2 );
+    glTranslatef        ( -receiverPos.x, -receiverPos.y, -receiverPos.z );
 
 
-	//RenderArrow(startPos, startPos + dishFront * 100, 2.0f, RGBAColour( 0, 255, 0, 255 ) );
-	//RenderArrow(endPos, endPos + receiverFront * 100, 2.0f, RGBAColour( 255, 0, 0, 255 ) );
-	//RenderArrow(startPos, endPos, 2.0f );
+    glTranslatef        ( startPos.x, startPos.y, startPos.z );
 
-    g_imRenderer->Translatef( startPos.x, startPos.y, startPos.z );
-
+    glEnable            (GL_CLIP_PLANE0);
+    glEnable            (GL_CLIP_PLANE1);
 
     float texXInner = -g_gameTime/_radius;
     float texXOuter = -g_gameTime;
@@ -200,7 +220,7 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
     //float texXInner = -1.0f/_radius;
     //float texXOuter = -1.0f;
 	if (true) {
-    g_imRenderer->Begin(PRIM_QUAD_STRIP);
+    glBegin( GL_QUAD_STRIP );
 
     for( int s = 0; s < numSteps; ++s )
     {
@@ -211,29 +231,13 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 
         for( int r = 0; r <= numRadii; ++r )
         {
-            g_imRenderer->Vertex3fv( (currentPos + deltaFrom).GetData() );
+            gglMultiTexCoord2fARB    ( GL_TEXTURE0_ARB, texXInner, r/numRadii );
+            gglMultiTexCoord2fARB    ( GL_TEXTURE1_ARB, texXOuter, r/numRadii );
+            glVertex3fv             ( (currentPos + deltaFrom).GetData() );
 
-            g_imRenderer->Vertex3fv( (currentPos + deltaTo).GetData() );
-
-            currentPos.RotateAround( deltaNorm * ( 2.0f * M_PI / (float) numRadii ) );
-        }
-
-        texXInner += 10.0f / (float) numSteps;
-        texXOuter += distance/(200.0f * (float) numSteps);
-    }
-
-    g_imRenderer->End();
-
-
-    for( int s = 0; s < numSteps; ++s )
-    {
-        LegacyVector3 deltaFrom = 1.2f * delta * (float) s / (float) numSteps;
-        LegacyVector3 deltaTo = 1.2f * delta * (float) (s+1) / (float) numSteps;
-
-        LegacyVector3 currentPos = (-delta*0.1f) + LegacyVector3(0,_radius,0);
-
-        for( int r = 0; r <= numRadii; ++r )
-        {
+            gglMultiTexCoord2fARB    ( GL_TEXTURE0_ARB, texXInner+10.0f/(float)numSteps, (r)/numRadii );
+            gglMultiTexCoord2fARB    ( GL_TEXTURE1_ARB, texXOuter+distance/(200.0f *(float)numSteps), (r)/numRadii );
+            glVertex3fv             ( (currentPos + deltaTo).GetData() );
 
             currentPos.RotateAround( deltaNorm * ( 2.0f * M_PI / (float) numRadii ) );
         }
@@ -242,12 +246,28 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
         texXOuter += distance/(200.0f * (float) numSteps);
     }
 
+    glEnd();
 	}
-	g_imRenderer->Translatef( -startPos.x, -startPos.y, -startPos.z );
+    glTranslatef        ( -startPos.x, -startPos.y, -startPos.z );
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDisable           (GL_CLIP_PLANE0);
+    glDisable           (GL_CLIP_PLANE1);
+    glDepthMask         (true);
+    glDisable           (GL_BLEND);
+    glBlendFunc         (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable            (GL_CULL_FACE);
+
+    gglActiveTextureARB  (GL_TEXTURE1_ARB);
+    glDisable           (GL_TEXTURE_2D);
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+
+    gglActiveTextureARB  (GL_TEXTURE0_ARB);
+    glDisable           (GL_TEXTURE_2D);
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    glTexParameteri	    (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    glTexEnvf           (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
 	END_PROFILE(g_app->m_profiler, "Signal");
 }
 

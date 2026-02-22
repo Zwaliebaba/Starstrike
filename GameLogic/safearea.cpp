@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
 
 #include "debug_render.h"
 #include "file_writer.h"
@@ -18,6 +17,7 @@
 #include "main.h"
 #include "particle_system.h"
 #include "global_world.h"
+
 
 
 SafeArea::SafeArea()
@@ -110,8 +110,9 @@ void SafeArea::Render( float predictionTime )
         int numSteps = 30;
         float angle = 0.0f;
 
-        g_imRenderer->Color4ubv(colour.GetData() );
-        g_imRenderer->Begin(PRIM_LINE_LOOP);
+        glColor4ubv(colour.GetData() );
+        glLineWidth( 2.0f );
+        glBegin( GL_LINE_LOOP );
         for( int i = 0; i <= numSteps; ++i )
         {
             float xDiff = m_size * sinf(angle);
@@ -119,20 +120,10 @@ void SafeArea::Render( float predictionTime )
             LegacyVector3 pos = m_pos + LegacyVector3(xDiff,5,zDiff);
 	        pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 10.0f;
             if( pos.y < 2 ) pos.y = 2;
-            g_imRenderer->Vertex3fv( pos.GetData() );
+            glVertex3fv( pos.GetData() );
             angle += 2.0f * M_PI / (float) numSteps;
         }
-        g_imRenderer->End();
-
-        for( int i = 0; i <= numSteps; ++i )
-        {
-            float xDiff = m_size * sinf(angle);
-            float zDiff = m_size * cosf(angle);
-            LegacyVector3 pos = m_pos + LegacyVector3(xDiff,5,zDiff);
-	        pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 10.0f;
-            if( pos.y < 2 ) pos.y = 2;
-            angle += 2.0f * M_PI / (float) numSteps;
-        }
+        glEnd();
     }
     else
     {

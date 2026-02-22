@@ -7,7 +7,6 @@
 #include "profiler.h"
 #include "rgb_colour.h"
 #include "preferences.h"
-#include "texture_manager.h"
 #include "app.h"
 
 #define BMP_RGB				0
@@ -706,9 +705,57 @@ void BitmapRGBA::Clear(const RGBAColour& colour)
 
 int BitmapRGBA::ConvertToTexture(bool _mipmapping) const
 {
-  if (!g_textureManager)
-    return 0;
+  unsigned int texId;
 
-  int texId = g_textureManager->CreateTexture(m_pixels, m_width, m_height, _mipmapping);
-  return texId;
+  glEnable(GL_TEXTURE_2D);
+  glGenTextures(1, &texId);
+  glBindTexture(GL_TEXTURE_2D, texId);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+  //    bool texturingWasEnabled = glIsEnabled(GL_TEXTURE_2D);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+  if (_mipmapping)
+  {
+    int newWidth = 1 << static_cast<int>(ceil(log((float)m_width) / log(2.0f)));
+    int newHeight = 1 << static_cast<int>(ceil(log((float)m_height) / log(2.0f)));
+
+    if (newHeight < newWidth)
+      newHeight = newWidth;
+    else if (newWidth < newHeight)
+      newWidth = newHeight;
+
+    int result;
+
+    bool sameDimensions = (m_width == newWidth && m_height == newHeight);
+    bool scale = static_cast<bool>(g_prefsManager->GetInt("ManuallyScaleTextures", 0));
+
+    if (sameDimensions || !scale)
+    {
+      result = gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_pixels);
+    }
+    else
+    {
+      // Scale the bitmap ourselves
+
+      BitmapRGBA scaled(newWidth, newHeight);
+      scaled.Blit(0, 0, m_width, m_height, this, 0, 0, newWidth, newHeight, true);
+
+      result = gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, scaled.m_width, scaled.m_height, GL_RGBA, GL_UNSIGNED_BYTE, scaled.m_pixels);
+    }
+
+    DarwiniaReleaseAssert(result == 0, "ConvertToTexture failed with error : %s", gluErrorString(result));
+  }
+  else
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixels);
+
+  //    if (!texturingWasEnabled)
+  //    {
+  //        glDisable(GL_TEXTURE_2D);
+  //    }
+
+  return static_cast<int>(texId);
 }

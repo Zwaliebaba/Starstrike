@@ -17,7 +17,7 @@ class Matrix34
 public:
 	LegacyVector3 r, u, f, pos;
 
-	static float m_columnMajor[16];
+	static float m_openGLFormat[16];
 
 	// Constructors
 	Matrix34() {}
@@ -88,26 +88,26 @@ public:
     bool            IsNormalised    ();
     void			Normalise		();
 
-	float *ConvertToColumnMajor() const
+	float *ConvertToOpenGLFormat() const
 	{
-		m_columnMajor[0] = r.x;
-		m_columnMajor[1] = r.y;
-		m_columnMajor[2] = r.z;
-		m_columnMajor[3] = 0.0f;
-		m_columnMajor[4] = u.x;
-		m_columnMajor[5] = u.y;
-		m_columnMajor[6] = u.z;
-		m_columnMajor[7] = 0.0f;
-		m_columnMajor[8] = f.x;
-		m_columnMajor[9] = f.y;
-		m_columnMajor[10] = f.z;
-		m_columnMajor[11] = 0.0f;
-		m_columnMajor[12] = pos.x;
-		m_columnMajor[13] = pos.y;
-		m_columnMajor[14] = pos.z;
-		m_columnMajor[15] = 1.0f;
+		m_openGLFormat[0] = r.x;
+		m_openGLFormat[1] = r.y;
+		m_openGLFormat[2] = r.z;
+		m_openGLFormat[3] = 0.0f;
+		m_openGLFormat[4] = u.x;
+		m_openGLFormat[5] = u.y;
+		m_openGLFormat[6] = u.z;
+		m_openGLFormat[7] = 0.0f;
+		m_openGLFormat[8] = f.x;
+		m_openGLFormat[9] = f.y;
+		m_openGLFormat[10] = f.z;
+		m_openGLFormat[11] = 0.0f;
+		m_openGLFormat[12] = pos.x;
+		m_openGLFormat[13] = pos.y;
+		m_openGLFormat[14] = pos.z;
+		m_openGLFormat[15] = 1.0f;
 
-		return m_columnMajor;
+		return m_openGLFormat;
 	}
 
 	Matrix33 GetOr() const

@@ -8,10 +8,6 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
-#include "texture_manager.h"
 
 #include "app.h"
 #include "camera.h"
@@ -174,29 +170,31 @@ void Particle::Render(float _predictionTime)
 	LegacyVector3 up(g_app->m_camera->GetUp() * size);
 	LegacyVector3 right(g_app->m_camera->GetRight() * size);
 
-	if( m_typeId == TypeMissileTrail )
-	{
-		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-		float fraction = (float) alpha / 100.0f;
-		g_imRenderer->Color4ub(m_colour.r*fraction, m_colour.g*fraction, m_colour.b*fraction, 0);
-	}
-	else
-	{
-		g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-		g_imRenderer->Color4ub(m_colour.r, m_colour.g, m_colour.b, alpha);
-	}
+    if( m_typeId == TypeMissileTrail )
+    {
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
+        float fraction = (float) alpha / 100.0f;
+        glColor4ub(m_colour.r*fraction, m_colour.g*fraction, m_colour.b*fraction, 0.0f );
+    }
+    else
+    {
+        glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
+        glColor4ub(m_colour.r, m_colour.g, m_colour.b, alpha );
+    }
 
-	g_imRenderer->Begin( PRIM_QUADS );
-		g_imRenderer->TexCoord2i(0, 0);
-		g_imRenderer->Vertex3fv( (predictedPos - up).GetData() );
-		g_imRenderer->TexCoord2i(0, 1);
-		g_imRenderer->Vertex3fv( (predictedPos + right).GetData() );
-		g_imRenderer->TexCoord2i(1, 1);
-		g_imRenderer->Vertex3fv( (predictedPos + up).GetData() );
-		g_imRenderer->TexCoord2i(1, 0);
-		g_imRenderer->Vertex3fv( (predictedPos - right).GetData() );
-	g_imRenderer->End();
+    glBegin( GL_QUADS );
+		glTexCoord2i(0, 0);
+        glVertex3fv( (predictedPos - up).GetData() );
 
+		glTexCoord2i(0, 1);
+        glVertex3fv( (predictedPos + right).GetData() );
+
+		glTexCoord2i(1, 1);
+		glVertex3fv( (predictedPos + up).GetData() );
+
+		glTexCoord2i(1, 0);
+		glVertex3fv( (predictedPos - right).GetData() );
+    glEnd();
 }
 
 
@@ -351,44 +349,47 @@ void ParticleSystem::Advance(int _slice)
 // *** Render
 void ParticleSystem::Render()
 {
-	START_PROFILE(g_app->m_profiler, "Render Particles");
+    START_PROFILE(g_app->m_profiler, "Render Particles");
 
-	int texId = g_app->m_resource->GetTexture("textures/particle.bmp");
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-	g_imRenderer->BindTexture(texId);
-	g_imRenderer->SetSampler(SAMPLER_NEAREST_CLAMP);
+    glDisable   ( GL_CULL_FACE );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
+
+    glEnable    ( GL_BLEND );
+	glEnable	( GL_TEXTURE_2D );
+	glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/particle.bmp"));
+	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    glDepthMask ( false );
 
 
 	// Render all the particles that are up-to-date with server advances
-	int lastUpdated = m_particles.GetLastUpdated();
-	int size = m_particles.Size();
+    int lastUpdated = m_particles.GetLastUpdated();
+  	int size = m_particles.Size();
 
-	for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
 	{
-		if (m_particles.ValidIndex(i))
-		{
-			Particle *p = m_particles.GetPointer(i);
+        if (m_particles.ValidIndex(i))
+        {
+            Particle *p = m_particles.GetPointer(i);
 
-			if( i <= lastUpdated )
-			{
-				p->Render(g_predictionTime);
-			}
-			else
-			{
-				p->Render(g_predictionTime+SERVER_ADVANCE_PERIOD);
-			}
-		}
+            if( i <= lastUpdated )
+            {
+			    p->Render(g_predictionTime);
+            }
+            else
+            {
+                p->Render(g_predictionTime+SERVER_ADVANCE_PERIOD);
+            }
+        }
 	}
 
-	g_imRenderer->UnbindTexture();
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDepthMask ( true );
+	glDisable	( GL_TEXTURE_2D );
+	glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glDisable   ( GL_BLEND );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glEnable    ( GL_CULL_FACE );
 
-
-	END_PROFILE(g_app->m_profiler, "Render Particles");
+    END_PROFILE(g_app->m_profiler, "Render Particles");
 }
 
 

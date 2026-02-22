@@ -10,7 +10,7 @@ class Matrix33
 public:
 	LegacyVector3 r, u, f;
 
-	static float m_columnMajor[16];
+	static float m_openGLFormat[16];
 
 	// Constructors
 	Matrix33();
@@ -45,7 +45,7 @@ public:
 	LegacyVector3			InverseMultiplyVector(LegacyVector3 const &) const;
 
 	void OutputToDebugStream();
-	float *ConvertToColumnMajor(LegacyVector3 const *_pos = NULL);
+	float *ConvertToOpenGLFormat(LegacyVector3 const *_pos = NULL);
 
 	// Operators
 	Matrix33 const &operator =  ( Matrix33 const &_o );

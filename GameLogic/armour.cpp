@@ -503,6 +503,8 @@ void Armour::Render(float _predictionTime)
 
   if (m_renderDamaged)
   {
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_BLEND);
 
     if (frand() > 0.5f)
       bodyMat.r *= (1.0f + sinf(g_gameTime) * 0.5f);
@@ -513,6 +515,9 @@ void Armour::Render(float _predictionTime)
   g_app->m_renderer->SetObjectLighting();
   m_shape->Render(_predictionTime, bodyMat);
   g_app->m_renderer->UnsetObjectLighting();
+
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   //
   // Render the flag

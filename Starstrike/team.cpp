@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
@@ -343,7 +340,12 @@ void Team::Render()
 
   float timeSinceAdvance = g_predictionTime;
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glEnable(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glEnable(GL_BLEND);
+  glEnable(GL_ALPHA_TEST);
+  glAlphaFunc(GL_GREATER, 0.02f);
 
   for (int i = 0; i < m_units.Size(); ++i)
   {
@@ -359,35 +361,43 @@ void Team::Render()
     }
   }
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_imRenderer->UnbindTexture();
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_ALPHA_TEST);
+  glDisable(GL_BLEND);
+  glDisable(GL_TEXTURE_2D);
+  glAlphaFunc(GL_GREATER, 0.01f);
 
   END_PROFILE(g_app->m_profiler, "Render Units");
 
   //
   // Render Others
 
+  CHECK_OPENGL_STATE();
   START_PROFILE(g_app->m_profiler, "Render Others");
   RenderOthers(timeSinceAdvance);
   END_PROFILE(g_app->m_profiler, "Render Others");
+  CHECK_OPENGL_STATE();
 
   //
   // Render Virii
 
+  CHECK_OPENGL_STATE();
   if (m_teamId == 1 && m_teamType == TeamTypeCPU)
   {
     START_PROFILE(g_app->m_profiler, "Render Virii");
     RenderVirii(timeSinceAdvance);
     END_PROFILE(g_app->m_profiler, "Render Virii");
   }
+  CHECK_OPENGL_STATE();
 
   //
   // Render Darwinians
 
+  CHECK_OPENGL_STATE();
   START_PROFILE(g_app->m_profiler, "Render Darwinians");
   RenderDarwinians(timeSinceAdvance);
   END_PROFILE(g_app->m_profiler, "Render Darwinians");
+  CHECK_OPENGL_STATE();
 }
 
 void Team::RenderVirii(float _predictionTime)
@@ -403,12 +413,16 @@ void Team::RenderVirii(float _predictionTime)
   //
   // Render Red Virii shapes
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("sprites/viriifull.bmp"));
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/viriifull.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_imRenderer->Begin(PRIM_QUADS);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glDepthMask(false);
+  glDisable(GL_CULL_FACE);
+  glBegin(GL_QUADS);
 
   int entityDetail = g_prefsManager->GetInt("RenderEntityDetail");
 
@@ -447,12 +461,14 @@ void Team::RenderVirii(float _predictionTime)
     }
   }
 
-  g_imRenderer->End();
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glEnd();
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_BLEND);
+  glEnable(GL_CULL_FACE);
+  glDepthMask(true);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
 }
@@ -464,9 +480,14 @@ void Team::RenderDarwinians(float _predictionTime)
 
   int lastUpdated = m_others.GetLastUpdated();
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glEnable(GL_BLEND);
+  glEnable(GL_ALPHA_TEST);
+  glAlphaFunc(GL_GREATER, 0.04f);
+  glDisable(GL_CULL_FACE);
 
   int entityDetail = g_prefsManager->GetInt("RenderEntityDetail", 1);
   float highDetailDistanceSqd = 0.0f;
@@ -504,9 +525,11 @@ void Team::RenderDarwinians(float _predictionTime)
     }
   }
 
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+  glDisable(GL_ALPHA_TEST);
+  glAlphaFunc(GL_GREATER, 0.01);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_BLEND);
+  glEnable(GL_CULL_FACE);
 }
 
 void Team::RenderOthers(float _predictionTime)

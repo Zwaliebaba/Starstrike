@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "resource.h"
 #include "math_utils.h"
 #include "preferences.h"
@@ -122,9 +119,11 @@ void Spam::RenderAlphas(float _predictionTime)
   LegacyVector3 camUp = g_app->m_camera->GetUp();
   LegacyVector3 camRight = g_app->m_camera->GetRight();
 
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+  glDepthMask(false);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
 
   float timeIndex = g_gameTime + m_id.GetUniqueId() * 10.0f;
 
@@ -151,22 +150,21 @@ void Spam::RenderAlphas(float _predictionTime)
     size = max(size, 2.0f);
 
     //glColor4f( 0.6f, 0.2f, 0.1f, alpha);
-    g_imRenderer->Color4f(0.9f, 0.2f, 0.2f, alpha);
+    glColor4f(0.9f, 0.2f, 0.2f, alpha);
 
     if (m_research)
-      g_imRenderer->Color4f(0.1f, 0.2f, 0.8f, alpha);
+      glColor4f(0.1f, 0.2f, 0.8f, alpha);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex3fv((pos - camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex3fv((pos + camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex3fv((pos + camRight * size - camUp * size).GetData());
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex3fv((pos - camRight * size - camUp * size).GetData());
-    g_imRenderer->End();
-
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3fv((pos - camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 0);
+    glVertex3fv((pos + camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 1);
+    glVertex3fv((pos + camRight * size - camUp * size).GetData());
+    glTexCoord2i(0, 1);
+    glVertex3fv((pos - camRight * size - camUp * size).GetData());
+    glEnd();
   }
 
   //
@@ -175,7 +173,7 @@ void Spam::RenderAlphas(float _predictionTime)
   alpha = 1.0f - m_timer / SpamReloadTime();
   alpha *= 0.3f;
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
 
   int numStars = 10;
   if (buildingDetail == 2)
@@ -195,25 +193,24 @@ void Spam::RenderAlphas(float _predictionTime)
       size = i * 20 * alpha;
 
     //glColor4f( 1.0f, 0.4f, 0.2f, alpha );
-    g_imRenderer->Color4f(0.8f, 0.2f, 0.2f, alpha);
+    glColor4f(0.8f, 0.2f, 0.2f, alpha);
 
     if (m_research)
-      g_imRenderer->Color4f(0.1f, 0.2f, 0.8f, alpha);
+      glColor4f(0.1f, 0.2f, 0.8f, alpha);
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex3fv((pos - camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex3fv((pos + camRight * size + camUp * size).GetData());
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex3fv((pos + camRight * size - camUp * size).GetData());
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex3fv((pos - camRight * size - camUp * size).GetData());
-    g_imRenderer->End();
-
+    glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3fv((pos - camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 0);
+    glVertex3fv((pos + camRight * size + camUp * size).GetData());
+    glTexCoord2i(1, 1);
+    glVertex3fv((pos + camRight * size - camUp * size).GetData());
+    glTexCoord2i(0, 1);
+    glVertex3fv((pos - camRight * size - camUp * size).GetData());
+    glEnd();
   }
 
-  g_imRenderer->UnbindTexture();
+  glDisable(GL_TEXTURE_2D);
 }
 
 void Spam::SpawnInfection()
@@ -587,7 +584,8 @@ void SpamInfection::Render(float _time)
   //RenderSphere( predictedPos, 200.0f, RGBAColour(255,0,0,255) );
   //RenderArrow( predictedPos, m_targetPos, 1.0f, RGBAColour(255,255,255,255) );
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_BLEND);
   //glDepthMask( false );
   int maxLength = SPAMINFECTION_TAILLENGTH * (m_life / SPAMINFECTION_LIFE);
   maxLength = max(maxLength, 2);
@@ -596,8 +594,9 @@ void SpamInfection::Render(float _time)
   LegacyVector3 camPos = g_app->m_camera->GetPos();
   int numRepeats = 4;
 
-  g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
   for (int j = 0; j < numRepeats; ++j)
   {
@@ -606,45 +605,44 @@ void SpamInfection::Render(float _time)
     {
       float alpha = 1.0f - i / static_cast<float>(maxLength);
       alpha *= 0.75f;
-      g_imRenderer->Color4f(1.0f, 0.1f, 0.1f, alpha);
+      glColor4f(1.0f, 0.1f, 0.1f, alpha);
       LegacyVector3 thisPos = *m_positionHistory.GetPointer(i);
       LegacyVector3 lastPos = *m_positionHistory.GetPointer(i - 1);
       LegacyVector3 rightAngle = (thisPos - lastPos) ^ (camPos - thisPos);
       rightAngle.SetLength(size);
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2f(0.2f, 0.0f);
-      g_imRenderer->Vertex3fv((thisPos - rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.2f, 1.0f);
-      g_imRenderer->Vertex3fv((thisPos + rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.8f, 1.0f);
-      g_imRenderer->Vertex3fv((lastPos + rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.8f, 0.0f);
-      g_imRenderer->Vertex3fv((lastPos - rightAngle).GetData());
-      g_imRenderer->End();
-
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.2f, 0.0f);
+      glVertex3fv((thisPos - rightAngle).GetData());
+      glTexCoord2f(0.2f, 1.0f);
+      glVertex3fv((thisPos + rightAngle).GetData());
+      glTexCoord2f(0.8f, 1.0f);
+      glVertex3fv((lastPos + rightAngle).GetData());
+      glTexCoord2f(0.8f, 0.0f);
+      glVertex3fv((lastPos - rightAngle).GetData());
+      glEnd();
     }
     if (m_positionHistory.Size() > 0)
     {
-      g_imRenderer->Color4f(1.0f, 0.0f, 0.0f, 1.0f);
+      glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
       LegacyVector3 lastPos = *m_positionHistory.GetPointer(0);
       LegacyVector3 thisPos = predictedPos;
       LegacyVector3 rightAngle = (thisPos - lastPos) ^ (camPos - thisPos);
       rightAngle.SetLength(size);
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2f(0.2f, 0.0f);
-      g_imRenderer->Vertex3fv((thisPos - rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.2f, 1.0f);
-      g_imRenderer->Vertex3fv((thisPos + rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.8f, 1.0f);
-      g_imRenderer->Vertex3fv((lastPos + rightAngle).GetData());
-      g_imRenderer->TexCoord2f(0.8f, 0.0f);
-      g_imRenderer->Vertex3fv((lastPos - rightAngle).GetData());
-      g_imRenderer->End();
-
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.2f, 0.0f);
+      glVertex3fv((thisPos - rightAngle).GetData());
+      glTexCoord2f(0.2f, 1.0f);
+      glVertex3fv((thisPos + rightAngle).GetData());
+      glTexCoord2f(0.8f, 1.0f);
+      glVertex3fv((lastPos + rightAngle).GetData());
+      glTexCoord2f(0.8f, 0.0f);
+      glVertex3fv((lastPos - rightAngle).GetData());
+      glEnd();
     }
   }
 
   //glDepthMask( true );
-  g_imRenderer->UnbindTexture();
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
+  glShadeModel(GL_FLAT);
 }

@@ -1,10 +1,6 @@
 #include "pch.h"
 #include <float.h>
 
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
-
 #include "math_utils.h"
 #include "debug_utils.h"
 #include "vector2.h"
@@ -185,7 +181,7 @@ void Route::Render()
 #ifdef DEBUG_RENDER_ENABLED
     LegacyVector3 lastPos;
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
+    glDisable( GL_DEPTH_TEST );
 
     for( int i = 0; i < m_wayPoints.Size(); ++i )
     {
@@ -198,7 +194,7 @@ void Route::Render()
         lastPos = thisPos;
     }
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+    glEnable( GL_DEPTH_TEST );
 #endif
 }
 

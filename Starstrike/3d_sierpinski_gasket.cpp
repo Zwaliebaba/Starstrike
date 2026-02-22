@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "math_utils.h"
 #include "matrix34.h"
 #include "LegacyVector3.h"
@@ -72,27 +69,29 @@ Sierpinski3D::~Sierpinski3D()
 
 void Sierpinski3D::Render(float scale)
 {
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDisable(GL_LIGHTING);
+	glPointSize(3.0f);
 	//glDepthMask(false);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-    g_imRenderer->UnbindTexture();
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-	g_imRenderer->Scalef(scale, scale, scale);
+	glDisable(GL_DEPTH_TEST);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_CULL_FACE);
+	glScalef(scale, scale, scale);
 
 	float alpha = 128.0f * scale;
-	g_imRenderer->Color4ub(alpha*0.4f, alpha*0.7f, alpha, 128);
+	glColor4ub(alpha*0.4f, alpha*0.7f, alpha, 128);
 
-	g_imRenderer->Begin(PRIM_POINTS);
+	glBegin(GL_POINTS);
 		for (unsigned int i = 0; i < m_numPoints; ++i)
 		{
-			g_imRenderer->Vertex3fv(m_points[i].GetData());
+			glVertex3fv(m_points[i].GetData());
 		}
-	g_imRenderer->End();
+	glEnd();
 
-		for (unsigned int i = 0; i < m_numPoints; ++i)
-		{
-		}
-
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(true);
+	glEnable(GL_LIGHTING);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_BLEND);
 }

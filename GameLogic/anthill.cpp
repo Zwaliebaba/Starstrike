@@ -399,10 +399,15 @@ void AntHill::Render( float _predictionTime )
         if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.7f );
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.7f );
-
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_ONE, GL_ONE );
     }
 
     m_shape->Render(_predictionTime, mat);
+
+    glDisable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
 
 #ifdef DEBUG_RENDER_ENABLED
     //g_editorFont.DrawText3DCentre( m_pos + LegacyVector3(0,140,0), 20, "Health %d", m_health );

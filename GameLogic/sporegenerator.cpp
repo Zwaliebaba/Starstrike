@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 #include <math.h>
 
@@ -301,7 +298,12 @@ void SporeGenerator::RenderTail( LegacyVector3 const &_from, LegacyVector3 const
     LegacyVector3 normal = right ^ lineVector;
     normal.Normalise();
 
+    glNormal3fv( normal.GetData() );
 
+    glVertex3fv( (_from - lineOurPos).GetData() );
+    glVertex3fv( (_from + lineOurPos).GetData() );
+    glVertex3fv( (_to - lineOurPos).GetData() );
+    glVertex3fv( (_to + lineOurPos).GetData() );
 }
 
 
@@ -321,7 +323,8 @@ void SporeGenerator::Render( float _predictionTime )
     // 3d Shape
 
 	g_app->m_renderer->SetObjectLighting();
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+    glDisable       (GL_TEXTURE_2D);
+    glDisable       (GL_BLEND);
 
     Matrix34 mat(entityFront, entityUp, predictedPos);
 
@@ -332,7 +335,8 @@ void SporeGenerator::Render( float _predictionTime )
         if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_ONE, GL_ONE );
     }
 
     m_shape->Render(_predictionTime, mat);
@@ -341,7 +345,8 @@ void SporeGenerator::Render( float _predictionTime )
     //
     // Tails
 
-    g_imRenderer->Color4f( 0.2f, 0.0f, 0.0f, 1.0f );
+    glColor4f       ( 0.2f, 0.0f, 0.0f, 1.0f );
+    glEnable        ( GL_COLOR_MATERIAL );
 
     int numTailParts = 3;
     static LegacyVector3 s_vel;
@@ -353,7 +358,7 @@ void SporeGenerator::Render( float _predictionTime )
         LegacyVector3 prevTailDir = ( prevTailPos - predictedPos );
         prevTailDir.HorizontalAndNormalise();
 
-        g_imRenderer->Begin(PRIM_QUAD_STRIP);
+        glBegin( GL_QUAD_STRIP );
 
         for( int j = 0; j < numTailParts; ++j )
         {
@@ -387,45 +392,12 @@ void SporeGenerator::Render( float _predictionTime )
             prevTailPos = thisTailPos;
         }
 
-        g_imRenderer->End();
-
-
-        for( int j = 0; j < numTailParts; ++j )
-        {
-            LegacyVector3 thisTailPos = prevTailPos + prevTailDir * 15.0f;
-            prevTailDir = ( thisTailPos - prevTailPos );
-            prevTailDir.HorizontalAndNormalise();
-
-            float timeIndex = g_gameTime + i + j + m_id.GetUniqueId()*10;
-            thisTailPos += LegacyVector3(     sinf( timeIndex ) * 10.0f,
-                                        sinf( timeIndex ) * 10.0f,
-                                        sinf( timeIndex ) * 10.0f );
-
-            LegacyVector3 vel = s_vel;
-            vel.SetLength( 10.0f * (float) j / (float) numTailParts );
-            thisTailPos += vel;
-            thisTailPos.y -= 10.0f * (float) j / (float) numTailParts;
-
-            if( m_state == StatePanic )
-            {
-                float panicFraction = 5.0f;
-                thisTailPos += LegacyVector3(     cosf( g_gameTime*panicFraction + i + j ) * 5.0f,
-                                            cosf( g_gameTime*panicFraction + i + j ) * 5.0f,
-                                            cosf( g_gameTime*panicFraction + i + j ) * 5.0f );
-            }
-
-            float size = 1.0f - (float) j / (float) numTailParts;
-            size *= 2.0f;
-            size += sinf(g_gameTime+i+j) * 0.3f;
-
-            RenderTail( prevTailPos, thisTailPos, size );
-            prevTailPos = thisTailPos;
-        }
-
+        glEnd();
     }
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+    glDisable   ( GL_COLOR_MATERIAL );
+    glEnable    ( GL_CULL_FACE );
+    glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	g_app->m_renderer->UnsetObjectLighting();
 
     //
@@ -442,6 +414,7 @@ bool SporeGenerator::IsInView()
 {
     return g_app->m_camera->SphereInViewFrustum( m_pos+m_centrePos, m_radius );
 }
+
 
 
 bool SporeGenerator::RenderPixelEffect( float _predictionTime )

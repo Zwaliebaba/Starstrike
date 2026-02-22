@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 
 
 #include <stdio.h>
@@ -54,6 +51,7 @@ public:
 		}
     }
 };
+
 
 
 // ****************************************************************************
@@ -130,7 +128,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 			int brightness = (time / largestTime) * 150.0f + 105.0f;
 			if (brightness < 105) brightness = 105;
 			else if (brightness > 255) brightness = 255;
-			g_imRenderer->Color3ub( brightness, brightness, brightness );
+			glColor3ub( brightness, brightness, brightness );
 
 			// Deal with mouse clicks to expand or unexpand a node
 			if ( g_inputManager->controlEvent( ControlEclipseLMousePressed ) ) // g_inputManager->GetRawLmbClicked()
@@ -152,14 +150,13 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
             int lineY = m_yPos - 6;
             int lineWidth = sqrtf(time) * 10.0f;
             int lineHeight = 11.0f;
-			g_imRenderer->Color4ub( 150, 150, 250, brightness );
-			g_imRenderer->Begin( PRIM_QUADS );
-				g_imRenderer->Vertex2i( lineLeft, lineY);
-				g_imRenderer->Vertex2i( lineLeft + lineWidth, lineY);
-				g_imRenderer->Vertex2i( lineLeft + lineWidth, lineY + lineHeight );
-				g_imRenderer->Vertex2i( lineLeft, lineY + lineHeight );
-			g_imRenderer->End();
-
+            glColor4ub( 150, 150, 250, brightness );
+            glBegin( GL_QUADS );
+                glVertex2i( lineLeft, lineY);
+                glVertex2i( lineLeft + lineWidth, lineY);
+                glVertex2i( lineLeft + lineWidth, lineY + lineHeight );
+                glVertex2i( lineLeft, lineY + lineHeight );
+            glEnd();
 
 			if (m_yPos > m_h)
 			{
@@ -175,7 +172,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 		i = _pe->m_children.GetNextOrderedIndex();
     }
 
-	g_imRenderer->Color3ub(255,255,255);
+	glColor3ub(255,255,255);
 	g_editorFont.DrawText2D( left + (_indent+1) * 7.5f, m_yPos+=12, DEF_FONT_SIZE, "Total %.0f", totalTime );
 }
 

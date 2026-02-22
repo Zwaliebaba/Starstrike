@@ -1,18 +1,13 @@
 #ifndef INCLUDED_GLOBAL_INTERNET
 #define INCLUDED_GLOBAL_INTERNET
 
-
-#include "fast_darray.h"
 #include "llist.h"
 #include "LegacyVector3.h"
-
 
 #define GLOBALINTERNET_ITERATIONS       7
 #define GLOBALINTERNET_MAXNODES		    13701
 #define GLOBALINTERNET_MAXLINKS		    13700
 #define GLOBALINTERNET_MAXNODELINKS     GLOBALINTERNET_ITERATIONS
-
-
 
 // ****************************************************************************
 // Class GlobalInternetNode
@@ -20,18 +15,17 @@
 
 class GlobalInternetNode
 {
-public:
+  public:
     GlobalInternetNode();
-	void AddLink(int id);
+    void AddLink(int id);
 
-    LegacyVector3			m_pos;
-    unsigned char	m_size;
-    float			m_burst;
+    LegacyVector3 m_pos;
+    unsigned char m_size;
+    float m_burst;
 
-	unsigned short	m_links[GLOBALINTERNET_ITERATIONS];
-	unsigned short	m_numLinks;
+    unsigned short m_links[GLOBALINTERNET_ITERATIONS];
+    unsigned short m_numLinks;
 };
-
 
 //*****************************************************************************
 // Class GlobalInternetLink
@@ -39,13 +33,12 @@ public:
 
 class GlobalInternetLink
 {
-public:
-    unsigned short	m_from;
-    unsigned short	m_to;
-    float			m_size;
-    LList <float>	m_packets;
+  public:
+    unsigned short m_from;
+    unsigned short m_to;
+    float m_size;
+    LList<float> m_packets;
 };
-
 
 //*****************************************************************************
 // Class GlobalInternet
@@ -53,32 +46,29 @@ public:
 
 class GlobalInternet
 {
-protected:
-    GlobalInternetNode      *m_nodes;
-	unsigned short		    m_numNodes;
-    GlobalInternetLink      *m_links;
-	unsigned short	        m_numLinks;
-    LList       <int>       m_leafs;
-    LList       <int>       m_bursts;
+  protected:
+    GlobalInternetNode* m_nodes;
+    unsigned short m_numNodes;
+    GlobalInternetLink* m_links;
+    unsigned short m_numLinks;
+    LList<int> m_leafs;
+    LList<int> m_bursts;
 
-    int                     m_nearestNodeToCentre;
-    float                   m_nearestDistance;
+    int m_nearestNodeToCentre;
+    float m_nearestDistance;
 
-    void            GenerateInternet();
-    unsigned short  GenerateInternet( LegacyVector3 const &_pos, unsigned char _size );
-    void            DeleteInternet();
+    void GenerateInternet();
+    unsigned short GenerateInternet(const LegacyVector3& _pos, unsigned char _size);
+    void DeleteInternet();
 
-    void        TriggerPacket( unsigned short _nodeId, unsigned short _fromLinkId );
+    void TriggerPacket(unsigned short _nodeId, unsigned short _fromLinkId);
 
-public:
+  public:
     GlobalInternet();
-	~GlobalInternet();
+    ~GlobalInternet();
 
     void Render();
     void RenderPackets();
 };
-
-
-
 
 #endif

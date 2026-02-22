@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "limits.h"
 #include "debug_utils.h"
 #include "math_utils.h"
@@ -569,7 +566,9 @@ void Squadie::Render( float _predictionTime )
         // 3d Shape
 
 		g_app->m_renderer->SetObjectLighting();
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+        glDisable       (GL_TEXTURE_2D);
+        glEnable        (GL_COLOR_MATERIAL);
+        glDisable       (GL_BLEND);
 
         Matrix34 mat(entityFront, entityUp, predictedPos);
 
@@ -583,14 +582,17 @@ void Squadie::Render( float _predictionTime )
             if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.5f );
             else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.2f );
             else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
+            glEnable( GL_BLEND );
+            glBlendFunc( GL_ONE, GL_ONE );
         }
 
 
         m_shape->Render(_predictionTime, mat);
 
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
+        glEnable        (GL_BLEND);
+        glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glDisable       (GL_COLOR_MATERIAL);
+        glEnable        (GL_TEXTURE_2D);
 		g_app->m_renderer->UnsetObjectLighting();
     }
 }

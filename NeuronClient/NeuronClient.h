@@ -72,6 +72,7 @@
 #ifdef TARGET_DEBUG
 #define DARWINIA_GAMETYPE "debug"
 #define CHEATMENU_ENABLED
+#define D3D_DEBUG_INFO
 #endif
 
 //#define PROMOTIONAL_BUILD                         // Their company logo is shown on screen
@@ -114,11 +115,8 @@
 #define HAVE_DSOUND
 #endif
 
-#include <d3d11.h>
-#include <DirectXMath.h>
-
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
+#include "DirectXHelper.h"
+#include "opengl_directx.h"
 
 #define SAFE_FREE(x) {free(x);x=NULL;}
 #define SAFE_DELETE(x) {delete x;x=NULL;}

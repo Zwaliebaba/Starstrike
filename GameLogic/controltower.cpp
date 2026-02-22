@@ -1,7 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
-#include "render_device.h"
-#include "render_states.h"
 #include "debug_utils.h"
 #include "file_writer.h"
 #include "matrix34.h"
@@ -311,11 +308,16 @@ void ControlTower::RenderAlphas(float _predictionTime)
   {
     LegacyVector3 controlUp(0, 50.0f + (m_id.GetUniqueId() % 50), 0);
 
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glShadeModel(GL_SMOOTH);
+    glDepthMask(false);
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     float w = (lightPos - g_app->m_camera->GetPos()).Mag() * 0.002f;
     w = max(0.5f, w);
@@ -337,30 +339,30 @@ void ControlTower::RenderAlphas(float _predictionTime)
       float y = static_cast<float>(i) / 10.0f;
       float h = 1.0f / 10.0f;
 
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->Color4ub(colour.r, colour.g, colour.b, alpha);
+      glBegin(GL_QUADS);
+      glColor4ub(colour.r, colour.g, colour.b, alpha);
 
-      g_imRenderer->TexCoord2f(y, 0);
-      g_imRenderer->Vertex3fv((lightPos - camR * w + thisUp1).GetData());
-      g_imRenderer->TexCoord2f(y, 1);
-      g_imRenderer->Vertex3fv((lightPos + camR * w + thisUp1).GetData());
+      glTexCoord2f(y, 0);
+      glVertex3fv((lightPos - camR * w + thisUp1).GetData());
+      glTexCoord2f(y, 1);
+      glVertex3fv((lightPos + camR * w + thisUp1).GetData());
 
-      g_imRenderer->Color4ub(colour.r, colour.g, colour.b, alpha2);
+      glColor4ub(colour.r, colour.g, colour.b, alpha2);
 
-      g_imRenderer->TexCoord2f(y + h, 1);
-      g_imRenderer->Vertex3fv((lightPos + camR * w + thisUp2).GetData());
-      g_imRenderer->TexCoord2f(y + h, 0);
-      g_imRenderer->Vertex3fv((lightPos - camR * w + thisUp2).GetData());
-      g_imRenderer->End();
-
-
+      glTexCoord2f(y + h, 1);
+      glVertex3fv((lightPos + camR * w + thisUp2).GetData());
+      glTexCoord2f(y + h, 0);
+      glVertex3fv((lightPos - camR * w + thisUp2).GetData());
+      glEnd();
     }
 
-    g_imRenderer->UnbindTexture();
+    glDisable(GL_TEXTURE_2D);
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
+    glDepthMask(true);
+    glShadeModel(GL_FLAT);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
   }
 
   //
@@ -376,35 +378,39 @@ void ControlTower::RenderAlphas(float _predictionTime)
 
     float signalSize = m_ownership / 5.0f;
 
-    g_imRenderer->Color4ub(colour.r, colour.g, colour.b, 255);
+    glColor4ub(colour.r, colour.g, colour.b, 255);
 
-    g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glDisable(GL_CULL_FACE);
+    glDepthMask(false);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
     for (int i = 0; i < 10; ++i)
     {
       float size = signalSize * static_cast<float>(i) / 10.0f;
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->TexCoord2f(0.0f, 0.0f);
-      g_imRenderer->Vertex3fv((lightPos - camR * size - camU * size).GetData());
-      g_imRenderer->TexCoord2f(1.0f, 0.0f);
-      g_imRenderer->Vertex3fv((lightPos + camR * size - camU * size).GetData());
-      g_imRenderer->TexCoord2f(1.0f, 1.0f);
-      g_imRenderer->Vertex3fv((lightPos + camR * size + camU * size).GetData());
-      g_imRenderer->TexCoord2f(0.0f, 1.0f);
-      g_imRenderer->Vertex3fv((lightPos - camR * size + camU * size).GetData());
-      g_imRenderer->End();
-
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0f, 0.0f);
+      glVertex3fv((lightPos - camR * size - camU * size).GetData());
+      glTexCoord2f(1.0f, 0.0f);
+      glVertex3fv((lightPos + camR * size - camU * size).GetData());
+      glTexCoord2f(1.0f, 1.0f);
+      glVertex3fv((lightPos + camR * size + camU * size).GetData());
+      glTexCoord2f(0.0f, 1.0f);
+      glVertex3fv((lightPos - camR * size + camU * size).GetData());
+      glEnd();
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
 
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
-    g_imRenderer->UnbindTexture();
+    glDepthMask(true);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_TEXTURE_2D);
   }
 }
 

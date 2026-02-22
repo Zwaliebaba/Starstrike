@@ -153,8 +153,8 @@ public:
 
 	void WaterReflect       (); // inverts direction of all lights
 
-	void FlushRenderState	();
-	void RegenerateRenderState();
+	void FlushOpenGlState	();
+	void RegenerateOpenGlState();
 };
 
 

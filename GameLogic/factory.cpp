@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "im_renderer.h"
 
 #include "debug_utils.h"
 #include "file_writer.h"
@@ -69,13 +68,13 @@ void Factory::Render( float predictionTime )
     {
         LegacyVector3 pos( m_pos + LegacyVector3( 2.0f, 20.0f, 20.0f) );
 
-        g_imRenderer->Begin(PRIM_LINE_LOOP);
-            g_imRenderer->Vertex3fv( (pos + LegacyVector3(-5,-5,0)).GetData() );
-            g_imRenderer->Vertex3fv( (pos + LegacyVector3(-5,+5,0)).GetData() );
-            g_imRenderer->Vertex3fv( (pos + LegacyVector3(+5,+5,0)).GetData() );
-            g_imRenderer->Vertex3fv( (pos + LegacyVector3(+5,-5,0)).GetData() );
-        g_imRenderer->End();
-
+        glLineWidth(2.0f);
+        glBegin( GL_LINE_LOOP );
+            glVertex3fv( (pos + LegacyVector3(-5,-5,0)).GetData() );
+            glVertex3fv( (pos + LegacyVector3(-5,+5,0)).GetData() );
+            glVertex3fv( (pos + LegacyVector3(+5,+5,0)).GetData() );
+            glVertex3fv( (pos + LegacyVector3(+5,-5,0)).GetData() );
+        glEnd();
     }
 }
 

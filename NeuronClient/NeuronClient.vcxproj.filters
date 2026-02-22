@@ -39,6 +39,7 @@
     <ClInclude Include="bounded_array.h" />
     <ClInclude Include="btree.h" />
     <ClInclude Include="darray.h" />
+    <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
     <ClInclude Include="debug_utils.h" />
     <ClInclude Include="fast_darray.h" />
@@ -53,6 +54,8 @@
     <ClInclude Include="matrix33.h" />
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
+    <ClInclude Include="ogl_extensions.h" />
+    <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
     <ClInclude Include="preferences.h" />
@@ -179,11 +182,36 @@
     <ClInclude Include="eclwindow.h">
       <Filter>Canvas</Filter>
     </ClInclude>
-    <ClInclude Include="render_device.h" />
-    <ClInclude Include="im_renderer.h" />
-    <ClInclude Include="render_states.h" />
-    <ClInclude Include="texture_manager.h" />
-    <ClInclude Include="sprite_batch.h" />
+    <ClInclude Include="d3d12_backend.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist_dev.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_inline.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_internals.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_matrix_stack.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_trace.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dx12.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXHelper.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -217,6 +245,8 @@
     <ClCompile Include="3d_sprite.cpp" />
     <ClCompile Include="binary_stream_readers.cpp" />
     <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="debug_fog_logging.cpp" />
+    <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
     <ClCompile Include="debug_utils.cpp" />
     <ClCompile Include="file_writer.cpp" />
@@ -228,6 +258,7 @@
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
+    <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
@@ -247,7 +278,7 @@
     <ClCompile Include="user_info.cpp" />
     <ClCompile Include="vector2.cpp" />
     <ClCompile Include="vector3.cpp" />
-    <ClCompile Include="window_manager.cpp" />
+    <ClCompile Include="window_manager_directx.cpp" />
     <ClCompile Include="control_bindings.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -341,11 +372,30 @@
     <ClCompile Include="eclwindow.cpp">
       <Filter>Canvas</Filter>
     </ClCompile>
-    <ClCompile Include="render_device.cpp" />
-    <ClCompile Include="im_renderer.cpp" />
-    <ClCompile Include="render_states.cpp" />
-    <ClCompile Include="texture_manager.cpp" />
-    <ClCompile Include="sprite_batch.cpp" />
+    <ClCompile Include="d3d12_backend.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ogl_extensions_directx.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_dlist.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_dlist_dev.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_matrix_stack.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_directx_stubs.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_trace.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
@@ -360,11 +410,11 @@
     <Filter Include="Canvas">
       <UniqueIdentifier>{062425be-f9fd-49a6-a08e-112390dccd54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{7a1d775d-f17b-457e-aa15-0abbc7835186}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Graphics">
-      <UniqueIdentifier>{a90305e3-076c-4f7b-a2e7-cb698690339c}</UniqueIdentifier>
+      <UniqueIdentifier>{75fc0aef-18bf-43fe-b7e3-e2dcbededb60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{dc64aef6-7e7d-453f-bc39-54a3b9944222}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -379,27 +429,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
-      <Filter>Project Files</Filter>
-    </Natvis>
-    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis">
-      <Filter>Project Files</Filter>
-    </Natvis>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\im_coloredPS.hlsl">
+    <FxCompile Include="Shaders\PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\im_defaultVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\im_texturedPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\sprite_ps.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\sprite_vs.hlsl">
+    <FxCompile Include="Shaders\VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

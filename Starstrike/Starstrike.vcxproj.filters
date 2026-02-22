@@ -462,7 +462,13 @@
     <Text Include="Assets\effects.txt">
       <Filter>Assets</Filter>
     </Text>
+    <Text Include="Assets\egames.txt">
+      <Filter>Assets</Filter>
+    </Text>
     <Text Include="Assets\game.txt">
+      <Filter>Assets</Filter>
+    </Text>
+    <Text Include="Assets\game_unlockall.txt">
       <Filter>Assets</Filter>
     </Text>
     <Text Include="Assets\locations.txt">
@@ -945,12 +951,6 @@
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\cloudyglow.bmp">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\deform1c.bmp">
-      <Filter>Assets\Textures</Filter>
-    </Image>
-    <Image Include="Assets\Textures\deform36c.bmp">
       <Filter>Assets\Textures</Filter>
     </Image>
     <Image Include="Assets\Textures\dmacrew.bmp">
