@@ -144,7 +144,6 @@ void Triffid::Render(float _predictionTime)
       mat.u *= (1.0f - sinf(timeIndex) * 0.2f);
     else
       mat.r *= (1.0f - sinf(timeIndex) * 0.5f);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
   }
 
@@ -162,7 +161,6 @@ void Triffid::Render(float _predictionTime)
     eggShape->Render(_predictionTime, eggMat);
   }
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
 }

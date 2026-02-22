@@ -48,7 +48,7 @@ public:
 class Water
 {
 protected:
-	// Render data - referenced directly by OpenGL
+	// Render data
 	FastDArray		<WaterVertex> m_renderVerts;
 	FastDArray		<WaterTriangleStrip *> m_strips;
 
@@ -90,7 +90,7 @@ public:
 	void            GenerateLightMap		();
 	inline RGBAColour const &GetColour(int _brightness);
 
-	void			BuildOpenGlState		();
+	void			BuildRenderState		();
 
 	void            Advance                 ();
     void			Render					();

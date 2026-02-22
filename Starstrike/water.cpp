@@ -93,7 +93,7 @@ Water::Water()
 		    m_waveTableX = new float[m_waveTableSizeX];
 		    m_waveTableZ = new float[m_waveTableSizeZ];
 
-		    BuildOpenGlState();
+			BuildRenderState();
 	    }
     }
 }
@@ -287,7 +287,7 @@ void Water::GenerateLightMap()
 }
 
 
-void Water::BuildOpenGlState()
+void Water::BuildRenderState()
 {
 }
 
@@ -403,8 +403,8 @@ void Water::RenderFlatWaterTiles(
 		float texNorth1, float texSouth1, float texEast1, float texWest1,
 		float texNorth2, float texSouth2, float texEast2, float texWest2, int steps)
 {
-    float sizeX = posWest - posEast;
-    float sizeZ = posSouth - posNorth;
+	float sizeX = posWest - posEast;
+	float sizeZ = posSouth - posNorth;
 	float posStepX = sizeX / (float)steps;
 	float posStepZ = sizeZ / (float)steps;
 
@@ -413,16 +413,11 @@ void Water::RenderFlatWaterTiles(
 	float texStepX1 = texSizeX1 / (float)steps;
 	float texStepZ1 = texSizeZ1 / (float)steps;
 
-	float texSizeX2 = texWest2 - texEast2;
-	float texSizeZ2 = texSouth2 - texNorth2;
-	float texStepX2 = texSizeX2 / (float)steps;
-	float texStepZ2 = texSizeZ2 / (float)steps;
-
+	g_imRenderer->Begin(PRIM_QUADS);
 		for (int j = 0; j < steps; ++j)
 		{
 			float pz = posNorth + j * posStepZ;
 			float tz1 = texNorth1 + j * texStepZ1;
-			float tz2 = texNorth2 + j * texStepZ2;
 
 			for (int i = 0; i < steps; ++i)
 			{
@@ -431,38 +426,59 @@ void Water::RenderFlatWaterTiles(
 				if (m_flatWaterTiles->GetData(i, j) == false) continue;
 
 				float tx1 = texEast1 + i * texStepX1;
-				float tx2 = texEast2 + i * texStepX2;
+
+				g_imRenderer->TexCoord2f(tx1 + texStepX1, tz1);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz);
+
+				g_imRenderer->TexCoord2f(tx1 + texStepX1, tz1 + texStepZ1);
+				g_imRenderer->Vertex3f(px + posStepX, height, pz + posStepZ);
+
+				g_imRenderer->TexCoord2f(tx1, tz1 + texStepZ1);
+				g_imRenderer->Vertex3f(px, height, pz + posStepZ);
+
+				g_imRenderer->TexCoord2f(tx1, tz1);
+				g_imRenderer->Vertex3f(px, height, pz);
 			}
 		}
+	g_imRenderer->End();
 }
 
 
 void Water::RenderFlatWater()
 {
-    Landscape *land = &g_app->m_location->m_landscape;
+	Landscape *land = &g_app->m_location->m_landscape;
 
+	auto* ctx = g_renderDevice->GetContext();
+	g_renderStates->SetRasterState(ctx, RASTER_CULL_NONE);
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_READONLY);
 
-    if( g_app->m_negativeRenderer )
-    {
-    }
-    else
-    {
-    }
+	if( g_app->m_negativeRenderer )
+	{
+		g_renderStates->SetBlendState(ctx, BLEND_SUBTRACTIVE_COLOR);
+		g_imRenderer->Color4ub(255, 255, 255, 0);
+	}
+	else
+	{
+		g_renderStates->SetBlendState(ctx, BLEND_DISABLED);
+		g_imRenderer->Color4ub(255, 255, 255, 255);
+	}
 
 	char waterFilename[256];
 	sprintf( waterFilename, "terrain/%s", g_app->m_location->m_levelFile->m_waterColourFilename );
 
-    if( Location::ChristmasModEnabled() == 1 )
-    {
-        strcpy( waterFilename, "terrain/water_icecaps.bmp" );
-    }
+	if( Location::ChristmasModEnabled() == 1 )
+	{
+		strcpy( waterFilename, "terrain/water_icecaps.bmp" );
+	}
 
-	// JAK HACK (DISABLED)
+	int waterTexId = g_app->m_resource->GetTexture(waterFilename);
+	g_imRenderer->BindTexture(waterTexId);
+	g_imRenderer->SetSampler(SAMPLER_LINEAR_WRAP);
 
-    float landSizeX = land->GetWorldSizeX();
-    float landSizeZ = land->GetWorldSizeZ();
+	float landSizeX = land->GetWorldSizeX();
+	float landSizeZ = land->GetWorldSizeZ();
 	float borderX = landSizeX / 2.0f;
-    float borderZ = landSizeZ / 2.0f;
+	float borderZ = landSizeZ / 2.0f;
 
 	float const timeFactor = g_gameTime / 30.0f;
 
@@ -471,6 +487,11 @@ void Water::RenderFlatWater()
 		timeFactor, timeFactor + 30.0f, timeFactor, timeFactor + 30.0f,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		m_flatWaterTiles->GetNumColumns());
+
+	g_imRenderer->UnbindTexture();
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_WRITE);
+	g_renderStates->SetRasterState(ctx, RASTER_CULL_BACK);
+	g_renderStates->SetBlendState(ctx, BLEND_ALPHA);
 }
 
 bool isIdentical(const LegacyVector3& a,const LegacyVector3& b,const LegacyVector3& c)
@@ -590,7 +611,36 @@ void Water::UpdateDynamicWater()
 
 void Water::RenderDynamicWater()
 {
-	// TODO Phase 10: Implement D3D11 vertex buffer rendering for water strips
+	if (m_renderVerts.NumUsed() <= 0 || !g_imRenderer || !g_renderDevice)
+		return;
+
+	auto* ctx = g_renderDevice->GetContext();
+
+	g_renderStates->SetBlendState(ctx, BLEND_ALPHA);
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_READONLY);
+	g_renderStates->SetRasterState(ctx, RASTER_CULL_NONE);
+	g_imRenderer->UnbindTexture();
+
+	// Render each strip as immediate-mode triangle strip
+	for (int i = 0; i < m_strips.Size(); ++i)
+	{
+		WaterTriangleStrip *strip = m_strips[i];
+		if (strip->m_numVerts < 3) continue;
+
+		g_imRenderer->Begin(PRIM_TRIANGLE_STRIP);
+		for (int j = 0; j < strip->m_numVerts; ++j)
+		{
+			int idx = strip->m_startRenderVertIndex + j;
+			WaterVertex& v = m_renderVerts[idx];
+			g_imRenderer->Normal3f(v.m_normal.x, v.m_normal.y, v.m_normal.z);
+			g_imRenderer->Color4ub(v.m_col.r, v.m_col.g, v.m_col.b, v.m_col.a);
+			g_imRenderer->Vertex3f(v.m_pos.x, v.m_pos.y, v.m_pos.z);
+		}
+		g_imRenderer->End();
+	}
+
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_WRITE);
+	g_renderStates->SetRasterState(ctx, RASTER_CULL_BACK);
 }
 
 void Water::Render()
@@ -623,8 +673,7 @@ void Water::Render()
         }
 	}
 
-    g_app->m_location->SetupFog();
-    g_app->m_renderer->CheckOpenGLState();
+	g_app->m_location->SetupFog();
 }
 
 void Water::Advance()

@@ -546,7 +546,7 @@ Landscape::~Landscape()
 }
 
 
-void Landscape::BuildOpenGlState()
+void Landscape::BuildRenderState()
 {
 	delete m_renderer;
 	m_renderer = new LandscapeRenderer(m_heightMap);
@@ -594,7 +594,7 @@ void Landscape::Init(LandscapeDef *_def, bool _justMakeTheHeightMap)
 	}
 
     GenerateNormals();
-    BuildOpenGlState();
+	BuildRenderState();
 
 	if( g_app->m_location->m_water )
 	{

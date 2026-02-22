@@ -135,7 +135,6 @@ void BlueprintBuilding::RenderAlphas( float _predictionTime )
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
 
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -644,7 +643,6 @@ void BlueprintConsole::RenderPorts()
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_imRenderer->Begin(PRIM_QUADS);
             g_imRenderer->TexCoord2i( 0, 0 );           g_imRenderer->Vertex3fv( (statusPos - camR - camU).GetData() );
@@ -653,7 +651,6 @@ void BlueprintConsole::RenderPorts()
             g_imRenderer->TexCoord2i( 0, 1 );           g_imRenderer->Vertex3fv( (statusPos - camR + camU).GetData() );
         g_imRenderer->End();
 
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);

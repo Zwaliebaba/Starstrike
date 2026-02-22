@@ -52,8 +52,6 @@ class WindowManager
     int m_desktopRefresh; // Original starting values
 
     void ListAllDisplayModes();
-    bool EnableOpenGL(int _colourDepth, int _zDepth);
-    void DisableOpenGL();
 
   public:
     WindowManager();

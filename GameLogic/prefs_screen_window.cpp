@@ -140,8 +140,8 @@ void RestartWindowManagerAndRenderer()
   // start new window
   g_app->m_renderer = new Renderer();
   g_app->m_renderer->Initialise();
-  g_app->m_resource->FlushOpenGlState();
-  g_app->m_resource->RegenerateOpenGlState();
+  g_app->m_resource->FlushRenderState();
+  g_app->m_resource->RegenerateRenderState();
 
   int newWidth = g_app->m_renderer->ScreenW();
   int newHeight = g_app->m_renderer->ScreenH();

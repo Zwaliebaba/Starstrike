@@ -332,7 +332,6 @@ void SporeGenerator::Render( float _predictionTime )
         if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
     }
 

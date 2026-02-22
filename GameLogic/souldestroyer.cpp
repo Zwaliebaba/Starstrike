@@ -591,7 +591,6 @@ void SoulDestroyer::Render( float _predictionTime )
         }
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);

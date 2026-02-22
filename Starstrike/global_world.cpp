@@ -819,7 +819,6 @@ void SphereWorld::RenderSpirits()
   // Render all spirits
 
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -898,7 +897,6 @@ void SphereWorld::RenderSpirits()
   g_imRenderer->UnbindTexture();
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
@@ -925,7 +923,6 @@ void SphereWorld::RenderWorldShape()
   g_imRenderer->Scalef(120.0f, 120.0f, 120.0f);
 
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 
@@ -948,7 +945,6 @@ void SphereWorld::RenderTrunkLinks()
 
   Matrix34 rootMat(0);
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -1024,7 +1020,6 @@ void SphereWorld::RenderTrunkLinks()
   }
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 }
 
@@ -1044,7 +1039,6 @@ void SphereWorld::RenderHeaven()
   LegacyVector3 camRight = g_app->m_camera->GetRight();
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/glow.bmp"));
 
@@ -1110,7 +1104,6 @@ void SphereWorld::RenderHeaven()
   */
 
   g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 
@@ -1137,9 +1130,7 @@ void SphereWorld::RenderIslands()
   //    glColor4f       ( 1.0f, 1.0f, 1.0f, 1.0f );
   g_imRenderer->Color4f(0.6f, 0.2f, 0.1f, 1.0f);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
 
   for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
@@ -1174,9 +1165,7 @@ void SphereWorld::RenderIslands()
   }
 
   g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 
   //

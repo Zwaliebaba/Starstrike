@@ -312,7 +312,6 @@ void ControlTower::RenderAlphas(float _predictionTime)
     LegacyVector3 controlUp(0, 50.0f + (m_id.GetUniqueId() % 50), 0);
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -360,7 +359,6 @@ void ControlTower::RenderAlphas(float _predictionTime)
     g_imRenderer->UnbindTexture();
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   }
@@ -384,7 +382,6 @@ void ControlTower::RenderAlphas(float _predictionTime)
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
     for (int i = 0; i < 10; ++i)
@@ -403,7 +400,6 @@ void ControlTower::RenderAlphas(float _predictionTime)
 
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);

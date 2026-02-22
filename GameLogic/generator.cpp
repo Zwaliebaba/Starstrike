@@ -114,7 +114,6 @@ void PowerBuilding::RenderAlphas ( float _predictionTime )
         theirPosRight.SetLength( 2.0f );
 
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
         g_imRenderer->Color4f( 0.9f, 0.9f, 0.5f, 1.0f );
@@ -163,7 +162,6 @@ void PowerBuilding::RenderAlphas ( float _predictionTime )
         }
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     }
@@ -581,7 +579,6 @@ void SolarPanel::RenderPorts()
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
     for( int i = 0; i < GetNumPorts(); ++i )
@@ -612,7 +609,6 @@ void SolarPanel::RenderPorts()
 
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
@@ -646,7 +642,6 @@ void SolarPanel::RenderAlphas( float _predictionTime )
         float alphaValue = fabs(sinf(g_gameTime)) * fractionOccupied;
 
         g_imRenderer->Color4f( 0.2f, 0.4f, 0.9f, alphaValue );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp" ) );
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
@@ -667,7 +662,6 @@ void SolarPanel::RenderAlphas( float _predictionTime )
 
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     }
 }

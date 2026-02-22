@@ -85,17 +85,6 @@ void WindowManager::RestoreDesktop()
   }
 }
 
-bool WindowManager::EnableOpenGL(int _colourDepth, int _zDepth)
-{
-  // OpenGL context removed — D3D11 device is created in CreateWin()
-  return true;
-}
-
-void WindowManager::DisableOpenGL()
-{
-  // OpenGL context removed — D3D11 device is destroyed in DestroyWin()
-}
-
 // Returns an index into the list of already registered resolutions
 int WindowManager::GetResolutionId(int _width, int _height)
 {

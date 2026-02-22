@@ -267,8 +267,8 @@ class WebsiteButton : public DarwiniaButton
         g_app->m_renderer = new Renderer();
         g_app->m_renderer->Initialise();
         getW32EventHandler()->ResetWindowHandle();
-        g_app->m_resource->FlushOpenGlState();
-        g_app->m_resource->RegenerateOpenGlState();
+        g_app->m_resource->FlushRenderState();
+        g_app->m_resource->RegenerateRenderState();
 
         g_prefsManager->Save();
 

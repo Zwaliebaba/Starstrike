@@ -1113,7 +1113,6 @@ void Engineer::Render( float predictionTime )
 
             g_imRenderer->Color4f( 0.2f, 0.4f, 1.0f, fabs(sinf(g_gameTime * 3.0f)) );
 
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );

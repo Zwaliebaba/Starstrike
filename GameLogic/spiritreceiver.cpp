@@ -112,7 +112,6 @@ void ReceiverBuilding::RenderAlphas(float _predictionTime)
     {
       g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/laser.bmp"));
 
-      g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
       g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
       size = 1.0f;
@@ -230,7 +229,6 @@ static float s_nearPlaneStart;
 void ReceiverBuilding::BeginRenderUnprocessedSpirits()
 {
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -341,7 +339,6 @@ void ReceiverBuilding::EndRenderUnprocessedSpirits()
 
   g_imRenderer->UnbindTexture();
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 }
@@ -638,7 +635,6 @@ void SpiritReceiver::RenderPorts()
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
   g_imRenderer->BindTexture(g_app->m_resource->GetTexture("textures/starburst.bmp"));
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
   for (int i = 0; i < GetNumPorts(); ++i)
@@ -677,7 +673,6 @@ void SpiritReceiver::RenderPorts()
 
   }
 
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   g_imRenderer->UnbindTexture();

@@ -55,7 +55,6 @@ void SpiritStore::Render( float _predictionTime )
 {
 	START_PROFILE(g_app->m_profiler, "Spirit Store");
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);

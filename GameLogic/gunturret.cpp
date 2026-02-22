@@ -437,7 +437,6 @@ void GunTurret::Render( float _predictionTime )
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
 
         g_imRenderer->Begin(PRIM_QUADS);
@@ -449,8 +448,6 @@ void GunTurret::Render( float _predictionTime )
 
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
         g_imRenderer->UnbindTexture();
@@ -465,7 +462,6 @@ void GunTurret::RenderPorts()
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
     for( int i = 0; i < GetNumPorts(); ++i )
@@ -502,7 +498,6 @@ void GunTurret::RenderPorts()
 
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);

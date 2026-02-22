@@ -238,13 +238,9 @@ void LandscapeRenderer::BuildColourArray()
 // PublicFunctions
 //*****************************************************************************
 
-const unsigned LandscapeRenderer::m_posOffset(0);
-const unsigned LandscapeRenderer::m_normOffset(sizeof(LegacyVector3));
-const unsigned LandscapeRenderer::m_colOffset(sizeof(LegacyVector3) * 2);
-const unsigned LandscapeRenderer::m_uvOffset(sizeof(LegacyVector3) * 2 + sizeof(RGBAColour));
-
 LandscapeRenderer::LandscapeRenderer(SurfaceMap2D <float> *_heightMap)
-:	m_vertexBuffer(0)
+:	m_d3dVertexBuffer(nullptr),
+	m_d3dVertexCount(0)
 {
     char fullFilname[256];
     sprintf( fullFilname, "terrain/%s", g_app->m_location->m_levelFile->m_landscapeColourFilename );
@@ -254,51 +250,206 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D <float> *_heightMap)
         strcpy( fullFilname, "terrain/landscape_icecaps.bmp" );
     }
 
-	// Read render mode from prefs file
-	m_renderMode = g_prefsManager->GetInt("RenderLandscapeMode", 2);
-
-	// Force fallback to slow path (VBOs and display lists removed for D3D11)
-	m_renderMode = RenderModeDisplayList;
-
+	// Read render mode from prefs file — always use D3D11 static VB now
 	BinaryReader *reader = g_app->m_resource->GetBinaryReader(fullFilname);
 	DarwiniaReleaseAssert(reader != NULL, "Failed to get resource %s", fullFilname);
 	m_landscapeColour = new BitmapRGBA(reader, "bmp");
 	delete reader;
 
-	BuildOpenGlState(_heightMap);
+	BuildRenderState(_heightMap);
 }
 
 
 LandscapeRenderer::~LandscapeRenderer()
 {
-	if (m_renderMode == RenderModeDisplayList)
+	if (m_d3dVertexBuffer)
 	{
-		g_app->m_resource->DeleteDisplayList(MAIN_DISPLAY_LIST_NAME);
-		g_app->m_resource->DeleteDisplayList(OVERLAY_DISPLAY_LIST_NAME);
+		m_d3dVertexBuffer->Release();
+		m_d3dVertexBuffer = nullptr;
 	}
 
 	m_verts.Empty();
 }
 
-void LandscapeRenderer::BuildOpenGlState(SurfaceMap2D <float> *_heightMap)
+void LandscapeRenderer::BuildRenderState(SurfaceMap2D <float> *_heightMap)
 {
 	BuildVertArrayAndTriStrip(_heightMap);
 	BuildNormArray();
 	BuildColourArray();
 	BuildUVArray(_heightMap);
 
-	// TODO Phase 10: Create static D3D11 vertex buffers from m_verts
+	CreateD3DVertexBuffer();
+}
+
+void LandscapeRenderer::CreateD3DVertexBuffer()
+{
+	if (!g_renderDevice || m_verts.NumUsed() <= 0)
+		return;
+
+	int numVerts = m_verts.NumUsed();
+
+	// Convert LandVertex array to ImRenderer-compatible vertex format
+	struct LandImVertex
+	{
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT4 color;
+		DirectX::XMFLOAT2 texcoord;
+		DirectX::XMFLOAT3 normal;
+	};
+
+	LandImVertex* gpuVerts = new LandImVertex[numVerts];
+	for (int i = 0; i < numVerts; ++i)
+	{
+		LandVertex& src = m_verts[i];
+		LandImVertex& dst = gpuVerts[i];
+		dst.pos      = { src.m_pos.x, src.m_pos.y, src.m_pos.z };
+		dst.color    = { src.m_col.r / 255.0f, src.m_col.g / 255.0f, src.m_col.b / 255.0f, src.m_col.a / 255.0f };
+		dst.texcoord = { src.m_uv.u, src.m_uv.v };
+		dst.normal   = { src.m_norm.x, src.m_norm.y, src.m_norm.z };
+	}
+
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+	bd.ByteWidth     = numVerts * sizeof(LandImVertex);
+	bd.Usage         = D3D11_USAGE_DEFAULT;
+	bd.BindFlags     = D3D11_BIND_VERTEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	ZeroMemory(&initData, sizeof(initData));
+	initData.pSysMem = gpuVerts;
+
+	HRESULT hr = g_renderDevice->GetDevice()->CreateBuffer(&bd, &initData, &m_d3dVertexBuffer);
+	delete[] gpuVerts;
+
+	if (FAILED(hr))
+	{
+		m_d3dVertexBuffer = nullptr;
+		m_d3dVertexCount = 0;
+		return;
+	}
+
+	m_d3dVertexCount = numVerts;
 }
 
 void LandscapeRenderer::RenderMainSlow()
 {
-	// TODO Phase 10: Implement D3D11 vertex buffer rendering for landscape
+	if (!m_d3dVertexBuffer || !g_imRenderer)
+		return;
+
+	// Set blend state for negative renderer
+	auto* ctx = g_renderDevice->GetContext();
+	if (g_app->m_negativeRenderer)
+		g_renderStates->SetBlendState(ctx, BLEND_SUBTRACTIVE_COLOR);
+
+	g_imRenderer->UnbindTexture();
+
+	// Use ImRenderer's current WVP matrix — computed the same way as Flush()
+	DirectX::XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+	wvp = DirectX::XMMatrixTranspose(wvp);
+
+	// Upload WVP to ImRenderer's constant buffer
+	ID3D11Buffer* cb = g_imRenderer->GetConstantBuffer();
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	HRESULT hr = ctx->Map(cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	if (SUCCEEDED(hr))
+	{
+		auto* data = static_cast<DirectX::XMMATRIX*>(mapped.pData);
+		*data = wvp;
+		ctx->Unmap(cb, 0);
+	}
+
+	// Bind pipeline — same shaders as ImRenderer colored path
+	UINT stride = sizeof(DirectX::XMFLOAT3) + sizeof(DirectX::XMFLOAT4) + sizeof(DirectX::XMFLOAT2) + sizeof(DirectX::XMFLOAT3); // 48
+	UINT offset = 0;
+	ctx->IASetVertexBuffers(0, 1, &m_d3dVertexBuffer, &stride, &offset);
+	ctx->IASetInputLayout(g_imRenderer->GetInputLayout());
+	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	ctx->VSSetShader(g_imRenderer->GetVertexShader(), nullptr, 0);
+	ctx->VSSetConstantBuffers(0, 1, &cb);
+	ctx->PSSetShader(g_imRenderer->GetColoredPixelShader(), nullptr, 0);
+
+	// Draw each strip
+	for (int z = 0; z < m_strips.Size(); ++z)
+	{
+		LandTriangleStrip *strip = m_strips[z];
+		ctx->Draw(strip->m_numVerts, strip->m_firstVertIndex);
+	}
+
+	if (g_app->m_negativeRenderer)
+		g_renderStates->SetBlendState(ctx, BLEND_ALPHA);
 }
 
 
 void LandscapeRenderer::RenderOverlaySlow()
 {
-	// TODO Phase 10: Implement D3D11 vertex buffer rendering for landscape overlay
+	if (!m_d3dVertexBuffer || !g_imRenderer)
+		return;
+
+	auto* ctx = g_renderDevice->GetContext();
+
+	// Set overlay state: additive blend, depth readonly, textured
+	if (!g_app->m_negativeRenderer)
+		g_renderStates->SetBlendState(ctx, BLEND_ADDITIVE);
+	else
+		g_renderStates->SetBlendState(ctx, BLEND_SUBTRACTIVE_COLOR);
+
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_READONLY);
+
+	int outlineTextureId = g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false);
+	g_imRenderer->BindTexture(outlineTextureId);
+	g_imRenderer->SetSampler(SAMPLER_LINEAR_WRAP);
+
+	// Upload WVP
+	DirectX::XMMATRIX wvp = g_imRenderer->GetWorldMatrix() * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+	wvp = DirectX::XMMatrixTranspose(wvp);
+
+	ID3D11Buffer* cb = g_imRenderer->GetConstantBuffer();
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	HRESULT hr = ctx->Map(cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	if (SUCCEEDED(hr))
+	{
+		auto* data = static_cast<DirectX::XMMATRIX*>(mapped.pData);
+		*data = wvp;
+		ctx->Unmap(cb, 0);
+	}
+
+	// Bind pipeline — textured path
+	UINT stride = sizeof(DirectX::XMFLOAT3) + sizeof(DirectX::XMFLOAT4) + sizeof(DirectX::XMFLOAT2) + sizeof(DirectX::XMFLOAT3);
+	UINT offset = 0;
+	ctx->IASetVertexBuffers(0, 1, &m_d3dVertexBuffer, &stride, &offset);
+	ctx->IASetInputLayout(g_imRenderer->GetInputLayout());
+	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	ctx->VSSetShader(g_imRenderer->GetVertexShader(), nullptr, 0);
+	ctx->VSSetConstantBuffers(0, 1, &cb);
+
+	ID3D11ShaderResourceView* srv = g_textureManager->GetSRV(outlineTextureId);
+	if (srv)
+	{
+		ctx->PSSetShader(g_imRenderer->GetTexturedPixelShader(), nullptr, 0);
+		ctx->PSSetShaderResources(0, 1, &srv);
+	}
+	else
+	{
+		ctx->PSSetShader(g_imRenderer->GetColoredPixelShader(), nullptr, 0);
+	}
+
+	for (int z = 0; z < m_strips.Size(); ++z)
+	{
+		LandTriangleStrip *strip = m_strips[z];
+		ctx->Draw(strip->m_numVerts, strip->m_firstVertIndex);
+	}
+
+	// Unbind SRV and restore state
+	if (srv)
+	{
+		ID3D11ShaderResourceView* nullSRV = nullptr;
+		ctx->PSSetShaderResources(0, 1, &nullSRV);
+	}
+	g_imRenderer->UnbindTexture();
+	g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_WRITE);
+	g_renderStates->SetBlendState(ctx, BLEND_ALPHA);
 }
 
 
@@ -307,41 +458,17 @@ void LandscapeRenderer::Render()
 	if (m_verts.Size() <= 0)
 		return;
 
-    g_app->m_location->SetupFog();
+	g_app->m_location->SetupFog();
 
 	START_PROFILE(g_app->m_profiler, "Render Landscape Main");
-
-	switch (m_renderMode) {
-		case RenderModeDisplayList:
-			{
-				int id = g_app->m_resource->GetDisplayList(MAIN_DISPLAY_LIST_NAME);
-				DarwiniaDebugAssert(id != -1);
-			}
-			break;
-
-		default:
-			RenderMainSlow();
-			break;
-	}
+	RenderMainSlow();
 	END_PROFILE(g_app->m_profiler, "Render Landscape Main");
 
-    int landscapeDetail = g_prefsManager->GetInt( "RenderLandscapeDetail", 1 );
-    if( landscapeDetail < 4 )
-    {
-	    START_PROFILE(g_app->m_profiler, "Render Landscape Overlay");
-		switch (m_renderMode) {
-			case RenderModeDisplayList:
-				{
-					int id = g_app->m_resource->GetDisplayList(OVERLAY_DISPLAY_LIST_NAME);
-					DarwiniaDebugAssert(id != -1);
-				}
-				break;
-
-			default:
-			    RenderOverlaySlow();
-				;
-	    }
-	    END_PROFILE(g_app->m_profiler, "Render Landscape Overlay");
-    }
-
+	int landscapeDetail = g_prefsManager->GetInt( "RenderLandscapeDetail", 1 );
+	if( landscapeDetail < 4 )
+	{
+		START_PROFILE(g_app->m_profiler, "Render Landscape Overlay");
+		RenderOverlaySlow();
+		END_PROFILE(g_app->m_profiler, "Render Landscape Overlay");
+	}
 }

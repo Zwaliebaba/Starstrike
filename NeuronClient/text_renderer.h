@@ -38,7 +38,7 @@ protected:
 public:
 	void Initialise(char const *_filename);
 
-	void BuildOpenGlState();
+	void BuildRenderState();
 
     void BeginText2D	 ();
     void EndText2D		 ();

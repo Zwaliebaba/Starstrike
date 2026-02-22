@@ -84,6 +84,13 @@ public:
   void SetDrawEnabled(bool enabled) { m_drawEnabled = enabled; }
   bool IsDrawEnabled() const { return m_drawEnabled; }
 
+  // Accessors for direct rendering (landscape, water static VBs)
+  ID3D11Buffer*        GetConstantBuffer()       { return m_constantBuffer; }
+  ID3D11InputLayout*   GetInputLayout()          { return m_inputLayout; }
+  ID3D11VertexShader*  GetVertexShader()          { return m_vsDefault; }
+  ID3D11PixelShader*   GetColoredPixelShader()    { return m_psColored; }
+  ID3D11PixelShader*   GetTexturedPixelShader()   { return m_psTextured; }
+
 private:
   struct ImVertex
   {

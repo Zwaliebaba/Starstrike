@@ -570,7 +570,6 @@ void Entity::BeginRenderShadow()
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
     g_imRenderer->Color4f( 0.6f, 0.6f, 0.6f, 0.0f );
 
@@ -582,7 +581,6 @@ void Entity::BeginRenderShadow()
 
 void Entity::EndRenderShadow()
 {
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);

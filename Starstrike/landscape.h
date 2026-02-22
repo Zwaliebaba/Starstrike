@@ -96,7 +96,7 @@ public:
 	Landscape(float _cellSize, int universeSizeX, int universeSizeZ);
 	~Landscape();
 
-	void		BuildOpenGlState	();
+	void		BuildRenderState	();
 
     void		Init				(LandscapeDef *_def, bool _justMakeTheHeightMap = false);
 	void		Empty				();

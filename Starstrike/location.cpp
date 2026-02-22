@@ -840,7 +840,6 @@ void Location::RenderSpirits()
   }
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 
@@ -1135,7 +1134,6 @@ void Location::RenderWeapons()
   g_imRenderer->UnbindTexture();
   g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
   g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
@@ -1912,7 +1910,7 @@ bool Location::IsFriend(unsigned char _teamId1, unsigned char _teamId2)
   return friends[_teamId1][_teamId2];
 }
 
-void Location::FlushOpenGlState()
+void Location::FlushRenderState()
 {
   int treeTypeId = Building::GetTypeId("Tree");
   for (int i = 0; i < m_buildings.Size(); ++i)
@@ -1929,11 +1927,11 @@ void Location::FlushOpenGlState()
   }
 }
 
-void Location::RegenerateOpenGlState()
+void Location::RegenerateRenderState()
 {
   // Tell the landscape
-  g_app->m_location->m_landscape.BuildOpenGlState();
+  g_app->m_location->m_landscape.BuildRenderState();
 
   // Tell the water
-  g_app->m_location->m_water->BuildOpenGlState();
+  g_app->m_location->m_water->BuildRenderState();
 }

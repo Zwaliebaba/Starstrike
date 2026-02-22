@@ -156,13 +156,14 @@ void ImRenderer::LoadIdentity()
 void ImRenderer::MultMatrixf(const float* m)
 {
   // OpenGL glMultMatrixf takes column-major; XMMATRIX is row-major.
-  // Transpose on load so that M_gl^T = M_dx, then post-multiply:
-  // world = world * M  (OpenGL semantics: current = current * new)
+  // Reading column-major data sequentially into row-major storage
+  // naturally transposes: M_dx = M_gl^T, then pre-multiply so that
+  // the result matches OpenGL semantics (current = current * new).
   DirectX::XMMATRIX mat(
-    m[0], m[4], m[8],  m[12],
-    m[1], m[5], m[9],  m[13],
-    m[2], m[6], m[10], m[14],
-    m[3], m[7], m[11], m[15]);
+    m[0],  m[1],  m[2],  m[3],
+    m[4],  m[5],  m[6],  m[7],
+    m[8],  m[9],  m[10], m[11],
+    m[12], m[13], m[14], m[15]);
   m_worldMatrix = mat * m_worldMatrix;
 }
 

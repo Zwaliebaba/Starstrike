@@ -171,7 +171,6 @@ void Officer::RenderShield( float _predictionTime )
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
     LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
@@ -187,7 +186,6 @@ void Officer::RenderShield( float _predictionTime )
         RenderSpirit( spiritPos );
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
@@ -257,7 +255,6 @@ bool Officer::RenderPixelEffect( float _predictionTime )
         if      ( thefrand > 0.7f ) mat.f *= ( 1.0f - sinf(timeIndex) * 0.5f );
         else if ( thefrand > 0.4f ) mat.u *= ( 1.0f - sinf(timeIndex) * 0.2f );
         else                        mat.r *= ( 1.0f - sinf(timeIndex) * 0.5f );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE_PURE);
     }
 

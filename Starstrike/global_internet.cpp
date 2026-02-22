@@ -205,117 +205,70 @@ void GlobalInternet::Render()
 //    }
 
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
+	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
+	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 
 
-	int linksId = g_app->m_resource->GetDisplayList(DISPLAY_LIST_NAME_LINKS);
-    if( linksId >= 0 )
-    {
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
+	//
+	// Render Links
 
-    }
-    else
-    {
-        linksId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_LINKS);
+	g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laserfence2.bmp") );
+	g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
 
-        g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
+	g_imRenderer->Begin(PRIM_QUADS);
 
-		//
-		// Render Links
+	for( int i = 0; i < m_numLinks; ++i )
+	{
+		GlobalInternetLink *link = &m_links[i];
+		GlobalInternetNode *from = &m_nodes[ link->m_from ];
+		GlobalInternetNode *to = &m_nodes[ link->m_to ];
 
-        g_imRenderer->Begin(PRIM_QUADS);
+		LegacyVector3 fromPos         = from->m_pos;
+		LegacyVector3 toPos           = to->m_pos;
+		LegacyVector3 midPoint        = (toPos + fromPos)/2.0f;
+		LegacyVector3 camToMidPoint   = g_zeroVector - midPoint;
+		LegacyVector3 rightAngle      = (camToMidPoint ^ ( midPoint - toPos )).Normalise();
 
-        for( int i = 0; i < m_numLinks; ++i )
-        {
-            GlobalInternetLink *link = &m_links[i];
-            GlobalInternetNode *from = &m_nodes[ link->m_from ];
-            GlobalInternetNode *to = &m_nodes[ link->m_to ];
+		rightAngle *= link->m_size * 0.5f;
 
-            LegacyVector3 fromPos         = from->m_pos;
-            LegacyVector3 toPos           = to->m_pos;
-            LegacyVector3 midPoint        = (toPos + fromPos)/2.0f;
-            LegacyVector3 camToMidPoint   = g_zeroVector - midPoint;
-            LegacyVector3 rightAngle      = (camToMidPoint ^ ( midPoint - toPos )).Normalise();
-
-            rightAngle *= link->m_size * 0.5f;
-
-            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (fromPos - rightAngle).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (fromPos + rightAngle).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (toPos + rightAngle).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (toPos - rightAngle).GetData() );
-        }
-        g_imRenderer->End();
+		g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (fromPos - rightAngle).GetData() );
+		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (fromPos + rightAngle).GetData() );
+		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (toPos + rightAngle).GetData() );
+		g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (toPos - rightAngle).GetData() );
+	}
+	g_imRenderer->End();
 
 
-        for( int i = 0; i < m_numLinks; ++i )
-        {
-            GlobalInternetLink *link = &m_links[i];
-            GlobalInternetNode *from = &m_nodes[ link->m_from ];
-            GlobalInternetNode *to = &m_nodes[ link->m_to ];
+	//
+	// Render Nodes
 
-            LegacyVector3 fromPos         = from->m_pos;
-            LegacyVector3 toPos           = to->m_pos;
-            LegacyVector3 midPoint        = (toPos + fromPos)/2.0f;
-            LegacyVector3 camToMidPoint   = g_zeroVector - midPoint;
-            LegacyVector3 rightAngle      = (camToMidPoint ^ ( midPoint - toPos )).Normalise();
+	g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp") );
+	g_imRenderer->Color4f( 0.8f, 0.8f, 1.0f, 0.6f );
+	float nodeSize = 10.0f;
 
-            rightAngle *= link->m_size * 0.5f;
+	g_imRenderer->Begin(PRIM_QUADS);
+	for( int i = 0; i < m_numNodes; ++i )
+	{
+		GlobalInternetNode *node = &m_nodes[i];
 
-        }
+		LegacyVector3 camToMidPoint   = (g_zeroVector - node->m_pos).Normalise();
+		LegacyVector3 right           = camToMidPoint ^ LegacyVector3(0,0,1);
+		LegacyVector3 up              = right ^ camToMidPoint;
+		right *= nodeSize;
+		up *= nodeSize;
+		g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up - right).GetData() );
+		g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up + right).GetData() );
+		g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up + right).GetData() );
+		g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up - right).GetData() );
+	}
+	g_imRenderer->End();
 
-    }
-
-
-    int nodesId = g_app->m_resource->GetDisplayList(DISPLAY_LIST_NAME_NODES);
-    if( nodesId >= 0 )
-    {
-        g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/glow.bmp") );
-
-    }
-    else
-    {
-        nodesId = g_app->m_resource->CreateDisplayList(DISPLAY_LIST_NAME_NODES);
-
-        g_imRenderer->Color4f( 0.8f, 0.8f, 1.0f, 0.6f );
-        float nodeSize = 10.0f;
-
-        g_imRenderer->Begin(PRIM_QUADS);
-        for( int i = 0; i < m_numNodes; ++i )
-        {
-            GlobalInternetNode *node = &m_nodes[i];
-
-            LegacyVector3 camToMidPoint   = (g_zeroVector - node->m_pos).Normalise();
-            LegacyVector3 right           = camToMidPoint ^ LegacyVector3(0,0,1);
-            LegacyVector3 up              = right ^ camToMidPoint;
-            right *= nodeSize;
-            up *= nodeSize;
-            g_imRenderer->TexCoord2i( 0, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up - right).GetData() );
-            g_imRenderer->TexCoord2i( 1, 0 );       g_imRenderer->Vertex3fv( (node->m_pos - up + right).GetData() );
-            g_imRenderer->TexCoord2i( 1, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up + right).GetData() );
-            g_imRenderer->TexCoord2i( 0, 1 );       g_imRenderer->Vertex3fv( (node->m_pos + up - right).GetData() );
-        }
-        g_imRenderer->End();
-
-        for( int i = 0; i < m_numNodes; ++i )
-        {
-            GlobalInternetNode *node = &m_nodes[i];
-
-            LegacyVector3 camToMidPoint   = (g_zeroVector - node->m_pos).Normalise();
-            LegacyVector3 right           = camToMidPoint ^ LegacyVector3(0,0,1);
-            LegacyVector3 up              = right ^ camToMidPoint;
-            right *= nodeSize;
-            up *= nodeSize;
-        }
-
-    }
+	g_imRenderer->UnbindTexture();
 
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 
 
@@ -402,7 +355,6 @@ void GlobalInternet::RenderPackets()
     g_imRenderer->Color4f( 0.25f, 0.25f, 0.5f, 0.8f );
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
@@ -460,7 +412,6 @@ void GlobalInternet::RenderPackets()
     }
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 

@@ -20,7 +20,7 @@ Resource::Resource()
 
 Resource::~Resource()
 {
-  FlushOpenGlState();
+  FlushRenderState();
   m_bitmaps.EmptyAndDelete();
   m_shapes.EmptyAndDelete();
 }
@@ -275,7 +275,7 @@ void Resource::DeleteDisplayList(const char* _name)
   }
 }
 
-void Resource::FlushOpenGlState()
+void Resource::FlushRenderState()
 {
 #if 1 // Try to catch crash on shutdown bug
   // Display lists no longer used (D3D11 migration)
@@ -299,14 +299,14 @@ void Resource::FlushOpenGlState()
   m_textures.Empty();
 
   if (g_app->m_location)
-    g_app->m_location->FlushOpenGlState();
+    g_app->m_location->FlushRenderState();
 }
 
-void Resource::RegenerateOpenGlState()
+void Resource::RegenerateRenderState()
 {
   // Tell the text renderers to reload their font
-  g_editorFont.BuildOpenGlState();
-  g_gameFont.BuildOpenGlState();
+  g_editorFont.BuildRenderState();
+  g_gameFont.BuildRenderState();
 
   // Tell all the shapes to generate a new display list
   for (int i = 0; i < m_shapes.Size(); ++i)
@@ -318,11 +318,11 @@ void Resource::RegenerateOpenGlState()
   }
 
   // Tell the renderer (for the pixel effect texture)
-  g_app->m_renderer->BuildOpenGlState();
+  g_app->m_renderer->BuildRenderState();
 
   // Tell the location
   if (g_app->m_location)
-    g_app->m_location->RegenerateOpenGlState();
+    g_app->m_location->RegenerateRenderState();
 }
 
 char* Resource::GenerateName()

@@ -164,7 +164,6 @@ void SpawnBuilding::RenderAlphas( float _predictionTime )
 
             if( buildingDetail == 1 )
             {
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                 g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
                 g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
@@ -683,7 +682,6 @@ void SpawnPoint::RenderAlphas( float _predictionTime )
     LegacyVector3 camRight = g_app->m_camera->GetRight();
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
 
@@ -727,7 +725,6 @@ void SpawnPoint::RenderPorts()
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_imRenderer->Begin(PRIM_QUADS);
 
@@ -802,7 +799,6 @@ void SpawnPoint::RenderPorts()
 
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);

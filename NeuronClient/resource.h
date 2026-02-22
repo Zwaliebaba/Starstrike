@@ -68,8 +68,8 @@ class Resource
     int GetDisplayList(const char* _name); // Returns -1 if _name doesn't exist
     void DeleteDisplayList(const char* _name); // Removes _name from the hashtable and calls glDeleteLists
 
-    void FlushOpenGlState();
-    void RegenerateOpenGlState();
+    void FlushRenderState();
+    void RegenerateRenderState();
 
     char* GenerateName();
 

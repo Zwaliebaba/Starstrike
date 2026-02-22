@@ -246,7 +246,6 @@ void FeedingTube::RenderSignal( float _predictionTime, float _radius, float _alp
 	g_imRenderer->Translatef( -startPos.x, -startPos.y, -startPos.z );
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
 	END_PROFILE(g_app->m_profiler, "Signal");

@@ -795,7 +795,7 @@ void Initialise()
     }
   }
 
-  g_app->m_renderer->SetOpenGLState();
+  g_app->m_renderer->SetDefaultRenderState();
 }
 
 void Finalise()

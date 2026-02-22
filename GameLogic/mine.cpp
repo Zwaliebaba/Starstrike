@@ -284,7 +284,6 @@ void MineBuilding::RenderCart( MineCart *_cart, float _predictionTime )
 
                     if( buildingDetail < 3 )
                     {
-                        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
                         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
                         //glDisable( GL_DEPTH_TEST );
@@ -301,8 +300,6 @@ void MineBuilding::RenderCart( MineCart *_cart, float _predictionTime )
 								 		                       g_app->m_renderer->GetFarPlane());
 
                         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                        g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-                        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
                     }
                 }

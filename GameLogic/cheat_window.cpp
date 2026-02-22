@@ -249,8 +249,8 @@ class ClearResourcesButton : public DarwiniaButton
 {
     void MouseUp()
     {
-        g_app->m_resource->FlushOpenGlState();
-		g_app->m_resource->RegenerateOpenGlState();
+        g_app->m_resource->FlushRenderState();
+		g_app->m_resource->RegenerateRenderState();
     }
 };
 

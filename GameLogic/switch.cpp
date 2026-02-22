@@ -279,7 +279,6 @@ void FenceSwitch::RenderConnection( LegacyVector3 _targetPos, bool _active )
     theirPosRight.SetLength( 2.0f );
 
     g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -451,7 +450,6 @@ void FenceSwitch::RenderLights()
                 g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
                 g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                 g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
                 for( int i = 0; i < 10; ++i )
@@ -466,7 +464,6 @@ void FenceSwitch::RenderLights()
 
                 }
 
-                g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
                 g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 
                 g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);

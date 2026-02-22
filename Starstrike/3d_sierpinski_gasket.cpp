@@ -72,7 +72,6 @@ Sierpinski3D::~Sierpinski3D()
 
 void Sierpinski3D::Render(float scale)
 {
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 	//glDepthMask(false);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
@@ -95,7 +94,5 @@ void Sierpinski3D::Render(float scale)
 		}
 
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 }

@@ -102,12 +102,12 @@ void Renderer::Initialise()
     g_prefsManager->Save();
   }
 
-  BuildOpenGlState();
+  BuildRenderState();
 }
 
-void Renderer::Restart() { BuildOpenGlState(); }
+void Renderer::Restart() { BuildRenderState(); }
 
-void Renderer::BuildOpenGlState()
+void Renderer::BuildRenderState()
 {
   // Phase 9: pixel effect texture now created via TextureManager
   // m_pixelEffectTexId will be set when needed
@@ -195,7 +195,6 @@ void Renderer::RenderLogo()
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
   g_imRenderer->UnbindTexture();
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
   g_imRenderer->Color4f(1.0f, 0.75f, 0.75f, 1.0f);
@@ -267,7 +266,6 @@ void Renderer::RenderFadeOut()
   if (m_fadedness > 0.0001f)
   {
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
@@ -281,7 +279,6 @@ void Renderer::RenderFadeOut()
 
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   }
@@ -313,7 +310,7 @@ void Renderer::RenderFrame(bool withFlip)
 {
   int renderPixelShaderPref = g_prefsManager->GetInt("RenderPixelShader");
 
-  SetOpenGLState();
+  SetDefaultRenderState();
 
   if (g_app->m_locationId == -1)
   {
@@ -596,22 +593,7 @@ void Renderer::SetNearAndFar(float _nearPlane, float _farPlane)
   m_farPlane = _farPlane;
 }
 
-int Renderer::GetGLStateInt(int pname) const
-{
-  return 0;
-}
-
-float Renderer::GetGLStateFloat(int pname) const
-{
-  return 0.0f;
-}
-
-void Renderer::CheckOpenGLState() const
-{
-  // No-op: GL state validation removed in D3D11 migration
-}
-
-void Renderer::SetOpenGLState() const
+void Renderer::SetDefaultRenderState() const
 {
   auto* ctx = g_renderDevice->GetContext();
 

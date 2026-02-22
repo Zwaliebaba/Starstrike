@@ -2,22 +2,11 @@
 
 ## 1. Executive Summary
 
-The Starstrike codebase currently uses **OpenGL 1.x immediate-mode** rendering (plus a handful of ARB extensions for multitexture and VBOs). The OpenGL headers and libraries are pulled in globally via `NeuronClient\NeuronClient.h` (lines 118–122), meaning every `.cpp` file in **Starstrike**, **NeuronClient**, and **GameLogic** can (and does) call `gl*` / `glu*` functions directly.
+The Starstrike codebase has been **fully migrated from OpenGL 1.x to DirectX 11**. Zero OpenGL headers, libraries, API calls, or GL type aliases remain in any compiled source file. The project links exclusively against `d3d11.lib` and `dxgi.lib`.
 
-A dormant `USE_DIRECT3D` compile-time path that targeted **Direct3D 9** existed across many files. **This has been fully removed in Phase 0.** The remaining migration replaces OpenGL with **DirectX 11**.
+The migration was completed in 10 phases, replacing ~95 source files worth of `gl*`/`glu*` calls with a thin D3D11 abstraction layer (`RenderDevice`, `ImRenderer`, `RenderStates`, `TextureManager`). The landscape uses a static `ID3D11Buffer` vertex buffer; all other rendering goes through `ImRenderer`'s immediate-mode emulation.
 
-**Total OpenGL call-sites:** ~95 source files across three projects, with the heaviest consumers being:
-
-| File | Approx. GL calls | Category |
-|---|---|---|
-| `Starstrike\taskmanager_interface_icons.cpp` | 633 | 2D UI quads |
-| `Starstrike\renderer.cpp` | 254 | State management, frame rendering |
-| `GameLogic\darwinia_window.cpp` | 172 | 2D UI |
-| `Starstrike\global_world.cpp` | 152 | 3D world rendering |
-| `NeuronClient\text_renderer.cpp` | 142 | Bitmap font rendering |
-| `GameLogic\weapons.cpp` | 124 | 3D entity rendering |
-| `Starstrike\gamecursor.cpp` | 114 | 2D cursor |
-| ~85 other files | 10–110 each | Misc rendering |
+**Remaining work** (Phase 10 deferred items): batch optimisation, lighting/fog/alpha-test constant buffer, thick line emulation, `Camera::Get2DScreenPos()` migration, water multitexture lightmap.
 
 ---
 
@@ -725,62 +714,86 @@ These two systems used OpenGL vertex array paths (`glVertexPointer`/`glDrawArray
 
 ---
 
-## 13. Phase 10 — Polish & Optimisation
+## 13. Phase 10 — Polish & Optimisation ✅ PARTIALLY COMPLETED
 
-### 13.1 Batch Optimisation
-The `ImRenderer` immediate-mode emulation works but is inherently slow (one draw call per `Begin`/`End` pair). After correctness is verified:
+### 13.1 Batch Optimisation (deferred)
+The `ImRenderer` immediate-mode emulation works but is inherently slow (one draw call per `Begin`/`End` pair). Future optimisation:
 
 - **Merge batches:** Consecutive `Begin`/`End` pairs with the same state (same texture, same blend mode) can be merged into a single draw call.
-- **Static vertex buffers:** For geometry that doesn't change (landscape, shapes), create static `ID3D11Buffer` objects uploaded once.
+- **Static vertex buffers:** For geometry that doesn't change (shapes), create static `ID3D11Buffer` objects uploaded once.
 
-### 13.2 Landscape & Water — Static Vertex Buffers
+### 13.2 Landscape — Static Vertex Buffer ✅
+
+**File:** `Starstrike\landscape_renderer.h`
+
+- Removed old `RenderMode` enum (`RenderModeVertexArray`, `RenderModeDisplayList`, `RenderModeVertexBufferObject`), `m_renderMode`, `unsigned int m_vertexBuffer`, static offset members (`m_posOffset`, `m_normOffset`, `m_colOffset`, `m_uvOffset`), and `Initialise()`.
+- Added `ID3D11Buffer* m_d3dVertexBuffer`, `int m_d3dVertexCount`, `void CreateD3DVertexBuffer()`.
 
 **File:** `Starstrike\landscape_renderer.cpp`
 
-`RenderMainSlow()` and `RenderOverlaySlow()` are currently stubs. Implement D3D11 static vertex buffers:
-- Create `ID3D11Buffer` from `m_verts` data in `BuildOpenGlState()` after `BuildVertArrayAndTriStrip()`.
-- Render via `IASetVertexBuffers` + `DrawIndexed` with triangle strip topology.
+- **`CreateD3DVertexBuffer()`** — Converts `m_verts` (array of `LandVertex`) to ImRenderer-compatible vertex format (48 bytes/vert: `XMFLOAT3 pos`, `XMFLOAT4 color`, `XMFLOAT2 texcoord`, `XMFLOAT3 normal`), creates a `D3D11_USAGE_DEFAULT` static buffer via `CreateBuffer()`.
+- **`BuildRenderState()`** — Calls `CreateD3DVertexBuffer()` after building vertex/normal/colour/UV arrays.
+- **`RenderMainSlow()`** — Binds the static VB, uploads WVP via ImRenderer's constant buffer, sets ImRenderer's colored pixel shader, and draws each triangle strip via `ctx->Draw()`. Handles `m_negativeRenderer` blend mode.
+- **`RenderOverlaySlow()`** — Same VB with additive blend (`BLEND_ADDITIVE`), depth readonly, and `textures/triangleOutline.bmp` texture via ImRenderer's textured pixel shader. Sampler set to `SAMPLER_LINEAR_WRAP`.
+- **`Render()`** — Simplified to call `RenderMainSlow()` / `RenderOverlaySlow()` directly (no more display list lookup or render mode switch).
+- **`~LandscapeRenderer()`** — Releases `m_d3dVertexBuffer`.
+- **`ImRenderer` extended** with accessors for direct rendering: `GetConstantBuffer()`, `GetInputLayout()`, `GetVertexShader()`, `GetColoredPixelShader()`, `GetTexturedPixelShader()`.
+
+### 13.2.1 Water — Flat + Dynamic Rendering ✅
 
 **File:** `Starstrike\water.cpp`
 
-Same approach — create static D3D11 vertex buffers for water mesh.
+- **`RenderFlatWaterTiles()`** — Renders textured quads via `g_imRenderer->Begin(PRIM_QUADS)` with scrolling UV coordinates (single texture; original multitexture lightmap deferred to future work).
+- **`RenderFlatWater()`** — Sets cull/depth/blend states, binds water colour texture with `SAMPLER_LINEAR_WRAP`, calls `RenderFlatWaterTiles()`, restores state.
+- **`RenderDynamicWater()`** — Renders animated wave triangle strips per-frame via `g_imRenderer->Begin(PRIM_TRIANGLE_STRIP)` with per-vertex colors and normals from `m_renderVerts`. Each `WaterTriangleStrip` is a separate `Begin`/`End` pair.
 
-### 13.3 Lighting via Constant Buffer
+### 13.3 Lighting via Constant Buffer (deferred)
 
 `SetObjectLighting()` / `UnsetObjectLighting()` in `renderer.cpp` and `SetupLights()` in `location.cpp` / `global_world.cpp` are currently stubs. Add lighting parameters to the shader constant buffer and implement in the pixel shader.
 
-### 13.4 Fog via Constant Buffer
+### 13.4 Fog via Constant Buffer (deferred)
 
 Add fog parameters (`gFogStart`, `gFogEnd`, `gFogColor`) to the constant buffer and implement linear fog in the pixel shader.
 
-### 13.5 Alpha Test via Pixel Shader
+### 13.5 Alpha Test via Pixel Shader (deferred)
 
 Add `gAlphaClipThreshold` to the constant buffer. In the pixel shader: `if (color.a <= gAlphaClipThreshold) discard;`
 
-### 13.6 Thick Line Emulation
+### 13.6 Thick Line Emulation (deferred)
 
-`glLineWidth` > 1.0 is unsupported in D3D11 (36 former call sites). Implement thick-line quad expansion in `ImRenderer::End()` when `SetLineWidth()` value > 1.0 and primitive is `PRIM_LINES` / `PRIM_LINE_STRIP` / `PRIM_LINE_LOOP`.
+`glLineWidth` > 1.0 is unsupported in D3D11 (36 former call sites, currently rendering as 1px). Implement thick-line quad expansion in `ImRenderer::End()` when `SetLineWidth()` value > 1.0 and primitive is `PRIM_LINES` / `PRIM_LINE_STRIP` / `PRIM_LINE_LOOP`.
 
-### 13.7 Update `SystemInfo::GetDirectXVersion()`
+### 13.7 Update `SystemInfo::GetDirectXVersion()` ✅
 
 **File:** `NeuronClient\system_info.cpp`
 
-Change `m_directXVersion = 9;` → `m_directXVersion = 11;` (or query feature level from `g_renderDevice`).
+Changed `m_directXVersion = 9;` → `m_directXVersion = 11;`.
 
-### 13.8 Remove Legacy Naming
+### 13.8 Remove Legacy Naming ✅
 
-Rename functions with "OpenGL" in their name to neutral names:
-- `SetOpenGLState()` → `SetDefaultRenderState()`
-- `CheckOpenGLState()` → remove entirely (no-op)
-- `BuildOpenGlState()` → `BuildRenderState()`
-- `FlushOpenGlState()` → `FlushRenderState()`
-- `EnableOpenGL()` / `DisableOpenGL()` → remove entirely (empty stubs)
+All OpenGL-named functions have been renamed to neutral names:
 
-Remove `GetGLStateInt()` / `GetGLStateFloat()` methods and all callers.
+| Old Name | New Name | Files Affected |
+|---|---|---|
+| `SetOpenGLState()` | `SetDefaultRenderState()` | `renderer.h`, `renderer.cpp`, `main.cpp` |
+| `CheckOpenGLState()` | **removed** (was no-op) | `renderer.h`, `renderer.cpp`, `water.cpp` |
+| `BuildOpenGlState()` | `BuildRenderState()` | `renderer.h/cpp`, `text_renderer.h/cpp`, `landscape_renderer.h/cpp`, `landscape.h/cpp`, `water.h/cpp`, `resource.cpp` |
+| `FlushOpenGlState()` | `FlushRenderState()` | `resource.h/cpp`, `location.h/cpp`, `cheat_window.cpp`, `mainmenus.cpp`, `prefs_screen_window.cpp` |
+| `RegenerateOpenGlState()` | `RegenerateRenderState()` | `resource.h/cpp`, `location.h/cpp`, `cheat_window.cpp`, `mainmenus.cpp`, `prefs_screen_window.cpp` |
+| `EnableOpenGL()` | **removed** (was empty stub) | `window_manager.h/cpp` |
+| `DisableOpenGL()` | **removed** (was empty stub) | `window_manager.h/cpp` |
+| `GetGLStateInt()` | **removed** (no callers) | `renderer.h/cpp` |
+| `GetGLStateFloat()` | **removed** (no callers) | `renderer.h/cpp` |
 
-### 13.9 `Camera::Get2DScreenPos()` Migration
+Zero OpenGL-named function references remain in any compiled source file.
+
+### 13.9 `Camera::Get2DScreenPos()` Migration (deferred)
 
 Replace the former `gluProject`-based implementation with manual viewport projection using the stored `ImRenderer` matrices. Must handle the Y-axis convention difference (OpenGL Y=0 at bottom vs D3D11 Y=0 at top).
+
+### 13.10 `ConvertToOpenGLFormat()` Rename (deferred, cosmetic)
+
+`Matrix33::ConvertToOpenGLFormat()` and `Matrix34::ConvertToOpenGLFormat()` in NeuronCore still carry the old name. These produce column-major 4×4 float arrays consumed by `ImRenderer::MultMatrixf()`. The name is misleading but the function is still needed. Rename to `ConvertToColumnMajor()` or similar in a future cleanup pass.
 
 ---
 
@@ -852,7 +865,8 @@ All ~65 GameLogic `.cpp` files and ~15 Starstrike `.cpp` files listed in Section
 - [x] **Phase 7:** Migrate 2D/UI rendering (text, HUD, menus, cursors, taskmanager icons)
 - [x] **Phase 8:** Migrate entity/GameLogic rendering (~65 files)
 - [x] **Phase 9:** Remove all OpenGL code, headers, libs
-- [ ] **Phase 10:** Polish, optimise batching, static VBs, final cleanup
+- [x] **Phase 10:** Landscape static VB, water rendering, legacy naming cleanup, `m_directXVersion = 11`
+- [ ] **Phase 10 remaining:** Batch optimisation, lighting, fog, alpha test, thick lines, `Get2DScreenPos`
 
 ---
 
@@ -905,16 +919,18 @@ The generated `.h` files (e.g. `const BYTE g_pim_defaultVS[] = { ... };`) are in
 | Coordinate handedness mismatch (RH→LH) | ✅ Resolved | `XMMatrix*RH` variants used throughout — existing vertex data and winding preserved |
 | Texture coordinate origin difference (GL bottom-left vs D3D top-left) | 🟠 Moderate | Flip V coordinate in `ConvertToTexture()` or in HLSL |
 | `GL_QUADS` has no D3D primitive | ✅ Resolved | `ImRenderer` converts quads to triangle pairs |
-| `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Important | Implement via `clip()` in pixel shader |
+| `glAlphaFunc` / alpha test has no D3D11 fixed function | 🟡 Deferred | Implement via `clip()` in pixel shader — Phase 10 remaining |
 | Display lists have no D3D11 equivalent | ✅ Resolved | Shape and sphere display lists removed; `BuildDisplayList()` no-op; always uses `RenderSlow()` path |
-| Performance regression from immediate-mode emulation | 🟠 Moderate | Acceptable initially; optimise with static VBs in Phase 10 |
-| GL state queries (`glGet*`) used in debug asserts | ✅ Resolved | `CheckOpenGLState()` → no-op; `GetGLStateInt/Float()` → return 0; viewport from `g_renderDevice->GetBackBufferWidth/Height()` |
+| Performance regression from immediate-mode emulation | 🟠 Moderate | Landscape uses static VB; water dynamic uses `ImRenderer`; shapes and batch merge deferred |
+| GL state queries (`glGet*`) used in debug asserts | ✅ Resolved | `CheckOpenGLState()` removed; `GetGLStateInt/Float()` removed; viewport from `g_renderDevice->GetBackBufferWidth/Height()` |
 | `gluBuild2DMipmaps` has no D3D11 equivalent | ✅ Resolved | `GenerateMips()` via `TextureManager::CreateTexture()` |
 | Large number of files to touch (~95) | ✅ Resolved | PowerShell bulk scripts stripped 154+ GL lines across 37 files in Phase 9 |
-| `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | 🔴 Critical | Accept 1px initially; implement thick-line quad expansion in Phase 10 |
+| `glLineWidth` > 1.0 unsupported in D3D11 (36 sites) | 🟡 Deferred | Accept 1px; thick-line quad expansion deferred to Phase 10 remaining |
 | Save/restore state RAII pattern in `text_renderer.cpp` | ✅ Resolved | RAII guards removed; explicit save/restore via `ImRenderer` matrix accessors and `RenderStates::GetCurrent*()` |
-| Vertex array paths (landscape, water) not coverable by `ImRenderer::Begin/End` | 🟡 Important | Create direct `ID3D11Buffer` for these systems |
-| `Matrix34::ConvertToOpenGLFormat()` column-major vs `XMMATRIX` row-major | ✅ Resolved | `ImRenderer::MultMatrixf()` transposes on load |
+| Vertex array paths (landscape, water) | ✅ Resolved | Landscape uses static `ID3D11Buffer`; water uses `ImRenderer::Begin(PRIM_TRIANGLE_STRIP)` per frame |
+| `Matrix34::ConvertToOpenGLFormat()` column-major vs `XMMATRIX` row-major | ✅ Resolved | `ImRenderer::MultMatrixf()` transposes on load; function rename deferred (cosmetic) |
 | `GL_CLAMP` vs `D3D11_TEXTURE_ADDRESS_CLAMP` (border pixel bleed) | ✅ Resolved | 4 sampler states pre-created; accept minor difference |
 | `Camera::SetupModelviewMatrix()` scales vectors by `magOfPos` before `gluLookAt` | ✅ Resolved | `XMMatrixLookAtRH` receives same eye/target/up — normalises cross products internally |
 | Missing modelview matrix stack in `ImRenderer` | ✅ Resolved | `PushMatrix`/`PopMatrix`/`MultMatrixf`/`Translatef`/`Rotatef`/`Scalef` added |
+| Legacy OpenGL naming in function names | ✅ Resolved | All `*OpenGL*` / `*OpenGl*` function names renamed or removed (Phase 10) |
+| Water multitexture (lightmap overlay) | 🟡 Deferred | Single-texture rendering only; `GL_TEXTURE1_ARB` lightmap layer not yet reimplemented |

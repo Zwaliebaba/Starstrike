@@ -42,13 +42,13 @@ TextRenderer g_editorFont;
 void TextRenderer::Initialise(char const *_filename)
 {
 	m_filename = strdup(_filename);
-	BuildOpenGlState();
+	BuildRenderState();
     m_renderShadow = false;
     m_renderOutline = false;
 }
 
 
-void TextRenderer::BuildOpenGlState()
+void TextRenderer::BuildRenderState()
 {
 	BinaryReader *reader = g_app->m_resource->GetBinaryReader(m_filename);
 	char const *extension = GetExtensionPart(m_filename);

@@ -35,9 +35,6 @@ class Renderer
     float m_pixelEffectGrid[PIXEL_EFFECT_GRID_RES][PIXEL_EFFECT_GRID_RES]; // -1.0 means cell not used
     int m_pixelSize;
 
-    int GetGLStateInt(int pname) const;
-    float GetGLStateFloat(int pname) const;
-
     void RenderFlatTexture();
     void RenderLogo();
 
@@ -54,14 +51,13 @@ class Renderer
     void Render();
     void FPSMeterAdvance();
 
-    void BuildOpenGlState();
+    void BuildRenderState();
 
     float GetNearPlane() const;
     float GetFarPlane() const;
     void SetNearAndFar(float _nearPlane, float _farPlane);
 
-    void CheckOpenGLState() const;
-    void SetOpenGLState() const;
+    void SetDefaultRenderState() const;
 
     void SetObjectLighting() const;
     void UnsetObjectLighting() const;

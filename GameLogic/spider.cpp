@@ -754,13 +754,11 @@ void Spider::Render(float _predictionTime)
         float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
         if( frand() > 0.5f ) mat.r *= ( 1.0f + sinf(timeIndex) * 0.5f );
         else                 mat.u *= ( 1.0f + sinf(timeIndex) * 0.5f );
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
     }
 
 	m_shape->Render(_predictionTime, mat);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
 	//

@@ -94,5 +94,5 @@ void SystemInfo::GetAudioDetails()
 
 void SystemInfo::GetDirectXVersion()
 {
-  m_directXVersion = 9;
+  m_directXVersion = 11;
 }

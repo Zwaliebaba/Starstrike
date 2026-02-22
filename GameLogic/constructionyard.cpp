@@ -194,7 +194,6 @@ void ConstructionYard::RenderAlphas( float _predictionTime )
     LegacyVector3 camRight = g_app->m_camera->GetRight();
 
     g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
     g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
 

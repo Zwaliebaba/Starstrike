@@ -179,7 +179,6 @@ void FuelBuilding::RenderAlphas( float _predictionTime )
             rightAngle.SetLength( 25.0f );
 
             g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/fuel.bmp" ) );
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -711,8 +710,6 @@ void FuelStation::RenderAlphas( float _predictionTime )
 
 
             g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-            g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
             g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
         }
     }
@@ -1363,7 +1360,6 @@ void EscapeRocket::RenderAlphas( float _predictionTime )
         LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.75f;
 
         g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-        g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
         g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
         g_imRenderer->BindTexture(g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
         //glDisable       ( GL_DEPTH_TEST );
