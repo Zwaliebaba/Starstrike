@@ -16,6 +16,24 @@
 #include "global_world.h"
 #include "soundsystem.h"
 
+namespace
+{
+  struct StartSeqVertex
+  {
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 color;
+    DirectX::XMFLOAT2 texcoord;
+    DirectX::XMFLOAT3 normal;
+  };
+
+  struct StartSeqCB
+  {
+    DirectX::XMMATRIX worldViewProj;
+  };
+
+  static const int MAX_GRID_VERTICES = 1024;
+}
+
 StartSequence::StartSequence()
 {
   m_startTime = GetHighResTime();
@@ -37,6 +55,56 @@ StartSequence::StartSequence()
   RegisterCaption(LANGUAGEPHRASE("intro_8"), x, y, size, 74, 90);
   RegisterCaption(LANGUAGEPHRASE("intro_9"), x, y + 15, 15, 82, 90);
   RegisterCaption(LANGUAGEPHRASE("intro_10"), x, y + 30, 15, 86, 90);
+
+  InitD3DResources();
+}
+
+StartSequence::~StartSequence()
+{
+  ShutdownD3DResources();
+}
+
+void StartSequence::InitD3DResources()
+{
+  m_overlayVB = nullptr;
+  m_cursorVB = nullptr;
+  m_gridVB = nullptr;
+  m_cbPerDraw = nullptr;
+
+  auto* device = g_renderDevice->GetDevice();
+  HRESULT hr;
+
+  D3D11_BUFFER_DESC vbd = {};
+  vbd.Usage = D3D11_USAGE_DYNAMIC;
+  vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+  vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+  vbd.ByteWidth = 6 * sizeof(StartSeqVertex);
+  hr = device->CreateBuffer(&vbd, nullptr, &m_overlayVB);
+  DarwiniaReleaseAssert(SUCCEEDED(hr), "Failed to create start sequence overlay VB");
+
+  hr = device->CreateBuffer(&vbd, nullptr, &m_cursorVB);
+  DarwiniaReleaseAssert(SUCCEEDED(hr), "Failed to create start sequence cursor VB");
+
+  vbd.ByteWidth = MAX_GRID_VERTICES * sizeof(StartSeqVertex);
+  hr = device->CreateBuffer(&vbd, nullptr, &m_gridVB);
+  DarwiniaReleaseAssert(SUCCEEDED(hr), "Failed to create start sequence grid VB");
+
+  D3D11_BUFFER_DESC cbd = {};
+  cbd.ByteWidth = sizeof(StartSeqCB);
+  cbd.Usage = D3D11_USAGE_DYNAMIC;
+  cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  hr = device->CreateBuffer(&cbd, nullptr, &m_cbPerDraw);
+  DarwiniaReleaseAssert(SUCCEEDED(hr), "Failed to create start sequence CB");
+}
+
+void StartSequence::ShutdownD3DResources()
+{
+  if (m_overlayVB) { m_overlayVB->Release(); m_overlayVB = nullptr; }
+  if (m_cursorVB)  { m_cursorVB->Release();  m_cursorVB = nullptr; }
+  if (m_gridVB)    { m_gridVB->Release();    m_gridVB = nullptr; }
+  if (m_cbPerDraw) { m_cbPerDraw->Release(); m_cbPerDraw = nullptr; }
 }
 
 void StartSequence::RegisterCaption(char* _caption, float _x, float _y, float _size, float _startTime, float _endTime)
@@ -96,40 +164,94 @@ void StartSequence::Render()
   float screenRatio = static_cast<float>(g_app->m_renderer->ScreenH()) / static_cast<float>(g_app->m_renderer->ScreenW());
   int screenH = 800 * screenRatio;
 
-  g_imRenderer->SetProjectionMatrix(XMMatrixOrthographicOffCenterRH(0, 800, static_cast<float>(screenH), 0, -1, 1));
+  XMMATRIX orthoProj = XMMatrixOrthographicOffCenterRH(0, 800, static_cast<float>(screenH), 0, -1, 1);
+
+  // Set ImRenderer matrices for g_gameFont compatibility
+  g_imRenderer->SetProjectionMatrix(orthoProj);
   g_imRenderer->SetViewMatrix(XMMatrixIdentity());
   g_imRenderer->LoadIdentity();
 
-  g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
-  g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_DISABLED);
+  auto* ctx = g_renderDevice->GetContext();
 
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  g_renderStates->SetRasterState(ctx, RASTER_CULL_NONE);
+  g_renderStates->SetDepthState(ctx, DEPTH_DISABLED);
 
   float timeNow = GetHighResTime() - m_startTime;
 
+  // Helper: update constant buffer with WVP matrix
+  auto updateCB = [&](const XMMATRIX& wvp)
+  {
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    if (SUCCEEDED(ctx->Map(m_cbPerDraw, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+    {
+      static_cast<StartSeqCB*>(mapped.pData)->worldViewProj = XMMatrixTranspose(wvp);
+      ctx->Unmap(m_cbPerDraw, 0);
+    }
+  };
+
+  // Helper: bind pipeline for colored (non-textured) direct draws
+  auto bindColoredPipeline = [&](ID3D11Buffer* vb, D3D11_PRIMITIVE_TOPOLOGY topology)
+  {
+    UINT stride = static_cast<UINT>(sizeof(StartSeqVertex));
+    UINT vbOffset = 0;
+    ctx->IASetVertexBuffers(0, 1, &vb, &stride, &vbOffset);
+    ctx->IASetInputLayout(g_imRenderer->GetInputLayout());
+    ctx->IASetPrimitiveTopology(topology);
+    ctx->VSSetShader(g_imRenderer->GetVertexShader(), nullptr, 0);
+    ctx->VSSetConstantBuffers(0, 1, &m_cbPerDraw);
+    ctx->PSSetShader(g_imRenderer->GetColoredPixelShader(), nullptr, 0);
+  };
+
+  // Helper: fill a 6-vertex quad (2 triangles) into a dynamic VB
+  auto fillQuadVB = [&](ID3D11Buffer* vb, float x0, float y0, float x1, float y1,
+                         float cr, float cg, float cb, float ca) -> bool
+  {
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    if (FAILED(ctx->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+      return false;
+
+    auto* v = static_cast<StartSeqVertex*>(mapped.pData);
+    XMFLOAT4 col = {cr, cg, cb, ca};
+    XMFLOAT2 uv = {0.0f, 0.0f};
+    XMFLOAT3 nrm = {0.0f, 0.0f, 1.0f};
+
+    v[0] = {{x0, y0, 0.0f}, col, uv, nrm};
+    v[1] = {{x1, y0, 0.0f}, col, uv, nrm};
+    v[2] = {{x1, y1, 0.0f}, col, uv, nrm};
+    v[3] = {{x0, y0, 0.0f}, col, uv, nrm};
+    v[4] = {{x1, y1, 0.0f}, col, uv, nrm};
+    v[5] = {{x0, y1, 0.0f}, col, uv, nrm};
+
+    ctx->Unmap(vb, 0);
+    return true;
+  };
+
+  // Fade-in overlay
   if (timeNow < 3.0f)
   {
     float alpha = 1.0f - timeNow / 3.0f;
-    g_imRenderer->Color4f(0, 0, 0, alpha);
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->Vertex2i(0, 0);
-    g_imRenderer->Vertex2i(800, 0);
-    g_imRenderer->Vertex2i(800, screenH);
-    g_imRenderer->Vertex2i(0, screenH);
-    g_imRenderer->End();
+    if (fillQuadVB(m_overlayVB, 0, 0, 800, static_cast<float>(screenH), 0.0f, 0.0f, 0.0f, alpha))
+    {
+      updateCB(orthoProj);
+      bindColoredPipeline(m_overlayVB, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      ctx->Draw(6, 0);
+    }
   }
 
+  // Fade-out overlay
   if (timeNow > 87)
   {
     float alpha = (timeNow - 87) / 2.0f;
-    g_imRenderer->Color4f(1, 1, 1, alpha);
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->Vertex2i(0, 0);
-    g_imRenderer->Vertex2i(800, 0);
-    g_imRenderer->Vertex2i(800, screenH);
-    g_imRenderer->Vertex2i(0, screenH);
-    g_imRenderer->End();
+    if (fillQuadVB(m_overlayVB, 0, 0, 800, static_cast<float>(screenH), 1.0f, 1.0f, 1.0f, alpha))
+    {
+      updateCB(orthoProj);
+      bindColoredPipeline(m_overlayVB, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      ctx->Draw(6, 0);
+    }
   }
+
+  // Captions (rendered through g_gameFont -> ImRenderer)
+  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
   Vector2 cursorPos;
   bool cursorFlash = false;
@@ -158,72 +280,82 @@ void StartSequence::Render()
     }
   }
 
+  // Cursor quad
   if (cursorPos != Vector2(0, 0))
   {
     if (!cursorFlash || fmod(timeNow, 1) < 0.5f)
     {
-      g_imRenderer->Begin(PRIM_QUADS);
-      g_imRenderer->Vertex2f(cursorPos.x, cursorPos.y);
-      g_imRenderer->Vertex2f(cursorPos.x + cursorSize * 0.7f, cursorPos.y);
-      g_imRenderer->Vertex2f(cursorPos.x + cursorSize * 0.7f, cursorPos.y + cursorSize * 0.88f);
-      g_imRenderer->Vertex2f(cursorPos.x, cursorPos.y + cursorSize * 0.88f);
-      g_imRenderer->End();
+      float cx = cursorPos.x;
+      float cy = cursorPos.y;
+      float cw = cursorSize * 0.7f;
+      float ch = cursorSize * 0.88f;
+      if (fillQuadVB(m_cursorVB, cx, cy, cx + cw, cy + ch, 1.0f, 1.0f, 1.0f, 0.8f))
+      {
+        updateCB(orthoProj);
+        bindColoredPipeline(m_cursorVB, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        ctx->Draw(6, 0);
+      }
     }
   }
 
   g_app->m_renderer->SetupMatricesFor3D();
 
   //
-  // Render grid behind darwinia
+  // Render grid
 
   float scale = 1000.0f;
-
-  float fog = 0.0f;
-  float fogCol[] = {fog, fog, fog, fog};
-
-  int fogVal = 5810000;
-
-  float r = 2.0f;
+  float gridR = 2.0f;
   float height = -400.0f;
   float gridSize = 100.0f;
 
-  float xStart = -4000.0f * r;
-  float xEnd = 4000.0f + 4000.0f * r;
-  float zStart = -4000.0f * r;
-  float zEnd = 4000.0f + 4000.0f * r;
-
-  float fogColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  float xStart = -4000.0f * gridR;
+  float xEnd = 4000.0f + 4000.0f * gridR;
+  float zStart = -4000.0f * gridR;
+  float zEnd = 4000.0f + 4000.0f * gridR;
 
   if (timeNow > 50.0f)
   {
-    g_imRenderer->PushMatrix();
-    g_imRenderer->Scalef(scale, scale, scale);
-
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-
-    g_imRenderer->Color4f(0.5, 0.5, 1.0, 0.5);
+    g_renderStates->SetBlendState(ctx, BLEND_ADDITIVE);
+    g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_WRITE);
 
     float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;
     percentDrawn = max(percentDrawn, 0.0f);
-    xEnd -= (8000 + 4000 * r * percentDrawn);
-    zEnd -= (8000 + 4000 * r * percentDrawn);
+    xEnd -= (8000 + 4000 * gridR * percentDrawn);
+    zEnd -= (8000 + 4000 * gridR * percentDrawn);
 
-    for (int x = xStart; x < xEnd; x += gridSize)
+    // Batch all grid lines into a single VB
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    if (SUCCEEDED(ctx->Map(m_gridVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
     {
-      g_imRenderer->Begin(PRIM_LINES);
-      g_imRenderer->Vertex3f(x, height, zStart);
-      g_imRenderer->Vertex3f(x, height, zEnd);
-      g_imRenderer->Vertex3f(xStart, height, x);
-      g_imRenderer->Vertex3f(xEnd, height, x);
-      g_imRenderer->End();
+      auto* v = static_cast<StartSeqVertex*>(mapped.pData);
+      int vertCount = 0;
+      XMFLOAT4 gridCol = {0.5f, 0.5f, 1.0f, 0.5f};
+      XMFLOAT2 uv = {0.0f, 0.0f};
+      XMFLOAT3 nrm = {0.0f, 0.0f, 1.0f};
+
+      for (float gx = xStart; gx < xEnd && vertCount + 4 <= MAX_GRID_VERTICES; gx += gridSize)
+      {
+        v[vertCount++] = {{gx, height, zStart}, gridCol, uv, nrm};
+        v[vertCount++] = {{gx, height, zEnd}, gridCol, uv, nrm};
+        v[vertCount++] = {{xStart, height, gx}, gridCol, uv, nrm};
+        v[vertCount++] = {{xEnd, height, gx}, gridCol, uv, nrm};
+      }
+
+      ctx->Unmap(m_gridVB, 0);
+
+      if (vertCount > 0)
+      {
+        XMMATRIX gridWorld = XMMatrixScaling(scale, scale, scale);
+        XMMATRIX gridWVP = gridWorld * g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+        updateCB(gridWVP);
+        bindColoredPipeline(m_gridVB, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+        ctx->Draw(vertCount, 0);
+      }
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
-    g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
+    g_renderStates->SetBlendState(ctx, BLEND_DISABLED);
+    g_renderStates->SetDepthState(ctx, DEPTH_ENABLED_WRITE);
 
     g_app->m_globalWorld->SetupFog();
-
-    g_imRenderer->PopMatrix();
   }
 }

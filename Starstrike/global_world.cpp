@@ -698,6 +698,13 @@ SphereWorld::SphereWorld()
   m_shapeOuter = g_app->m_resource->GetShape("globalworld_outer.shp");
   m_shapeMiddle = g_app->m_resource->GetShape("globalworld_middle.shp");
   m_shapeInner = g_app->m_resource->GetShape("globalworld_inner.shp");
+
+  if (m_shapeOuter)
+    ColourShapeFragment(m_shapeOuter->m_rootFragment, RGBAColour(255, 200, 100, 60));
+  if (m_shapeMiddle)
+    ColourShapeFragment(m_shapeMiddle->m_rootFragment, RGBAColour(255, 200, 100, 100));
+  if (m_shapeInner)
+    ColourShapeFragment(m_shapeInner->m_rootFragment, RGBAColour(255, 200, 100, 180));
   //#endif
 }
 
