@@ -21,38 +21,3 @@ void glGetMaterialfv (GLenum face, GLenum pname, GLfloat *params)
 {
 	GL_TRACE("glGetMaterialfv(%s, %s, (float *)%p)", glEnumToString(face), glEnumToString(pname), params)
 }
-
-void glEnableClientState (GLenum array)
-{
-	GL_TRACE("glEnableClientState(%s)", glEnumToString(array))
-}
-
-void glDisableClientState (GLenum array)
-{
-	GL_TRACE("glDisableClientState(%s)", glEnumToString(array))
-}
-
-void glVertexPointer (GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
-{
-	GL_TRACE("glVertexPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
-}
-
-void glColorPointer (GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
-{
-	GL_TRACE("glColorPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
-}
-
-void glNormalPointer (GLenum type, GLsizei stride, const GLvoid *pointer)
-{
-	GL_TRACE("glNormalPointer(%s, %d, %p)", glEnumToString(type), stride, pointer)
-}
-
-void glTexCoordPointer (GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
-{
-	GL_TRACE("glTexCoordPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
-}
-
-void glDrawArrays (GLenum mode, GLint first, GLsizei count)
-{
-	GL_TRACE("glDrawArrays(%s, %d, %d)", glEnumToString(mode), first, count)
-}

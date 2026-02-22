@@ -1,144 +1,108 @@
-# Copilot Instructions — Starstrike
+# GitHub Copilot Instructions
 
-## Project Overview
+## Priority Guidelines
 
-Starstrike is a Windows-native C++ game built with Visual Studio using the `.slnx` solution format. It targets **x64 Windows 10+** (minimum 10.0.17763.0) and is packaged as an **MSIX** application using the **Windows App SDK 1.8** and **WinUI 3**.
+When generating code for this repository:
 
-## Solution Structure
+1. **Version Compatibility**: Always detect and respect the exact versions of languages, frameworks, and libraries used in this project.
+2. **Context Files**: Prioritize patterns and standards defined in the .github/copilot directory if it exists.
+3. **Codebase Patterns**: When context files don't provide specific guidance, scan the codebase for established patterns.
+4. **Architectural Consistency**: Maintain the existing multi-project modular architecture and dependency boundaries.
+5. **Code Quality**: Prioritize performance in all generated code.
 
-| Project | Type | Role |
-|---|---|---|
-| **Starstrike** | Application (.exe) | Main WinUI 3 entry point, game loop, rendering, camera, scripting, task management |
-| **NeuronClient** | Static Library | Client-side engine: rendering primitives, sound (DirectSound), UI (Eclipse widget system), input, resource management, text rendering, window management |
-| **NeuronCore** | Static Library | Core engine: networking (WinSock2), file I/O, math, threading, C++/WinRT interop, debug utilities |
-| **NeuronServer** | Static Library | Server-side networking |
-| **GameLogic** | Static Library | Game entities, buildings, AI, weapons, UI windows, preferences |
+## Technology Version Detection
 
-### Dependency Graph
+Before generating code, scan the codebase to identify:
 
-```
-Starstrike → NeuronClient, NeuronCore, GameLogic
-NeuronClient → NeuronCore, GameLogic
-NeuronServer → NeuronCore
-GameLogic → (standalone)
-```
+1. **Language Versions**: Detect the exact versions of programming languages in use.
+	- Examine project files such as `Starstrike.slnx` and `*.vcxproj`.
+	- Look for C++ language standard settings (e.g., `stdcpplatest`, `stdcpp20`).
+	- Never use language features beyond the detected version.
 
-## Build & Toolchain
+2. **Framework Versions**: Identify the exact versions of all frameworks.
+	- Check NuGet package metadata in `packages.config` and project files.
+	- Respect version constraints when generating code.
+	- Never suggest features not available in the detected framework versions.
 
-- **Platform toolset**: v145 (VS 2022 17.x+) with v143 fallback
-- **C++ standard**: `stdcpplatest` (Debug), `stdcpp20` (Release)
-- **Precompiled headers**: Every project uses `pch.h` / `pch.cpp`
-- **Package management**: NuGet via `packages.config`
-- **Character set**: Unicode
-- **Key packages**: Microsoft.WindowsAppSDK 1.8, Microsoft.Windows.CppWinRT 2.0, Microsoft.Windows.SDK.BuildTools
+3. **Library Versions**: Note the exact versions of key libraries and dependencies.
+	- Generate code compatible with these specific versions.
+	- Never use APIs or features not available in the detected versions.
 
-## Coding Conventions
+## Context Files
 
-### Naming
+Prioritize the following files in .github/copilot directory (if they exist):
 
-- **Files**: `snake_case.cpp` / `snake_case.h`
-- **Classes**: `PascalCase` (e.g., `SystemInfo`, `SoundLibrary3dDSound`)
-- **Methods**: `PascalCase` (e.g., `GetLocaleDetails`, `ReadFile`)
-- **Member variables**: `m_` prefix with `camelCase` (e.g., `m_preferredDevice`, `m_homeDir`)
-- **Global pointers**: `g_` prefix (e.g., `g_app`, `g_systemInfo`, `g_prefsManager`)
-- **Constants / macros**: `UPPER_SNAKE_CASE`
+- **architecture.md**: System architecture guidelines
+- **tech-stack.md**: Technology versions and framework details
+- **coding-standards.md**: Code style and formatting standards
+- **folder-structure.md**: Project organization guidelines
+- **exemplars.md**: Exemplary code patterns to follow
 
-### Style
+If the .github/copilot directory is not present, use guidance from `.github/coding-standards.md` and the existing codebase.
 
-- Indentation: **2 spaces** in Starstrike/app-level code; some library code uses **tabs** — match the existing file's style
-- Include guards: Legacy code uses `#ifndef` / `#define` / `#endif`; newer NeuronCore headers use `#pragma once`
-- Braces: Opening brace on the **same line** as the declaration for control flow; **next line** for function/class definitions in some files — match surrounding code
+## Codebase Scanning Instructions
 
-### Patterns
+When context files don't provide specific guidance:
 
-- Raw pointers with manual `new` / `delete` are common in legacy code (NeuronClient, GameLogic). Do not refactor existing code to smart pointers unless specifically asked.
-- `Neuron` namespace is used for all NeuronCore types and utilities.
-- Custom assert macros: `DarwiniaReleaseAssert(condition, msg)` and `DarwiniaDebugAssert(x)` — use these instead of standard `assert`.
-- Debug output: `Neuron::DebugTrace(fmt, args...)` using `std::format` syntax.
-- Fatal errors: `Neuron::Fatal(fmt, args...)` — `[[noreturn]]`, triggers `__debugbreak()`.
-- Globals: Singleton-style global pointers are the norm (e.g., `g_app`, `g_systemInfo`). Do not introduce dependency injection or service locators.
+1. Identify similar files to the one being modified or created.
+2. Analyze patterns for:
+	- Naming conventions
+	- Code organization
+	- Error handling
+	- Logging approaches
+	- Documentation style
+	- Testing patterns
+3. Follow the most consistent patterns found in the codebase.
+4. When conflicting patterns exist, prioritize patterns in newer files or files with higher test coverage.
+5. Never introduce patterns not found in the existing codebase.
 
-### Modern C++ Usage (NeuronCore)
+## Code Quality Standards
 
-NeuronCore uses modern C++20/23 features. When writing code in NeuronCore:
-- Prefer `std::string_view`, `std::format`, `constexpr`, `[[nodiscard]]`, `noexcept`
-- Use `std::vector`, `std::array`, `std::ranges`, `std::mdspan` where appropriate
-- Use C++/WinRT for Windows Runtime API access
+- Follow existing patterns for memory and resource management.
+- Match existing patterns for handling computationally expensive operations.
+- Follow established patterns for asynchronous operations.
+- Apply caching consistently with existing patterns.
+- Optimize according to patterns evident in the codebase.
 
-### Legacy Code (NeuronClient, GameLogic)
+## Documentation Requirements
 
-These projects contain ported legacy code. When modifying:
-- Keep C-style string usage (`char*`) consistent with surrounding code
-- Use `strdup`, `new[]` / `delete[]` as existing code does
-- Use the existing `DarwiniaReleaseAssert` / `DarwiniaDebugAssert` macros
+- Follow the exact documentation format found in the codebase.
+- Match the comment style and completeness of existing comments.
+- Document parameters, returns, and exceptions in the same style where comments are used.
+- Follow existing patterns for usage examples.
+- Match class-level documentation style and content.
 
-## Audio
+## Testing Approach
 
-- Audio uses **DirectSound** (`dsound.h`, `mmsystem.h`)
-- Sound device enumeration via `waveOutGetDevCaps` / `waveOutGetNumDevs`
-- Sound library abstraction: `SoundLibrary3dDSound`
+### Unit Testing
 
-## Networking
+- Use the Visual Studio Native Unit Test Framework for any new unit tests.
 
-- Uses **WinSock2** (`winsock2.h`, `ws2tcpip.h`)
-- Client-server architecture with `ClientToServer`, `ServerToClient`, `ServerToClientLetter`
-- Custom `NetSocket`, `NetSocketListener`, `NetMutex`, `NetThread` abstractions
+### Integration Testing
 
-## File I/O
+- No integration-test framework is present in the current codebase. Do not invent new test frameworks unless explicitly requested.
 
-- `Neuron::FileSys` base with `Neuron::BinaryFile` and `Neuron::TextFile` for asset loading
-- Home directory set to `Assets\` subdirectory
-- Legacy file readers: `TextStreamReaders`, `BinaryStreamReaders`
+## General Best Practices
 
-## Rendering Architecture
+- Follow naming conventions exactly as they appear in existing code.
+- Match code organization patterns from similar files.
+- Apply error handling consistent with existing patterns.
+- Follow the same approach to testing as seen in the codebase.
+- Match logging patterns from existing code.
+- Use the same approach to configuration as seen in the codebase.
 
-### Current State
+## Project-Specific Guidance
 
-The rendering pipeline is built on **Direct3D 11**. Key components:
-
-| Component | File(s) | Role |
-|---|---|---|
-| `RenderDevice` | `render_device.h/.cpp` | D3D11 device, swap chain, back buffer management |
-| `RenderStates` | `render_states.h/.cpp` | Pre-built blend, depth, and rasteriser states |
-| `TextureManager` | `texture_manager.h/.cpp` | D3D11 texture creation, SRV lookup, sampler states |
-| `ImRenderer` | `im_renderer.h/.cpp` | **Legacy** — OpenGL-style immediate-mode emulation over D3D11 |
-| `TextRenderer` | `text_renderer.h/.cpp` | Bitmap font rendering (currently uses `ImRenderer`) |
-| `SpriteBatch` | `sprite_batch.h/.cpp` | **Planned** — batched 2D/3D sprite and text rendering |
-
-### `ImRenderer` — Legacy (Do Not Extend)
-
-`ImRenderer` (`g_imRenderer`) is an **OpenGL immediate-mode emulation layer** over D3D11. It was created as a transitional bridge during the OpenGL → D3D11 port. **Do not add new functionality to `ImRenderer` or write new code that depends on it.** Specifically:
-
-- **Do not** add new `Begin(PRIM_QUADS)` / `End()` sequences for textured quads or sprites — use `SpriteBatch` instead (once available) or note the code as pending migration.
-- **Do not** extend the `ImRenderer` constant buffer, vertex format, or shader pair.
-- **Do not** use `ImRenderer` matrix state (`SetProjectionMatrix`, `SetViewMatrix`, `SetWorldMatrix`) for new rendering paths.
-- Existing `ImRenderer` usage for **line rendering**, **debug wireframes**, and **lit 3D mesh rendering** is acceptable until those subsystems are individually migrated.
-
-The full migration plan is documented in [`DX11Text.md`](../DX11Text.md).
-
-### `SpriteBatch` — Replacement for Sprite/Text Rendering
-
-All new 2D/3D textured-quad rendering (text glyphs, UI sprites, cursor, logos) should target the `SpriteBatch` API:
-- `g_spriteBatch->Begin2D()` / `End2D()` for screen-space quads
-- `g_spriteBatch->Begin3D()` / `End3D()` for world-space billboards
-- `g_spriteBatch->AddQuad2D()` / `AddQuad3D()` to batch geometry
-- Uses a dedicated lightweight shader pair (no lighting/fog), pre-built index buffer, and single `DrawIndexed()` per batch.
-
-### Shaders
-
-HLSL shaders live in `NeuronClient/Shaders/` and are compiled offline into byte arrays in `NeuronClient/CompiledShaders/`.
-
-| Shader | Purpose |
-|---|---|
-| `im_defaultVS.hlsl` | Vertex shader for `ImRenderer` (full WVP + lighting + fog) |
-| `im_texturedPS.hlsl` | Pixel shader for `ImRenderer` textured draws |
-| `im_coloredPS.hlsl` | Pixel shader for `ImRenderer` untextured draws |
-| `sprite_vs.hlsl` | **Planned** — Vertex shader for `SpriteBatch` (ViewProj only) |
-| `sprite_ps.hlsl` | **Planned** — Pixel shader for `SpriteBatch` (tex × color) |
-
-## Important Notes
-
-- Do not add `#include` directives that are already covered by `pch.h`.
-- When adding new source files, create a corresponding precompiled header entry (`Use` for `.cpp`, `Create` for `pch.cpp`).
-- The Starstrike project includes headers from NeuronCore, NeuronClient, and GameLogic via `AdditionalIncludeDirectories`.
-- Build verification: always run a build after making changes to confirm compilation succeeds.
+- Respect the solution boundaries and dependency graph:
+  - Starstrike depends on NeuronClient, NeuronCore, GameLogic.
+  - NeuronClient depends on NeuronCore, GameLogic.
+  - NeuronServer depends on NeuronCore.
+  - GameLogic is standalone.
+- Use `ASSERT` and `DEBUG_ASSERT` for assertions.
+- Use `Neuron::DebugTrace` for debug logging and `Neuron::Fatal` for fatal errors.
+- Files are named `PascalCase.cpp` / `PascalCase.h` and identifiers use `PascalCase` for classes and functions, `m_` for members, `g_` for global pointers, `UPPER_SNAKE_CASE` for constants.
+- Do not add `#include` directives already covered by `pch.h`. All projects use `pch.h` / `pch.cpp`.
+- Legacy code (NeuronClient, GameLogic) uses raw pointers and C-style strings; keep those patterns when editing those areas.
+- NeuronCore favors modern C++ (e.g., `std::string_view`, `std::format`, `constexpr`, `[[nodiscard]]`, `noexcept`).
+- Rendering: `ImRenderer` is legacy and should not be extended. New textured-quad rendering should target `SpriteBatch`.
+- Build and verify after changes using the existing solution and configurations.

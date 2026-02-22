@@ -67,6 +67,7 @@ static CustomVertex* s_vertices = nullptr;
 static CustomVertex* s_currentVertex = nullptr;
 static unsigned s_allocatedVertices = 0;
 static unsigned s_currentVertexNumber = 0;
+static int s_quadVertexCount = 0;
 
 // --- Textures ---
 struct TextureResource
@@ -88,6 +89,23 @@ static TextureState* s_activeTextureState = &s_textureStates[0];
 static std::map<unsigned, DisplayList*> s_displayLists;
 static unsigned s_lastDisplayId = 0;
 static DisplayListRecorder* s_pDisplayListRecorder = nullptr;
+
+// --- Vertex arrays (client state) ---
+struct VertexArrayConfig
+{
+    const void* pointer = nullptr;
+    GLint size = 4;
+    GLenum type = GL_FLOAT;
+    GLsizei stride = 0;
+};
+static bool s_clientStateVertex = false;
+static bool s_clientStateNormal = false;
+static bool s_clientStateColor = false;
+static bool s_clientStateTexCoord = false;
+static VertexArrayConfig s_vertexArray;
+static VertexArrayConfig s_normalArray;
+static VertexArrayConfig s_colorArray;
+static VertexArrayConfig s_texCoordArray;
 
 // --- Current vertex attributes ---
 class CurrentAttributes : public CustomVertex
@@ -704,6 +722,7 @@ void glBegin(GLenum mode)
     GL_TRACE_IMP(" glBegin(%s)", glEnumToString(mode))
     s_currentVertex = s_vertices;
     s_currentVertexNumber = 0;
+    s_quadVertexCount = 0;
     s_primitiveMode = mode;
 }
 
@@ -803,9 +822,7 @@ void glVertex3f_impl(GLfloat x, GLfloat y, GLfloat z)
 
     if (s_primitiveMode == GL_QUADS)
     {
-        static int vertexCount = 0;
-
-        if (vertexCount == 2)
+        if (s_quadVertexCount == 2)
         {
             *s_currentVertex = s_vertices[s_currentVertexNumber - 3];
             s_currentVertex++;
@@ -816,7 +833,7 @@ void glVertex3f_impl(GLfloat x, GLfloat y, GLfloat z)
             s_currentVertexNumber++;
         }
 
-        vertexCount = (vertexCount + 1) & 3;
+        s_quadVertexCount = (s_quadVertexCount + 1) & 3;
     }
 }
 
@@ -1325,6 +1342,163 @@ void __stdcall OpenGLD3D::glActiveTextureD3D(int _target)
     DEBUG_ASSERT(_target >= 0 && _target < MAX_ACTIVE_TEXTURES);
     s_activeTexture = _target;
     s_activeTextureState = &s_textureStates[s_activeTexture];
+}
+
+// ============================================================================
+// Vertex Arrays
+// ============================================================================
+
+void glEnableClientState(GLenum array)
+{
+    GL_TRACE_IMP(" glEnableClientState(%s)", glEnumToString(array))
+    switch (array)
+    {
+    case GL_VERTEX_ARRAY:          s_clientStateVertex = true; break;
+    case GL_NORMAL_ARRAY:          s_clientStateNormal = true; break;
+    case GL_COLOR_ARRAY:           s_clientStateColor = true; break;
+    case GL_TEXTURE_COORD_ARRAY:   s_clientStateTexCoord = true; break;
+    }
+}
+
+void glDisableClientState(GLenum array)
+{
+    GL_TRACE_IMP(" glDisableClientState(%s)", glEnumToString(array))
+    switch (array)
+    {
+    case GL_VERTEX_ARRAY:          s_clientStateVertex = false; break;
+    case GL_NORMAL_ARRAY:          s_clientStateNormal = false; break;
+    case GL_COLOR_ARRAY:           s_clientStateColor = false; break;
+    case GL_TEXTURE_COORD_ARRAY:   s_clientStateTexCoord = false; break;
+    }
+}
+
+void glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid* pointer)
+{
+    GL_TRACE_IMP(" glVertexPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
+    s_vertexArray.pointer = pointer;
+    s_vertexArray.size = size;
+    s_vertexArray.type = type;
+    s_vertexArray.stride = stride;
+}
+
+void glNormalPointer(GLenum type, GLsizei stride, const GLvoid* pointer)
+{
+    GL_TRACE_IMP(" glNormalPointer(%s, %d, %p)", glEnumToString(type), stride, pointer)
+    s_normalArray.pointer = pointer;
+    s_normalArray.size = 3;
+    s_normalArray.type = type;
+    s_normalArray.stride = stride;
+}
+
+void glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid* pointer)
+{
+    GL_TRACE_IMP(" glColorPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
+    s_colorArray.pointer = pointer;
+    s_colorArray.size = size;
+    s_colorArray.type = type;
+    s_colorArray.stride = stride;
+}
+
+void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid* pointer)
+{
+    GL_TRACE_IMP(" glTexCoordPointer(%d, %s, %d, %p)", size, glEnumToString(type), stride, pointer)
+    s_texCoordArray.pointer = pointer;
+    s_texCoordArray.size = size;
+    s_texCoordArray.type = type;
+    s_texCoordArray.stride = stride;
+}
+
+void glDrawArrays(GLenum mode, GLint first, GLsizei count)
+{
+    GL_TRACE_IMP(" glDrawArrays(%s, %d, %d)", glEnumToString(mode), first, count)
+
+    if (count <= 0 || !s_clientStateVertex) return;
+
+    // Allocate temporary CustomVertex array
+    auto* verts = new CustomVertex[count];
+    memset(verts, 0, sizeof(CustomVertex) * count);
+
+    GLsizei vstride = s_vertexArray.stride;
+    GLsizei nstride = s_normalArray.stride;
+    GLsizei cstride = s_colorArray.stride;
+    GLsizei tstride = s_texCoordArray.stride;
+
+    for (GLsizei i = 0; i < count; ++i)
+    {
+        GLsizei idx = first + i;
+        CustomVertex& v = verts[i];
+
+        // Position (required)
+        {
+            auto src = reinterpret_cast<const char*>(s_vertexArray.pointer) + idx * vstride;
+            auto f = reinterpret_cast<const float*>(src);
+            v.x = f[0];
+            v.y = f[1];
+            v.z = (s_vertexArray.size >= 3) ? f[2] : 0.0f;
+        }
+
+        // Normal
+        if (s_clientStateNormal)
+        {
+            auto src = reinterpret_cast<const char*>(s_normalArray.pointer) + idx * nstride;
+            auto f = reinterpret_cast<const float*>(src);
+            v.nx = f[0];
+            v.ny = f[1];
+            v.nz = f[2];
+        }
+
+        // Color (RGBA source → BGRA destination)
+        if (s_clientStateColor)
+        {
+            auto src = reinterpret_cast<const char*>(s_colorArray.pointer) + idx * cstride;
+            if (s_colorArray.type == GL_UNSIGNED_BYTE && s_colorArray.size == 4)
+            {
+                v.r8 = src[0];
+                v.g8 = src[1];
+                v.b8 = src[2];
+                v.a8 = src[3];
+            }
+            else if (s_colorArray.type == GL_UNSIGNED_BYTE && s_colorArray.size == 3)
+            {
+                v.r8 = src[0];
+                v.g8 = src[1];
+                v.b8 = src[2];
+                v.a8 = 255;
+            }
+        }
+        else
+        {
+            // Use current color
+            v.r8 = s_currentAttribs.r8;
+            v.g8 = s_currentAttribs.g8;
+            v.b8 = s_currentAttribs.b8;
+            v.a8 = s_currentAttribs.a8;
+        }
+
+        // Texture coordinates
+        if (s_clientStateTexCoord)
+        {
+            auto src = reinterpret_cast<const char*>(s_texCoordArray.pointer) + idx * tstride;
+            auto f = reinterpret_cast<const float*>(src);
+            v.u = f[0];
+            v.v = (s_texCoordArray.size >= 2) ? f[1] : 0.0f;
+        }
+    }
+
+    D3D_PRIMITIVE_TOPOLOGY topology;
+    switch (mode)
+    {
+    case GL_POINTS:         topology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST; break;
+    case GL_LINES:          topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST; break;
+    case GL_LINE_LOOP:      topology = D3D_PRIMITIVE_TOPOLOGY_LINESTRIP; break;
+    case GL_TRIANGLES:      topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+    case GL_TRIANGLE_STRIP: topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; break;
+    case GL_TRIANGLE_FAN:   topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+    default:                topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST; break;
+    }
+
+    issueDrawCall(topology, count, verts);
+    delete[] verts;
 }
 
 void __stdcall OpenGLD3D::glMultiTexCoord2fD3D(int _target, float _x, float _y)

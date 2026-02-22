@@ -22,10 +22,6 @@ void GlobalInternetNode::AddLink(int _id)
   m_numLinks++;
 }
 
-// ****************************************************************************
-// Class GlobalInternet
-// ****************************************************************************
-
 GlobalInternet::GlobalInternet()
   : m_nodes(nullptr),
     m_numNodes(0),
@@ -91,10 +87,8 @@ void GlobalInternet::GenerateInternet()
   m_links = new GlobalInternetLink[GLOBALINTERNET_MAXLINKS];
   m_nodes = new GlobalInternetNode[GLOBALINTERNET_MAXNODES];
 
-  //LegacyVector3 centre(200, 200, 200);
-  //LegacyVector3 centre(449,1787,-139);
   LegacyVector3 centre(-797, 1949, -1135);
-  unsigned short firstNode = GenerateInternet(centre, GLOBALINTERNET_ITERATIONS);
+  GenerateInternet(centre, GLOBALINTERNET_ITERATIONS);
 
   m_nodes[m_numNodes].m_pos.Zero();
   m_nodes[m_numNodes].m_size = 0.0f;
@@ -114,24 +108,6 @@ void GlobalInternet::GenerateInternet()
     if (node->m_numLinks == 1)
       m_leafs.PutData(i);
   }
-
-#ifdef DEBUG
-  for (int i = 0; i < 5; ++i)
-  {
-    GlobalInternetNode* node = &m_nodes[i];
-    DebugTrace("Node %d : %2.2f %2.2f %2.2f\n", i, node->m_pos.x, node->m_pos.y, node->m_pos.z);
-
-    /*
-            Node 0 : -797.00 1949.00 -1135.00
-            Node 1 : 675.75 1643.66 1259.99
-            Node 2 : 727.92 1423.32 459.74
-            Node 3 : 324.37 928.37 646.87
-            Node 4 : 140.59 1095.22 520.61
-    */
-  } double timeTaken = GetHighResTime() - timeStart; DebugTrace("Global Internet time to generate : %.2fms\n", timeTaken * 1000.0);
-  DebugTrace("Global Internet number of nodes  : %d\n", m_numNodes); DebugTrace("Global Internet number of links  : %d\n", m_numLinks);
-  DebugTrace("Global Internet number of leafs  : %d\n", m_leafs.Size());
-#endif
 }
 
 void GlobalInternet::DeleteInternet()
@@ -157,16 +133,7 @@ void GlobalInternet::Render()
   float fog = 0.0f;
   float fogCol[] = {fog, fog, fog, fog};
 
-  /*static*/
   int fogVal = 5810000;
-  //    if( g_keys[KEY_P] )
-  //    {
-  //        fogVal += 100000;
-  //    }
-  //    if( g_keys[KEY_O] )
-  //    {
-  //        fogVal -= 100000;
-  //    }
 
   glFogf(GL_FOG_DENSITY, 1.0f);
   glFogf(GL_FOG_START, 0.0f);
@@ -325,6 +292,7 @@ void GlobalInternet::RenderPackets()
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
   glDepthMask(false);
 
+  glBegin(GL_QUADS);
   for (int i = 0; i < m_numLinks; ++i)
   {
     GlobalInternetLink* link = &m_links[i];
@@ -365,7 +333,6 @@ void GlobalInternet::RenderPackets()
       else if (packetVal < 0.0f)
         packetPos = from->m_pos + (to->m_pos - from->m_pos) * -packetVal;
 
-      glBegin(GL_QUADS);
       glTexCoord2i(0, 0);
       glVertex3fv((packetPos - camUp - camRight).GetData());
       glTexCoord2i(1, 0);
@@ -374,9 +341,9 @@ void GlobalInternet::RenderPackets()
       glVertex3fv((packetPos + camUp + camRight).GetData());
       glTexCoord2i(0, 1);
       glVertex3fv((packetPos + camUp - camRight).GetData());
-      glEnd();
     }
   }
+  glEnd();
 
   glDepthMask(true);
   glDisable(GL_TEXTURE_2D);
