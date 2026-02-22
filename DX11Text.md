@@ -180,14 +180,23 @@ for each char:
 g_spriteBatch->End3D()
 ```
 
-### 3.4  Members to remove from `TextRenderer`
+### 3.4  Members removed from `TextRenderer`
 
-- `m_projectionMatrix[16]`, `m_modelviewMatrix[16]` — legacy OpenGL leftovers, already unused.
-- `m_savedProjMatrix`, `m_savedViewMatrix`, `m_savedWorldMatrix` — no longer needed; `SpriteBatch` is self-contained.
+- ✅ `m_projectionMatrix[16]`, `m_modelviewMatrix[16]` — legacy OpenGL leftovers, removed.
+- `m_savedProjMatrix`, `m_savedViewMatrix`, `m_savedWorldMatrix` — **retained**. Still needed by `BeginText2D` / `EndText2D` to save/restore `g_imRenderer` matrices for callers that use `g_imRenderer` between the bracket (e.g. drawing background quads then text).
 
 ### 3.5  `BeginText2D` / `EndText2D`
 
-These become thin wrappers or are removed entirely. The callers that bracket text drawing with these calls can switch to `g_spriteBatch->Begin2D()` / `End2D()` directly, or `TextRenderer` can call them internally in each `DrawText2D*` method.
+Retained as-is. Callers still bracket text drawing with `g_imRenderer` geometry draws (e.g. background quads in `renderer.cpp`), so these must continue to save/restore the `g_imRenderer` projection, view, and world matrices. The text draw methods themselves are fully self-contained via `SpriteBatch`.
+
+### 3.6  `SetColour` — vertex colour migration
+
+`TextRenderer` previously relied on callers setting vertex colour via `g_imRenderer->Color4f()` before draw calls. Since `SpriteBatch` has its own colour state, a new `SetColour(float r, float g, float b, float a = 1.0f)` method was added to `TextRenderer`:
+
+- Stores colour in `DirectX::XMFLOAT4 m_colour` (default white).
+- All draw methods call `g_spriteBatch->SetColor(m_colour)` after `Begin`.
+- Matches the existing `SetRenderShadow` / `SetRenderOutline` pattern.
+- All callers that previously used `g_imRenderer->Color4f()` or `Color4ub()` before text draws have been migrated to `font.SetColour()`.
 
 ---
 
@@ -229,45 +238,68 @@ These use the full `ImVertex` format (normals) and the lighting/fog constant buf
 
 ## 5  File Plan
 
-| File | Action |
-|---|---|
-| `NeuronClient/sprite_batch.h` | **New** — class declaration |
-| `NeuronClient/sprite_batch.cpp` | **New** — implementation (init, shutdown, begin/end, add quad, flush) |
-| `NeuronClient/Shaders/sprite_vs.hlsl` | **New** — vertex shader |
-| `NeuronClient/Shaders/sprite_ps.hlsl` | **New** — pixel shader |
-| `NeuronClient/CompiledShaders/sprite_vs.h` | **New** — compiled shader byte array (offline compile or build step) |
-| `NeuronClient/CompiledShaders/sprite_ps.h` | **New** — compiled shader byte array |
-| `NeuronClient/text_renderer.h` | **Modify** — remove legacy matrix members, add `SpriteBatch` usage |
-| `NeuronClient/text_renderer.cpp` | **Modify** — rewrite draw methods to use `SpriteBatch` |
-| `NeuronClient/NeuronClient.vcxproj` | **Modify** — add new files to project |
-| `NeuronClient/NeuronClient.vcxproj.filters` | **Modify** — add new files to filters |
-| `NeuronClient/pch.h` | Check — ensure no new includes needed |
+| File | Action | Status |
+|---|---|---|
+| `NeuronClient/sprite_batch.h` | **New** — class declaration | ✅ Done |
+| `NeuronClient/sprite_batch.cpp` | **New** — implementation (init, shutdown, begin/end, add quad, flush) | ✅ Done |
+| `NeuronClient/Shaders/sprite_vs.hlsl` | **New** — vertex shader | ✅ Done |
+| `NeuronClient/Shaders/sprite_ps.hlsl` | **New** — pixel shader | ✅ Done |
+| `NeuronClient/CompiledShaders/sprite_vs.h` | **Generated** — compiled shader byte array (FxCompile build step) | ✅ Done |
+| `NeuronClient/CompiledShaders/sprite_ps.h` | **Generated** — compiled shader byte array (FxCompile build step) | ✅ Done |
+| `NeuronClient/text_renderer.h` | **Modify** — remove legacy matrix members, add `SetColour`, add `m_colour` | ✅ Done |
+| `NeuronClient/text_renderer.cpp` | **Modify** — rewrite draw methods to use `SpriteBatch` | ✅ Done |
+| `NeuronClient/window_manager.cpp` | **Modify** — instantiate/destroy `g_spriteBatch` | ✅ Done |
+| `NeuronClient/NeuronClient.vcxproj` | **Modify** — add new files + FxCompile entries | ✅ Done |
+| `NeuronClient/NeuronClient.vcxproj.filters` | **Modify** — add new files to filters | ✅ Done |
+| `NeuronClient/pch.h` | Check — no new includes needed | ✅ Verified |
+
+### Colour migration (callers):
+
+| File | Change | Status |
+|---|---|---|
+| `Starstrike/game_menu.cpp` | `g_imRenderer->Color4f` → `g_gameFont.SetColour` (outline buttons, title) | ✅ Done |
+| `Starstrike/renderer.cpp` | Shadow, outline, private demo, lag text | ✅ Done |
+| `Starstrike/global_world.cpp` | Shadow island names, grey inactive | ✅ Done |
+| `GameLogic/trunkport.cpp` | Shadow port labels | ✅ Done |
+| `Starstrike/taskmanager_interface_icons.cpp` | All 14 shadow/outline + colour pairs | ✅ Done |
+| `GameLogic/generator.cpp` | Counter shadow text | ✅ Done |
+| `GameLogic/mine.cpp` | Counter shadow text | ✅ Done |
+| `GameLogic/prefs_graphics_window.cpp` | Red dash text | ✅ Done |
+| `GameLogic/prefs_sound_window.cpp` | Red CPU usage text | ✅ Done |
+| `GameLogic/prefs_other_window.cpp` | Grey disabled difficulty text | ✅ Done |
+| `GameLogic/darwinia_window.cpp` | Shadow caption, disabled label colour | ✅ Done |
+| `Starstrike/location_input.cpp` | Team colour text | ✅ Done |
+| `Starstrike/startsequence.cpp` | Translucent caption text | ✅ Done |
 
 ### Sprite migration (follow-up, same `SpriteBatch`):
 
-| File | Action |
-|---|---|
-| `GameLogic/mainmenus.cpp` | **Modify** — replace `g_imRenderer` quad with `g_spriteBatch->AddQuad2D` |
-| `Starstrike/renderer.cpp` | **Modify** — replace logo quad |
-| `Starstrike/gamecursor.cpp` | **Modify** — replace cursor quad |
-| `NeuronClient/debug_render.cpp` | **Modify** — replace debug quad (or keep on `ImRenderer` since it's a solid-colour quad with no texture — low priority) |
+| File | Action | Status |
+|---|---|---|
+| `GameLogic/mainmenus.cpp` | **Modify** — replace `g_imRenderer` quad with `g_spriteBatch->AddQuad2D` | ✅ Done |
+| `Starstrike/renderer.cpp` | **Modify** — replace logo quad + Darwin logo shadow/main quads | ✅ Done |
+| `Starstrike/gamecursor.cpp` | **Modify** — replace 2D cursor + 3D cursor quads | ✅ Done |
+| `NeuronClient/debug_render.cpp` | **Keep on `ImRenderer`** — solid-colour untextured quad, not suitable for `SpriteBatch` | ⬚ N/A |
 
 ---
 
 ## 6  Implementation Order
 
-1. **Create `SpriteBatch` class** with `Initialise`, `Shutdown`, `Begin2D`/`End2D`, `Begin3D`/`End3D`, `AddQuad2D`, `AddQuad3D`, `Flush`.
-2. **Write & compile shaders** (`sprite_vs.hlsl`, `sprite_ps.hlsl`).
-3. **Instantiate `g_spriteBatch`** alongside `g_imRenderer` in the app startup path.
-4. **Convert `TextRenderer`** — method by method, test after each:
-   - `DrawText2DSimple` (most call paths funnel here)
-   - `DrawText2DUp` / `DrawText2DDown`
-   - `DrawText3DSimple`
-   - `DrawText3D` (oriented, with front/up vectors)
-   - `BeginText2D` / `EndText2D` — simplify or remove
-5. **Convert sprite call sites** (mainmenus, gamecursor, renderer).
-6. **Remove dead code** — legacy matrix members from `TextRenderer`, any `g_imRenderer` helpers that are no longer called.
-7. **Build & verify** on Debug + Release x64.
+1. ✅ **Create `SpriteBatch` class** with `Initialise`, `Shutdown`, `Begin2D`/`End2D`, `Begin3D`/`End3D`, `AddQuad2D`, `AddQuad3D`, `Flush`.
+2. ✅ **Write & compile shaders** (`sprite_vs.hlsl`, `sprite_ps.hlsl`) — FxCompile entries in vcxproj, compiled to header byte arrays.
+3. ✅ **Instantiate `g_spriteBatch`** in `window_manager.cpp` — created after `g_textureManager`, destroyed before it.
+4. ✅ **Convert `TextRenderer`** — all draw methods rewritten:
+   - `DrawText2DSimple` — `AddQuad2D` per glyph, single `End2D()` flush
+   - `DrawText2DUp` / `DrawText2DDown` — `AddQuad3D` with rotated corner positions
+   - `DrawText3DSimple` — `AddQuad3D` with billboard corners, `Begin3D(viewProj)`
+   - `DrawText3D` (oriented) — same pattern with custom front/up vectors
+   - `BeginText2D` / `EndText2D` — retained for callers that use `g_imRenderer` between the bracket
+5. ✅ **Add `SetColour`** to `TextRenderer` and migrate all callers from `g_imRenderer->Color4f()` (13 files updated).
+6. ✅ **Convert sprite call sites** — `gamecursor.cpp` (2D + 3D), `renderer.cpp` (logo + Darwin overlay), `mainmenus.cpp` (Darwinian sprite). `debug_render.cpp` kept on `ImRenderer` (untextured solid quad).
+7. ✅ **Remove dead code**:
+   - `ImRenderer`: removed `Color4fv`, `Rotatef`, `SetAlphaClipThreshold`, `SetDrawEnabled`/`IsDrawEnabled`, `m_drawEnabled` — none had any callers.
+   - `startsequence.cpp`: removed dead ortho matrix setup on `g_imRenderer` (SpriteBatch sets its own), removed dead `Color4f(white)` (text now uses `SetColour`, default is white), updated comment.
+   - `g_imRenderer` include retained in `text_renderer.cpp` — still needed for `BeginText2D`/`EndText2D` matrix save/restore and 3D view/proj access.
+8. ⬚ **Build & verify** on Release x64 — Debug x64 verified ✅.
 
 ---
 
@@ -287,9 +319,10 @@ These use the full `ImVertex` format (normals) and the lighting/fog constant buf
 
 ## 8  Risks & Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| UV / winding order bugs during conversion | Keep both paths behind a toggle (`#define USE_SPRITE_BATCH`) until validated visually |
-| `g_spriteBatch` lifetime vs `g_imRenderer` | Init `SpriteBatch` right after `ImRenderer`; shut down in reverse order |
-| Outline rendering looks different | The outline pass uses the same offsets and blend state; visual diff test with a screenshot comparison |
-| Thread safety | Text rendering is single-threaded (main render loop); `SpriteBatch` does not need to be thread-safe |
+| Risk | Mitigation | Status |
+|---|---|---|
+| UV / winding order bugs during conversion | Visual diff test with a screenshot comparison | ⬚ Needs visual testing |
+| `g_spriteBatch` lifetime vs `g_imRenderer` | Init `SpriteBatch` right after `ImRenderer`; shut down in reverse order | ✅ Done — init after `g_textureManager`, destroy before it |
+| Outline rendering looks different | The outline pass uses the same offsets and blend state; visual diff test | ⬚ Needs visual testing |
+| Thread safety | Text rendering is single-threaded (main render loop); `SpriteBatch` does not need to be thread-safe | ✅ N/A |
+| Vertex colour lost during migration | Added `TextRenderer::SetColour()` and migrated all callers | ✅ Done |

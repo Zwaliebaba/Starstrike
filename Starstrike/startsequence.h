@@ -19,7 +19,7 @@ protected:
     ID3D11Buffer* m_gridVB;
     ID3D11Buffer* m_cbPerDraw;
 
-    void RegisterCaption( char *_caption, float _x, float _y, float _size,
+    void RegisterCaption(const char *_caption, float _x, float _y, float _size,
                           float _startTime, float _endTime );
     void InitD3DResources();
     void ShutdownD3DResources();

@@ -25,7 +25,6 @@ ImRenderer::ImRenderer()
     m_defaultSampler(nullptr),
     m_currentPrimitive(PRIM_TRIANGLES),
     m_inBeginEnd(false),
-    m_drawEnabled(true),
     m_currentColor(1.0f, 1.0f, 1.0f, 1.0f),
     m_currentTexCoord(0.0f, 0.0f),
     m_currentNormal(0.0f, 0.0f, 1.0f),
@@ -187,14 +186,6 @@ void ImRenderer::Translatef(float x, float y, float z)
   m_worldMatrix = t * m_worldMatrix;
 }
 
-void ImRenderer::Rotatef(float angleDeg, float x, float y, float z)
-{
-  float rad = DirectX::XMConvertToRadians(angleDeg);
-  DirectX::XMVECTOR axis = DirectX::XMVectorSet(x, y, z, 0.0f);
-  DirectX::XMMATRIX r = DirectX::XMMatrixRotationAxis(axis, rad);
-  m_worldMatrix = r * m_worldMatrix;
-}
-
 void ImRenderer::Scalef(float sx, float sy, float sz)
 {
   DirectX::XMMATRIX s = DirectX::XMMatrixScaling(sx, sy, sz);
@@ -235,7 +226,6 @@ void ImRenderer::Color3f(float r, float g, float b)                             
 void ImRenderer::Color3ub(unsigned char r, unsigned char g, unsigned char b)                               { m_currentColor = { r / 255.0f, g / 255.0f, b / 255.0f, 1.0f }; }
 void ImRenderer::Color3ubv(const unsigned char* c)                                                         { m_currentColor = { c[0] / 255.0f, c[1] / 255.0f, c[2] / 255.0f, 1.0f }; }
 void ImRenderer::Color4f(float r, float g, float b, float a)                                               { m_currentColor = { r, g, b, a }; }
-void ImRenderer::Color4fv(const float* c)                                                                  { m_currentColor = { c[0], c[1], c[2], c[3] }; }
 void ImRenderer::Color4ub(unsigned char r, unsigned char g, unsigned char b, unsigned char a)               { m_currentColor = { r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }; }
 void ImRenderer::Color4ubv(const unsigned char* c)                                                         { m_currentColor = { c[0] / 255.0f, c[1] / 255.0f, c[2] / 255.0f, c[3] / 255.0f }; }
 
@@ -299,13 +289,6 @@ void ImRenderer::End()
 
   if (m_batch.empty())
     return;
-
-  // During transition: accept vertices (exercises the API) but don't draw
-  if (!m_drawEnabled)
-  {
-    m_batch.clear();
-    return;
-  }
 
   switch (m_currentPrimitive)
   {
@@ -509,12 +492,6 @@ void ImRenderer::SetFogParams(float start, float end, float r, float g, float b)
   m_fogEnd   = end;
   m_fogColor = { r, g, b, 0.0f };
 }
-
-// ---------------------------------------------------------------------------
-// Alpha clip
-// ---------------------------------------------------------------------------
-
-void ImRenderer::SetAlphaClipThreshold(float threshold) { m_alphaClipThreshold = threshold; }
 
 // ---------------------------------------------------------------------------
 // Camera position

@@ -107,7 +107,7 @@ void StartSequence::ShutdownD3DResources()
   if (m_cbPerDraw) { m_cbPerDraw->Release(); m_cbPerDraw = nullptr; }
 }
 
-void StartSequence::RegisterCaption(char* _caption, float _x, float _y, float _size, float _startTime, float _endTime)
+void StartSequence::RegisterCaption(const char* _caption, float _x, float _y, float _size, float _startTime, float _endTime)
 {
   auto caption = new StartSequenceCaption();
 
@@ -165,11 +165,6 @@ void StartSequence::Render()
   int screenH = 800 * screenRatio;
 
   XMMATRIX orthoProj = XMMatrixOrthographicOffCenterRH(0, 800, static_cast<float>(screenH), 0, -1, 1);
-
-  // Set ImRenderer matrices for g_gameFont compatibility
-  g_imRenderer->SetProjectionMatrix(orthoProj);
-  g_imRenderer->SetViewMatrix(XMMatrixIdentity());
-  g_imRenderer->LoadIdentity();
 
   auto* ctx = g_renderDevice->GetContext();
 
@@ -250,8 +245,7 @@ void StartSequence::Render()
     }
   }
 
-  // Captions (rendered through g_gameFont -> ImRenderer)
-  g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+  // Captions (rendered through g_gameFont -> SpriteBatch)
 
   Vector2 cursorPos;
   bool cursorFlash = false;

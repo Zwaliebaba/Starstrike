@@ -8,6 +8,7 @@
 #include "debug_render.h"
 #include "binary_stream_readers.h"
 #include "im_renderer.h"
+#include "sprite_batch.h"
 #include "render_device.h"
 #include "render_states.h"
 #include "texture_manager.h"
@@ -1029,36 +1030,29 @@ void MouseCursor::Render(float _x, float _y)
 	float x = (float)_x - s * m_hotspotX;
 	float y = (float)_y - s * m_hotspotY;
 
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
+	int screenW = g_renderDevice->GetBackBufferWidth();
+	int screenH = g_renderDevice->GetBackBufferHeight();
+
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-
 
 	if( m_shadowed )
 	{
 		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
-		g_imRenderer->BindTexture(shadowTexId);
-		g_imRenderer->Color4f( 1.0f, 1.0f, 1.0f, 0.0f );
-		g_imRenderer->Begin(PRIM_QUADS);
-			g_imRenderer->TexCoord2i(0,1);			g_imRenderer->Vertex2f(x, y);
-			g_imRenderer->TexCoord2i(1,1);			g_imRenderer->Vertex2f(x + s, y);
-			g_imRenderer->TexCoord2i(1,0);			g_imRenderer->Vertex2f(x + s, y + s);
-			g_imRenderer->TexCoord2i(0,0);			g_imRenderer->Vertex2f(x, y + s);
-		g_imRenderer->End();
+		g_spriteBatch->Begin2D(screenW, screenH, BLEND_SUBTRACTIVE_COLOR);
+		g_spriteBatch->SetTexture(shadowTexId);
+		g_spriteBatch->SetColor( 1.0f, 1.0f, 1.0f, 0.0f );
+		g_spriteBatch->AddQuad2D(x, y, s, s, 0.0f, 1.0f, 1.0f, 0.0f);
+		g_spriteBatch->End2D();
 	}
 
-	g_imRenderer->Color4ubv(m_colour.GetData());
 	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
-	g_imRenderer->BindTexture(mainTexId);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-	g_imRenderer->Begin(PRIM_QUADS);
-		g_imRenderer->TexCoord2i(0,1);			g_imRenderer->Vertex2f(x, y);
-		g_imRenderer->TexCoord2i(1,1);			g_imRenderer->Vertex2f(x + s, y);
-		g_imRenderer->TexCoord2i(1,0);			g_imRenderer->Vertex2f(x + s, y + s);
-		g_imRenderer->TexCoord2i(0,0);			g_imRenderer->Vertex2f(x, y + s);
-	g_imRenderer->End();
+	g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
+	g_spriteBatch->SetTexture(mainTexId);
+	g_spriteBatch->SetColor(m_colour.r / 255.0f, m_colour.g / 255.0f, m_colour.b / 255.0f, m_colour.a / 255.0f);
+	g_spriteBatch->AddQuad2D(x, y, s, s, 0.0f, 1.0f, 1.0f, 0.0f);
+	g_spriteBatch->End2D();
 
-	g_imRenderer->UnbindTexture();
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);
@@ -1070,7 +1064,6 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 {
 	LegacyVector3 rightAngle = (_front ^ _up).Normalise();
 
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_NONE);
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
 
@@ -1086,35 +1079,44 @@ void MouseCursor::Render3D( LegacyVector3 const &_pos, LegacyVector3 const &_fro
 	pos -= m_hotspotX * rightAngle * scale;
 	pos += m_hotspotY * _front * scale;
 
+	DirectX::XMMATRIX viewProj = g_imRenderer->GetViewMatrix() * g_imRenderer->GetProjectionMatrix();
+
 	if( m_shadowed )
 	{
 		int shadowTexId = g_app->m_resource->GetTexture(m_shadowFilename);
-		g_imRenderer->BindTexture(shadowTexId);
-		g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, 0.0f);
 
-		g_imRenderer->Begin( PRIM_QUADS );
-			g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos).GetData() );
-			g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + rightAngle * scale).GetData() );
-			g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
-			g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - _front * scale).GetData() );
-		g_imRenderer->End();
+		LegacyVector3 p0 = pos;
+		LegacyVector3 p1 = pos + rightAngle * scale;
+		LegacyVector3 p2 = pos - _front * scale + rightAngle * scale;
+		LegacyVector3 p3 = pos - _front * scale;
 
+		g_spriteBatch->Begin3D(viewProj, BLEND_SUBTRACTIVE_COLOR);
+		g_spriteBatch->SetTexture(shadowTexId);
+		g_spriteBatch->SetColor(1.0f, 1.0f, 1.0f, 0.0f);
+		g_spriteBatch->AddQuad3D(
+			{ p0.x, p0.y, p0.z }, { p1.x, p1.y, p1.z },
+			{ p2.x, p2.y, p2.z }, { p3.x, p3.y, p3.z },
+			0.0f, 1.0f, 1.0f, 0.0f);
+		g_spriteBatch->End3D();
 	}
 
-	g_imRenderer->Color4ubv(m_colour.GetData());
 	int mainTexId = g_app->m_resource->GetTexture(m_mainFilename);
-	g_imRenderer->BindTexture(mainTexId);
-	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
-	g_imRenderer->Begin( PRIM_QUADS );
-		g_imRenderer->TexCoord2i(0,1);      g_imRenderer->Vertex3fv( (pos).GetData() );
-		g_imRenderer->TexCoord2i(1,1);      g_imRenderer->Vertex3fv( (pos + rightAngle * scale).GetData() );
-		g_imRenderer->TexCoord2i(1,0);      g_imRenderer->Vertex3fv( (pos - _front * scale + rightAngle * scale).GetData() );
-		g_imRenderer->TexCoord2i(0,0);      g_imRenderer->Vertex3fv( (pos - _front * scale).GetData() );
-	g_imRenderer->End();
+	LegacyVector3 p0 = pos;
+	LegacyVector3 p1 = pos + rightAngle * scale;
+	LegacyVector3 p2 = pos - _front * scale + rightAngle * scale;
+	LegacyVector3 p3 = pos - _front * scale;
+
+	g_spriteBatch->Begin3D(viewProj, BLEND_ADDITIVE);
+	g_spriteBatch->SetTexture(mainTexId);
+	g_spriteBatch->SetColor(m_colour.r / 255.0f, m_colour.g / 255.0f, m_colour.b / 255.0f, m_colour.a / 255.0f);
+	g_spriteBatch->AddQuad3D(
+		{ p0.x, p0.y, p0.z }, { p1.x, p1.y, p1.z },
+		{ p2.x, p2.y, p2.z }, { p3.x, p3.y, p3.z },
+		0.0f, 1.0f, 1.0f, 0.0f);
+	g_spriteBatch->End3D();
 
 
-	g_imRenderer->UnbindTexture();
 	g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
 	g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_DISABLED);
 	g_renderStates->SetRasterState(g_renderDevice->GetContext(), RASTER_CULL_BACK);

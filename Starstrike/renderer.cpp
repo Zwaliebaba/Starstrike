@@ -23,6 +23,7 @@
 #include "render_device.h"
 #include "render_states.h"
 #include "im_renderer.h"
+#include "sprite_batch.h"
 #include "gamecursor.h"
 #include "startsequence.h"
 #include "soundsystem.h"
@@ -156,11 +157,10 @@ void Renderer::RenderFlatTexture()
 
 void Renderer::RenderLogo()
 {
-  g_imRenderer->Color3ubv(g_colourWhite.GetData());
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_READONLY);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
+  // Solid background quad — stays on ImRenderer (untextured)
   g_imRenderer->Color4ub(0, 0, 0, 200);
   float logoW = 200;
   float logoH = 35;
@@ -171,28 +171,22 @@ void Renderer::RenderLogo()
   g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - 10);
   g_imRenderer->End();
 
-
-  g_imRenderer->Color4ub(255, 255, 255, 255);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
+  // Textured logo quad — SpriteBatch
   int textureId = g_app->m_resource->GetTexture("textures/privatedemo.bmp", true, false);
   if (textureId == -1)
     return;
-  g_imRenderer->BindTexture(textureId);
 
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - logoH - 10);
-  g_imRenderer->TexCoord2f(1.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - logoH - 10);
-  g_imRenderer->TexCoord2f(1.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_screenW - 10, m_screenH - 10);
-  g_imRenderer->TexCoord2f(0.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_screenW - logoW - 10, m_screenH - 10);
-  g_imRenderer->End();
-
+  int screenW = g_renderDevice->GetBackBufferWidth();
+  int screenH = g_renderDevice->GetBackBufferHeight();
+  g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
+  g_spriteBatch->SetTexture(textureId);
+  g_spriteBatch->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+  g_spriteBatch->AddQuad2D(m_screenW - logoW - 10, m_screenH - logoH - 10,
+                            logoW, logoH,
+                            0.0f, 1.0f, 1.0f, 0.0f);
+  g_spriteBatch->End2D();
 
   g_renderStates->SetDepthState(g_renderDevice->GetContext(), DEPTH_ENABLED_WRITE);
-  g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
   g_gameFont.SetColour(1.0f, 0.75f, 0.75f, 1.0f);
@@ -433,8 +427,6 @@ void Renderer::RenderFrame(bool withFlip)
   {
     int textureId = g_app->m_resource->GetTexture("icons/darwin_research_associates.bmp");
 
-    g_imRenderer->BindTexture(textureId);
-
     float y = m_screenH * 0.05f;
     float h = m_screenH * 0.7f;
 
@@ -456,45 +448,32 @@ void Renderer::RenderFrame(bool withFlip)
     alpha = max(alpha, 0.0f);
     alpha = min(alpha, 1.0f);
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_SUBTRACTIVE_COLOR);
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_imRenderer->Color4f(alpha, alpha, alpha, 0.0f);
+    int screenW = g_renderDevice->GetBackBufferWidth();
+    int screenH = g_renderDevice->GetBackBufferHeight();
+
+    // Shadow pass — 9 offset quads batched into a single draw
+    g_spriteBatch->Begin2D(screenW, screenH, BLEND_SUBTRACTIVE_COLOR);
+    g_spriteBatch->SetTexture(textureId);
+    g_spriteBatch->SetColor(alpha, alpha, alpha, 0.0f);
 
     for (float dx = -4; dx <= 4; dx += 4)
     {
       for (float dy = -4; dy <= 4; dy += 4)
       {
-        g_imRenderer->Begin(PRIM_QUADS);
-        g_imRenderer->TexCoord2i(0, 1);
-        g_imRenderer->Vertex2f(x + dx, y + dy);
-        g_imRenderer->TexCoord2i(1, 1);
-        g_imRenderer->Vertex2f(x + w + dx, y + dy);
-        g_imRenderer->TexCoord2i(1, 0);
-        g_imRenderer->Vertex2f(x + w + dx, y + h + dy);
-        g_imRenderer->TexCoord2i(0, 0);
-        g_imRenderer->Vertex2f(x + dx, y + h + dy);
-        g_imRenderer->End();
-
+        g_spriteBatch->AddQuad2D(x + dx, y + dy, w, h, 0.0f, 1.0f, 1.0f, 0.0f);
       }
     }
 
-    g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
-    g_imRenderer->Color4f(1.0f, 1.0f, 1.0f, alpha);
+    g_spriteBatch->End2D();
 
-    g_imRenderer->Begin(PRIM_QUADS);
-    g_imRenderer->TexCoord2i(0, 1);
-    g_imRenderer->Vertex2f(x, y);
-    g_imRenderer->TexCoord2i(1, 1);
-    g_imRenderer->Vertex2f(x + w, y);
-    g_imRenderer->TexCoord2i(1, 0);
-    g_imRenderer->Vertex2f(x + w, y + h);
-    g_imRenderer->TexCoord2i(0, 0);
-    g_imRenderer->Vertex2f(x, y + h);
-    g_imRenderer->End();
-
+    // Main logo pass
+    g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
+    g_spriteBatch->SetTexture(textureId);
+    g_spriteBatch->SetColor(1.0f, 1.0f, 1.0f, alpha);
+    g_spriteBatch->AddQuad2D(x, y, w, h, 0.0f, 1.0f, 1.0f, 0.0f);
+    g_spriteBatch->End2D();
 
     g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
-    g_imRenderer->UnbindTexture();
 
     float textSize = m_screenH / 9.0f;
     g_gameFont.SetRenderOutline(true);

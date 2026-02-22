@@ -44,7 +44,6 @@ public:
   void Color3ub(unsigned char r, unsigned char g, unsigned char b);
   void Color3ubv(const unsigned char* c);
   void Color4f(float r, float g, float b, float a);
-  void Color4fv(const float* c);
   void Color4ub(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
   void Color4ubv(const unsigned char* c);
 
@@ -68,7 +67,6 @@ public:
   void LoadIdentity();
   void MultMatrixf(const float* m);   // column-major 4x4 (OpenGL layout)
   void Translatef(float x, float y, float z);
-  void Rotatef(float angleDeg, float x, float y, float z);
   void Scalef(float sx, float sy, float sz);
   const DirectX::XMMATRIX& GetWorldMatrix() const { return m_worldMatrix; }
 
@@ -91,18 +89,11 @@ public:
   void SetFogEnabled(bool enabled);
   void SetFogParams(float start, float end, float r, float g, float b);
 
-  // Alpha clip (-1.0 to disable)
-  void SetAlphaClipThreshold(float threshold);
-
   // Camera position (for fog distance calculation)
   void SetCameraPos(float x, float y, float z);
 
   // Upload constant buffer with current matrices and state (for external renderers)
   void UpdateConstantBuffer();
-
-  // During transition: suppress actual D3D11 draw calls
-  void SetDrawEnabled(bool enabled) { m_drawEnabled = enabled; }
-  bool IsDrawEnabled() const { return m_drawEnabled; }
 
   // Accessors for direct rendering (landscape, water static VBs)
   ID3D11Buffer*        GetConstantBuffer()       { return m_constantBuffer; }
@@ -158,7 +149,6 @@ private:
   std::vector<ImVertex>    m_batch;
   PrimitiveType            m_currentPrimitive;
   bool                     m_inBeginEnd;
-  bool                     m_drawEnabled;
 
   // Current vertex attributes (set before each Vertex call)
   DirectX::XMFLOAT4       m_currentColor;

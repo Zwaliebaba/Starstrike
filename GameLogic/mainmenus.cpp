@@ -6,6 +6,7 @@
 #include "language_table.h"
 #include "win32_eventhandler.h"
 #include "im_renderer.h"
+#include "sprite_batch.h"
 #include "render_device.h"
 #include "render_states.h"
 #include "texture_manager.h"
@@ -546,28 +547,16 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   DarwiniaWindow::Render(_hasFocus);
 
   int texId = g_app->m_resource->GetTexture("sprites/darwinian.bmp");
-  g_imRenderer->BindTexture(texId);
-  g_imRenderer->SetSampler(SAMPLER_LINEAR_CLAMP);
-  g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ADDITIVE);
 
+  int screenW = g_renderDevice->GetBackBufferWidth();
+  int screenH = g_renderDevice->GetBackBufferHeight();
+  g_spriteBatch->Begin2D(screenW, screenH, BLEND_ADDITIVE);
+  g_spriteBatch->SetTexture(texId);
+  g_spriteBatch->SetColor(0.3f, 1.0f, 0.3f, 1.0f);
+  g_spriteBatch->AddQuad2D(m_x + m_w / 2 - 25, m_y + 30, 50, GetMenuSize(80) - 30,
+                            0.0f, 1.0f, 1.0f, 0.0f);
+  g_spriteBatch->End2D();
 
-  float texH = 1.0f;
-  float texW = texH * 512.0f / 64.0f;
-
-  g_imRenderer->Color4f(0.3f, 1.0f, 0.3f, 1.0f);
-  g_imRenderer->Begin(PRIM_QUADS);
-  g_imRenderer->TexCoord2f(0.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + m_w / 2 - 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 1.0f);
-  g_imRenderer->Vertex2f(m_x + m_w / 2 + 25, m_y + 30);
-  g_imRenderer->TexCoord2f(1.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + m_w / 2 + 25, m_y + GetMenuSize(80));
-  g_imRenderer->TexCoord2f(0.0f, 0.0f);
-  g_imRenderer->Vertex2f(m_x + m_w / 2 - 25, m_y + GetMenuSize(80));
-  g_imRenderer->End();
-
-
-  g_imRenderer->UnbindTexture();
   g_renderStates->SetBlendState(g_renderDevice->GetContext(), BLEND_ALPHA);
 
   float y = m_y + 100;
