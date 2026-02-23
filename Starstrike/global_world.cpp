@@ -14,7 +14,7 @@
 #include "text_stream_readers.h"
 #include "LegacyVector3.h"
 #include "eclipse.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_internet.h"
 #include "global_world.h"
@@ -108,7 +108,7 @@ int GlobalEventCondition::GetType(const char* _typeName)
 {
   for (int i = 0; i < NumConditions; ++i)
   {
-    if (stricmp(_typeName, GetTypeName(i)) == 0)
+    if (_stricmp(_typeName, GetTypeName(i)) == 0)
       return i;
   }
 
@@ -201,19 +201,19 @@ void GlobalEventAction::Read(TextReader* _in)
 {
   char* action = _in->GetNextToken();
 
-  if (stricmp(action, "SetMission") == 0)
+  if (_stricmp(action, "SetMission") == 0)
   {
     m_type = SetMission;
     m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
     DarwiniaDebugAssert(m_locationId != -1);
     strcpy(m_filename, _in->GetNextToken());
   }
-  else if (stricmp(action, "RunScript") == 0)
+  else if (_stricmp(action, "RunScript") == 0)
   {
     m_type = RunScript;
     strcpy(m_filename, _in->GetNextToken());
   }
-  else if (stricmp(action, "MakeAvailable") == 0)
+  else if (_stricmp(action, "MakeAvailable") == 0)
   {
     m_type = MakeAvailable;
     m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
@@ -417,9 +417,9 @@ void GlobalEvent::Read(TextReader* _in)
     if (_in->TokenAvailable())
     {
       char* word = _in->GetNextToken();
-      if (stricmp(word, "end") == 0)
+      if (_stricmp(word, "end") == 0)
         break;
-      DarwiniaDebugAssert(stricmp( word, "action" ) == 0);
+      DarwiniaDebugAssert(_stricmp( word, "action" ) == 0);
 
       auto action = new GlobalEventAction;
       action->Read(_in);
@@ -603,9 +603,9 @@ void GlobalResearch::Read(TextReader* _in)
       continue;
     char* word = _in->GetNextToken();
 
-    if (stricmp(word, "research_enddefinition") == 0)
+    if (_stricmp(word, "research_enddefinition") == 0)
       return;
-    if (stricmp(word, "Research") == 0)
+    if (_stricmp(word, "Research") == 0)
     {
       char* type = _in->GetNextToken();
       int progress = atoi(_in->GetNextToken());
@@ -615,13 +615,13 @@ void GlobalResearch::Read(TextReader* _in)
       m_researchLevel[researchType] = level;
       SetCurrentProgress(researchType, progress);
     }
-    else if (stricmp(word, "CurrentResearch") == 0)
+    else if (_stricmp(word, "CurrentResearch") == 0)
     {
       char* type = _in->GetNextToken();
       int researchType = GetType(type);
       m_currentResearch = researchType;
     }
-    else if (stricmp(word, "CurrentPoints") == 0)
+    else if (_stricmp(word, "CurrentPoints") == 0)
     {
       int points = atoi(_in->GetNextToken());
       m_researchPoints = points;
@@ -657,7 +657,7 @@ int GlobalResearch::GetType(char* _name)
 {
   for (int i = 0; i < NumResearchItems; ++i)
   {
-    if (stricmp(_name, GetTypeName(i)) == 0)
+    if (_stricmp(_name, GetTypeName(i)) == 0)
       return i;
   }
 
@@ -1129,7 +1129,7 @@ void SphereWorld::RenderIslands()
       LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id);
 
       int numRedraws = 5;
-      if (!loc->m_missionCompleted && stricmp(loc->m_missionFilename, "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
+      if (!loc->m_missionCompleted && _stricmp(loc->m_missionFilename, "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
         numRedraws = 10;
 
       glBegin(GL_QUADS);
@@ -1186,7 +1186,7 @@ void SphereWorld::RenderIslands()
 
       g_gameFont.SetRenderShadow(false);
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-      if (stricmp(loc->m_missionFilename, "null") == 0)
+      if (_stricmp(loc->m_missionFilename, "null") == 0)
         glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
@@ -1433,7 +1433,7 @@ int GlobalWorld::GetLocationId(const char* _name)
   {
     GlobalLocation* loc = m_locations[i];
     DarwiniaDebugAssert(loc);
-    if (stricmp(loc->m_name, _name) == 0)
+    if (_stricmp(loc->m_name, _name) == 0)
       return loc->m_id;
   }
 
@@ -1531,7 +1531,7 @@ void GlobalWorld::ParseLocations(TextReader* _in)
 
     char* word = _in->GetNextToken();
 
-    if (stricmp(word, "Locations_EndDefinition") == 0)
+    if (_stricmp(word, "Locations_EndDefinition") == 0)
       return;
 
     auto location = new GlobalLocation();
@@ -1558,7 +1558,7 @@ void GlobalWorld::ParseBuildings(TextReader* _in)
 
     char* word = _in->GetNextToken();
 
-    if (stricmp(word, "buildings_enddefinition") == 0)
+    if (_stricmp(word, "buildings_enddefinition") == 0)
       return;
 
     auto building = new GlobalBuilding();
@@ -1582,10 +1582,10 @@ void GlobalWorld::ParseEvents(TextReader* _in)
       continue;
     char* word = _in->GetNextToken();
 
-    if (stricmp(word, "events_enddefinition") == 0)
+    if (_stricmp(word, "events_enddefinition") == 0)
       return;
 
-    DarwiniaDebugAssert(stricmp( word, "Event" ) == 0);
+    DarwiniaDebugAssert(_stricmp( word, "Event" ) == 0);
 
     auto event = new GlobalEvent();
     event->Read(_in);
@@ -1637,13 +1637,13 @@ void GlobalWorld::LoadGame(char* _filename)
         continue;
       char* word = in->GetNextToken();
 
-      if (stricmp("locations_startdefinition", word) == 0)
+      if (_stricmp("locations_startdefinition", word) == 0)
         ParseLocations(in);
-      else if (stricmp("buildings_startdefinition", word) == 0)
+      else if (_stricmp("buildings_startdefinition", word) == 0)
         ParseBuildings(in);
-      else if (stricmp("events_startdefinition", word) == 0)
+      else if (_stricmp("events_startdefinition", word) == 0)
         ParseEvents(in);
-      else if (stricmp("research_startdefinition", word) == 0)
+      else if (_stricmp("research_startdefinition", word) == 0)
         m_research->Read(in);
     }
   }

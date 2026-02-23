@@ -10,7 +10,7 @@
 #include "language_table.h"
 #include "soundsystem.h"
 #include "triffid.h"
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
 #include "explosion.h"

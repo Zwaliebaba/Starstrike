@@ -13,7 +13,7 @@
 #include "prefs_other_window.h"
 #include "eclipse.h"
 #include "clienttoserver.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "level_file.h"
@@ -1919,12 +1919,10 @@ void Camera::Advance()
   if (m_anim == nullptr && (m_debugMode == DebugModeAlways || (m_debugMode == DebugModeAuto && EclGetWindows()->Size() > 0) ||
     m_framesInThisMode < 2))
   {
-    g_windowManager->EnsureMouseUncaptured();
     AdvanceDebugMode();
   }
   else
   {
-    g_windowManager->EnsureMouseCaptured();
     switch (m_mode)
     {
     case ModeSphereWorld:
@@ -2118,7 +2116,7 @@ void Camera::SetTarget(const LegacyVector3& _pos, const LegacyVector3& _front, c
 
 bool Camera::SetTarget(const char* _mountName)
 {
-  if (stricmp(_mountName, MAGIC_MOUNT_NAME_START_POS) == 0)
+  if (_stricmp(_mountName, MAGIC_MOUNT_NAME_START_POS) == 0)
   {
     SetTarget(m_posBeforeAnim, m_frontBeforeAnim, m_upBeforeAnim);
     return true;
@@ -2127,7 +2125,7 @@ bool Camera::SetTarget(const char* _mountName)
   for (int i = 0; i < g_app->m_location->m_levelFile->m_cameraMounts.Size(); ++i)
   {
     CameraMount* mount = g_app->m_location->m_levelFile->m_cameraMounts[i];
-    if (stricmp(mount->m_name, _mountName) == 0)
+    if (_stricmp(mount->m_name, _mountName) == 0)
     {
       SetTarget(mount->m_pos, mount->m_front, mount->m_up);
       return true;

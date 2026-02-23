@@ -4,13 +4,11 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "system_info.h"
-#include "window_manager.h"
-#include "window_manager_win32.h"
 #include <MMSYSTEM.H>
 #include <DSOUND.H>
 #include "sound_filter.h"
 #include "sound_library_3d_dsound.h"
-#include "app.h"
+#include "GameApp.h"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dsound.lib")
@@ -257,7 +255,7 @@ void SoundLibrary3dDirectSound::Initialise(int _mixFreq, int _numChannels, bool 
                                &m_directSound->m_device, nullptr); // Has to be NULL - stupid, stupid Microsoft
   SOUNDASSERT(errCode, "Direct Sound couldn't create a sound device");
 
-  errCode = m_directSound->m_device->SetCooperativeLevel(g_windowManager->m_win32Specific->m_hWnd, DSSCL_PRIORITY);
+  errCode = m_directSound->m_device->SetCooperativeLevel(ClientEngine::Window(), DSSCL_PRIORITY);
   SOUNDASSERT(errCode, "Direct Sound couldn't set the cooperative level");
 
   RefreshCapabilities();

@@ -94,7 +94,7 @@ void IdleInputDriver::Advance()
 
 bool IdleInputDriver::acceptDriver( std::string const &name )
 {
-	return stricmp( name.c_str(), "idle" ) == 0;
+	return _stricmp( name.c_str(), "idle" ) == 0;
 }
 
 
@@ -120,7 +120,7 @@ inputtype_t IdleInputDriver::getControlType( control_id_t control_id )
 condition_t IdleInputDriver::getConditionID( std::string const &name, inputtype_t &type )
 {
 	if ( INPUT_TYPE_BOOL == type ) {
-		return ( stricmp( name.c_str(), "longer" ) == 0 ) ? 0 : -1;
+		return ( _stricmp( name.c_str(), "longer" ) == 0 ) ? 0 : -1;
 	} else if ( INPUT_TYPE_1D == type ) {
 		std::istringstream str( name );
 		int num;

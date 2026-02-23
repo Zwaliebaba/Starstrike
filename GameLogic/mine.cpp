@@ -19,7 +19,7 @@
 #include "input_types.h"
 #endif
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "location.h"

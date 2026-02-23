@@ -255,7 +255,7 @@ void Profiler::EndProfile(char const *_name)
 		}
 
 		DarwiniaDebugAssert(m_currentElement != m_rootElement);
-		DarwiniaDebugAssert(stricmp(_name, m_currentElement->m_name) == 0);
+		DarwiniaDebugAssert(_stricmp(_name, m_currentElement->m_name) == 0);
 
 		m_currentElement->End();
 	}

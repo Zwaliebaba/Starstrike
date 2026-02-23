@@ -7,7 +7,7 @@
 
 #include "scrollbar.h"
 
-#include "app.h"
+#include "GameApp.h"
 
 
 ScrollBar::ScrollBar( EclWindow *parent )

@@ -4,7 +4,7 @@
 #include "language_table.h"
 #include "preferences.h"
 #include "clienttoserver.h"
-#include "app.h"
+#include "GameApp.h"
 #include "gamecursor.h"
 #include "global_world.h"
 #include "location.h"

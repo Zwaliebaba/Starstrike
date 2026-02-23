@@ -9,7 +9,7 @@
 #include "bitmap.h"
 #include "binary_stream_readers.h"
 #include "soundsystem.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 #include "global_world.h"

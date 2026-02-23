@@ -10,7 +10,7 @@
 #include "darwinia_window.h"
 #include "input_field.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "globals.h"
 #include "control_bindings.h"
@@ -638,8 +638,6 @@ void DarwiniaWindow::SetCurrentButton( EclButton *button )
 void GameExitButton::MouseUp()
 {
 	g_app->m_requestQuit = true;
-    //g_app->m_atMainMenu = true;
-    //g_app->m_renderer->StartFadeOut();
 }
 
 

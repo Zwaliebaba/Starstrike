@@ -9,7 +9,7 @@
 #include "shape.h"
 #include "debug_render.h"
 #include "preferences.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "clouds.h"
 #include "entity_grid.h"

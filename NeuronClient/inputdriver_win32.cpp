@@ -2,14 +2,12 @@
 #include "eclipse.h"
 #include "input_types.h"
 #include "control_bindings.h"
-#include "win32_eventhandler.h"
 #include "inputdriver_win32.h"
 #include "keynames.h"
 #include "window_manager.h"
-#include "window_manager_win32.h"
 #include "language_table.h"
-#include "app.h"
-#include "debug_utils.h"
+#include "GameApp.h"
+#include "WndProcManager.h"
 
 using namespace std;
 
@@ -59,12 +57,12 @@ W32InputDriver::W32InputDriver()
   memset(g_keyDeltas, 0, KEY_MAX);
   memset(m_keyNewDeltas, 0, KEY_MAX);
 
-  getW32EventHandler()->AddEventProcessor(this);
+  WndProcManager::AddWndProc(&WndProc);
 
   g_win32InputDriver = this;
 }
 
-W32InputDriver::~W32InputDriver() { getW32EventHandler()->RemoveEventProcessor(this); }
+W32InputDriver::~W32InputDriver() { WndProcManager::RemoveWndProc(&WndProc); }
 
 bool W32InputDriver::getInput(const InputSpec& spec, InputDetails& details)
 {
@@ -194,22 +192,6 @@ void W32InputDriver::SetMousePosNoVelocity(int _x, int _y)
 
 bool W32InputDriver::getFirstActiveInput(InputSpec& spec, bool instant)
 {
-  // Check for pressed mouse buttons
-  //for ( unsigned i = 0; i < NUM_MB; ++i ) {
-  //	if ( 1 == m_mbDeltas[i] ) { // Mouse button pressed
-  //		spec.handler_id = MOUSE_DRIVER;
-  //		switch ( i ) {
-  //			case L: spec.control_id = MOUSE_LEFTBUTTON; break;
-  //			case R: spec.control_id = MOUSE_RIGHTBUTTON; break;
-  //			case M: spec.control_id = MOUSE_MIDBUTTON; break;
-  //			default: return false; // We should never get here!
-  //		}
-  //		spec.condition = COND_DOWN;
-  //		spec.type = INPUT_TYPE_BOOL;
-  //		return true;
-  //	}
-  //}
-
   // Check for pressed keys
   for (unsigned i = 0; i < KEY_TILDE; ++i)
   {
@@ -282,7 +264,7 @@ LRESULT CALLBACK W32InputDriver::WndProc(HWND hWnd, UINT message, WPARAM wParam,
     g_windowManager->UncaptureMouse();
     break;
 
-  case 0x020A: //case WM_MOUSEWHEEL:
+  case WM_MOUSEWHEEL:
     {
       int move = static_cast<short>(HIWORD(wParam)) / 120;
       m_mousePos[Z] += move;
@@ -445,11 +427,11 @@ control_id_t W32InputDriver::getKeyId(const string& keyName)
 {
   for (control_id_t i = 0; i <= KEY_TILDE; ++i)
   {
-    if (stricmp(keyName.c_str(), getKeyNames()[i]) == 0)
+    if (_stricmp(keyName.c_str(), getKeyNames()[i]) == 0)
       return i;
   }
 
-  if (stricmp(keyName.c_str(), "any") == 0)
+  if (_stricmp(keyName.c_str(), "any") == 0)
     return KEY_ANY;
 
   return -1;

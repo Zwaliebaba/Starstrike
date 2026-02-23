@@ -6,7 +6,7 @@
 #include "debug_render.h"
 #include "language_table.h"
 #include "staticshape.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 
 StaticShape::StaticShape()

@@ -6,7 +6,7 @@
 
 #include "airstrike.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "explosion.h"
 #include "location.h"
 #include "renderer.h"

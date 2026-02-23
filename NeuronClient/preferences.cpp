@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "app.h"
+#include "GameApp.h"
 #include "debug_utils.h"
 #include "preferences.h"
 #include "resource.h"

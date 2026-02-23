@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "eclipse.h"
 #include "input.h"
-#include "app.h"
+#include "GameApp.h"
 #include "script.h"
 #include "attract.h"
 #include "taskmanager_interface.h"

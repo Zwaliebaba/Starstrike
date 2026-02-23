@@ -1,10 +1,7 @@
 #include "pch.h"
-#include "preferences.h"
 #include "text_renderer.h"
-#include "window_manager.h"
 #include "resource.h"
 #include "language_table.h"
-#include "win32_eventhandler.h"
 #include "mainmenus.h"
 #include "prefs_screen_window.h"
 #include "prefs_graphics_window.h"
@@ -12,13 +9,11 @@
 #include "prefs_keybindings_window.h"
 #include "prefs_other_window.h"
 #include "userprofile_window.h"
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "global_world.h"
 #include "script.h"
 #include "input.h"
-
-class WebsiteButton;
 
 class SkipPrologueWindowButton : public DarwiniaButton
 {
@@ -243,38 +238,6 @@ class ExitLevelButton : public DarwiniaButton
   }
 };
 
-class WebsiteButton : public DarwiniaButton
-{
-  public:
-    char m_website[256];
-
-    void MouseUp() override
-    {
-      int windowed = g_prefsManager->GetInt("ScreenWindowed", 1);
-      if (!windowed)
-      {
-        // Switch to windowed mode if required
-        g_prefsManager->SetInt("ScreenWindowed", 1);
-        g_prefsManager->SetInt("ScreenWidth", 800);
-        g_prefsManager->SetInt("ScreenHeight", 600);
-
-        g_windowManager->DestroyWin();
-        delete g_app->m_renderer;
-        g_app->m_renderer = new Renderer();
-        g_app->m_renderer->Initialise();
-        getW32EventHandler()->ResetWindowHandle();
-        g_app->m_resource->FlushOpenGlState();
-        g_app->m_resource->RegenerateOpenGlState();
-
-        g_prefsManager->Save();
-
-        EclInitialise(800, 600);
-
-        m_parent->SetPosition(g_app->m_renderer->ScreenW() / 2 - m_parent->m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_parent->m_h / 2);
-      }
-    }
-};
-
 LocationWindow::LocationWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_locationmenu"))
 {
@@ -300,63 +263,32 @@ void LocationWindow::Create()
 
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(g_app->m_locationId);
 
-  if (g_app->HasBoughtGame())
+  // Full game menu
+
+  if (loc && !loc->m_missionCompleted)
   {
-    // Full game menu
-
-    if (loc && !loc->m_missionCompleted)
-    {
-      auto reset = new ResetLevelButton();
-      reset->SetShortProperties(LANGUAGEPHRASE("dialog_resetlocation"), border, y += gap, buttonW, buttonH);
-      reset->m_fontSize = fontSize;
-      reset->m_centered = true;
-      RegisterButton(reset);
-      m_buttonOrder.PutData(reset);
-      gap = h;
-    }
-
-    if (g_app->m_gameMode == App::GameModePrologue)
-    {
-      auto exit = new GameExitButton();
-      exit->SetShortProperties(LANGUAGEPHRASE("dialog_leavedarwinia"), border, y += h, buttonW, buttonH);
-      exit->m_fontSize = fontSize;
-      exit->m_centered = true;
-      RegisterButton(exit);
-      m_buttonOrder.PutData(exit);
-    }
-    else
-    {
-      auto exitLevel = new ExitLevelButton();
-      exitLevel->SetShortProperties(LANGUAGEPHRASE("dialog_leavelocation"), border, y += gap, buttonW, buttonH);
-      exitLevel->m_fontSize = fontSize;
-      exitLevel->m_centered = true;
-      RegisterButton(exitLevel);
-      m_buttonOrder.PutData(exitLevel);
-    }
-  }
-  else
-  {
-    // Demo mode
-
     auto reset = new ResetLevelButton();
     reset->SetShortProperties(LANGUAGEPHRASE("dialog_resetlocation"), border, y += gap, buttonW, buttonH);
     reset->m_fontSize = fontSize;
     reset->m_centered = true;
     RegisterButton(reset);
     m_buttonOrder.PutData(reset);
+    gap = h;
+  }
 
-    auto buy = new WebsiteButton();
-    buy->SetShortProperties(LANGUAGEPHRASE("dialog_buyonline"), border, y += h, buttonW, buttonH);
-    buy->m_fontSize = fontSize;
-    buy->m_centered = true;
-
-    strcpy(buy->m_website, "http://store.introversion.co.uk");
-
-    RegisterButton(buy);
-    m_buttonOrder.PutData(buy);
-
+  if (g_app->m_gameMode == GameApp::GameModePrologue)
+  {
+    auto exit = new GameExitButton();
+    exit->SetShortProperties(LANGUAGEPHRASE("dialog_leavedarwinia"), border, y += h, buttonW, buttonH);
+    exit->m_fontSize = fontSize;
+    exit->m_centered = true;
+    RegisterButton(exit);
+    m_buttonOrder.PutData(exit);
+  }
+  else
+  {
     auto exitLevel = new ExitLevelButton();
-    exitLevel->SetShortProperties(LANGUAGEPHRASE("dialog_leavedarwinia"), border, y += h, buttonW, buttonH);
+    exitLevel->SetShortProperties(LANGUAGEPHRASE("dialog_leavelocation"), border, y += gap, buttonW, buttonH);
     exitLevel->m_fontSize = fontSize;
     exitLevel->m_centered = true;
     RegisterButton(exitLevel);
@@ -370,7 +302,7 @@ void LocationWindow::Create()
   RegisterButton(options);
   m_buttonOrder.PutData(options);
 
-  if (g_app->HasBoughtGame() && g_app->m_gameMode == App::GameModePrologue)
+  if (g_app->m_gameMode == GameApp::GameModePrologue)
   {
     auto skip = new SkipPrologueWindowButton();
     skip->SetShortProperties(LANGUAGEPHRASE("dialog_skipprologue"), border, y += h, buttonW, buttonH);
@@ -400,7 +332,7 @@ class ResetLocationButton : public DarwiniaButton
 #ifdef DEMO2
     g_app->ResetLevel(true);
 #else
-    g_app->ResetLevel(g_app->m_gameMode == App::GameModePrologue);
+    g_app->ResetLevel(g_app->m_gameMode == GameApp::GameModePrologue);
 #endif
   }
 };
@@ -485,14 +417,6 @@ void MainMenuWindow::Create()
   options->m_centered = true;
   RegisterButton(options);
   m_buttonOrder.PutData(options);
-
-  auto website = new WebsiteButton();
-  website->SetShortProperties(LANGUAGEPHRASE("dialog_visitwebsite"), border, y += h, buttonW, buttonH);
-  website->m_fontSize = fontSize;
-  website->m_centered = true;
-  strcpy(website->m_website, "http://www.darwinia.co.uk");
-  RegisterButton(website);
-  m_buttonOrder.PutData(website);
 
   auto play = new PlayPrologueWindowButton();
   play->SetShortProperties(LANGUAGEPHRASE("dialog_playprologue"), border, y += h, buttonW, buttonH);

@@ -8,7 +8,7 @@
 #include "text_renderer.h"
 #include "debug_utils.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "debug_render.h"
 #include "renderer.h"

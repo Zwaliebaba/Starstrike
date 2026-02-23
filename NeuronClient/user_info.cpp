@@ -18,13 +18,13 @@ bool GetUserInfoData( char const *_userInfoFilename, char const **_username, cha
         {
             fileReader.ReadLine();
 
-            DarwiniaReleaseAssert( stricmp( fileReader.GetNextToken(), "Username" ) == 0, "Failed to parse %s", _userInfoFilename );
+            DarwiniaReleaseAssert( _stricmp( fileReader.GetNextToken(), "Username" ) == 0, "Failed to parse %s", _userInfoFilename );
 
             s_username = strdup( fileReader.GetRestOfLine() );
 
             fileReader.ReadLine();
 
-            DarwiniaReleaseAssert( stricmp( fileReader.GetNextToken(), "Email" ) == 0, "Failed to parse %s", _userInfoFilename );
+            DarwiniaReleaseAssert( _stricmp( fileReader.GetNextToken(), "Email" ) == 0, "Failed to parse %s", _userInfoFilename );
 
             s_email = strdup( fileReader.GetRestOfLine() );
         }

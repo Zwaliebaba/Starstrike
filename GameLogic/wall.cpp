@@ -8,7 +8,7 @@
 
 #include "wall.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "particle_system.h"
 #include "renderer.h"

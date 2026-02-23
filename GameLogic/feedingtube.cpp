@@ -11,7 +11,7 @@
 #include "file_writer.h"
 #include "text_stream_readers.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "globals.h"
 #include "location.h"

@@ -8,7 +8,7 @@
 #include "resource.h"
 #include "shape.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "main.h"
 #include "location.h"

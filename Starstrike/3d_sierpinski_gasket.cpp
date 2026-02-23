@@ -4,7 +4,7 @@
 #include "LegacyVector3.h"
 #include "debug_render.h"
 
-#include "app.h" // DELETEME
+#include "GameApp.h" // DELETEME
 #include "camera.h" // DELETEME
 
 #include "3d_sierpinski_gasket.h"

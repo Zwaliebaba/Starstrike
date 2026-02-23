@@ -3,7 +3,7 @@
 #include <map>
 
 #include "file_paths.h"
-#include "app.h"
+#include "GameApp.h"
 #include "preferences.h"
 #include "resource.h"
 #include "text_stream_readers.h"
@@ -72,7 +72,7 @@ const string & InputPrefs::GetUserPrefsPath()
 	static string path = "";
 
 	if ( path == "" ) {
-		path = App::GetProfileDirectory();
+		path = GameApp::GetProfileDirectory();
 		path.append( USER_INPUT_PREFS_FILE );
 	}
 

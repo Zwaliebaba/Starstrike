@@ -16,7 +16,7 @@
 #include "vector2.h"
 #include "LegacyVector3.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "landscape.h"

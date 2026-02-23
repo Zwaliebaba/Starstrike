@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "sample_cache.h"
 #include "sound_stream_decoder.h"
-#include "app.h"
+#include "GameApp.h"
 
 
 CachedSampleManager g_cachedSampleManager;

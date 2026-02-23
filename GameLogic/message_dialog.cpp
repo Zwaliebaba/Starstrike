@@ -7,7 +7,7 @@
 
 #include "message_dialog.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 
 

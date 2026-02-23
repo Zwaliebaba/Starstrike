@@ -12,7 +12,7 @@
 #include "input_types.h"
 
 #include "globals.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "team.h"
 #include "unit.h"

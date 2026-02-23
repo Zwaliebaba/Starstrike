@@ -7,7 +7,7 @@
 
 #include "egg.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 #include "main.h"

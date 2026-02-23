@@ -6,7 +6,7 @@
 #include "shape.h"
 #include "input.h"
 #include "input_types.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "explosion.h"
 #include "location.h"

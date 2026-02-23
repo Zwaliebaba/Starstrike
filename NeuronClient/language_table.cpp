@@ -10,7 +10,7 @@
 #include "text_renderer.h"
 #include "text_stream_readers.h"
 
-#include "app.h"
+#include "GameApp.h"
 
 #include "input.h"
 

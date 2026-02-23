@@ -13,7 +13,7 @@ static HWAVEOUT	s_device;
 SoundLibrary2d *g_soundLibrary2d = NULL;
 
 
-#include "app.h"
+#include "GameApp.h"
 #include "hi_res_time.h"
 #include "soundsystem.h"
 

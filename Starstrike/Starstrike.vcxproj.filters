@@ -388,7 +388,7 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="3d_sierpinski_gasket.cpp" />
-    <ClCompile Include="app.cpp" />
+    <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="attract.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="clouds.cpp" />
@@ -418,11 +418,12 @@
     <ClCompile Include="unit.cpp" />
     <ClCompile Include="user_input.cpp" />
     <ClCompile Include="water.cpp" />
+    <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="3d_sierpinski_gasket.h" />
-    <ClInclude Include="app.h" />
+    <ClInclude Include="GameApp.h" />
     <ClInclude Include="attract.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="clouds.h" />

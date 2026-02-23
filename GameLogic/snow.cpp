@@ -8,7 +8,7 @@
 
 #include "main.h"
 #include "globals.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 
 

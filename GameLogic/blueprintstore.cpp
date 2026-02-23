@@ -11,7 +11,7 @@
 #include "blueprintstore.h"
 #include "darwinian.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "renderer.h"
 #include "camera.h"

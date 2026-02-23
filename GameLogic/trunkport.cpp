@@ -13,7 +13,7 @@
 
 #include "soundsystem.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "team.h"
 #include "location.h"
 #include "global_world.h"

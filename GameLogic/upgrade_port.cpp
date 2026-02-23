@@ -5,7 +5,7 @@
 
 #include "upgrade_port.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "global_world.h"
 
 

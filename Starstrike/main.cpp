@@ -1,62 +1,54 @@
 #include "pch.h"
-#include "eclipse.h"
+#include "main.h"
+#include "GameApp.h"
+#include "LegacyVector3.h"
+#include "camera.h"
+#include "clienttoserver.h"
 #include "debug_utils.h"
+#include "eclipse.h"
+#include "explosion.h"
+#include "file_paths.h"
+#include "game_menu.h"
+#include "global_world.h"
 #include "hi_res_time.h"
 #include "input.h"
-#include "file_paths.h"
-#include "targetcursor.h"
-#include "math_utils.h"
-#include "preferences.h"
-#include "profiler.h"
-#include "system_info.h"
-#include "LegacyVector3.h"
-#include "window_manager.h"
-#include "resource.h"
-#include "text_stream_readers.h"
-#include "language_table.h"
-#include "win32_eventhandler.h"
+#include "inputdriver_alias.h"
+#include "inputdriver_chord.h"
+#include "inputdriver_conjoin.h"
+#include "inputdriver_idle.h"
+#include "inputdriver_invert.h"
+#include "inputdriver_prefs.h"
+#include "inputdriver_value.h"
 #include "inputdriver_win32.h"
 #include "inputdriver_xinput.h"
-#include "inputdriver_prefs.h"
-#include "inputdriver_alias.h"
-#include "inputdriver_conjoin.h"
-#include "inputdriver_chord.h"
-#include "inputdriver_invert.h"
-#include "inputdriver_idle.h"
-#include "inputdriver_value.h"
-#include "sound_library_2d.h"
-#include "sound_library_3d_dsound.h"
-#include "app.h"
-#include "camera.h"
-#include "explosion.h"
-#include "global_world.h"
 #include "landscape.h"
+#include "language_table.h"
 #include "location.h"
 #include "location_input.h"
-#include "main.h"
-#include "particle_system.h"
-#include "renderer.h"
-#include "script.h"
-#include "soundsystem.h"
-#include "taskmanager.h"
-#include "taskmanager_interface.h"
-#include "taskmanager_interface_icons.h"
-#include "team.h"
-#include "user_input.h"
-#include "startsequence.h"
-#include "unit.h"
-#include "water.h"
-#include "game_menu.h"
 #include "mainmenus.h"
-#include "debugmenu.h"
-#include "clienttoserver.h"
+#include "math_utils.h"
+#include "particle_system.h"
+#include "preferences.h"
+#include "profiler.h"
+#include "renderer.h"
+#include "resource.h"
+#include "script.h"
 #include "server.h"
 #include "servertoclientletter.h"
-#include "message_dialog.h"
+#include "sound_library_2d.h"
+#include "sound_library_3d_dsound.h"
+#include "soundsystem.h"
+#include "startsequence.h"
+#include "system_info.h"
+#include "targetcursor.h"
+#include "taskmanager.h"
+#include "taskmanager_interface.h"
+#include "team.h"
+#include "user_input.h"
+#include "water.h"
+#include "window_manager.h"
 
 #define TARGET_FRAME_RATE_INCREMENT 0.25f
-
-static void Finalise();
 
 // ******************
 //  Global Variables
@@ -70,12 +62,6 @@ float g_predictionTime;
 float g_targetFrameRate = 20.0f;
 int g_lastProcessedSequenceId = -1;
 int g_sliceNum; // Most recently advanced slice
-#ifdef TARGET_OS_VISTA
-char g_saveFile[128]; // The profile name extracted from the save file that was used to launch darwinia
-bool g_mediaCenter = false;
-#endif
-
-void SwitchTaskManagerForX360Controller();
 
 // ******************
 //  Local Functions
@@ -83,29 +69,13 @@ void SwitchTaskManagerForX360Controller();
 
 void UpdateAdvanceTime()
 {
-  int recordDemo = g_prefsManager->GetInt("RecordDemo");
-  if (recordDemo == 1 || recordDemo == 2)
-  {
-    int demoFrameRate = g_prefsManager->GetInt("DemoFrameRate", 25);
-    g_advanceTime = 1.0f / static_cast<float>(demoFrameRate);
-    IncrementFakeTime(1.0f / static_cast<double>(demoFrameRate));
-    //g_gameTime += g_advanceTime;
-    g_gameTime = GetHighResTime();
-    g_predictionTime = static_cast<float>(g_gameTime - g_lastServerAdvance) - 0.07f;
-  }
-  else
-  {
-    double realTime = GetHighResTime();
-    g_advanceTime = static_cast<float>(realTime - g_gameTime);
-    if (g_advanceTime > 0.25f)
-      g_advanceTime = 0.25f;
-    g_gameTime = realTime;
+  double realTime = GetHighResTime();
+  g_advanceTime = static_cast<float>(realTime - g_gameTime);
+  if (g_advanceTime > 0.25f)
+    g_advanceTime = 0.25f;
+  g_gameTime = realTime;
 
-    float prevPredictionTime = g_predictionTime;
-    g_predictionTime = static_cast<float>(realTime - g_lastServerAdvance) - 0.07f;
-
-    //DebugTrace( "Change = %6.3f\n", g_predictionTime - prevPredictionTime );
-  }
+  g_predictionTime = static_cast<float>(realTime - g_lastServerAdvance) - 0.07f;
 }
 
 double GetNetworkTime() { return g_lastProcessedSequenceId * 0.1f; }
@@ -130,38 +100,14 @@ void UpdateTargetFrameRate(int _currentSlice)
     g_targetFrameRate = 85.0f;
 }
 
-/*
-int GetNumSlicesToAdvance()
-{
-	int slicesPerSecond = SERVER_ADVANCE_FREQ * NUM_SLICES_PER_FRAME;
-	float ratio = (float)slicesPerSecond / (float)g_targetFrameRate;
-
-#ifdef AVI_GENERATOR
-	if (g_app->m_aviGenerator)
-	{
-		ratio = (float)slicesPerSecond / (float)g_app->m_aviGenerator->GetRecordingFrameRate();
-	}
-#endif
-
-	static float accumulator = 0.0f;
-	accumulator += ratio;
-
-	int returnVal = floorf(accumulator);
-
-	accumulator -= (float)returnVal;
-
-	return returnVal;
-}*/
-
 int GetNumSlicesToAdvance()
 {
   int numUpdatesToProcess = g_app->m_clientToServer->m_lastValidSequenceIdFromServer - g_lastProcessedSequenceId;
   int numSlicesPending = numUpdatesToProcess * NUM_SLICES_PER_FRAME;
   if (g_sliceNum != -1)
     numSlicesPending -= g_sliceNum;
-  else
-    if (g_sliceNum == -1)
-      numSlicesPending -= 10;
+  else if (g_sliceNum == -1)
+    numSlicesPending -= 10;
 
   float timeSinceStartOfAdvance = g_gameTime - g_lastServerAdvance;
   //int numSlicesThatShouldBePending = 10 - timeSinceStartOfAdvance * 10.0f;
@@ -217,153 +163,15 @@ void RemoveAllWindows()
   }
 }
 
-bool HandleCommonConditions()
-{
-  bool curWindowHasFocus = g_eventHandler->WindowHasFocus();
+unsigned char GenerateSyncValue() { return 255 * syncfrand(); }
 
-  static bool controllerPlugged = true;
-  if (controllerPlugged && g_inputManager->controlEvent(ControlControllerUnplugged))
-  {
-    auto dialog = new MessageDialog(LANGUAGEPHRASE("dialog_unplugged1"), LANGUAGEPHRASE("dialog_unplugged2"));
-    EclRegisterWindow(dialog);
-    controllerPlugged = false;
-  }
-
-  if (!controllerPlugged && g_inputManager->controlEvent(ControlControllerPlugged))
-  {
-    EclRemoveWindow(LANGUAGEPHRASE("dialog_unplugged1"));
-    controllerPlugged = true;
-  }
-
-  // Pretend we're not focused
-  if (!controllerPlugged && g_inputManager->getInputMode() == INPUT_MODE_GAMEPAD)
-    curWindowHasFocus = false;
-
-  if (!curWindowHasFocus)
-  {
-    g_app->m_userInput->Advance();
-    g_app->m_soundSystem->Advance();
-
-    // Render twice to avoid double buffering artefacts
-    g_app->m_renderer->Render();
-    g_app->m_renderer->Render();
-    return true;
-  }
-
-#ifdef TARGET_OS_MACOSX
-  // Quit on Command-Q
-  if (g_keyDeltas[KEY_Q] && g_keys[KEY_META])
-  {
-    // TODO: This
-    if (g_app->m_requestedLocationId != -1)
-      DebugKeyBindings::ReallyQuitButton();
-    else
-      g_app->m_requestQuit = true;
-  }
-#endif
-
-  if (g_app->m_requestQuit)
-  {
-    Finalise();
-    exit(0);
-  }
-
-  return false;
-}
-
-unsigned char GenerateSyncValue()
-{
-#ifdef TARGET_DEBUG
-  LegacyVector3 unitPosition; LegacyVector3 entityPosition; LegacyVector3 laserPosition; LegacyVector3 effectsPosition; for (
-    int t = 0; t < NUM_TEAMS; ++t)
-  {
-    Team* team = &g_app->m_location->m_teams[t];
-    if (team->m_teamType != Team::TeamTypeUnused)
-    {
-      for (int u = 0; u < team->m_units.Size(); ++u)
-      {
-        if (team->m_units.ValidIndex(u))
-        {
-          Unit* unit = team->m_units[u];
-          unitPosition += unit->m_centrePos;
-          for (int e = 0; e < unit->m_entities.Size(); ++e)
-          {
-            if (unit->m_entities.ValidIndex(e))
-            {
-              Entity* ent = unit->m_entities[e];
-              unitPosition += ent->m_pos;
-              unitPosition += ent->m_vel;
-            }
-          }
-        }
-      }
-
-      for (int e = 0; e < team->m_others.Size(); ++e)
-      {
-        if (team->m_others.ValidIndex(e))
-        {
-          Entity* entity = team->m_others[e];
-          entityPosition += entity->m_pos;
-          entityPosition += entity->m_vel;
-        }
-      }
-    }
-  } for (int l = 0; l < g_app->m_location->m_lasers.Size(); ++l)
-  {
-    if (g_app->m_location->m_lasers.ValidIndex(l))
-    {
-      Laser* laser = g_app->m_location->m_lasers.GetPointer(l);
-      laserPosition += laser->m_pos;
-      laserPosition += laser->m_vel;
-    }
-  } for (int e = 0; e < g_app->m_location->m_effects.Size(); ++e)
-  {
-    if (g_app->m_location->m_effects.ValidIndex(e))
-    {
-      WorldObject* wobj = g_app->m_location->m_effects[e];
-      effectsPosition += wobj->m_pos;
-      effectsPosition += wobj->m_vel;
-    }
-  } LegacyVector3 position = unitPosition + entityPosition + laserPosition + effectsPosition; float totalValue = position.x + position.y +
-    position.z; totalValue -= int(totalValue); DarwiniaDebugAssert(totalValue >= 0.0f && totalValue <= 1.0f); unsigned char syncValue =
-    totalValue * 255;
-
-  //    float unitPositionSync = ( unitPosition.x + unitPosition.y + unitPosition.z );
-  //    float entityPositionSync = ( entityPosition.x + entityPosition.y + entityPosition.z );
-  //    float laserPositionSync = ( laserPosition.x + laserPosition.y + laserPosition.z );
-  //    float effectsPositionSync = ( effectsPosition.x + effectsPosition.y + effectsPosition.z );
-  //
-  //    unitPositionSync -= (int) unitPositionSync;
-  //    entityPositionSync -= (int) entityPositionSync;
-  //    laserPositionSync -= (int) laserPositionSync;
-  //    effectsPositionSync -= (int) effectsPositionSync;
-  //
-  //    DebugTrace( "Frame [%3d] Sync [%3d] unit[%3d] entity[%3d] laser[%3d] effects[%3d]\n",
-  //            g_lastProcessedSequenceId, syncValue,
-  //            (int)(unitPositionSync*255),
-  //            (int)(entityPositionSync*255),
-  //            (int)(laserPositionSync*255),
-  //            (int)(effectsPositionSync*255) );
-
-  return syncValue;
-
-#else
-
-  return 255 * syncfrand();
-
-#endif
-}
-
-void LocationGameLoop()
+bool LocationGameLoop()
 {
   bool iAmAClient = true;
   bool iAmAServer = g_prefsManager->GetInt("IAmAServer") ? true : false;
 
   double nextServerAdvanceTime = GetHighResTime();
   double nextIAmAliveMessage = GetHighResTime();
-  double heavyWeightAdvanceStartTime = -1;
-  double serverAdvanceStartTime = -1;
-  double lastRenderTime = GetHighResTime();
 
   TeamControls teamControls;
 
@@ -411,7 +219,7 @@ void LocationGameLoop()
       g_app->m_userInput->Advance();
     }
 
-    if (HandleCommonConditions())
+    if (g_app->m_requestQuit)
       continue;
 
     //
@@ -445,7 +253,6 @@ void LocationGameLoop()
         // Read the current teamControls from the inputManager
 
         bool entityUnderMouse = false;
-        int numMouseButtons = g_prefsManager->GetInt("ControlMouseButtons", 3);
 
         Team* team = g_app->m_location->GetMyTeam();
         if (team)
@@ -528,7 +335,6 @@ void LocationGameLoop()
               g_app->m_clientToServer->ProcessServerUpdates(letter);
 
             g_sliceNum = 0;
-            heavyWeightAdvanceStartTime = timeNow;
             g_lastServerAdvance = static_cast<float>(letter->GetSequenceId()) * SERVER_ADVANCE_PERIOD + g_startTime;
             g_lastProcessedSequenceId = letter->GetSequenceId();
             delete letter;
@@ -546,24 +352,17 @@ void LocationGameLoop()
           if (g_sliceNum < NUM_SLICES_PER_FRAME - 1)
             g_sliceNum++;
           else
-          {
             g_sliceNum = -1;
-            heavyWeightAdvanceStartTime = -1.0;
-          }
         }
       }
 
       // Render
       UpdateAdvanceTime();
-      lastRenderTime = GetHighResTime();
 #ifdef PROFILER_ENABLED
       g_app->m_profiler->Advance();
 #endif // PROFILER_ENABLED
 
       g_app->m_userInput->Advance();
-
-      // Check Task Manager
-      SwitchTaskManagerForX360Controller();
 
       // The following are candidates for running in parallel
       // using something like OpenMP
@@ -590,13 +389,6 @@ void LocationGameLoop()
   g_app->m_soundSystem->StopAllSounds(WorldObjectId(), "Ambience EnterLocation");
   g_app->m_soundSystem->TriggerOtherEvent(nullptr, "ExitLocation", SoundSourceBlueprint::TypeAmbience);
 
-  if (g_prefsManager->GetInt("RecordDemo") == 1)
-  {
-    if (g_app->m_server)
-      g_app->m_server->SaveHistory("serverHistory.dat");
-    //g_inputManager->StopLogging( "inputLog.dat" );
-  }
-
   g_explosionManager.Reset();
 
   if (g_app->m_globalWorld->GetLocationName(g_app->m_locationId))
@@ -605,9 +397,6 @@ void LocationGameLoop()
   g_app->m_clientToServer->ClientLeave();
   g_app->m_location->Empty();
   g_app->m_particleSystem->Empty();
-
-  //	g_app->m_inLocation = false;
-  //	g_app->m_requestedLocationId = false;
 
   delete g_app->m_location;
   g_app->m_location = nullptr;
@@ -623,31 +412,11 @@ void LocationGameLoop()
 
   g_app->m_globalWorld->m_myTeamId = 255;
   g_app->m_globalWorld->EvaluateEvents();
+
+  return g_app->m_requestQuit;
 }
 
-void SwitchTaskManagerForX360Controller()
-{
-  static int oldControlType = INPUT_MODE_KEYBOARD;
-
-  if (oldControlType != INPUT_MODE_GAMEPAD && g_inputManager->getInputMode() == INPUT_MODE_GAMEPAD && !g_app->m_taskManagerInterface->
-    m_visible)
-  {
-    // user has just switched to the game pad
-    if (g_prefsManager->GetInt("ControlMethod") == 0)
-    {
-      delete g_app->m_taskManagerInterface;
-      g_app->m_taskManagerInterface = new TaskManagerInterfaceIcons();
-    }
-    oldControlType = INPUT_MODE_GAMEPAD;
-  }
-  else if (oldControlType == INPUT_MODE_GAMEPAD && g_inputManager->getInputMode() != INPUT_MODE_GAMEPAD && !g_app->m_taskManagerInterface->
-    m_visible)
-  {
-    oldControlType = g_inputManager->getInputMode();
-  }
-}
-
-void GlobalWorldGameLoop()
+bool GlobalWorldGameLoop()
 {
   g_app->m_renderer->StartFadeIn(0.25f);
 
@@ -672,12 +441,11 @@ void GlobalWorldGameLoop()
       g_app->m_userInput->Advance();
     }
 
-    if (HandleCommonConditions())
+    if (g_app->m_requestQuit)
       continue;
 
     // Get the time
     UpdateAdvanceTime();
-    double timeNow = GetHighResTime();
 
     g_app->m_script->Advance();
     g_app->m_globalWorld->Advance();
@@ -701,6 +469,7 @@ void GlobalWorldGameLoop()
   }
 
   g_app->m_soundSystem->StopAllSounds(WorldObjectId(), "Ambience EnterGlobalWorld");
+  return g_app->m_requestQuit;
 }
 
 void InitialiseInputManager()
@@ -710,48 +479,20 @@ void InitialiseInputManager()
   g_inputManager->addDriver(new ChordInputDriver());
   g_inputManager->addDriver(new InvertInputDriver());
   g_inputManager->addDriver(new IdleInputDriver());
-#ifdef TARGET_MSVC
   g_inputManager->addDriver(new W32InputDriver());
-
-  if (LoadLibrary(L"XINPUT1_3"))
-    g_inputManager->addDriver(new XInputDriver());
-#endif
   g_inputManager->addDriver(new PrefsInputDriver());
   g_inputManager->addDriver(new ValueInputDriver());
   g_inputManager->addDriver(new AliasInputDriver());
   {
-    // Read Darwinia default input preferences file
-    TextReader* inputPrefsReader = g_app->m_resource->GetTextReader(InputPrefs::GetSystemPrefsPath());
-    if (inputPrefsReader)
-    {
-      DarwiniaReleaseAssert(inputPrefsReader->IsOpen(), "Couldn't open input preferences file: %s\n", InputPrefs::GetSystemPrefsPath());
-      g_inputManager->parseInputPrefs(*inputPrefsReader);
-      delete inputPrefsReader;
-    }
-
-    // Override defaults with keyboard specific file, if applicable
-    TextReader* localeInputPrefsReader = g_app->m_resource->GetTextReader(InputPrefs::GetLocalePrefsPath());
-    if (localeInputPrefsReader)
-    {
-      if (localeInputPrefsReader->IsOpen())
-        g_inputManager->parseInputPrefs(*localeInputPrefsReader, true);
-      delete localeInputPrefsReader;
-    }
-
-    // Override again with user specified bindings
-    TextReader* userInputPrefsReader = new TextFileReader(InputPrefs::GetUserPrefsPath());
-    if (userInputPrefsReader)
-    {
-      if (userInputPrefsReader->IsOpen())
-        g_inputManager->parseInputPrefs(*userInputPrefsReader, true);
-      delete userInputPrefsReader;
-    }
+      // Read Darwinia default input preferences file
+      TextReader* inputPrefsReader = Resource::GetTextReader(InputPrefs::GetSystemPrefsPath());
+      if (inputPrefsReader)
+      {
+          ASSERT_TEXT(inputPrefsReader->IsOpen(), "Couldn't open input preferences file: %s\n", InputPrefs::GetSystemPrefsPath());
+          g_inputManager->parseInputPrefs(*inputPrefsReader);
+          delete inputPrefsReader;
+      }
   }
-}
-
-bool IsRunningVista()
-{
-    return false;
 }
 
 void Initialise()
@@ -762,38 +503,10 @@ void Initialise()
   g_systemInfo = new SystemInfo;
   InitialiseHighResTime();
 
-#ifdef TARGET_MSVC
-  g_eventHandler = new W32EventHandler();
-#endif
-  g_app = new App();
-
   InitialiseInputManager();
 
-#if defined(TARGET_OS_VISTA)
-  DoVistaChecks();
-#endif
-
   g_target = new TargetCursor();
-  //if( g_prefsManager->GetInt("ControlMethod")==0 ) getW32EventHandler()->BindAltTab();
   EntityBlueprint::Initialise();
-  g_windowManager->HideMousePointer();
-
-  //
-  // Start on a specific level if the prefs file tells us to
-
-  char* startMap = g_prefsManager->GetString("StartMap");
-  if (startMap && g_app->HasBoughtGame())
-  {
-    int requestedLocationId = g_app->m_globalWorld->GetLocationId(startMap);
-    GlobalLocation* gloc = g_app->m_globalWorld->GetLocation(requestedLocationId);
-
-    if (gloc)
-    {
-      g_app->m_requestedLocationId = requestedLocationId;
-      strcpy(g_app->m_requestedMap, gloc->m_mapFilename);
-      strcpy(g_app->m_requestedMission, gloc->m_missionFilename);
-    }
-  }
 
   g_app->m_renderer->SetOpenGLState();
 }
@@ -808,51 +521,33 @@ void Finalise()
 
   delete g_app->m_resource;
   delete g_windowManager;
-
-#ifdef TARGET_OS_VISTA
-  // Skip if not running on a Media Center
-  if (g_mediaCenter)
-  {
-    // Get the path to Media Center
-    WCHAR szExpandedPath[MAX_PATH];
-    if (ExpandEnvironmentStringsW(L"%SystemRoot%\\ehome\\ehshell.exe", szExpandedPath, MAX_PATH))
-    {
-      // Skip if ehshell.exe doesn't exist
-      if (GetFileAttributesW(szExpandedPath) != 0xFFFFFFFF)
-      {
-        // Launch ehshell.exe
-        INT_PTR result = (INT_PTR)ShellExecuteW(NULL, L"open", szExpandedPath, NULL, NULL, SW_SHOWNORMAL);
-      }
-    }
-  }
-#endif
 }
 
 void RunBootLoaders()
 {
-    if (g_prefsManager->GetInt("CurrentGameMode", 1) == 1)
+  if (g_prefsManager->GetInt("CurrentGameMode", 1) == 1)
+  {
+    g_app->m_startSequence = new StartSequence();
+    while (true)
     {
-        g_app->m_startSequence = new StartSequence();
-        while (true)
-        {
-            UpdateAdvanceTime();
-            bool amIDone = g_app->m_startSequence->Advance();
-            if (amIDone)
-                break;
-        }
-
-        delete g_app->m_startSequence;
-        g_app->m_startSequence = nullptr;
-
-        g_app->m_camera->SetTarget(LegacyVector3(1000, 500, 1000), LegacyVector3(0, -0.5f, -1));
-        g_app->m_camera->CutToTarget();
-
-        g_inputManager->Advance(); // clears g_keyDeltas[KEY_ESC]
-        g_inputManager->Advance();
+      UpdateAdvanceTime();
+      bool amIDone = g_app->m_startSequence->Advance();
+      if (amIDone)
+        break;
     }
+
+    delete g_app->m_startSequence;
+    g_app->m_startSequence = nullptr;
+
+    g_app->m_camera->SetTarget(LegacyVector3(1000, 500, 1000), LegacyVector3(0, -0.5f, -1));
+    g_app->m_camera->CutToTarget();
+
+    g_inputManager->Advance(); // clears g_keyDeltas[KEY_ESC]
+    g_inputManager->Advance();
+  }
 }
 
-void EnterLocation()
+bool EnterLocation()
 {
   bool iAmAServer = g_prefsManager->GetInt("IAmAServer") ? true : false;
   if (!g_app->m_editing)
@@ -898,22 +593,14 @@ void EnterLocation()
   g_app->m_camera->SetTarget(LegacyVector3(maxX, 1000, maxX), LegacyVector3(-1, -0.7, -1)); // Incase start doesn't exist
   g_app->m_camera->SetTarget("start");
   g_app->m_camera->CutToTarget();
+  g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
 
-  if (g_app->m_editing)
-  {
-  }
-  else
-  {
-    g_app->m_camera->SetDebugMode(Camera::DebugModeAuto);
-    g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
-
-    LocationGameLoop();
-  }
+  return LocationGameLoop();
 }
 
-void EnterGlobalWorld()
+bool EnterGlobalWorld()
 {
-  if (g_app->m_gameMode == App::GameModePrologue && !g_app->m_script->IsRunningScript())
+  if (g_app->m_gameMode == GameApp::GameModePrologue && !g_app->m_script->IsRunningScript())
   {
     // the only time you should see the world in prologue is during the cutscene
     //g_app->m_atMainMenu = true;
@@ -927,7 +614,7 @@ void EnterGlobalWorld()
   g_app->m_camera->SetDebugMode(Camera::DebugModeAuto);
   g_app->m_camera->RequestMode(Camera::ModeSphereWorld);
   g_app->m_camera->SetHeight(50.0f);
-  GlobalWorldGameLoop();
+  return GlobalWorldGameLoop();
 }
 
 void MainMenuLoop()
@@ -940,7 +627,6 @@ void MainMenuLoop()
     g_app->m_userInput->Advance();
     g_app->m_camera->Advance();
     g_app->m_soundSystem->Advance();
-    HandleCommonConditions();
 
     if (!g_app->m_gameMenu->m_menuCreated)
     {
@@ -954,30 +640,23 @@ void MainMenuLoop()
 
 void RunTheGame()
 {
+  bool quit = false;
+
   Initialise();
   RunBootLoaders();
 
-  //
-  // Do whatever mode was requested
+  g_app->LoadCampaign();
 
-  if (g_prefsManager->GetInt("CurrentGameMode", 1) == 0)
-    g_app->LoadPrologue();
-  else
-    g_app->LoadCampaign();
-
-  while (true)
+  while (!quit)
   {
     if (g_app->m_requestedLocationId != -1)
-      EnterLocation();
-    else // Not in location
-      EnterGlobalWorld();
+      quit = EnterLocation();
+    else
+      quit = EnterGlobalWorld();
 
     g_inputManager->Advance();
   }
 }
 
 // Main Function
-void AppMain()
-{
-    RunTheGame();
-}
+void AppMain() { RunTheGame(); }

@@ -2,7 +2,7 @@
 #include "targetcursor.h"
 #include "input.h"
 #include "window_manager.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "eclipse.h"
 #include "taskmanager_interface.h"

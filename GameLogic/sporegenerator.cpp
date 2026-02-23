@@ -11,7 +11,7 @@
 
 #include "sporegenerator.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "main.h"
 #include "renderer.h"

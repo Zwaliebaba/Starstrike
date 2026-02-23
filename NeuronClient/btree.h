@@ -157,14 +157,14 @@ void BTree<T>::PutData(const char* newid, const T& newdata)
         return;
     }
 
-    if (stricmp(newid, id) <= 0)
+    if (_stricmp(newid, id) <= 0)
     {
         if (ltree)
             ltree->PutData(newid, newdata);
         else
             ltree = new BTree(newid, newdata);
     }
-    else if (stricmp(newid, id) > 0)
+    else if (_stricmp(newid, id) > 0)
     {
         if (rtree)
             rtree->PutData(newid, newdata);
@@ -185,7 +185,7 @@ void BTree<T>::RemoveData(const char* newid)
 
     DarwiniaDebugAssert(newid);
 
-    if (stricmp(newid, id) == 0)
+    if (_stricmp(newid, id) == 0)
     {
         //var tempright : pointer to node := data->right
         BTree<T>* tempright = Right();
@@ -219,11 +219,11 @@ void BTree<T>::RemoveData(const char* newid)
             }
         }
     }                                                   //elsif Name < data->name then
-    else if (stricmp(newid, id) < 0)
+    else if (_stricmp(newid, id) < 0)
     {
         if (Left())
         {
-            if (stricmp(Left()->id, newid) == 0 && !Left()->Left() && !Left()->Right())
+            if (_stricmp(Left()->id, newid) == 0 && !Left()->Left() && !Left()->Right())
                 ltree = NULL;
             else
                 Left()->RemoveData(newid);
@@ -233,7 +233,7 @@ void BTree<T>::RemoveData(const char* newid)
     {
         if (Right())
         {
-            if (stricmp(Right()->id, newid) == 0 && !Right()->Left() && !Right()->Right())
+            if (_stricmp(Right()->id, newid) == 0 && !Right()->Left() && !Right()->Right())
                 rtree = NULL;
             else
                 Right()->RemoveData(newid);
@@ -270,13 +270,13 @@ BTree<T>* BTree<T>::LookupTree(const char* searchid)
     if (!id)
         return NULL;
 
-    if (stricmp(searchid, id) == 0)
+    if (_stricmp(searchid, id) == 0)
         return this;
 
-    else if (ltree && stricmp(searchid, id) < 0)
+    else if (ltree && _stricmp(searchid, id) < 0)
         return ltree->LookupTree(searchid);
 
-    else if (rtree && stricmp(searchid, id) > 0)
+    else if (rtree && _stricmp(searchid, id) > 0)
         return rtree->LookupTree(searchid);
 
     else return NULL;

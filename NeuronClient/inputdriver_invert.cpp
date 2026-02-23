@@ -48,7 +48,7 @@ InputParserState InvertInputDriver::parseInputSpecification( InputSpecTokens con
 	//derr << "Full: " << tokens << endl;
 
 	if ( tokens.length() < 1 ) return STATE_ERROR;
-	if ( ( stricmp( tokens[0].c_str(), "not" ) == 0 ) ||
+	if ( ( _stricmp( tokens[0].c_str(), "not" ) == 0 ) ||
 	     tokens[0] == "!" ) {
 		std::unique_ptr<InputSpecTokens> newtokens = tokens( 1, -1 );
 		//derr << "Part: " << *newtokens << endl;

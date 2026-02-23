@@ -8,7 +8,7 @@
 #include "rgb_colour.h"
 #include "texture_uv.h"
 #include "LegacyVector3.h"
-#include "app.h"
+#include "GameApp.h"
 #include "landscape_renderer.h"
 #include "location.h"	
 #include "level_file.h"

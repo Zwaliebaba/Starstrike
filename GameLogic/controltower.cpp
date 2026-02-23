@@ -9,7 +9,7 @@
 #include "hi_res_time.h"
 #include "clienttoserver.h"
 #include "soundsystem.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"

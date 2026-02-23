@@ -15,7 +15,7 @@
 #include "text_renderer.h"
 #include "language_table.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "globals.h"
 #include "location.h"
@@ -738,7 +738,7 @@ Building *Building::CreateBuilding( char *_name )
 {
     for( int i = 0; i < NumBuildingTypes; ++i )
     {
-        if( stricmp( _name, GetTypeName(i) ) == 0 )
+        if( _stricmp( _name, GetTypeName(i) ) == 0 )
         {
             return CreateBuilding(i);
         }
@@ -831,7 +831,7 @@ int Building::GetTypeId( char const *_name )
 {
     for( int i = 0; i < NumBuildingTypes; ++i )
     {
-        if( stricmp( _name, GetTypeName(i) ) == 0 )
+        if( _stricmp( _name, GetTypeName(i) ) == 0 )
         {
             return i;
         }

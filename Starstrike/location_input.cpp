@@ -13,7 +13,7 @@
 #include "officer.h"
 #include "insertion_squad.h"
 #include "armour.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "location.h"

@@ -5,7 +5,7 @@
 #include "cheat_window.h"
 #include "debugmenu.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "global_world.h"
 #include "globals.h"
 #include "location.h"

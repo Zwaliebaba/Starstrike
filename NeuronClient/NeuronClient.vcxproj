@@ -100,14 +100,19 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="bounded_array.h" />
     <ClInclude Include="btree.h" />
+    <ClInclude Include="bytestream.h" />
+    <ClInclude Include="clienttoserver.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="control_bindings.h" />
     <ClInclude Include="control_types.h" />
     <ClInclude Include="d3d12_backend.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="darray.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
     <ClInclude Include="debug_utils.h" />
+    <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="eclbutton.h" />
     <ClInclude Include="eclipse.h" />
@@ -117,6 +122,12 @@
     <ClInclude Include="filesys_utils.h" />
     <ClInclude Include="file_paths.h" />
     <ClInclude Include="file_writer.h" />
+    <ClInclude Include="GameMain.h" />
+    <ClInclude Include="generic.h" />
+    <ClInclude Include="GpuBuffer.h" />
+    <ClInclude Include="GpuResource.h" />
+    <ClInclude Include="GraphicsCommon.h" />
+    <ClInclude Include="GraphicsCore.h" />
     <ClInclude Include="hash_table.h" />
     <ClInclude Include="hi_res_time.h" />
     <ClInclude Include="input.h" />
@@ -150,6 +161,7 @@
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
     <ClInclude Include="movement2d.h" />
+    <ClInclude Include="networkupdate.h" />
     <ClInclude Include="NeuronClient.h" />
     <ClInclude Include="ogl_extensions.h" />
     <ClInclude Include="opengl_directx.h" />
@@ -160,7 +172,8 @@
     <ClInclude Include="opengl_directx_matrix_stack.h" />
     <ClInclude Include="opengl_trace.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="persisting_debug_render.h" />
+    <ClInclude Include="PipelineState.h" />
+    <ClInclude Include="PixProfiler.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preferences.h" />
     <ClInclude Include="preference_names.h" />
@@ -169,8 +182,14 @@
     <ClInclude Include="random.h" />
     <ClInclude Include="render_utils.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceStateTracker.h" />
     <ClInclude Include="rgb_colour.h" />
+    <ClInclude Include="RootSignature.h" />
+    <ClInclude Include="SamplerManager.h" />
     <ClInclude Include="sample_cache.h" />
+    <ClInclude Include="server.h" />
+    <ClInclude Include="servertoclient.h" />
+    <ClInclude Include="servertoclientletter.h" />
     <ClInclude Include="shape.h" />
     <ClInclude Include="slice_darray.h" />
     <ClInclude Include="sorting_hash_table.h" />
@@ -183,6 +202,7 @@
     <ClInclude Include="sound_parameter.h" />
     <ClInclude Include="sound_stream_decoder.h" />
     <ClInclude Include="sphere_renderer.h" />
+    <ClInclude Include="Strings.h" />
     <ClInclude Include="string_utils.h" />
     <ClInclude Include="system_info.h" />
     <ClInclude Include="targetcursor.h" />
@@ -193,22 +213,23 @@
     <ClInclude Include="user_info.h" />
     <ClInclude Include="vector2.h" />
     <ClInclude Include="LegacyVector3.h" />
-    <ClInclude Include="win32_eventhandler.h" />
-    <ClInclude Include="win32_eventproc.h" />
+    <ClInclude Include="VertexTypes.h" />
     <ClInclude Include="window_manager.h" />
-    <ClInclude Include="window_manager_win32.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3d_sprite.cpp" />
     <ClCompile Include="binary_stream_readers.cpp" />
     <ClCompile Include="bitmap.cpp" />
+    <ClCompile Include="clienttoserver.cpp" />
     <ClCompile Include="control_bindings.cpp" />
     <ClCompile Include="control_types.cpp" />
     <ClCompile Include="d3d12_backend.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="debug_fog_logging.cpp" />
     <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
     <ClCompile Include="debug_utils.cpp" />
+    <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="eclbutton.cpp" />
     <ClCompile Include="eclipse.cpp" />
     <ClCompile Include="eclwindow.cpp" />
@@ -216,6 +237,10 @@
     <ClCompile Include="filesys_utils.cpp" />
     <ClCompile Include="file_paths.cpp" />
     <ClCompile Include="file_writer.cpp" />
+    <ClCompile Include="generic.cpp" />
+    <ClCompile Include="GpuBuffer.cpp" />
+    <ClCompile Include="GraphicsCommon.cpp" />
+    <ClCompile Include="GraphicsCore.cpp" />
     <ClCompile Include="hi_res_time.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="inputdriver.cpp" />
@@ -245,6 +270,8 @@
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
     <ClCompile Include="movement2d.cpp" />
+    <ClCompile Include="networkupdate.cpp" />
+    <ClCompile Include="NeuronClient.cpp" />
     <ClCompile Include="ogl_extensions_directx.cpp" />
     <ClCompile Include="opengl_directx.cpp" />
     <ClCompile Include="opengl_directx_dlist.cpp" />
@@ -256,15 +283,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="persisting_debug_render.cpp" />
+    <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="render_utils.cpp" />
     <ClCompile Include="resource.cpp" />
+    <ClCompile Include="ResourceStateTracker.cpp" />
     <ClCompile Include="rgb_colour.cpp" />
+    <ClCompile Include="RootSignature.cpp" />
+    <ClCompile Include="SamplerManager.cpp" />
     <ClCompile Include="sample_cache.cpp" />
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="servertoclient.cpp" />
+    <ClCompile Include="servertoclientletter.cpp" />
     <ClCompile Include="shape.cpp" />
     <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="sound_filter.cpp" />
@@ -275,6 +308,7 @@
     <ClCompile Include="sound_parameter.cpp" />
     <ClCompile Include="sound_stream_decoder.cpp" />
     <ClCompile Include="sphere_renderer.cpp" />
+    <ClCompile Include="Strings.cpp" />
     <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="system_info.cpp" />
     <ClCompile Include="targetcursor.cpp" />
@@ -286,7 +320,6 @@
     <ClCompile Include="user_info.cpp" />
     <ClCompile Include="vector2.cpp" />
     <ClCompile Include="vector3.cpp" />
-    <ClCompile Include="win32_eventhandler.cpp" />
     <ClCompile Include="window_manager_directx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -297,6 +330,7 @@
   <ItemGroup>
     <None Include="control_types.inc" />
     <None Include="inputdriver_values.inc" />
+    <None Include="networkupdate.inc" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -336,6 +370,7 @@
     <Import Project="..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7705\build\Microsoft.Windows.SDK.BuildTools.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.BuildTools.10.0.26100.7705\build\Microsoft.Windows.SDK.BuildTools.targets')" />
     <Import Project="..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets" Condition="Exists('..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets')" />
     <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.260126.7\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.260126.7\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
+    <Import Project="..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -369,5 +404,6 @@
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.SDK.BuildTools.MSIX.1.7.251221100\build\Microsoft.Windows.SDK.BuildTools.MSIX.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.260126.7\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.260126.7\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+    <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.240308001\build\WinPixEventRuntime.targets'))" />
   </Target>
 </Project>

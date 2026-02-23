@@ -7,7 +7,7 @@
 #include "profiler.h"
 #include "rgb_colour.h"
 #include "preferences.h"
-#include "app.h"
+#include "GameApp.h"
 
 #define BMP_RGB				0
 #define OS2INFOHEADERSIZE  12
@@ -388,13 +388,13 @@ void BitmapRGBA::Initialise(const char* _filename)
   BinaryFileReader in(_filename);
 
   const char* extension = GetExtensionPart(_filename);
-  DarwiniaDebugAssert(stricmp(extension, "bmp") == 0);
+  DarwiniaDebugAssert(_stricmp(extension, "bmp") == 0);
   LoadBmp(&in);
 }
 
 void BitmapRGBA::Initialise(BinaryReader* _reader, const char* _type)
 {
-  DarwiniaDebugAssert(stricmp(_type, "bmp") == 0);
+  DarwiniaDebugAssert(_stricmp(_type, "bmp") == 0);
   LoadBmp(_reader);
 }
 

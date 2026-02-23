@@ -31,7 +31,7 @@ InputParserState ValueInputDriver::parseInputSpecification( InputSpecTokens cons
 	InputParserState state = STATE_WANT_DRIVER;
 	unsigned idx = 0;
 	if ( ( tokens.length() < idx + 1 ) ||
-	     ( stricmp( tokens[idx++].c_str(), "value" ) == 0 ) )
+	     ( _stricmp( tokens[idx++].c_str(), "value" ) == 0 ) )
 		return state;
 
 	state = STATE_WANT_CONTROL;

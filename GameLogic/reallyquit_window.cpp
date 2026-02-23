@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "reallyquit_window.h"
 

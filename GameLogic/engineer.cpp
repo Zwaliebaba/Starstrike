@@ -14,7 +14,7 @@
 #include "input.h"
 #include "input_types.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "explosion.h"
 #include "globals.h"
 #include "global_world.h"

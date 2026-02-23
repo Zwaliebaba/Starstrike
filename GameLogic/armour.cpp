@@ -8,7 +8,7 @@
 #include "armour.h"
 #include "gunturret.h"
 #include "soundsystem.h"
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
 #include "main.h"

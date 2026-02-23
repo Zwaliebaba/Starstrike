@@ -9,7 +9,7 @@
 #include "text_stream_readers.h"
 #include "text_renderer.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "entity_grid.h"
 #include "explosion.h"

@@ -6,7 +6,7 @@
 #include "debug_utils.h"
 #include "math_utils.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "worldobject.h"
 #include "main.h"

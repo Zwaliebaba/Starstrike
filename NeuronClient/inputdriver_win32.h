@@ -1,89 +1,82 @@
 #ifndef INCLUDED_INPUT_W32_H
 #define INCLUDED_INPUT_W32_H
 
-
-#include <string>
-
 #include "inputdriver_simple.h"
 #include "keydefs.h"
-#include "win32_eventproc.h"
 
 #define NUM_MB 3
 #define NUM_AXES 3
 
+class W32InputDriver : public SimpleInputDriver
+{
+  int lastAcceptedDriver; // We're handling multiple driver types
 
-class W32InputDriver : public SimpleInputDriver, W32EventProcessor {
+  bool acceptDriver(const std::string& name) override;
 
-private:
-	int lastAcceptedDriver; // We're handling multiple driver types
+  control_id_t getControlID(const std::string& name) override;
 
-	bool acceptDriver( std::string const &name );
+  inputtype_t getControlType(control_id_t control_id) override;
 
-	control_id_t getControlID( std::string const &name );
+  InputParserState writeExtraSpecInfo(InputSpec& spec) override;
 
-	inputtype_t getControlType( control_id_t control_id );
+  control_id_t getKeyId(const std::string& keyName);
 
-	InputParserState writeExtraSpecInfo( InputSpec &spec );
+  inputtype_t getMouseControlType(control_id_t control_id);
 
-	control_id_t getKeyId( std::string const &keyName );
+  bool getKeyInput(const InputSpec& spec, InputDetails& details);
 
-	inputtype_t getMouseControlType( control_id_t control_id );
+  bool getMouseInput(const InputSpec& spec, InputDetails& details);
 
-	bool getKeyInput( InputSpec const &spec, InputDetails &details );
+  public:
+    W32InputDriver();
 
-	bool getMouseInput( InputSpec const &spec, InputDetails &details );
+    ~W32InputDriver();
 
-public:
-	W32InputDriver();
+    // Get input state. True if the input was triggered (input condition met). If true,
+    // details are placed in details.
+    bool getInput(const InputSpec& spec, InputDetails& details) override;
 
-	~W32InputDriver();
+    // Returns true if the InputDriver is receiving no user input. Used to access screensaver
+    // type modes.
+    bool isIdle() override;
 
-	// Get input state. True if the input was triggered (input condition met). If true,
-	// details are placed in details.
-	bool getInput( InputSpec const &spec, InputDetails &details );
+    // Returns the input mode associated with the InputDriver (keyboard or gamepad or none)
+    InputMode getInputMode() override;
 
-	// Returns true if the InputDriver is receiving no user input. Used to access screensaver
-	// type modes.
-	bool isIdle();
+    // Returns true if there was an "active" input event this frame. Fills spec with
+    // the details of the input. Active inputs are primarily things like button presses
+    // but not buttons held down or released or 2D analog events.
+    bool getFirstActiveInput(InputSpec& spec, bool instant) override;
 
-	// Returns the input mode associated with the InputDriver (keyboard or gamepad or none)
-	InputMode getInputMode();
+    // This triggers a read from the input hardware and does message polling
+    void Advance() override;
 
-	// Returns true if there was an "active" input event this frame. Fills spec with
-	// the details of the input. Active inputs are primarily things like button presses
-	// but not buttons held down or released or 2D analog events.
-	bool getFirstActiveInput( InputSpec &spec, bool instant );
+    // Poll for system events that may require immediate, hard-coded action
+    void PollForEvents() override;
 
-	// This triggers a read from the input hardware and does message polling
-	void Advance();
+    // Fill out a description of the input defined by spec
+    bool getInputDescription(const InputSpec& spec, InputDescription& desc) override;
 
-	// Poll for system events that may require immediate, hard-coded action
-	void PollForEvents();
+    // Get the name of the driver (debuggung purposes)
+    const std::string& getName();
 
-	// Fill out a description of the input defined by spec
-	bool getInputDescription( InputSpec const &spec, InputDescription &desc );
+    // This is a callback for Windows events
+    // Returns 0 if the event is handled here, -1 otherwise
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	// Get the name of the driver (debuggung purposes)
-	const std::string &getName();
+    // Warp the mouse to a particular position and pretend it has always been there
+    void SetMousePosNoVelocity(int _x, int _y);
 
-	// This is a callback for Windows events
-	// Returns 0 if the event is handled here, -1 otherwise
-	LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+  private:
+    inline static bool m_mb[NUM_MB]; // Mouse button states from this frame
+    inline static bool m_mbOld[NUM_MB]; // Mouse button states from last frame
+    inline static int m_mbDeltas[NUM_MB]; // Mouse button diffs
 
-	// Warp the mouse to a particular position and pretend it has always been there
-	void SetMousePosNoVelocity( int _x, int _y );
+    inline static int m_mousePos[NUM_AXES]; // X Y Z
+    inline static int m_mousePosOld[NUM_AXES]; // X Y Z
+    inline static int m_mouseVel[NUM_AXES]; // X Y Z
 
-private:
-	bool        m_mb[NUM_MB];            // Mouse button states from this frame
-	bool        m_mbOld[NUM_MB];         // Mouse button states from last frame
-	int         m_mbDeltas[NUM_MB];      // Mouse button diffs
-
-	int         m_mousePos[NUM_AXES];    // X Y Z
-	int         m_mousePosOld[NUM_AXES]; // X Y Z
-	int         m_mouseVel[NUM_AXES];    // X Y Z
-
-	signed char	m_keyNewDeltas[KEY_MAX];
+    inline static signed char m_keyNewDeltas[KEY_MAX];
 };
-
 
 #endif //INCLUDED_INPUT_W32_H

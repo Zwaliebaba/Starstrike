@@ -2,18 +2,15 @@
 #include "input.h"
 #include "debug_utils.h"
 #include "hi_res_time.h"
-#include "win32_eventhandler.h"
 #include "math_utils.h"
 #include "ogl_extensions.h"
-#include "persisting_debug_render.h"
 #include "preferences.h"
 #include "profiler.h"
 #include "resource.h"
 #include "text_renderer.h"
 #include "window_manager.h"
 #include "language_table.h"
-#include "debug_render.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "explosion.h"
 #include "global_world.h"
@@ -26,8 +23,6 @@
 #include "gamecursor.h"
 #include "startsequence.h"
 #include "soundsystem.h"
-#include "eclipse.h"
-#include "message_dialog.h"
 
 Renderer::Renderer()
   : m_fps(60),
@@ -45,60 +40,8 @@ Renderer::Renderer()
 
 void Renderer::Initialise()
 {
-  m_screenW = g_prefsManager->GetInt("ScreenWidth", 0);
-  m_screenH = g_prefsManager->GetInt("ScreenHeight", 0);
-  bool windowed = g_prefsManager->GetInt("ScreenWindowed", 0) ? true : false;
-  int colourDepth = g_prefsManager->GetInt("ScreenColourDepth", 32);
-  int refreshRate = g_prefsManager->GetInt("ScreenRefresh", 75);
-  int zDepth = g_prefsManager->GetInt("ScreenZDepth", 24);
-  bool waitVRT = g_prefsManager->GetInt("WaitVerticalRetrace", 1);
-
-  if (m_screenW == 0 || m_screenH == 0)
-  {
-    g_windowManager->SuggestDefaultRes(&m_screenW, &m_screenH, &refreshRate, &colourDepth);
-    g_prefsManager->SetInt("ScreenWidth", m_screenW);
-    g_prefsManager->SetInt("ScreenHeight", m_screenH);
-    g_prefsManager->SetInt("ScreenRefresh", refreshRate);
-    g_prefsManager->SetInt("ScreenColourDepth", colourDepth);
-  }
-
-  bool success = g_windowManager->CreateWin(m_screenW, m_screenH, windowed, colourDepth, refreshRate, zDepth, waitVRT);
-
-  if (!success)
-  {
-    char caption[512];
-    sprintf(caption, "Failed to set requested screen resolution of\n"
-            "%d x %d, %d bit colour, %s\n\n" "Restored to safety settings of\n" "640 x 480, 16 bit colour, windowed", m_screenW, m_screenH,
-            colourDepth, windowed ? "windowed" : "fullscreen");
-    auto dialog = new MessageDialog("Error", caption);
-    EclRegisterWindow(dialog);
-    dialog->m_x = 100;
-    dialog->m_y = 100;
-
-    // Go for safety values
-    m_screenW = 640;
-    m_screenH = 480;
-    windowed = true;
-    colourDepth = 16;
-    zDepth = 16;
-    refreshRate = 60;
-
-    success = g_windowManager->CreateWin(m_screenW, m_screenH, windowed, colourDepth, refreshRate, zDepth, waitVRT);
-    if (!success)
-    {
-      // next try with 24bit z (colour depth is automatic in windowed mode)
-      zDepth = 24;
-      success = g_windowManager->CreateWin(m_screenW, m_screenH, windowed, colourDepth, refreshRate, zDepth, waitVRT);
-    }
-    DarwiniaReleaseAssert(success, "Failed to set screen mode");
-
-    g_prefsManager->SetInt("ScreenWidth", m_screenW);
-    g_prefsManager->SetInt("ScreenHeight", m_screenH);
-    g_prefsManager->SetInt("ScreenWindowed", 1);
-    g_prefsManager->SetInt("ScreenColourDepth", colourDepth);
-    g_prefsManager->SetInt("ScreenRefresh", 60);
-    g_prefsManager->Save();
-  }
+  m_screenW = static_cast<int>(ClientEngine::OutputSize().Width);
+  m_screenH = static_cast<int>(ClientEngine::OutputSize().Height);
 
   InitialiseOGLExtensions();
 
@@ -343,13 +286,9 @@ void Renderer::RenderFrame(bool withFlip)
   END_PROFILE(g_app->m_profiler, "Render Clear");
 
   if (g_app->m_locationId != -1)
-  {
     g_app->m_location->Render();
-  }
   else
     g_app->m_globalWorld->Render();
-
-  CHECK_OPENGL_STATE();
 
   g_explosionManager.Render();
   g_app->m_particleSystem->Render();
@@ -357,11 +296,6 @@ void Renderer::RenderFrame(bool withFlip)
   g_app->m_gameCursor->Render();
   g_app->m_taskManagerInterface->Render();
   g_app->m_camera->Render();
-
-#ifdef DEBUG_RENDER_ENABLED
-  g_debugRenderer.Render();
-#endif
-  CHECK_OPENGL_STATE();
 
   g_editorFont.BeginText2D();
 
@@ -431,8 +365,8 @@ void Renderer::RenderFrame(bool withFlip)
   //
   // Personalisation information
 
-  if (!g_app->m_taskManagerInterface->m_visible && !g_app->
-    m_camera->IsInMode(Camera::ModeSphereWorldIntro) && !g_app->m_camera->IsInMode(Camera::ModeSphereWorldOutro))
+  if (!g_app->m_taskManagerInterface->m_visible && !g_app->m_camera->IsInMode(Camera::ModeSphereWorldIntro) && !g_app->m_camera->IsInMode(
+    Camera::ModeSphereWorldOutro))
   {
 #ifdef PROMOTIONAL_BUILD
     RenderLogo();
@@ -518,9 +452,6 @@ void Renderer::RenderFrame(bool withFlip)
   }
 
   g_editorFont.EndText2D();
-
-  if (!g_eventHandler->WindowHasFocus() || g_app->m_paused)
-    RenderPaused();
 
   START_PROFILE(g_app->m_profiler, "GL Flip");
 
@@ -930,21 +861,17 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
 void Renderer::MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transform)
 {
 #if USE_PIXEL_EFFECT_GRID_OPTIMISATION
-  Matrix34 total = _frag->m_transform * _transform;
-  LegacyVector3 worldPos = _frag->m_centre * total;
+  Matrix34 total = _frag->m_transform * _transform; LegacyVector3 worldPos = _frag->m_centre * total;
 
   // Return early if this shape fragment isn't on the screen
   {
     if (!g_app->m_camera->SphereInViewFrustum(worldPos, _frag->m_radius))
       return;
-  }
-
-  if (_frag->m_radius > 0.0f)
+  } if (_frag->m_radius > 0.0f)
     RasteriseSphere(worldPos, _frag->m_radius);
 
   // Recurse into all child fragments
-  int numChildren = _frag->m_childFragments.Size();
-  for (int i = 0; i < numChildren; ++i)
+  int numChildren = _frag->m_childFragments.Size(); for (int i = 0; i < numChildren; ++i)
   {
     const ShapeFragment* child = _frag->m_childFragments.GetData(i);
     MarkUsedCells(child, total);

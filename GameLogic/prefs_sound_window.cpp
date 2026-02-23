@@ -12,7 +12,7 @@
 #include "sound_library_3d.h"
 #include "sample_cache.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 
 
@@ -142,7 +142,7 @@ PrefsSoundWindow::PrefsSoundWindow()
 
     char *soundLib  = g_prefsManager->GetString( SOUND_LIBRARY );
 
-    if( stricmp( soundLib, "dsound" ) == 0 ) m_soundLib = 1;
+    if( _stricmp( soundLib, "dsound" ) == 0 ) m_soundLib = 1;
     else                                     m_soundLib = 0;
 }
 

@@ -10,7 +10,7 @@
 
 #include "safearea.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "team.h"
 #include "entity_grid.h"

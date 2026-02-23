@@ -15,7 +15,7 @@
 #include "soundsystem.h"
 #include "sound_stream_decoder.h"
 #include "sound_library_3d_dsound.h"
-#include "app.h"
+#include "GameApp.h"
 #include "main.h"
 #include "camera.h"
 #include "location.h"
@@ -51,7 +51,7 @@ int SoundSourceBlueprint::GetSoundSoundType(const char* _name)
 {
   for (int i = 0; i < NumOtherSoundSources; ++i)
   {
-    if (stricmp(_name, GetSoundSourceName(i)) == 0)
+    if (_stricmp(_name, GetSoundSourceName(i)) == 0)
       return i;
   }
   return -1;
@@ -272,7 +272,7 @@ void SoundSystem::RestartSoundLibrary()
   g_soundLibrary3d = nullptr;
 
 #ifdef HAVE_DSOUND
-  if (stricmp(libName, "dsound") == 0)
+  if (_stricmp(libName, "dsound") == 0)
     g_soundLibrary3d = new SoundLibrary3dDirectSound();
 #endif
 
@@ -454,7 +454,7 @@ void SoundSystem::LoadEffects()
     if (!in->TokenAvailable())
       continue;
     char* effect = in->GetNextToken();
-    DarwiniaDebugAssert(stricmp( effect, "EFFECT" ) == 0);
+    DarwiniaDebugAssert(_stricmp( effect, "EFFECT" ) == 0);
 
     auto bp = new DspBlueprint();
     m_filterBlueprints.PutData(bp);
@@ -462,7 +462,7 @@ void SoundSystem::LoadEffects()
 
     in->ReadLine();
     char* param = in->GetNextToken();
-    while (stricmp(param, "END") != 0)
+    while (_stricmp(param, "END") != 0)
     {
       auto sb = new DspParameterBlueprint();
       bp->m_params.PutData(sb);
@@ -501,7 +501,7 @@ void SoundSystem::LoadBlueprints()
     bool event = false;
     SoundSourceBlueprint* ssb = nullptr;
 
-    if (stricmp(group, "ENTITY") == 0)
+    if (_stricmp(group, "ENTITY") == 0)
     {
       strncpy(objectName, type, 127);
       int entityType = Entity::GetTypeId(type);
@@ -512,7 +512,7 @@ void SoundSystem::LoadBlueprints()
       m_entityBlueprints.PutData(ssb, entityType);
       event = true;
     }
-    else if (stricmp(group, "BUILDING") == 0)
+    else if (_stricmp(group, "BUILDING") == 0)
     {
       strncpy(objectName, type, 127);
       int buildingType = Building::GetTypeId(type);
@@ -523,7 +523,7 @@ void SoundSystem::LoadBlueprints()
       m_buildingBlueprints.PutData(ssb, buildingType);
       event = true;
     }
-    else if (stricmp(group, "OTHER") == 0)
+    else if (_stricmp(group, "OTHER") == 0)
     {
       strncpy(objectName, type, 127);
       int otherType = SoundSourceBlueprint::GetSoundSoundType(type);
@@ -534,7 +534,7 @@ void SoundSystem::LoadBlueprints()
       m_otherBlueprints.PutData(ssb, otherType);
       event = true;
     }
-    else if (stricmp(group, "SAMPLEGROUP") == 0)
+    else if (_stricmp(group, "SAMPLEGROUP") == 0)
     {
       strncpy(objectName, "sample group", 127);
       SampleGroup* sampleGroup = NewSampleGroup(type);
@@ -548,9 +548,9 @@ void SoundSystem::LoadBlueprints()
         if (in->TokenAvailable())
         {
           char* word = in->GetNextToken();
-          if (stricmp(word, "END") == 0)
+          if (_stricmp(word, "END") == 0)
             break;
-          DarwiniaDebugAssert(stricmp( word, "EVENT" ) == 0);
+          DarwiniaDebugAssert(_stricmp( word, "EVENT" ) == 0);
           ParseSoundEvent(in, ssb, objectName);
         }
       }
@@ -608,40 +608,40 @@ void SoundSystem::ParseSoundEvent(TextReader* _in, SoundSourceBlueprint* _source
 
   _in->ReadLine();
   char* fieldName = _in->GetNextToken();
-  while (stricmp(fieldName, "END") != 0)
+  while (_stricmp(fieldName, "END") != 0)
   {
-    if (stricmp(fieldName, "SOUNDNAME") == 0)
+    if (_stricmp(fieldName, "SOUNDNAME") == 0)
     {
       char* soundName = _in->GetNextToken();
       StrToLower(soundName);
       const char* extensionRemoved = RemoveExtension(soundName);
       seb->m_instance->SetSoundName(extensionRemoved);
     }
-    else if (stricmp(fieldName, "SOURCETYPE") == 0)
+    else if (_stricmp(fieldName, "SOURCETYPE") == 0)
       seb->m_instance->m_sourceType = atoi(_in->GetNextToken());
-    else if (stricmp(fieldName, "POSITIONTYPE") == 0)
+    else if (_stricmp(fieldName, "POSITIONTYPE") == 0)
       seb->m_instance->m_positionType = atoi(_in->GetNextToken());
-    else if (stricmp(fieldName, "INSTANCETYPE") == 0)
+    else if (_stricmp(fieldName, "INSTANCETYPE") == 0)
       seb->m_instance->m_instanceType = atoi(_in->GetNextToken());
-    else if (stricmp(fieldName, "LOOPTYPE") == 0)
+    else if (_stricmp(fieldName, "LOOPTYPE") == 0)
       seb->m_instance->m_loopType = atoi(_in->GetNextToken());
-    else if (stricmp(fieldName, "PRIORITY") == 0)
+    else if (_stricmp(fieldName, "PRIORITY") == 0)
       oldUserPriority = atoi(_in->GetNextToken());
-    else if (stricmp(fieldName, "MINDISTANCE") == 0)
+    else if (_stricmp(fieldName, "MINDISTANCE") == 0)
       seb->m_instance->m_minDistance = atof(_in->GetNextToken());
-    else if (stricmp(fieldName, "VOLUME") == 0)
+    else if (_stricmp(fieldName, "VOLUME") == 0)
       seb->m_instance->m_volume.Read(_in);
-    else if (stricmp(fieldName, "FREQUENCY") == 0)
+    else if (_stricmp(fieldName, "FREQUENCY") == 0)
       seb->m_instance->m_freq.Read(_in);
-    else if (stricmp(fieldName, "ATTACK") == 0)
+    else if (_stricmp(fieldName, "ATTACK") == 0)
       seb->m_instance->m_attack.Read(_in);
-    else if (stricmp(fieldName, "SUSTAIN") == 0)
+    else if (_stricmp(fieldName, "SUSTAIN") == 0)
       seb->m_instance->m_sustain.Read(_in);
-    else if (stricmp(fieldName, "RELEASE") == 0)
+    else if (_stricmp(fieldName, "RELEASE") == 0)
       seb->m_instance->m_release.Read(_in);
-    else if (stricmp(fieldName, "LOOPDELAY") == 0)
+    else if (_stricmp(fieldName, "LOOPDELAY") == 0)
       seb->m_instance->m_loopDelay.Read(_in);
-    else if (stricmp(fieldName, "EFFECT") == 0)
+    else if (_stricmp(fieldName, "EFFECT") == 0)
       ParseSoundEffect(_in, seb);
     else
       DarwiniaDebugAssert(false);
@@ -666,7 +666,7 @@ void SoundSystem::ParseSoundEffect(TextReader* _in, SoundEventBlueprint* _bluepr
   for (int i = 0; i < m_filterBlueprints.Size(); ++i)
   {
     DspBlueprint* seb = m_filterBlueprints[i];
-    if (stricmp(seb->m_name, effectName) == 0)
+    if (_stricmp(seb->m_name, effectName) == 0)
     {
       fxType = i;
       break;
@@ -683,7 +683,7 @@ void SoundSystem::ParseSoundEffect(TextReader* _in, SoundEventBlueprint* _bluepr
   {
     _in->ReadLine();
     char* paramName = _in->GetNextToken();
-    if (stricmp(paramName, "END") == 0)
+    if (_stricmp(paramName, "END") == 0)
       break;
     effect->m_params[paramIndex].Read(_in);
     ++paramIndex;
@@ -697,7 +697,7 @@ void SoundSystem::ParseSampleGroup(TextReader* _in, SampleGroup* _group)
   {
     _in->ReadLine();
     char* paramType = _in->GetNextToken();
-    if (stricmp(paramType, "END") == 0)
+    if (_stricmp(paramType, "END") == 0)
       break;
 
     char* sample = _in->GetNextToken();
@@ -720,7 +720,7 @@ bool SoundSystem::InitialiseSound(SoundInstance* _instance)
       if (m_sounds.ValidIndex(i))
       {
         SoundInstance* thisInstance = m_sounds[i];
-        if (thisInstance->m_instanceType != SoundInstance::Polyphonic && stricmp(thisInstance->m_eventName, _instance->m_eventName) == 0)
+        if (thisInstance->m_instanceType != SoundInstance::Polyphonic && _stricmp(thisInstance->m_eventName, _instance->m_eventName) == 0)
         {
           for (int j = 0; j < _instance->m_objIds.Size(); ++j)
           {
@@ -815,7 +815,7 @@ void SoundSystem::TriggerEntityEvent(Entity* _entity, char* _eventName)
     for (int i = 0; i < sourceBlueprint->m_events.Size(); ++i)
     {
       SoundEventBlueprint* seb = sourceBlueprint->m_events[i];
-      if (stricmp(seb->m_eventName, _eventName) == 0)
+      if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
         DarwiniaDebugAssert(seb->m_instance);
         auto instance = new SoundInstance();
@@ -845,7 +845,7 @@ void SoundSystem::TriggerBuildingEvent(Building* _building, char* _eventName)
     for (int i = 0; i < sourceBlueprint->m_events.Size(); ++i)
     {
       SoundEventBlueprint* seb = sourceBlueprint->m_events[i];
-      if (stricmp(seb->m_eventName, _eventName) == 0)
+      if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
         DarwiniaDebugAssert(seb->m_instance);
         auto instance = new SoundInstance();
@@ -880,7 +880,7 @@ void SoundSystem::TriggerOtherEvent(WorldObject* _other, char* _eventName, int _
     for (int i = 0; i < sourceBlueprint->m_events.Size(); ++i)
     {
       SoundEventBlueprint* seb = sourceBlueprint->m_events[i];
-      if (stricmp(seb->m_eventName, _eventName) == 0)
+      if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
         // We have a match
         DarwiniaDebugAssert(seb->m_instance);
@@ -888,8 +888,8 @@ void SoundSystem::TriggerOtherEvent(WorldObject* _other, char* _eventName, int _
         instance->Copy(seb->m_instance);
         if (_type == musicType)
         {
-          //if( m_music && stricmp( m_music->m_eventName+6, _eventName ) == 0 )
-          if (m_music && stricmp(m_music->m_soundName, seb->m_instance->m_soundName) == 0)
+          //if( m_music && _stricmp( m_music->m_eventName+6, _eventName ) == 0 )
+          if (m_music && _stricmp(m_music->m_soundName, seb->m_instance->m_soundName) == 0)
           {
             // The music is already playing
           }
@@ -956,7 +956,7 @@ void SoundSystem::StopAllSounds(WorldObjectId _id, char* _eventName)
 
         if (instance->m_objId == _id)
         {
-          if (!_eventName || stricmp(instance->m_eventName, _eventName) == 0)
+          if (!_eventName || _stricmp(instance->m_eventName, _eventName) == 0)
           {
             if (instance->IsPlaying())
               instance->BeginRelease(true);
@@ -991,7 +991,7 @@ int SoundSystem::NumInstancesPlaying(WorldObjectId _id, char* _eventName)
     SoundInstance* instance = GetSoundInstance(soundId);
     bool instanceMatch = !_id.IsValid() || instance->m_objId == _id;
 
-    if (instance && instanceMatch && stricmp(instance->m_eventName, _eventName) == 0)
+    if (instance && instanceMatch && _stricmp(instance->m_eventName, _eventName) == 0)
       ++result;
   }
 
@@ -1009,7 +1009,7 @@ int SoundSystem::NumInstances(WorldObjectId _id, char* _eventName)
       SoundInstance* instance = m_sounds[i];
       bool instanceMatch = !_id.IsValid() || instance->m_objId == _id;
 
-      if (instance && instanceMatch && stricmp(instance->m_eventName, _eventName) == 0)
+      if (instance && instanceMatch && _stricmp(instance->m_eventName, _eventName) == 0)
         ++result;
     }
   }
@@ -1277,292 +1277,8 @@ void SoundSystem::Advance()
   }
 }
 
-/*
-void SoundSystem::Advance()
-{
-
-	if (g_app->m_requestQuit && !m_quitWithoutSave)
-	{
-		if (AreBlueprintsModified())
-		{
-			g_app->m_requestQuit = false;
-		}
-	}
-
-    if( !m_channels ) return;
-
-#ifdef PROFILER_ENABLED
-    m_mainProfiler->Advance();
-    m_eventProfiler->Advance();
-#endif
-
-    m_timeSync += g_advanceTime;
-    if( m_timeSync >= SOUNDSYSTEM_UPDATEPERIOD )
-    {
-        m_timeSync -= SOUNDSYSTEM_UPDATEPERIOD;
-
-        START_PROFILE(g_app->m_profiler, "Advance SoundSystem");
-
-        //
-        // Resync with blueprints (changed by editor)
-
-        START_PROFILE(g_app->m_profiler,  "Propagate Blueprints" );
-        if( m_propagateBlueprints )
-        {
-            PropagateBlueprints();
-        }
-        END_PROFILE(g_app->m_profiler,  "Propagate Blueprints" );
-
-
-        //
-        // Build a list of change requests, ordered on priority
-
-        START_PROFILE(g_app->m_profiler,  "HandleRequests" );
-
-        int maxChannelChanges = 1;
-        int numChannelChanges = 0;
-
-        LList<int> newRequests;                                 // Indexes of the channels
-
-        for( int i = 0; i < m_numChannels; ++i )
-        {
-            SoundChannel *channel = &m_channels[i];
-            SoundInstance *requestedSound = GetSoundInstance( channel->m_requestedSound );
-
-            if( requestedSound )
-            {
-                bool inserted = false;
-                for( int x = 0; x < newRequests.Size(); ++x )
-                {
-                    if( x > maxChannelChanges ) break;
-                    int channelIndex = newRequests[x];
-                    SoundChannel *thisChannel = &m_channels[channelIndex];
-                    SoundInstance *thisRequestedSound = GetSoundInstance( thisChannel->m_requestedSound );
-                    DarwiniaDebugAssert( thisRequestedSound );
-                    if( requestedSound->m_calculatedPriority > thisRequestedSound->m_calculatedPriority )
-                    {
-                        newRequests.PutDataAtIndex( i, x );
-                        inserted = true;
-                        break;
-                    }
-                }
-                if( !inserted && newRequests.Size() < maxChannelChanges )
-                {
-                    newRequests.PutDataAtEnd( i );
-                }
-            }
-        }
-
-        END_PROFILE(g_app->m_profiler,  "HandleRequests" );
-
-
-        //
-        // Start the highest priority new requests
-
-        START_PROFILE(g_app->m_profiler,  "StartNewSound" );
-
-        while( newRequests.Size() > 0 &&
-               numChannelChanges < maxChannelChanges )
-        {
-            int channelIndex = newRequests[0];
-            newRequests.RemoveData(0);
-
-            SoundChannel *channel = &m_channels[channelIndex];
-            SoundInstance *currentSound = GetSoundInstance( channel->m_currentSound );
-            if( currentSound && !currentSound->m_loopType )
-            {
-                ShutdownSound( currentSound );
-            }
-            else if( currentSound )
-            {
-                currentSound->StopPlaying();
-            }
-            channel->m_currentSound.SetInvalid();
-
-            SoundInstance *requestedSound = GetSoundInstance( channel->m_requestedSound );
-            bool success = requestedSound->StartPlaying( channelIndex );
-            if( success )
-            {
-                channel->m_currentSound = channel->m_requestedSound;
-            }
-            else
-            {
-                // This is fairly bad, the sound failed to play
-                // Which means it failed to load, or to go into a channel
-                ShutdownSound( requestedSound );
-            }
-            channel->m_requestedSound.SetInvalid();
-
-            g_soundLibrary3d->ResetChannel( channelIndex );
-            numChannelChanges++;
-
-#ifdef SOUNDSYSTEM_VERIFY
-			RuntimeVerify();
-#endif
-        }
-
-        END_PROFILE(g_app->m_profiler,  "StartNewSound" );
-
-
-        //
-        // Advance all our channels
-        // Clear out all the sound requests that have failed to start
-
-        START_PROFILE(g_app->m_profiler,  "Advance Channels" );
-
-        for( int i = 0; i < m_numChannels; ++i )
-        {
-            SoundChannel *channel = &m_channels[i];
-
-            SoundInstance *currentSound = GetSoundInstance( channel->m_currentSound );
-            if( currentSound )
-            {
-                bool amIDone = currentSound->Advance();
-                if( amIDone )
-                {
-                    ShutdownSound( currentSound );
-                }
-            }
-
-            SoundInstance *requestedSound = GetSoundInstance( channel->m_requestedSound );
-            channel->m_requestedSound.SetInvalid();
-            if(  requestedSound &&
-                !requestedSound->m_loopType &&
-                 requestedSound->m_restartAttempts <= 0 )
-            {
-                ShutdownSound( requestedSound );
-            }
-        }
-
-        END_PROFILE(g_app->m_profiler,  "Advance Channels" );
-
-
-        //
-        // Recalculate all sound priorities
-        // If we're attached to a bogus object then give up trying
-
-        START_PROFILE(g_app->m_profiler,  "UpdatePriority" );
-
-        for( int i = 0; i < m_sounds.Size(); ++i )
-        {
-            if( m_sounds.ValidIndex(i) )
-            {
-                SoundInstance *instance = m_sounds[i];
-                instance->RecalculatePriority();
-
-                if( instance->m_positionType == SoundInstance::Type3DAttachedToObject &&
-                    !instance->GetAttachedObject() )
-                {
-                    ShutdownSound( instance );
-                }
-            }
-        }
-
-        END_PROFILE(g_app->m_profiler,  "UpdatePriority" );
-
-
-        //
-        // If we're a looping sound and we're not playing, try to start us playing now
-        // If we're not looping but still have restart attempts left, try to restart now
-
-        START_PROFILE(g_app->m_profiler,  "Restart loops" );
-        for( int i = 0; i < m_sounds.Size(); ++i )
-        {
-            if( m_sounds.ValidIndex(i) )
-            {
-                SoundInstance *instance = m_sounds[i];
-                {
-                    if( !instance->IsPlaying() )
-                    {
-                        if( !instance->m_loopType && instance->m_restartAttempts <= 0 )
-                        {
-                            ShutdownSound( instance );
-                        }
-                        else if( instance->m_loopType || instance->m_restartAttempts > 0 )
-                        {
-                            bool success = RequestSound( instance );
-                            if( !success && !instance->m_loopType && instance->m_restartAttempts <= 0 )
-                            {
-                                ShutdownSound( instance );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        END_PROFILE(g_app->m_profiler,  "Restart loops" );
-
-
-        //
-        // Update our listener position
-
-        START_PROFILE(g_app->m_profiler, "UpdateListener" );
-
-        LegacyVector3 camUp = g_app->m_camera->GetUp();
-        if( g_prefsManager->GetInt("SoundSwapStereo",0) == 1 )
-        {
-            camUp.y *= -1.0f;
-        }
-
-        g_soundLibrary3d->SetListenerPosition( g_app->m_camera->GetPos(),
-                                            g_app->m_camera->GetFront(),
-                                            camUp,
-                                            g_app->m_camera->GetVel() );
-
-        END_PROFILE(g_app->m_profiler, "UpdateListener" );
-
-
-        //
-        // Advance our sound library
-
-        START_PROFILE(g_app->m_profiler, "SoundLibrary3d Commit" );
-        g_soundLibrary3d->CommitChanges();
-        END_PROFILE(g_app->m_profiler, "SoundLibrary3d Commit" );
-        START_PROFILE(g_app->m_profiler, "SoundLibrary3d Advance" );
-        g_soundLibrary3d->Advance();
-        END_PROFILE(g_app->m_profiler, "SoundLibrary3d Advance" );
-
-
-#ifdef SOUNDSYSTEM_VERIFY
-        RuntimeVerify();
-#endif
-
-        END_PROFILE(g_app->m_profiler, "Advance SoundSystem");
-    }
-}
-*/
-
 void SoundSystem::RuntimeVerify()
 {
-  //
-  // Make sure there aren't any SoundInstances on more than one channel
-  // Make sure all playing samples have sensible channel handles
-
-  /*
-      for( int i = 0; i < m_numChannels; ++i )
-      {
-          SoundInstanceId id1 = m_channels[i];
-          SoundInstance *currentSound = GetSoundInstance( id1 );
-          DarwiniaDebugAssert( !currentSound ||
-                       !(currentSound->IsPlaying() && currentSound->m_channelIndex == -1) );
-  
-          if( currentSound )
-          {
-              for( int j = 0; j < m_numChannels; ++j )
-              {
-                  if( i != j )
-                  {
-                      SoundInstanceId id2 = m_channels[j];
-                      if( GetSoundInstance(id2) )
-                      {
-                          DarwiniaDebugAssert( !(id1 == id2) );
-                      }
-                  }
-              }
-          }
-      }
-  */
-
   //
   // Make sure all sounds that believe they are playing have an opened sound stream
 
@@ -1770,7 +1486,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
         if (eventBlueprint->m_instance)
         {
           SoundInstance* instance = eventBlueprint->m_instance;
-          if (instance->m_sourceType == SoundInstance::Sample && stricmp(instance->m_soundName, _soundName) == 0)
+          if (instance->m_sourceType == SoundInstance::Sample && _stricmp(instance->m_soundName, _soundName) == 0)
             return true;
           if (instance->m_sourceType != SoundInstance::Sample)
           {
@@ -1780,7 +1496,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
               for (int k = 0; k < group->m_samples.Size(); ++k)
               {
                 char* thisSample = group->m_samples[k];
-                if (stricmp(thisSample, _soundName) == 0)
+                if (_stricmp(thisSample, _soundName) == 0)
                   return true;
               }
             }
@@ -1804,7 +1520,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
         if (eventBlueprint->m_instance)
         {
           SoundInstance* instance = eventBlueprint->m_instance;
-          if (instance->m_sourceType == SoundInstance::Sample && stricmp(instance->m_soundName, _soundName) == 0)
+          if (instance->m_sourceType == SoundInstance::Sample && _stricmp(instance->m_soundName, _soundName) == 0)
             return true;
           if (instance->m_sourceType != SoundInstance::Sample)
           {
@@ -1814,7 +1530,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
               for (int k = 0; k < group->m_samples.Size(); ++k)
               {
                 char* thisSample = group->m_samples[k];
-                if (stricmp(thisSample, _soundName) == 0)
+                if (_stricmp(thisSample, _soundName) == 0)
                   return true;
               }
             }
@@ -1838,7 +1554,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
         if (eventBlueprint->m_instance)
         {
           SoundInstance* instance = eventBlueprint->m_instance;
-          if (instance->m_sourceType == SoundInstance::Sample && stricmp(instance->m_soundName, _soundName) == 0)
+          if (instance->m_sourceType == SoundInstance::Sample && _stricmp(instance->m_soundName, _soundName) == 0)
             return true;
           if (instance->m_sourceType != SoundInstance::Sample)
           {
@@ -1848,7 +1564,7 @@ bool SoundSystem::IsSampleUsed(const char* _soundName)
               for (int k = 0; k < group->m_samples.Size(); ++k)
               {
                 char* thisSample = group->m_samples[k];
-                if (stricmp(thisSample, _soundName) == 0)
+                if (_stricmp(thisSample, _soundName) == 0)
                   return true;
               }
             }

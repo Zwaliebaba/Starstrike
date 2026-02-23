@@ -4,7 +4,7 @@
 #include "resource.h"
 #include "text_stream_readers.h"
 #include "language_table.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "level_file.h"
@@ -146,7 +146,7 @@ void Script::RunCommand_LocationFocus(const char* _locationName, float _fov)
 
   LegacyVector3 targetPos;
 
-  if (stricmp(_locationName, "heaven") == 0)
+  if (_stricmp(_locationName, "heaven") == 0)
     targetPos = g_zeroVector;
   else
   {
@@ -868,7 +868,7 @@ int Script::GetOpCode(const char* _word)
 
   for (unsigned int i = 0; i < OpNumOps; ++i)
   {
-    if (stricmp(_word, g_opCodeNames[i]) == 0)
+    if (_stricmp(_word, g_opCodeNames[i]) == 0)
       return i;
   }
 

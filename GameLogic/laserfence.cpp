@@ -15,7 +15,7 @@
 #include "preferences.h"
 
 #include "main.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "camera.h"
 #include "renderer.h"

@@ -6,7 +6,7 @@
 #include "debug_utils.h"
 #include "debug_render.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"

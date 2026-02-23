@@ -110,7 +110,7 @@ short SortingHashTable<T>::FindPrevKey(char const* _key) const
 	{
 		if (i == -1) return prevI;
 
-		if (stricmp(this->m_keys[i], _key) >= 0) return prevI;
+		if (_stricmp(this->m_keys[i], _key) >= 0) return prevI;
 
 		prevI = i;
 		i = m_orderedIndices[i];

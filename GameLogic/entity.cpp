@@ -14,7 +14,7 @@
 #include "text_stream_readers.h"
 #include "language_table.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "main.h"
 #include "particle_system.h"
@@ -671,7 +671,7 @@ int Entity::GetTypeId( char const *_typeName )
 {
     for( int i = 0; i < NumEntityTypes; ++i )
     {
-        if( stricmp( _typeName, GetTypeName(i) ) == 0 )
+        if( _stricmp( _typeName, GetTypeName(i) ) == 0 )
         {
             return i;
         }

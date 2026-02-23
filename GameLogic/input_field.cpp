@@ -14,7 +14,7 @@
 
 #include "keydefs.h" // Key code definitions (bit of a hack)
 
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "main.h"
 

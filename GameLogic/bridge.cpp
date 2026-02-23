@@ -7,7 +7,7 @@
 #include "shape.h"
 #include "text_stream_readers.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"
 #include "renderer.h"

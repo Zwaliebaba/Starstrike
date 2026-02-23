@@ -9,7 +9,7 @@
 
 #include "soundsystem.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
 #include "unit.h"

@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 
 #include "drop_down_menu.h"
@@ -120,7 +120,7 @@ void DropDownMenu::AddOption( char const *_word, int _value )
 		int i;
 		for (i = 0; i < size; ++i)
 		{
-			if (stricmp(_word, m_options[i]->m_word) < 0)
+			if (_stricmp(_word, m_options[i]->m_word) < 0)
 			{
 				break;
 			}
@@ -156,7 +156,7 @@ bool DropDownMenu::SelectOption2(char const *_option)
 	for (int i = 0; i < m_options.Size(); ++i)
 	{
 		char *itemName = m_options[i]->m_word;
-		if (stricmp(itemName, _option) == 0)
+		if (_stricmp(itemName, _option) == 0)
 		{
 			SelectOption(m_options[i]->m_value);
 			return true;

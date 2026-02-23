@@ -13,7 +13,7 @@
 #include "sound_stream_decoder.h"
 #include "sound_library_3d.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 

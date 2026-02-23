@@ -14,12 +14,12 @@
 
 #include "input.h"
 #include "language_table.h"
-#include "app.h"
+#include "GameApp.h"
 
 #include "hi_res_time.h"
 
 #ifdef TARGET_MSVC
-	#define snprintf _snprintf
+	#define _snprintf _snprintf
 #endif
 
 #ifndef SEPULVEDA_MAX_PHRASE_LENGTH

@@ -12,7 +12,7 @@
 
 #include "entity.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"
 #include "team.h"

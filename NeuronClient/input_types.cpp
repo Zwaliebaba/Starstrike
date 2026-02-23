@@ -1,9 +1,6 @@
 #include "pch.h"
-
-#include <string>
-
 #include "input_types.h"
-#include "app.h"
+#include "GameApp.h"
 #include "language_table.h"
 
 using std::string;

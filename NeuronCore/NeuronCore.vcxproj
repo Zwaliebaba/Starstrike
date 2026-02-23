@@ -81,18 +81,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ASyncLoader.h" />
-    <ClInclude Include="bytestream.h" />
-    <ClInclude Include="clienttoserver.h" />
     <ClInclude Include="DataReader.h" />
     <ClInclude Include="DataWriter.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DeviceNotify.h" />
     <ClInclude Include="FileSys.h" />
     <ClInclude Include="GameMath.h" />
-    <ClInclude Include="generic.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="MathCommon.h" />
-    <ClInclude Include="networkupdate.h" />
     <ClInclude Include="net_lib.h" />
     <ClInclude Include="net_lib_win32.h" />
     <ClInclude Include="net_mutex.h" />
@@ -103,34 +99,25 @@
     <ClInclude Include="NeuronCore.h" />
     <ClInclude Include="NeuronHelper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="server.h" />
-    <ClInclude Include="servertoclient.h" />
-    <ClInclude Include="servertoclientletter.h" />
     <ClInclude Include="TimerCore.h" />
     <ClInclude Include="WndProcManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="clienttoserver.cpp" />
     <ClCompile Include="FileSys.cpp" />
-    <ClCompile Include="generic.cpp" />
-    <ClCompile Include="networkupdate.cpp" />
     <ClCompile Include="net_lib.cpp" />
     <ClCompile Include="net_mutex_win32.cpp" />
     <ClCompile Include="net_socket.cpp" />
     <ClCompile Include="net_socket_listener.cpp" />
     <ClCompile Include="net_thread_win32.cpp" />
     <ClCompile Include="net_udp_packet.cpp" />
+    <ClCompile Include="NeuronCore.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="server.cpp" />
-    <ClCompile Include="servertoclient.cpp" />
-    <ClCompile Include="servertoclientletter.cpp" />
     <ClCompile Include="WndProcManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="networkupdate.inc" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

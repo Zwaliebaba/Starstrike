@@ -4,7 +4,7 @@
 #include "language_table.h"
 #include "userprofile_window.h"
 #include "server.h"
-#include "app.h"
+#include "GameApp.h"
 #include "input_field.h"
 #include "level_file.h"
 #include "renderer.h"

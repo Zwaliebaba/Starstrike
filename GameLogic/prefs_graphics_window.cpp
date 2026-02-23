@@ -8,7 +8,7 @@
 #include "prefs_graphics_window.h"
 #include "drop_down_menu.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
 #include "level_file.h"

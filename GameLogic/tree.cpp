@@ -10,7 +10,7 @@
 #include "preferences.h"
 #include "tree.h"
 #include "soundsystem.h"
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "particle_system.h"
 #include "location.h"

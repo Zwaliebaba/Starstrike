@@ -12,7 +12,7 @@
 #include "server.h"
 #include "clienttoserver.h"
 
-#include "app.h"
+#include "GameApp.h"
 
 #include "profilewindow.h"
 
@@ -29,23 +29,23 @@ class ProfilerButton : public DarwiniaButton
 public:
     void MouseUp()
     {
-		if (stricmp(m_caption, "Toggle glFinish") == 0)
+		if (_stricmp(m_caption, "Toggle glFinish") == 0)
 		{
 			g_app->m_profiler->m_doGlFinish = !g_app->m_profiler->m_doGlFinish;
 		}
-		else if (stricmp(m_caption, "Reset History") == 0)
+		else if (_stricmp(m_caption, "Reset History") == 0)
 		{
 			g_app->m_profiler->ResetHistory();
 		}
-		else if (stricmp(m_caption, "Min") == 0)
+		else if (_stricmp(m_caption, "Min") == 0)
 		{
 			strcpy(m_caption, "Avg");
 		}
-		else if (stricmp(m_caption, "Avg") == 0)
+		else if (_stricmp(m_caption, "Avg") == 0)
 		{
 			strcpy(m_caption, "Max");
 		}
-		else if (stricmp(m_caption, "Max") == 0)
+		else if (_stricmp(m_caption, "Max") == 0)
 		{
 			strcpy(m_caption, "Min");
 		}
@@ -79,11 +79,11 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
     char caption[256];
 	EclButton *minAvgMaxButton = GetButton("Avg");
 	int minAvgMax = 0;
-	if (stricmp(minAvgMaxButton->m_caption, "Avg") == 0)
+	if (_stricmp(minAvgMaxButton->m_caption, "Avg") == 0)
 	{
 		minAvgMax = 1;
 	}
-	else if (stricmp(minAvgMaxButton->m_caption, "Max") == 0)
+	else if (_stricmp(minAvgMaxButton->m_caption, "Max") == 0)
 	{
 		minAvgMax = 2;
 	}

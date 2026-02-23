@@ -111,7 +111,7 @@ float SoundParameter::GetOutput()
 void SoundParameter::Read( TextReader *_in )
 {
     char *parameter = _in->GetNextToken();
-    DarwiniaDebugAssert( stricmp( parameter, "PARAMETER" ) == 0 );
+    DarwiniaDebugAssert( _stricmp( parameter, "PARAMETER" ) == 0 );
 
     char *paramType     = _in->GetNextToken();
     m_type              = GetParameterType( paramType );
@@ -214,7 +214,7 @@ int SoundParameter::GetParameterType( char *_name )
 {
     for( int i = 0; i < NumParameterTypes; ++i )
     {
-        if( stricmp( GetParameterTypeName(i), _name ) == 0 )
+        if( _stricmp( GetParameterTypeName(i), _name ) == 0 )
         {
             return i;
         }
@@ -244,7 +244,7 @@ int SoundParameter::GetLinkType( char *_name )
 {
     for( int i = 0; i < NumLinkTypes; ++i )
     {
-        if( stricmp( GetLinkName(i), _name ) == 0 )
+        if( _stricmp( GetLinkName(i), _name ) == 0 )
         {
             return i;
         }
@@ -269,7 +269,7 @@ int SoundParameter::GetUpdateType( char *_name )
 {
     for( int i = 0; i < NumUpdateTypes; ++i )
     {
-        if( stricmp( GetUpdateTypeName(i), _name ) == 0 )
+        if( _stricmp( GetUpdateTypeName(i), _name ) == 0 )
         {
             return i;
         }

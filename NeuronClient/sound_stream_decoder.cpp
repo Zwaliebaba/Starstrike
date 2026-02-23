@@ -12,7 +12,7 @@ SoundStreamDecoder::SoundStreamDecoder(BinaryReader* _in)
     m_numSamples(0)
 {
   char* fileType = _in->GetFileType();
-  if (stricmp(fileType, "wav") == 0)
+  if (_stricmp(fileType, "wav") == 0)
   {
     m_fileType = TypeWav;
     ReadWavHeader();

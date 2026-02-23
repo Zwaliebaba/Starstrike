@@ -4,7 +4,7 @@
 #include "preferences.h"
 #include "spam.h"
 #include "explosion.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "globals.h"
 #include "entity_grid.h"

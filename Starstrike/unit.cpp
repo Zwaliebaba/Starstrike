@@ -10,7 +10,7 @@
 #include "hi_res_time.h"
 #include "profiler.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "entity_grid.h"
 #include "level_file.h"
 #include "location.h"

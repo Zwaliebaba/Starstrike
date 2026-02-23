@@ -7,7 +7,7 @@
 #include "preferences.h"
 #include "profiler.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "clouds.h"
 #include "location.h"

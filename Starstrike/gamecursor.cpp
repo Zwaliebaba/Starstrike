@@ -10,7 +10,7 @@
 
 #include "eclipse.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "global_world.h"
 #include "main.h"
 #include "gamecursor.h"

@@ -12,7 +12,7 @@
 #include "researchitem.h"
 #include "armour.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "main.h"
 #include "global_world.h"
 #include "particle_system.h"

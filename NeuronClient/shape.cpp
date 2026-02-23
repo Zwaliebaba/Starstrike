@@ -59,38 +59,38 @@ ShapeMarker::ShapeMarker(TextReader* _in, const char* _name)
 
     if (firstWord)
     {
-      if (stricmp(firstWord, "ParentName") == 0)
+      if (_stricmp(firstWord, "ParentName") == 0)
       {
         char* secondWord = _in->GetNextToken();
         m_parentName = strdup(secondWord);
       }
-      else if (stricmp(firstWord, "Depth") == 0)
+      else if (_stricmp(firstWord, "Depth") == 0)
       {
         char* secondWord = _in->GetNextToken();
         m_depth = atoi(secondWord);
       }
-      else if (stricmp(firstWord, "front") == 0)
+      else if (_stricmp(firstWord, "front") == 0)
       {
         char* secondWord = _in->GetNextToken();
         m_transform.f.x = static_cast<float>(atof(secondWord));
         m_transform.f.y = static_cast<float>(atof(_in->GetNextToken()));
         m_transform.f.z = static_cast<float>(atof(_in->GetNextToken()));
       }
-      else if (stricmp(firstWord, "up") == 0)
+      else if (_stricmp(firstWord, "up") == 0)
       {
         char* secondWord = _in->GetNextToken();
         m_transform.u.x = static_cast<float>(atof(secondWord));
         m_transform.u.y = static_cast<float>(atof(_in->GetNextToken()));
         m_transform.u.z = static_cast<float>(atof(_in->GetNextToken()));
       }
-      else if (stricmp(firstWord, "pos") == 0)
+      else if (_stricmp(firstWord, "pos") == 0)
       {
         char* secondWord = _in->GetNextToken();
         m_transform.pos.x = static_cast<float>(atof(secondWord));
         m_transform.pos.y = static_cast<float>(atof(_in->GetNextToken()));
         m_transform.pos.z = static_cast<float>(atof(_in->GetNextToken()));
       }
-      else if (stricmp(firstWord, "MarkerEnd") == 0)
+      else if (_stricmp(firstWord, "MarkerEnd") == 0)
         break;
     }
   }
@@ -182,53 +182,53 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     char* firstWord = _in->GetNextToken();
     char* secondWord = _in->GetNextToken();
 
-    if (stricmp(firstWord, "ParentName") == 0)
+    if (_stricmp(firstWord, "ParentName") == 0)
       m_parentName = strdup(secondWord);
-    else if (stricmp(firstWord, "front") == 0)
+    else if (_stricmp(firstWord, "front") == 0)
     {
       m_transform.f.x = static_cast<float>(atof(secondWord));
       m_transform.f.y = static_cast<float>(atof(_in->GetNextToken()));
       m_transform.f.z = static_cast<float>(atof(_in->GetNextToken()));
     }
-    else if (stricmp(firstWord, "up") == 0)
+    else if (_stricmp(firstWord, "up") == 0)
     {
       m_transform.u.x = static_cast<float>(atof(secondWord));
       m_transform.u.y = static_cast<float>(atof(_in->GetNextToken()));
       m_transform.u.z = static_cast<float>(atof(_in->GetNextToken()));
     }
-    else if (stricmp(firstWord, "pos") == 0)
+    else if (_stricmp(firstWord, "pos") == 0)
     {
       m_transform.pos.x = static_cast<float>(atof(secondWord));
       m_transform.pos.y = static_cast<float>(atof(_in->GetNextToken()));
       m_transform.pos.z = static_cast<float>(atof(_in->GetNextToken()));
     }
-    else if (stricmp(firstWord, "Positions") == 0)
+    else if (_stricmp(firstWord, "Positions") == 0)
     {
       int numPositions = atoi(secondWord);
       ParsePositionBlock(_in, numPositions);
     }
-    else if (stricmp(firstWord, "Normals") == 0)
+    else if (_stricmp(firstWord, "Normals") == 0)
     {
       int numNorms = atoi(secondWord);
       ParseNormalBlock(_in, numNorms);
     }
-    else if (stricmp(firstWord, "Colours") == 0)
+    else if (_stricmp(firstWord, "Colours") == 0)
     {
       int numColours = atoi(secondWord);
       ParseColourBlock(_in, numColours);
     }
-    else if (stricmp(firstWord, "Vertices") == 0)
+    else if (_stricmp(firstWord, "Vertices") == 0)
     {
       int numVerts = atoi(secondWord);
       ParseVertexBlock(_in, numVerts);
     }
-    else if (stricmp(firstWord, "Strips") == 0)
+    else if (_stricmp(firstWord, "Strips") == 0)
     {
       int numStrips = atoi(secondWord);
       ParseAllStripBlocks(_in, numStrips);
       break;
     }
-    else if (stricmp(firstWord, "Triangles") == 0)
+    else if (_stricmp(firstWord, "Triangles") == 0)
     {
       int numTriangles = atoi(secondWord);
       ParseTriangleBlock(_in, numTriangles);
@@ -327,7 +327,7 @@ void ShapeFragment::WriteToFile(FILE* _out) const
 {
   int i;
 
-  if (stricmp(m_name, "SceneRoot") != 0)
+  if (_stricmp(m_name, "SceneRoot") != 0)
   {
     fprintf(_out, "Fragment: %s\n", m_name);
     fprintf(_out, "\tParentName: %s\n", m_parentName);
@@ -526,7 +526,7 @@ void ShapeFragment::ParseStripBlock(TextReader* _in)
   DarwiniaDebugAssert(c);
 
   // Read material name
-  if (stricmp(c, "Material") == 0)
+  if (_stricmp(c, "Material") == 0)
   {
     c = _in->GetNextToken();
     DarwiniaDebugAssert(c);
@@ -536,7 +536,7 @@ void ShapeFragment::ParseStripBlock(TextReader* _in)
   }
 
   // Read number of vertices in strip
-  DarwiniaDebugAssert(c && (stricmp(c, "Verts") == 0));
+  DarwiniaDebugAssert(c && (_stricmp(c, "Verts") == 0));
   c = _in->GetNextToken();
   DarwiniaDebugAssert(c);
   int numVerts = atoi(c);
@@ -598,7 +598,7 @@ void ShapeFragment::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips
   while (_in->ReadLine())
   {
     char* c = _in->GetNextToken();
-    if (c && stricmp(c, "Strip") == 0)
+    if (c && _stricmp(c, "Strip") == 0)
     {
       c = _in->GetNextToken();
       int id = atoi(c);
@@ -860,7 +860,7 @@ void ShapeFragment::RenderSlow()
 // Recursively look through all child fragments until we find a name match
 ShapeFragment* ShapeFragment::LookupFragment(const char* _name)
 {
-  if (stricmp(_name, m_name) == 0)
+  if (_stricmp(_name, m_name) == 0)
     return this;
   int numChildFragments = m_childFragments.Size();
   for (int i = 0; i < numChildFragments; ++i)
@@ -884,7 +884,7 @@ ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
   for (i = 0; i < numMarkers; ++i)
   {
     ShapeMarker* marker = m_childMarkers.GetData(i);
-    if (stricmp(_name, marker->m_name) == 0)
+    if (_stricmp(_name, marker->m_name) == 0)
       return marker;
   }
 
@@ -1170,14 +1170,14 @@ void Shape::Load(TextReader* _in)
 
     char* c = _in->GetNextToken();
 
-    if (stricmp(c, "fragment") == 0)
+    if (_stricmp(c, "fragment") == 0)
     {
       DarwiniaDebugAssert(currentFrag < maxFrags);
       c = _in->GetNextToken();
       allFrags[currentFrag] = new ShapeFragment(_in, c);
       currentFrag++;
     }
-    else if (stricmp(c, "marker") == 0)
+    else if (_stricmp(c, "marker") == 0)
     {
       DarwiniaDebugAssert(currentMarker < maxMarkers);
       c = _in->GetNextToken();
@@ -1191,7 +1191,7 @@ void Shape::Load(TextReader* _in)
   // We need to build the hierarchy of fragments from the flat array
   for (int i = 0; i < currentFrag; ++i)
   {
-    if (stricmp(allFrags[i]->m_parentName, "SceneRoot") == 0)
+    if (_stricmp(allFrags[i]->m_parentName, "SceneRoot") == 0)
       m_rootFragment->m_childFragments.PutData(allFrags[i]);
     else
     {
@@ -1201,8 +1201,8 @@ void Shape::Load(TextReader* _in)
       {
         if (i == j)
           continue;
-        DarwiniaDebugAssert(stricmp(allFrags[i]->m_name, allFrags[j]->m_name) != 0);
-        if (stricmp(allFrags[i]->m_parentName, allFrags[j]->m_name) == 0)
+        DarwiniaDebugAssert(_stricmp(allFrags[i]->m_name, allFrags[j]->m_name) != 0);
+        if (_stricmp(allFrags[i]->m_parentName, allFrags[j]->m_name) == 0)
         {
           allFrags[j]->m_childFragments.PutData(allFrags[i]);
           break;
@@ -1222,7 +1222,7 @@ void Shape::Load(TextReader* _in)
     int depth = allMarkers[i]->m_depth - 1;
     allMarkers[i]->m_parents[depth] = parent;
     depth--;
-    while (stricmp(parent->m_name, "SceneRoot") != 0)
+    while (_stricmp(parent->m_name, "SceneRoot") != 0)
     {
       parent = m_rootFragment->LookupFragment(parent->m_parentName);
       DarwiniaDebugAssert(parent && depth >= 0);

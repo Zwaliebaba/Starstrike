@@ -6,7 +6,7 @@
 #include "render_utils.h"
 #include "resource.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "main.h"
 #include "renderer.h"
 

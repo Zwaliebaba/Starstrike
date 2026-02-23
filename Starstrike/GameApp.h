@@ -26,7 +26,7 @@ class GameMenu;
 class StartSequence;
 class BitmapRGBA;
 
-class App
+class GameApp : public GameMain
 {
   public:
     // Library Code Objects
@@ -90,16 +90,19 @@ class App
       NumGameModes
     };
 
-    App();
-    ~App();
+    GameApp();
+    ~GameApp() override;
+
+    void Startup() override {}
+    void Shutdown() override {}
+    void Update([[maybe_unused]] float _deltaT) override {}
+    void RenderScene() override {}
 
     void SetProfileName(char* _profileName);
     bool LoadProfile();
     void ResetLevel(bool _global);
 
     void SetLanguage(char* _language, bool _test);
-
-    bool HasBoughtGame();
 
     void LoadPrologue();
     void LoadCampaign();
@@ -111,6 +114,6 @@ class App
     void UpdateDifficultyFromPreferences();
 };
 
-extern App* g_app;
+extern GameApp* g_app;
 
 #endif

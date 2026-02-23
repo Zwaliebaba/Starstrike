@@ -5,7 +5,7 @@
 #include "goddish.h"
 #include "spam.h"
 #include "darwinian.h"
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "global_world.h"
 #include "location.h"

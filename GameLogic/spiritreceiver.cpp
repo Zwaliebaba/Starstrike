@@ -9,7 +9,7 @@
 #include "preferences.h"
 #include "language_table.h"
 #include "spiritreceiver.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"

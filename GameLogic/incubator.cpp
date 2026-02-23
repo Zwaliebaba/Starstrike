@@ -8,7 +8,7 @@
 #include "text_renderer.h"
 #include "debug_render.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "globals.h"
 #include "location.h"
 #include "particle_system.h"

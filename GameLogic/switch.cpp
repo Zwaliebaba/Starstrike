@@ -12,7 +12,7 @@
 
 #include "clienttoserver.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"

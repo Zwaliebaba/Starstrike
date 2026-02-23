@@ -10,7 +10,7 @@
 #include "text_stream_readers.h"
 #include "preferences.h"
 #include "sound_stream_decoder.h"
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "renderer.h"
 

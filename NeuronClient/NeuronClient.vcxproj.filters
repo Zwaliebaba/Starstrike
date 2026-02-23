@@ -55,7 +55,6 @@
     <ClInclude Include="matrix34.h" />
     <ClInclude Include="mouse_cursor.h" />
     <ClInclude Include="ogl_extensions.h" />
-    <ClInclude Include="persisting_debug_render.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="preference_names.h" />
     <ClInclude Include="preferences.h" />
@@ -79,7 +78,6 @@
     <ClInclude Include="vector2.h" />
     <ClInclude Include="LegacyVector3.h" />
     <ClInclude Include="window_manager.h" />
-    <ClInclude Include="window_manager_win32.h" />
     <ClInclude Include="control_bindings.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -167,12 +165,6 @@
     <ClInclude Include="transform.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="win32_eventhandler.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="win32_eventproc.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="eclbutton.h">
       <Filter>Canvas</Filter>
     </ClInclude>
@@ -182,35 +174,97 @@
     <ClInclude Include="eclwindow.h">
       <Filter>Canvas</Filter>
     </ClInclude>
-    <ClInclude Include="d3d12_backend.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx_dlist.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx_dlist_dev.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx_inline.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx_internals.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_directx_matrix_stack.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="opengl_trace.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="d3dx12.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="DirectXHelper.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12_backend.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_dlist_dev.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_inline.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_internals.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_directx_matrix_stack.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_trace.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorHeap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuBuffer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuResource.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsCommon.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsCore.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="PixProfiler.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceStateTracker.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="RootSignature.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="SamplerManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexTypes.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Strings.h" />
+    <ClInclude Include="GameMain.h" />
+    <ClInclude Include="bytestream.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="clienttoserver.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="generic.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="networkupdate.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="server.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="servertoclient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="servertoclientletter.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -258,7 +312,6 @@
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />
     <ClCompile Include="mouse_cursor.cpp" />
-    <ClCompile Include="persisting_debug_render.cpp" />
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
@@ -360,9 +413,6 @@
     <ClCompile Include="transform.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="win32_eventhandler.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="eclbutton.cpp">
       <Filter>Canvas</Filter>
     </ClCompile>
@@ -373,28 +423,75 @@
       <Filter>Canvas</Filter>
     </ClCompile>
     <ClCompile Include="d3d12_backend.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="ogl_extensions_directx.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx_dlist.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx_dlist_dev.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx_matrix_stack.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx_stubs.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_trace.cpp">
+      <Filter>Graphics\Legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorHeap.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuBuffer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsCommon.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsCore.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceStateTracker.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RootSignature.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings.cpp" />
+    <ClCompile Include="NeuronClient.cpp" />
+    <ClCompile Include="clienttoserver.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="generic.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="networkupdate.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="server.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="servertoclient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="servertoclientletter.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -416,6 +513,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{dc64aef6-7e7d-453f-bc39-54a3b9944222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Legacy">
+      <UniqueIdentifier>{7a1141b6-9140-44bd-b289-bd2b1377fa3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{601e3861-10fb-4f11-a087-34eefb5fe286}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
@@ -426,6 +529,9 @@
     </None>
     <None Include="inputdriver_values.inc">
       <Filter>Input</Filter>
+    </None>
+    <None Include="networkupdate.inc">
+      <Filter>Network</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

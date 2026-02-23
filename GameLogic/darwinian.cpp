@@ -7,7 +7,7 @@
 #include "shape.h"
 #include "hi_res_time.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "location.h"
 #include "team.h"
 #include "camera.h"

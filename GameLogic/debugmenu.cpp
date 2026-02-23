@@ -2,7 +2,6 @@
 #include "debug_utils.h"
 #include "text_renderer.h"
 #include "preferences.h"
-#include "window_manager.h"
 #include "language_table.h"
 #include "debugmenu.h"
 #include "network_window.h"
@@ -12,7 +11,7 @@
 #include "profilewindow.h"
 #include "cheat_window.h"
 #include "reallyquit_window.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "renderer.h"
 
@@ -512,10 +511,4 @@ void DebugKeyBindings::ReallyQuitButton()
 	// Bring up a really quit window
 	if (!EclGetWindow(REALLYQUIT_WINDOWNAME))
 		EclRegisterWindow( new ReallyQuitWindow() );
-}
-
-void DebugKeyBindings::ToggleFullscreenButton()
-{
-	bool switchingToWindowed;
-	SetWindowed(!g_windowManager->Windowed(), true, switchingToWindowed);
 }

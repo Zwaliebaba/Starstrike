@@ -25,7 +25,7 @@ controltype_t ControlBindings::getControlID(const std::string& name)
 {
   int i = 0;
   const char* cmd = s_actions[i].name;
-  while (cmd && stricmp(name.c_str(), cmd) != 0) { cmd = s_actions[++i].name; }
+  while (cmd && _stricmp(name.c_str(), cmd) != 0) { cmd = s_actions[++i].name; }
   if (i < NumControlTypes)
     return i;
   return -1;

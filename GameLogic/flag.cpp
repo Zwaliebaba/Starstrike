@@ -4,7 +4,7 @@
 
 #include "flag.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "main.h"
 #include "camera.h"
 

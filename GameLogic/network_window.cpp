@@ -8,7 +8,7 @@
 #include "server.h"
 #include "clienttoserver.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "main.h"
 
 #include "network_window.h"

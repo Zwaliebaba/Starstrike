@@ -13,7 +13,7 @@
 
 #include "explosion.h"
 #include "main.h"
-#include "app.h"
+#include "GameApp.h"
 #include "global_world.h"
 #include "camera.h"
 #include "renderer.h"

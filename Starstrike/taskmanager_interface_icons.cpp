@@ -13,7 +13,7 @@
 #include "preferences.h"
 #include "eclipse.h"
 #include "clienttoserver.h"
-#include "app.h"
+#include "GameApp.h"
 #include "gamecursor.h"
 #include "global_world.h"
 #include "location.h"
@@ -602,7 +602,7 @@ void TaskManagerInterfaceIcons::AdvanceScreenZones()
         for (int i = 0; i < m_screenZones.Size(); ++i)
         {
           ScreenZone* zone = m_screenZones[i];
-          if (stricmp(zone->m_name, "SelectTask") == 0 && zone->m_data == taskIndex)
+          if (_stricmp(zone->m_name, "SelectTask") == 0 && zone->m_data == taskIndex)
           {
             if (g_inputManager->getInputMode() != INPUT_MODE_GAMEPAD)
             {
@@ -627,7 +627,7 @@ void TaskManagerInterfaceIcons::AdvanceScreenZones()
     ScreenZone* currentZone = m_screenZones[m_currentScreenZone];
     if (currentZone)
     {
-      if (stricmp(currentZone->m_name, "SelectTask") == 0 && g_app->m_taskManager->m_tasks.ValidIndex(currentZone->m_data))
+      if (_stricmp(currentZone->m_name, "SelectTask") == 0 && g_app->m_taskManager->m_tasks.ValidIndex(currentZone->m_data))
       {
         Task* task = g_app->m_taskManager->m_tasks[currentZone->m_data];
         m_highlightedTaskId = task->m_id;
@@ -668,7 +668,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
   //
   // New task buttons
 
-  if (stricmp(_name, "NewTask") == 0)
+  if (_stricmp(_name, "NewTask") == 0)
   {
     //
     // Prevent creation of new tasks if we're placing one
@@ -696,7 +696,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
   //
   // Select task buttons
 
-  if (stricmp(_name, "SelectTask") == 0)
+  if (_stricmp(_name, "SelectTask") == 0)
   {
     if (g_app->m_taskManager->m_tasks.ValidIndex(_data))
     {
@@ -712,7 +712,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
   //
   // Delete task buttons
 
-  if (stricmp(_name, "DeleteTask") == 0)
+  if (_stricmp(_name, "DeleteTask") == 0)
   {
     if (_data == -1)
       g_app->m_taskManager->TerminateTask(g_app->m_taskManager->m_currentTaskId);
@@ -724,7 +724,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
   //
   // Select weapon buttons
 
-  if (stricmp(_name, "SelectWeapon") == 0)
+  if (_stricmp(_name, "SelectWeapon") == 0)
   {
     if (g_app->m_globalWorld->m_research->HasResearch(_data))
     {
@@ -745,7 +745,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
 
   if (m_visible)
   {
-    if (stricmp(_name, "ShowScreen") == 0)
+    if (_stricmp(_name, "ShowScreen") == 0)
     {
       m_screenId = _data;
 
@@ -766,7 +766,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
       g_app->m_soundSystem->TriggerOtherEvent(nullptr, "Slide", SoundSourceBlueprint::TypeInterface);
     }
 
-    if (stricmp(_name, "ScreenUp") == 0)
+    if (_stricmp(_name, "ScreenUp") == 0)
     {
       switch (m_screenId)
       {
@@ -780,7 +780,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
       }
     }
 
-    if (stricmp(_name, "ScreenDown") == 0)
+    if (_stricmp(_name, "ScreenDown") == 0)
     {
       switch (m_screenId)
       {
@@ -798,13 +798,13 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
   //
   // Research
 
-  if (stricmp(_name, "Research") == 0)
+  if (_stricmp(_name, "Research") == 0)
     g_app->m_globalWorld->m_research->SetCurrentResearch(_data);
 
   //
   // Objectives
 
-  if (stricmp(_name, "Objective") == 0)
+  if (_stricmp(_name, "Objective") == 0)
   {
     bool primary = _data > 0;
     int objectiveId = _data;
@@ -953,13 +953,13 @@ void TaskManagerInterfaceIcons::RenderTooltip()
       for (int i = 0; i < m_keyboardShortcuts.Size(); ++i)
       {
         KeyboardShortcut* shortcut = m_keyboardShortcuts[i];
-        if (stricmp(shortcut->name(), zone->m_name) == 0 && shortcut->data() == zone->m_data)
+        if (_stricmp(shortcut->name(), zone->m_name) == 0 && shortcut->data() == zone->m_data)
         {
           selectedShortcut = shortcut;
           break;
         }
 
-        if (stricmp(shortcut->name(), zone->m_name) == 0 && stricmp(shortcut->name(), "DeleteTask") == 0)
+        if (_stricmp(shortcut->name(), zone->m_name) == 0 && _stricmp(shortcut->name(), "DeleteTask") == 0)
         {
           // Special case : DeleteTask shortcut key
           selectedShortcut = shortcut;

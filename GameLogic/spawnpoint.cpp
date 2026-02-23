@@ -10,7 +10,7 @@
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "language_table.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 #include "entity_grid.h"

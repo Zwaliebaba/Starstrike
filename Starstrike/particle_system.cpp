@@ -9,7 +9,7 @@
 #include "profiler.h"
 #include "resource.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "main.h"
 #include "particle_system.h"

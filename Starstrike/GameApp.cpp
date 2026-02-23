@@ -8,12 +8,11 @@
 #include "system_info.h"
 #include "text_renderer.h"
 #include "filesys_utils.h"
-#include "bitmap.h"
 #include "file_writer.h"
 #include "prefs_other_window.h"
 #include "sound_stream_decoder.h"
 #include "soundsystem.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
 #include "location.h"
@@ -29,11 +28,11 @@
 #include "level_file.h"
 #include "game_menu.h"
 
-App* g_app = nullptr;
+GameApp* g_app = nullptr;
 
 #define GAMEDATAFILE "game.txt"
 
-App::App()
+GameApp::GameApp()
   : m_userInput(nullptr),
     m_resource(nullptr),
     m_soundSystem(nullptr),
@@ -90,15 +89,6 @@ App::App()
   m_renderer = new Renderer();
   m_renderer->Initialise();
 
-  // Make sure that resources are now available - either the .dat files
-  // or the data directory must exist
-
-  SoundStreamDecoder* ssd = m_resource->GetSoundStreamDecoder("sounds/ablaster");
-  DarwiniaReleaseAssert(ssd, "Couldn't find sound resources. This is probably because\n" "sounds.dat isn't in the working directory.");
-  delete ssd;
-
-  int textureId = m_resource->GetTexture("textures/editor_font_normal.bmp");
-
   m_gameCursor = new GameCursor();
   m_soundSystem = new SoundSystem();
   m_clientToServer = new ClientToServer();
@@ -113,7 +103,7 @@ App::App()
   // Determine default language if possible
 
   char* language = g_prefsManager->GetString("TextLanguage");
-  if (stricmp(language, "unknown") == 0)
+  if (_stricmp(language, "unknown") == 0)
   {
     char* defaultLang = g_systemInfo->m_localeInfo.m_language;
     char langFilename[512];
@@ -144,10 +134,10 @@ App::App()
   //
   // Load save games
 
-  bool profileLoaded = LoadProfile();
+  LoadProfile();
 }
 
-App::~App()
+GameApp::~GameApp()
 {
   SAFE_DELETE(m_globalWorld);
   SAFE_DELETE(m_langTable);
@@ -168,7 +158,7 @@ App::~App()
   SAFE_DELETE(m_resource);
 }
 
-void App::UpdateDifficultyFromPreferences()
+void GameApp::UpdateDifficultyFromPreferences()
 {
   // This method is called to make sure that the difficulty setting
   // used to control the game play (g_app->m_difficultyLevel) is
@@ -180,7 +170,7 @@ void App::UpdateDifficultyFromPreferences()
     m_difficultyLevel = 0;
 }
 
-void App::SetLanguage(char* _language, bool _test)
+void GameApp::SetLanguage(char* _language, bool _test)
 {
   //
   // Delete existing language data
@@ -241,11 +231,11 @@ void App::SetLanguage(char* _language, bool _test)
     m_langTable->RebuildTables();
 }
 
-void App::SetProfileName(char* _profileName)
+void GameApp::SetProfileName(char* _profileName)
 {
   strcpy(m_userProfileName, _profileName);
 
-  if (stricmp(_profileName, "AttractMode") != 0)
+  if (_stricmp(_profileName, "AttractMode") != 0)
   {
     g_prefsManager->SetString("UserProfile", m_userProfileName);
     g_prefsManager->Save();
@@ -257,7 +247,7 @@ void App::SetProfileName(char* _profileName)
 #include <sys/stat.h>
 #endif
 
-const char* App::GetProfileDirectory()
+const char* GameApp::GetProfileDirectory()
 {
 #if defined(TARGET_OS_LINUX)
 
@@ -320,7 +310,7 @@ const char* App::GetProfileDirectory()
 #endif
 }
 
-const char* App::GetPreferencesPath()
+const char* GameApp::GetPreferencesPath()
 {
   // good leak #1
   static char* path = nullptr;
@@ -335,7 +325,7 @@ const char* App::GetPreferencesPath()
   return path;
 }
 
-const char* App::GetScreenshotDirectory()
+const char* GameApp::GetScreenshotDirectory()
 {
 #ifdef TARGET_OS_VISTA
   static char dir[MAX_PATH]; SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, SHGFP_TYPE_CURRENT, dir); sprintf(dir, "%s\\", dir); return dir;
@@ -344,11 +334,11 @@ const char* App::GetScreenshotDirectory()
 #endif
 }
 
-bool App::LoadProfile()
+bool GameApp::LoadProfile()
 {
   DebugTrace("Loading profile %s\n", m_userProfileName);
 
-  if ((stricmp(m_userProfileName, "AccessAllAreas") == 0 || stricmp(m_userProfileName, "AttractMode") == 0) && g_app->m_gameMode !=
+  if ((_stricmp(m_userProfileName, "AccessAllAreas") == 0 || _stricmp(m_userProfileName, "AttractMode") == 0) && g_app->m_gameMode !=
     GameModePrologue)
   {
     // Cheat username that opens all locations
@@ -389,7 +379,7 @@ bool App::LoadProfile()
   return true;
 }
 
-void App::ResetLevel(bool _global)
+void GameApp::ResetLevel(bool _global)
 {
   if (m_location)
   {
@@ -416,16 +406,7 @@ void App::ResetLevel(bool _global)
   }
 }
 
-bool App::HasBoughtGame()
-{
-#if defined(DEMOBUILD)
-  return false;
-#else
-  return true;
-#endif
-}
-
-void App::LoadPrologue()
+void GameApp::LoadPrologue()
 {
   m_gameMode = GameModePrologue;
 
@@ -446,7 +427,7 @@ void App::LoadPrologue()
   g_prefsManager->Save();
 }
 
-void App::LoadCampaign()
+void GameApp::LoadCampaign()
 {
   m_soundSystem->StopAllSounds(WorldObjectId(), "Music");
 

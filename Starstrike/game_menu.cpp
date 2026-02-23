@@ -6,7 +6,7 @@
 #include "drop_down_menu.h"
 #include "input_field.h"
 #include "game_menu.h"
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "global_internet.h"
 #include "renderer.h"
@@ -157,94 +157,8 @@ public:
     void MouseUp()
     {
         ((GameMenuWindow *) m_parent)->m_newPage = GameMenuWindow::PageDarwinia;
-        /*if( g_app->m_multiwinia )
-        {
-            delete g_app->m_multiwinia;
-            g_app->m_multiwinia = NULL;
-        }*/
     }
 };
-/*
-class GameTypeButton : public GameMenuButton
-{
-public:
-    int m_gameType;
-
-    GameTypeButton( char *_iconName, int _gameType )
-    :   GameMenuButton( _iconName ),
-        m_gameType(_gameType)
-    {
-    }
-
-    void MouseUp()
-    {
-        ((GameMenuWindow *) m_parent)->m_newPage = GameMenuWindow::PageGameSetup;
-        ((GameMenuWindow *) m_parent)->m_gameType = m_gameType;
-    }
-};
-
-class MultiwiniaModeButton : public GameMenuButton
-{
-public:
-    MultiwiniaModeButton( char *_iconName )
-    :   GameMenuButton( _iconName )
-    {
-    }
-
-    void MouseUp()
-    {
-        ((GameMenuWindow *) m_parent)->m_newPage = GameMenuWindow::PageMultiwinia;
-        if( !g_app->m_multiwinia )
-        {
-            g_app->m_multiwinia = new Multiwinia();
-        }
-
-    }
-};
-
-class PlayGameButton : public GameMenuButton
-{
-public:
-    PlayGameButton()
-    : GameMenuButton( "Play" )
-    {
-    }
-
-    void MouseUp()
-    {
-        GameMenuWindow *parent = (GameMenuWindow *)m_parent;
-
-        if( g_app->m_gameMenu->m_maps[parent->m_gameType].ValidIndex(parent->m_requestedMapId ) )
-        {
-            strcpy( g_app->m_requestedMap, g_app->m_gameMenu->m_maps[parent->m_gameType][parent->m_requestedMapId] );
-            strcpy( g_app->m_requestedMission, "null" );
-        }
-
-        g_app->m_requestToggleEditing = false;
-        g_app->m_requestedLocationId = 999;
-
-        g_app->m_multiwinia->SetGameResearch( parent->m_researchLevel );
-        g_app->m_multiwinia->SetGameOptions( parent->m_gameType, parent->m_params );
-
-        g_app->m_atMainMenu = false;
-        g_app->m_gameMode = App::GameModeMultiwinia;
-    }
-};
-
-class ResearchModeButton : public GameMenuButton
-{
-public:
-    ResearchModeButton()
-    : GameMenuButton( "Research" )
-    {
-    }
-
-    void MouseUp()
-    {
-        ((GameMenuWindow *) m_parent)->m_newPage = GameMenuWindow::PageResearch;
-    }
-};
-*/
 
 // *************************
 // Game Menu Class
@@ -283,7 +197,7 @@ void GameMenu::CreateMenu()
     g_app->m_camera->SetTarget(LegacyVector3(-900000, 3000000, 397000), LegacyVector3(0,0.5f,-1));
     g_app->m_camera->CutToTarget();
 
-    g_app->m_gameMode = App::GameModeNone;
+    g_app->m_gameMode = GameApp::GameModeNone;
 
     m_menuCreated = true;
 }

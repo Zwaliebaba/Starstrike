@@ -6,7 +6,7 @@
 #include "profiler.h"
 #include "resource.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "explosion.h"
 #include "globals.h"
 #include "main.h"

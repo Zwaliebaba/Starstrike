@@ -469,5 +469,13 @@
     <Filter Include="GameObjects">
       <UniqueIdentifier>{03d8f1ab-662b-41fc-9007-d473c07f4190}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Project Files">
+      <UniqueIdentifier>{6cd5b3ab-8d81-4aec-a281-92fd7faeff7d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>Project Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

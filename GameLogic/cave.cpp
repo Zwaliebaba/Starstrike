@@ -6,7 +6,7 @@
 #include "debug_utils.h"
 
 #include "explosion.h"
-#include "app.h"
+#include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"
 #include "renderer.h"

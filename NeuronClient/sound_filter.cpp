@@ -4,7 +4,7 @@
 #include "profiler.h"
 #include "soundsystem.h"
 #include "sound_filter.h"
-#include "app.h"
+#include "GameApp.h"
 
 //*****************************************************************************
 // Class DspResLowPass

@@ -7,7 +7,7 @@
 #include "text_renderer.h"
 #include "hi_res_time.h"
 
-#include "app.h"
+#include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "explosion.h"
