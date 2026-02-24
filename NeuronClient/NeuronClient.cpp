@@ -2,7 +2,7 @@
 #include "WndProcManager.h"
 #include "system_info.h"
 
-bool Direct3DInit(HWND _hWnd, bool _windowed, int _width, int _height, int _colourDepth, int _zDepth, bool _waitVRT);
+bool Direct3DInit();
 void Direct3DShutdown();
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -12,7 +12,8 @@ void ClientEngine::Startup(const wchar_t* _gameName, HINSTANCE _hInstance, int n
     CoreEngine::Startup();
     Strings::Startup();
 
-    Graphics::Core::Startup();
+    // Match the legacy backend's R8G8B8A8 format; depth uses Core's D32_FLOAT default.
+    Graphics::Core::Startup(DXGI_FORMAT_R8G8B8A8_UNORM);
 
     m_instance = _hInstance;
     m_outputSize = Graphics::Core::GetScreenSize();
@@ -55,7 +56,13 @@ void ClientEngine::Startup(const wchar_t* _gameName, HINSTANCE _hInstance, int n
     RECT rc;
     GetClientRect(m_hwnd, &rc);
 
-    Direct3DInit(m_hwnd, true, rc.right - rc.left, rc.bottom - rc.top, 32, 24, false);
+    // Create swap chain and window-size-dependent resources via Core.
+    Graphics::Core::SetWindow(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
+
+    // Open the command list so the backend can record init-time GPU work.
+    Graphics::Core::Prepare();
+
+    Direct3DInit();
     glClear(GL_COLOR_BUFFER_BIT);
 
     ShowWindow(m_hwnd, nCmdShow);

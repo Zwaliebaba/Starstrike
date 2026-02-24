@@ -496,20 +496,40 @@ static void InitialiseData()
     s_pDisplayListRecorder = nullptr;
 }
 
-bool Direct3DInit(HWND _hWnd, bool _windowed, int _width, int _height, int _colourDepth, int _zDepth, bool _waitVRT)
+bool Direct3DInit()
 {
-    if (!g_backend.Init(_hWnd, _windowed, _width, _height, _colourDepth, _zDepth, _waitVRT))
+    if (!g_backend.Init())
         return false;
 
     InitialiseData();
-    s_renderState.viewportW = _width;
-    s_renderState.viewportH = _height;
+    auto outputSize = Neuron::Graphics::Core::GetOutputSize();
+    s_renderState.viewportW = static_cast<int>(outputSize.Width);
+    s_renderState.viewportH = static_cast<int>(outputSize.Height);
 
     return true;
 }
 
 void Direct3DShutdown()
 {
+    // Release all GPU resources held by the OpenGL translation layer before
+    // the backend (and ultimately Core) destroys the device.
+
+    // Textures
+    s_textureResources.clear();
+
+    // Display lists (each owns a GPU vertex buffer)
+    for (auto& entry : s_displayLists)
+        delete entry.second;
+    s_displayLists.clear();
+
+    // VBOs
+    ShutdownOGLExtensions();
+
+    // Vertices
+    delete[] s_vertices;
+    s_vertices = nullptr;
+    s_allocatedVertices = 0;
+
     g_backend.Shutdown();
 }
 

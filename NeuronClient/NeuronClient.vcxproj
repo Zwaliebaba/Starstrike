@@ -154,6 +154,7 @@
     <ClInclude Include="keydefs.h" />
     <ClInclude Include="keynames.h" />
     <ClInclude Include="language_table.h" />
+    <ClInclude Include="LegacyBridge.h" />
     <ClInclude Include="llist.h" />
     <ClInclude Include="math_utils.h" />
     <ClInclude Include="matrix33.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="invert_matrix.cpp" />
     <ClCompile Include="keynames.cpp" />
     <ClCompile Include="language_table.cpp" />
+    <ClCompile Include="LegacyBridge.cpp" />
     <ClCompile Include="math_utils.cpp" />
     <ClCompile Include="matrix33.cpp" />
     <ClCompile Include="matrix34.cpp" />

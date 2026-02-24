@@ -147,6 +147,13 @@ void InitialiseOGLExtensions()
 	gglChoosePixelFormatARB = 0;
 }
 
+void ShutdownOGLExtensions()
+{
+	s_currentVBO = nullptr;
+	s_vertexBuffers.clear();
+	s_lastVertexBufferId = 0;
+}
+
 int IsOGLExtensionSupported(const char *extension)
 {
 	return 0;

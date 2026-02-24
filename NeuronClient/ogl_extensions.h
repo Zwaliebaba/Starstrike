@@ -125,6 +125,7 @@ extern ChoosePixelFormatARB gglChoosePixelFormatARB;
 #define WGL_STENCIL_BITS_EXT           0x2023
 
 void InitialiseOGLExtensions();
+void ShutdownOGLExtensions();
 int IsOGLExtensionSupported(const char *extension);
 
 #endif

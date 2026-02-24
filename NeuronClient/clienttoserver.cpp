@@ -77,7 +77,7 @@ ClientToServer::ClientToServer()
 
 ClientToServer::~ClientToServer()
 {
-  while (m_outbox.Size() > 0) {}
+  //while (m_outbox.Size() > 0) {}
 
   m_inbox.EmptyAndDelete();
   m_outbox.EmptyAndDelete();

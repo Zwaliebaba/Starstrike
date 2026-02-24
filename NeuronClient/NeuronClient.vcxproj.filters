@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -180,6 +180,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="d3d12_backend.h">
+      <Filter>Graphics\Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="LegacyBridge.h">
       <Filter>Graphics\Legacy</Filter>
     </ClInclude>
     <ClInclude Include="opengl_directx.h">
@@ -421,6 +424,9 @@
       <Filter>Canvas</Filter>
     </ClCompile>
     <ClCompile Include="d3d12_backend.cpp">
+      <Filter>Graphics\Legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="LegacyBridge.cpp">
       <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="ogl_extensions_directx.cpp">

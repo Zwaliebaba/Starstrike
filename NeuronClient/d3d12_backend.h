@@ -110,6 +110,7 @@ namespace OpenGLD3D {
     class UploadRingBuffer {
     public:
         void Init(ID3D12Device* device, SIZE_T size);
+        void Shutdown();
         void Reset();
 
         // Allocate space and return CPU pointer + GPU virtual address
@@ -132,20 +133,24 @@ namespace OpenGLD3D {
     };
 
     // --- D3D12 Backend ---
+    // After Phase 1: device, swap chain, command queue, command list, fence,
+    // command allocators, render targets, and depth stencil are all owned by
+    // Neuron::Graphics::Core.  This class retains descriptor heaps, root
+    // signature, PSO cache, upload ring buffers, samplers, and default texture.
 
     class D3D12Backend {
     public:
-        bool Init(HWND hWnd, bool windowed, int width, int height, int colourDepth, int zDepth, bool waitVRT);
+        bool Init();
         void Shutdown();
         void BeginFrame();
-        void EndFrame(); // Close, execute, present
+        void EndFrame(); // Transition, present via Core, prepare next frame
         void WaitForGpu();
 
-        // Accessors
-        ID3D12Device* GetDevice() const { return m_device.Get(); }
-        ID3D12GraphicsCommandList* GetCommandList() const { return m_commandList.Get(); }
+        // Accessors — device / command list now delegate to Core
+        ID3D12Device* GetDevice() const;
+        ID3D12GraphicsCommandList* GetCommandList() const;
         ID3D12RootSignature* GetRootSignature() const { return m_rootSignature.Get(); }
-        UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[m_frameIndex]; }
+        UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[Neuron::Graphics::Core::GetCurrentFrameIndex()]; }
 
         // PSO management
         ID3D12PipelineState* GetOrCreatePSO(const PSOKey& key);
@@ -160,10 +165,6 @@ namespace OpenGLD3D {
         D3D12_CPU_DESCRIPTOR_HANDLE AllocateSRVSlot(UINT& outIndex);
         D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUHandle(UINT index) const;
 
-        // Frame constant buffer
-        void UploadConstants(const PerFrameConstants& constants);
-        D3D12_GPU_VIRTUAL_ADDRESS GetConstantBufferGPUAddress() const;
-
         // Pre-built sampler descriptors: [0]=linear/wrap, [1]=point/wrap, [2]=linear/clamp, [3]=point/clamp
         // + mip variants: [4]=linear/wrap/mipLinear, ...
         static constexpr UINT NUM_STATIC_SAMPLERS = 8;
@@ -171,50 +172,16 @@ namespace OpenGLD3D {
         // Default (white) texture SRV index
         UINT GetDefaultTextureSRVIndex() const { return m_defaultTextureSRVIndex; }
 
-        int GetWidth() const { return m_width; }
-        int GetHeight() const { return m_height; }
-
-        // RTV/DSV handle access (for glClear)
+        // RTV/DSV handle access (for glClear) — delegate to Core
         D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRTVHandle() const;
         D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentDSVHandle() const;
 
     private:
-        void CreateDevice();
-        void CreateCommandQueue();
-        void CreateSwapChain(HWND hWnd, bool windowed, int width, int height, bool waitVRT);
-        void CreateRTVAndDSV(int width, int height, int zDepth);
         void CreateRootSignature();
         void CreateDescriptorHeaps();
         void CreateUploadBuffer();
-        void CreateConstantBuffer();
         void CreateDefaultTexture();
         void CreateSamplers();
-        void MoveToNextFrame();
-
-        // Device & queue
-        ComPtr<IDXGIFactory4> m_factory;
-        ComPtr<ID3D12Device> m_device;
-        ComPtr<ID3D12CommandQueue> m_commandQueue;
-        ComPtr<IDXGISwapChain3> m_swapChain;
-
-        // Frame resources
-        UINT m_frameIndex = 0;
-        ComPtr<ID3D12CommandAllocator> m_commandAllocators[FRAME_COUNT];
-        ComPtr<ID3D12GraphicsCommandList> m_commandList;
-
-        // Fence
-        ComPtr<ID3D12Fence> m_fence;
-        UINT64 m_fenceValues[FRAME_COUNT] = {};
-        HANDLE m_fenceEvent = nullptr;
-
-        // Render targets
-        ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
-        ComPtr<ID3D12Resource> m_renderTargets[FRAME_COUNT];
-        UINT m_rtvDescriptorSize = 0;
-
-        // Depth stencil
-        ComPtr<ID3D12DescriptorHeap> m_dsvHeap;
-        ComPtr<ID3D12Resource> m_depthStencilBuffer;
 
         // SRV/CBV descriptor heap (shader-visible)
         ComPtr<ID3D12DescriptorHeap> m_srvCbvHeap;
@@ -235,18 +202,9 @@ namespace OpenGLD3D {
         // Upload ring buffers (one per frame to avoid GPU data races)
         UploadRingBuffer m_uploadBuffers[FRAME_COUNT];
 
-        // Per-frame constant buffer
-        ComPtr<ID3D12Resource> m_constantBuffer;
-        UINT8* m_constantBufferCPU = nullptr;
-        D3D12_GPU_VIRTUAL_ADDRESS m_constantBufferGPU = 0;
-
         // Default 1x1 white texture
         ComPtr<ID3D12Resource> m_defaultTexture;
         UINT m_defaultTextureSRVIndex = 0;
-
-        int m_width = 0;
-        int m_height = 0;
-        bool m_vsync = false;
     };
 
     // Global backend instance
