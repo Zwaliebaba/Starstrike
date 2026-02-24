@@ -3,7 +3,7 @@
 #include "binary_stream_readers.h"
 #include "bitmap.h"
 #include "debug_render.h"
-#include "debug_utils.h"
+
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
@@ -519,7 +519,7 @@ bool Virii::AdvanceToEgg()
     // At this point we MUST have found an egg, otherwise we'd have returned by now
 
     theEgg = (Egg *) g_app->m_location->GetEntitySafe( m_eggId, Entity::TypeEgg );
-    DarwiniaDebugAssert( theEgg );
+    DEBUG_ASSERT( theEgg );
 
     bool arrived = AdvanceToTargetPos( theEgg->m_pos );
 

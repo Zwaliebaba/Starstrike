@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "debug_utils.h"
+
 #include "debug_render.h"
 #include "math_utils.h"
 #include "shape.h"
@@ -24,7 +24,7 @@ Lander::Lander()
     m_type = Entity::TypeLander;
 
     m_shape = g_app->m_resource->GetShape( "lander.shp" );
-    DarwiniaDebugAssert( m_shape );
+    DEBUG_ASSERT( m_shape );
 }
 
 bool Lander::Advance( Unit *_unit )

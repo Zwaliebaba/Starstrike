@@ -34,7 +34,7 @@ Officer::Officer()
     m_orders = OrderNone;
 
     m_shape = g_app->m_resource->GetShape( "darwinian.shp" );
-    DarwiniaReleaseAssert( m_shape, "Shape not found : officer.shp" );
+    ASSERT_TEXT( m_shape, "Shape not found : officer.shp" );
 
     m_flagMarker = m_shape->m_rootFragment->LookupMarker( "MarkerFlag" );
 

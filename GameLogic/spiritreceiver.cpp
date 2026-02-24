@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
@@ -38,7 +38,7 @@ LegacyVector3 ReceiverBuilding::GetSpiritLocation()
   if (!m_spiritLocation)
   {
     m_spiritLocation = m_shape->m_rootFragment->LookupMarker("MarkerSpiritLink");
-    DarwiniaDebugAssert(m_spiritLocation);
+    DEBUG_ASSERT(m_spiritLocation);
   }
 
   Matrix34 rootMat(m_front, m_up, m_pos);

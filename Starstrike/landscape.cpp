@@ -6,7 +6,7 @@
 #include "binary_stream_readers.h"
 #include "bitmap.h"
 #include "debug_render.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "preferences.h"
@@ -71,7 +71,7 @@ void LandscapeTile::GuideGridSetPower(int _power)
 		int resolution = (1 << _power) - 1;
 		int a = GetPowerOfTwo(resolution + 1);
 		int b = GetPowerOfTwo(resolution + 2);
-		DarwiniaDebugAssert(a != b);
+		DEBUG_ASSERT(a != b);
 
         delete m_guideGrid;
 		m_guideGrid = NULL;
@@ -965,7 +965,7 @@ float Landscape::SphereHit(LegacyVector3 const &_centre, float _radius) const
 {
 	// Make sure the specified radius is +ve and not so large to cause
 	// major efficiency problems
-	DarwiniaDebugAssert(_radius > 0.0f && _radius < 200.0f);
+	DEBUG_ASSERT(_radius > 0.0f && _radius < 200.0f);
 
 	int x1 = m_heightMap->GetMapIndexX(_centre.x - _radius);
 	int x2 = m_heightMap->GetMapIndexX(_centre.x + _radius);

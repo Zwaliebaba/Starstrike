@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "input.h"
 #include "movement2d.h"
@@ -1625,8 +1625,8 @@ void Camera::CreateCameraShake(float _intensity) { m_cameraShake = max(m_cameraS
 
 void Camera::SetupProjectionMatrix(float _nearPlane, float _farPlane)
 {
-  //DarwiniaDebugAssert(m_fov > 0.0f);
-  //DarwiniaDebugAssert(m_fov < 180.0f);
+  //DEBUG_ASSERT(m_fov > 0.0f);
+  //DEBUG_ASSERT(m_fov < 180.0f);
 
   clamp(m_fov, 1, 180);
 
@@ -1659,9 +1659,9 @@ void Camera::SetupProjectionMatrix(float _nearPlane, float _farPlane)
 void Camera::SetupModelviewMatrix()
 {
   float dot = m_front * m_up;
-  DarwiniaDebugAssert(NearlyEquals(m_front.MagSquared(), 1.0f));
-  DarwiniaDebugAssert(NearlyEquals(m_up.MagSquared(), 1.0f));
-  DarwiniaDebugAssert(NearlyEquals(dot, 0.0f));
+  DEBUG_ASSERT(NearlyEquals(m_front.MagSquared(), 1.0f));
+  DEBUG_ASSERT(NearlyEquals(m_up.MagSquared(), 1.0f));
+  DEBUG_ASSERT(NearlyEquals(dot, 0.0f));
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -1986,7 +1986,7 @@ void Camera::Advance()
 
   ASSERT_VECTOR3_IS_SANE(m_pos);
   float dot = m_front * m_up;
-  DarwiniaDebugAssert(NearlyEquals(dot, 0.0f));
+  DEBUG_ASSERT(NearlyEquals(dot, 0.0f));
 
   g_app->m_userInput->RecalcMousePos3d();
 
@@ -2008,7 +2008,7 @@ void Camera::SetNextDebugMode()
 
 void Camera::RequestMode(int _mode)
 {
-  DarwiniaDebugAssert(_mode >= 0 && _mode < ModeNumModes);
+  DEBUG_ASSERT(_mode >= 0 && _mode < ModeNumModes);
   int screenW = g_app->m_renderer->ScreenW();
   int screenH = g_app->m_renderer->ScreenH();
 

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <mmsystem.h>
-#include "debug_utils.h"
+
 #include "system_info.h"
 
 SystemInfo* g_systemInfo = nullptr;
@@ -23,13 +23,13 @@ void SystemInfo::GetLocaleDetails()
   {
     size = GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGLANGUAGE, nullptr, 0);
     m_localeInfo.m_language = new char[size + 1];
-    DarwiniaReleaseAssert(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGLANGUAGE, m_localeInfo.m_language, size),
+    ASSERT_TEXT(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGLANGUAGE, m_localeInfo.m_language, size),
                           "Couldn't get locale details");
   }
 
   size = GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGCOUNTRY, nullptr, 0);
   m_localeInfo.m_country = new char[size + 1];
-  DarwiniaReleaseAssert(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGCOUNTRY, m_localeInfo.m_country, size),
+  ASSERT_TEXT(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SENGCOUNTRY, m_localeInfo.m_country, size),
                         "Couldn't get country details");
 }
 
@@ -89,7 +89,7 @@ void SystemInfo::GetAudioDetails()
       m_audioInfo.m_preferredDevice = i;
   }
 
-  DarwiniaReleaseAssert(m_audioInfo.m_preferredDevice != -1, "No suitable audio hardware found");
+  ASSERT_TEXT(m_audioInfo.m_preferredDevice != -1, "No suitable audio hardware found");
 }
 
 void SystemInfo::GetDirectXVersion()

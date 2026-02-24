@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "filesys_utils.h"
 #include "file_writer.h"
 #include "resource.h"
@@ -49,7 +49,7 @@ int CamAnimNode::GetTransitModeId(const char* _word)
 
 const char* CamAnimNode::GetTransitModeName(int _modeId)
 {
-  DarwiniaDebugAssert(_modeId >= 0 && _modeId < TransitionNumModes);
+  DEBUG_ASSERT(_modeId >= 0 && _modeId < TransitionNumModes);
   return g_transitionModeNames[_modeId];
 }
 
@@ -80,7 +80,7 @@ void LevelFile::ParseMissionFile(const char* _filename)
     in = g_app->m_resource->GetTextReader(fullFilename);
   }
 
-  DarwiniaReleaseAssert(in && in->IsOpen(), "Invalid level specified");
+  ASSERT_TEXT(in && in->IsOpen(), "Invalid level specified");
 
   while (in->ReadLine())
   {
@@ -89,7 +89,7 @@ void LevelFile::ParseMissionFile(const char* _filename)
     char* word = in->GetNextToken();
 
     if (_stricmp("Landscape_StartDefinition", word) == 0 || _stricmp("LandscapeTiles_StartDefinition", word) == 0 ||
-      _stricmp("LandFlattenAreas_StartDefinition", word) == 0 || _stricmp("Lights_StartDefinition", word) == 0) { DarwiniaDebugAssert(0); }
+      _stricmp("LandFlattenAreas_StartDefinition", word) == 0 || _stricmp("Lights_StartDefinition", word) == 0) { DEBUG_ASSERT(0); }
     else if (_stricmp("CameraMounts_StartDefinition", word) == 0)
       ParseCameraMounts(in);
     else if (_stricmp("CameraAnimations_StartDefinition", word) == 0)
@@ -109,7 +109,7 @@ void LevelFile::ParseMissionFile(const char* _filename)
     else
     {
       // Looks like a damaged level file
-      DarwiniaDebugAssert(0);
+      DEBUG_ASSERT(0);
     }
   }
 
@@ -121,7 +121,7 @@ void LevelFile::ParseMapFile(const char* _levelFilename)
   char fullFilename[256];
   sprintf(fullFilename, "levels/%s", _levelFilename);
   TextReader* in = g_app->m_resource->GetTextReader(fullFilename);
-  DarwiniaReleaseAssert(in && in->IsOpen(), "Invalid map file specified (%s)", _levelFilename);
+  ASSERT_TEXT(in && in->IsOpen(), "Invalid map file specified (%s)", _levelFilename);
 
   while (in->ReadLine())
   {
@@ -139,7 +139,7 @@ void LevelFile::ParseMapFile(const char* _levelFilename)
       ParseBuildings(in, false);
     else if (_stricmp("Lights_StartDefinition", word) == 0)
       ParseLights(in);
-    else { DarwiniaDebugAssert(0); }
+    else { DEBUG_ASSERT(0); }
   }
 
   delete in;
@@ -217,7 +217,7 @@ void LevelFile::ParseCameraAnims(TextReader* _in)
 
       // Read camera mode
       node->m_transitionMode = CamAnimNode::GetTransitModeId(word);
-      DarwiniaReleaseAssert(node->m_transitionMode >= 0 && node->m_transitionMode < Camera::ModeNumModes,
+      ASSERT_TEXT(node->m_transitionMode >= 0 && node->m_transitionMode < Camera::ModeNumModes,
                             "Bad camera animation camera mode in level file %s", m_missionFilename);
 
       // Read mount name
@@ -225,13 +225,13 @@ void LevelFile::ParseCameraAnims(TextReader* _in)
       node->m_mountName = strdup(word);
       if (_stricmp(node->m_mountName, MAGIC_MOUNT_NAME_START_POS))
       {
-        DarwiniaReleaseAssert(GetCameraMount(node->m_mountName), "Bad camera animation mount name in level file %s", m_missionFilename);
+        ASSERT_TEXT(GetCameraMount(node->m_mountName), "Bad camera animation mount name in level file %s", m_missionFilename);
       }
 
       // Read time
       word = _in->GetNextToken();
       node->m_duration = atof(word);
-      DarwiniaReleaseAssert(node->m_duration >= 0.0f && node->m_duration < 60.0f, "Bad camera animation transition time in level file %s",
+      ASSERT_TEXT(node->m_duration >= 0.0f && node->m_duration < 60.0f, "Bad camera animation transition time in level file %s",
                             m_missionFilename);
 
       anim->m_nodes.PutDataAtEnd(node);
@@ -266,7 +266,7 @@ void LevelFile::ParseBuildings(TextReader* _in, bool _dynamic)
       Building* existingBuilding = GetBuilding(uniqueId);
       if (existingBuilding)
       {
-        DarwiniaReleaseAssert(false, "%s UniqueId was not unique in %s", Building::GetTypeName(existingBuilding->m_type),
+        ASSERT_TEXT(false, "%s UniqueId was not unique in %s", Building::GetTypeName(existingBuilding->m_type),
                               _in->GetFilename());
       }
 
@@ -274,7 +274,7 @@ void LevelFile::ParseBuildings(TextReader* _in, bool _dynamic)
       if (building->m_type == Building::TypeTrunkPort || building->m_type == Building::TypeControlTower || building->m_type ==
         Building::TypeRadarDish || building->m_type == Building::TypeIncubator || building->m_type == Building::TypeFenceSwitch)
       {
-        DarwiniaReleaseAssert(building->m_isGlobal, "Non-global %s found in %s", Building::GetTypeName(building->m_type),
+        ASSERT_TEXT(building->m_isGlobal, "Non-global %s found in %s", Building::GetTypeName(building->m_type),
                               _in->GetFilename());
       }
 
@@ -578,7 +578,7 @@ void LevelFile::ParseRoute(TextReader* _in, int _id)
 
     if (_stricmp("end", word) == 0)
       break;
-    DarwiniaDebugAssert(isdigit(word[0]));
+    DEBUG_ASSERT(isdigit(word[0]));
 
     int type = atoi(word);
     LegacyVector3 pos;
@@ -624,7 +624,7 @@ void LevelFile::ParseRoutes(TextReader* _in)
     {
       word = _in->GetNextToken();
       int id = atoi(word);
-      DarwiniaDebugAssert(id >= 0 && id < 10000);
+      DEBUG_ASSERT(id >= 0 && id < 10000);
       ParseRoute(_in, id);
     }
   }
@@ -641,12 +641,12 @@ void LevelFile::ParsePrimaryObjectives(TextReader* _in)
 
     auto condition = new GlobalEventCondition;
     condition->m_type = condition->GetType(word);
-    DarwiniaDebugAssert(condition->m_type != -1);
+    DEBUG_ASSERT(condition->m_type != -1);
 
     switch (condition->m_type)
     {
     case GlobalEventCondition::AlwaysTrue:
-    case GlobalEventCondition::NotInLocation: DarwiniaDebugAssert(false);
+    case GlobalEventCondition::NotInLocation: DEBUG_ASSERT(false);
       break;
 
     case GlobalEventCondition::BuildingOffline:
@@ -655,13 +655,13 @@ void LevelFile::ParsePrimaryObjectives(TextReader* _in)
         //condition->m_locationId = g_app->m_globalWorld->GetLocationIdFromMapFilename( m_mapFilename );
         condition->m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
         condition->m_id = atoi(_in->GetNextToken());
-        DarwiniaDebugAssert(condition->m_locationId != -1);
+        DEBUG_ASSERT(condition->m_locationId != -1);
         break;
       }
 
     case GlobalEventCondition::ResearchOwned:
       condition->m_id = GlobalResearch::GetType(_in->GetNextToken());
-      DarwiniaDebugAssert(condition->m_id != -1);
+      DEBUG_ASSERT(condition->m_id != -1);
       break;
 
     case GlobalEventCondition::DebugKey:

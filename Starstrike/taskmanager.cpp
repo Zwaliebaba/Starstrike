@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "math_utils.h"
-#include "debug_utils.h"
+
 #include "language_table.h"
 #include "preferences.h"
 #include "clienttoserver.h"
@@ -115,14 +115,14 @@ WorldObjectId Task::Promote(WorldObjectId _id)
   int teamId = g_app->m_globalWorld->m_myTeamId;
 
   Entity* entity = g_app->m_location->GetEntity(_id);
-  DarwiniaDebugAssert(entity);
+  DEBUG_ASSERT(entity);
 
   //
   // Spawn an Officer
 
   WorldObjectId spawnedId = g_app->m_location->SpawnEntities(entity->m_pos, teamId, -1, Entity::TypeOfficer, 1, entity->m_vel, 0);
   auto officer = static_cast<Officer*>(g_app->m_location->GetEntity(spawnedId));
-  DarwiniaDebugAssert(officer);
+  DEBUG_ASSERT(officer);
 
   //
   // Particle effect
@@ -147,7 +147,7 @@ WorldObjectId Task::Demote(WorldObjectId _id)
   int teamId = 0;
 
   Entity* entity = g_app->m_location->GetEntity(_id);
-  DarwiniaDebugAssert(entity);
+  DEBUG_ASSERT(entity);
 
   //
   // Spawn a Darwinian
@@ -591,7 +591,7 @@ void TaskManager::SelectTask(int _id)
       }
     }
 
-    DarwiniaReleaseAssert(currentIndex != -1, "Error in TaskManager::SelectTask. Tried to select a task that doesn't exist.");
+    ASSERT_TEXT(currentIndex != -1, "Error in TaskManager::SelectTask. Tried to select a task that doesn't exist.");
 
     Task* task = m_tasks[currentIndex];
     //m_tasks.RemoveData(currentIndex);

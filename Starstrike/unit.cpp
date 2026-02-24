@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "debug_utils.h"
+
 #include "resource.h"
 #include "math_utils.h"
 #include "shape.h"
@@ -486,9 +486,9 @@ void Unit::RecalculateOffsets()
 
 void Unit::FollowRoute()
 {
-	DarwiniaDebugAssert(m_routeId != -1);
+	DEBUG_ASSERT(m_routeId != -1);
 	Route *route = g_app->m_location->m_levelFile->GetRoute(m_routeId);
-	DarwiniaDebugAssert(route);
+	DEBUG_ASSERT(route);
 
 	if (m_routeWayPointId == -1)
 	{

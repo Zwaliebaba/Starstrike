@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "resource.h"
 #include "text_stream_readers.h"
@@ -43,7 +43,7 @@ void Script::ReportError(LevelFile const* _levelFile, char* _fmt, ...)
   if (g_app->m_testHarness) { g_app->m_testHarness->PrintError(buf); }
   else
   {
-    DarwiniaDebugAssert(false); // Error message is in buf
+    DEBUG_ASSERT(false); // Error message is in buf
   }
 }
 #endif // SCRIPT_TEST_ENABLED
@@ -71,7 +71,7 @@ void Script::RunCommand_CamCut(const char* _mountName)
     return;
 
   bool mountFound = g_app->m_camera->SetTarget(_mountName);
-  DarwiniaDebugAssert(mountFound);
+  DEBUG_ASSERT(mountFound);
   g_app->m_camera->CutToTarget();
 }
 
@@ -94,7 +94,7 @@ void Script::RunCommand_CamAnim(const char* _animName)
     return;
 
   int animId = g_app->m_location->m_levelFile->GetCameraAnimId(_animName);
-  DarwiniaReleaseAssert(animId != -1, "Invalid camera animation requested %s", _animName);
+  ASSERT_TEXT(animId != -1, "Invalid camera animation requested %s", _animName);
   CameraAnimation* camAnim = g_app->m_location->m_levelFile->m_cameraAnimations[animId];
   g_app->m_camera->PlayAnimation(camAnim);
 }
@@ -182,7 +182,7 @@ void Script::RunCommand_EnterLocation(char* _name)
   m_requestedLocationId = g_app->m_requestedLocationId;
 
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(g_app->m_requestedLocationId);
-  DarwiniaDebugAssert(loc);
+  DEBUG_ASSERT(loc);
 
   strcpy(g_app->m_requestedMission, loc->m_missionFilename);
   strcpy(g_app->m_requestedMap, loc->m_mapFilename);
@@ -200,7 +200,7 @@ void Script::RunCommand_ExitLocation()
 void Script::RunCommand_SetMission(char* _locName, char* _missionName)
 {
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(_locName);
-  DarwiniaDebugAssert(loc);
+  DEBUG_ASSERT(loc);
   strcpy(loc->m_missionFilename, _missionName);
   loc->m_missionCompleted = false;
 }
@@ -394,7 +394,7 @@ void Script::RunScript(char* _filename)
     char fullFilename[256] = "scripts/";
     strcat(fullFilename, _filename);
     m_in = g_app->m_resource->GetTextReader(fullFilename);
-    DarwiniaDebugAssert(m_in);
+    DEBUG_ASSERT(m_in);
   }
   else
   {
@@ -697,7 +697,7 @@ void Script::AdvanceScript()
       break;
     }
 
-  default: DarwiniaDebugAssert(false);
+  default: DEBUG_ASSERT(false);
     break;
   }
 }
@@ -864,7 +864,7 @@ static char* g_opCodeNames[] = {
 
 int Script::GetOpCode(const char* _word)
 {
-  DarwiniaDebugAssert(sizeof(g_opCodeNames) / sizeof(char *) == OpNumOps);
+  DEBUG_ASSERT(sizeof(g_opCodeNames) / sizeof(char *) == OpNumOps);
 
   for (unsigned int i = 0; i < OpNumOps; ++i)
   {

@@ -4,7 +4,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "debug_utils.h"
+
 #include "shape.h"
 #include "hi_res_time.h"
 #include "preferences.h"
@@ -39,7 +39,7 @@ void Tree::Initialise(Building* _template)
 {
   Building::Initialise(_template);
 
-  DarwiniaDebugAssert(_template->m_type == TypeTree);
+  DEBUG_ASSERT(_template->m_type == TypeTree);
   auto tree = static_cast<Tree*>(_template);
 
   m_height = tree->m_height;

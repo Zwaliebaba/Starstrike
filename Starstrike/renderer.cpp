@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "input.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "ogl_extensions.h"
@@ -527,8 +527,8 @@ float Renderer::GetFarPlane() const { return m_farPlane; }
 
 void Renderer::SetNearAndFar(float _nearPlane, float _farPlane)
 {
-  DarwiniaDebugAssert(_nearPlane < _farPlane);
-  DarwiniaDebugAssert(_nearPlane > 0.0f);
+  DEBUG_ASSERT(_nearPlane < _farPlane);
+  DEBUG_ASSERT(_nearPlane > 0.0f);
   m_nearPlane = _nearPlane;
   m_farPlane = _farPlane;
 }
@@ -553,36 +553,36 @@ void Renderer::CheckOpenGLState() const
   int results[10];
   float resultsf[10];
 
-  DarwiniaDebugAssert(glGetError() == GL_NO_ERROR);
+  DEBUG_ASSERT(glGetError() == GL_NO_ERROR);
 
   // Geometry
-  //	DarwiniaDebugAssert(glIsEnabled(GL_CULL_FACE));
-  DarwiniaDebugAssert(GetGLStateInt(GL_FRONT_FACE) == GL_CCW);
+  //	DEBUG_ASSERT(glIsEnabled(GL_CULL_FACE));
+  DEBUG_ASSERT(GetGLStateInt(GL_FRONT_FACE) == GL_CCW);
   glGetIntegerv(GL_POLYGON_MODE, results);
-  DarwiniaDebugAssert(results[0] == GL_FILL);
-  DarwiniaDebugAssert(results[1] == GL_FILL);
-  DarwiniaDebugAssert(GetGLStateInt(GL_SHADE_MODEL) == GL_FLAT);
-  DarwiniaDebugAssert(!glIsEnabled(GL_NORMALIZE));
+  DEBUG_ASSERT(results[0] == GL_FILL);
+  DEBUG_ASSERT(results[1] == GL_FILL);
+  DEBUG_ASSERT(GetGLStateInt(GL_SHADE_MODEL) == GL_FLAT);
+  DEBUG_ASSERT(!glIsEnabled(GL_NORMALIZE));
 
   // Colour
-  DarwiniaDebugAssert(!glIsEnabled(GL_COLOR_MATERIAL));
-  DarwiniaDebugAssert(GetGLStateInt(GL_COLOR_MATERIAL_FACE) == GL_FRONT_AND_BACK);
-  DarwiniaDebugAssert(GetGLStateInt(GL_COLOR_MATERIAL_PARAMETER) == GL_AMBIENT_AND_DIFFUSE);
+  DEBUG_ASSERT(!glIsEnabled(GL_COLOR_MATERIAL));
+  DEBUG_ASSERT(GetGLStateInt(GL_COLOR_MATERIAL_FACE) == GL_FRONT_AND_BACK);
+  DEBUG_ASSERT(GetGLStateInt(GL_COLOR_MATERIAL_PARAMETER) == GL_AMBIENT_AND_DIFFUSE);
 
   // Lighting
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHTING));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHTING));
 
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT0));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT1));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT2));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT3));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT4));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT5));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT6));
-  DarwiniaDebugAssert(!glIsEnabled(GL_LIGHT7));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT0));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT1));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT2));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT3));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT4));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT5));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT6));
+  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT7));
 
   glGetFloatv(GL_LIGHT_MODEL_AMBIENT, resultsf);
-  DarwiniaDebugAssert(resultsf[0] < 0.001f && resultsf[1] < 0.001f && resultsf[2] < 0.001f && resultsf[3] < 0.001f);
+  DEBUG_ASSERT(resultsf[0] < 0.001f && resultsf[1] < 0.001f && resultsf[2] < 0.001f && resultsf[3] < 0.001f);
 
   if (g_app->m_location)
   {
@@ -605,57 +605,57 @@ void Renderer::CheckOpenGLState() const
 
       for (int i = 0; i < 4; i++)
       {
-        //			DarwiniaDebugAssert(fabsf(lightPos1[i] - pos1_actual[i]) < 0.001f);
-        //			DarwiniaDebugAssert(fabsf(light->m_colour[i] - diffuse1_actual[i]) < 0.001f);
-        //			DarwiniaDebugAssert(fabsf(light->m_colour[i] - specular1_actual[i]) < 0.0001f);
-        //			DarwiniaDebugAssert(fabsf(ambCol1[i] - ambient1_actual[i]) < 0.001f);
+        //			DEBUG_ASSERT(fabsf(lightPos1[i] - pos1_actual[i]) < 0.001f);
+        //			DEBUG_ASSERT(fabsf(light->m_colour[i] - diffuse1_actual[i]) < 0.001f);
+        //			DEBUG_ASSERT(fabsf(light->m_colour[i] - specular1_actual[i]) < 0.0001f);
+        //			DEBUG_ASSERT(fabsf(ambCol1[i] - ambient1_actual[i]) < 0.001f);
       }
     }
   }
 
   // Blending, Anti-aliasing, Fog and Polygon Offset
-  //	DarwiniaDebugAssert(!glIsEnabled(GL_BLEND));
-  DarwiniaDebugAssert(GetGLStateInt(GL_BLEND_DST) == GL_ONE_MINUS_SRC_ALPHA);
-  DarwiniaDebugAssert(GetGLStateInt(GL_BLEND_SRC) == GL_SRC_ALPHA);
-  DarwiniaDebugAssert(!glIsEnabled(GL_ALPHA_TEST));
-  DarwiniaDebugAssert(GetGLStateInt(GL_ALPHA_TEST_FUNC) == GL_GREATER);
-  DarwiniaDebugAssert(GetGLStateFloat(GL_ALPHA_TEST_REF) == 0.01f);
-  DarwiniaDebugAssert(!glIsEnabled(GL_FOG));
-  DarwiniaDebugAssert(GetGLStateFloat(GL_FOG_DENSITY) == 1.0f);
-  DarwiniaDebugAssert(GetGLStateFloat(GL_FOG_END) >= 4000.0f);
-  //DarwiniaDebugAssert(GetGLStateFloat(GL_FOG_START) >= 1000.0f);
+  //	DEBUG_ASSERT(!glIsEnabled(GL_BLEND));
+  DEBUG_ASSERT(GetGLStateInt(GL_BLEND_DST) == GL_ONE_MINUS_SRC_ALPHA);
+  DEBUG_ASSERT(GetGLStateInt(GL_BLEND_SRC) == GL_SRC_ALPHA);
+  DEBUG_ASSERT(!glIsEnabled(GL_ALPHA_TEST));
+  DEBUG_ASSERT(GetGLStateInt(GL_ALPHA_TEST_FUNC) == GL_GREATER);
+  DEBUG_ASSERT(GetGLStateFloat(GL_ALPHA_TEST_REF) == 0.01f);
+  DEBUG_ASSERT(!glIsEnabled(GL_FOG));
+  DEBUG_ASSERT(GetGLStateFloat(GL_FOG_DENSITY) == 1.0f);
+  DEBUG_ASSERT(GetGLStateFloat(GL_FOG_END) >= 4000.0f);
+  //DEBUG_ASSERT(GetGLStateFloat(GL_FOG_START) >= 1000.0f);
   glGetFloatv(GL_FOG_COLOR, resultsf);
-  //	DarwiniaDebugAssert(fabsf(resultsf[0] - g_app->m_location->m_backgroundColour.r/255.0f) < 0.001f);
-  //	DarwiniaDebugAssert(fabsf(resultsf[1] - g_app->m_location->m_backgroundColour.g/255.0f) < 0.001f);
-  //	DarwiniaDebugAssert(fabsf(resultsf[2] - g_app->m_location->m_backgroundColour.b/255.0f) < 0.001f);
-  //	DarwiniaDebugAssert(fabsf(resultsf[3] - g_app->m_location->m_backgroundColour.a/255.0f) < 0.001f);
-  DarwiniaDebugAssert(GetGLStateInt(GL_FOG_MODE) == GL_LINEAR);
-  DarwiniaDebugAssert(!glIsEnabled(GL_LINE_SMOOTH));
-  DarwiniaDebugAssert(!glIsEnabled(GL_POINT_SMOOTH));
+  //	DEBUG_ASSERT(fabsf(resultsf[0] - g_app->m_location->m_backgroundColour.r/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[1] - g_app->m_location->m_backgroundColour.g/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[2] - g_app->m_location->m_backgroundColour.b/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[3] - g_app->m_location->m_backgroundColour.a/255.0f) < 0.001f);
+  DEBUG_ASSERT(GetGLStateInt(GL_FOG_MODE) == GL_LINEAR);
+  DEBUG_ASSERT(!glIsEnabled(GL_LINE_SMOOTH));
+  DEBUG_ASSERT(!glIsEnabled(GL_POINT_SMOOTH));
 
   // Texture Mapping
-  DarwiniaDebugAssert(!glIsEnabled(GL_TEXTURE_2D));
+  DEBUG_ASSERT(!glIsEnabled(GL_TEXTURE_2D));
   glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, results);
-  DarwiniaDebugAssert(results[0] == GL_CLAMP);
+  DEBUG_ASSERT(results[0] == GL_CLAMP);
   glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, results);
-  DarwiniaDebugAssert(results[0] == GL_CLAMP);
+  DEBUG_ASSERT(results[0] == GL_CLAMP);
   glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, results);
-  DarwiniaDebugAssert(results[0] == GL_MODULATE);
+  DEBUG_ASSERT(results[0] == GL_MODULATE);
   glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, results);
-  DarwiniaDebugAssert(results[0] == 0);
-  DarwiniaDebugAssert(results[1] == 0);
-  DarwiniaDebugAssert(results[2] == 0);
-  DarwiniaDebugAssert(results[3] == 0);
+  DEBUG_ASSERT(results[0] == 0);
+  DEBUG_ASSERT(results[1] == 0);
+  DEBUG_ASSERT(results[2] == 0);
+  DEBUG_ASSERT(results[3] == 0);
 
   // Frame Buffer
-  DarwiniaDebugAssert(glIsEnabled(GL_DEPTH_TEST));
-  DarwiniaDebugAssert(GetGLStateInt(GL_DEPTH_WRITEMASK) != 0);
-  DarwiniaDebugAssert(GetGLStateInt(GL_DEPTH_FUNC) == GL_LEQUAL);
-  DarwiniaDebugAssert(glIsEnabled(GL_SCISSOR_TEST) == 0);
+  DEBUG_ASSERT(glIsEnabled(GL_DEPTH_TEST));
+  DEBUG_ASSERT(GetGLStateInt(GL_DEPTH_WRITEMASK) != 0);
+  DEBUG_ASSERT(GetGLStateInt(GL_DEPTH_FUNC) == GL_LEQUAL);
+  DEBUG_ASSERT(glIsEnabled(GL_SCISSOR_TEST) == 0);
 
   // Hints
-  DarwiniaDebugAssert(GetGLStateInt(GL_FOG_HINT) == GL_DONT_CARE);
-  DarwiniaDebugAssert(GetGLStateInt(GL_POLYGON_SMOOTH_HINT) == GL_DONT_CARE);
+  DEBUG_ASSERT(GetGLStateInt(GL_FOG_HINT) == GL_DONT_CARE);
+  DEBUG_ASSERT(GetGLStateInt(GL_POLYGON_SMOOTH_HINT) == GL_DONT_CARE);
 }
 
 void Renderer::SetOpenGLState() const
@@ -756,22 +756,22 @@ void Renderer::UpdateTotalMatrix()
   glGetDoublev(GL_MODELVIEW_MATRIX, m);
   glGetDoublev(GL_PROJECTION_MATRIX, p);
 
-  DarwiniaDebugAssert(m[3] == 0.0);
-  DarwiniaDebugAssert(m[7] == 0.0);
-  DarwiniaDebugAssert(m[11] == 0.0);
-  DarwiniaDebugAssert(NearlyEquals(m[15], 1.0));
+  DEBUG_ASSERT(m[3] == 0.0);
+  DEBUG_ASSERT(m[7] == 0.0);
+  DEBUG_ASSERT(m[11] == 0.0);
+  DEBUG_ASSERT(NearlyEquals(m[15], 1.0));
 
-  DarwiniaDebugAssert(p[1] == 0.0);
-  DarwiniaDebugAssert(p[2] == 0.0);
-  DarwiniaDebugAssert(p[3] == 0.0);
-  DarwiniaDebugAssert(p[4] == 0.0);
-  DarwiniaDebugAssert(p[6] == 0.0);
-  DarwiniaDebugAssert(p[7] == 0.0);
-  DarwiniaDebugAssert(p[8] == 0.0);
-  DarwiniaDebugAssert(p[9] == 0.0);
-  DarwiniaDebugAssert(p[12] == 0.0);
-  DarwiniaDebugAssert(p[13] == 0.0);
-  DarwiniaDebugAssert(p[15] == 0.0);
+  DEBUG_ASSERT(p[1] == 0.0);
+  DEBUG_ASSERT(p[2] == 0.0);
+  DEBUG_ASSERT(p[3] == 0.0);
+  DEBUG_ASSERT(p[4] == 0.0);
+  DEBUG_ASSERT(p[6] == 0.0);
+  DEBUG_ASSERT(p[7] == 0.0);
+  DEBUG_ASSERT(p[8] == 0.0);
+  DEBUG_ASSERT(p[9] == 0.0);
+  DEBUG_ASSERT(p[12] == 0.0);
+  DEBUG_ASSERT(p[13] == 0.0);
+  DEBUG_ASSERT(p[15] == 0.0);
 
   m_totalMatrix[0] = m[0] * p[0] + m[1] * p[4] + m[2] * p[8] + m[3] * p[12];
   m_totalMatrix[1] = m[0] * p[1] + m[1] * p[5] + m[2] * p[9] + m[3] * p[13];

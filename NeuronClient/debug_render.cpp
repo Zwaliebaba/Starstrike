@@ -6,7 +6,7 @@
 #include "math_utils.h"
 #include "sphere_renderer.h"
 #include "text_renderer.h"
-#include "debug_utils.h"
+
 
 #include "GameApp.h"
 #include "camera.h"

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "profiler.h"
@@ -239,8 +239,8 @@ void SoundLibrary3dDirectSound::Initialise(int _mixFreq, int _numChannels, bool 
 {
   int errCode;
 
-  DarwiniaReleaseAssert(g_systemInfo->m_directXVersion >= 9.0f, "Darwinia requires DirectX9 or Greater");
-  DarwiniaReleaseAssert(_numChannels > 0, "SoundLibrary3d asked to create too few channels");
+  ASSERT_TEXT(g_systemInfo->m_directXVersion >= 9.0f, "Darwinia requires DirectX9 or Greater");
+  ASSERT_TEXT(_numChannels > 0, "SoundLibrary3d asked to create too few channels");
 
   //
   // Initialise COM
@@ -497,7 +497,7 @@ void SoundLibrary3dDirectSound::SetChannelMinDistance(int _channel, float _minDi
 
   if (!NearlyEquals(_minDistance, channel->m_minDist))
   {
-    DarwiniaReleaseAssert(_minDistance >= DS3D_DEFAULTMINDISTANCE && _minDistance <= DS3D_DEFAULTMAXDISTANCE,
+    ASSERT_TEXT(_minDistance >= DS3D_DEFAULTMINDISTANCE && _minDistance <= DS3D_DEFAULTMAXDISTANCE,
                           "Channel MinDistance must be between %2.2f and %2.2f." "You requested %2.2f", DS3D_DEFAULTMINDISTANCE,
                           DS3D_DEFAULTMAXDISTANCE, _minDistance);
 
@@ -519,7 +519,7 @@ void SoundLibrary3dDirectSound::SetChannelVolume(int _channel, float _volume)
 
   if (!NearlyEquals(_volume, channel->m_volume))
   {
-    DarwiniaDebugAssert(_volume >= 0.0f && _volume <= 10.0f);
+    DEBUG_ASSERT(_volume >= 0.0f && _volume <= 10.0f);
 
     channel->m_volume = _volume;
 
@@ -738,7 +738,7 @@ void SoundLibrary3dDirectSound::Verify()
   for (int i = 0; i < m_numChannels; ++i)
   {
     int numFilters = GetNumFilters(i);
-    DarwiniaDebugAssert(numFilters <= 1);
+    DEBUG_ASSERT(numFilters <= 1);
   }
 }
 
@@ -775,7 +775,7 @@ void SoundLibrary3dDirectSound::ResetChannel(int _channel)
 
   int errCode;
 
-  DarwiniaDebugAssert(_channel >= -1);
+  DEBUG_ASSERT(_channel >= -1);
 
   //
   // Get Play Cursor
@@ -813,9 +813,9 @@ void SoundLibrary3dDirectSound::ResetChannel(int _channel)
 
 void SoundLibrary3dDirectSound::EnableDspFX(int _channel, int _numFilters, const int* _filterTypes)
 {
-  DarwiniaReleaseAssert(_numFilters > 0, "Bad argument passed to EnableFilters");
+  ASSERT_TEXT(_numFilters > 0, "Bad argument passed to EnableFilters");
 
-  DarwiniaDebugAssert(_channel >= 0 && _channel < m_numChannels);
+  DEBUG_ASSERT(_channel >= 0 && _channel < m_numChannels);
   DirectSoundChannel* channel;
   if (_channel == m_musicChannelId)
     channel = m_musicChannel;
@@ -842,7 +842,7 @@ void SoundLibrary3dDirectSound::EnableDspFX(int _channel, int _numFilters, const
       desc[numDSoundFilters].dwFlags = DSFX_LOCSOFTWARE;
       desc[numDSoundFilters].guidDSFXClass = *s_dxDescriptors[_filterTypes[i]].m_sfxClass;
 
-      DarwiniaDebugAssert(
+      DEBUG_ASSERT(
         desc[numDSoundFilters].guidDSFXClass == GUID_DSFX_STANDARD_CHORUS || desc[numDSoundFilters].guidDSFXClass ==
         GUID_DSFX_STANDARD_COMPRESSOR || desc[numDSoundFilters].guidDSFXClass == GUID_DSFX_STANDARD_DISTORTION || desc[numDSoundFilters].
         guidDSFXClass == GUID_DSFX_STANDARD_ECHO || desc[numDSoundFilters].guidDSFXClass == GUID_DSFX_STANDARD_FLANGER || desc[
@@ -877,11 +877,11 @@ void SoundLibrary3dDirectSound::EnableDspFX(int _channel, int _numFilters, const
 
   for (int i = 0; i < _numFilters; ++i)
   {
-    DarwiniaDebugAssert(_filterTypes[i] >= 0);
+    DEBUG_ASSERT(_filterTypes[i] >= 0);
 
     if (_filterTypes[i] <= DSP_DSOUND_WAVESREVERB)
     {
-      DarwiniaReleaseAssert(results[i] == DSFXR_LOCSOFTWARE, "DirectSound couldn't enable filter");
+      ASSERT_TEXT(results[i] == DSFXR_LOCSOFTWARE, "DirectSound couldn't enable filter");
       channel->m_dspFX[i].m_dxFilter = true;
     }
 
@@ -908,8 +908,8 @@ void SoundLibrary3dDirectSound::EnableDspFX(int _channel, int _numFilters, const
 
 void SoundLibrary3dDirectSound::UpdateDspFX(int _channel, int _filterType, int _numParams, const float* _params)
 {
-  DarwiniaDebugAssert(_channel >= 0 && _channel < m_numChannels);
-  DarwiniaDebugAssert(GetNumFilters(_channel) > 0);
+  DEBUG_ASSERT(_channel >= 0 && _channel < m_numChannels);
+  DEBUG_ASSERT(GetNumFilters(_channel) > 0);
 
   DirectSoundChannel* channel;
   if (_channel == m_musicChannelId)
@@ -959,14 +959,14 @@ void SoundLibrary3dDirectSound::UpdateDspFX(int _channel, int _filterType, int _
       errCode = static_cast<IDirectSoundFXI3DL2Reverb*>(effect)->SetQuality(_params[12]);
       break;
     default:
-      DarwiniaReleaseAssert(false, "Unknown filter type");
+      ASSERT_TEXT(false, "Unknown filter type");
     }
 
     SOUNDASSERT(errCode, "Failed to set filter parameters");
   }
   else
   {
-    DarwiniaDebugAssert(channel->m_dspFX[_filterType].m_userFilter);
+    DEBUG_ASSERT(channel->m_dspFX[_filterType].m_userFilter);
     channel->m_dspFX[_filterType].m_userFilter->SetParameters(_params);
   }
 }
@@ -975,7 +975,7 @@ void SoundLibrary3dDirectSound::DisableDspFX(int _channel)
 {
   int errCode;
 
-  DarwiniaDebugAssert(GetNumFilters(_channel) > 0);
+  DEBUG_ASSERT(GetNumFilters(_channel) > 0);
 
   DirectSoundChannel* channel;
   if (_channel == m_musicChannelId)

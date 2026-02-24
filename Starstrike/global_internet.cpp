@@ -3,7 +3,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "profiler.h"
-#include "debug_utils.h"
+
 #include "GameApp.h"
 #include "camera.h"
 #include "global_internet.h"
@@ -17,7 +17,7 @@ GlobalInternetNode::GlobalInternetNode()
 
 void GlobalInternetNode::AddLink(int _id)
 {
-  DarwiniaDebugAssert(m_numLinks < GLOBALINTERNET_MAXNODELINKS);
+  DEBUG_ASSERT(m_numLinks < GLOBALINTERNET_MAXNODELINKS);
   m_links[m_numLinks] = _id;
   m_numLinks++;
 }
@@ -45,7 +45,7 @@ unsigned short GlobalInternet::GenerateInternet(const LegacyVector3& _pos, unsig
   node->m_size = _size;
   unsigned short nodeIndex = m_numNodes;
   m_numNodes++;
-  DarwiniaDebugAssert(m_numNodes < GLOBALINTERNET_MAXNODES);
+  DEBUG_ASSERT(m_numNodes < GLOBALINTERNET_MAXNODES);
 
   float distanceToCentre = _pos.Mag();
   if (distanceToCentre < m_nearestDistance)
@@ -72,7 +72,7 @@ unsigned short GlobalInternet::GenerateInternet(const LegacyVector3& _pos, unsig
     node->AddLink(m_numLinks);
 
     m_numLinks++;
-    DarwiniaDebugAssert(m_numLinks <= GLOBALINTERNET_MAXLINKS);
+    DEBUG_ASSERT(m_numLinks <= GLOBALINTERNET_MAXLINKS);
 
     --numLinks;
   }
@@ -94,13 +94,13 @@ void GlobalInternet::GenerateInternet()
   m_nodes[m_numNodes].m_size = 0.0f;
   unsigned short nodeIndex = m_numNodes;
   m_numNodes++;
-  DarwiniaDebugAssert(m_numNodes <= GLOBALINTERNET_MAXNODES);
+  DEBUG_ASSERT(m_numNodes <= GLOBALINTERNET_MAXNODES);
 
   m_links[m_numLinks].m_from = m_nearestNodeToCentre;
   m_links[m_numLinks].m_to = nodeIndex;
   m_links[m_numLinks].m_size = 1.0f;
   m_numLinks++;
-  DarwiniaDebugAssert(m_numLinks <= GLOBALINTERNET_MAXLINKS);
+  DEBUG_ASSERT(m_numLinks <= GLOBALINTERNET_MAXLINKS);
 
   for (int i = 0; i < m_numNodes; ++i)
   {

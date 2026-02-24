@@ -286,7 +286,7 @@ void Spider::DetectCollisions()
     if (ent->m_type == TypeSpider && ent->m_id != m_id)
     {
       Entity* entity = g_app->m_location->GetEntity(neighbours[darwiniaRandom() % numFound]);
-      DarwiniaDebugAssert(entity);
+      DEBUG_ASSERT(entity);
       LegacyVector3 toNeighbour = m_pos - entity->m_pos;
       toNeighbour.y = 0.0f;
       toNeighbour.Normalise();

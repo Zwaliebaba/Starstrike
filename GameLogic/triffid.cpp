@@ -42,8 +42,8 @@ Triffid::Triffid()
   m_launchPoint = m_shape->m_rootFragment->LookupMarker("MarkerLaunchPoint");
   m_stem = m_shape->m_rootFragment->LookupMarker("MarkerTriffidStem");
 
-  DarwiniaDebugAssert(m_launchPoint);
-  DarwiniaDebugAssert(m_stem);
+  DEBUG_ASSERT(m_launchPoint);
+  DEBUG_ASSERT(m_stem);
 
   m_triggerTimer = syncfrand(5.0f);
 

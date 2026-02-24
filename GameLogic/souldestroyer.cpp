@@ -245,7 +245,7 @@ bool SoulDestroyer::SearchForRetreatPosition()
     if( targetId.IsValid() )
     {
         WorldObject *obj = g_app->m_location->GetEntity( targetId );
-        DarwiniaDebugAssert( obj );
+        DEBUG_ASSERT( obj );
 
         float distance = 50.0f;
         LegacyVector3 retreatVector = ( m_pos - obj->m_pos ).Normalise();

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "debug_utils.h"
+
 #include "language_table.h"
 #include "resource.h"
 #include "text_renderer.h"
@@ -78,7 +78,7 @@ LangTable::~LangTable()
 void LangTable::ParseLanguageFile(char const *_filename)
 {
     TextReader *in = g_app->m_resource->GetTextReader(_filename);
-	DarwiniaReleaseAssert(in && in->IsOpen(), "Couldn't open language file %s", _filename );
+	ASSERT_TEXT(in && in->IsOpen(), "Couldn't open language file %s", _filename );
 
 	// Read all the phrases from the language file
 	while (in->ReadLine())
@@ -99,7 +99,7 @@ void LangTable::ParseLanguageFile(char const *_filename)
 		char *aString = in->GetRestOfLine();
 
 		// Make sure a language key always has a some text with it
-		DarwiniaDebugAssert(aString && aString[0] != '\0');
+		DEBUG_ASSERT(aString && aString[0] != '\0');
 
         for( unsigned int i = 0; i < strlen(aString)-1; ++i )
         {

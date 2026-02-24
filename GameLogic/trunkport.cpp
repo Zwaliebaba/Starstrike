@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "text_stream_readers.h"
 #include "shape.h"
@@ -49,7 +49,7 @@ void TrunkPort::SetDetail( int _detail )
     memset( m_heightMap, 0, m_heightMapSize * m_heightMapSize * sizeof(LegacyVector3) );
 
     ShapeMarker *marker = m_shape->m_rootFragment->LookupMarker( "MarkerSurface" );
-    DarwiniaDebugAssert( marker );
+    DEBUG_ASSERT( marker );
 
     Matrix34 transform( m_front, g_upVector, m_pos );
     LegacyVector3 worldPos = marker->GetWorldMatrix( transform ).pos;
@@ -170,7 +170,7 @@ void TrunkPort::RenderAlphas( float predictionTime )
     if( m_openTimer > 0.0f )
     {
         ShapeMarker *marker = m_shape->m_rootFragment->LookupMarker( "MarkerSurface" );
-        DarwiniaDebugAssert( marker );
+        DEBUG_ASSERT( marker );
 
         Matrix34 transform( m_front, g_upVector, m_pos );
         LegacyVector3 markerPos = marker->GetWorldMatrix( transform ).pos;

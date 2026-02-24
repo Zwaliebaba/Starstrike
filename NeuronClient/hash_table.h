@@ -63,7 +63,7 @@ public:
 #include <string.h>
 #include <stdlib.h> // for free()
 
-#include "debug_utils.h"
+
 #include "hash_table.h"
 
 
@@ -122,7 +122,7 @@ unsigned int HashTable<T>::HashFunc(char const* _key) const
 template <class T>
 void HashTable<T>::Grow()
 {
-	DarwiniaReleaseAssert(m_size < 65536, "Hashtable grew too large");
+	ASSERT_TEXT(m_size < 65536, "Hashtable grew too large");
 	//	if (m_numCollisions * 4 > m_size)
 	//	{
 	//		DumpKeys();
@@ -168,7 +168,7 @@ unsigned int HashTable<T>::GetInsertPos(char const* _key) const
 	// find an empty one
 	while (m_keys[index] != NULL)
 	{
-		DarwiniaDebugAssert(_stricmp(m_keys[index], _key) != 0);
+		DEBUG_ASSERT(_stricmp(m_keys[index], _key) != 0);
 		index++;
 		index &= m_mask;
 		m_numCollisions++;
@@ -278,7 +278,7 @@ int HashTable<T>::PutData(char const* _key, T const& _data)
 	// Do the main insert
 
 	unsigned int index = GetInsertPos(_key);
-	DarwiniaDebugAssert(m_keys[index] == NULL);
+	DEBUG_ASSERT(m_keys[index] == NULL);
 	m_keys[index] = strdup(_key);
 	m_data[index] = _data;
 	m_slotsFree--;

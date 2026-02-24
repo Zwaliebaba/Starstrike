@@ -4,7 +4,7 @@
 #include "input.h"
 #include "targetcursor.h"
 #include "vector2.h"
-#include "debug_utils.h"
+
 #include "resource.h"
 #include "bitmap.h"
 #include "profiler.h"
@@ -817,7 +817,7 @@ void TaskManagerInterfaceIcons::RunScreenZone(const char* _name, int _data)
       gec = g_app->m_location->m_levelFile->m_primaryObjectives[objectiveId];
     else
       gec = g_app->m_location->m_levelFile->m_secondaryObjectives[objectiveId];
-    DarwiniaDebugAssert(gec);
+    DEBUG_ASSERT(gec);
 
     if (gec->m_cutScene)
       g_app->m_script->RunScript(gec->m_cutScene);

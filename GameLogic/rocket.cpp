@@ -44,7 +44,7 @@ FuelBuilding::FuelBuilding()
     if( !s_fuelPipe )
     {
         s_fuelPipe = g_app->m_resource->GetShape( "fuelpipe.shp" );
-        DarwiniaDebugAssert( s_fuelPipe );
+        DEBUG_ASSERT( s_fuelPipe );
     }
 }
 
@@ -62,7 +62,7 @@ LegacyVector3 FuelBuilding::GetFuelPosition()
     if( !m_fuelMarker )
     {
         m_fuelMarker = m_shape->m_rootFragment->LookupMarker( "MarkerFuel" );
-        DarwiniaDebugAssert( m_fuelMarker );
+        DEBUG_ASSERT( m_fuelMarker );
     }
 
     Matrix34 mat( m_front, m_up, m_pos );
@@ -153,7 +153,7 @@ void FuelBuilding::Render( float _predictionTime )
         ourPipePos += pipeVector * 10;
 
         Matrix34 pipeMat( up, pipeVector, ourPipePos );
-        DarwiniaDebugAssert( s_fuelPipe );
+        DEBUG_ASSERT( s_fuelPipe );
         s_fuelPipe->Render( _predictionTime, pipeMat );
     }
 }
@@ -755,14 +755,14 @@ EscapeRocket::EscapeRocket()
     SetShape( g_app->m_resource->GetShape( "rocket.shp" ) );
 
     m_booster = m_shape->m_rootFragment->LookupMarker( "MarkerBooster" );
-    DarwiniaReleaseAssert( m_booster, "MarkerBooster not found in rocket.shp" );
+    ASSERT_TEXT( m_booster, "MarkerBooster not found in rocket.shp" );
 
     for( int i = 0; i < 3; ++i )
     {
         char name[256];
         sprintf( name, "MarkerWindow0%d", i+1 );
         m_window[i] = m_shape->m_rootFragment->LookupMarker( name );
-        DarwiniaReleaseAssert( m_window[i], "%s not found", name );
+        ASSERT_TEXT( m_window[i], "%s not found", name );
     }
 }
 

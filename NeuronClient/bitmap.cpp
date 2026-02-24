@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "binary_stream_readers.h"
 #include "bitmap.h"
-#include "debug_utils.h"
+
 #include "filesys_utils.h"
 #include "math_utils.h"
 #include "profiler.h"
@@ -71,7 +71,7 @@ void BitmapRGBA::ReadBMPFileHeader(BinaryReader* f, BitmapFileHeader* fileheader
   fileheader->bfReserved2 = f->ReadS16();
   fileheader->bfOffBits = f->ReadS32();
 
-  DarwiniaDebugAssert(fileheader->bfType == 19778);
+  DEBUG_ASSERT(fileheader->bfType == 19778);
 }
 
 // Reads information from a BMP file header.
@@ -194,11 +194,11 @@ void BitmapRGBA::LoadBmp(BinaryReader* _in)
     int ncol = (fileheader.bfOffBits - 26) / 3; // compute number of colors recorded
     ReadBMPPalette(ncol, palette, _in, 0);
   }
-  else { DarwiniaDebugAssert(0); }
+  else { DEBUG_ASSERT(0); }
 
   Initialise(infoheader.biWidth, infoheader.biHeight);
-  DarwiniaDebugAssert(infoheader.biCompression == BMP_RGB);
-  DarwiniaDebugAssert(!_in->m_eof);
+  DEBUG_ASSERT(infoheader.biCompression == BMP_RGB);
+  DEBUG_ASSERT(!_in->m_eof);
 
   // Read the image
   for (int i = 0; i < static_cast<int>(infoheader.biHeight); ++i)
@@ -214,7 +214,7 @@ void BitmapRGBA::LoadBmp(BinaryReader* _in)
     case 24:
       Read24BitLine(infoheader.biWidth, _in, i);
       break;
-    default: DarwiniaDebugAssert(0);
+    default: DEBUG_ASSERT(0);
       break;
     }
   }
@@ -302,14 +302,14 @@ void BitmapRGBA::Write24BitLine(FILE* _out, int _y)
 void BitmapRGBA::SaveBmp(const char* _filename)
 {
   FILE* _out = fopen(_filename, "wb");
-  DarwiniaReleaseAssert(_out, "Couldn't create image file %s", _filename);
+  ASSERT_TEXT(_out, "Couldn't create image file %s", _filename);
   WriteBmp(_out);
   fclose(_out);
 }
 
 void BitmapRGBA::WriteBmp(FILE* _out)
 {
-  DarwiniaReleaseAssert(_out, "Couldn't write image file");
+  ASSERT_TEXT(_out, "Couldn't write image file");
 
   WriteBMPFileHeader(_out);
 
@@ -377,7 +377,7 @@ void BitmapRGBA::Initialise(int width, int height)
   m_pixels = new RGBAColour[width * height];
   m_lines = new RGBAColour*[height];
 
-  DarwiniaDebugAssert(m_pixels && m_lines);
+  DEBUG_ASSERT(m_pixels && m_lines);
 
   for (int y = 0; y < height; ++y)
     m_lines[y] = &m_pixels[y * width];
@@ -388,13 +388,13 @@ void BitmapRGBA::Initialise(const char* _filename)
   BinaryFileReader in(_filename);
 
   const char* extension = GetExtensionPart(_filename);
-  DarwiniaDebugAssert(_stricmp(extension, "bmp") == 0);
+  DEBUG_ASSERT(_stricmp(extension, "bmp") == 0);
   LoadBmp(&in);
 }
 
 void BitmapRGBA::Initialise(BinaryReader* _reader, const char* _type)
 {
-  DarwiniaDebugAssert(_stricmp(_type, "bmp") == 0);
+  DEBUG_ASSERT(_stricmp(_type, "bmp") == 0);
   LoadBmp(_reader);
 }
 
@@ -499,10 +499,10 @@ void BitmapRGBA::ConvertToGreyScale()
 void BitmapRGBA::Blit(int _srcX, int _srcY, int _srcW, int _srcH, const BitmapRGBA* _srcBmp, int _destX, int _destY, int _destW, int _destH,
                       bool _bilinear)
 {
-  DarwiniaDebugAssert(_srcX + _srcW <= _srcBmp->m_width);
-  DarwiniaDebugAssert(_srcY + _srcH <= _srcBmp->m_height);
-  DarwiniaDebugAssert(_destX + _destW <= m_width);
-  DarwiniaDebugAssert(_destY + _destH <= m_height);
+  DEBUG_ASSERT(_srcX + _srcW <= _srcBmp->m_width);
+  DEBUG_ASSERT(_srcY + _srcH <= _srcBmp->m_height);
+  DEBUG_ASSERT(_destX + _destW <= m_width);
+  DEBUG_ASSERT(_destY + _destH <= m_height);
 
   float sxPitch = static_cast<float>(_srcW) / static_cast<float>(_destW);
   float syPitch = static_cast<float>(_srcH) / static_cast<float>(_destH);
@@ -572,8 +572,8 @@ void BitmapRGBA::ApplyBlurFilter(float _scale)
 {
   START_PROFILE(g_app->m_profiler, "ApplyBlur");
 
-  DarwiniaDebugAssert(m_width > 0 && m_width <= 1024);
-  DarwiniaDebugAssert(m_height > 0 && m_height <= 1024);
+  DEBUG_ASSERT(m_width > 0 && m_width <= 1024);
+  DEBUG_ASSERT(m_height > 0 && m_height <= 1024);
 
   auto temp = new RGBAColour[m_width * m_height];
   memset(temp, 0, sizeof(RGBAColour) * m_width * m_height);
@@ -747,15 +747,10 @@ int BitmapRGBA::ConvertToTexture(bool _mipmapping) const
       result = gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, scaled.m_width, scaled.m_height, GL_RGBA, GL_UNSIGNED_BYTE, scaled.m_pixels);
     }
 
-    DarwiniaReleaseAssert(result == 0, "ConvertToTexture failed with error : %s", gluErrorString(result));
+    ASSERT_TEXT(result == 0, "ConvertToTexture failed with error");
   }
   else
     glTexImage2D(GL_TEXTURE_2D, 0, 4, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixels);
-
-  //    if (!texturingWasEnabled)
-  //    {
-  //        glDisable(GL_TEXTURE_2D);
-  //    }
 
   return static_cast<int>(texId);
 }

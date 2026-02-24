@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "limits.h"
-#include "debug_utils.h"
+
 #include "math_utils.h"
 #include "resource.h"
 #include "shape.h"
@@ -350,7 +350,7 @@ Squadie::Squadie()
     m_retargetTimer(0.0f)
 {
     m_shape = g_app->m_resource->GetShape( "squad.shp" );
-    DarwiniaDebugAssert( m_shape );
+    DEBUG_ASSERT( m_shape );
 
 	m_centrePos = m_shape->CalculateCentre(g_identityMatrix34);
     m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centrePos );
@@ -702,7 +702,7 @@ bool Squadie::HasSecondaryWeapon()
 void Squadie::FireSecondaryWeapon( LegacyVector3 const &_pos )
 {
     InsertionSquad *squad = (InsertionSquad *) g_app->m_location->GetUnit( m_id );
-    DarwiniaDebugAssert(squad);
+    DEBUG_ASSERT(squad);
 
     if( g_app->m_globalWorld->m_research->HasResearch( squad->m_weaponType ) )
     {

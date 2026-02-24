@@ -60,7 +60,7 @@ public:
 
 #include <stdlib.h>
 
-#include "debug_utils.h"
+
 #include "fast_darray.h"
 
 
@@ -237,7 +237,7 @@ int FastDArray <T>::PutData(const T& newdata)
 		Grow();
 	}
 
-	DarwiniaDebugAssert(firstfree != -1);
+	DEBUG_ASSERT(firstfree != -1);
 	if (firstfree == -1)
 	{
 		// Must resize the array
@@ -260,7 +260,7 @@ int FastDArray <T>::PutData(const T& newdata)
 template <class T>
 void FastDArray <T>::PutData(const T& newdata, int index)
 {
-	DarwiniaDebugAssert(index < this->m_arraySize && index >= 0);
+	DEBUG_ASSERT(index < this->m_arraySize && index >= 0);
 
 	this->array[index] = newdata;
 
@@ -301,8 +301,8 @@ void FastDArray <T>::Empty()
 template <class T>
 void FastDArray <T>::MarkUsed(int index)
 {
-	DarwiniaDebugAssert(index < this->m_arraySize && index >= 0);
-	DarwiniaDebugAssert(this->shadow[index] == 0);
+	DEBUG_ASSERT(index < this->m_arraySize && index >= 0);
+	DEBUG_ASSERT(this->shadow[index] == 0);
 
 	this->shadow[index] = 1;
 	++numused;
@@ -313,8 +313,8 @@ void FastDArray <T>::MarkUsed(int index)
 template <class T>
 void FastDArray <T>::MarkNotUsed(int index)
 {
-	DarwiniaDebugAssert(index < this->m_arraySize && index >= 0);
-	DarwiniaDebugAssert(this->shadow[index] != 0);
+	DEBUG_ASSERT(index < this->m_arraySize && index >= 0);
+	DEBUG_ASSERT(this->shadow[index] != 0);
 
 	--numused;
 	this->shadow[index] = 0;

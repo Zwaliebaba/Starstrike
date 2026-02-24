@@ -2,7 +2,7 @@
 #include "net_lib.h"
 #include "net_socket.h"
 #include "GameApp.h"
-#include "debug_utils.h"
+
 #include "servertoclient.h"
 
 ServerToClient::ServerToClient(char* _ip)
@@ -14,7 +14,7 @@ ServerToClient::ServerToClient(char* _ip)
   {
     m_socket = new NetSocket();
     NetRetCode retCode = m_socket->Connect(_ip, 4001);
-    DarwiniaDebugAssert(retCode == NetOk);
+    DEBUG_ASSERT(retCode == NetOk);
   }
 
   m_lastKnownSequenceId = -1;

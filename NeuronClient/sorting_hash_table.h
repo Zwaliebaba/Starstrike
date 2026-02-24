@@ -38,7 +38,7 @@ public:
 };
 
 
-#include "debug_utils.h"
+
 #include "sorting_hash_table.h"
 
 
@@ -156,7 +156,7 @@ int SortingHashTable<T>::PutData(char const* _key, T const& _data)
 	// Do the main insert
 
 	unsigned int index = this->GetInsertPos(_key);
-	DarwiniaDebugAssert(this->m_keys[index] == NULL);
+	DEBUG_ASSERT(this->m_keys[index] == NULL);
 	this->m_keys[index] = strdup(_key);
 	this->m_data[index] = _data;
 	this->m_slotsFree--;
@@ -212,7 +212,7 @@ void SortingHashTable<T>::RemoveData(unsigned int _index)
 	short index = m_firstOrderedIndex;
 	while (m_orderedIndices[index] != _index)
 	{
-		DarwiniaDebugAssert(index != -1);
+		DEBUG_ASSERT(index != -1);
 		prevIndex = index;
 		index = m_orderedIndices[index];
 	}

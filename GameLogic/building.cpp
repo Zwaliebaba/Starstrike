@@ -3,7 +3,7 @@
 #include <math.h>
 
 #include "debug_render.h"
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "math_utils.h"
 #include "matrix34.h"
@@ -86,10 +86,10 @@ Building::Building()
     if( !s_controlPad )
     {
         s_controlPad = g_app->m_resource->GetShape( "controlpad.shp" );
-        DarwiniaDebugAssert( s_controlPad );
+        DEBUG_ASSERT( s_controlPad );
 
         s_controlPadStatus = s_controlPad->m_rootFragment->LookupMarker( "MarkerStatus" );
-        DarwiniaDebugAssert( s_controlPadStatus );
+        DEBUG_ASSERT( s_controlPadStatus );
     }
 
     m_id.SetTeamId(1);
@@ -744,7 +744,7 @@ Building *Building::CreateBuilding( char *_name )
         }
     }
 
-    //DarwiniaDebugAssert(false);
+    //DEBUG_ASSERT(false);
 	return NULL;
 }
 
@@ -907,7 +907,7 @@ char *Building::GetTypeName( int _type )
     }
     else
     {
-        DarwiniaDebugAssert(false);
+        DEBUG_ASSERT(false);
         return NULL;
     }
 }

@@ -3,7 +3,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "shape.h"
-#include "debug_utils.h"
+
 
 #include "explosion.h"
 #include "GameApp.h"
@@ -30,7 +30,7 @@ Cave::Cave()
     SetShape( g_app->m_resource->GetShape( "cave.shp" ) );
 
     m_spawnPoint = m_shape->m_rootFragment->LookupMarker( "MarkerSpawnPoint" );
-    DarwiniaDebugAssert( m_spawnPoint );
+    DEBUG_ASSERT( m_spawnPoint );
 }
 
 

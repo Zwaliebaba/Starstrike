@@ -41,7 +41,6 @@
     <ClInclude Include="darray.h" />
     <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
-    <ClInclude Include="debug_utils.h" />
     <ClInclude Include="fast_darray.h" />
     <ClInclude Include="file_writer.h" />
     <ClInclude Include="filesys_utils.h" />
@@ -302,7 +301,6 @@
     <ClCompile Include="debug_fog_logging.cpp" />
     <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
-    <ClCompile Include="debug_utils.cpp" />
     <ClCompile Include="file_writer.cpp" />
     <ClCompile Include="filesys_utils.cpp" />
     <ClCompile Include="hi_res_time.cpp" />

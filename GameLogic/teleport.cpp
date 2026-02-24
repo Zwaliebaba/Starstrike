@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "debug_utils.h"
+
 #include "shape.h"
 #include "math_utils.h"
 #include "debug_render.h"
@@ -222,7 +222,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                     }
                 }
 
-                DarwiniaDebugAssert( oldUnit );
+                DEBUG_ASSERT( oldUnit );
 
                 Unit *newUnit = NULL;
 
@@ -308,7 +308,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                     m_teleportMap.PutDataAtStart( map );
                 }
 
-                DarwiniaDebugAssert( newUnit );
+                DEBUG_ASSERT( newUnit );
 
 
                 // Put me into the new unit
@@ -349,24 +349,24 @@ bool Teleport::GetEntrance( LegacyVector3 &_pos, LegacyVector3 &_front )
 
 bool Teleport::GetExit( LegacyVector3 &_pos, LegacyVector3 &_front )
 {
-    DarwiniaDebugAssert( false );
+    DEBUG_ASSERT( false );
     return false;
 }
 
 LegacyVector3 Teleport::GetStartPoint()
 {
-    DarwiniaDebugAssert(false);
+    DEBUG_ASSERT(false);
     return LegacyVector3();
 }
 
 LegacyVector3 Teleport::GetEndPoint()
 {
-    DarwiniaDebugAssert(false);
+    DEBUG_ASSERT(false);
     return LegacyVector3();
 }
 
 bool Teleport::UpdateEntityInTransit( Entity *_entity )
 {
-    DarwiniaDebugAssert(false);
+    DEBUG_ASSERT(false);
     return false;
 }

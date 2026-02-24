@@ -2,7 +2,7 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
-#include "debug_utils.h"
+
 #include "shape.h"
 #include "preferences.h"
 #include "debug_render.h"
@@ -206,7 +206,7 @@ Entity* Team::NewEntity(int _troopType, int _unitId, int* _index)
   if (_unitId == -1)
   {
     Entity* entity = Entity::NewEntity(_troopType);
-    DarwiniaDebugAssert(entity);
+    DEBUG_ASSERT(entity);
     *_index = m_others.PutData(entity);
     return entity;
   }
@@ -310,7 +310,7 @@ void Team::Advance(int _slice)
           END_PROFILE(g_app->m_profiler, entityName);
 
 #ifdef PROFILER_ENABLED
-          DarwiniaDebugAssert(strcmp(g_app->m_profiler->m_currentElement->m_name, "Advance Others") == 0);
+          DEBUG_ASSERT(strcmp(g_app->m_profiler->m_currentElement->m_name, "Advance Others") == 0);
 #endif
 
           if (amIdead)

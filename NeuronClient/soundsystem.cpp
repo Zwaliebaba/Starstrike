@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "filesys_utils.h"
 #include "file_writer.h"
 #include "profiler.h"
@@ -61,7 +61,7 @@ char* SoundSourceBlueprint::GetSoundSourceName(int _type)
 {
   char* names[] = {"Laser", "Grenade", "Rocket", "AirStrikeBomb", "Spirit", "Sepulveda", "Gesture", "Ambience", "Music", "Interface"};
 
-  DarwiniaDebugAssert(_type >= 0 && _type < NumOtherSoundSources);
+  DEBUG_ASSERT(_type >= 0 && _type < NumOtherSoundSources);
   return names[_type];
 }
 
@@ -447,14 +447,14 @@ void SoundSystem::LoadEffects()
   m_filterBlueprints.SetSize(SoundLibrary3d::NUM_FILTERS);
 
   TextReader* in = g_app->m_resource->GetTextReader("effects.txt");
-  DarwiniaReleaseAssert(in && in->IsOpen(), "Couldn't load effects.txt");
+  ASSERT_TEXT(in && in->IsOpen(), "Couldn't load effects.txt");
 
   while (in->ReadLine())
   {
     if (!in->TokenAvailable())
       continue;
     char* effect = in->GetNextToken();
-    DarwiniaDebugAssert(_stricmp( effect, "EFFECT" ) == 0);
+    DEBUG_ASSERT(_stricmp( effect, "EFFECT" ) == 0);
 
     auto bp = new DspBlueprint();
     m_filterBlueprints.PutData(bp);
@@ -488,7 +488,7 @@ void SoundSystem::LoadBlueprints()
   m_otherBlueprints.SetSize(SoundSourceBlueprint::NumOtherSoundSources);
 
   TextReader* in = g_app->m_resource->GetTextReader("sounds.txt");
-  DarwiniaReleaseAssert(in && in->IsOpen(), "Couldn't open sounds.txt");
+  ASSERT_TEXT(in && in->IsOpen(), "Couldn't open sounds.txt");
 
   char objectName[128];
 
@@ -505,8 +505,8 @@ void SoundSystem::LoadBlueprints()
     {
       strncpy(objectName, type, 127);
       int entityType = Entity::GetTypeId(type);
-      DarwiniaDebugAssert(entityType >= 0 && entityType < Entity::NumEntityTypes);
-      DarwiniaDebugAssert(!m_entityBlueprints.ValidIndex( entityType ));
+      DEBUG_ASSERT(entityType >= 0 && entityType < Entity::NumEntityTypes);
+      DEBUG_ASSERT(!m_entityBlueprints.ValidIndex( entityType ));
 
       ssb = new SoundSourceBlueprint();
       m_entityBlueprints.PutData(ssb, entityType);
@@ -516,8 +516,8 @@ void SoundSystem::LoadBlueprints()
     {
       strncpy(objectName, type, 127);
       int buildingType = Building::GetTypeId(type);
-      DarwiniaDebugAssert(buildingType >= 0 && buildingType < Building::NumBuildingTypes);
-      DarwiniaDebugAssert(!m_buildingBlueprints.ValidIndex( buildingType ));
+      DEBUG_ASSERT(buildingType >= 0 && buildingType < Building::NumBuildingTypes);
+      DEBUG_ASSERT(!m_buildingBlueprints.ValidIndex( buildingType ));
 
       ssb = new SoundSourceBlueprint();
       m_buildingBlueprints.PutData(ssb, buildingType);
@@ -527,8 +527,8 @@ void SoundSystem::LoadBlueprints()
     {
       strncpy(objectName, type, 127);
       int otherType = SoundSourceBlueprint::GetSoundSoundType(type);
-      DarwiniaDebugAssert(otherType >= 0 && otherType < SoundSourceBlueprint::NumOtherSoundSources);
-      DarwiniaDebugAssert(!m_otherBlueprints.ValidIndex( otherType ));
+      DEBUG_ASSERT(otherType >= 0 && otherType < SoundSourceBlueprint::NumOtherSoundSources);
+      DEBUG_ASSERT(!m_otherBlueprints.ValidIndex( otherType ));
 
       ssb = new SoundSourceBlueprint();
       m_otherBlueprints.PutData(ssb, otherType);
@@ -550,7 +550,7 @@ void SoundSystem::LoadBlueprints()
           char* word = in->GetNextToken();
           if (_stricmp(word, "END") == 0)
             break;
-          DarwiniaDebugAssert(_stricmp( word, "EVENT" ) == 0);
+          DEBUG_ASSERT(_stricmp( word, "EVENT" ) == 0);
           ParseSoundEvent(in, ssb, objectName);
         }
       }
@@ -644,11 +644,11 @@ void SoundSystem::ParseSoundEvent(TextReader* _in, SoundSourceBlueprint* _source
     else if (_stricmp(fieldName, "EFFECT") == 0)
       ParseSoundEffect(_in, seb);
     else
-      DarwiniaDebugAssert(false);
+      DEBUG_ASSERT(false);
 
     // This is bad, we have a looping sound that won't be attached
     // to any one object
-    //        DarwiniaDebugAssert( !( seb->m_instance->m_loopType &&
+    //        DEBUG_ASSERT( !( seb->m_instance->m_loopType &&
     //                        seb->m_instance->m_positionType != SoundInstance::Type3DAttachedToObject ) );
 
     _in->ReadLine();
@@ -673,7 +673,7 @@ void SoundSystem::ParseSoundEffect(TextReader* _in, SoundEventBlueprint* _bluepr
     }
   }
 
-  DarwiniaDebugAssert(fxType != -1);
+  DEBUG_ASSERT(fxType != -1);
 
   auto effect = new DspHandle();
   effect->m_type = fxType;
@@ -817,7 +817,7 @@ void SoundSystem::TriggerEntityEvent(Entity* _entity, char* _eventName)
       SoundEventBlueprint* seb = sourceBlueprint->m_events[i];
       if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
-        DarwiniaDebugAssert(seb->m_instance);
+        DEBUG_ASSERT(seb->m_instance);
         auto instance = new SoundInstance();
         instance->Copy(seb->m_instance);
         instance->m_objIds.PutData(new WorldObjectId(objId));
@@ -847,7 +847,7 @@ void SoundSystem::TriggerBuildingEvent(Building* _building, char* _eventName)
       SoundEventBlueprint* seb = sourceBlueprint->m_events[i];
       if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
-        DarwiniaDebugAssert(seb->m_instance);
+        DEBUG_ASSERT(seb->m_instance);
         auto instance = new SoundInstance();
         instance->Copy(seb->m_instance);
         instance->m_objIds.PutData(new WorldObjectId(_building->m_id));
@@ -883,7 +883,7 @@ void SoundSystem::TriggerOtherEvent(WorldObject* _other, char* _eventName, int _
       if (_stricmp(seb->m_eventName, _eventName) == 0)
       {
         // We have a match
-        DarwiniaDebugAssert(seb->m_instance);
+        DEBUG_ASSERT(seb->m_instance);
         auto instance = new SoundInstance();
         instance->Copy(seb->m_instance);
         if (_type == musicType)
@@ -1042,8 +1042,8 @@ int SoundInstanceCompare(const void* elem1, const void* elem2)
   SoundInstance* instance1 = g_app->m_soundSystem->GetSoundInstance(id1);
   SoundInstance* instance2 = g_app->m_soundSystem->GetSoundInstance(id2);
 
-  DarwiniaDebugAssert(instance1);
-  DarwiniaDebugAssert(instance2);
+  DEBUG_ASSERT(instance1);
+  DEBUG_ASSERT(instance2);
 
   if (instance1->m_perceivedVolume < instance2->m_perceivedVolume)
     return +1;
@@ -1171,7 +1171,7 @@ void SoundSystem::Advance()
     {
       SoundInstanceId id = sortedIds[i];
       SoundInstance* instance = GetSoundInstance(id);
-      DarwiniaDebugAssert(instance);
+      DEBUG_ASSERT(instance);
 
       instance->m_calculatedPriority = instance->m_perceivedVolume;
 
@@ -1432,7 +1432,7 @@ void SoundSystem::LoadtimeVerify()
   }
 
   fclose(soundErrors);
-  DarwiniaReleaseAssert(!errorFound, "Errors found in sounds.txt : refer to sounderrors.txt for details");
+  ASSERT_TEXT(!errorFound, "Errors found in sounds.txt : refer to sounderrors.txt for details");
 }
 
 static const char* g_soundSourceErrors[SoundSystem::SoundSourceNumErrors] = {

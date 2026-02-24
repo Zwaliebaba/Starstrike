@@ -6,7 +6,7 @@
 #include "net_thread.h"
 #include "net_udp_packet.h"
 #include "hi_res_time.h"
-#include "debug_utils.h"
+
 #include "preferences.h"
 #include "profiler.h"
 #include "input.h"
@@ -45,7 +45,7 @@ static NetCallBackRetType ListenThread(void* ignored)
 {
   g_app->m_clientToServer->m_receiveSocket = new NetSocketListener(4001);
   NetRetCode retCode = g_app->m_clientToServer->m_receiveSocket->StartListening(ListenCallback);
-  DarwiniaDebugAssert(retCode == NetOk);
+  DEBUG_ASSERT(retCode == NetOk);
   return 0;
 }
 
@@ -96,7 +96,7 @@ void ClientToServer::AdvanceSender()
   while (g_app->m_clientToServer->m_outbox.Size())
   {
     NetworkUpdate* letter = g_app->m_clientToServer->m_outbox[0];
-    DarwiniaDebugAssert(letter);
+    DEBUG_ASSERT(letter);
 
     if (g_app->m_bypassNetworking)
       g_app->m_server->ReceiveLetter(letter, g_app->m_clientToServer->GetOurIP_String());
@@ -432,7 +432,7 @@ void ClientToServer::RequestTargetProgram(unsigned char _teamId, unsigned char _
 
 void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
 {
-  DarwiniaDebugAssert(letter->m_type == ServerToClientLetter::Update);
+  DEBUG_ASSERT(letter->m_type == ServerToClientLetter::Update);
 
   for (int i = 0; i < letter->m_updates.Size(); ++i)
   {
@@ -463,7 +463,7 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
         }
         else
         {
-          DarwiniaDebugAssert(update->GetWorldPos() != g_zeroVector);
+          DEBUG_ASSERT(update->GetWorldPos() != g_zeroVector);
           int unitId;
           Unit* unit = g_app->m_location->m_teams[update->m_teamId].NewUnit(update->m_entityType, update->m_numTroops, &unitId,
                                                                             update->GetWorldPos());

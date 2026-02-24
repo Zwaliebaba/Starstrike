@@ -5,7 +5,7 @@
 #include <string.h>
 #include <float.h>
 
-#include "debug_utils.h"
+
 #include "math_utils.h"
 #include "text_renderer.h"
 #include "hi_res_time.h"
@@ -104,7 +104,7 @@ void EntityGridCell::AddObjectId(WorldObjectId _objectId)
 
 	if (m_firstFree == END_OF_LIST)
 	{
-        DarwiniaDebugAssert( m_numSlotsFree == 0 );
+        DEBUG_ASSERT( m_numSlotsFree == 0 );
 
 		int newArraySize = m_arraySize * 2;
 		if (m_arraySize == 0)
@@ -144,8 +144,8 @@ void EntityGridCell::AddObjectId(WorldObjectId _objectId)
 
 	int target = m_firstFree;
 
-    DarwiniaDebugAssert( target >= 0 );
-    DarwiniaDebugAssert( target < m_arraySize);
+    DEBUG_ASSERT( target >= 0 );
+    DEBUG_ASSERT( target < m_arraySize);
 
     m_firstFree = m_usageLists[target];
 
@@ -200,7 +200,7 @@ void LogEntityGridError( WorldObjectId _id, LegacyVector3 const &_pos, int _erro
     theError->m_errorCode = _error;
     s_entityGridErrors.PutData( theError );
 #else
-    DarwiniaDebugAssert( false );
+    DEBUG_ASSERT( false );
 #endif
 }
 
@@ -290,8 +290,8 @@ EntityGridCell *EntityGrid::GetCell(float _worldX, float _worldZ, int _team)
 // *** GetCell
 EntityGridCell *EntityGrid::GetCell(int _indexX, int _indexZ, int _team)
 {
-    DarwiniaDebugAssert(_indexX >= 0 && _indexX < m_numCellsX);
-    DarwiniaDebugAssert(_indexZ >= 0 && _indexZ < m_numCellsZ);
+    DEBUG_ASSERT(_indexX >= 0 && _indexX < m_numCellsX);
+    DEBUG_ASSERT(_indexZ >= 0 && _indexZ < m_numCellsZ);
 
     return &m_cells[_team][_indexZ * m_numCellsX + _indexX];
 }
@@ -530,7 +530,7 @@ WorldObjectId *EntityGrid::GetNeighbours(float _worldX, float _worldZ, float _ra
 
                         if (distSqrd < rangeSqrd)
                         {
-                            //DarwiniaReleaseAssert(numFoundSoFar < MAX_NUM_NEIGHBOURS, "Too many entities in one area" );
+                            //ASSERT_TEXT(numFoundSoFar < MAX_NUM_NEIGHBOURS, "Too many entities in one area" );
                             EnsureMaxNeighbours( numFoundSoFar+1 );
                             m_neighbours[numFoundSoFar] = objId;
                             numFoundSoFar++;

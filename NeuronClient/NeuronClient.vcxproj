@@ -111,7 +111,6 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="debug_logging.h" />
     <ClInclude Include="debug_render.h" />
-    <ClInclude Include="debug_utils.h" />
     <ClInclude Include="DescriptorHeap.h" />
     <ClInclude Include="DirectXHelper.h" />
     <ClInclude Include="eclbutton.h" />
@@ -228,7 +227,6 @@
     <ClCompile Include="debug_fog_logging.cpp" />
     <ClCompile Include="debug_logging.cpp" />
     <ClCompile Include="debug_render.cpp" />
-    <ClCompile Include="debug_utils.cpp" />
     <ClCompile Include="DescriptorHeap.cpp" />
     <ClCompile Include="eclbutton.cpp" />
     <ClCompile Include="eclipse.cpp" />

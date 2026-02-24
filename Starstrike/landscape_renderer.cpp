@@ -126,12 +126,12 @@ void LandscapeRenderer::BuildNormArray()
       m_verts[nextNormId++].m_norm = norm2;
 
       int vertIndex = strip->m_firstVertIndex + j + 2;
-      DarwiniaDebugAssert(nextNormId - 2 == vertIndex);
+      DEBUG_ASSERT(nextNormId - 2 == vertIndex);
     }
   }
 
   int vertIndex = m_verts.NumUsed();
-  DarwiniaDebugAssert(nextNormId == vertIndex);
+  DEBUG_ASSERT(nextNormId == vertIndex);
 }
 
 void LandscapeRenderer::BuildUVArray(SurfaceMap2D<float>* _heightMap)
@@ -158,7 +158,7 @@ void LandscapeRenderer::BuildUVArray(SurfaceMap2D<float>* _heightMap)
     }
   }
 
-  DarwiniaDebugAssert(nextUVId == m_verts.NumUsed());
+  DEBUG_ASSERT(nextUVId == m_verts.NumUsed());
 }
 
 // _gradient=1 means flat, _gradient=0 means vertical
@@ -219,7 +219,7 @@ void LandscapeRenderer::BuildColourArray()
     }
   }
 
-  DarwiniaDebugAssert(nextColId == m_verts.NumUsed());
+  DEBUG_ASSERT(nextColId == m_verts.NumUsed());
 }
 
 //*****************************************************************************
@@ -241,7 +241,7 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D<float>* _heightMap)
     strcpy(fullFilname, "terrain\\landscape_icecaps.bmp");
 
   BinaryReader* reader = g_app->m_resource->GetBinaryReader(fullFilname);
-  DarwiniaReleaseAssert(reader != nullptr, "Failed to get resource %s", fullFilname);
+  ASSERT_TEXT(reader != nullptr, "Failed to get resource %s", fullFilname);
   m_landscapeColour = new BitmapRGBA(reader, "bmp");
   delete reader;
 

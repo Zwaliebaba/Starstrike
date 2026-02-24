@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
@@ -53,7 +53,7 @@ LegacyVector3 PowerBuilding::GetPowerLocation()
     if( !m_powerLocation )
     {
         m_powerLocation = m_shape->m_rootFragment->LookupMarker( "MarkerPowerLocation" );
-        DarwiniaDebugAssert( m_powerLocation );
+        DEBUG_ASSERT( m_powerLocation );
     }
 
     Matrix34 rootMat( m_front, m_up, m_pos );
@@ -523,7 +523,7 @@ SolarPanel::SolarPanel()
         char name[64];
         sprintf( name, "MarkerGlow0%d", i+1 );
         m_glowMarker[i] = m_shape->m_rootFragment->LookupMarker( name );
-        DarwiniaDebugAssert( m_glowMarker[i] );
+        DEBUG_ASSERT( m_glowMarker[i] );
     }
 
     for( int i = 0; i < SOLARPANEL_NUMSTATUSMARKERS; ++i )

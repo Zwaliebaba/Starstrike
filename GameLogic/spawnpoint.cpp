@@ -254,7 +254,7 @@ LegacyVector3 SpawnBuilding::GetSpiritLink()
     if( !m_spiritLink )
     {
         m_spiritLink = m_shape->m_rootFragment->LookupMarker( "MarkerSpiritLink" );
-        DarwiniaDebugAssert( m_spiritLink );
+        DEBUG_ASSERT( m_spiritLink );
     }
 
     Matrix34 mat( m_front, g_upVector, m_pos );

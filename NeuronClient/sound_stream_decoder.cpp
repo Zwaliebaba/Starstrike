@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "binary_stream_readers.h"
-#include "debug_utils.h"
+
 #include "sound_stream_decoder.h"
 
 SoundStreamDecoder::SoundStreamDecoder(BinaryReader* _in)
@@ -18,7 +18,7 @@ SoundStreamDecoder::SoundStreamDecoder(BinaryReader* _in)
     ReadWavHeader();
   }
   else
-    DarwiniaReleaseAssert(false, "Unknown sound file format %s", m_in->m_filename);
+    ASSERT_TEXT(false, "Unknown sound file format %s", m_in->m_filename);
 }
 
 SoundStreamDecoder::~SoundStreamDecoder()
@@ -142,12 +142,12 @@ unsigned int SoundStreamDecoder::Read(signed short* _data, unsigned int _numSamp
   switch (m_fileType)
   {
   case TypeUnknown:
-    DarwiniaReleaseAssert(false, "Unknown format of sound file %s", m_in->m_filename);
+    ASSERT_TEXT(false, "Unknown format of sound file %s", m_in->m_filename);
   case TypeWav:
     return ReadWavData(_data, _numSamples);
   }
 
-  DarwiniaDebugAssert(0);
+  DEBUG_ASSERT(0);
   return 0;
 }
 

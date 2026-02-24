@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "matrix34.h"
 #include "resource.h"
@@ -142,7 +142,7 @@ int ControlTower::GetAvailablePosition(LegacyVector3& _pos, LegacyVector3& _fron
 
 void ControlTower::GetConsolePosition(int _position, LegacyVector3& _pos)
 {
-  DarwiniaDebugAssert(_position >= 0 && _position < 3);
+  DEBUG_ASSERT(_position >= 0 && _position < 3);
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
   Matrix34 worldMat = m_console[_position]->GetWorldMatrix(rootMat);
@@ -152,7 +152,7 @@ void ControlTower::GetConsolePosition(int _position, LegacyVector3& _pos)
 
 void ControlTower::BeginReprogram(int _position)
 {
-  DarwiniaDebugAssert(!m_beingReprogrammed[_position]);
+  DEBUG_ASSERT(!m_beingReprogrammed[_position]);
   m_beingReprogrammed[_position] = true;
 }
 
@@ -211,7 +211,7 @@ bool ControlTower::Reprogram(int _teamId)
 
 void ControlTower::EndReprogram(int _position)
 {
-  DarwiniaDebugAssert(m_beingReprogrammed[_position]);
+  DEBUG_ASSERT(m_beingReprogrammed[_position]);
   m_beingReprogrammed[_position] = false;
 }
 

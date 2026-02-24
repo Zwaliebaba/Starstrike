@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "math_utils.h"
 #include "profiler.h"
 #include "soundsystem.h"
@@ -282,7 +282,7 @@ void DspEcho::Process(signed short *_data, unsigned int _numSamples)
 {
     START_PROFILE( g_app->m_profiler, "DspEcho" );
 
-	DarwiniaDebugAssert(m_buffer);
+	DEBUG_ASSERT(m_buffer);
 
 	int delayInSamples = 0.001f * m_delay * m_sampleRate;
 	float wetProportion = m_wetDryMix * 0.01f;

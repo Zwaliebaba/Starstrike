@@ -6,7 +6,7 @@
 #include "resource.h"
 #include "matrix34.h"
 #include "shape.h"
-#include "debug_utils.h"
+
 #include "text_renderer.h"
 #include "debug_render.h"
 #include "language_table.h"
@@ -692,7 +692,7 @@ bool Engineer::AdvanceToControlTower ()
         return false;
     }
 
-    DarwiniaDebugAssert( building->m_type == Building::TypeControlTower );
+    DEBUG_ASSERT( building->m_type == Building::TypeControlTower );
 
     ControlTower *ct = (ControlTower *) building;
     int positionId = ct->GetAvailablePosition( m_targetPos, m_targetFront );

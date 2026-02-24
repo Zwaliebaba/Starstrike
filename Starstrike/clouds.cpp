@@ -3,7 +3,7 @@
 #include <math.h>
 
 #include "resource.h"
-#include "debug_utils.h"
+
 #include "preferences.h"
 #include "profiler.h"
 

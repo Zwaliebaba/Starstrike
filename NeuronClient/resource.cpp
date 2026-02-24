@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "binary_stream_readers.h"
 #include "bitmap.h"
-#include "debug_utils.h"
+
 #include "filesys_utils.h"
 #include "file_writer.h"
 #include "resource.h"
@@ -112,7 +112,7 @@ int Resource::GetTexture(const char* _name, bool _mipMapping, bool _masked)
   {
     char errorString[512];
     sprintf(errorString, "Failed to load texture %s", _name);
-    DarwiniaReleaseAssert(false, errorString);
+    ASSERT_TEXT(false, errorString);
   }
 
   return theTexture;
@@ -180,7 +180,7 @@ Shape* Resource::GetShapeCopy(const char* _name, bool _animating)
       theShape = NEW Shape(to_string(fullFilename).c_str(), _animating);
   }
 
-  DarwiniaReleaseAssert(theShape, "Couldn't create shape file %s", _name);
+  ASSERT_TEXT(theShape, "Couldn't create shape file %s", _name);
   return theShape;
 }
 
@@ -241,7 +241,7 @@ int Resource::WildCmp(const char* wild, const char* string)
 int Resource::CreateDisplayList(const char* _name)
 {
   // Make sure name isn't NULL and isn't too long
-  DarwiniaDebugAssert(_name && strlen(_name) < 20);
+  DEBUG_ASSERT(_name && strlen(_name) < 20);
 
   unsigned int id = glGenLists(1);
   m_displayLists.PutData(_name, id);
@@ -252,7 +252,7 @@ int Resource::CreateDisplayList(const char* _name)
 int Resource::GetDisplayList(const char* _name)
 {
   // Make sure name isn't NULL and isn't too long
-  DarwiniaDebugAssert(_name && strlen(_name) < 20);
+  DEBUG_ASSERT(_name && strlen(_name) < 20);
 
   return m_displayLists.GetData(_name, -1);
 }
@@ -263,7 +263,7 @@ void Resource::DeleteDisplayList(const char* _name)
     return;
 
   // Make sure name isn't too long
-  DarwiniaDebugAssert(strlen(_name) < 20);
+  DEBUG_ASSERT(strlen(_name) < 20);
 
   int id = m_displayLists.GetData(_name, -1);
   if (id >= 0)

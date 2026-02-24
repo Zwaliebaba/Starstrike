@@ -2,7 +2,7 @@
 #include <float.h>
 
 #include "math_utils.h"
-#include "debug_utils.h"
+
 #include "vector2.h"
 #include "debug_render.h"
 
@@ -56,7 +56,7 @@ LegacyVector3 WayPoint::GetPos()
 		Building *building = g_app->m_location->GetBuilding(m_buildingId);
         if( building )
         {
-            DarwiniaDebugAssert( building->m_type == Building::TypeRadarDish ||
+            DEBUG_ASSERT( building->m_type == Building::TypeRadarDish ||
                          building->m_type == Building::TypeBridge );
             Teleport *teleport = (Teleport *) building;
             LegacyVector3 pos, front;

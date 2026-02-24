@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "input.h"
 #include "profiler.h"
 #include "language_table.h"
@@ -175,7 +175,7 @@ void Location::InitBuildings()
     Building* existing = g_app->m_location->GetBuilding(building->m_id.GetUniqueId());
     if (existing)
     {
-      DarwiniaReleaseAssert(
+      ASSERT_TEXT(
         false,
         "Error loading level file...duplicate building found\n" "Map filename = %s, Mission filename = %s\n"
         "Existing building type = %s, new building type = %s", m_levelFile->m_mapFilename, m_levelFile->m_missionFilename,
@@ -208,7 +208,7 @@ void Location::InitTeams()
 WorldObjectId Location::SpawnEntities(const LegacyVector3& _pos, unsigned char _teamId, int _unitId, unsigned char _type, int _numEntities,
                                       const LegacyVector3& _vel, float _spread, float _range, int _routeId, int _routeWaypointId)
 {
-  DarwiniaDebugAssert(_teamId < NUM_TEAMS && m_teams[_teamId].m_teamType > Team::TeamTypeUnused);
+  DEBUG_ASSERT(_teamId < NUM_TEAMS && m_teams[_teamId].m_teamType > Team::TeamTypeUnused);
 
   Team* team = &m_teams[_teamId];
   WorldObjectId entityId;
@@ -217,7 +217,7 @@ WorldObjectId Location::SpawnEntities(const LegacyVector3& _pos, unsigned char _
   {
     int unitIndex;
     Entity* s = team->NewEntity(_type, _unitId, &unitIndex);
-    DarwiniaDebugAssert(s);
+    DEBUG_ASSERT(s);
 
     s->SetType(_type);
     s->m_pos = FindValidSpawnPosition(_pos, _spread);
@@ -296,7 +296,7 @@ LegacyVector3 Location::FindValidSpawnPosition(const LegacyVector3& _pos, float 
 
 int Location::SpawnSpirit(const LegacyVector3& _pos, const LegacyVector3& _vel, unsigned char _teamId, WorldObjectId _id)
 {
-  DarwiniaDebugAssert(_teamId < NUM_TEAMS);
+  DEBUG_ASSERT(_teamId < NUM_TEAMS);
 
   int index = m_spirits.GetNextFree();
   Spirit* s = m_spirits.GetPointer(index);
@@ -1040,7 +1040,7 @@ void Location::RenderBuildingAlphas()
           s_sortedBuildings[s_nextSortedBuilding].m_buildingIndex = i;
           s_sortedBuildings[s_nextSortedBuilding].m_distance = distance;
           s_nextSortedBuilding++;
-          DarwiniaReleaseAssert(s_nextSortedBuilding < MaxDepthSortedBuildings, "More that 256 buildings require Depth Sorting!");
+          ASSERT_TEXT(s_nextSortedBuilding < MaxDepthSortedBuildings, "More that 256 buildings require Depth Sorting!");
         }
         else
         {
@@ -1171,8 +1171,8 @@ void Location::RenderWeapons()
 
 void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
 {
-  DarwiniaDebugAssert(_teamId < NUM_TEAMS);
-  DarwiniaDebugAssert(m_teams[_teamId].m_teamType == Team::TeamTypeUnused);
+  DEBUG_ASSERT(_teamId < NUM_TEAMS);
+  DEBUG_ASSERT(m_teams[_teamId].m_teamType == Team::TeamTypeUnused);
 
   Team* team = &m_teams[_teamId];
   team->Initialise(_teamId);
@@ -1304,7 +1304,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
 
         for (int s = 0; s < squad->m_entities.Size(); ++s)
         {
-          DarwiniaDebugAssert(squad->m_entities.ValidIndex(s));
+          DEBUG_ASSERT(squad->m_entities.ValidIndex(s));
           Entity* entity = squad->m_entities[s];
           entity->m_stats[Entity::StatHealth] = program->m_health[s];
         }

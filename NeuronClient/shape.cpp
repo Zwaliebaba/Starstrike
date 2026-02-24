@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "debug_utils.h"
+
 #include "debug_render.h"
 #include "math_utils.h"
 #include "matrix33.h"
@@ -167,7 +167,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
   m_maxTriangles = 1;
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
-  DarwiniaDebugAssert(_name);
+  DEBUG_ASSERT(_name);
   m_name = strdup(_name);
 
   m_transform.SetToIdentity();
@@ -392,7 +392,7 @@ void ShapeFragment::ParsePositionBlock(TextReader* _in, unsigned int _numPositio
   int expectedId = 0;
   while (expectedId < _numPositions)
   {
-    if (_in->ReadLine() == 0) { DarwiniaDebugAssert(0); }
+    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
@@ -403,13 +403,13 @@ void ShapeFragment::ParsePositionBlock(TextReader* _in, unsigned int _numPositio
 
       LegacyVector3* vect = &positions[id];
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->x = static_cast<float>(atof(c));
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->y = static_cast<float>(atof(c));
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->z = static_cast<float>(atof(c));
 
       expectedId++;
@@ -429,23 +429,23 @@ void ShapeFragment::ParseNormalBlock(TextReader* _in, unsigned int _numNorms)
   int expectedId = 0;
   while (expectedId < _numNorms)
   {
-    if (_in->ReadLine() == 0) { DarwiniaDebugAssert(0); }
+    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numNorms) { DarwiniaDebugAssert(0); }
+      if (id != expectedId || id >= _numNorms) { DEBUG_ASSERT(0); }
 
       LegacyVector3* vect = &m_normals[id];
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->x = static_cast<float>(atof(c));
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->y = static_cast<float>(atof(c));
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       vect->z = static_cast<float>(atof(c));
 
       expectedId++;
@@ -462,23 +462,23 @@ void ShapeFragment::ParseColourBlock(TextReader* _in, unsigned int _numColours)
   int expectedId = 0;
   while (expectedId < _numColours)
   {
-    if (_in->ReadLine() == 0) { DarwiniaDebugAssert(0); }
+    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numColours) { DarwiniaDebugAssert(0); }
+      if (id != expectedId || id >= _numColours) { DEBUG_ASSERT(0); }
 
       RGBAColour* col = &m_colours[id];
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       col->r = atoi(c);
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       col->g = atoi(c);
       c = _in->GetNextToken();
-      DarwiniaDebugAssert(c);
+      DEBUG_ASSERT(c);
       col->b = atoi(c);
       col->a = 0;
 
@@ -499,13 +499,13 @@ void ShapeFragment::ParseVertexBlock(TextReader* _in, unsigned int _numVerts)
   int expectedId = 0;
   while (expectedId < _numVerts)
   {
-    if (_in->ReadLine() == 0) { DarwiniaDebugAssert(0); }
+    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numVerts) { DarwiniaDebugAssert(0); }
+      if (id != expectedId || id >= _numVerts) { DEBUG_ASSERT(0); }
 
       VertexPosCol* vert = &m_vertices[id];
       c = _in->GetNextToken();
@@ -523,40 +523,40 @@ void ShapeFragment::ParseStripBlock(TextReader* _in)
 {
   _in->ReadLine();
   char* c = _in->GetNextToken();
-  DarwiniaDebugAssert(c);
+  DEBUG_ASSERT(c);
 
   // Read material name
   if (_stricmp(c, "Material") == 0)
   {
     c = _in->GetNextToken();
-    DarwiniaDebugAssert(c);
+    DEBUG_ASSERT(c);
 
     _in->ReadLine();
     c = _in->GetNextToken();
   }
 
   // Read number of vertices in strip
-  DarwiniaDebugAssert(c && (_stricmp(c, "Verts") == 0));
+  DEBUG_ASSERT(c && (_stricmp(c, "Verts") == 0));
   c = _in->GetNextToken();
-  DarwiniaDebugAssert(c);
+  DEBUG_ASSERT(c);
   int numVerts = atoi(c);
-  DarwiniaDebugAssert(numVerts > 2);
+  DEBUG_ASSERT(numVerts > 2);
 
   // Now just read a sequence of verts
   int i = 0;
   int v1 = -1, v2 = -1;
   while (i < numVerts)
   {
-    if (_in->ReadLine() == 0) { DarwiniaDebugAssert(0); }
+    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
 
     while (_in->TokenAvailable())
     {
       char* c = _in->GetNextToken();
-      DarwiniaDebugAssert(c[0] == 'v');
+      DEBUG_ASSERT(c[0] == 'v');
 
       c++;
       int v3 = atoi(c);
-      DarwiniaDebugAssert(v3 < m_numVertices);
+      DEBUG_ASSERT(v3 < m_numVertices);
 
       if (i >= 2 && v1 != v2 && v2 != v3 && v1 != v3)
       {
@@ -603,7 +603,7 @@ void ShapeFragment::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips
       c = _in->GetNextToken();
       int id = atoi(c);
 
-      DarwiniaDebugAssert(id == expectedId);
+      DEBUG_ASSERT(id == expectedId);
 
       ParseStripBlock(_in);
 
@@ -624,7 +624,7 @@ void ShapeFragment::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips
 
 void ShapeFragment::ParseTriangleBlock(TextReader* _in, unsigned int _numTriangles)
 {
-  DarwiniaDebugAssert(m_numTriangles == 0 && m_maxTriangles == 1 && m_triangles != NULL);
+  DEBUG_ASSERT(m_numTriangles == 0 && m_maxTriangles == 1 && m_triangles != NULL);
   delete [] m_triangles;
 
   m_maxTriangles = _numTriangles;
@@ -1172,14 +1172,14 @@ void Shape::Load(TextReader* _in)
 
     if (_stricmp(c, "fragment") == 0)
     {
-      DarwiniaDebugAssert(currentFrag < maxFrags);
+      DEBUG_ASSERT(currentFrag < maxFrags);
       c = _in->GetNextToken();
       allFrags[currentFrag] = new ShapeFragment(_in, c);
       currentFrag++;
     }
     else if (_stricmp(c, "marker") == 0)
     {
-      DarwiniaDebugAssert(currentMarker < maxMarkers);
+      DEBUG_ASSERT(currentMarker < maxMarkers);
       c = _in->GetNextToken();
       allMarkers[currentMarker] = new ShapeMarker(_in, c);
       currentMarker++;
@@ -1201,14 +1201,14 @@ void Shape::Load(TextReader* _in)
       {
         if (i == j)
           continue;
-        DarwiniaDebugAssert(_stricmp(allFrags[i]->m_name, allFrags[j]->m_name) != 0);
+        DEBUG_ASSERT(_stricmp(allFrags[i]->m_name, allFrags[j]->m_name) != 0);
         if (_stricmp(allFrags[i]->m_parentName, allFrags[j]->m_name) == 0)
         {
           allFrags[j]->m_childFragments.PutData(allFrags[i]);
           break;
         }
       }
-      DarwiniaDebugAssert(j < currentFrag);
+      DEBUG_ASSERT(j < currentFrag);
     }
   }
 
@@ -1216,7 +1216,7 @@ void Shape::Load(TextReader* _in)
   for (int i = 0; i < currentMarker; ++i)
   {
     ShapeFragment* parent = m_rootFragment->LookupFragment(allMarkers[i]->m_parentName);
-    DarwiniaDebugAssert(parent);
+    DEBUG_ASSERT(parent);
     parent->m_childMarkers.PutData(allMarkers[i]);
 
     int depth = allMarkers[i]->m_depth - 1;
@@ -1225,11 +1225,11 @@ void Shape::Load(TextReader* _in)
     while (_stricmp(parent->m_name, "SceneRoot") != 0)
     {
       parent = m_rootFragment->LookupFragment(parent->m_parentName);
-      DarwiniaDebugAssert(parent && depth >= 0);
+      DEBUG_ASSERT(parent && depth >= 0);
       allMarkers[i]->m_parents[depth] = parent;
       depth--;
     }
-    DarwiniaDebugAssert(depth == -1);
+    DEBUG_ASSERT(depth == -1);
   }
 }
 

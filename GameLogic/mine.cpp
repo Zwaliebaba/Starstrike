@@ -2,7 +2,7 @@
 
 #include "text_stream_readers.h"
 #include "shape.h"
-#include "debug_utils.h"
+
 #include "file_writer.h"
 #include "resource.h"
 #include "math_utils.h"
@@ -375,7 +375,7 @@ LegacyVector3 MineBuilding::GetTrackMarker1()
     if( !m_trackMarker1 || g_app->m_editing )
     {
         m_trackMarker1 = m_shape->m_rootFragment->LookupMarker( "MarkerTrack1" );
-        DarwiniaDebugAssert( m_trackMarker1 );
+        DEBUG_ASSERT( m_trackMarker1 );
         Matrix34 rootMat( m_front, g_upVector, m_pos );
         m_trackMatrix1 = m_trackMarker1->GetWorldMatrix( rootMat );
     }
@@ -389,7 +389,7 @@ LegacyVector3 MineBuilding::GetTrackMarker2()
     if( !m_trackMarker2 || g_app->m_editing )
     {
         m_trackMarker2 = m_shape->m_rootFragment->LookupMarker( "MarkerTrack2" );
-        DarwiniaDebugAssert( m_trackMarker2 );
+        DEBUG_ASSERT( m_trackMarker2 );
         Matrix34 rootMat( m_front, g_upVector, m_pos );
         m_trackMatrix2 = m_trackMarker2->GetWorldMatrix( rootMat );
     }

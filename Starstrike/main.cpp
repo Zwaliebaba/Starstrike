@@ -4,7 +4,6 @@
 #include "LegacyVector3.h"
 #include "camera.h"
 #include "clienttoserver.h"
-#include "debug_utils.h"
 #include "eclipse.h"
 #include "explosion.h"
 #include "file_paths.h"
@@ -118,7 +117,7 @@ int GetNumSlicesToAdvance()
   if (g_sliceNum == -1)
     numSlicesToAdvance -= 10;
 
-  //DarwiniaDebugAssert( numSlicesToAdvance >= 0 );
+  //DEBUG_ASSERT( numSlicesToAdvance >= 0 );
   numSlicesToAdvance = max(numSlicesToAdvance, 0);
   numSlicesToAdvance = min(numSlicesToAdvance, 10);
 
@@ -184,7 +183,7 @@ bool LocationGameLoop()
   // Main loop
 
   bool fadingOut = false;
-  while (true)
+  while (!g_app->m_requestQuit)
   {
     if (!fadingOut)
     {
@@ -309,8 +308,6 @@ bool LocationGameLoop()
 
       g_app->m_clientToServer->Advance();
 
-      //UpdateTargetFrameRate(g_sliceNum);
-
       int slicesToAdvance = GetNumSlicesToAdvance();
 
       END_PROFILE(g_app->m_profiler, "Client Main Loop");
@@ -325,8 +322,7 @@ bool LocationGameLoop()
 
           if (letter)
           {
-            DarwiniaDebugAssert(letter->GetSequenceId() == g_lastProcessedSequenceId + 1);
-            //g_app->m_clientToServer->m_lastServerLetterReceivedTime = GetHighResTime();
+            DEBUG_ASSERT(letter->GetSequenceId() == g_lastProcessedSequenceId + 1);
 
             //DebugTrace( "CLIENT : Processed update %d\n", letter->GetSequenceId() );
             //g_app->m_clientToServer->m_lastKnownSequenceIdFromServer = letter->GetSequenceId();
@@ -422,7 +418,7 @@ bool GlobalWorldGameLoop()
 
   g_app->m_soundSystem->TriggerOtherEvent(nullptr, "EnterGlobalWorld", SoundSourceBlueprint::TypeAmbience);
 
-  while (g_app->m_requestedLocationId == -1 && !g_app->m_requestToggleEditing)
+  while (g_app->m_requestedLocationId == -1 && !g_app->m_requestQuit)
   {
     if (g_app->m_atMainMenu)
       break;
@@ -460,12 +456,6 @@ bool GlobalWorldGameLoop()
     g_app->m_globalWorld->EvaluateEvents();
 
     g_app->m_renderer->Render();
-  }
-
-  if (g_app->m_requestToggleEditing)
-  {
-    g_app->m_editing = true;
-    g_app->m_requestToggleEditing = false;
   }
 
   g_app->m_soundSystem->StopAllSounds(WorldObjectId(), "Ambience EnterGlobalWorld");

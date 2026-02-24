@@ -2,7 +2,7 @@
 #include "2d_array.h"
 #include "binary_stream_readers.h"
 #include "bitmap.h"
-#include "debug_utils.h"
+
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "ogl_extensions.h"
@@ -541,8 +541,8 @@ void Water::UpdateDynamicWater()
       const float lowZ = -landSizeZ * 0.5f;
       int indexX = static_cast<int>((vertex1->m_pos.x - lowX) / m_cellSize + 0.1f);
       int indexZ = static_cast<int>((vertex1->m_pos.z - lowZ) / m_cellSize + 0.1f);
-      DarwiniaDebugAssert(indexX < m_waveTableSizeX);
-      DarwiniaDebugAssert(indexZ + 1 < m_waveTableSizeZ);
+      DEBUG_ASSERT(indexX < m_waveTableSizeX);
+      DEBUG_ASSERT(indexZ + 1 < m_waveTableSizeZ);
 
       // Update the height and calc brightness for FIRST vertex of the pair
       vertex1->m_pos.y = m_waveTableX[indexX] + m_waveTableZ[indexZ];

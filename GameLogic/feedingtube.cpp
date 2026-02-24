@@ -39,7 +39,7 @@ FeedingTube::FeedingTube()
 void FeedingTube::Initialise( Building *_template )
 {
     Building::Initialise( _template );
-	DarwiniaDebugAssert(_template->m_type == Building::TypeFeedingTube);
+	DEBUG_ASSERT(_template->m_type == Building::TypeFeedingTube);
     m_receiverId = ((FeedingTube *) _template)->m_receiverId;
 }
 
