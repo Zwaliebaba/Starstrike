@@ -55,7 +55,7 @@ void UploadRingBuffer::Init(ID3D12Device* device, SIZE_T size)
   desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
   ThrowIfFailed(device->CreateCommittedResource(
-                  &heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_resource)),
+                  &heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_GRAPHICS_PPV_ARGS(m_resource)),
                 "Failed to create upload ring buffer");
 
   D3D12_RANGE readRange = {0, 0};
@@ -69,7 +69,7 @@ void UploadRingBuffer::Shutdown()
   if (m_resource)
   {
     m_resource->Unmap(0, nullptr);
-    m_resource.Reset();
+    m_resource = nullptr;
   }
   m_cpuBase = nullptr;
   m_gpuBase = 0;
@@ -127,10 +127,10 @@ void D3D12Backend::Shutdown()
   WaitForGpu();
 
   m_psoCache.clear();
-  m_rootSignature.Reset();
-  m_srvCbvHeap.Reset();
-  m_samplerHeap.Reset();
-  m_defaultTexture.Reset();
+  m_rootSignature = nullptr;
+  m_srvCbvHeap = nullptr;
+  m_samplerHeap = nullptr;
+  m_defaultTexture = nullptr;
 
   for (UINT i = 0; i < FRAME_COUNT; i++)
     m_uploadBuffers[i].Shutdown();
@@ -156,7 +156,7 @@ void D3D12Backend::CreateDescriptorHeaps()
     desc.NumDescriptors = MAX_SRV_DESCRIPTORS;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_srvCbvHeap)), "Failed to create SRV/CBV heap");
+    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_srvCbvHeap)), "Failed to create SRV/CBV heap");
     m_srvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     m_srvNextFreeSlot = 0;
   }
@@ -167,7 +167,7 @@ void D3D12Backend::CreateDescriptorHeaps()
     desc.NumDescriptors = NUM_STATIC_SAMPLERS + 16; // extra room
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_samplerHeap)), "Failed to create sampler heap");
+    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_samplerHeap)), "Failed to create sampler heap");
     m_samplerDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
   }
 }
@@ -222,9 +222,9 @@ void D3D12Backend::CreateRootSignature()
   rootSigDesc.pParameters = rootParams;
   rootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-  ComPtr<ID3DBlob> signature;
-  ComPtr<ID3DBlob> error;
-  HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
+  com_ptr<ID3DBlob> signature;
+  com_ptr<ID3DBlob> error;
+  HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, signature.put(), error.put());
   if (FAILED(hr))
   {
     if (error)
@@ -232,7 +232,7 @@ void D3D12Backend::CreateRootSignature()
     ThrowIfFailed(hr, "Failed to serialize root signature");
   }
 
-  ThrowIfFailed(GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
+  ThrowIfFailed(GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_GRAPHICS_PPV_ARGS(m_rootSignature)),
                 "Failed to create root signature");
 }
 
@@ -261,7 +261,7 @@ void D3D12Backend::CreateDefaultTexture()
   texDesc.SampleDesc.Count = 1;
 
   ThrowIfFailed(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-                                                  IID_PPV_ARGS(&m_defaultTexture)), "Failed to create default texture");
+                                                  IID_GRAPHICS_PPV_ARGS(m_defaultTexture)), "Failed to create default texture");
 
   // Upload the white pixel
   UINT64 uploadSize = 0;
@@ -283,7 +283,7 @@ void D3D12Backend::CreateDefaultTexture()
   srcLoc.PlacedFootprint.Offset = alloc.offset;
 
   D3D12_TEXTURE_COPY_LOCATION dstLoc = {};
-  dstLoc.pResource = m_defaultTexture.Get();
+  dstLoc.pResource = m_defaultTexture.get();
   dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
   dstLoc.SubresourceIndex = 0;
 
@@ -292,7 +292,7 @@ void D3D12Backend::CreateDefaultTexture()
   // Transition to shader resource
   D3D12_RESOURCE_BARRIER barrier = {};
   barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-  barrier.Transition.pResource = m_defaultTexture.Get();
+  barrier.Transition.pResource = m_defaultTexture.get();
   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
   barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -308,7 +308,7 @@ void D3D12Backend::CreateDefaultTexture()
   srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
   srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
   srvDesc.Texture2D.MipLevels = 1;
-  device->CreateShaderResourceView(m_defaultTexture.Get(), &srvDesc, srvHandle);
+  device->CreateShaderResourceView(m_defaultTexture.get(), &srvDesc, srvHandle);
 }
 
 void D3D12Backend::CreateSamplers()
@@ -369,11 +369,11 @@ ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
 {
   auto it = m_psoCache.find(key);
   if (it != m_psoCache.end())
-    return it->second.Get();
+    return it->second.get();
 
   // Build PSO
   D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-  psoDesc.pRootSignature = m_rootSignature.Get();
+  psoDesc.pRootSignature = m_rootSignature.get();
 
   // Shaders (pre-compiled headers)
   psoDesc.VS = {g_pVertexShader, sizeof(g_pVertexShader)};
@@ -445,10 +445,10 @@ ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
   psoDesc.RTVFormats[0] = Neuron::Graphics::Core::GetBackBufferFormat();
   psoDesc.DSVFormat = Neuron::Graphics::Core::GetDepthBufferFormat();
 
-  ComPtr<ID3D12PipelineState> pso;
-  ThrowIfFailed(GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso)), "Failed to create PSO");
+  com_ptr<ID3D12PipelineState> pso;
+  ThrowIfFailed(GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_GRAPHICS_PPV_ARGS(pso)), "Failed to create PSO");
 
-  auto* rawPtr = pso.Get();
+  auto* rawPtr = pso.get();
   m_psoCache[key] = std::move(pso);
   return rawPtr;
 }
@@ -462,11 +462,11 @@ void D3D12Backend::BeginFrame()
   auto* cmdList = GetCommandList();
 
   // Set our shader-visible descriptor heaps (overrides Core's CPU-only heaps)
-  ID3D12DescriptorHeap* heaps[] = {m_srvCbvHeap.Get(), m_samplerHeap.Get()};
+  ID3D12DescriptorHeap* heaps[] = {m_srvCbvHeap.get(), m_samplerHeap.get()};
   cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
 
   // Set root signature
-  cmdList->SetGraphicsRootSignature(m_rootSignature.Get());
+  cmdList->SetGraphicsRootSignature(m_rootSignature.get());
 
   // Set render targets from Core
   D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Neuron::Graphics::Core::GetRenderTargetView();

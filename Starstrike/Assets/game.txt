@@ -1,17 +1,17 @@
 Locations_StartDefinition
 	# Id    Avail   mapFile                      	missionFile
 	# ==========================================================================
-	   1    0       map_sandbox.txt              	null
+	   1    1       map_sandbox.txt              	mission_sandbox_tutorial.txt
 	   2	1		map_garden.txt				 	mission_garden_liberate.txt
-	   3	0		map_containment.txt             null
-       4    0       map_generator.txt               null
-       5    0       map_mine.txt                    null
-       6    0       map_yard.txt                    null
-	   7	0		map_escort.txt			        mission_escort_escort.txt
-       8    0       map_pattern_buffer.txt          null
-	   9	0		map_biosphere.txt			    null
-       10   0       map_receiver.txt                null
-       11   0       map_temple.txt                  null
+	   3	1		map_containment.txt             mission_containment_enable.txt
+       4    1       map_generator.txt               mission_generator_enable.txt
+       5    1       map_mine.txt                    mission_mine_enable.txt
+       6    1       map_yard.txt                    mission_yard_enable.txt
+	   7	1		map_escort.txt			        mission_escort_escort.txt
+       8    1       map_pattern_buffer.txt          mission_pattern_buffer_recapture.txt
+	   9	1		map_biosphere.txt			    mission_biosphere_recapture.txt
+       10   1       map_receiver.txt                mission_receiver_recapture.txt
+       11   1       map_temple.txt                  mission_temple_cutscene.txt
 Locations_EndDefinition
 
 

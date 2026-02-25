@@ -26,7 +26,7 @@ using namespace OpenGLD3D;
 
 struct VBOEntry
 {
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+	com_ptr<ID3D12Resource> resource;
 	D3D12_VERTEX_BUFFER_VIEW vbView;
 	UINT size;
 };
@@ -81,7 +81,7 @@ void __stdcall glBufferDataD3D (GLenum _target, GLsizeiptrARB _size, const GLvoi
 	auto* cmdList = g_backend.GetCommandList();
 
 	// Release old buffer
-	s_currentVBO->resource.Reset();
+	s_currentVBO->resource = nullptr;
 
 	// Create a default-heap vertex buffer
 	D3D12_HEAP_PROPERTIES heapProps = {};
@@ -99,7 +99,7 @@ void __stdcall glBufferDataD3D (GLenum _target, GLsizeiptrARB _size, const GLvoi
 	HRESULT hr = device->CreateCommittedResource(
 		&heapProps, D3D12_HEAP_FLAG_NONE, &desc,
 		D3D12_RESOURCE_STATE_COMMON, nullptr,
-		IID_PPV_ARGS(&s_currentVBO->resource));
+		IID_GRAPHICS_PPV_ARGS(s_currentVBO->resource));
 	DEBUG_ASSERT(SUCCEEDED(hr));
 
 	// Upload via ring buffer
@@ -108,13 +108,13 @@ void __stdcall glBufferDataD3D (GLenum _target, GLsizeiptrARB _size, const GLvoi
 
 	D3D12_RESOURCE_BARRIER barrier = {};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = s_currentVBO->resource.Get();
+	barrier.Transition.pResource = s_currentVBO->resource.get();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	cmdList->ResourceBarrier(1, &barrier);
 
-	cmdList->CopyBufferRegion(s_currentVBO->resource.Get(), 0,
+	cmdList->CopyBufferRegion(s_currentVBO->resource.get(), 0,
 		g_backend.GetUploadBuffer().GetResource(), alloc.offset, _size);
 
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;

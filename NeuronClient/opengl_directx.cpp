@@ -72,7 +72,7 @@ static int s_quadVertexCount = 0;
 // --- Textures ---
 struct TextureResource
 {
-    Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+    com_ptr<ID3D12Resource> resource;
     UINT srvIndex = 0;
     UINT width = 0, height = 0;
     bool valid = false;
@@ -1182,7 +1182,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     auto* cmdList = g_backend.GetCommandList();
 
     // Release old resource
-    tex.resource.Reset();
+    tex.resource = nullptr;
 
     // Create texture resource
     D3D12_HEAP_PROPERTIES heapProps = {};
@@ -1200,7 +1200,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     HRESULT hr = device->CreateCommittedResource(
         &heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
         D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-        IID_PPV_ARGS(&tex.resource));
+        IID_GRAPHICS_PPV_ARGS(tex.resource));
     if (FAILED(hr)) return -1;
 
     // Upload via ring buffer
@@ -1227,7 +1227,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     srcLoc.PlacedFootprint.Offset = alloc.offset;
 
     D3D12_TEXTURE_COPY_LOCATION dstLoc = {};
-    dstLoc.pResource = tex.resource.Get();
+    dstLoc.pResource = tex.resource.get();
     dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
     dstLoc.SubresourceIndex = 0;
 
@@ -1236,7 +1236,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     // Transition to shader resource
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Transition.pResource = tex.resource.Get();
+    barrier.Transition.pResource = tex.resource.get();
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -1251,7 +1251,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Texture2D.MipLevels = 1;
-        device->CreateShaderResourceView(tex.resource.Get(), &srvDesc, srvHandle);
+        device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
     }
     else
     {
@@ -1263,7 +1263,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
         srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srvDesc.Texture2D.MipLevels = 1;
-        device->CreateShaderResourceView(tex.resource.Get(), &srvDesc, srvHandle);
+        device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
     }
 
     tex.width = width;

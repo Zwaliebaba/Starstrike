@@ -397,7 +397,7 @@ void Core::HandleDeviceLost()
 #ifdef _DEBUG
   {
     com_ptr<IDXGIDebug1> dxgiDebug;
-    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug))))
+    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_GRAPHICS_PPV_ARGS(dxgiDebug))))
     {
       dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL,
                                    static_cast<DXGI_DEBUG_RLO_FLAGS>(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));

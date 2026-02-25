@@ -33,7 +33,7 @@ DisplayList::DisplayList(std::vector<std::unique_ptr<DLCommand>>&& commands,
 		device->CreateCommittedResource(
 			&heapProps, D3D12_HEAP_FLAG_NONE, &desc,
 			D3D12_RESOURCE_STATE_COMMON, nullptr,
-			IID_PPV_ARGS(&m_vertexBuffer));
+			IID_GRAPHICS_PPV_ARGS(m_vertexBuffer));
 
 		// Upload via the ring buffer — note: this must happen while a command list is open
 		auto alloc = g_backend.GetUploadBuffer().Allocate(vbSize, sizeof(CustomVertex));
@@ -44,13 +44,13 @@ DisplayList::DisplayList(std::vector<std::unique_ptr<DLCommand>>&& commands,
 		// Transition to copy dest
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = m_vertexBuffer.Get();
+		barrier.Transition.pResource = m_vertexBuffer.get();
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		cmdList->ResourceBarrier(1, &barrier);
 
-		cmdList->CopyBufferRegion(m_vertexBuffer.Get(), 0, g_backend.GetUploadBuffer().GetResource(), alloc.offset, vbSize);
+		cmdList->CopyBufferRegion(m_vertexBuffer.get(), 0, g_backend.GetUploadBuffer().GetResource(), alloc.offset, vbSize);
 
 		// Transition to vertex buffer
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;

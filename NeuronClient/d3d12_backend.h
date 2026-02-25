@@ -3,13 +3,10 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <DirectXMath.h>
-#include <wrl/client.h>
 
 #include <unordered_map>
 #include <vector>
 #include <array>
-
-using Microsoft::WRL::ComPtr;
 
 namespace OpenGLD3D {
 
@@ -121,11 +118,11 @@ namespace OpenGLD3D {
         };
         Allocation Allocate(SIZE_T sizeBytes, SIZE_T alignment = 4);
 
-        ID3D12Resource* GetResource() const { return m_resource.Get(); }
+        ID3D12Resource* GetResource() const { return m_resource.get(); }
         SIZE_T GetOffset() const { return m_offset; }
 
     private:
-        ComPtr<ID3D12Resource> m_resource;
+        com_ptr<ID3D12Resource> m_resource;
         UINT8* m_cpuBase = nullptr;
         D3D12_GPU_VIRTUAL_ADDRESS m_gpuBase = 0;
         SIZE_T m_size = 0;
@@ -149,15 +146,15 @@ namespace OpenGLD3D {
         // Accessors — device / command list now delegate to Core
         ID3D12Device* GetDevice() const;
         ID3D12GraphicsCommandList* GetCommandList() const;
-        ID3D12RootSignature* GetRootSignature() const { return m_rootSignature.Get(); }
+        ID3D12RootSignature* GetRootSignature() const { return m_rootSignature.get(); }
         UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[Neuron::Graphics::Core::GetCurrentFrameIndex()]; }
 
         // PSO management
         ID3D12PipelineState* GetOrCreatePSO(const PSOKey& key);
 
         // Descriptor heap management
-        ID3D12DescriptorHeap* GetSRVCBVHeap() const { return m_srvCbvHeap.Get(); }
-        ID3D12DescriptorHeap* GetSamplerHeap() const { return m_samplerHeap.Get(); }
+        ID3D12DescriptorHeap* GetSRVCBVHeap() const { return m_srvCbvHeap.get(); }
+        ID3D12DescriptorHeap* GetSamplerHeap() const { return m_samplerHeap.get(); }
         UINT GetSRVDescriptorSize() const { return m_srvDescriptorSize; }
         UINT GetSamplerDescriptorSize() const { return m_samplerDescriptorSize; }
 
@@ -184,26 +181,26 @@ namespace OpenGLD3D {
         void CreateSamplers();
 
         // SRV/CBV descriptor heap (shader-visible)
-        ComPtr<ID3D12DescriptorHeap> m_srvCbvHeap;
+        com_ptr<ID3D12DescriptorHeap> m_srvCbvHeap;
         UINT m_srvDescriptorSize = 0;
         UINT m_srvNextFreeSlot = 0;
         static constexpr UINT MAX_SRV_DESCRIPTORS = 1024;
 
         // Sampler descriptor heap (shader-visible)
-        ComPtr<ID3D12DescriptorHeap> m_samplerHeap;
+        com_ptr<ID3D12DescriptorHeap> m_samplerHeap;
         UINT m_samplerDescriptorSize = 0;
 
         // Root signature
-        ComPtr<ID3D12RootSignature> m_rootSignature;
+        com_ptr<ID3D12RootSignature> m_rootSignature;
 
         // PSO cache
-        std::unordered_map<PSOKey, ComPtr<ID3D12PipelineState>, PSOKeyHash> m_psoCache;
+        std::unordered_map<PSOKey, com_ptr<ID3D12PipelineState>, PSOKeyHash> m_psoCache;
 
         // Upload ring buffers (one per frame to avoid GPU data races)
         UploadRingBuffer m_uploadBuffers[FRAME_COUNT];
 
         // Default 1x1 white texture
-        ComPtr<ID3D12Resource> m_defaultTexture;
+        com_ptr<ID3D12Resource> m_defaultTexture;
         UINT m_defaultTextureSRVIndex = 0;
     };
 

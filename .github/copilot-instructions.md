@@ -63,6 +63,11 @@ When context files don't provide specific guidance:
 - Follow established patterns for asynchronous operations.
 - Apply caching consistently with existing patterns.
 - Optimize according to patterns evident in the codebase.
+- Use `winrt::com_ptr` instead of `Microsoft::WRL::ComPtr` for COM smart pointers throughout the codebase.
+  - Use `.get()` instead of `.Get()` to obtain the raw pointer.
+  - Use `= nullptr` instead of `.Reset()` to release a COM object.
+  - Use `IID_GRAPHICS_PPV_ARGS(ptr)` (defined in `DirectXHelper.h`) instead of `IID_PPV_ARGS(&ptr)` when the target is a `com_ptr`.
+  - `IID_PPV_ARGS` is only correct with raw pointers (`T**`) or `.put()` / `.Put()` return values.
 
 ## Documentation Requirements
 

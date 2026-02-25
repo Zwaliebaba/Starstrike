@@ -17,7 +17,7 @@ void GpuBuffer::Create(const std::wstring& name, uint32_t NumElements, uint32_t 
 
   auto indexBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(m_BufferSize);
   check_hresult(device->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc,
-    D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&m_pResource)));
+    D3D12_RESOURCE_STATE_COMMON, nullptr, IID_GRAPHICS_PPV_ARGS(m_pResource)));
 
   m_gpuVirtualAddress = m_pResource->GetGPUVirtualAddress();
   check_hresult(m_pResource->SetName(name.c_str()));

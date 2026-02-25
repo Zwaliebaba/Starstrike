@@ -336,7 +336,7 @@ const char* GameApp::GetScreenshotDirectory()
 
 bool GameApp::LoadProfile()
 {
-  DebugTrace("Loading profile %s\n", m_userProfileName);
+  DebugTrace("Loading profile {}\n", m_userProfileName);
 
   if ((_stricmp(m_userProfileName, "AccessAllAreas") == 0 || _stricmp(m_userProfileName, "AttractMode") == 0) && g_app->m_gameMode !=
     GameModePrologue)

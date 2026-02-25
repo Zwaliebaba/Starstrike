@@ -6,7 +6,6 @@
 #include "opengl_directx_internals.h"
 #include "opengl_directx_matrix_stack.h"
 #include <d3d12.h>
-#include <wrl/client.h>
 
 namespace OpenGLD3D {
 
@@ -72,7 +71,7 @@ namespace OpenGLD3D {
 		void Draw();
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource> m_vertexBuffer;
+		com_ptr<ID3D12Resource> m_vertexBuffer;
 		D3D12_VERTEX_BUFFER_VIEW m_vbView;
 		std::vector<std::unique_ptr<DLCommand>> m_commands;
 	};
