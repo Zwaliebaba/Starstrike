@@ -177,6 +177,9 @@ struct RenderState
     // Viewport
     int viewportX = 0, viewportY = 0, viewportW = 0, viewportH = 0;
 
+    // Scissor rect
+    int scissorX = 0, scissorY = 0, scissorW = 0, scissorH = 0;
+
     // Sampler state per texture unit
     struct SamplerConfig {
         GLenum minFilter = GL_NEAREST_MIPMAP_LINEAR;
@@ -426,7 +429,20 @@ void OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY topology)
     viewport.MaxDepth = 1.0f;
     cmdList->RSSetViewports(1, &viewport);
 
-    D3D12_RECT scissor = { 0, 0, static_cast<LONG>(s_renderState.viewportW), static_cast<LONG>(s_renderState.viewportH) };
+    D3D12_RECT scissor;
+    if (s_renderState.scissorTestEnabled && (s_renderState.scissorW > 0 || s_renderState.scissorH > 0))
+    {
+        scissor = {
+            static_cast<LONG>(s_renderState.scissorX),
+            static_cast<LONG>(s_renderState.scissorY),
+            static_cast<LONG>(s_renderState.scissorX + s_renderState.scissorW),
+            static_cast<LONG>(s_renderState.scissorY + s_renderState.scissorH)
+        };
+    }
+    else
+    {
+        scissor = { 0, 0, static_cast<LONG>(s_renderState.viewportW), static_cast<LONG>(s_renderState.viewportH) };
+    }
     cmdList->RSSetScissorRects(1, &scissor);
 }
 
@@ -707,6 +723,20 @@ void glScalef(GLfloat x, GLfloat y, GLfloat z)
 
     XMFLOAT4X4 mat;
     XMStoreFloat4x4(&mat, XMMatrixScaling(x, y, z));
+    s_pTargetMatrixStack->Multiply(mat);
+}
+
+void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
+{
+    GL_TRACE_IMP(" glFrustum(%10.4g, %10.4g, %10.4g, %10.4g, %10.4g, %10.4g)", left, right, bottom, top, zNear, zFar)
+
+    XMMATRIX m = XMMatrixPerspectiveOffCenterRH(
+        static_cast<float>(left), static_cast<float>(right),
+        static_cast<float>(bottom), static_cast<float>(top),
+        static_cast<float>(zNear), static_cast<float>(zFar));
+
+    XMFLOAT4X4 mat;
+    XMStoreFloat4x4(&mat, m);
     s_pTargetMatrixStack->Multiply(mat);
 }
 
@@ -1103,6 +1133,20 @@ void glMaterialfv(GLenum face, GLenum pname, const GLfloat* params)
     }
 }
 
+void glGetMaterialfv(GLenum face, GLenum pname, GLfloat* params)
+{
+    GL_TRACE_IMP(" glGetMaterialfv(%s, %s, (float *)%p)", glEnumToString(face), glEnumToString(pname), params);
+    switch (pname)
+    {
+    case GL_SPECULAR:            memcpy(params, s_renderState.matSpecular, 4 * sizeof(float)); break;
+    case GL_DIFFUSE:             memcpy(params, s_renderState.matDiffuse, 4 * sizeof(float)); break;
+    case GL_AMBIENT:             memcpy(params, s_renderState.matAmbient, 4 * sizeof(float)); break;
+    case GL_AMBIENT_AND_DIFFUSE: memcpy(params, s_renderState.matAmbient, 4 * sizeof(float)); break;
+    case GL_SHININESS:           params[0] = s_renderState.matShininess; break;
+    default: break;
+    }
+}
+
 // ============================================================================
 // Fog
 // ============================================================================
@@ -1156,6 +1200,20 @@ void glGenTextures(GLsizei n, GLuint* textures)
     {
         textures[i] = static_cast<GLuint>(s_textureResources.size());
         s_textureResources.push_back(TextureResource());
+    }
+}
+
+void glDeleteTextures(GLsizei n, const GLuint* textures)
+{
+    GL_TRACE_IMP(" glDeleteTextures(%d, (const unsigned *)%p)", n, textures)
+    for (int i = 0; i < n; i++)
+    {
+        GLuint texIdx = textures[i];
+        if (texIdx < s_textureResources.size() && s_textureResources[texIdx].valid)
+        {
+            s_textureResources[texIdx].resource = nullptr;
+            s_textureResources[texIdx].valid = false;
+        }
     }
 }
 
@@ -1301,7 +1359,97 @@ void glTexParameterf(GLenum target, GLenum pname, GLfloat param)
 void glCopyTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
 {
     GL_TRACE_IMP(" glCopyTexImage2D(%s, %d, %s, %d, %d, %d, %d, %d)", glEnumToString(target), level, glEnumToString(internalFormat), x, y, width, height, border);
-    // TODO: implement back buffer copy for D3D12
+
+    DEBUG_ASSERT(target == GL_TEXTURE_2D);
+    GLuint texIdx = s_activeTextureState->target;
+    if (texIdx >= s_textureResources.size()) return;
+
+    auto& tex = s_textureResources[texIdx];
+    auto* device = g_backend.GetDevice();
+    auto* cmdList = g_backend.GetCommandList();
+    auto* stateTracker = Neuron::Graphics::Core::GetGpuResourceStateTracker();
+
+    // Release old resource
+    tex.resource = nullptr;
+
+    // Create a new texture resource matching the requested dimensions
+    D3D12_HEAP_PROPERTIES heapProps = {};
+    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC texDesc = {};
+    texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    texDesc.Width = width;
+    texDesc.Height = height;
+    texDesc.DepthOrArraySize = 1;
+    texDesc.MipLevels = 1;
+    texDesc.Format = Neuron::Graphics::Core::GetBackBufferFormat();
+    texDesc.SampleDesc.Count = 1;
+
+    HRESULT hr = device->CreateCommittedResource(
+        &heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+        D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+        IID_GRAPHICS_PPV_ARGS(tex.resource));
+    if (FAILED(hr)) return;
+
+    // Transition the back buffer from RENDER_TARGET to COPY_SOURCE
+    auto& renderTarget = Neuron::Graphics::Core::GetRenderTarget();
+    stateTracker->TransitionResource(renderTarget, D3D12_RESOURCE_STATE_COPY_SOURCE, true);
+
+    // Copy the specified region from the back buffer
+    D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
+    srcLoc.pResource = renderTarget.GetResource();
+    srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    srcLoc.SubresourceIndex = 0;
+
+    D3D12_TEXTURE_COPY_LOCATION dstLoc = {};
+    dstLoc.pResource = tex.resource.get();
+    dstLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dstLoc.SubresourceIndex = 0;
+
+    D3D12_BOX srcBox = {};
+    srcBox.left = x;
+    srcBox.top = y;
+    srcBox.right = x + width;
+    srcBox.bottom = y + height;
+    srcBox.front = 0;
+    srcBox.back = 1;
+
+    cmdList->CopyTextureRegion(&dstLoc, 0, 0, 0, &srcLoc, &srcBox);
+
+    // Transition texture to shader resource
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = tex.resource.get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    cmdList->ResourceBarrier(1, &barrier);
+
+    // Transition the back buffer back to RENDER_TARGET
+    stateTracker->TransitionResource(renderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET, true);
+
+    // Create or update SRV
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = texDesc.Format;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    if (!tex.valid)
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.AllocateSRVSlot(tex.srvIndex);
+        device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    }
+    else
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.GetSRVCBVHeap()->GetCPUDescriptorHandleForHeapStart();
+        srvHandle.ptr += tex.srvIndex * g_backend.GetSRVDescriptorSize();
+        device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    }
+
+    tex.width = width;
+    tex.height = height;
+    tex.valid = true;
 }
 
 // ============================================================================
@@ -1760,5 +1908,9 @@ void glFinish()
 
 void glScissorRect(GLint x, GLint y, GLsizei width, GLsizei height)
 {
-    // TODO
+    GL_TRACE_IMP(" glScissorRect(%d, %d, %d, %d)", x, y, width, height)
+    s_renderState.scissorX = x;
+    s_renderState.scissorY = y;
+    s_renderState.scissorW = width;
+    s_renderState.scissorH = height;
 }

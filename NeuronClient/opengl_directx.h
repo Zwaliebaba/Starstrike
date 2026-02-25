@@ -229,7 +229,6 @@ void glDisable ( GLenum cap );
 GLboolean glIsEnabled ( GLenum cap );
 
 GLenum glGetError ();
-const GLubyte * glGetString (GLenum name);
 
 void glHint (GLenum target, GLenum mode);
 
