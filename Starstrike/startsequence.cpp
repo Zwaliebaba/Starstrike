@@ -203,7 +203,7 @@ void StartSequence::Render()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_DEPTH_TEST);
-    glLineWidth(1.0f);
+    
     glColor4f(0.5, 0.5, 1.0, 0.5);
 
     float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;

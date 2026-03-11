@@ -25,10 +25,10 @@ void DescriptorHeap::Create(const std::wstring& Name, D3D12_DESCRIPTOR_HEAP_TYPE
 
   m_HeapDesc.NodeMask = 1;
 
-  check_hresult(Core::GetD3DDevice()->CreateDescriptorHeap(&m_HeapDesc, IID_GRAPHICS_PPV_ARGS(m_Heap)));
+  check_hresult(Core::Get().GetD3DDevice()->CreateDescriptorHeap(&m_HeapDesc, IID_GRAPHICS_PPV_ARGS(m_Heap)));
   SetName(m_Heap.get(), Name.c_str());
 
-  m_DescriptorSize = Core::GetD3DDevice()->GetDescriptorHandleIncrementSize(m_HeapDesc.Type);
+  m_DescriptorSize = Core::Get().GetD3DDevice()->GetDescriptorHandleIncrementSize(m_HeapDesc.Type);
   m_NumFreeDescriptors = m_HeapDesc.NumDescriptors;
 
   if (gpuHeap)
@@ -70,7 +70,7 @@ void DescriptorAllocator::Create()
 {
   sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create(L"CBV_SRV_UAV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NUM_DESCRIPTORS_PER_HEAP);
   sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create(L"Sampler Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, NUM_DESCRIPTORS_PER_HEAP);
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(L"RTV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Core::GetBackBufferCount());
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(L"RTV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Core::Get().GetBackBufferCount());
   sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Create(L"DSV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
   sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES].Create(L"CBV_SRV_UAV CPU Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NUM_DESCRIPTORS_PER_HEAP);
 }

@@ -1,10 +1,6 @@
 #ifndef _included_ogl_extensions_h
 #define _included_ogl_extensions_h
 
-
-#include <stddef.h>
-
-
 // Extension 1: GL_ARB_multitexture
 #define GL_COMBINE_EXT                    0x8570
 #define GL_COMBINE_RGB_EXT                0x8571
@@ -15,8 +11,8 @@
 #define GL_SOURCE0_ALPHA_ARB              0x8588
 #define GL_TEXTURE0_ARB                   0x84C0
 #define GL_TEXTURE1_ARB                   0x84C1
-typedef void (__stdcall *MultiTexCoord2fARB) (int, float, float);
-typedef void (__stdcall *ActiveTextureARB) (int);
+using MultiTexCoord2fARB = void(__stdcall *)(int, float, float);
+using ActiveTextureARB = void(__stdcall *)(int);
 extern MultiTexCoord2fARB gglMultiTexCoord2fARB;
 extern ActiveTextureARB gglActiveTextureARB;
 
@@ -30,17 +26,6 @@ extern ActiveTextureARB gglActiveTextureARB;
 #define WGL_PBUFFER_WIDTH_ARB		   0x2034
 #define WGL_PBUFFER_HEIGHT_ARB		   0x2035
 #define WGL_PBUFFER_LOST_ARB		   0x2036
-//DECLARE_HANDLE(HPBUFFERARB);
-//typedef HPBUFFERARB glCreatePbufferARB(HDC hDC,
-//				int iPixelFormat,
-//				int iWidth,
-//				int iHeight,
-//				const int *piAttribList);
-//HDC wglGetPbufferDCARB(HPBUFFERARB hPbuffer);
-//int wglReleasePbufferDCARB(HPBUFFERARB hPbuffer, HDC hDC);
-//BOOL wglDestroyPbufferARB(HPBUFFERARB hPbuffer);
-//BOOL wglQueryPbufferARB(HPBUFFERARB hPbuffer,	int iAttribute,	int *piValue);
-
 
 // Extension 28: GL_ARB_vertex_buffer_object
 #define GL_ARRAY_BUFFER_ARB                             0x8892
@@ -81,35 +66,35 @@ extern ActiveTextureARB gglActiveTextureARB;
 
 #define GL_BUFFER_MAP_POINTER_ARB                       0x88BD
 
-typedef ptrdiff_t GLintptrARB;
-typedef ptrdiff_t GLsizeiptrARB;
+using GLintptrARB = ptrdiff_t;
+using GLsizeiptrARB = ptrdiff_t;
 
-typedef void (__stdcall *glBindBufferARB) (GLenum, GLuint);
-typedef void (__stdcall *glDeleteBuffersARB) (GLsizei, const GLuint *);
-typedef void (__stdcall *glGenBuffersARB) (GLsizei, GLuint *);
-typedef GLboolean (__stdcall *glIsBufferARB) (GLuint);
-typedef void (__stdcall *glBufferDataARB) (GLenum, GLsizeiptrARB, const GLvoid *, GLenum);
-typedef void (__stdcall *glBufferSubDataARB) (GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid *);
-typedef void (__stdcall *glGetBufferSubDataARB) (GLenum, GLintptrARB, GLsizeiptrARB, GLvoid *);
-typedef GLvoid* (__stdcall *glMapBufferARB) (GLenum, GLenum);
-typedef GLboolean (__stdcall *glUnmapBufferARB) (GLenum);
-typedef void (__stdcall *glGetBufferParameterivARB) (GLenum, GLenum, GLint *);
-typedef void (__stdcall *glGetBufferPointervARB) (GLenum, GLenum, GLvoid* *);
+using glBindBufferARB = void(__stdcall *)(GLenum, GLuint);
+using glDeleteBuffersARB = void(__stdcall *)(GLsizei, const GLuint*);
+using glGenBuffersARB = void(__stdcall *)(GLsizei, GLuint*);
+using glIsBufferARB = GLboolean(__stdcall *)(GLuint);
+using glBufferDataARB = void(__stdcall *)(GLenum, GLsizeiptrARB, const GLvoid*, GLenum);
+using glBufferSubDataARB = void(__stdcall *)(GLenum, GLintptrARB, GLsizeiptrARB, const GLvoid*);
+using glGetBufferSubDataARB = void(__stdcall *)(GLenum, GLintptrARB, GLsizeiptrARB, GLvoid*);
+using glMapBufferARB = GLvoid* (__stdcall *)(GLenum, GLenum);
+using glUnmapBufferARB = GLboolean(__stdcall *)(GLenum);
+using glGetBufferParameterivARB = void(__stdcall *)(GLenum, GLenum, GLint*);
+using glGetBufferPointervARB = void(__stdcall *)(GLenum, GLenum, GLvoid* *);
 
-extern glBindBufferARB				gglBindBufferARB;
-extern glDeleteBuffersARB			gglDeleteBuffersARB;
-extern glGenBuffersARB				gglGenBuffersARB;
-extern glIsBufferARB				gglIsBufferARB;
-extern glBufferDataARB				gglBufferDataARB;
-extern glBufferSubDataARB			gglBufferSubDataARB;
-extern glGetBufferSubDataARB		gglGetBufferSubDataARB;
-extern glMapBufferARB				gglMapBufferARB;
-extern glUnmapBufferARB				gglUnmapBufferARB;
-extern glGetBufferParameterivARB	gglGetBufferParameterivARB;
-extern glGetBufferPointervARB		gglGetBufferPointervARB;
+extern glBindBufferARB gglBindBufferARB;
+extern glDeleteBuffersARB gglDeleteBuffersARB;
+extern glGenBuffersARB gglGenBuffersARB;
+extern glIsBufferARB gglIsBufferARB;
+extern glBufferDataARB gglBufferDataARB;
+extern glBufferSubDataARB gglBufferSubDataARB;
+extern glGetBufferSubDataARB gglGetBufferSubDataARB;
+extern glMapBufferARB gglMapBufferARB;
+extern glUnmapBufferARB gglUnmapBufferARB;
+extern glGetBufferParameterivARB gglGetBufferParameterivARB;
+extern glGetBufferPointervARB gglGetBufferPointervARB;
 
 // Extension for full-screen anti-aliasing
-typedef bool (__stdcall *ChoosePixelFormatARB) (HDC, const int *, const float *, unsigned int, int *, unsigned int *);
+using ChoosePixelFormatARB = bool(__stdcall *)(HDC, const int*, const float*, unsigned int, int*, unsigned int*);
 extern ChoosePixelFormatARB gglChoosePixelFormatARB;
 #define WGL_SAMPLE_BUFFERS_ARB              0x2041
 #define WGL_SAMPLES_ARB                     0x2042
@@ -126,6 +111,6 @@ extern ChoosePixelFormatARB gglChoosePixelFormatARB;
 
 void InitialiseOGLExtensions();
 void ShutdownOGLExtensions();
-int IsOGLExtensionSupported(const char *extension);
+int IsOGLExtensionSupported(const char* extension);
 
 #endif

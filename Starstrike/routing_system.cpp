@@ -4,7 +4,7 @@
 #include "math_utils.h"
 
 #include "vector2.h"
-#include "debug_render.h"
+
 
 #include "GameApp.h"
 #include "landscape.h"
@@ -176,25 +176,5 @@ int	Route::GetIdOfNearestEdge(LegacyVector3 const &_pos, float *_dist)
 
 void Route::Render()
 {
-    if( !g_app->m_location ) return;
-
-#ifdef DEBUG_RENDER_ENABLED
-    LegacyVector3 lastPos;
-
-    glDisable( GL_DEPTH_TEST );
-
-    for( int i = 0; i < m_wayPoints.Size(); ++i )
-    {
-        WayPoint *wayPoint = m_wayPoints[i];
-        LegacyVector3 thisPos = wayPoint->GetPos();
-        if( i > 0 )
-        {
-            RenderArrow( lastPos, thisPos, 5.0f, RGBAColour(255,100,100,255) );
-        }
-        lastPos = thisPos;
-    }
-
-    glEnable( GL_DEPTH_TEST );
-#endif
 }
 

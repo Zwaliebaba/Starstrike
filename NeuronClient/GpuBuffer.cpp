@@ -3,7 +3,7 @@
 
 void GpuBuffer::Create(const std::wstring& name, uint32_t NumElements, uint32_t ElementSize)
 {
-  auto device = Graphics::Core::GetD3DDevice();
+  auto device = Graphics::Core::Get().GetD3DDevice();
 
   Destroy();
 

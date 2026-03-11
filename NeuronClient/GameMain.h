@@ -48,13 +48,13 @@ namespace Neuron
 
       virtual void OnWindowMoved()
       {
-        const auto r = Graphics::Core::GetOutputSize();
-        Graphics::Core::WindowSizeChanged(r.Width, r.Height);
+        const auto r = Graphics::Core::Get().GetOutputSize();
+        Graphics::Core::Get().WindowSizeChanged(r.Width, r.Height);
       }
 
-      virtual void OnDisplayChange() { Graphics::Core::UpdateColorSpace(); }
+      virtual void OnDisplayChange() { Graphics::Core::Get().UpdateColorSpace(); }
 
-      virtual void OnWindowSizeChanged(int width, int height) { Graphics::Core::WindowSizeChanged(width, height); }
+      virtual void OnWindowSizeChanged(int width, int height) { Graphics::Core::Get().WindowSizeChanged(width, height); }
 
       // IDeviceNotify
       void OnDeviceLost() override {}

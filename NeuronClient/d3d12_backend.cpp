@@ -4,10 +4,6 @@
 #include "CompiledShaders/VertexShader.h"
 #include "CompiledShaders/PixelShader.h"
 
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-
-using namespace DirectX;
 using namespace OpenGLD3D;
 
 D3D12Backend OpenGLD3D::g_backend;
@@ -21,18 +17,17 @@ static D3D12_BLEND ToAlphaBlend(D3D12_BLEND blend)
 {
   switch (blend)
   {
-  case D3D12_BLEND_SRC_COLOR:      return D3D12_BLEND_SRC_ALPHA;
-  case D3D12_BLEND_INV_SRC_COLOR:  return D3D12_BLEND_INV_SRC_ALPHA;
-  case D3D12_BLEND_DEST_COLOR:     return D3D12_BLEND_DEST_ALPHA;
-  case D3D12_BLEND_INV_DEST_COLOR: return D3D12_BLEND_INV_DEST_ALPHA;
-  default:                         return blend;
+  case D3D12_BLEND_SRC_COLOR:
+    return D3D12_BLEND_SRC_ALPHA;
+  case D3D12_BLEND_INV_SRC_COLOR:
+    return D3D12_BLEND_INV_SRC_ALPHA;
+  case D3D12_BLEND_DEST_COLOR:
+    return D3D12_BLEND_DEST_ALPHA;
+  case D3D12_BLEND_INV_DEST_COLOR:
+    return D3D12_BLEND_INV_DEST_ALPHA;
+  default:
+    return blend;
   }
-}
-
-static void ThrowIfFailed(HRESULT hr, const char* msg = "D3D12 call failed")
-{
-  if (FAILED(hr))
-    Fatal("{} (HRESULT 0x{:08X})", msg, static_cast<unsigned>(hr));
 }
 
 // ---- UploadRingBuffer ----
@@ -54,12 +49,11 @@ void UploadRingBuffer::Init(ID3D12Device* device, SIZE_T size)
   desc.SampleDesc.Count = 1;
   desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-  ThrowIfFailed(device->CreateCommittedResource(
-                  &heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_GRAPHICS_PPV_ARGS(m_resource)),
-                "Failed to create upload ring buffer");
+  check_hresult(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+                                                IID_GRAPHICS_PPV_ARGS(m_resource)));
 
   D3D12_RANGE readRange = {0, 0};
-  ThrowIfFailed(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&m_cpuBase)), "Failed to map upload ring buffer");
+  check_hresult(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&m_cpuBase)));
 
   m_gpuBase = m_resource->GetGPUVirtualAddress();
 }
@@ -101,9 +95,6 @@ UploadRingBuffer::Allocation UploadRingBuffer::Allocate(SIZE_T sizeBytes, SIZE_T
 
 bool D3D12Backend::Init()
 {
-  DEBUG_ASSERT_TEXT(FRAME_COUNT <= Neuron::Graphics::Core::GetBackBufferCount(),
-                   "FRAME_COUNT exceeds Core back buffer count");
-
   auto* device = GetDevice();
 
   CreateDescriptorHeaps();
@@ -132,19 +123,14 @@ void D3D12Backend::Shutdown()
   m_samplerHeap = nullptr;
   m_defaultTexture = nullptr;
 
-  for (UINT i = 0; i < FRAME_COUNT; i++)
-    m_uploadBuffers[i].Shutdown();
+  for (auto& buffer : m_uploadBuffers)
+    buffer.Shutdown();
+  m_uploadBuffers.clear();
 }
 
-ID3D12Device* D3D12Backend::GetDevice() const
-{
-  return Neuron::Graphics::Core::GetD3DDevice();
-}
+ID3D12Device* D3D12Backend::GetDevice() const { return Graphics::Core::Get().GetD3DDevice(); }
 
-ID3D12GraphicsCommandList* D3D12Backend::GetCommandList() const
-{
-  return Neuron::Graphics::Core::GetCommandList();
-}
+ID3D12GraphicsCommandList* D3D12Backend::GetCommandList() const { return Graphics::Core::Get().GetCommandList(); }
 
 void D3D12Backend::CreateDescriptorHeaps()
 {
@@ -156,7 +142,7 @@ void D3D12Backend::CreateDescriptorHeaps()
     desc.NumDescriptors = MAX_SRV_DESCRIPTORS;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_srvCbvHeap)), "Failed to create SRV/CBV heap");
+    check_hresult(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_srvCbvHeap)));
     m_srvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     m_srvNextFreeSlot = 0;
   }
@@ -167,7 +153,7 @@ void D3D12Backend::CreateDescriptorHeaps()
     desc.NumDescriptors = NUM_STATIC_SAMPLERS + 16; // extra room
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_samplerHeap)), "Failed to create sampler heap");
+    check_hresult(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_samplerHeap)));
     m_samplerDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
   }
 }
@@ -229,16 +215,18 @@ void D3D12Backend::CreateRootSignature()
   {
     if (error)
       OutputDebugStringA(static_cast<const char*>(error->GetBufferPointer()));
-    ThrowIfFailed(hr, "Failed to serialize root signature");
+    check_hresult(hr);
   }
 
-  ThrowIfFailed(GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_GRAPHICS_PPV_ARGS(m_rootSignature)),
-                "Failed to create root signature");
+  check_hresult(GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(),
+                                                 IID_GRAPHICS_PPV_ARGS(m_rootSignature)));
 }
 
 void D3D12Backend::CreateUploadBuffer()
 {
-  for (UINT i = 0; i < FRAME_COUNT; i++)
+  const UINT bufferCount = Graphics::Core::Get().GetBackBufferCount();
+  m_uploadBuffers.resize(bufferCount);
+  for (UINT i = 0; i < bufferCount; i++)
     m_uploadBuffers[i].Init(GetDevice(), UPLOAD_BUFFER_SIZE);
 }
 
@@ -246,7 +234,7 @@ void D3D12Backend::CreateDefaultTexture()
 {
   auto* device = GetDevice();
   auto* cmdList = GetCommandList();
-  UINT frameIndex = Neuron::Graphics::Core::GetCurrentFrameIndex();
+  UINT frameIndex = Graphics::Core::Get().GetCurrentFrameIndex();
   // Create a 1x1 white texture for use when texturing is disabled
   D3D12_HEAP_PROPERTIES heapProps = {};
   heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -260,8 +248,8 @@ void D3D12Backend::CreateDefaultTexture()
   texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
   texDesc.SampleDesc.Count = 1;
 
-  ThrowIfFailed(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
-                                                  IID_GRAPHICS_PPV_ARGS(m_defaultTexture)), "Failed to create default texture");
+  check_hresult(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr,
+                                                IID_GRAPHICS_PPV_ARGS(m_defaultTexture)));
 
   // Upload the white pixel
   UINT64 uploadSize = 0;
@@ -442,11 +430,11 @@ ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
 
   // Render target format — use Core's formats
   psoDesc.NumRenderTargets = 1;
-  psoDesc.RTVFormats[0] = Neuron::Graphics::Core::GetBackBufferFormat();
-  psoDesc.DSVFormat = Neuron::Graphics::Core::GetDepthBufferFormat();
+  psoDesc.RTVFormats[0] = Graphics::Core::Get().GetBackBufferFormat();
+  psoDesc.DSVFormat = Graphics::Core::Get().GetDepthBufferFormat();
 
   com_ptr<ID3D12PipelineState> pso;
-  ThrowIfFailed(GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_GRAPHICS_PPV_ARGS(pso)), "Failed to create PSO");
+  check_hresult(GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_GRAPHICS_PPV_ARGS(pso)));
 
   auto* rawPtr = pso.get();
   m_psoCache[key] = std::move(pso);
@@ -469,8 +457,8 @@ void D3D12Backend::BeginFrame()
   cmdList->SetGraphicsRootSignature(m_rootSignature.get());
 
   // Set render targets from Core
-  D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Neuron::Graphics::Core::GetRenderTargetView();
-  D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = Neuron::Graphics::Core::GetDepthStencilView();
+  D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::Core::Get().GetRenderTargetView();
+  D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = Graphics::Core::Get().GetDepthStencilView();
   cmdList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 }
 
@@ -479,33 +467,23 @@ void D3D12Backend::EndFrame()
   using namespace Neuron::Graphics;
 
   // Transition back buffer to present state via Core's resource state tracker
-  Core::GetGpuResourceStateTracker()->TransitionResource(
-    Core::GetRenderTarget(), D3D12_RESOURCE_STATE_PRESENT, true);
+  Core::Get().GetGpuResourceStateTracker()->TransitionResource(Core::Get().GetRenderTarget(), D3D12_RESOURCE_STATE_PRESENT, true);
 
   // Close command list, execute, present, move to next frame
-  Core::Present();
+  Core::Get().Present();
 
   // Prepare next frame (reset allocator/cmdlist, transition back buffer to RT)
-  Core::Prepare();
+  Core::Get().Prepare();
 
   // Reset this frame's upload buffer
-  m_uploadBuffers[Core::GetCurrentFrameIndex()].Reset();
+  m_uploadBuffers[Core::Get().GetCurrentFrameIndex()].Reset();
 
   // Set up our per-frame rendering state
   BeginFrame();
 }
 
-void D3D12Backend::WaitForGpu()
-{
-  Neuron::Graphics::Core::WaitForGpu();
-}
+void D3D12Backend::WaitForGpu() { Graphics::Core::Get().WaitForGpu(); }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentRTVHandle() const
-{
-  return Neuron::Graphics::Core::GetRenderTargetView();
-}
+D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentRTVHandle() const { return Graphics::Core::Get().GetRenderTargetView(); }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentDSVHandle() const
-{
-  return Neuron::Graphics::Core::GetDepthStencilView();
-}
+D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentDSVHandle() const { return Graphics::Core::Get().GetDepthStencilView(); }

@@ -1,7 +1,5 @@
 #include "pch.h"
-#include "debug_render.h"
 #include "file_writer.h"
-#include "text_renderer.h"
 #include "text_stream_readers.h"
 #include "language_table.h"
 #include "scripttrigger.h"
@@ -126,20 +124,6 @@ bool ScriptTrigger::Advance()
 
 void ScriptTrigger::RenderAlphas(float predictionTime)
 {
-  if (g_app->m_editing)
-  {
-    RGBAColour colour;
-    if (m_id.GetTeamId() == 255)
-      colour.Set(100, 100, 100);
-    else
-      colour = g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-
-    RenderSphere(m_pos, m_range, colour);
-    RenderSphere(m_pos, m_range, colour);
-
-    g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 30, 0), 10, "%s", m_scriptFilename);
-    g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 20, 0), 10, "%d", m_triggered);
-  }
 };
 
 bool ScriptTrigger::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }

@@ -8,7 +8,7 @@
 #include "math_utils.h"
 #include "matrix33.h"
 #include "profiler.h"
-#include "debug_render.h"
+
 #include "preferences.h"
 #include "prefs_other_window.h"
 #include "eclipse.h"

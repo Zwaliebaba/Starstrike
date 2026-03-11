@@ -7,7 +7,7 @@
 #include "matrix33.h"
 #include "resource.h"
 #include "shape.h"
-#include "debug_render.h"
+
 #include "preferences.h"
 #include "GameApp.h"
 #include "camera.h"

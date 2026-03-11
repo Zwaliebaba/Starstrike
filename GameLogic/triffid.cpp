@@ -119,7 +119,6 @@ void Triffid::Render(float _predictionTime)
   LegacyVector3 midPoint = mat.pos + (stemPos - mat.pos).SetLength(10.0f);
   LegacyVector3 midPoint2 = midPoint - LegacyVector3(0, 20, 0);
   glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
-  glLineWidth(2.0f);
   glDisable(GL_TEXTURE_2D);
   glBegin(GL_LINES);
   glVertex3fv(mat.pos.GetData());
@@ -171,7 +170,7 @@ void Triffid::RenderAlphas(float _predictionTime)
   if (g_app->m_editing)
   {
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    glLineWidth(1.0f);
+    
 
     Matrix34 headMat = GetHead();
     Matrix34 mat(m_front, g_upVector, headMat.pos);
@@ -232,7 +231,7 @@ void Triffid::RenderAlphas(float _predictionTime)
         LegacyVector3 triggerPos = m_pos + m_triggerLocation;
         int numSteps = 20;
         glBegin(GL_LINE_LOOP);
-        glLineWidth(1.0f);
+        
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
         for (int i = 0; i < numSteps; ++i)
         {

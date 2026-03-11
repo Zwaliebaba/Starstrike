@@ -1,6 +1,4 @@
 #include "pch.h"
-
-#include "debug_render.h"
 #include "math_utils.h"
 #include "matrix33.h"
 #include "matrix34.h"
@@ -158,7 +156,6 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     m_transform(1),
     m_angVel(0, 0, 0),
     m_vel(0, 0, 0),
-    m_useCylinder(false),
     m_centre(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
@@ -263,7 +260,6 @@ ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
     m_numTriangles(0),
     m_maxTriangles(0),
     m_triangles(nullptr),
-    m_useCylinder(false),
     m_centre(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
@@ -899,91 +895,14 @@ ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
   return nullptr;
 }
 
-// *** RenderHitCheck
-void ShapeFragment::RenderHitCheck(const Matrix34& _transform)
-{
-#ifndef EXPORTER_BUILD
-#ifdef DEBUG_RENDER_ENABLED
-  Matrix34 totalMatrix = m_transform * _transform;
-
-  if (m_useCylinder)
-  {
-    LegacyVector3 centreTop = m_centre;
-    centreTop.y = m_mostPositiveY;
-    centreTop = totalMatrix * centreTop;
-    LegacyVector3 centreBase = m_centre;
-    centreBase.y = m_mostNegativeY;
-    centreBase = totalMatrix * centreBase;
-    LegacyVector3 verticalAxis = centreTop - centreBase;
-    RenderVerticalCylinder(centreBase, verticalAxis, verticalAxis.Mag(), m_radius);
-  }
-  else
-  {
-    // Get world space version of m_centre
-    LegacyVector3 centre = totalMatrix * m_centre;
-    RenderSphere(centre, m_radius);
-  }
-
-  int numChildren = m_childFragments.Size();
-  for (int i = 0; i < numChildren; ++i)
-    m_childFragments.GetData(i)->RenderHitCheck(totalMatrix);
-#endif
-#endif
-}
-
-// *** RenderMarkers
-void ShapeFragment::RenderMarkers(const Matrix34& _rootTransform)
-{
-#ifndef EXPORTER_BUILD
-#ifdef DEBUG_RENDER_ENABLED
-  int i;
-
-  glDisable(GL_DEPTH_TEST);
-
-  int numMarkers = m_childMarkers.Size();
-  for (i = 0; i < numMarkers; ++i)
-  {
-    ShapeMarker* marker = m_childMarkers.GetData(i);
-    Matrix34 mat = marker->GetWorldMatrix(_rootTransform);
-    RenderArrow(mat.pos, mat.pos + mat.f * 20.0f, 2.0f);
-    RenderArrow(mat.pos, mat.pos + mat.u * 10.0f, 2.0f);
-    //		glLineWidth(2.0f);
-    //		glColor3f(1,0,0);
-    //        glBegin(GL_LINES);
-    //			glVertex3fv(mat.pos.GetData());
-    //			glVertex3fv((mat.pos + mat.f * 20.0f).GetData());
-    //		glEnd();
-    //		glColor3f(0,1,0);
-    //		glBegin(GL_LINES);
-    //			glVertex3fv(mat.pos.GetData());
-    //			glVertex3fv((mat.pos + mat.u * 10.0f).GetData());
-    //		glEnd();
-  }
-
-  glEnable(GL_DEPTH_TEST);
-
-  int numChildren = m_childFragments.Size();
-  for (i = 0; i < numChildren; ++i)
-    m_childFragments.GetData(i)->RenderMarkers(_rootTransform);
-#endif
-#endif
-}
-
-// *** RayHit
 bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
 {
 #ifndef EXPORTER_BUILD
   Matrix34 totalMatrix = m_transform * _transform;
   LegacyVector3 centre = totalMatrix * m_centre;
 
-  //	LegacyVector3 rayStart = m_transform.InverseMultiplyVector(_package->m_rayStart);
-  //	LegacyVector3 rayDir = m_transform.GetOr().InverseMultiplyVector(_package->m_rayDir);
-  //	RayPackage package(rayStart, rayDir);
-
   // First do bounding sphere check
   if (m_radius > 0.0f && RaySphereIntersection(_package->m_rayStart, _package->m_rayDir, centre, m_radius, _package->m_rayLen))
-  //		RaySphereIntersection(package.m_rayStart, package.m_rayDir,
-  //							  m_centre, m_radius, package.m_rayLen))
   {
     // Exit early to save loads of work if we don't care about accuracy too much
     if (_accurate == false)
@@ -1252,42 +1171,9 @@ void Shape::Render(float _predictionTime, const Matrix34& _transform)
 #endif
 }
 
-void Shape::RenderHitCheck(const Matrix34& _transform)
-{
-#ifndef EXPORTER_BUILD
-  // Like the main render function this function starts a recursive tree
-  // walk, rendering as it goes. UNLIKE the main renderer, it doesn't
-  // use the OpenGL matrix stack to store the combined matrix results, but
-  // rather does all the matrix muls using our own Matrix34 code. The
-  // reason for this is that this function is designed to aid debugging
-  // of the hitcheck. Since the hitcheck uses no OpenGL commands, it
-  // makes sense to emulate that behaviour here as much as possible.
-  m_rootFragment->RenderHitCheck(_transform);
-#endif
-}
-
-void Shape::RenderMarkers(const Matrix34& _transform)
-{
-#ifndef EXPORTER_BUILD
-  // Like the main render function this function starts a recursive tree
-  // walk, rendering as it goes. UNLIKE the main renderer, it doesn't
-  // use the OpenGL matrix stack to store the combined matrix results, but
-  // rather does all the matrix muls using our own Matrix34 code. The
-  // reason for this is that this function is designed to aid debugging
-  // of the hitcheck. Since the hitcheck uses no OpenGL commands, it
-  // makes sense to emulate that behaviour here as much as possible.
-  m_rootFragment->RenderMarkers(_transform);
-#endif
-}
-
 bool Shape::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
 {
 #ifndef EXPORTER_BUILD
-  //	LegacyVector3 rayStart = _transform.InverseMultiplyVector(_package->m_rayStart);
-  //	LegacyVector3 rayDir = _transform.GetOr().InverseMultiplyVector(_package->m_rayDir);
-  //	RayPackage package(rayStart, rayDir);
-
-  //	bool rv = m_rootFragment->RayHit(&package, _transform);
   bool rv = m_rootFragment->RayHit(_package, _transform, _accurate);
   return rv;
 #else

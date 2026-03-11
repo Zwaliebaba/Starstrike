@@ -5,7 +5,7 @@
 
 #include "binary_stream_readers.h"
 #include "bitmap.h"
-#include "debug_render.h"
+
 
 #include "hi_res_time.h"
 #include "math_utils.h"
@@ -499,7 +499,7 @@ void Landscape::GenerateNormals()
 void Landscape::RenderHitNormals() const
 {
 	glColor3ub(255,90,90);
-	glLineWidth(1.0f);
+	
 	glBegin(GL_LINES);
 		for (int z = 0; z < m_heightMap->GetNumRows(); z++)
 		{

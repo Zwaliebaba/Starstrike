@@ -154,6 +154,7 @@ NetRetCode NetSocket::Connect()
 	// Attempt the connect until we timeout
 	while (::connect(m_sockfd, (struct sockaddr *)servaddr, sizeof(*servaddr)) < 0)
 	{
+		err = NetGetLastError();
 		DebugTrace("Connection error");
 		if (NetIsBlockingError(err))
 		{

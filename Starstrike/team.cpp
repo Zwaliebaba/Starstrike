@@ -5,7 +5,7 @@
 
 #include "shape.h"
 #include "preferences.h"
-#include "debug_render.h"
+
 #include "bitmap.h"
 #include "binary_stream_readers.h"
 #include "soundsystem.h"

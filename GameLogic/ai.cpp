@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "debug_render.h"
 #include "file_writer.h"
 #include "math_utils.h"
 #include "resource.h"
@@ -292,25 +291,6 @@ bool AI::Advance(Unit* _unit)
   }
 
   return false;
-}
-
-void AI::Render(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    RGBAColour teamCol = g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-
-    LegacyVector3 pos = m_pos;
-    pos.y = 400.0f;
-    RenderSphere(pos, 20.0f, teamCol);
-
-    int numGreen = g_app->m_location->m_teams[0].m_others.NumUsed();
-    int numRed = g_app->m_location->m_teams[1].m_others.NumUsed();
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    g_editorFont.DrawText3DCentre(pos - LegacyVector3(0, 30, 0), 25, "Green : %d", numGreen);
-    g_editorFont.DrawText3DCentre(pos - LegacyVector3(0, 60, 0), 25, "Red  : %d", numRed);
-  }
 }
 
 // ============================================================================
@@ -670,21 +650,6 @@ bool AISpawnPoint::Advance()
 
 void AISpawnPoint::RenderAlphas(float _predictionTime)
 {
-  if (g_app->m_editing)
-  {
-    RGBAColour colour;
-    if (m_id.GetTeamId() == 255)
-      colour.Set(100, 100, 100, 255);
-    else
-      colour = g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-
-    RenderSphere(m_pos, 10.0f, colour);
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 30, 0), 5.0f, "Spawn %d %s's", m_count, Entity::GetTypeName(m_entityType));
-    g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 25, 0), 5.0f, "Every %d seconds", m_period);
-    g_editorFont.DrawText3DCentre(m_pos + LegacyVector3(0, 20, 0), 5.0f, "Next spawn in %d seconds", static_cast<int>(m_timer));
-  }
 }
 
 int AISpawnPoint::GetBuildingLink() { return m_activatorId; }

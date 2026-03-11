@@ -4,7 +4,7 @@
 #include "vector2.h"
 #include "shape.h"
 #include "hi_res_time.h"
-#include "debug_render.h"
+
 #include "weapons.h"
 #include "insertion_squad.h"
 #include "airstrike.h"

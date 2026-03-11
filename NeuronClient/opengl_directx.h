@@ -1,19 +1,6 @@
 #if !defined __OPENGL_DIRECTX
 #define __OPENGL_DIRECTX
 
-// We are forced to declare our own prototypes because the default OpenGL.h
-// includes APIENTRY which means that the function is to be linked in from a DLL
-// and so we get an error when we try to define the function ourselves.
-
-// Error codes returned by glGetError
-#define GL_NO_ERROR                       0
-#define GL_INVALID_ENUM                   0x0500
-#define GL_INVALID_VALUE                  0x0501
-#define GL_INVALID_OPERATION              0x0502
-#define GL_STACK_OVERFLOW                 0x0503
-#define GL_STACK_UNDERFLOW                0x0504
-#define GL_OUT_OF_MEMORY                  0x0505
-
 // Mode declarations for glBegin
 #define GL_POINTS                         0x0000
 #define GL_LINES                          0x0001
@@ -267,7 +254,6 @@ void glVertex3f (GLfloat x, GLfloat y, GLfloat z);
 void glVertex3fv (const GLfloat *v);
 
 void glDepthMask ( GLboolean flag );
-void glLineWidth ( GLfloat width );
 
 // Lights
 void glLightfv (GLenum light, GLenum pname, const GLfloat *params);
@@ -347,7 +333,6 @@ void gluOrtho2D (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top);
 void gluPerspective (GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
 void gluLookAt (GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx, GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy, GLdouble upz);
 int gluBuild2DMipmaps (GLenum target, GLint components, GLint width, GLint height, GLenum format, GLenum type, const void *data);
-const GLubyte* gluErrorString (GLenum errCode);
 int gluProject (GLdouble objx, GLdouble objy, GLdouble objz,  const GLdouble modelMatrix[16], const GLdouble  projMatrix[16], const GLint     viewport[4], GLdouble *winx, GLdouble *winy, GLdouble *winz);
 int gluUnProject (GLdouble winx, GLdouble winy, GLdouble winz, const GLdouble modelMatrix[16], const GLdouble projMatrix[16], const GLint    viewport[4], GLdouble *objx, GLdouble *objy, GLdouble *objz);
 

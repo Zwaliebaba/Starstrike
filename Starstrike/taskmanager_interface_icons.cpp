@@ -1271,14 +1271,12 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
   glDisable(GL_TEXTURE_2D);
 
   glColor4ub(199, 214, 220, 255);
-  glLineWidth(2.0f);
   glBegin(GL_LINE_LOOP);
   glVertex2f(x, y - titleHeight);
   glVertex2f(x + w, y - titleHeight);
   glVertex2f(x + w, y + boxH);
   glVertex2f(x, y + boxH);
   glEnd();
-  glLineWidth(1.0f);
 
   y += titleHeight;
 
@@ -1837,14 +1835,12 @@ void TaskManagerInterfaceIcons::RenderOverview()
   g_gameFont.SetRenderShadow(false);
 
   glColor4f(0.0f, 0.0f, 0.5f, 0.6f);
-  glLineWidth(1.0f);
   glBegin(GL_LINE_LOOP);
   glVertex2f(boxX, boxY);
   glVertex2f(boxX + boxW, boxY);
   glVertex2f(boxX + boxW, boxY + boxH);
   glVertex2f(boxX, boxY + boxH);
   glEnd();
-  glLineWidth(1.0f);
 
   glColor4f(0.0f, 0.0f, 0.5f, 0.2f);
   glBegin(GL_QUADS);
@@ -1951,14 +1947,12 @@ void TaskManagerInterfaceIcons::RenderObjectives()
     glDisable(GL_TEXTURE_2D);
 
     glColor4ub(199, 214, 220, 255);
-    glLineWidth(2.0f);
     glBegin(GL_LINE_LOOP);
     glVertex2f(boxX, boxY - titleHeight);
     glVertex2f(boxX + boxW, boxY - titleHeight);
     glVertex2f(boxX + boxW, boxY + boxH);
     glVertex2f(boxX, boxY + boxH);
     glEnd();
-    glLineWidth(1.0f);
 
     for (int i = 0; i < numObjectives; ++i)
     {
@@ -2121,14 +2115,12 @@ void TaskManagerInterfaceIcons::RenderResearch()
   glDisable(GL_TEXTURE_2D);
 
   glColor4ub(199, 214, 220, 255);
-  glLineWidth(2.0f);
   glBegin(GL_LINE_LOOP);
   glVertex2f(boxX, boxY - titleHeight);
   glVertex2f(boxX + boxW, boxY - titleHeight);
   glVertex2f(boxX + boxW, boxY + boxH);
   glVertex2f(boxX, boxY + boxH);
   glEnd();
-  glLineWidth(1.0f);
 
   //
   // Render each item
@@ -2340,7 +2332,6 @@ void TaskManagerInterfaceIcons::RenderResearch()
         }
 
         glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-        glLineWidth(1.0f);
         glBegin(GL_LINE_LOOP);
         glVertex2i(boxX, boxY);
         glVertex2i(boxX + requiredProgress * boxScale, boxY);

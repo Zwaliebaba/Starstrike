@@ -7,7 +7,6 @@
 #include "eclipse.h"
 #include "explosion.h"
 #include "file_paths.h"
-#include "game_menu.h"
 #include "global_world.h"
 #include "hi_res_time.h"
 #include "input.h"
@@ -607,27 +606,6 @@ bool EnterGlobalWorld()
   return GlobalWorldGameLoop();
 }
 
-void MainMenuLoop()
-{
-  g_app->m_camera->RequestMode(Camera::ModeMainMenu);
-  while (g_app->m_atMainMenu)
-  {
-    UpdateAdvanceTime();
-    g_app->m_renderer->Render();
-    g_app->m_userInput->Advance();
-    g_app->m_camera->Advance();
-    g_app->m_soundSystem->Advance();
-
-    if (!g_app->m_gameMenu->m_menuCreated)
-    {
-      if (g_app->m_renderer->IsFadeComplete())
-        g_app->m_gameMenu->CreateMenu();
-    }
-  }
-
-  g_app->m_gameMenu->DestroyMenu();
-}
-
 void RunTheGame()
 {
   bool quit = false;
@@ -646,6 +624,8 @@ void RunTheGame()
 
     g_inputManager->Advance();
   }
+
+  Finalise();
 }
 
 // Main Function

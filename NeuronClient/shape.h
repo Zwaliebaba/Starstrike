@@ -132,7 +132,6 @@ class ShapeFragment
     LegacyVector3 m_angVel;
     LegacyVector3 m_vel;
 
-    bool m_useCylinder; // If true then use cylinder hit check instead of sphere
     LegacyVector3 m_centre;
     float m_radius;
     float m_mostPositiveY;
@@ -155,8 +154,6 @@ class ShapeFragment
 
     void Render(float _predictionTime); // Uses display list
     void RenderSlow(); // Doesn't use display list
-    void RenderHitCheck(const Matrix34& _transform);
-    void RenderMarkers(const Matrix34& _transform);
 
     ShapeFragment* LookupFragment(const char* _name); // Recurses into child fragments
     ShapeMarker* LookupMarker(const char* _name); // Recurses into child fragments
@@ -189,8 +186,6 @@ class Shape
     void WriteToFile(FILE* _out) const;
 
     void Render(float _predictionTime, const Matrix34& _transform);
-    void RenderHitCheck(const Matrix34& _transform);
-    void RenderMarkers(const Matrix34& _transform);
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false);
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false);

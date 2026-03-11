@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "language_table.h"
 #include "filesys_utils.h"
 #include "file_writer.h"
@@ -28,10 +27,6 @@
 #include "taskmanager_interface.h"
 #include "building.h"
 #include "trunkport.h"
-
-// ****************************************************************************
-// Class GlobalLocation
-// ****************************************************************************
 
 GlobalLocation::GlobalLocation()
   : m_id(-1),

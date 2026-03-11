@@ -13,10 +13,10 @@ void ClientEngine::Startup(const wchar_t* _gameName, HINSTANCE _hInstance, int n
     Strings::Startup();
 
     // Match the legacy backend's R8G8B8A8 format; depth uses Core's D32_FLOAT default.
-    Graphics::Core::Startup(DXGI_FORMAT_R8G8B8A8_UNORM);
+    Graphics::Core::Get().Startup(DXGI_FORMAT_R8G8B8A8_UNORM);
 
     m_instance = _hInstance;
-    m_outputSize = Graphics::Core::GetScreenSize();
+    m_outputSize = Graphics::Core::Get().GetScreenSize();
 
     // Register class
     WNDCLASSEX wcex = {};
@@ -57,10 +57,10 @@ void ClientEngine::Startup(const wchar_t* _gameName, HINSTANCE _hInstance, int n
     GetClientRect(m_hwnd, &rc);
 
     // Create swap chain and window-size-dependent resources via Core.
-    Graphics::Core::SetWindow(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
+    Graphics::Core::Get().SetWindow(m_hwnd, rc.right - rc.left, rc.bottom - rc.top);
 
     // Open the command list so the backend can record init-time GPU work.
-    Graphics::Core::Prepare();
+    Graphics::Core::Get().Prepare();
 
     Direct3DInit();
     glClear(GL_COLOR_BUFFER_BIT);
@@ -88,7 +88,7 @@ void ClientEngine::Shutdown()
 
     Direct3DShutdown();
 
-    Graphics::Core::Shutdown();
+    Graphics::Core::Get().Shutdown();
 
     Strings::Shutdown();
     CoreEngine::Shutdown();

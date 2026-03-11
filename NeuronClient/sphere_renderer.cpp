@@ -1,10 +1,4 @@
 #include "pch.h"
-
-#include <math.h>
-
-#include "vector2.h"
-#include "LegacyVector3.h"
-
 #include "sphere_renderer.h"
 
 
@@ -113,7 +107,6 @@ void Sphere::Render(LegacyVector3 const &pos, float radius)
 	glTranslatef(pos.x, pos.y, pos.z);
 	glScalef(radius, radius, radius);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glLineWidth(1.0f);
 	glCallList(m_displayListId);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glPopMatrix();

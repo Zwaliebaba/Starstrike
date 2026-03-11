@@ -1,46 +1,44 @@
 #ifndef _included_feedingtube_h
 #define _included_feedingtube_h
 
+#include "building.h"
 
 class FeedingTube : public Building
 {
-protected:
-	ShapeMarker	  *m_focusMarker;
+  protected:
+    ShapeMarker* m_focusMarker;
 
-    int         m_receiverId;
-    float       m_range;
-    float       m_signal;
+    int m_receiverId;
+    float m_range;
+    float m_signal;
 
-    LegacyVector3     GetDishPos      ( float _predictionTime );      // Returns the position of the transmission point
-    LegacyVector3     GetDishFront    ( float _predictionTime );      // Returns the front vector of the dish
-	LegacyVector3		GetForwardsClippingDir( float _predictionTime, FeedingTube *_sender );// Returns a good clipping direction for signal
+    LegacyVector3 GetDishPos(float _predictionTime); // Returns the position of the transmission point
+    LegacyVector3 GetDishFront(float _predictionTime); // Returns the front vector of the dish
+    LegacyVector3 GetForwardsClippingDir(float _predictionTime, FeedingTube* _sender); // Returns a good clipping direction for signal
 
-    void RenderSignal   ( float _predictionTime, float _radius, float _alpha );
+    void RenderSignal(float _predictionTime, float _radius, float _alpha);
 
-
-public:
+  public:
     FeedingTube();
 
-    void Initialise( Building *_template );
-    void Read( TextReader *_in, bool _dynamic );
-    void Write( FileWriter *_out );
+    void Initialise(Building* _template) override;
+    void Read(TextReader* _in, bool _dynamic) override;
+    void Write(FileWriter* _out) override;
 
-    bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
+    bool Advance() override;
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    LegacyVector3 GetStartPoint   ();
-    LegacyVector3 GetEndPoint     ();
+    LegacyVector3 GetStartPoint();
+    LegacyVector3 GetEndPoint();
 
-    int  GetBuildingLink();
-    void SetBuildingLink(int _buildingId);
+    int GetBuildingLink() override;
+    void SetBuildingLink(int _buildingId) override;
 
-    bool    DoesSphereHit   (LegacyVector3 const &_pos, float _radius);
+    bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
 
-    void    ListSoundEvents ( LList<char *> *_list );
-    bool IsInView();
+    void ListSoundEvents(LList<char*>* _list) override;
+    bool IsInView() override;
 };
-
-
 
 #endif

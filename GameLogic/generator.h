@@ -1,12 +1,9 @@
-
 #ifndef _included_generator_h
 #define _included_generator_h
 
 #include "building.h"
 
-
 class FileWriter;
-
 
 // ****************************************************************************
 // Class PowerBuilding
@@ -14,34 +11,32 @@ class FileWriter;
 
 class PowerBuilding : public Building
 {
-protected:
-    int             m_powerLink;
-    ShapeMarker     *m_powerLocation;
+  protected:
+    int m_powerLink;
+    ShapeMarker* m_powerLocation;
 
-    LList           <float> m_surges;
+    LList<float> m_surges;
 
-public:
+  public:
     PowerBuilding();
 
-    void Initialise     ( Building *_template );
-    bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
+    void Initialise(Building* _template) override;
+    bool Advance() override;
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    bool IsInView       ();
+    bool IsInView() override;
     LegacyVector3 GetPowerLocation();
-    virtual void TriggerSurge ( float _initValue );
+    virtual void TriggerSurge(float _initValue);
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents(LList<char*>* _list) override;
 
-    void Read   ( TextReader *_in, bool _dynamic );
-    void Write  ( FileWriter *_out );
+    void Read(TextReader* _in, bool _dynamic) override;
+    void Write(FileWriter* _out) override;
 
-    int  GetBuildingLink();
-    void SetBuildingLink( int _buildingId );
+    int GetBuildingLink() override;
+    void SetBuildingLink(int _buildingId) override;
 };
-
-
 
 // ****************************************************************************
 // Class Generator
@@ -49,32 +44,29 @@ public:
 
 class Generator : public PowerBuilding
 {
-protected:
-    ShapeMarker *m_counter;
+  protected:
+    ShapeMarker* m_counter;
 
-    float   m_timerSync;
-    int     m_numThisSecond;
-    bool    m_enabled;
+    float m_timerSync;
+    int m_numThisSecond;
+    bool m_enabled;
 
-public:
-    float   m_throughput;
+  public:
+    float m_throughput;
 
-public:
     Generator();
 
-    void TriggerSurge ( float _initValue );
+    void TriggerSurge(float _initValue) override;
 
-    void ReprogramComplete();
+    void ReprogramComplete() override;
 
-    char *GetObjectiveCounter();
+    char* GetObjectiveCounter() override;
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents(LList<char*>* _list) override;
 
-    bool Advance();
-    void Render( float _predictionTime );
+    bool Advance() override;
+    void Render(float _predictionTime) override;
 };
-
-
 
 // ****************************************************************************
 // Class Pylon
@@ -82,11 +74,10 @@ public:
 
 class Pylon : public PowerBuilding
 {
-public:
+  public:
     Pylon();
-    bool Advance();
+    bool Advance() override;
 };
-
 
 // ****************************************************************************
 // Class PylonStart
@@ -94,20 +85,17 @@ public:
 
 class PylonStart : public PowerBuilding
 {
-public:
+  public:
     int m_reqBuildingId;
 
-public:
     PylonStart();
 
-    void Initialise     ( Building *_template );
-    bool Advance        ();
-    void RenderAlphas   ( float _predictionTime );
+    void Initialise(Building* _template) override;
+    bool Advance() override;
 
-    void Read   ( TextReader *_in, bool _dynamic );
-    void Write  ( FileWriter *_out );
+    void Read(TextReader* _in, bool _dynamic) override;
+    void Write(FileWriter* _out) override;
 };
-
 
 // ****************************************************************************
 // Class PylonEnd
@@ -115,13 +103,12 @@ public:
 
 class PylonEnd : public PowerBuilding
 {
-public:
+  public:
     PylonEnd();
 
-    void TriggerSurge   ( float _initValue );
-    void RenderAlphas   ( float _predictionTime );
+    void TriggerSurge(float _initValue) override;
+    void RenderAlphas(float _predictionTime) override;
 };
-
 
 // ****************************************************************************
 // Class SolarPanel
@@ -132,23 +119,23 @@ public:
 
 class SolarPanel : public PowerBuilding
 {
-protected:
-    ShapeMarker *m_glowMarker   [SOLARPANEL_NUMGLOWS];
-    ShapeMarker *m_statusMarkers[SOLARPANEL_NUMSTATUSMARKERS];
+  protected:
+    ShapeMarker* m_glowMarker[SOLARPANEL_NUMGLOWS];
+    ShapeMarker* m_statusMarkers[SOLARPANEL_NUMSTATUSMARKERS];
 
     bool m_operating;
 
-public:
+  public:
     SolarPanel();
 
-    void Initialise     ( Building *_template );
-    bool Advance        ();
+    void Initialise(Building* _template) override;
+    bool Advance() override;
 
-    void Render         ( float _predictionTime );
-    void RenderPorts    ();
-    void RenderAlphas   ( float _predictionTime );
+    void Render(float _predictionTime) override;
+    void RenderPorts() override;
+    void RenderAlphas(float _predictionTime) override;
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents(LList<char*>* _list) override;
 };
 
 #endif

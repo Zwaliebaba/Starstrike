@@ -5,6 +5,12 @@
 
 using namespace Neuron::Graphics;
 
+Core& Core::Get()
+{
+  static Core s_instance;
+  return s_instance;
+}
+
 namespace
 {
   DXGI_FORMAT NoSRGB(DXGI_FORMAT fmt) noexcept

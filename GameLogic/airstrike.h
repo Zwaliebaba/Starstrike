@@ -32,7 +32,6 @@ public:
 
     void Begin      ();
     bool Advance    ( int _slice );
-    void Render     ( float _predictionTime );
 
     bool IsInView   ();
 };

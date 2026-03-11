@@ -1,10 +1,8 @@
 #include "pch.h"
-#include "debug_render.h"
 #include "file_writer.h"
 #include "math_utils.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-
 #include "shape.h"
 #include "hi_res_time.h"
 #include "preferences.h"
@@ -14,7 +12,6 @@
 #include "globals.h"
 #include "particle_system.h"
 #include "location.h"
-#include "global_world.h"
 
 Tree::Tree()
   : Building(),
@@ -231,6 +228,7 @@ void Tree::Generate()
   darwiniaSeedRandom(m_seed);
   m_branchDisplayListId = glGenLists(1);
   glNewList(m_branchDisplayListId, GL_COMPILE);
+  glColor4ubv(m_branchColourArray);
   glBegin(GL_QUADS);
   RenderBranch(g_zeroVector, g_upVector, m_iterations, false, true, false);
   glEnd();
@@ -239,6 +237,7 @@ void Tree::Generate()
   darwiniaSeedRandom(m_seed);
   m_leafDisplayListId = glGenLists(1);
   glNewList(m_leafDisplayListId, GL_COMPILE);
+  glColor4ubv(m_leafColourArray);
   glBegin(GL_QUADS);
   RenderBranch(g_zeroVector, g_upVector, m_iterations, false, false, true);
   glEnd();
@@ -249,7 +248,7 @@ void Tree::Generate()
   // So we can calculate the actual centre position, then the radius
 
   m_hitcheckCentre /= static_cast<float>(m_numLeafs);
-  RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, true);
+  RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, false);
   m_hitcheckRadius *= 0.8f;
 
   float totalTime = GetHighResTime() - timeNow;
@@ -269,14 +268,15 @@ bool Tree::PerformDepthSort(LegacyVector3& _centrePos)
 
 void Tree::RenderAlphas(float _predictionTime)
 {
-  if (m_branchDisplayListId == -1 || m_leafDisplayListId == -1)
-    Generate();
-
   if (g_app->m_editing)
   {
     intToArray(m_branchColour, m_branchColourArray);
     intToArray(m_leafColour, m_leafColourArray);
+    DeleteDisplayLists();
   }
+
+  if (m_branchDisplayListId == -1 || m_leafDisplayListId == -1)
+    Generate();
 
   float actualHeight = GetActualHeight(_predictionTime);
 
@@ -318,16 +318,6 @@ void Tree::RenderAlphas(float _predictionTime)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
-}
-
-void Tree::RenderHitCheck()
-{
-#ifdef DEBUG_RENDER_ENABLED
-  float actualHeight = GetActualHeight(0.0f);
-
-  RenderSphere(m_pos, 10.0f);
-  RenderSphere(m_pos + m_hitcheckCentre * actualHeight, m_hitcheckRadius * actualHeight);
-#endif
 }
 
 void Tree::Damage(float _damage)

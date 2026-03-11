@@ -39,7 +39,6 @@
     <ClInclude Include="bounded_array.h" />
     <ClInclude Include="btree.h" />
     <ClInclude Include="darray.h" />
-    <ClInclude Include="debug_render.h" />
     <ClInclude Include="fast_darray.h" />
     <ClInclude Include="file_writer.h" />
     <ClInclude Include="filesys_utils.h" />
@@ -197,9 +196,6 @@
     <ClInclude Include="opengl_directx_matrix_stack.h">
       <Filter>Graphics\Legacy</Filter>
     </ClInclude>
-    <ClInclude Include="opengl_trace.h">
-      <Filter>Graphics\Legacy</Filter>
-    </ClInclude>
     <ClInclude Include="Color.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -298,7 +294,6 @@
     <ClCompile Include="3d_sprite.cpp" />
     <ClCompile Include="binary_stream_readers.cpp" />
     <ClCompile Include="bitmap.cpp" />
-    <ClCompile Include="debug_render.cpp" />
     <ClCompile Include="file_writer.cpp" />
     <ClCompile Include="filesys_utils.cpp" />
     <ClCompile Include="hi_res_time.cpp" />
@@ -433,9 +428,6 @@
       <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="opengl_directx_matrix_stack.cpp">
-      <Filter>Graphics\Legacy</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl_trace.cpp">
       <Filter>Graphics\Legacy</Filter>
     </ClCompile>
     <ClCompile Include="DDSTextureLoader.cpp">

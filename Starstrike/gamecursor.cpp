@@ -5,7 +5,7 @@
 #include "resource.h"
 #include "profiler.h"
 #include "hi_res_time.h"
-#include "debug_render.h"
+
 #include "binary_stream_readers.h"
 
 #include "eclipse.h"

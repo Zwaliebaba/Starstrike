@@ -84,7 +84,7 @@ void RootSignature::Finalize(const std::wstring _name, D3D12_ROOT_SIGNATURE_FLAG
 
       check_hresult(hr);
     }
-    check_hresult(Core::GetD3DDevice()->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(),
+    check_hresult(Core::Get().GetD3DDevice()->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(),
       IID_PPV_ARGS(&m_signature)));
 
     check_hresult(m_signature->SetName(_name.c_str()));

@@ -66,7 +66,7 @@ void GraphicsPSO::SetInputLayout(const D3D12_INPUT_LAYOUT_DESC* pInputElementDes
 
 void GraphicsPSO::Finalize()
 {
-  auto device = Core::GetD3DDevice();
+  auto device = Core::Get().GetD3DDevice();
 
   // Make sure the root signature is finalized first
   m_PSODesc.pRootSignature = m_RootSignature->GetSignature();
@@ -81,7 +81,7 @@ void GraphicsPSO::Finalize()
 
 void ComputePSO::Finalize()
 {
-  auto device = Core::GetD3DDevice();
+  auto device = Core::Get().GetD3DDevice();
 
   // Make sure the root signature is finalized first
   m_PSODesc.pRootSignature = m_RootSignature->GetSignature();

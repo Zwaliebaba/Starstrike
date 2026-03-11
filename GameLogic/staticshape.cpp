@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "text_stream_readers.h"
 #include "shape.h"
-#include "debug_render.h"
+
 #include "language_table.h"
 #include "staticshape.h"
 #include "GameApp.h"
@@ -121,8 +121,6 @@ void StaticShape::Render(float _predictionTime)
     m_shape->Render(_predictionTime, mat);
     glDisable(GL_NORMALIZE);
   }
-  else
-    RenderSphere(m_pos, 40.0f);
 }
 
 bool StaticShape::Advance() { return Building::Advance(); }

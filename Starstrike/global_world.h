@@ -2,13 +2,10 @@
 #define _included_global_world_h
 
 #include "llist.h"
-#include "fast_darray.h"
-#include "sphere_renderer.h"
-#include "matrix34.h"
+#include "LegacyVector3.h"
 
 class FileWriter;
 class TextReader;
-class LegacyVector3;
 class Shape;
 class Building;
 class GlobalInternet;

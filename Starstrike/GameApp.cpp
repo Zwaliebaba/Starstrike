@@ -24,7 +24,6 @@
 #include "taskmanager_interface_icons.h"
 #include "gamecursor.h"
 #include "level_file.h"
-#include "game_menu.h"
 
 GameApp* g_app = nullptr;
 
@@ -45,11 +44,9 @@ GameApp::GameApp()
     m_clientToServer(nullptr),
     m_renderer(nullptr),
     m_locationInput(nullptr),
-    m_effectProcessor(nullptr),
     m_taskManager(nullptr),
     m_script(nullptr),
     m_startSequence(nullptr),
-    m_gameMenu(nullptr),
     m_negativeRenderer(false),
     m_difficultyLevel(0),
     m_largeMenus(false),
@@ -93,7 +90,6 @@ GameApp::GameApp()
   m_userInput = new UserInput();
 
   m_camera = new Camera();
-  m_gameMenu = new GameMenu();
 
   strcpy(m_gameDataFile, "game.txt");
 

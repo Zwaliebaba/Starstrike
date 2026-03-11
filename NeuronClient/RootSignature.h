@@ -111,7 +111,7 @@ public:
 
   void Load(const std::wstring_view _name, const void* _shader, size_t _size)
   {
-    check_hresult(Graphics::Core::GetD3DDevice()->CreateRootSignature(0, _shader, _size, IID_PPV_ARGS(&m_signature)));
+    check_hresult(Graphics::Core::Get().GetD3DDevice()->CreateRootSignature(0, _shader, _size, IID_PPV_ARGS(&m_signature)));
     m_signature->SetName(_name.data());
     m_Finalized = true;
   }

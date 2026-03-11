@@ -13,7 +13,6 @@ class Resource;
 class SoundSystem;
 class LocationInput;
 class LangTable;
-class EffectProcessor;
 class GlobalWorld;
 class ParticleSystem;
 class TaskManager;
@@ -22,7 +21,6 @@ class Script;
 class Profiler;
 class MouseCursor;
 class GameCursor;
-class GameMenu;
 class StartSequence;
 class BitmapRGBA;
 
@@ -48,13 +46,11 @@ class GameApp : public GameMain
     ClientToServer* m_clientToServer; // Clients connection to Server
     Renderer* m_renderer;
     LocationInput* m_locationInput;
-    EffectProcessor* m_effectProcessor;
     TaskManager* m_taskManager;
     TaskManagerInterface* m_taskManagerInterface;
     Script* m_script;
     GameCursor* m_gameCursor;
     StartSequence* m_startSequence;
-    GameMenu* m_gameMenu;
 
     bool m_bypassNetworking;
     bool m_negativeRenderer;

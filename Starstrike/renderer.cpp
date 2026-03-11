@@ -94,7 +94,7 @@ void Renderer::RenderFlatTexture()
 
   glDisable(GL_TEXTURE_2D);
 
-  glLineWidth(1.0f);
+  
   glBegin(GL_LINE_LOOP);
   glVertex3fv((pos + up - right).GetData());
   glVertex3fv((pos + up + right).GetData());
@@ -553,10 +553,7 @@ void Renderer::CheckOpenGLState() const
   int results[10];
   float resultsf[10];
 
-  DEBUG_ASSERT(glGetError() == GL_NO_ERROR);
-
   // Geometry
-  //	DEBUG_ASSERT(glIsEnabled(GL_CULL_FACE));
   DEBUG_ASSERT(GetGLStateInt(GL_FRONT_FACE) == GL_CCW);
   glGetIntegerv(GL_POLYGON_MODE, results);
   DEBUG_ASSERT(results[0] == GL_FILL);
