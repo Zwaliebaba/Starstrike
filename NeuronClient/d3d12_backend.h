@@ -3,7 +3,7 @@
 namespace OpenGLD3D
 {
   // --- Constants ---
-  constexpr UINT UPLOAD_BUFFER_SIZE = 16 * 1024 * 1024; // 16 MB ring buffer
+  constexpr UINT UPLOAD_BUFFER_SIZE = 64 * 1024 * 1024; // 64 MB ring buffer
   constexpr UINT CBV_SIZE_ALIGNED = (sizeof(float) * 512 + 255) & ~255; // Aligned constant buffer
 
   // --- Per-frame constant buffer layout (must match HLSL exactly) ---

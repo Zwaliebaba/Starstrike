@@ -78,9 +78,17 @@ UploadRingBuffer::Allocation UploadRingBuffer::Allocate(SIZE_T sizeBytes, SIZE_T
   // Align offset
   m_offset = (m_offset + alignment - 1) & ~(alignment - 1);
 
-  // Wrap if we've exceeded the buffer
+  // Wrap if we've exceeded the buffer.
+  // This overwrites data from earlier draw calls in the same frame that the
+  // GPU has not yet consumed (the command list is deferred).  The GPU will
+  // read garbage, causing spiky/flickering geometry.  Trigger a debug assert
+  // so the developer knows the buffer is too small, then wrap anyway to
+  // avoid a hard crash in release builds.
   if (m_offset + sizeBytes > m_size)
+  {
+    DEBUG_ASSERT(false && "UploadRingBuffer wrapped mid-frame — increase UPLOAD_BUFFER_SIZE");
     m_offset = 0;
+  }
 
   Allocation alloc;
   alloc.cpuPtr = m_cpuBase + m_offset;

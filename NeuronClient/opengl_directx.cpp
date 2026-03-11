@@ -100,6 +100,10 @@ static VertexArrayConfig s_normalArray;
 static VertexArrayConfig s_colorArray;
 static VertexArrayConfig s_texCoordArray;
 
+// --- Scratch buffer for glDrawArrays (avoids heap allocation per call) ---
+static CustomVertex* s_drawArraysScratch = nullptr;
+static unsigned s_drawArraysScratchSize = 0;
+
 // --- Current vertex attributes ---
 class CurrentAttributes : public CustomVertex
 {
@@ -557,6 +561,11 @@ void Direct3DShutdown()
   delete[] s_vertices;
   s_vertices = nullptr;
   s_allocatedVertices = 0;
+
+  // glDrawArrays scratch buffer
+  delete[] s_drawArraysScratch;
+  s_drawArraysScratch = nullptr;
+  s_drawArraysScratchSize = 0;
 
   g_backend.Shutdown();
 }
@@ -1657,13 +1666,26 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid* po
   s_texCoordArray.stride = stride;
 }
 
+// --- Scratch buffer for glDrawArrays (avoids heap allocation per call) ---
+
+static CustomVertex* ensureDrawArraysScratch(unsigned count)
+{
+  if (count > s_drawArraysScratchSize)
+  {
+    delete[] s_drawArraysScratch;
+    s_drawArraysScratchSize = count + (count / 2); // grow with headroom
+    s_drawArraysScratch = new CustomVertex[s_drawArraysScratchSize];
+  }
+  return s_drawArraysScratch;
+}
+
 void glDrawArrays(GLenum mode, GLint first, GLsizei count)
 {
   if (count <= 0 || !s_clientStateVertex)
     return;
 
-  // Allocate temporary CustomVertex array
-  auto* verts = new CustomVertex[count];
+  // Use reusable scratch buffer instead of heap-allocating per call.
+  CustomVertex* verts = ensureDrawArraysScratch(static_cast<unsigned>(count));
   memset(verts, 0, sizeof(CustomVertex) * count);
 
   GLsizei vstride = s_vertexArray.stride;
@@ -1752,15 +1774,35 @@ void glDrawArrays(GLenum mode, GLint first, GLsizei count)
     topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
     break;
   case GL_TRIANGLE_FAN:
-    topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    break;
+    // D3D12 has no triangle fan — decompose to triangle list
+    {
+      if (count < 3)
+        return;
+      unsigned numTris = static_cast<unsigned>(count) - 2;
+      unsigned newVertCount = numTris * 3;
+      CustomVertex* fanVerts = ensureDrawArraysScratch(newVertCount);
+
+      // Rebuild into the same scratch buffer — safe because we read verts[]
+      // (which IS the scratch buffer) front-to-back while writing fanVerts[]
+      // further ahead, so we never overwrite data we still need.
+      // However if newVertCount > count (always true for fans with > 3 verts),
+      // the writes overlap the source.  Copy the fan hub vertex first.
+      CustomVertex hub = verts[0];
+      for (unsigned i = 0; i < numTris; i++)
+      {
+        fanVerts[i * 3 + 0] = hub;
+        fanVerts[i * 3 + 1] = verts[i + 1];
+        fanVerts[i * 3 + 2] = verts[i + 2];
+      }
+      issueDrawCall(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, newVertCount, fanVerts);
+    }
+    return;
   default:
     topology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     break;
   }
 
   issueDrawCall(topology, count, verts);
-  delete[] verts;
 }
 
 void __stdcall OpenGLD3D::glMultiTexCoord2fD3D(int _target, float _x, float _y)
