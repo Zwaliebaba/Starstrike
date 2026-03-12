@@ -73,9 +73,13 @@ NetRetCode NetSocketListener::StartListening(NetCallBack functionPointer)
 		datasize = recvfrom(m_sockfd, buf, MAX_PACKET_SIZE, 0,
 							(struct sockaddr *)&clientaddr, &cliLen);
 		
+		if (datasize <= 0)
+			continue;
+
 		// Call function pointer with datagram data (type is NetUdpPacket) -
 		// the function pointed to must free NetUdpPacket passed in
-		(*functionPointer)(new NetUdpPacket(client, &clientaddr, buf, datasize));
+		auto packet = std::make_unique<NetUdpPacket>(client, &clientaddr, buf, datasize);
+		(*functionPointer)(packet.release());
 		if (!m_listening) break;
 	}
 	

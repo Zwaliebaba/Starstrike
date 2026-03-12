@@ -787,10 +787,11 @@ void ShapeFragment::Render(float _predictionTime)
   predictedTransform.pos += m_vel * _predictionTime;
 
   bool matrixIsIdentity = predictedTransform == g_identityMatrix34;
+  auto& mv = OpenGLD3D::GetModelViewStack();
   if (!matrixIsIdentity)
   {
-    glPushMatrix();
-    glMultMatrixf(predictedTransform.ConvertToOpenGLFormat());
+    mv.Push();
+    mv.Multiply(predictedTransform.ToXMFLOAT4X4());
   }
 
   RenderSlow();
@@ -800,7 +801,7 @@ void ShapeFragment::Render(float _predictionTime)
     m_childFragments.GetData(i)->Render(_predictionTime);
 
   if (!matrixIsIdentity)
-    glPopMatrix();
+    mv.Pop();
 #endif
 }
 
@@ -899,7 +900,7 @@ bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, boo
 {
 #ifndef EXPORTER_BUILD
   Matrix34 totalMatrix = m_transform * _transform;
-  LegacyVector3 centre = totalMatrix * m_centre;
+  LegacyVector3 centre = m_centre * totalMatrix;
 
   // First do bounding sphere check
   if (m_radius > 0.0f && RaySphereIntersection(_package->m_rayStart, _package->m_rayDir, centre, m_radius, _package->m_rayLen))
@@ -943,7 +944,7 @@ bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transfor
 {
 #ifndef EXPORTER_BUILD
   Matrix34 totalMatrix = m_transform * _transform;
-  LegacyVector3 centre = totalMatrix * m_centre;
+  LegacyVector3 centre = m_centre * totalMatrix;
 
   if (m_radius > 0.0f && SphereSphereIntersection(_package->m_pos, _package->m_radius, centre, m_radius))
   {
@@ -986,7 +987,7 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
 #ifndef EXPORTER_BUILD
 
   Matrix34 totalMatrix = m_transform * _ourTransform;
-  LegacyVector3 centre = totalMatrix * m_centre;
+  LegacyVector3 centre = m_centre * totalMatrix;
 
   if (m_radius > 0.0f)
   {
@@ -1013,7 +1014,7 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
 void ShapeFragment::CalculateCentre(const Matrix34& _transform, LegacyVector3& _centre, int& _numFragments)
 {
   Matrix34 totalMatrix = m_transform * _transform;
-  LegacyVector3 centre = totalMatrix * m_centre;
+  LegacyVector3 centre = m_centre * totalMatrix;
 
   _centre += centre;
   _numFragments++;
@@ -1029,7 +1030,7 @@ void ShapeFragment::CalculateCentre(const Matrix34& _transform, LegacyVector3& _
 void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre, float& _radius)
 {
   Matrix34 totalMatrix = m_transform * _transform;
-  LegacyVector3 centre = totalMatrix * m_centre;
+  LegacyVector3 centre = m_centre * totalMatrix;
 
   float distance = (centre - _centre).Mag();
   if (distance + m_radius > _radius)
@@ -1158,15 +1159,14 @@ void Shape::Render(float _predictionTime, const Matrix34& _transform)
 {
 #ifndef EXPORTER_BUILD
   glEnable(GL_COLOR_MATERIAL);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glMultMatrixf(_transform.ConvertToOpenGLFormat());
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
+  mv.Multiply(_transform.ToXMFLOAT4X4());
 
   m_rootFragment->Render(_predictionTime);
 
   glDisable(GL_COLOR_MATERIAL);
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
+  mv.Pop();
 
 #endif
 }

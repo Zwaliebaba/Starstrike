@@ -77,7 +77,7 @@ void Sierpinski3D::Render(float scale)
 	glDisable(GL_DEPTH_TEST);
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_CULL_FACE);
-	glScalef(scale, scale, scale);
+	OpenGLD3D::GetModelViewStack().Scale(scale, scale, scale);
 
 	float alpha = 128.0f * scale;
 	glColor4ub(alpha*0.4f, alpha*0.7f, alpha, 128);

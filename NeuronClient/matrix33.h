@@ -3,14 +3,11 @@
 
 
 #include "LegacyVector3.h"
-#include "stdlib.h"	// For "NULL"
 
 class Matrix33
 {
 public:
 	LegacyVector3 r, u, f;
-
-	static float m_openGLFormat[16];
 
 	// Constructors
 	Matrix33();
@@ -45,7 +42,8 @@ public:
 	LegacyVector3			InverseMultiplyVector(LegacyVector3 const &) const;
 
 	void OutputToDebugStream();
-	float *ConvertToOpenGLFormat(LegacyVector3 const *_pos = NULL);
+
+	DirectX::XMFLOAT4X4 ToXMFLOAT4X4(LegacyVector3 const *_pos = nullptr) const;
 
 	// Operators
 	Matrix33 const &operator =  ( Matrix33 const &_o );
@@ -63,12 +61,12 @@ inline LegacyVector3 operator * ( Matrix33 const &_m, LegacyVector3 const &_v )
 }
 
 
-// Operator * between vector3 and matrix33
+// Operator * between vector3 and matrix33 — forward rotation (row-vector convention)
 inline LegacyVector3 operator * (	LegacyVector3 const & _v, Matrix33 const &_m )
 {
-	return LegacyVector3(_m.r.x * _v.x + _m.r.y * _v.y + _m.r.z * _v.z,
-				   _m.u.x * _v.x + _m.u.y * _v.y + _m.u.z * _v.z,
-				   _m.f.x * _v.x + _m.f.y * _v.y + _m.f.z * _v.z);
+	return LegacyVector3(_v.x * _m.r.x + _v.y * _m.u.x + _v.z * _m.f.x,
+				   _v.x * _m.r.y + _v.y * _m.u.y + _v.z * _m.f.y,
+				   _v.x * _m.r.z + _v.y * _m.u.z + _v.z * _m.f.z);
 }
 
 

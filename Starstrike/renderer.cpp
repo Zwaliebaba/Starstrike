@@ -469,11 +469,10 @@ int Renderer::ScreenH() const { return m_screenH; }
 
 void Renderer::SetupProjMatrixFor3D() const
 {
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-
-  gluPerspective(g_app->m_camera->GetFov(), static_cast<float>(m_screenW) / static_cast<float>(m_screenH), // Aspect ratio
-                 m_nearPlane, m_farPlane);
+  OpenGLD3D::GetProjectionStack().PerspectiveFovRH(
+    g_app->m_camera->GetFov(),
+    static_cast<float>(m_screenW) / static_cast<float>(m_screenH),
+    m_nearPlane, m_farPlane);
 }
 
 void Renderer::SetupMatricesFor3D() const
@@ -488,18 +487,16 @@ void Renderer::SetupMatricesFor2D() const
 {
   int v[4];
   glGetIntegerv(GL_VIEWPORT, &v[0]);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  auto& proj = OpenGLD3D::GetProjectionStack();
+  mv.LoadIdentity();
 
   float left = v[0];
   float right = v[0] + v[2];
   float bottom = v[1] + v[3];
   float top = v[1];
-  //	glOrtho(left, right, bottom, top, -m_nearPlane, -m_farPlane);
-  gluOrtho2D(left, right, bottom, top);
-  glMatrixMode(GL_MODELVIEW);
+  proj.OrthoOffCenterRH(left, right, bottom, top);
 }
 
 void Renderer::FPSMeterAdvance()
@@ -750,8 +747,14 @@ void Renderer::UpdateTotalMatrix()
 {
   double m[16];
   double p[16];
-  glGetDoublev(GL_MODELVIEW_MATRIX, m);
-  glGetDoublev(GL_PROJECTION_MATRIX, p);
+
+  const auto& mvTop = OpenGLD3D::GetModelViewStack().GetTop();
+  const auto& prTop = OpenGLD3D::GetProjectionStack().GetTop();
+  for (int i = 0; i < 16; i++)
+  {
+    m[i] = reinterpret_cast<const float*>(&mvTop)[i];
+    p[i] = reinterpret_cast<const float*>(&prTop)[i];
+  }
 
   DEBUG_ASSERT(m[3] == 0.0);
   DEBUG_ASSERT(m[7] == 0.0);

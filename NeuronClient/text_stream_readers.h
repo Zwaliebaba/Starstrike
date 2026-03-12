@@ -1,10 +1,6 @@
 #ifndef INCLUDE_TEXT_STREAM_READERS_H
 #define INCLUDE_TEXT_STREAM_READERS_H
 
-#include <stdio.h>
-#include <string>
-
-
 //*****************************************************************************
 // Class TextReader
 //*****************************************************************************

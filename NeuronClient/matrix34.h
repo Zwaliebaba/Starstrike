@@ -17,8 +17,6 @@ class Matrix34
 public:
 	LegacyVector3 r, u, f, pos;
 
-	static float m_openGLFormat[16];
-
 	// Constructors
 	Matrix34() {}
 
@@ -88,26 +86,13 @@ public:
     bool            IsNormalised    ();
     void			Normalise		();
 
-	float *ConvertToOpenGLFormat() const
+	DirectX::XMFLOAT4X4 ToXMFLOAT4X4() const
 	{
-		m_openGLFormat[0] = r.x;
-		m_openGLFormat[1] = r.y;
-		m_openGLFormat[2] = r.z;
-		m_openGLFormat[3] = 0.0f;
-		m_openGLFormat[4] = u.x;
-		m_openGLFormat[5] = u.y;
-		m_openGLFormat[6] = u.z;
-		m_openGLFormat[7] = 0.0f;
-		m_openGLFormat[8] = f.x;
-		m_openGLFormat[9] = f.y;
-		m_openGLFormat[10] = f.z;
-		m_openGLFormat[11] = 0.0f;
-		m_openGLFormat[12] = pos.x;
-		m_openGLFormat[13] = pos.y;
-		m_openGLFormat[14] = pos.z;
-		m_openGLFormat[15] = 1.0f;
-
-		return m_openGLFormat;
+		return DirectX::XMFLOAT4X4(
+			r.x,   r.y,   r.z,   0.0f,
+			u.x,   u.y,   u.z,   0.0f,
+			f.x,   f.y,   f.z,   0.0f,
+			pos.x, pos.y, pos.z, 1.0f);
 	}
 
 	Matrix33 GetOr() const
@@ -141,12 +126,15 @@ public:
 extern Matrix34 const g_identityMatrix34;
 
 
-// Operator * between matrix34 and vector3
+// Operator * between matrix34 and vector3 — inverse affine transform (column-vector convention)
 inline LegacyVector3 operator * ( Matrix34 const &m, LegacyVector3 const &v )
 {
-	return LegacyVector3(m.r.x*v.x + m.u.x*v.y + m.f.x*v.z + m.pos.x,
-    			   m.r.y*v.x + m.u.y*v.y + m.f.y*v.z + m.pos.y,
-				   m.r.z*v.x + m.u.z*v.y + m.f.z*v.z + m.pos.z);
+	float dx = v.x - m.pos.x;
+	float dy = v.y - m.pos.y;
+	float dz = v.z - m.pos.z;
+	return LegacyVector3(m.r.x*dx + m.r.y*dy + m.r.z*dz,
+				   m.u.x*dx + m.u.y*dy + m.u.z*dz,
+				   m.f.x*dx + m.f.y*dy + m.f.z*dz);
 }
 
 

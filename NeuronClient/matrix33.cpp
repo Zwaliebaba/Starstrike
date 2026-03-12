@@ -7,8 +7,6 @@
 
 
 
-float Matrix33::m_openGLFormat[16];
-
 
 // ****************************************************************************
 // Constructors
@@ -443,36 +441,13 @@ void Matrix33::OutputToDebugStream()
 	DebugTrace("%4.1f %4.1f %4.1f\n", u.x, u.y, u.z );
 }
 
-float *Matrix33::ConvertToOpenGLFormat(LegacyVector3 const *_pos)
+DirectX::XMFLOAT4X4 Matrix33::ToXMFLOAT4X4(LegacyVector3 const *_pos) const
 {
-	m_openGLFormat[0] = r.x;
-	m_openGLFormat[1] = r.y;
-	m_openGLFormat[2] = r.z;
-	m_openGLFormat[3] = 0.0f;
-	m_openGLFormat[4] = u.x;
-	m_openGLFormat[5] = u.y;
-	m_openGLFormat[6] = u.z;
-	m_openGLFormat[7] = 0.0f;
-	m_openGLFormat[8] = f.x;
-	m_openGLFormat[9] = f.y;
-	m_openGLFormat[10] = f.z;
-	m_openGLFormat[11] = 0.0f;
-
-	if (_pos)
-	{
-		m_openGLFormat[12] = _pos->x;
-		m_openGLFormat[13] = _pos->y;
-		m_openGLFormat[14] = _pos->z;
-	}
-	else
-	{
-		m_openGLFormat[12] = 0.0f;
-		m_openGLFormat[13] = 0.0f;
-		m_openGLFormat[14] = 0.0f;
-	}
-	m_openGLFormat[15] = 1.0f;
-
-	return m_openGLFormat;
+	return DirectX::XMFLOAT4X4(
+		r.x,                  r.y,                  r.z,                  0.0f,
+		u.x,                  u.y,                  u.z,                  0.0f,
+		f.x,                  f.y,                  f.z,                  0.0f,
+		_pos ? _pos->x : 0.f, _pos ? _pos->y : 0.f, _pos ? _pos->z : 0.f, 1.0f);
 }
 
 

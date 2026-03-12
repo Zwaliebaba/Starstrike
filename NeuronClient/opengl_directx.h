@@ -1,6 +1,15 @@
 #if !defined __OPENGL_DIRECTX
 #define __OPENGL_DIRECTX
 
+#include "opengl_directx_matrix_stack.h"
+
+class Matrix34;
+
+namespace OpenGLD3D {
+  MatrixStack& GetModelViewStack();
+  MatrixStack& GetProjectionStack();
+}
+
 // Mode declarations for glBegin
 #define GL_POINTS                         0x0000
 #define GL_LINES                          0x0001
@@ -300,6 +309,7 @@ void glPopMatrix ();
 void glLoadIdentity ();
 void glLoadMatrixd (const GLdouble *m);
 void glMultMatrixf (const GLfloat *m);
+void glMultMatrixf (const Matrix34& m);
 void glTranslatef (GLfloat x, GLfloat y, GLfloat z);
 void glScalef (GLfloat x, GLfloat y, GLfloat z);
 void glFrustum (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar);

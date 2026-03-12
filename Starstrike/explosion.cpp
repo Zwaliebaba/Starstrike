@@ -71,7 +71,7 @@ Explosion::Explosion(ShapeFragment *_frag, Matrix34 const &_transform, float _fr
 	FastDArray <ExplodingTri> triangles;
 
 	Matrix34 totalTransform = _frag->m_transform * _transform;
-	LegacyVector3 transformedFragCentre = totalTransform * _frag->m_centre;
+	LegacyVector3 transformedFragCentre = _frag->m_centre * totalTransform;
 
 	for (int j = 0; j < _frag->m_numTriangles; ++j)
 	{

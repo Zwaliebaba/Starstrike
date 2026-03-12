@@ -3,7 +3,6 @@
 #define TARGET_MSVC
 #define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
 #if defined (_DEBUG) 
 #define PROFILER_ENABLED
@@ -16,6 +15,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <concurrent_queue.h>
 #include <concurrent_unordered_map.h>
 #include <cstddef>

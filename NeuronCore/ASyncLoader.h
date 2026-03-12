@@ -27,35 +27,6 @@ class ASyncLoader
       m_isValid = true;
     }
 
-    volatile std::atomic_bool m_isValid{false};
-    volatile std::atomic_bool m_isLoading{false};
-};
-
-class StaticASyncLoader
-{
-  public:
-    [[nodiscard]] static bool IsValid() { return m_isValid; }
-
-    static void WaitForLoad()
-    {
-      while (m_isLoading)
-        std::this_thread::yield();
-    }
-
-  protected:
-    static void StartLoading()
-    {
-      DEBUG_ASSERT_TEXT(!m_isLoading, "Already loading");
-      m_isLoading = true;
-    }
-
-    static void FinishLoading()
-    {
-      DEBUG_ASSERT_TEXT(m_isLoading, "Not loading");
-      m_isLoading = false;
-      m_isValid = true;
-    }
-
-    inline static volatile std::atomic_bool m_isValid{false};
-    inline static volatile std::atomic_bool m_isLoading{false};
+    std::atomic_bool m_isValid{false};
+    std::atomic_bool m_isLoading{false};
 };

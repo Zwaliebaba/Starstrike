@@ -61,19 +61,17 @@ void TextRenderer::BuildOpenGlState()
 
 void TextRenderer::BeginText2D()
 {
-	GLint matrixMode;
 	GLint v[4];
-
-	/* Setup OpenGL matrices */
-	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 	glGetIntegerv(GL_VIEWPORT, &v[0]);
-	glMatrixMode(GL_MODELVIEW);
-	glGetDoublev(GL_MODELVIEW_MATRIX, m_modelviewMatrix);
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glGetDoublev(GL_PROJECTION_MATRIX, m_projectionMatrix);
-	glLoadIdentity();
-	gluOrtho2D(v[0] - 0.325, v[0] + v[2] - 0.325, v[1] + v[3] - 0.325, v[1] - 0.325);
+
+	auto& mv = OpenGLD3D::GetModelViewStack();
+	auto& proj = OpenGLD3D::GetProjectionStack();
+
+	m_modelviewMatrix = mv.GetTop();
+	mv.LoadIdentity();
+
+	m_projectionMatrix = proj.GetTop();
+	proj.OrthoOffCenterRH(v[0] - 0.325f, v[0] + v[2] - 0.325f, v[1] + v[3] - 0.325f, v[1] - 0.325f);
 
     glDisable( GL_LIGHTING );
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -82,17 +80,16 @@ void TextRenderer::BeginText2D()
     glDisable   ( GL_CULL_FACE );
     glDisable   ( GL_DEPTH_TEST );
     glDepthMask ( false );
-
-	glMatrixMode(matrixMode);
 }
 
 
 void TextRenderer::EndText2D()
 {
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixd(m_projectionMatrix);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixd(m_modelviewMatrix);
+	auto& proj = OpenGLD3D::GetProjectionStack();
+	auto& mv = OpenGLD3D::GetModelViewStack();
+
+	proj.Load(m_projectionMatrix);
+	mv.Load(m_modelviewMatrix);
 
     glDepthMask ( true );
     glEnable    ( GL_DEPTH_TEST );
