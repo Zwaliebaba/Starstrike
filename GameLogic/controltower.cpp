@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "file_writer.h"
 #include "matrix34.h"
 #include "resource.h"
@@ -30,7 +29,7 @@ ControlTower::ControlTower()
   m_radius = 4.0f;
   m_type = TypeControlTower;
 
-  SetShape(g_app->m_resource->GetShape("controltower.shp"));
+  Building::SetShape(g_app->m_resource->GetShape("controltower.shp"));
   m_lightPos = m_shape->m_rootFragment->LookupMarker("MarkerLightPos");
   m_dishPos = m_shape->m_rootFragment->LookupMarker("MarkerDishPos");
 
