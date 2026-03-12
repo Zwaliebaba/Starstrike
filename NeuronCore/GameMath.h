@@ -3,6 +3,7 @@
 #include <DirectXCollision.h>
 #include <DirectXMath.h>
 #include "MathCommon.h"
+#include "Transform3D.h"
 
 using namespace DirectX;
 

@@ -252,7 +252,7 @@ void Tree::Generate()
   m_hitcheckRadius *= 0.8f;
 
   float totalTime = GetHighResTime() - timeNow;
-  DebugTrace("Tree generated in %dms\n", static_cast<int>(totalTime * 1000.0f));
+  DebugTrace("Tree generated in {}ms\n", static_cast<int>(totalTime * 1000.0f));
 }
 
 void Tree::Render(float _predictionTime)
@@ -292,7 +292,7 @@ void Tree::RenderAlphas(float _predictionTime)
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
   Matrix34 mat(m_front, g_upVector, m_pos);
-  mv.Multiply(mat.ToXMFLOAT4X4());
+  mv.Multiply(mat);
   mv.Scale(actualHeight, actualHeight, actualHeight);
 
   if (Location::ChristmasModEnabled() == 1)

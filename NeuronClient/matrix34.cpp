@@ -1,8 +1,4 @@
 #include "pch.h"
-
-#include <math.h>
-#include <memory.h>
-
 #include "matrix33.h"
 #include "matrix34.h"
 
@@ -366,10 +362,10 @@ LegacyVector3	Matrix34::InverseMultiplyVector(LegacyVector3 const &s) const
 
 void Matrix34::WriteToDebugStream()
 {
-    DebugTrace("%5.2f %5.2f %5.2f\n", r.x, r.y, r.z);
-    DebugTrace("%5.2f %5.2f %5.2f\n", u.x, u.y, u.z);
-    DebugTrace("%5.2f %5.2f %5.2f\n", f.x, f.y, f.z);
-    DebugTrace("%5.2f %5.2f %5.2f\n\n", pos.x, pos.y, pos.z);
+	DebugTrace("{:5.2f} {:5.2f} {:5.2f}\n", r.x, r.y, r.z);
+	DebugTrace("{:5.2f} {:5.2f} {:5.2f}\n", u.x, u.y, u.z);
+	DebugTrace("{:5.2f} {:5.2f} {:5.2f}\n", f.x, f.y, f.z);
+	DebugTrace("{:5.2f} {:5.2f} {:5.2f}\n\n", pos.x, pos.y, pos.z);
 }
 
 

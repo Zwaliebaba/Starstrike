@@ -219,85 +219,67 @@ form preserves **exact** runtime behaviour with zero semantic change.
 
 ---
 
-### Phase 3 — Introduce a Row-Major Matrix Type (Low–Medium Risk)
+### Phase 3 — Introduce a Row-Major Matrix Type (Low–Medium Risk) ✅ DONE
 
 **Goal:** Provide a modern matrix type that wraps `XMFLOAT4X4` and replaces
 `Matrix33` / `Matrix34` over time.
 
-#### 3.1 — Create `Transform3D` in NeuronCore
+**Status:** Completed. All four sub-steps applied.
 
-A thin wrapper over `XMFLOAT4X4` stored in row-major DirectX convention:
+#### 3.1 — Create `Transform3D` in NeuronCore ✅
 
-```cpp
-// NeuronCore/Transform3D.h
-struct Transform3D
-{
-    XMFLOAT4X4 m;  // Row-major: row 0 = right, row 1 = up, row 2 = forward, row 3 = [pos, 1]
+A thin, header-only wrapper over `XMFLOAT4X4` stored in row-major DirectX convention,
+placed in `NeuronCore/Transform3D.h` inside `namespace Neuron`. Included globally via
+`GameMath.h` → `pch.h` chain.
 
-    // Construction
-    static Transform3D Identity();
-    static Transform3D FromAxes(FXMVECTOR right, FXMVECTOR up, FXMVECTOR forward, FXMVECTOR pos);
-    static Transform3D FromLegacy(const Matrix34& legacy);  // No-cost conversion (memcpy-compatible)
+API surface:
+- **Construction:** `Identity()`, `FromAxes(right, up, forward, pos)`,
+  `FromXMFLOAT4X4(XMFLOAT4X4)`
+- **Access:** `Right()`, `Up()`, `Forward()`, `Position()` (return `XMVECTOR`)
+- **Operations:** `TransformPoint(FXMVECTOR)`, `TransformNormal(FXMVECTOR)`,
+  `operator*`, `operator*=` (composition)
+- **Conversion:** `AsXMFLOAT4X4()`, `AsXMMATRIX()`
 
-    // Access
-    XMVECTOR Right()   const;
-    XMVECTOR Up()      const;
-    XMVECTOR Forward() const;
-    XMVECTOR Position() const;
+**Key design point:** `FromLegacy(Matrix34)` is NOT provided in `Transform3D` itself
+(NeuronCore cannot depend on NeuronClient's `Matrix34`). Instead, the implicit
+conversion operator on `Matrix34` (Phase 3.2) handles this at the NeuronClient layer.
 
-    // Operations
-    XMVECTOR TransformPoint(FXMVECTOR point)  const;  // v * M (row-vector)
-    XMVECTOR TransformNormal(FXMVECTOR normal) const;  // v * M (ignoring translation)
-    Transform3D operator*(const Transform3D& rhs) const; // Composition
+| File | Change |
+|---|---|
+| `NeuronCore/Transform3D.h` | New file — `Neuron::Transform3D` struct |
+| `NeuronCore/GameMath.h` | Added `#include "Transform3D.h"` |
+| `NeuronCore/NeuronCore.vcxproj` | Added `Transform3D.h` to `ClInclude` |
 
-    // Conversion
-    const XMFLOAT4X4& AsXMFLOAT4X4() const { return m; }
-    XMMATRIX          AsXMMATRIX()    const { return XMLoadFloat4x4(&m); }
-};
-```
+#### 3.2 — Add implicit conversion from `Matrix34` to `Transform3D` ✅
 
-**Key design point:** `FromLegacy(Matrix34)` is NOT a raw `memcpy` — `Matrix34` is
-48 bytes (four tightly-packed `LegacyVector3`, 3 floats each) while `XMFLOAT4X4` is
-64 bytes (four 4-float rows). The conversion must expand each 3-float row and insert
-the w component (0 for axes, 1 for position) — the same work `ConvertToOpenGLFormat`
-performs today. No *transpose* is needed, but the padding insertion is unavoidable.
+| File | Change |
+|---|---|
+| `NeuronClient/matrix34.h` | Added `operator Neuron::Transform3D() const` using existing `ToXMFLOAT4X4()` |
 
-#### 3.2 — Add implicit conversion from `Matrix34` to `Transform3D`
+#### 3.3 — Adopt `Transform3D` in rendering code ✅
 
-In `NeuronClient/matrix34.h`:
-```cpp
-operator Transform3D() const { return Transform3D::FromLegacy(*this); }
-```
+Added `MatrixStack::Multiply(const Neuron::Transform3D&)` overload and
+`Shape::Render(float, const Neuron::Transform3D&)` overload. All 4 call sites that
+previously called `.ToXMFLOAT4X4()` now use implicit `Matrix34 → Transform3D`
+conversion.
 
-This allows gradual migration: callers can pass `Matrix34` where `Transform3D` is
-expected.
-
-#### 3.3 — Adopt `Transform3D` in rendering code
-
-Update `Shape::Render`, `ShapeFragment::Render`, `MatrixStack`, and
-`uploadAndBindConstants` to accept/use `Transform3D` instead of `XMFLOAT4X4`.
+| File | Change |
+|---|---|
+| `NeuronClient/opengl_directx_matrix_stack.h` | Added forward decl `namespace Neuron { struct Transform3D; }`, added `Multiply(const Neuron::Transform3D&)` declaration |
+| `NeuronClient/opengl_directx_matrix_stack.cpp` | Added `#include "Transform3D.h"`, implemented `Multiply(const Neuron::Transform3D&)` delegating to `XMFLOAT4X4` overload |
+| `NeuronClient/shape.h` | Added `void Render(float, const Neuron::Transform3D&)` declaration |
+| `NeuronClient/shape.cpp` | `ShapeFragment::Render`: `mv.Multiply(predictedTransform.ToXMFLOAT4X4())` → `mv.Multiply(predictedTransform)` (implicit conversion) |
+| `NeuronClient/shape.cpp` | `Shape::Render(Matrix34)`: now delegates to `Shape::Render(Transform3D)` overload |
+| `NeuronClient/shape.cpp` | New `Shape::Render(Transform3D)`: primary implementation using `mv.Multiply(_transform)` |
+| `NeuronClient/opengl_directx.cpp` | `glMultMatrixf(Matrix34)`: `Multiply(m.ToXMFLOAT4X4())` → `Multiply(m)` (implicit conversion) |
+| `GameLogic/tree.cpp` | `mv.Multiply(mat.ToXMFLOAT4X4())` → `mv.Multiply(mat)` (implicit conversion) |
 
 #### 3.4 — Migrate GameLogic files incrementally
 
-Starting with the simplest callers (e.g., `Building::Render`), replace local
-`Matrix34` construction with `Transform3D`:
-
-```cpp
-// Before
-Matrix34 mat(m_front, g_upVector, m_pos);
-m_shape->Render(predictionTime, mat);
-
-// After
-auto transform = Transform3D::FromAxes(
-    ToXMVector(GetRight(m_front, m_up)),
-    ToXMVector(m_up),
-    ToXMVector(m_front),
-    ToXMVector(m_pos));
-m_shape->Render(predictionTime, transform);
-```
-
-Or, if `Matrix34` has an implicit conversion operator, no change is needed at the
-call site — the conversion happens automatically.
+No explicit migration needed at this stage. Since `Matrix34` has an implicit
+conversion to `Transform3D`, all existing callers of `Shape::Render(Matrix34)` work
+unchanged. Callers can optionally be updated to construct `Transform3D` directly, but
+this is deferred to Phase 4 when `Matrix34` usage is removed file-by-file.
 
 ---
 

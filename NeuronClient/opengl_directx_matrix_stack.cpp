@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "opengl_directx_matrix_stack.h"
+#include "Transform3D.h"
+#include "Transform3D.h"
 
 using namespace DirectX;
 using namespace OpenGLD3D;
@@ -31,6 +33,11 @@ void MatrixStack::Multiply(const XMFLOAT4X4& m)
 	XMMATRIX mat = XMLoadFloat4x4(&m);
 	XMStoreFloat4x4(&m_current, XMMatrixMultiply(mat, current));
 	m_dirty = true;
+}
+
+void MatrixStack::Multiply(const Neuron::Transform3D& t)
+{
+	Multiply(t.AsXMFLOAT4X4());
 }
 
 void MatrixStack::Push()

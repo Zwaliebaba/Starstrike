@@ -136,7 +136,7 @@ NetRetCode NetSocket::Connect()
 	NetHostDetails *pHostent = NetGetHostByName(m_hostname);
 	if (!pHostent)
 	{
-		DebugTrace("Host address resolution failed for %s", m_hostname);
+		DebugTrace("Host address resolution failed for {}", m_hostname);
 		return NetFailed;
 	}
 	else 
@@ -173,7 +173,7 @@ NetRetCode NetSocket::Connect()
 		}
 		else
 		{
-			DebugTrace("Connect to host failed: %d", err);
+			DebugTrace("Connect to host failed: {}", err);
 			ret = NetFailed;
 			break;
 		}

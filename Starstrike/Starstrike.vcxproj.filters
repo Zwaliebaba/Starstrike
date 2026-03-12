@@ -394,7 +394,6 @@
     <ClCompile Include="clouds.cpp" />
     <ClCompile Include="entity_grid.cpp" />
     <ClCompile Include="explosion.cpp" />
-    <ClCompile Include="game_menu.cpp" />
     <ClCompile Include="gamecursor.cpp" />
     <ClCompile Include="global_internet.cpp" />
     <ClCompile Include="global_world.cpp" />
@@ -419,6 +418,7 @@
     <ClCompile Include="user_input.cpp" />
     <ClCompile Include="water.cpp" />
     <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="ai.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -429,7 +429,6 @@
     <ClInclude Include="clouds.h" />
     <ClInclude Include="entity_grid.h" />
     <ClInclude Include="explosion.h" />
-    <ClInclude Include="game_menu.h" />
     <ClInclude Include="gamecursor.h" />
     <ClInclude Include="global_internet.h" />
     <ClInclude Include="global_world.h" />

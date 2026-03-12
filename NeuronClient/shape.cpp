@@ -791,7 +791,7 @@ void ShapeFragment::Render(float _predictionTime)
   if (!matrixIsIdentity)
   {
     mv.Push();
-    mv.Multiply(predictedTransform.ToXMFLOAT4X4());
+    mv.Multiply(predictedTransform);
   }
 
   RenderSlow();
@@ -1157,11 +1157,16 @@ void Shape::WriteToFile(FILE* _out) const { m_rootFragment->WriteToFile(_out); }
 
 void Shape::Render(float _predictionTime, const Matrix34& _transform)
 {
+  Render(_predictionTime, static_cast<Neuron::Transform3D>(_transform));
+}
+
+void Shape::Render(float _predictionTime, const Neuron::Transform3D& _transform)
+{
 #ifndef EXPORTER_BUILD
   glEnable(GL_COLOR_MATERIAL);
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
-  mv.Multiply(_transform.ToXMFLOAT4X4());
+  mv.Multiply(_transform);
 
   m_rootFragment->Render(_predictionTime);
 

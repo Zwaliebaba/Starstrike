@@ -95,6 +95,11 @@ public:
 			pos.x, pos.y, pos.z, 1.0f);
 	}
 
+  operator Neuron::Transform3D() const
+	{
+		return Neuron::Transform3D{ ToXMFLOAT4X4() };
+	}
+
 	Matrix33 GetOr() const
 	{
 		return Matrix33(r, u, f);

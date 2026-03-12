@@ -113,7 +113,7 @@ void ObstructionGrid::CalculateAll()
   }
 
   float totalTime = GetHighResTime() - startTime;
-  DebugTrace("ObstructionGrid took %dms to generate\n", static_cast<int>(totalTime * 1000));
+  DebugTrace("ObstructionGrid took {}ms to generate\n", static_cast<int>(totalTime * 1000));
 }
 
 LList<int>* ObstructionGrid::GetBuildings(float _locationX, float _locationZ)

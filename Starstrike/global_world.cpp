@@ -1684,7 +1684,7 @@ void GlobalWorld::LoadGame(char* _filename)
         {
           if (!building->m_dynamic)
           {
-            DebugTrace("%s found on level %s should be dynamic (otherwise save games wont work)\n", Building::GetTypeName(building->m_type),
+            DebugTrace("{} found on level {} should be dynamic (otherwise save games wont work)\n", Building::GetTypeName(building->m_type),
                        GetLocationName(loc->m_id));
           }
         }

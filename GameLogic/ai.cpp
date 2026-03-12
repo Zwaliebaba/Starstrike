@@ -88,7 +88,7 @@ void AI::Begin()
   }
 
   float timeTaken = GetHighResTime() - startTime;
-  DebugTrace("AI Node graph rebuilt in %dms\n", static_cast<int>(timeTaken * 1000.0f));
+  DebugTrace("AI Node graph rebuilt in {}ms\n", static_cast<int>(timeTaken * 1000.0f));
 }
 
 int AI::FindTargetBuilding(int _fromTargetId, int _fromTeamId)

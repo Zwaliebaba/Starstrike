@@ -1,42 +1,38 @@
 #include "pch.h"
-
-#include "input.h"
-#include "profiler.h"
-#include "language_table.h"
-#include "math_utils.h"
-#include "matrix33.h"
-#include "resource.h"
-#include "shape.h"
-
-#include "preferences.h"
+#include "location.h"
 #include "GameApp.h"
+#include "armour.h"
 #include "camera.h"
 #include "clouds.h"
+#include "darwinian.h"
+#include "engineer.h"
 #include "entity_grid.h"
+#include "factory.h"
+#include "gamecursor.h"
 #include "global_world.h"
+#include "input.h"
+#include "insertion_squad.h"
 #include "landscape.h"
 #include "level_file.h"
-#include "location.h"
 #include "main.h"
+#include "math_utils.h"
 #include "obstruction_grid.h"
+#include "officer.h"
 #include "particle_system.h"
+#include "preferences.h"
+#include "profiler.h"
 #include "renderer.h"
-#include "team.h"
-#include "unit.h"
-#include "water.h"
-#include "gamecursor.h"
+#include "resource.h"
+#include "shape.h"
+#include "snow.h"
 #include "taskmanager.h"
 #include "taskmanager_interface.h"
-#include "weapons.h"
-#include "factory.h"
-#include "worldobject.h"
-#include "engineer.h"
-#include "officer.h"
-#include "armour.h"
-#include "darwinian.h"
-#include "snow.h"
+#include "team.h"
 #include "tree.h"
-#include "insertion_squad.h"
+#include "unit.h"
+#include "water.h"
+#include "weapons.h"
+#include "worldobject.h"
 
 // ****************************************************************************
 //  Class Location
@@ -1178,14 +1174,12 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
   team->Initialise(_teamId);
   team->SetTeamType(_teamType);
 
-  DebugTrace("CLIENT : New team created, id %d, type %d\n", _teamId, _teamType);
+  DebugTrace("CLIENT : New team created, id {}, type {}\n", _teamId, _teamType);
 
   if (_teamType == Team::TeamTypeLocalPlayer)
   {
-    DebugTrace("CLIENT : Assigned team %d\n", _teamId);
+    DebugTrace("CLIENT : Assigned team {}\n", _teamId);
     g_app->m_globalWorld->m_myTeamId = _teamId;
-    //		g_target->SetMousePos(g_app->m_renderer->ScreenW(), g_app->m_renderer->ScreenH());
-    //		g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
   }
 
   // Create instant units that belong to this team

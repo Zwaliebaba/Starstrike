@@ -186,6 +186,7 @@ class Shape
     void WriteToFile(FILE* _out) const;
 
     void Render(float _predictionTime, const Matrix34& _transform);
+    void Render(float _predictionTime, const Neuron::Transform3D& _transform);
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false);
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false);

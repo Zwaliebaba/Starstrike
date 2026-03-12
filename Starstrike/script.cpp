@@ -117,7 +117,7 @@ void Script::RunCommand_CamBuildingFocus(int _buildingId, float _range, float _h
   if (building)
     g_app->m_camera->RequestBuildingFocusMode(building, _range, _height);
   else
-    DebugTrace("SCRIPT ERROR : Tried to target non-existent building %d", _buildingId);
+    DebugTrace("SCRIPT ERROR : Tried to target non-existent building {}", _buildingId);
 }
 
 void Script::RunCommand_CamBuildingApproach(int _buildingId, float _range, float _height, float _duration)
@@ -134,7 +134,7 @@ void Script::RunCommand_CamBuildingApproach(int _buildingId, float _range, float
     g_app->m_camera->RequestMode(Camera::ModeMoveToTarget);
   }
   else
-    DebugTrace("SCRIPT ERROR : Tried to target non-existent building %d", _buildingId);
+    DebugTrace("SCRIPT ERROR : Tried to target non-existent building {}", _buildingId);
 }
 
 void Script::RunCommand_CamGlobalWorldFocus() { g_app->m_camera->RequestSphereFocusMode(); }

@@ -88,6 +88,7 @@
     <ClInclude Include="MathCommon.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Transform3D.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

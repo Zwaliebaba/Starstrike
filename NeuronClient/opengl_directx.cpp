@@ -692,7 +692,7 @@ void glMultMatrixf(const GLfloat* m)
 
 void glMultMatrixf(const Matrix34& m)
 {
-  s_pTargetMatrixStack->Multiply(m.ToXMFLOAT4X4());
+  s_pTargetMatrixStack->Multiply(m);
 }
 
 void glLoadMatrixd(const GLdouble* _m)

@@ -249,7 +249,7 @@ void EntityGrid::EnsureMaxNeighbours( int _maxNeighbours )
         m_maxNeighbours = newMaxNeighbours;
 
         float time = GetHighResTime() - startTime;
-        DebugTrace( "EntityGrid max neighbours set to %d (time taken %2.2fms)\n", m_maxNeighbours, time*1000.0f );
+        DebugTrace( "EntityGrid max neighbours set to {} (time taken {:2.2f}ms)\n", m_maxNeighbours, time*1000.0f );
     }
 }
 

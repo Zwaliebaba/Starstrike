@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include <stack>
 
+namespace Neuron { struct Transform3D; }
+
 namespace OpenGLD3D {
 
 	class MatrixStack {
@@ -13,6 +15,7 @@ namespace OpenGLD3D {
 		void LoadIdentity();
 		void Load(const DirectX::XMFLOAT4X4& m);
 		void Multiply(const DirectX::XMFLOAT4X4& m);
+		void Multiply(const Neuron::Transform3D& t);
 		void Push();
 		void Pop();
 
