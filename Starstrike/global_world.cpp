@@ -761,9 +761,6 @@ void SphereWorld::Render()
     RenderSpirits();
     RenderHeaven();
   }
-
-  glEnable(GL_CULL_FACE); // CRASH WORKAROUND - FIX AND DELETE ASAP
-  CHECK_OPENGL_STATE();
 }
 
 void SphereWorld::RenderSpirits()
@@ -921,8 +918,9 @@ void SphereWorld::RenderWorldShape()
   glMaterialfv(GL_FRONT, GL_SHININESS, materialShininess);
   glMaterialfv(GL_FRONT, GL_AMBIENT, ambCol);
 
-  glPushMatrix();
-  glScalef(120.0f, 120.0f, 120.0f);
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
+  mv.Scale(120.0f, 120.0f, 120.0f);
   glEnable(GL_NORMALIZE);
 
   glEnable(GL_BLEND);
@@ -938,7 +936,7 @@ void SphereWorld::RenderWorldShape()
   m_shapeInner->Render(0.0f, g_identityMatrix34);
 
   glDisable(GL_NORMALIZE);
-  glPopMatrix();
+  mv.Pop();
 
   glDisable(GL_COLOR_MATERIAL);
   glDisable(GL_LIGHTING);
@@ -1010,8 +1008,9 @@ void SphereWorld::RenderHeaven()
   //
   // Render the central repository of spirits
 
-  glPushMatrix();
-  glScalef(120.0f, 120.0f, 120.0f);
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
+  mv.Scale(120.0f, 120.0f, 120.0f);
 
   LegacyVector3 camUp = g_app->m_camera->GetUp();
   LegacyVector3 camRight = g_app->m_camera->GetRight();
@@ -1042,7 +1041,7 @@ void SphereWorld::RenderHeaven()
     glEnd();
   }
 
-  glPopMatrix();
+  mv.Pop();
 
   //
   // Render god rays going down
@@ -1098,8 +1097,6 @@ void SphereWorld::RenderIslands()
   // Render the islands
 
   START_PROFILE(g_app->m_profiler, "Islands");
-
-  glMatrixMode(GL_MODELVIEW);
 
   LegacyVector3 rayStart, rayDir;
   g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);

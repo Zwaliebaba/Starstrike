@@ -102,12 +102,12 @@ void Sphere::RenderLong()
 
 void Sphere::Render(LegacyVector3 const &pos, float radius)
 {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glTranslatef(pos.x, pos.y, pos.z);
-	glScalef(radius, radius, radius);
+	auto& mv = OpenGLD3D::GetModelViewStack();
+	mv.Push();
+	mv.Translate(pos.x, pos.y, pos.z);
+	mv.Scale(radius, radius, radius);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glCallList(m_displayListId);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glPopMatrix();
+	mv.Pop();
 }

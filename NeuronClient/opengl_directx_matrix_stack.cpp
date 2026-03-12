@@ -45,3 +45,51 @@ void MatrixStack::Pop()
 	m_stack.pop();
 	m_dirty = true;
 }
+
+void MatrixStack::Translate(float x, float y, float z)
+{
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixTranslation(x, y, z));
+	Multiply(mat);
+}
+
+void MatrixStack::Scale(float x, float y, float z)
+{
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixScaling(x, y, z));
+	Multiply(mat);
+}
+
+void MatrixStack::RotateAxis(float angleDegrees, float x, float y, float z)
+{
+	XMVECTOR axis = XMVectorSet(x, y, z, 0);
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixRotationAxis(axis, XMConvertToRadians(angleDegrees)));
+	Multiply(mat);
+}
+
+void MatrixStack::LookAtRH(float eyeX, float eyeY, float eyeZ,
+                            float atX, float atY, float atZ,
+                            float upX, float upY, float upZ)
+{
+	XMVECTOR eye = XMVectorSet(eyeX, eyeY, eyeZ, 0);
+	XMVECTOR at = XMVectorSet(atX, atY, atZ, 0);
+	XMVECTOR up = XMVectorSet(upX, upY, upZ, 0);
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixLookAtRH(eye, at, up));
+	Load(mat);
+}
+
+void MatrixStack::PerspectiveFovRH(float fovAngleYDegrees, float aspect, float nearZ, float farZ)
+{
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixPerspectiveFovRH(XMConvertToRadians(fovAngleYDegrees), aspect, nearZ, farZ));
+	Load(mat);
+}
+
+void MatrixStack::OrthoOffCenterRH(float left, float right, float bottom, float top, float nearZ, float farZ)
+{
+	XMFLOAT4X4 mat;
+	XMStoreFloat4x4(&mat, XMMatrixOrthographicOffCenterRH(left, right, bottom, top, nearZ, farZ));
+	Load(mat);
+}

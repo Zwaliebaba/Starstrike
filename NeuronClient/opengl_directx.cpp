@@ -5,6 +5,7 @@
 #include "opengl_directx_matrix_stack.h"
 #include "ogl_extensions.h"
 #include "d3d12_backend.h"
+#include "matrix34.h"
 
 using namespace OpenGLD3D;
 
@@ -46,6 +47,9 @@ static GLenum s_matrixMode = GL_MODELVIEW;
 static MatrixStack* s_pTargetMatrixStack = nullptr;
 static MatrixStack s_modelViewMatrixStack;
 static MatrixStack s_projectionMatrixStack;
+
+MatrixStack& OpenGLD3D::GetModelViewStack() { return s_modelViewMatrixStack; }
+MatrixStack& OpenGLD3D::GetProjectionStack() { return s_projectionMatrixStack; }
 
 // --- Colours ---
 static UINT32 s_clearColor = 0xFF000000; // ARGB packed
@@ -684,6 +688,11 @@ void glMultMatrixf(const GLfloat* m)
   // OpenGL column-major → our row-major (same as D3D9 code which copied directly)
   memcpy(&mat, m, sizeof(XMFLOAT4X4));
   s_pTargetMatrixStack->Multiply(mat);
+}
+
+void glMultMatrixf(const Matrix34& m)
+{
+  s_pTargetMatrixStack->Multiply(m.ToXMFLOAT4X4());
 }
 
 void glLoadMatrixd(const GLdouble* _m)

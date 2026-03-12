@@ -1,6 +1,8 @@
 #ifndef TEXT_RENDERER_H
 #define TEXT_RENDERER_H
 
+#include <DirectXMath.h>
+
 class RGBAColour;
 class LegacyVector3;
 
@@ -16,8 +18,8 @@ class LegacyVector3;
 class TextRenderer
 {
 protected:
-	double			m_projectionMatrix[16];
-	double			m_modelviewMatrix[16];
+	DirectX::XMFLOAT4X4		m_projectionMatrix;
+	DirectX::XMFLOAT4X4		m_modelviewMatrix;
 	char			*m_filename;
 	unsigned int    m_textureID;
 	unsigned int	m_bitmapWidth;

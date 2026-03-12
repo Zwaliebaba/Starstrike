@@ -289,11 +289,11 @@ void Tree::RenderAlphas(float _predictionTime)
   glDisable(GL_CULL_FACE);
   glDepthMask(false);
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   Matrix34 mat(m_front, g_upVector, m_pos);
-  glMultMatrixf(mat.ConvertToOpenGLFormat());
-  glScalef(actualHeight, actualHeight, actualHeight);
+  mv.Multiply(mat.ToXMFLOAT4X4());
+  mv.Scale(actualHeight, actualHeight, actualHeight);
 
   if (Location::ChristmasModEnabled() == 1)
   {
@@ -311,7 +311,7 @@ void Tree::RenderAlphas(float _predictionTime)
     glCallList(m_leafDisplayListId);
   }
 
-  glPopMatrix();
+  mv.Pop();
 
   glDepthMask(true);
   glEnable(GL_CULL_FACE);

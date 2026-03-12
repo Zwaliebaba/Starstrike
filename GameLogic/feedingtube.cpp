@@ -163,16 +163,16 @@ void FeedingTube::RenderSignal(float _predictionTime, float _radius, float _alph
   glDepthMask(false);
   glColor4f(1.0f, 1.0f, 1.0f, _alpha);
 
-  glMatrixMode(GL_MODELVIEW);
-  glTranslatef(startPos.x, startPos.y, startPos.z);
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Translate(startPos.x, startPos.y, startPos.z);
   LegacyVector3 dishFront = GetForwardsClippingDir(_predictionTime, receiver);
   double eqn1[4] = {dishFront.x, dishFront.y, dishFront.z, -1.0f};
   glClipPlane(GL_CLIP_PLANE0, eqn1);
 
   LegacyVector3 receiverPos = receiver->GetDishPos(_predictionTime);
   LegacyVector3 receiverFront = receiver->GetForwardsClippingDir(_predictionTime, this);
-  glTranslatef(-startPos.x, -startPos.y, -startPos.z);
-  glTranslatef(receiverPos.x, receiverPos.y, receiverPos.z);
+  mv.Translate(-startPos.x, -startPos.y, -startPos.z);
+  mv.Translate(receiverPos.x, receiverPos.y, receiverPos.z);
 
   LegacyVector3 diff = receiverPos - startPos;
   float thisDistance = -(receiverFront * diff);
@@ -181,9 +181,9 @@ void FeedingTube::RenderSignal(float _predictionTime, float _radius, float _alph
 
   double eqn2[4] = {receiverFront.x, receiverFront.y, receiverFront.z, thisDistance};
   glClipPlane(GL_CLIP_PLANE1, eqn2);
-  glTranslatef(-receiverPos.x, -receiverPos.y, -receiverPos.z);
+  mv.Translate(-receiverPos.x, -receiverPos.y, -receiverPos.z);
 
-  glTranslatef(startPos.x, startPos.y, startPos.z);
+  mv.Translate(startPos.x, startPos.y, startPos.z);
 
   glEnable(GL_CLIP_PLANE0);
   glEnable(GL_CLIP_PLANE1);
@@ -223,7 +223,7 @@ void FeedingTube::RenderSignal(float _predictionTime, float _radius, float _alph
 
     glEnd();
   }
-  glTranslatef(-startPos.x, -startPos.y, -startPos.z);
+  mv.Translate(-startPos.x, -startPos.y, -startPos.z);
 
   glDisable(GL_CLIP_PLANE0);
   glDisable(GL_CLIP_PLANE1);

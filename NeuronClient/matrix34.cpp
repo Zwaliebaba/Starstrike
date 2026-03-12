@@ -8,8 +8,6 @@
 
 
 
-float Matrix34::m_openGLFormat[16];
-
 Matrix34 const g_identityMatrix34(0);
 
 

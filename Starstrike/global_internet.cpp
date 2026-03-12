@@ -127,8 +127,9 @@ void GlobalInternet::Render()
   /*static*/
   float scale = 1000.0f;
 
-  glPushMatrix();
-  glScalef(scale, scale, scale);
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
+  mv.Scale(scale, scale, scale);
 
   float fog = 0.0f;
   float fogCol[] = {fog, fog, fog, fog};
@@ -219,7 +220,7 @@ void GlobalInternet::Render()
   g_app->m_globalWorld->SetupFog();
   glDisable(GL_FOG);
 
-  glPopMatrix();
+  mv.Pop();
 
   END_PROFILE(g_app->m_profiler, "Internet");
 }

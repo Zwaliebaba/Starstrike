@@ -291,10 +291,9 @@ void TaskManagerInterfaceIcons::SetupRenderMatrices(int _screenId)
    *  And 960x600 on a widescreen screen
    */
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  auto& proj = OpenGLD3D::GetProjectionStack();
+  mv.LoadIdentity();
 
   float screenRatio = static_cast<float>(g_app->m_renderer->ScreenW()) / static_cast<float>(g_app->m_renderer->ScreenH());
   m_screenH = 600.0f;
@@ -324,8 +323,7 @@ void TaskManagerInterfaceIcons::SetupRenderMatrices(int _screenId)
   float right = left + m_screenW;
   float bottom = top + m_screenH;
 
-  gluOrtho2D(left, right, bottom, top);
-  glMatrixMode(GL_MODELVIEW);
+  proj.OrthoOffCenterRH(left, right, bottom, top);
 }
 
 void TaskManagerInterfaceIcons::ConvertMousePosition(float& _x, float& _y)

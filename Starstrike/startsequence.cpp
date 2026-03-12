@@ -85,12 +85,10 @@ void StartSequence::Render()
   float screenRatio = static_cast<float>(g_app->m_renderer->ScreenH()) / static_cast<float>(g_app->m_renderer->ScreenW());
   int screenH = 800 * screenRatio;
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0, 800, screenH, 0);
-  glMatrixMode(GL_MODELVIEW);
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  auto& proj = OpenGLD3D::GetProjectionStack();
+  mv.LoadIdentity();
+  proj.OrthoOffCenterRH(0, 800, screenH, 0);
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
@@ -189,8 +187,8 @@ void StartSequence::Render()
 
   if (timeNow > 50.0f)
   {
-    glPushMatrix();
-    glScalef(scale, scale, scale);
+    mv.Push();
+    mv.Scale(scale, scale, scale);
 
     glFogf(GL_FOG_DENSITY, 1.0f);
     glFogf(GL_FOG_START, 0.0f);
@@ -229,6 +227,6 @@ void StartSequence::Render()
     g_app->m_globalWorld->SetupFog();
     glDisable(GL_FOG);
 
-    glPopMatrix();
+    mv.Pop();
   }
 }

@@ -87,14 +87,14 @@ void Camera::AdvanceDebugMode()
   {
     Matrix33 mat(1);
     mat.RotateAroundY(static_cast<float>(mx) * -0.005f);
-    m_up = m_up * mat;
-    m_front = m_front * mat;
+    m_up = mat * m_up;
+    m_front = mat * m_front;
 
     LegacyVector3 right = GetRight();
     mat.SetToIdentity();
     mat.FastRotateAround(right, static_cast<float>(my) * -0.005f);
-    m_up = m_up * mat;
-    m_front = m_front * mat;
+    m_up = mat * m_up;
+    m_front = mat * m_front;
   }
 }
 
@@ -106,8 +106,15 @@ void Camera::Get2DScreenPos(const LegacyVector3& _vector, float* _screenX, float
   double viewMatrix[16];
   double projMatrix[16];
   glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_MODELVIEW_MATRIX, viewMatrix);
-  glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);
+
+  const auto& mvTop = OpenGLD3D::GetModelViewStack().GetTop();
+  const auto& prTop = OpenGLD3D::GetProjectionStack().GetTop();
+  for (int i = 0; i < 16; i++)
+  {
+    viewMatrix[i] = reinterpret_cast<const float*>(&mvTop)[i];
+    projMatrix[i] = reinterpret_cast<const float*>(&prTop)[i];
+  }
+
   gluProject(_vector.x, _vector.y, _vector.z, viewMatrix, projMatrix, viewport, &outX, &outY, &outZ);
 
   *_screenX = outX;
@@ -134,7 +141,8 @@ void Camera::AdvanceSphereWorldMode()
   auto focusPos = LegacyVector3(0, m_height * -400, 0);
 
   // Set up viewing matrices
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -217,7 +225,7 @@ void Camera::AdvanceSphereWorldMode()
 
   // Apply the mouse cursor movement
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
+  mv.Pop();
 }
 
 void Camera::AdvanceSphereWorldScriptedMode()
@@ -235,7 +243,8 @@ void Camera::AdvanceSphereWorldScriptedMode()
   focusPos.z += sinf(g_gameTime * 0.3f) * 4000.0f;
 
   // Set up viewing matrices
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -271,7 +280,7 @@ void Camera::AdvanceSphereWorldScriptedMode()
   float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
-  glPopMatrix();
+  mv.Pop();
 }
 
 /*
@@ -541,7 +550,8 @@ void Camera::AdvanceFreeMovementMode()
   InputManager* im = g_inputManager;
 
   // Set up viewing matrices
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -709,7 +719,7 @@ void Camera::AdvanceFreeMovementMode()
 
     // Apply the mouse cursor movement
     g_target->SetMousePos(newMouseX, newMouseY);
-    glPopMatrix();
+    mv.Pop();
   }
 }
 
@@ -1243,7 +1253,8 @@ void Camera::AdvanceRadarAimMode()
   focusPos.y += m_height;
 
   // Set up viewing matrices
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -1317,7 +1328,7 @@ void Camera::AdvanceRadarAimMode()
   // Apply the mouse cursor movement
   //alleg    position_mouse(newMouseX, newMouseY);
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
+  mv.Pop();
 }
 
 void Camera::AdvanceTurretAimMode()
@@ -1339,7 +1350,8 @@ void Camera::AdvanceTurretAimMode()
   focusPos.y += m_height;
 
   // Set up viewing matrices
-  glPushMatrix();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  mv.Push();
   SetupProjectionMatrix(g_app->m_renderer->GetNearPlane(), g_app->m_renderer->GetFarPlane());
   SetupModelviewMatrix();
 
@@ -1413,7 +1425,7 @@ void Camera::AdvanceTurretAimMode()
   // Apply the mouse cursor movement
   //alleg    position_mouse(newMouseX, newMouseY);
   g_target->SetMousePos(newMouseX, newMouseY);
-  glPopMatrix();
+  mv.Pop();
 }
 
 void Camera::AdvanceFirstPersonMode()
@@ -1463,14 +1475,14 @@ void Camera::AdvanceFirstPersonMode()
 
   Matrix33 mat(1);
   mat.RotateAroundY(static_cast<float>(mx) * -0.01f);
-  m_up = m_up * mat;
-  m_front = m_front * mat;
+  m_up = mat * m_up;
+  m_front = mat * m_front;
 
   LegacyVector3 right = GetRight();
   mat.SetToIdentity();
   mat.RotateAround(right, static_cast<float>(my) * 0.01f);
-  m_up = m_up * mat;
-  m_front = m_front * mat;
+  m_up = mat * m_up;
+  m_front = mat * m_front;
 
   float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   m_pos.y = landHeight + 3.0f;
@@ -1663,13 +1675,12 @@ void Camera::SetupModelviewMatrix()
   DEBUG_ASSERT(NearlyEquals(m_up.MagSquared(), 1.0f));
   DEBUG_ASSERT(NearlyEquals(dot, 0.0f));
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  auto& mv = OpenGLD3D::GetModelViewStack();
   float magOfPos = m_pos.Mag();
   LegacyVector3 front = m_front * magOfPos;
   LegacyVector3 up = m_up * magOfPos;
   LegacyVector3 forwards = m_pos + front;
-  gluLookAt(m_pos.x, m_pos.y, m_pos.z, forwards.x, forwards.y, forwards.z, up.x, up.y, up.z);
+  mv.LookAtRH(m_pos.x, m_pos.y, m_pos.z, forwards.x, forwards.y, forwards.z, up.x, up.y, up.z);
 }
 
 bool Camera::PosInViewFrustum(const LegacyVector3& _pos)
@@ -2176,16 +2187,25 @@ void Camera::GetClickRay(int _x, int _y, LegacyVector3* _rayStart, LegacyVector3
   GLdouble objx, objy, objz;
 
   glGetIntegerv(GL_VIEWPORT, viewport);
-  glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
-  glGetDoublev(GL_PROJECTION_MATRIX, projMatrix);
+
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  const auto& mvTop = mv.GetTop();
+  const auto& prTop = OpenGLD3D::GetProjectionStack().GetTop();
+  for (int i = 0; i < 16; i++)
+  {
+    mvMatrix[i] = reinterpret_cast<const float*>(&mvTop)[i];
+    projMatrix[i] = reinterpret_cast<const float*>(&prTop)[i];
+  }
+
   int realY = viewport[3] - _y - 1;
 
   if ((mvMatrix[0] + mvMatrix[1] + mvMatrix[2] == 0) || (mvMatrix[5] + mvMatrix[6] + mvMatrix[7] == 0) || (mvMatrix[9] + mvMatrix[10] +
     mvMatrix[11] == 0))
   {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
+    mv.LoadIdentity();
+    const auto& identity = mv.GetTop();
+    for (int i = 0; i < 16; i++)
+      mvMatrix[i] = reinterpret_cast<const float*>(&identity)[i];
   }
 
   gluUnProject(_x, realY, 0.0f, mvMatrix, projMatrix, viewport, &objx, &objy, &objz);
