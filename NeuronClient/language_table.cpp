@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include <strstream>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 
@@ -206,7 +206,7 @@ bool printTable( HashTable<int> const *keys, const char *table, std::ostream &ou
 
 void LangTable::RebuildTables()
 {
-	std::ostrstream stream;
+	std::ostringstream stream;
 
 	delete m_phrasesKbd;
 	delete m_phrasesXin;
@@ -217,7 +217,9 @@ void LangTable::RebuildTables()
 	RebuildTable( m_phrasesKbd, stream, INPUT_MODE_KEYBOARD );
 	RebuildTable( m_phrasesXin, stream, INPUT_MODE_GAMEPAD );
 	if ( m_chunk ) delete [] m_chunk;
-	m_chunk = stream.str();
+	const std::string &buf = stream.str();
+	m_chunk = new char[buf.size()];
+	memcpy( m_chunk, buf.data(), buf.size() );
 
 	if ( DEBUG_PRINT_LANGTABLE ) {
 		std::ofstream dbg_out( "langtable_debug.txt", std::ios::app );
@@ -234,7 +236,7 @@ void LangTable::RebuildTables()
 	}
 }
 
-void LangTable::RebuildTable( HashTable<int> *_phrases, std::ostrstream &stream, InputMode _mood )
+void LangTable::RebuildTable( HashTable<int> *_phrases, std::ostringstream &stream, InputMode _mood )
 {
 	char theString[1024];
 

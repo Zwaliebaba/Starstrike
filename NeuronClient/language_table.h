@@ -3,7 +3,7 @@
 
 #include "input_types.h"
 
-#include <strstream>
+#include <sstream>
 
 #include "llist.h"
 #include "btree.h"
@@ -35,7 +35,7 @@ private:
 	HashTable<int> *GetCurrentTable();
 	HashTable<int> *GetCurrentTable(InputMode _mood);
 
-	void RebuildTable( HashTable<int> *_phrases, std::ostrstream &stream, InputMode _mood );
+	void RebuildTable( HashTable<int> *_phrases, std::ostringstream &stream, InputMode _mood );
 
 public:
 	LangTable   (char *_filename);
