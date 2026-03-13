@@ -595,7 +595,23 @@ void TeamControls::SetFlags(unsigned short _flags)
   m_endSetTarget = _flags & 0x0100 ? 1 : 0;
 }
 
-void TeamControls::Clear() { memset(this, 0, sizeof(*this)); }
+void TeamControls::Clear()
+{
+  m_mousePos = LegacyVector3(0, 0, 0);
+  m_unitMove = 0;
+  m_primaryFireTarget = 0;
+  m_secondaryFireTarget = 0;
+  m_primaryFireDirected = 0;
+  m_secondaryFireDirected = 0;
+  m_cameraEntityTracking = 0;
+  m_directUnitMove = 0;
+  m_unitSecondaryMode = 0;
+  m_endSetTarget = 0;
+  m_directUnitMoveDx = 0;
+  m_directUnitMoveDy = 0;
+  m_directUnitFireDx = 0;
+  m_directUnitFireDy = 0;
+}
 
 void TeamControls::ClearFlags()
 {

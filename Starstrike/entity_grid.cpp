@@ -84,15 +84,15 @@ EntityGridCell::~EntityGridCell()
 void EntityGridCell::OutputContents()
 {
     char buffer[256];
-    sprintf(buffer, "Grid Cell: ");
+    snprintf(buffer, sizeof(buffer), "Grid Cell: ");
     int i;
     for (i = 0; i < m_arraySize; i++)
     {
         char buf2[128];
-        sprintf(buf2, "%d ", m_usageLists[i]);
-        strcat(buffer, buf2);
+        snprintf(buf2, sizeof(buf2), "%d ", m_usageLists[i]);
+        strncat(buffer, buf2, sizeof(buffer) - strlen(buffer) - 1);
     }
-    strcat(buffer, "\n");
+    strncat(buffer, "\n", sizeof(buffer) - strlen(buffer) - 1);
     DebugTrace(buffer);
 }
 

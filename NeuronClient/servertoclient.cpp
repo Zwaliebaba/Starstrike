@@ -8,7 +8,8 @@
 ServerToClient::ServerToClient(char* _ip)
   : m_socket(nullptr)
 {
-  strcpy(m_ip, _ip);
+  strncpy(m_ip, _ip, sizeof(m_ip));
+  m_ip[sizeof(m_ip) - 1] = '\0';
 
   if (!g_app->m_bypassNetworking)
   {

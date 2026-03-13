@@ -20,9 +20,9 @@ class GlobalLocation
     LegacyVector3 m_pos;
     bool m_available; // Is it connected on the transit system
 
-    char m_name[256];
-    char m_mapFilename[256];
-    char m_missionFilename[256];
+    std::string m_name;
+    std::string m_mapFilename;
+    std::string m_missionFilename;
     bool m_missionCompleted;
 
     int m_numSpirits; // Number of spirits that have died
@@ -94,7 +94,7 @@ class GlobalEventCondition
 
     void Save(FileWriter* _out);
 
-    static char* GetTypeName(int _type);
+    static const char* GetTypeName(int _type);
     static int GetType(const char* _typeName);
 };
 
@@ -111,7 +111,7 @@ class GlobalEventAction
 
     int m_type;
     int m_locationId;
-    char m_filename[256];
+    std::string m_filename;
 
     GlobalEventAction();
 
@@ -119,7 +119,7 @@ class GlobalEventAction
     void Write(FileWriter* _file);
     void Execute();
 
-    static char* GetTypeName(int _type);
+    static const char* GetTypeName(int _type);
 };
 
 class GlobalEvent
@@ -193,10 +193,10 @@ class GlobalResearch
     void Write(FileWriter* _out);
     void Read(TextReader* _in);
 
-    static char* GetTypeName(int _type);
-    static int GetType(char* _name);
+    static const char* GetTypeName(int _type);
+    static int GetType(const char* _name);
 
-    static char* GetTypeNameTranslated(int _type);
+    static const char* GetTypeNameTranslated(int _type);
 };
 
 // ****************************************************************************
@@ -274,8 +274,8 @@ class GlobalWorld
     GlobalLocation* GetHighlightedLocation(); // ie whats under the mouse
     int GetLocationId(const char* _name);
     int GetLocationIdFromMapFilename(const char* _mapFilename);
-    char* GetLocationName(int _id);
-    char* GetLocationNameTranslated(int _id);
+    const char* GetLocationName(int _id);
+    const char* GetLocationNameTranslated(int _id);
     LegacyVector3 GetLocationPosition(int _id);
 
     GlobalBuilding* GetBuilding(int _id, int _locationId);
@@ -284,9 +284,9 @@ class GlobalWorld
     bool EvaluateEvents(); // Returns true if an event was triggered
     void TransferSpirits(int _locationId);
 
-    void LoadGame(char* _filename);
+    void LoadGame(const char* _filename);
 
-    void LoadLocations(char* _filename);
+    void LoadLocations(const char* _filename);
 
     void SetupLights();
     void SetupFog();

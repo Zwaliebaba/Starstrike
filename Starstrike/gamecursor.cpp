@@ -69,7 +69,7 @@ GameCursor::GameCursor()
     //
     // Load selection arrow graphic
 
-	sprintf( m_selectionArrowFilename, "icons/selectionarrow.bmp" );
+	snprintf( m_selectionArrowFilename, sizeof(m_selectionArrowFilename), "icons/selectionarrow.bmp" );
 
     BinaryReader *binReader = g_app->m_resource->GetBinaryReader( m_selectionArrowFilename );
 	ASSERT_TEXT(binReader, "Failed to open mouse cursor resource %s", m_selectionArrowFilename );
@@ -78,7 +78,7 @@ GameCursor::GameCursor()
 
 	g_app->m_resource->AddBitmap(m_selectionArrowFilename, bmp);
 
-	sprintf(m_selectionArrowShadowFilename, "shadow_%s", m_selectionArrowFilename);
+	snprintf(m_selectionArrowShadowFilename, sizeof(m_selectionArrowShadowFilename), "shadow_%s", m_selectionArrowFilename);
     bmp.ApplyBlurFilter( 10.0f );
 	g_app->m_resource->AddBitmap(m_selectionArrowShadowFilename, bmp);
 
@@ -308,7 +308,7 @@ void GameCursor::Render()
         // We are in the global world
         GlobalLocation *highlightedLocation = g_app->m_globalWorld->GetHighlightedLocation();
         bool locAvailable = highlightedLocation &&
-                            strcmp(highlightedLocation->m_missionFilename, "null" ) != 0 &&
+                            highlightedLocation->m_missionFilename != "null" &&
                             highlightedLocation->m_available;
         g_app->m_renderer->SetupMatricesFor2D();
         m_cursorPlacement->SetAnimation( locAvailable );
@@ -955,7 +955,7 @@ MouseCursor::MouseCursor( char const *_filename )
     m_shadowed(true)
 {
     char fullFilename[512];
-	sprintf( fullFilename, "%s", _filename);
+	snprintf( fullFilename, sizeof(fullFilename), "%s", _filename);
 	m_mainFilename = strdup(fullFilename);
 
     BinaryReader *binReader = g_app->m_resource->GetBinaryReader( m_mainFilename );
@@ -965,7 +965,7 @@ MouseCursor::MouseCursor( char const *_filename )
 
 	g_app->m_resource->AddBitmap(m_mainFilename, bmp);
 
-	sprintf(fullFilename, "shadow_%s", _filename);
+	snprintf(fullFilename, sizeof(fullFilename), "shadow_%s", _filename);
 	m_shadowFilename = strdup(fullFilename);
     bmp.ApplyBlurFilter( 10.0f );
 	g_app->m_resource->AddBitmap(m_shadowFilename, bmp);

@@ -13,7 +13,7 @@ std::vector<std::string> ListDirectory(const char* _dir, const char* _filter, bo
     char searchstring[256];
     DEBUG_ASSERT(strlen(_dir) + strlen(_filter) < sizeof(searchstring) - 1);
 
-    sprintf(searchstring, "%s%s", _dir, _filter);
+    snprintf(searchstring, sizeof(searchstring), "%s%s", _dir, _filter);
 
     WIN32_FIND_DATAA thisfile;
     const HANDLE hFind = FindFirstFileA(searchstring, &thisfile);
@@ -102,7 +102,8 @@ const char* GetExtensionPart(const char* _fullFilePath) {
 
 const char* RemoveExtension(const char* _fullFileName)
 {
-    strcpy(s_filePathBuffer, _fullFileName);
+    strncpy(s_filePathBuffer, _fullFileName, FILE_PATH_BUFFER_SIZE);
+    s_filePathBuffer[FILE_PATH_BUFFER_SIZE] = '\0';
 
     char* dot = strrchr(s_filePathBuffer, '.');
     if (dot)

@@ -173,9 +173,9 @@ bool LangTable::specific_key_exists( const char * _key, InputMode _mood )
 
 		switch ( _mood ) {
 			case INPUT_MODE_KEYBOARD:
-				strcpy( key + len, "_kbd" ); break;
+				snprintf( key + len, sizeof(key) - len, "_kbd" ); break;
 			case INPUT_MODE_GAMEPAD:
-				strcpy( key + len, "_xin" ); break;
+				snprintf( key + len, sizeof(key) - len, "_xin" ); break;
 			default:
 				return false;
 		}
@@ -251,7 +251,8 @@ void LangTable::RebuildTable( HashTable<int> *_phrases, std::ostringstream &stre
 			LangPhrase const *phrase = ary->GetData( i );
 			if ( strncmp( phrase->m_key, "part_", 5 ) != 0 ) {
 				char key[1024];
-				strcpy( key, phrase->m_key );
+				strncpy( key, phrase->m_key, sizeof(key) );
+				key[sizeof(key) - 1] = '\0';
 
 				if ( !wrong_suffix( phrase->m_key, _mood ) ) {
 					// Make sure this is the most specific string, or ignore it
@@ -362,8 +363,7 @@ char *LangTable::LookupPhrase(char const *_key)
 
     if( !_key || !phrases || !m_chunk )
     {
-        sprintf( m_notFound.m_string, "ERROR (null)" );
-		phrase = m_notFound.m_string;
+		snprintf( m_notFound.m_string, 256, "ERROR (null)" );
     }
     else
     {
@@ -386,8 +386,8 @@ char *LangTable::LookupPhrase(char const *_key)
 char *LangTable::RawLookupPhrase(char const *_key)
 {
 	if ( !g_inputManager )
-    {
-        sprintf( m_notFound.m_string, "ERROR (null)" );
+	{
+		snprintf( m_notFound.m_string, 256, "ERROR (null)" );
 		return m_notFound.m_string;
 	}
 	else
@@ -404,8 +404,7 @@ char *LangTable::RawLookupPhrase(char const *_key, InputMode _mood)
 
     if( !_key )
     {
-        sprintf( m_notFound.m_string, "ERROR (null)" );
-		phrase = &m_notFound;
+		snprintf( m_notFound.m_string, 256, "ERROR (null)" );
     }
     else
     {

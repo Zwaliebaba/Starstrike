@@ -91,7 +91,8 @@ GameApp::GameApp()
 
   m_camera = new Camera();
 
-  strcpy(m_gameDataFile, "game.txt");
+  strncpy(m_gameDataFile, "game.txt", sizeof(m_gameDataFile));
+  m_gameDataFile[sizeof(m_gameDataFile) - 1] = '\0';
 
   //
   // Determine default language if possible
@@ -101,7 +102,7 @@ GameApp::GameApp()
   {
     char* defaultLang = g_systemInfo->m_localeInfo.m_language;
     char langFilename[512];
-    sprintf(langFilename, "%slanguage\\%s.txt", FileSys::GetHomeDirectoryA().c_str(), defaultLang);
+    snprintf(langFilename, sizeof(langFilename), "%slanguage\\%s.txt", FileSys::GetHomeDirectoryA().c_str(), defaultLang);
     if (DoesFileExist(langFilename))
       g_prefsManager->SetString("TextLanguage", defaultLang);
     else
@@ -179,7 +180,7 @@ void GameApp::SetLanguage(const char* _language, bool _test)
   // Load the language text file
 
   char langFilename[256];
-  sprintf(langFilename, "language/%s.txt", _language);
+  snprintf(langFilename, sizeof(langFilename), "language/%s.txt", _language);
 
   m_langTable = new LangTable(langFilename);
 
@@ -189,11 +190,11 @@ void GameApp::SetLanguage(const char* _language, bool _test)
   //
   // Load the MOD language file if it exists
 
-  sprintf(langFilename, "strings_%s.txt", _language);
+  snprintf(langFilename, sizeof(langFilename), "strings_%s.txt", _language);
   TextReader* modLangFile = g_app->m_resource->GetTextReader(langFilename);
   if (!modLangFile)
   {
-    sprintf(langFilename, "strings_default.txt");
+    snprintf(langFilename, sizeof(langFilename), "strings_default.txt");
     modLangFile = g_app->m_resource->GetTextReader(langFilename);
   }
 
@@ -207,14 +208,14 @@ void GameApp::SetLanguage(const char* _language, bool _test)
   // Load localised fonts if they exist
 
   char fontFilename[256];
-  sprintf(fontFilename, "textures/speccy_font_%s.bmp", _language);
+  snprintf(fontFilename, sizeof(fontFilename), "textures/speccy_font_%s.bmp", _language);
   if (!g_app->m_resource->DoesTextureExist(fontFilename))
-    sprintf(fontFilename, "textures/speccy_font_normal.bmp");
+    snprintf(fontFilename, sizeof(fontFilename), "textures/speccy_font_normal.bmp");
   g_gameFont.Initialise(fontFilename);
 
-  sprintf(fontFilename, "textures/editor_font_%s.bmp", _language);
+  snprintf(fontFilename, sizeof(fontFilename), "textures/editor_font_%s.bmp", _language);
   if (!g_app->m_resource->DoesTextureExist(fontFilename))
-    sprintf(fontFilename, "textures/editor_font_normal.bmp");
+    snprintf(fontFilename, sizeof(fontFilename), "textures/editor_font_normal.bmp");
   g_editorFont.Initialise(fontFilename);
 
   if (g_inputManager)
@@ -223,7 +224,8 @@ void GameApp::SetLanguage(const char* _language, bool _test)
 
 void GameApp::SetProfileName(const char* _profileName)
 {
-  strcpy(m_userProfileName, _profileName);
+  strncpy(m_userProfileName, _profileName, sizeof(m_userProfileName));
+  m_userProfileName[sizeof(m_userProfileName) - 1] = '\0';
 
   if (_stricmp(_profileName, "AttractMode") != 0)
   {
@@ -335,13 +337,16 @@ void GameApp::LoadPrologue()
 
   m_soundSystem->StopAllSounds(WorldObjectId(), "Music");
 
-  strcpy(m_gameDataFile, "game_demo2.txt");
+  strncpy(m_gameDataFile, "game_demo2.txt", sizeof(m_gameDataFile));
+  m_gameDataFile[sizeof(m_gameDataFile) - 1] = '\0';
   LoadProfile();
 
   m_requestedLocationId = m_globalWorld->GetLocationId("launchpad");
   GlobalLocation* gloc = m_globalWorld->GetLocation(m_requestedLocationId);
-  strcpy(m_requestedMap, gloc->m_mapFilename);
-  strcpy(m_requestedMission, gloc->m_missionFilename);
+  strncpy(m_requestedMap, gloc->m_mapFilename.c_str(), sizeof(m_requestedMap));
+  m_requestedMap[sizeof(m_requestedMap) - 1] = '\0';
+  strncpy(m_requestedMission, gloc->m_missionFilename.c_str(), sizeof(m_requestedMission));
+  m_requestedMission[sizeof(m_requestedMission) - 1] = '\0';
 
   m_atMainMenu = false;
 
@@ -356,7 +361,8 @@ void GameApp::LoadCampaign()
 
   //m_atMainMenu = false;
 
-  strcpy(m_gameDataFile, "game.txt");
+  strncpy(m_gameDataFile, "game.txt", sizeof(m_gameDataFile));
+  m_gameDataFile[sizeof(m_gameDataFile) - 1] = '\0';
   LoadProfile();
   m_gameMode = GameModeCampaign;
   m_requestedLocationId = -1;

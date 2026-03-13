@@ -205,23 +205,23 @@ void PrefsManager::CreateDefaultValues()
 
   AddLine("TextSpeed = 15");
 
-  sprintf(line, "HelpEnabled = %d", GetDefaultHelpEnabled());
+  snprintf(line, sizeof(line), "HelpEnabled = %d", GetDefaultHelpEnabled());
   AddLine(line);
 
   AddLine("\n");
 
-  sprintf(line, "SoundLibrary = %s", GetDefaultSoundLibrary());
+  snprintf(line, sizeof(line), "SoundLibrary = %s", GetDefaultSoundLibrary());
   AddLine(line);
 
   AddLine("SoundMixFreq = 22050");
   AddLine("SoundMasterVolume = 255");
-  sprintf(line, "SoundChannels = %d", GetDefaultSoundChannels());
+  snprintf(line, sizeof(line), "SoundChannels = %d", GetDefaultSoundChannels());
   AddLine(line);
   AddLine("SoundHW3D = 0");
   AddLine("SoundSwapStereo = 0");
   AddLine("SoundMemoryUsage = 1");
   AddLine("SoundBufferSize = 512"); // Must be a power of 2 for Linux
-  sprintf(line, "SoundDSP = %d", GetDefaultSoundDSP());
+  snprintf(line, sizeof(line), "SoundDSP = %d", GetDefaultSoundDSP());
   AddLine(line);
 
   AddLine("\n");
@@ -235,18 +235,18 @@ void PrefsManager::CreateDefaultValues()
 
   AddLine("\n");
 
-  sprintf(line, "RenderLandscapeDetail = %d", GetDefaultGraphicsDetail());
+  snprintf(line, sizeof(line), "RenderLandscapeDetail = %d", GetDefaultGraphicsDetail());
   AddLine(line);
-  sprintf(line, "RenderWaterDetail = %d", GetDefaultGraphicsDetail());
+  snprintf(line, sizeof(line), "RenderWaterDetail = %d", GetDefaultGraphicsDetail());
   AddLine(line);
-  sprintf(line, "RenderBuildingDetail = %d", GetDefaultGraphicsDetail());
+  snprintf(line, sizeof(line), "RenderBuildingDetail = %d", GetDefaultGraphicsDetail());
   AddLine(line);
-  sprintf(line, "RenderEntityDetail = %d", GetDefaultGraphicsDetail());
+  snprintf(line, sizeof(line), "RenderEntityDetail = %d", GetDefaultGraphicsDetail());
   AddLine(line);
-  sprintf(line, "RenderCloudDetail = %d", GetDefaultGraphicsDetail());
+  snprintf(line, sizeof(line), "RenderCloudDetail = %d", GetDefaultGraphicsDetail());
   AddLine(line);
 
-  sprintf(line, "RenderPixelShader = %d", GetDefaultPixelShader());
+  snprintf(line, sizeof(line), "RenderPixelShader = %d", GetDefaultPixelShader());
   AddLine(line);
 
   AddLine("\n");

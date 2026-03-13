@@ -111,7 +111,8 @@ int Server::ConvertIPToInt(const char* _ip)
 {
   ASSERT_TEXT(strlen(_ip) < 17, "IP address too long");
   char ipCopy[17];
-  strcpy(ipCopy, _ip);
+  strncpy(ipCopy, _ip, sizeof(ipCopy));
+  ipCopy[sizeof(ipCopy) - 1] = '\0';
   int ipLen = strlen(ipCopy);
 
   for (int i = 0; i < ipLen; ++i)
@@ -130,7 +131,7 @@ int Server::ConvertIPToInt(const char* _ip)
 char* Server::ConvertIntToIP(const int _ip)
 {
   static char result[16];
-  sprintf(result, "%d.%d.%d.%d", (_ip & 0x000000ff), (_ip & 0x0000ff00) >> 8, (_ip & 0x00ff0000) >> 16, (_ip & 0xff000000) >> 24);
+  snprintf(result, sizeof(result), "%d.%d.%d.%d", (_ip & 0x000000ff), (_ip & 0x0000ff00) >> 8, (_ip & 0x00ff0000) >> 16, (_ip & 0xff000000) >> 24);
 
   return result;
 }

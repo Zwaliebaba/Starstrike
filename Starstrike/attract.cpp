@@ -9,7 +9,8 @@
 AttractMode::AttractMode()
 :	m_running(false)
 {
-	strcpy(m_userProfile, "none");
+	strncpy(m_userProfile, "none", sizeof(m_userProfile));
+	m_userProfile[sizeof(m_userProfile) - 1] = '\0';
 }
 
 void AttractMode::Advance()
@@ -33,7 +34,8 @@ void AttractMode::Advance()
 
 void AttractMode::StartAttractMode()
 {
-	strcpy( m_userProfile, g_app->m_userProfileName );
+	strncpy( m_userProfile, g_app->m_userProfileName, sizeof(m_userProfile) );
+	m_userProfile[sizeof(m_userProfile) - 1] = '\0';
 	g_app->SetProfileName( "AttractMode" );
     g_app->m_taskManagerInterface->m_lockTaskManager = true;
 	if( g_app->LoadProfile() )
@@ -61,5 +63,6 @@ void AttractMode::EndAttractMode()
     g_app->m_taskManagerInterface->m_lockTaskManager = false;
 
 	m_running = false;
-	strcpy(m_userProfile, "none");
+	strncpy(m_userProfile, "none", sizeof(m_userProfile));
+	m_userProfile[sizeof(m_userProfile) - 1] = '\0';
 }

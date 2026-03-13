@@ -349,9 +349,9 @@ void Task::Stop()
   m_state = StateStopping;
 }
 
-char* Task::GetTaskName(int _type) { return GlobalResearch::GetTypeName(_type); }
+const char* Task::GetTaskName(int _type) { return GlobalResearch::GetTypeName(_type); }
 
-char* Task::GetTaskNameTranslated(int _type) { return GlobalResearch::GetTypeNameTranslated(_type); }
+const char* Task::GetTaskNameTranslated(int _type) { return GlobalResearch::GetTypeNameTranslated(_type); }
 
 // ============================================================================
 

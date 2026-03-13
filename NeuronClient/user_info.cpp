@@ -8,7 +8,7 @@
 // Which must be allocated beforehand
 bool GetUserInfoData( char const *_userInfoFilename, char const **_username, char const **_email )
 {
-    static char *s_username = NULL;
+    static char *s_username = NULL; // Process-lifetime allocations — intentional [CI §2.3]
     static char *s_email = NULL;
 
     if( !s_username || !s_email )

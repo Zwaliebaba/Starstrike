@@ -91,7 +91,7 @@ int Resource::GetTexture(const char* _name, bool _mipMapping, bool _masked)
   if (theTexture == -1)
   {
     char fullPath[512];
-    sprintf(fullPath, "%s", _name);
+    snprintf(fullPath, sizeof(fullPath), "%s", _name);
     strlwr(fullPath);
     BinaryReader* reader = GetBinaryReader(fullPath);
 
@@ -111,7 +111,7 @@ int Resource::GetTexture(const char* _name, bool _mipMapping, bool _masked)
   if (theTexture == -1)
   {
     char errorString[512];
-    sprintf(errorString, "Failed to load texture %s", _name);
+    snprintf(errorString, sizeof(errorString), "Failed to load texture %s", _name);
     ASSERT_TEXT(false, errorString);
   }
 
@@ -132,7 +132,7 @@ bool Resource::DoesTextureExist(const char* _name)
 
   // If we still didn't find it, try to load it from a file on the disk
   char fullPath[512];
-  sprintf(fullPath, "%s", _name);
+  snprintf(fullPath, sizeof(fullPath), "%s", _name);
   strlwr(fullPath);
   BinaryReader* reader = GetBinaryReader(fullPath);
   if (reader)
@@ -187,7 +187,7 @@ Shape* Resource::GetShapeCopy(const char* _name, bool _animating)
 SoundStreamDecoder* Resource::GetSoundStreamDecoder(const char* _filename)
 {
   char buf[256];
-  sprintf(buf, "%s.wav", _filename);
+  snprintf(buf, sizeof(buf), "%s.wav", _filename);
   BinaryReader* binReader = GetBinaryReader(buf);
 
   if (!binReader || !binReader->IsOpen())
@@ -339,7 +339,7 @@ std::vector<std::string> Resource::ListResources(const char* _dir, const char* _
   // List the base data directory
 
   char fullDirectory[256];
-  sprintf(fullDirectory, "%s", _dir);
+  snprintf(fullDirectory, sizeof(fullDirectory), "%s", _dir);
   auto results = ListDirectory(fullDirectory, _filter, _longResults);
 
   return results;

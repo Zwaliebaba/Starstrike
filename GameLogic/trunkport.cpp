@@ -111,7 +111,7 @@ void TrunkPort::Render( float predictionTime )
 
     char caption[256];
 
-    char *locationName = g_app->m_globalWorld->GetLocationNameTranslated( m_targetLocationId );
+    const char *locationName = g_app->m_globalWorld->GetLocationNameTranslated( m_targetLocationId );
     if( locationName )
     {
         strncpy( caption, locationName, sizeof(caption) );

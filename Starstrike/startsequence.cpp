@@ -35,6 +35,11 @@ StartSequence::StartSequence()
   RegisterCaption(LANGUAGEPHRASE("intro_10"), x, y + 30, 15, 86, 90);
 }
 
+StartSequence::~StartSequence()
+{
+  m_captions.EmptyAndDelete();
+}
+
 void StartSequence::RegisterCaption(char* _caption, float _x, float _y, float _size, float _startTime, float _endTime)
 {
   auto caption = new StartSequenceCaption();

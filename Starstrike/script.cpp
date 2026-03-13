@@ -28,17 +28,17 @@ void Script::ReportError(LevelFile const* _levelFile, char* _fmt, ...)
   char buf[512];
   va_list ap;
   va_start(ap, _fmt);
-  vsprintf(buf, _fmt, ap);
+  vsnprintf(buf, sizeof(buf), _fmt, ap);
 
   char location[128];
 
   if (_levelFile)
   {
-    sprintf(location, " (%s %s line: %d)", _levelFile->m_mapFilename + 12, _levelFile->m_missionFilename + 12, m_in->m_lineNum);
+    snprintf(location, sizeof(location), " (%s %s line: %d)", _levelFile->m_mapFilename + 12, _levelFile->m_missionFilename + 12, m_in->m_lineNum);
   }
-  else { sprintf(location, " (no map, no mission, line: %d)", m_in->m_lineNum); }
+  else { snprintf(location, sizeof(location), " (no map, no mission, line: %d)", m_in->m_lineNum); }
 
-  strcat(buf, location);
+  strncat(buf, location, sizeof(buf) - strlen(buf) - 1);
 
   if (g_app->m_testHarness) { g_app->m_testHarness->PrintError(buf); }
   else
@@ -184,8 +184,10 @@ void Script::RunCommand_EnterLocation(char* _name)
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(g_app->m_requestedLocationId);
   DEBUG_ASSERT(loc);
 
-  strcpy(g_app->m_requestedMission, loc->m_missionFilename);
-  strcpy(g_app->m_requestedMap, loc->m_mapFilename);
+  strncpy(g_app->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
+  g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
+  strncpy(g_app->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
+  g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
 }
 
 void Script::RunCommand_ExitLocation()
@@ -201,7 +203,7 @@ void Script::RunCommand_SetMission(char* _locName, char* _missionName)
 {
   GlobalLocation* loc = g_app->m_globalWorld->GetLocation(_locName);
   DEBUG_ASSERT(loc);
-  strcpy(loc->m_missionFilename, _missionName);
+  loc->m_missionFilename = _missionName;
   loc->m_missionCompleted = false;
 }
 
@@ -237,7 +239,7 @@ void Script::RunCommand_ClearHighlights() {  }
 void Script::RunCommand_TriggerSound(const char* _event)
 {
   char eventName[256];
-  sprintf(eventName, "Music %s", _event);
+  snprintf(eventName, sizeof(eventName), "Music %s", _event);
 
   if (g_app->m_soundSystem->NumInstancesPlaying(WorldObjectId(), eventName) == 0)
     g_app->m_soundSystem->TriggerOtherEvent(nullptr, (char*)_event, SoundSourceBlueprint::TypeMusic);
@@ -246,7 +248,7 @@ void Script::RunCommand_TriggerSound(const char* _event)
 void Script::RunCommand_StopSound(const char* _event)
 {
   char eventName[256];
-  sprintf(eventName, "Music %s", _event);
+  snprintf(eventName, sizeof(eventName), "Music %s", _event);
   g_app->m_soundSystem->StopAllSounds(WorldObjectId(), eventName);
 }
 
@@ -382,7 +384,7 @@ void Script::RunCommand_ActivateTrunkPort(int _buildingId, bool _fullActivation)
 
 // Opens a script file and returns. The script will only actually be run when
 // Script::Advance gets called
-void Script::RunScript(char* _filename)
+void Script::RunScript(const char* _filename)
 {
   if (strstr(_filename, ".txt"))
   {
@@ -392,7 +394,7 @@ void Script::RunScript(char* _filename)
 
     // Run a script, speficied by filename
     char fullFilename[256] = "scripts/";
-    strcat(fullFilename, _filename);
+    strncat(fullFilename, _filename, sizeof(fullFilename) - strlen(fullFilename) - 1);
     m_in = g_app->m_resource->GetTextReader(fullFilename);
     DEBUG_ASSERT(m_in);
   }
@@ -405,7 +407,7 @@ void Script::RunScript(char* _filename)
     while (true)
     {
       char stringName[256];
-      sprintf(stringName, "%s_%d", _filename, stringIndex);
+      snprintf(stringName, sizeof(stringName), "%s_%d", _filename, stringIndex);
       if (!ISLANGUAGEPHRASE_ANY(stringName))
         break;
 
@@ -706,7 +708,7 @@ void Script::AdvanceScript()
 void Script::TestScript(char* _filename)
 {
   char fullFilename[256] = "scripts/";
-  strcat(fullFilename, _filename);
+  strncat(fullFilename, _filename, sizeof(fullFilename) - strlen(fullFilename) - 1);
   m_in = g_app->m_resource->GetTextReader(fullFilename);
   if (!m_in) { ReportError(nullptr, "Script file not found"); }
 
@@ -802,7 +804,7 @@ void Script::TestScript(char* _filename)
           break;
         }
         delete levelFile;
-        levelFile = new LevelFile(globalLoc->m_missionFilename, globalLoc->m_mapFilename);
+        levelFile = new LevelFile(globalLoc->m_missionFilename.c_str(), globalLoc->m_mapFilename.c_str());
         break;
       }
     case OpExitLocation:

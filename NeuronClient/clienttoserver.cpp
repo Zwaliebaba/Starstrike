@@ -180,7 +180,8 @@ char* ClientToServer::GetOurIP_String()
   if (!result)
   {
     result = new char[16];
-    strcpy(result, Server::ConvertIntToIP(GetOurIP_Int()));
+    strncpy(result, Server::ConvertIntToIP(GetOurIP_Int()), 16);
+    result[15] = '\0';
   }
 
   return result;

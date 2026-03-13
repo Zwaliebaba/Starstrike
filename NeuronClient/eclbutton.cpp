@@ -11,7 +11,8 @@ EclButton::EclButton()
     m_tooltip(nullptr),
     m_parent(nullptr)
 {
-  strcpy(m_name, "New Button");
+  strncpy(m_name, "New Button", SIZE_ECLBUTTON_NAME);
+  m_name[SIZE_ECLBUTTON_NAME - 1] = '\0';
   SetTooltip(" ");
 }
 
@@ -30,7 +31,8 @@ void EclButton::SetProperties(char* _name, int _x, int _y, int _w, int _h, char*
 
   if (strlen(_name) > SIZE_ECLBUTTON_NAME) {}
   else
-    strcpy(m_name, _name);
+    strncpy(m_name, _name, SIZE_ECLBUTTON_NAME);
+    m_name[SIZE_ECLBUTTON_NAME - 1] = '\0';
 
   m_x = _x;
   m_y = _y;

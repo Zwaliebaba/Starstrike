@@ -184,7 +184,7 @@ char* DspBlueprint::GetParameter(int _param, float* _min, float* _max, float* _d
 // Class SampleGroup
 //*****************************************************************************
 
-void SampleGroup::SetName(char* _name) { strcpy(m_name, _name); }
+void SampleGroup::SetName(char* _name) { strncpy(m_name, _name, sizeof(m_name)); m_name[sizeof(m_name) - 1] = '\0'; }
 
 void SampleGroup::AddSample(char* _sample)
 {
@@ -458,7 +458,8 @@ void SoundSystem::LoadEffects()
 
     auto bp = new DspBlueprint();
     m_filterBlueprints.PutData(bp);
-    strcpy(bp->m_name, in->GetNextToken());
+    strncpy(bp->m_name, in->GetNextToken(), sizeof(bp->m_name));
+    bp->m_name[sizeof(bp->m_name) - 1] = '\0';
 
     in->ReadLine();
     char* param = in->GetNextToken();
@@ -467,7 +468,8 @@ void SoundSystem::LoadEffects()
       auto sb = new DspParameterBlueprint();
       bp->m_params.PutData(sb);
 
-      strcpy(sb->m_name, param);
+      strncpy(sb->m_name, param, sizeof(sb->m_name));
+      sb->m_name[sizeof(sb->m_name) - 1] = '\0';
       sb->m_min = atof(in->GetNextToken());
       sb->m_max = atof(in->GetNextToken());
       sb->m_default = atof(in->GetNextToken());
@@ -1449,7 +1451,7 @@ const char* SoundSystem::IsSoundSourceOK(const char* _soundName)
   }
 
   char fullPath[256] = "sounds/";
-  strcat(fullPath, _soundName);
+  strncat(fullPath, _soundName, sizeof(fullPath) - strlen(fullPath) - 1);
 
   SoundStreamDecoder* sound = g_app->m_resource->GetSoundStreamDecoder(fullPath);
   if (!sound)
@@ -1618,7 +1620,7 @@ SampleGroup* SoundSystem::NewSampleGroup(char* _name)
   while (true)
   {
     char nameCandidate[256];
-    sprintf(nameCandidate, "newsamplegroup%d", i);
+    snprintf(nameCandidate, sizeof(nameCandidate), "newsamplegroup%d", i);
     if (!GetSampleGroup(nameCandidate))
     {
       group->SetName(nameCandidate);

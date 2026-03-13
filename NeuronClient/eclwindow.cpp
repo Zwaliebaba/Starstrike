@@ -13,7 +13,8 @@ EclWindow::EclWindow(char* _name)
   SetName(_name);
   SetTitle("New Window");
   SetMovable(true);
-  strcpy(m_currentTextEdit, "None");
+  strncpy(m_currentTextEdit, "None", SIZE_ECLWINDOW_NAME);
+  m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0';
 }
 
 EclWindow::~EclWindow()
@@ -32,7 +33,8 @@ void EclWindow::SetName(char* _name)
   if (strlen(_name) > SIZE_ECLWINDOW_NAME)
     return;
 
-  strcpy(m_name, _name);
+  strncpy(m_name, _name, SIZE_ECLWINDOW_NAME);
+  m_name[SIZE_ECLWINDOW_NAME - 1] = '\0';
 }
 
 void EclWindow::SetTitle(char* _title)
@@ -40,7 +42,8 @@ void EclWindow::SetTitle(char* _title)
   if (strlen(_title) > SIZE_ECLWINDOW_TITLE)
     return;
 
-  strcpy(m_title, _title);
+  strncpy(m_title, _title, SIZE_ECLWINDOW_TITLE);
+  m_title[SIZE_ECLWINDOW_TITLE - 1] = '\0';
   EclDirtyWindow(this);
 }
 
@@ -74,9 +77,9 @@ void EclWindow::MakeAllOnScreen()
     m_y = screenH - m_h - 10;
 }
 
-void EclWindow::BeginTextEdit(char* _name) { strcpy(m_currentTextEdit, _name); }
+void EclWindow::BeginTextEdit(char* _name) { strncpy(m_currentTextEdit, _name, SIZE_ECLWINDOW_NAME); m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0'; }
 
-void EclWindow::EndTextEdit() { strcpy(m_currentTextEdit, "None"); }
+void EclWindow::EndTextEdit() { strncpy(m_currentTextEdit, "None", SIZE_ECLWINDOW_NAME); m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0'; }
 
 void EclWindow::RegisterButton(EclButton* button)
 {

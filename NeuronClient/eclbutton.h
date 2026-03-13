@@ -15,6 +15,7 @@ class EclWindow;
 
 class EclButton
 {
+	// TODO [CI §2.2]: Rule-of-Five — has dtor but no copy/move ops
 
 public:
 

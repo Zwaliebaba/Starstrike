@@ -595,8 +595,10 @@ bool EnterGlobalWorld()
     //g_app->m_atMainMenu = true;
     g_app->m_requestedLocationId = g_app->m_globalWorld->GetLocationId("launchpad");
     GlobalLocation* gloc = g_app->m_globalWorld->GetLocation(g_app->m_requestedLocationId);
-    strcpy(g_app->m_requestedMap, gloc->m_mapFilename);
-    strcpy(g_app->m_requestedMission, gloc->m_missionFilename);
+    strncpy(g_app->m_requestedMap, gloc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
+    g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
+    strncpy(g_app->m_requestedMission, gloc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
+    g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
   }
 
   // Put the camera in a sensible place

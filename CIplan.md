@@ -1228,25 +1228,25 @@ indicate missed `sprintf`/`strcpy` sites from Phase 1.
 
 | Phase | Section | Status |
 |-------|---------|--------|
-| **-1** | §-1.1 Fix `delete`/`delete[]` mismatch | ☐ |
-| **-1** | §-1.2 Fix format-string injection | ☐ |
-| **-1** | §-1.3 Fix `Fatal()` errorText | ☐ |
-| **0** | §0.2 `NULL` → `nullptr` | ☐ |
-| **4.2** | §4.2a Remove `TARGET_OS_LINUX`/`MACOSX` | ☐ |
-| **4.2** | §4.2b Remove `TARGET_OS_VISTA` | ☐ |
-| **4.2** | §4.2c Remove `DEMO2` | ☐ |
-| **4.2** | §4.2d Remove `JAMES_FIX` | ☐ |
-| **4.2** | §4.2e Clean `NeuronClient.h` target block | ☐ |
-| **7** | §7.5 Release include dirs | ☐ |
-| **7** | §7.7 Shader Release config | ☐ |
-| **7** | §7.1 Last 2 header guards | ☐ |
-| **1** | §1.2 `MAX_PACKET_SIZE` rename | ☐ |
-| **1** | §1.1b GameLogic unsafe strings (90) | ☐ |
-| **1** | §1.1c NeuronClient unsafe strings (94) | ☐ |
-| **1** | §1.1d Starstrike unsafe strings (114) | ☐ |
-| **1** | §1.9 `const_cast` fix | ☐ |
-| **1** | §1.5 Document `void*` dispatch | ☐ |
-| **1** | §1.7 Document `_CRT_SECURE_NO_WARNINGS` | ☐ |
+| **-1** | §-1.1 Fix `delete`/`delete[]` mismatch | ✅ DONE |
+| **-1** | §-1.2 Fix format-string injection | ✅ DONE |
+| **-1** | §-1.3 Fix `Fatal()` errorText | ✅ DONE |
+| **0** | §0.2 `NULL` → `nullptr` | ✅ DONE |
+| **4.2** | §4.2a Remove `TARGET_OS_LINUX`/`MACOSX` | ✅ DONE |
+| **4.2** | §4.2b Remove `TARGET_OS_VISTA` | ✅ DONE |
+| **4.2** | §4.2c Remove `DEMO2` | ✅ DONE |
+| **4.2** | §4.2d Remove `JAMES_FIX` | ✅ DONE |
+| **4.2** | §4.2e Clean `NeuronClient.h` target block | ✅ DONE |
+| **7** | §7.5 Release include dirs | ✅ DONE |
+| **7** | §7.7 Shader Release config | ✅ DONE |
+| **7** | §7.1 Last 2 header guards | ✅ DONE |
+| **1** | §1.2 `MAX_PACKET_SIZE` rename | ✅ DONE |
+| **1** | §1.1b GameLogic unsafe strings (90) | ✅ DONE — 5 deliberate skips (`strcpy(m_string,m_buf)` in `input_field.cpp`, `m_string` is `char*` with unknown external size) |
+| **1** | §1.1c NeuronClient unsafe strings (94) | ☐ ~86 sites remaining |
+| **1** | §1.1d Starstrike unsafe strings (114) | ☐ ~105 sites remaining |
+| **1** | §1.9 `const_cast` fix | ✅ DONE — cascaded to `SetLanguage`/`SetProfileName` const, `clienttoserver.cpp` uses mutable buffer for `NetSocket::Connect` |
+| **1** | §1.5 Document `void*` dispatch | ✅ DONE |
+| **1** | §1.7 Document `_CRT_SECURE_NO_WARNINGS` | ✅ DONE |
 | **2** | §2.3 Fix `strdup` leaks (5 sites) | ☐ |
 | **2** | §2.4 Fix `memset(this,…)` | ☐ |
 | **2** | §2.1 Starstrike RAII conversion | ☐ |

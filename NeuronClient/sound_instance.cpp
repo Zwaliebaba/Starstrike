@@ -172,7 +172,7 @@ SoundInstance::~SoundInstance()
 
 void SoundInstance::SetSoundName( char const *_name )
 {
-    if( _name ) strcpy( m_soundName, _name );
+    if( _name ) { strncpy( m_soundName, _name, sizeof(m_soundName) ); m_soundName[sizeof(m_soundName) - 1] = '\0'; }
 }
 
 
@@ -331,7 +331,8 @@ void SoundInstance::PropagateBlueprints()
 
         if( strcmp( m_parent->m_soundName, m_soundName ) != 0 )
         {
-            strcpy( m_soundName, m_parent->m_soundName );
+            strncpy( m_soundName, m_parent->m_soundName, sizeof(m_soundName) );
+            m_soundName[sizeof(m_soundName) - 1] = '\0';
             restartRequired = true;
         }
 
@@ -1045,21 +1046,21 @@ char *SoundInstance::GetDescriptor()
     char const *inEditor = m_positionType == TypeInEditor ? " editor" : "       ";
 
     char priority[32];
-    sprintf( priority, "%2.2f", m_calculatedPriority );
+    snprintf( priority, sizeof(priority), "%2.2f", m_calculatedPriority );
 
     char volume[32];
-    sprintf( volume, "%2.1f", m_channelVolume );
+    snprintf( volume, sizeof(volume), "%2.1f", m_channelVolume );
 
     char fx[32];
     if( m_dspFX.Size() )
     {
-        sprintf( fx, "fx%d", m_dspFX.Size() );
+        snprintf( fx, sizeof(fx), "fx%d", m_dspFX.Size() );
     }
     else
     {
-        sprintf( fx, "   " );
+        snprintf( fx, sizeof(fx), "   " );
     }
 
-    sprintf( descriptor, "%-18s  pri%5s  vol%4s   %s  %-8s  %s", m_soundName, priority, volume, fx, looping, inEditor );
+    snprintf( descriptor, sizeof(descriptor), "%-18s  pri%5s  vol%4s   %s  %-8s  %s", m_soundName, priority, volume, fx, looping, inEditor );
     return descriptor;
 }

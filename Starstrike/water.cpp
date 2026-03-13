@@ -55,10 +55,11 @@ Water::Water()
       // Load colour information from a bitmap
       {
         char fullFilename[256];
-        sprintf(fullFilename, "terrain/%s", g_app->m_location->m_levelFile->m_wavesColourFilename);
+        snprintf(fullFilename, sizeof(fullFilename), "terrain/%s", g_app->m_location->m_levelFile->m_wavesColourFilename);
 
         if (Location::ChristmasModEnabled() == 1)
-          strcpy(fullFilename, "terrain/waves_earth.bmp");
+          strncpy(fullFilename, "terrain/waves_earth.bmp", sizeof(fullFilename));
+          fullFilename[sizeof(fullFilename) - 1] = '\0';
 
         BinaryReader* in = g_app->m_resource->GetBinaryReader(fullFilename);
         BitmapRGBA bmp(in, "bmp");
@@ -434,10 +435,11 @@ void Water::RenderFlatWater()
     glColor4ub(255, 255, 255, 255);
 
   char waterFilename[256];
-  sprintf(waterFilename, "terrain/%s", g_app->m_location->m_levelFile->m_waterColourFilename);
+  snprintf(waterFilename, sizeof(waterFilename), "terrain/%s", g_app->m_location->m_levelFile->m_waterColourFilename);
 
   if (Location::ChristmasModEnabled() == 1)
-    strcpy(waterFilename, "terrain/water_icecaps.bmp");
+    strncpy(waterFilename, "terrain/water_icecaps.bmp", sizeof(waterFilename));
+    waterFilename[sizeof(waterFilename) - 1] = '\0';
 
   gglActiveTextureARB(GL_TEXTURE0_ARB);
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(waterFilename, true, true));

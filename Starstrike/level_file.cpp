@@ -69,14 +69,14 @@ void LevelFile::ParseMissionFile(const char* _filename)
   if (!g_app->m_editing)
   {
     // Try to load a save game first
-    sprintf(fullFilename, "%susers/%s/%s", g_app->GetProfileDirectory(), g_app->m_userProfileName, _filename);
+    snprintf(fullFilename, sizeof(fullFilename), "%susers/%s/%s", g_app->GetProfileDirectory(), g_app->m_userProfileName, _filename);
     if (DoesFileExist(fullFilename))
       in = new TextFileReader(fullFilename);
   }
 
   if (!in)
   {
-    sprintf(fullFilename, "levels/%s", _filename);
+    snprintf(fullFilename, sizeof(fullFilename), "levels/%s", _filename);
     in = g_app->m_resource->GetTextReader(fullFilename);
   }
 
@@ -119,7 +119,7 @@ void LevelFile::ParseMissionFile(const char* _filename)
 void LevelFile::ParseMapFile(const char* _levelFilename)
 {
   char fullFilename[256];
-  sprintf(fullFilename, "levels/%s", _levelFilename);
+  snprintf(fullFilename, sizeof(fullFilename), "levels/%s", _levelFilename);
   TextReader* in = g_app->m_resource->GetTextReader(fullFilename);
   ASSERT_TEXT(in && in->IsOpen(), "Invalid map file specified (%s)", _levelFilename);
 
@@ -423,11 +423,11 @@ void LevelFile::ParseLandscapeData(TextReader* _in)
     else if (_stricmp("outsideHeight", word) == 0)
       m_landscape.m_outsideHeight = atof(secondWord);
     else if (_stricmp("landColourFile", word) == 0)
-      strcpy(m_landscapeColourFilename, secondWord);
+    { strncpy(m_landscapeColourFilename, secondWord, MAX_FILENAME_LEN); m_landscapeColourFilename[MAX_FILENAME_LEN - 1] = '\0'; }
     else if (_stricmp("wavesColourFile", word) == 0)
-      strcpy(m_wavesColourFilename, secondWord);
+    { strncpy(m_wavesColourFilename, secondWord, MAX_FILENAME_LEN); m_wavesColourFilename[MAX_FILENAME_LEN - 1] = '\0'; }
     else if (_stricmp("waterColourFile", word) == 0)
-      strcpy(m_waterColourFilename, secondWord);
+    { strncpy(m_waterColourFilename, secondWord, MAX_FILENAME_LEN); m_waterColourFilename[MAX_FILENAME_LEN - 1] = '\0'; }
     else if (_stricmp("landscape_endDefinition", word) == 0)
       return;
   }
@@ -982,19 +982,19 @@ void LevelFile::WritePrimaryObjectives(FileWriter* _out)
 
 LevelFile::LevelFile()
 {
-  sprintf(m_landscapeColourFilename, "landscape_default.bmp");
-  sprintf(m_wavesColourFilename, "waves_default.bmp");
-  sprintf(m_waterColourFilename, "water_default.bmp");
+  snprintf(m_landscapeColourFilename, MAX_FILENAME_LEN, "landscape_default.bmp");
+  snprintf(m_wavesColourFilename, MAX_FILENAME_LEN, "waves_default.bmp");
+  snprintf(m_waterColourFilename, MAX_FILENAME_LEN, "water_default.bmp");
   m_levelDifficulty = -1;
 }
 
 LevelFile::LevelFile(const char* _missionFilename, const char* _mapFilename)
 {
-  sprintf(m_mapFilename, "%s", _mapFilename);
-  sprintf(m_missionFilename, "%s", _missionFilename);
-  sprintf(m_landscapeColourFilename, "landscape_default.bmp");
-  sprintf(m_wavesColourFilename, "waves_default.bmp");
-  sprintf(m_waterColourFilename, "water_default.bmp");
+  snprintf(m_mapFilename, MAX_FILENAME_LEN, "%s", _mapFilename);
+  snprintf(m_missionFilename, MAX_FILENAME_LEN, "%s", _missionFilename);
+  snprintf(m_landscapeColourFilename, MAX_FILENAME_LEN, "landscape_default.bmp");
+  snprintf(m_wavesColourFilename, MAX_FILENAME_LEN, "waves_default.bmp");
+  snprintf(m_waterColourFilename, MAX_FILENAME_LEN, "water_default.bmp");
   m_levelDifficulty = -1;
 
   // Make sure that the current game difficulty setting

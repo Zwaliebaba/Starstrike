@@ -119,7 +119,8 @@ void NetworkUpdate::SetType( UpdateType _type )
 
 void NetworkUpdate::SetClientIp( char *ip )
 {
-    strcpy( m_clientIp, ip );
+    strncpy( m_clientIp, ip, sizeof(m_clientIp) );
+    m_clientIp[sizeof(m_clientIp) - 1] = '\0';
 }
 
 void NetworkUpdate::SetTeamType( unsigned char _teamType )

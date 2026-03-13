@@ -27,8 +27,10 @@ ScreenZone::ScreenZone(char* _name, char* _tooltip, float _x, float _y, float _w
 {
   ASSERT_TEXT(strlen(_name) < sizeof(m_name), "Button name too long : %s", _name);
   ASSERT_TEXT(strlen(_tooltip) < sizeof(m_toolTip), "Tooltip too long : %s", _tooltip);
-  strcpy(m_name, _name);
-  strcpy(m_toolTip, _tooltip);
+  strncpy(m_name, _name, sizeof(m_name));
+  m_name[sizeof(m_name) - 1] = '\0';
+  strncpy(m_toolTip, _tooltip, sizeof(m_toolTip));
+  m_toolTip[sizeof(m_toolTip) - 1] = '\0';
 }
 
 // ============================================================================

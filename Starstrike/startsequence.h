@@ -16,6 +16,7 @@ protected:
 
 public:
     StartSequence();
+    ~StartSequence();
 
     bool Advance();
     void Render();
@@ -26,6 +27,8 @@ public:
 class StartSequenceCaption
 {
 public:
+    ~StartSequenceCaption() { free(m_caption); }
+
     char *m_caption;
     float m_x;
     float m_y;

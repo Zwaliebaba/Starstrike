@@ -130,16 +130,18 @@ PrefsOtherWindow::PrefsOtherWindow()
 
 void PrefsOtherWindow::ListAvailableLanguages()
 {
-  m_languages.EmptyAndDelete();
+  m_languages.EmptyAndDeleteArray();
 
   auto fileList = g_app->m_resource->ListResources("language/", "*.*", false);
   for (int i = 0; i < fileList.size(); ++i)
   {
-    auto lang = (char*)fileList[i].c_str();
+    size_t len = fileList[i].size() + 1;
+    char* lang = new char[len];
+    strncpy(lang, fileList[i].c_str(), len);
     char* dot = strrchr(lang, '.');
     if (dot)
       *dot = '\x0';
-    m_languages.PutData(strdup(lang));
+    m_languages.PutData(lang);
   }
 }
 

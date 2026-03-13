@@ -320,10 +320,11 @@ void Matrix34::DecomposeToYDR( float *_y, float *_d, float *_r ) const
 
 void Matrix34::SetToIdentity()
 {
-	memset(this, 0, sizeof(Matrix34));
-	r.x = 1.0f;
-	u.y = 1.0f;
-	f.z = 1.0f;
+	// User-declared copy ctor makes this non-trivially-copyable; avoid memset.
+	r = LegacyVector3(1.0f, 0.0f, 0.0f);
+	u = LegacyVector3(0.0f, 1.0f, 0.0f);
+	f = LegacyVector3(0.0f, 0.0f, 1.0f);
+	pos = LegacyVector3(0.0f, 0.0f, 0.0f);
 }
 
 bool Matrix34::IsNormalised()

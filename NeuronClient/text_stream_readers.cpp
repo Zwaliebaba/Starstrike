@@ -34,7 +34,8 @@ TextReader::TextReader()
 {
 	m_filename[0] = '\0';
 	m_line = new char[INITIAL_LINE_LEN + 1];	// Don't forget space for the null terminator
-	strcpy(m_seperatorChars, DEFAULT_SEPERATOR_CHARS);
+	strncpy(m_seperatorChars, DEFAULT_SEPERATOR_CHARS, sizeof(m_seperatorChars));
+	m_seperatorChars[sizeof(m_seperatorChars) - 1] = '\0';
 }
 
 
@@ -133,7 +134,8 @@ void TextReader::SetSeperatorChars(char const *_seperatorChars)
 
 void TextReader::SetDefaultSeperatorChars()
 {
-	strcpy(m_seperatorChars, DEFAULT_SEPERATOR_CHARS);
+	strncpy(m_seperatorChars, DEFAULT_SEPERATOR_CHARS, sizeof(m_seperatorChars));
+	m_seperatorChars[sizeof(m_seperatorChars) - 1] = '\0';
 }
 
 

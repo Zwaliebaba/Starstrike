@@ -10,6 +10,7 @@ class BinaryReader;
 
 class BitmapRGBA
 {
+	// TODO [CI §2.2]: Rule-of-Five — has copy ctor + dtor but no copy-assignment or move ops
 private:
 	void ReadBMPFileHeader(BinaryReader *f, BitmapFileHeader *fileheader);
 	void ReadWinBMPInfoHeader(BinaryReader *f, BitmapInfoHeader *infoheader);

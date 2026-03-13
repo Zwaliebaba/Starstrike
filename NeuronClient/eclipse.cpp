@@ -82,7 +82,8 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
       {
         if (strcmp(currentButton, button->m_name) != 0)
         {
-          strcpy(currentButton, button->m_name);
+          strncpy(currentButton, button->m_name, SIZE_ECLBUTTON_NAME);
+          currentButton[SIZE_ECLBUTTON_NAME - 1] = '\0';
           EclDirtyWindow(currentWindow);
           tooltipTimer = EclGetAccurateTime() + 1000;
         }
@@ -97,10 +98,8 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
       {
         if (strcmp(currentButton, "None") != 0)
         {
-          strcpy(currentButton, "None");
-          EclDirtyWindow(currentWindow);
-          if (tooltipCallback)
-            tooltipCallback(nullptr, nullptr);
+          strncpy(currentButton, "None", SIZE_ECLBUTTON_NAME);
+          currentButton[SIZE_ECLBUTTON_NAME - 1] = '\0';
         }
       }
     }
@@ -108,9 +107,8 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
     {
       if (strcmp(currentButton, "None") != 0)
       {
-        strcpy(currentButton, "None");
-        if (tooltipCallback)
-          tooltipCallback(nullptr, nullptr);
+        strncpy(currentButton, "None", SIZE_ECLBUTTON_NAME);
+        currentButton[SIZE_ECLBUTTON_NAME - 1] = '\0';
       }
     }
   }
@@ -124,20 +122,23 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
     {
       if (strcmp(windowFocus, "None") != 0)
         EclDirtyWindow(windowFocus);
-      strcpy(windowFocus, currentWindow->m_name);
+      strncpy(windowFocus, currentWindow->m_name, SIZE_ECLWINDOW_NAME);
+      windowFocus[SIZE_ECLWINDOW_NAME - 1] = '\0';
       EclBringWindowToFront(currentWindow->m_name);
-      strcpy(mouseDownWindow, currentWindow->m_name);
+      strncpy(mouseDownWindow, currentWindow->m_name, SIZE_ECLWINDOW_NAME);
+      mouseDownWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
 
       EclButton* button = currentWindow->GetButton(mouseX - currentWindow->m_x, mouseY - currentWindow->m_y);
       if (button)
       {
-        strcpy(currentButton, button->m_name);
+        strncpy(currentButton, button->m_name, SIZE_ECLBUTTON_NAME);
+        currentButton[SIZE_ECLBUTTON_NAME - 1] = '\0';
         button->MouseDown();
       }
       else
       {
-        strcpy(currentButton, "None");
-        currentWindow->MouseEvent(true, false, false, true);
+        strncpy(currentButton, "None", SIZE_ECLBUTTON_NAME);
+        currentButton[SIZE_ECLBUTTON_NAME - 1] = '\0';
         if (currentWindow->m_movable)
         {
           mouseDownWindowX = mouseX - currentWindow->m_x;
@@ -150,7 +151,8 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
       if (strcmp(windowFocus, "None") != 0)
       {
         EclDirtyWindow(windowFocus);
-        strcpy(windowFocus, "None");
+        strncpy(windowFocus, "None", SIZE_ECLWINDOW_NAME);
+        windowFocus[SIZE_ECLWINDOW_NAME - 1] = '\0';
       }
     }
 
@@ -206,7 +208,8 @@ void EclUpdateMouse(int _mouseX, int _mouseY, bool _lmb, bool _rmb)
   }
   else if (!_lmb && lmb) // Left button up
   {
-    strcpy(mouseDownWindow, "None");
+    strncpy(mouseDownWindow, "None", SIZE_ECLWINDOW_NAME);
+    mouseDownWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
     lmb = false;
 
     EclWindow* currentWindow = EclGetWindow(buttonDownMouseX, buttonDownMouseY);
@@ -333,11 +336,12 @@ char* EclGenerateUniqueWindowName(char* name)
   static char uniqueName[SIZE_ECLWINDOW_NAME];
 
   int index = 1;
-  strcpy(uniqueName, name);
+  strncpy(uniqueName, name, SIZE_ECLWINDOW_NAME);
+  uniqueName[SIZE_ECLWINDOW_NAME - 1] = '\0';
   while (EclGetWindow(uniqueName))
   {
     ++index;
-    sprintf(uniqueName, "%s%d", name, index);
+    snprintf(uniqueName, SIZE_ECLWINDOW_NAME, "%s%d", name, index);
   }
 
   return uniqueName;
@@ -374,7 +378,8 @@ void EclRegisterPopup(EclWindow* window)
 {
   EclRemovePopup();
   //DebugAssert( window );
-  strcpy(popupWindow, window->m_name);
+  strncpy(popupWindow, window->m_name, SIZE_ECLWINDOW_NAME);
+  popupWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
   EclRegisterWindow(window);
 }
 
@@ -382,7 +387,8 @@ void EclRemovePopup()
 {
   if (EclGetWindow(popupWindow))
     EclRemoveWindow(popupWindow);
-  strcpy(popupWindow, "None");
+  strncpy(popupWindow, "None", SIZE_ECLWINDOW_NAME);
+  popupWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
 }
 
 void EclRemoveWindow(char* name)
@@ -396,10 +402,12 @@ void EclRemoveWindow(char* name)
     delete window;
 
     if (strcmp(mouseDownWindow, name) == 0)
-      strcpy(mouseDownWindow, "None");
+      strncpy(mouseDownWindow, "None", SIZE_ECLWINDOW_NAME);
+      mouseDownWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
 
     if (strcmp(windowFocus, name) == 0)
-      strcpy(windowFocus, "None");
+      strncpy(windowFocus, "None", SIZE_ECLWINDOW_NAME);
+      windowFocus[SIZE_ECLWINDOW_NAME - 1] = '\0';
   }
   else {}
 }
@@ -505,9 +513,12 @@ void EclMaximiseWindow(char* name)
   EclWindow* w = EclGetWindow(name);
   if (w)
   {
-    strcpy(maximisedWindow, name);
-    strcpy(mouseDownWindow, name);
-    strcpy(windowFocus, name);
+    strncpy(maximisedWindow, name, SIZE_ECLWINDOW_NAME);
+    maximisedWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
+    strncpy(mouseDownWindow, name, SIZE_ECLWINDOW_NAME);
+    mouseDownWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
+    strncpy(windowFocus, name, SIZE_ECLWINDOW_NAME);
+    windowFocus[SIZE_ECLWINDOW_NAME - 1] = '\0';
     maximiseOldX = w->m_x;
     maximiseOldY = w->m_y;
     maximiseOldW = w->m_w;
@@ -520,7 +531,8 @@ void EclMaximiseWindow(char* name)
 void EclUnMaximise()
 {
   EclWindow* w = EclGetWindow(maximisedWindow);
-  strcpy(maximisedWindow, "None");
+  strncpy(maximisedWindow, "None", SIZE_ECLWINDOW_NAME);
+  maximisedWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
 
   if (w)
   {
@@ -631,5 +643,8 @@ char* EclGetCurrentFocus() { return windowFocus; }
 void EclSetCurrentFocus(char* name)
 {
   if (strlen(name) < SIZE_ECLWINDOW_NAME)
-    strcpy(windowFocus, name);
+  {
+    strncpy(windowFocus, name, SIZE_ECLWINDOW_NAME);
+    windowFocus[SIZE_ECLWINDOW_NAME - 1] = '\0';
+  }
 }

@@ -30,6 +30,8 @@ protected:
     float GetTexCoordY  ( unsigned char theChar );
 
 public:
+ ~TextRenderer() { free(m_filename); }
+
 	void Initialise(char const *_filename);
 
 	void BuildOpenGlState();

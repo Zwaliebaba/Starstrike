@@ -31,13 +31,12 @@
 GlobalLocation::GlobalLocation()
   : m_id(-1),
     m_available(false),
+    m_name("none"),
+    m_mapFilename("none"),
     m_missionCompleted(false),
+    m_missionFilename("none"),
     m_numSpirits(0)
-{
-  strcpy(m_name, "none");
-  strcpy(m_mapFilename, "none");
-  strcpy(m_missionFilename, "none");
-}
+{}
 
 void GlobalLocation::AddSpirits(int _count) { m_numSpirits += _count; }
 
@@ -90,9 +89,9 @@ void GlobalEventCondition::SetCutScene(char* _cutScene)
   m_cutScene = NewStr(_cutScene);
 }
 
-char* GlobalEventCondition::GetTypeName(int _type)
+const char* GlobalEventCondition::GetTypeName(int _type)
 {
-  static char* names[] = {"AlwaysTrue", "BuildingOnline", "BuildingOffline", "ResearchOwned", "NotInLocation", "DebugKey", "NeverTrue"};
+  static const char* names[] = {"AlwaysTrue", "BuildingOnline", "BuildingOffline", "ResearchOwned", "NotInLocation", "DebugKey", "NeverTrue"};
 
   DEBUG_ASSERT(_type >= 0 && _type < NumConditions);
 
@@ -181,16 +180,16 @@ void GlobalEventCondition::Save(FileWriter* _out)
 // Class GlobalEventAction
 // ****************************************************************************
 
-char* GlobalEventAction::GetTypeName(int _type)
+const char* GlobalEventAction::GetTypeName(int _type)
 {
-  static char* names[] = {"SetMission", "RunScript", "MakeAvailable"};
+  static const char* names[] = {"SetMission", "RunScript", "MakeAvailable"};
 
   DEBUG_ASSERT(_type >= 0 && _type < NumActionTypes);
 
   return names[_type];
 }
 
-GlobalEventAction::GlobalEventAction() { strcpy(m_filename, "null"); }
+GlobalEventAction::GlobalEventAction() : m_type(-1), m_locationId(-1), m_filename("null") {}
 
 void GlobalEventAction::Read(TextReader* _in)
 {
@@ -201,12 +200,12 @@ void GlobalEventAction::Read(TextReader* _in)
     m_type = SetMission;
     m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
     DEBUG_ASSERT(m_locationId != -1);
-    strcpy(m_filename, _in->GetNextToken());
+    m_filename = _in->GetNextToken();
   }
   else if (_stricmp(action, "RunScript") == 0)
   {
     m_type = RunScript;
-    strcpy(m_filename, _in->GetNextToken());
+    m_filename = _in->GetNextToken();
   }
   else if (_stricmp(action, "MakeAvailable") == 0)
   {
@@ -221,15 +220,15 @@ void GlobalEventAction::Write(FileWriter* _out)
 {
   _out->printf("\t\tAction %-10s ", GetTypeName(m_type));
 
-  char* locationName = g_app->m_globalWorld->GetLocationName(m_locationId);
+  const char* locationName = g_app->m_globalWorld->GetLocationName(m_locationId);
 
   switch (m_type)
   {
   case SetMission:
-    _out->printf("%s %s", locationName, m_filename);
+    _out->printf("%s %s", locationName, m_filename.c_str());
     break;
   case RunScript:
-    _out->printf("%s", m_filename);
+    _out->printf("%s", m_filename.c_str());
     break;
   case MakeAvailable:
     _out->printf("%s", locationName);
@@ -250,7 +249,7 @@ void GlobalEventAction::Execute()
     {
       if (g_app->m_testHarness)
       {
-        fprintf(g_app->m_testHarness->m_out, "%sSetting Mission: %s in location %s\n", g_app->m_testHarness->m_indent, m_filename,
+        fprintf(g_app->m_testHarness->m_out, "%sSetting Mission: %s in location %s\n", g_app->m_testHarness->m_indent, m_filename.c_str(),
                 g_app->m_globalWorld->GetLocationName(m_locationId));
       }
       break;
@@ -258,7 +257,7 @@ void GlobalEventAction::Execute()
   case RunScript:
     if (g_app->m_testHarness)
     {
-      fprintf(g_app->m_testHarness->m_out, "%sRunning script: %s\n", g_app->m_testHarness->m_indent, m_filename);
+      fprintf(g_app->m_testHarness->m_out, "%sRunning script: %s\n", g_app->m_testHarness->m_indent, m_filename.c_str());
     }
     break;
   case MakeAvailable:
@@ -279,12 +278,12 @@ void GlobalEventAction::Execute()
     {
       GlobalLocation* loc = g_app->m_globalWorld->GetLocation(m_locationId);
       DEBUG_ASSERT(loc);
-      strcpy(loc->m_missionFilename, m_filename);
+      loc->m_missionFilename = m_filename;
       break;
     }
   case RunScript:
     {
-      g_app->m_script->RunScript(m_filename);
+      g_app->m_script->RunScript(m_filename.c_str());
       break;
     }
   case MakeAvailable:
@@ -626,9 +625,9 @@ void GlobalResearch::Read(TextReader* _in)
   }
 }
 
-char* GlobalResearch::GetTypeName(int _type)
+const char* GlobalResearch::GetTypeName(int _type)
 {
-  char* names[] = {
+  const char* names[] = {
     "Darwinian", "Officer", "Squad", "Laser", "Grenade", "Rocket", "Controller", "AirStrike", "Armour", "TaskManager", "Engineer"
   };
 
@@ -636,19 +635,18 @@ char* GlobalResearch::GetTypeName(int _type)
   return names[_type];
 }
 
-char* GlobalResearch::GetTypeNameTranslated(int _type)
+const char* GlobalResearch::GetTypeNameTranslated(int _type)
 {
-  char* typeName = GetTypeName(_type);
+  const char* typeName = GetTypeName(_type);
 
-  char stringId[256];
-  sprintf(stringId, "researchname_%s", typeName);
+  auto stringId = std::format("researchname_{}", typeName);
 
-  if (ISLANGUAGEPHRASE(stringId))
-    return LANGUAGEPHRASE(stringId);
+  if (ISLANGUAGEPHRASE(stringId.c_str()))
+    return LANGUAGEPHRASE(stringId.c_str());
   return typeName;
 }
 
-int GlobalResearch::GetType(char* _name)
+int GlobalResearch::GetType(const char* _name)
 {
   for (int i = 0; i < NumResearchItems; ++i)
   {
@@ -717,7 +715,7 @@ void SphereWorld::AddLocation(int _locationId)
       GlobalLocation* loc = g_app->m_globalWorld->GetLocation(locationId);
       if (loc)
       {
-        if (strcmp(loc->m_name, "receiver") == 0)
+        if (loc->m_name == "receiver")
         {
           for (int i = 0; i < 60; ++i)
           {
@@ -775,7 +773,7 @@ void SphereWorld::RenderSpirits()
     GlobalLocation* location = g_app->m_globalWorld->GetLocation(locationId);
     if (location)
     {
-      bool isReceiver = (strcmp(location->m_name, "receiver") == 0);
+      bool isReceiver = (location->m_name == "receiver");
 
       if (isReceiver && frand(30) < 1.0f)
         m_spirits[locationId].PutDataAtStart(0.0f);
@@ -1121,7 +1119,7 @@ void SphereWorld::RenderIslands()
       LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id);
 
       int numRedraws = 5;
-      if (!loc->m_missionCompleted && _stricmp(loc->m_missionFilename, "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
+      if (!loc->m_missionCompleted && _stricmp(loc->m_missionFilename.c_str(), "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
         numRedraws = 10;
 
       glBegin(GL_QUADS);
@@ -1169,8 +1167,8 @@ void SphereWorld::RenderIslands()
 
       if (g_app->m_editing)
       {
-        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename);
-        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename);
+        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename.c_str());
+        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
       }
 
       islandPos += camUp * size * 0.3f;
@@ -1178,15 +1176,15 @@ void SphereWorld::RenderIslands()
 
       g_gameFont.SetRenderShadow(false);
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-      if (_stricmp(loc->m_missionFilename, "null") == 0)
+      if (_stricmp(loc->m_missionFilename.c_str(), "null") == 0)
         glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
       g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
       if (g_app->m_editing)
       {
-        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename);
-        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename);
+        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename.c_str());
+        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
       }
 
       free(islandName);
@@ -1267,8 +1265,10 @@ void GlobalWorld::Advance()
         {
           GlobalLocation* loc = GetLocation(locId);
           g_app->m_requestedLocationId = locId;
-          strcpy(g_app->m_requestedMission, loc->m_missionFilename);
-          strcpy(g_app->m_requestedMap, loc->m_mapFilename);
+          strncpy(g_app->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
+          g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
+          strncpy(g_app->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
+          g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
         }
       }
     }
@@ -1305,7 +1305,7 @@ void GlobalWorld::Advance()
       if (locId != -1)
       {
         GlobalLocation* loc = GetLocation(locId);
-        if (strcmp(loc->m_missionFilename, "null") != 0 && loc->m_available)
+        if (loc->m_missionFilename != "null" && loc->m_available)
         {
           // Default behaviour is to go the location
           m_locationRequested = locId;
@@ -1340,8 +1340,10 @@ void GlobalWorld::Advance()
     {
       GlobalLocation* loc = GetLocation(m_locationRequested);
       g_app->m_requestedLocationId = m_locationRequested;
-      strcpy(g_app->m_requestedMission, loc->m_missionFilename);
-      strcpy(g_app->m_requestedMap, loc->m_mapFilename);
+      strncpy(g_app->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
+      g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
+      strncpy(g_app->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
+      g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
 
       m_locationRequested = -1;
     }
@@ -1425,7 +1427,7 @@ int GlobalWorld::GetLocationId(const char* _name)
   {
     GlobalLocation* loc = m_locations[i];
     DEBUG_ASSERT(loc);
-    if (_stricmp(loc->m_name, _name) == 0)
+    if (_stricmp(loc->m_name.c_str(), _name) == 0)
       return loc->m_id;
   }
 
@@ -1434,34 +1436,37 @@ int GlobalWorld::GetLocationId(const char* _name)
 
 int GlobalWorld::GetLocationIdFromMapFilename(const char* _mapFilename)
 {
-  char buf[MAX_FILENAME_LEN];
-  strcpy(buf, _mapFilename);
-  char* mapName = strstr(buf, "map_") + 4;
-  mapName[strlen(mapName) - 4] = '\0';
+  std::string buf(_mapFilename);
+  auto pos = buf.find("map_");
+  if (pos == std::string::npos)
+    return -1;
+  std::string mapName = buf.substr(pos + 4);
+  // Strip the .xxx extension
+  if (mapName.size() >= 4)
+    mapName.resize(mapName.size() - 4);
 
-  return GetLocationId(mapName);
+  return GetLocationId(mapName.c_str());
 }
 
-char* GlobalWorld::GetLocationName(int _id)
+const char* GlobalWorld::GetLocationName(int _id)
 {
   GlobalLocation* loc = GetLocation(_id);
   if (loc)
-    return loc->m_name;
+    return loc->m_name.c_str();
   return nullptr;
 }
 
-char* GlobalWorld::GetLocationNameTranslated(int _id)
+const char* GlobalWorld::GetLocationNameTranslated(int _id)
 {
   GlobalLocation* loc = GetLocation(_id);
   if (!loc)
     return nullptr;
 
-  char stringId[256];
-  sprintf(stringId, "location_%s", loc->m_name);
+  auto stringId = std::format("location_{}", loc->m_name);
 
-  if (ISLANGUAGEPHRASE(stringId))
-    return LANGUAGEPHRASE(stringId);
-  return loc->m_name;
+  if (ISLANGUAGEPHRASE(stringId.c_str()))
+    return LANGUAGEPHRASE(stringId.c_str());
+  return loc->m_name.c_str();
 }
 
 LegacyVector3 GlobalWorld::GetLocationPosition(int _id)
@@ -1531,11 +1536,13 @@ void GlobalWorld::ParseLocations(TextReader* _in)
     location->m_id = atoi(word);
     location->m_available = static_cast<bool>(atoi(_in->GetNextToken()));
 
-    strcpy(location->m_mapFilename, _in->GetNextToken());
-    strcpy(location->m_missionFilename, _in->GetNextToken());
+    location->m_mapFilename = _in->GetNextToken();
+    location->m_missionFilename = _in->GetNextToken();
 
-    strcpy(location->m_name, (location->m_mapFilename + 4));
-    location->m_name[strlen(location->m_name) - 4] = '\x0';
+    // Extract name from map filename: strip "map_" prefix and ".xxx" extension
+    location->m_name = location->m_mapFilename.substr(4);
+    if (location->m_name.size() >= 4)
+      location->m_name.resize(location->m_name.size() - 4);
 
     AddLocation(location);
   }
@@ -1606,16 +1613,15 @@ void GlobalWorld::AddLevelBuildingToGlobalBuildings(Building* _building, int _lo
   }
 }
 
-void GlobalWorld::LoadGame(char* _filename)
+void GlobalWorld::LoadGame(const char* _filename)
 {
   TextReader* in = nullptr;
-  char fullFilename[256];
 
   if (!g_app->m_editing)
   {
-    sprintf(fullFilename, "%susers/%s/%s", g_app->GetProfileDirectory(), g_app->m_userProfileName, _filename);
-    if (DoesFileExist(fullFilename))
-      in = new TextFileReader(fullFilename);
+    auto fullFilename = std::format("{}users/{}/{}", g_app->GetProfileDirectory(), g_app->m_userProfileName, _filename);
+    if (DoesFileExist(fullFilename.c_str()))
+      in = new TextFileReader(fullFilename.c_str());
   }
 
   if (!in)
@@ -1660,19 +1666,18 @@ void GlobalWorld::LoadGame(char* _filename)
     GlobalLocation* loc = m_locations.GetData(i);
 
     // Load all the level files for the location
-    LevelFile levFile("null", loc->m_mapFilename);
+    LevelFile levFile("null", loc->m_mapFilename.c_str());
     for (int b = 0; b < levFile.m_buildings.Size(); ++b)
     {
       Building* building = levFile.m_buildings[b];
       AddLevelBuildingToGlobalBuildings(building, loc->m_id);
     }
 
-    char filter[256];
-    sprintf(filter, "mission_%s*.txt", GetLocationName(loc->m_id));
+    auto filter = std::format("mission_{}*.txt", GetLocationName(loc->m_id));
 
-    for (auto missionName : Resource::ListResources("levels\\", filter, false))
+    for (auto missionName : Resource::ListResources("levels\\", filter.c_str(), false))
     {
-        LevelFile levFile(missionName.c_str(), loc->m_mapFilename);
+        LevelFile levFile(missionName.c_str(), loc->m_mapFilename.c_str());
 
       for (int b = 0; b < levFile.m_buildings.Size(); ++b)
       {
@@ -1709,7 +1714,7 @@ void GlobalWorld::LoadGame(char* _filename)
   EvaluateEvents();
 }
 
-void GlobalWorld::LoadLocations(char* _filename)
+void GlobalWorld::LoadLocations(const char* _filename)
 {
   TextReader* in = g_app->m_resource->GetTextReader(_filename);
 

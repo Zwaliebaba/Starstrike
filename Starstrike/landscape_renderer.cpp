@@ -235,10 +235,11 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D<float>* _heightMap)
   : m_vertexBuffer(0)
 {
   char fullFilname[256];
-  sprintf(fullFilname, "terrain\\%s", g_app->m_location->m_levelFile->m_landscapeColourFilename);
+  snprintf(fullFilname, sizeof(fullFilname), "terrain\\%s", g_app->m_location->m_levelFile->m_landscapeColourFilename);
 
   if (Location::ChristmasModEnabled() == 1)
-    strcpy(fullFilname, "terrain\\landscape_icecaps.bmp");
+    strncpy(fullFilname, "terrain\\landscape_icecaps.bmp", sizeof(fullFilname));
+    fullFilname[sizeof(fullFilname) - 1] = '\0';
 
   BinaryReader* reader = g_app->m_resource->GetBinaryReader(fullFilname);
   ASSERT_TEXT(reader != nullptr, "Failed to get resource %s", fullFilname);
