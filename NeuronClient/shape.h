@@ -67,6 +67,7 @@ class ShapeMarker
     ~ShapeMarker();
 
     Matrix34 GetWorldMatrix(const Matrix34& _rootTransform);
+    Neuron::Transform3D GetWorldTransform(const Neuron::Transform3D& _rootTransform);
 
     void WriteToFile(FILE* _out) const;
 };
@@ -128,7 +129,7 @@ class ShapeFragment
 
     char* m_name;
     char* m_parentName;
-    Matrix34 m_transform;
+    Neuron::Transform3D m_transform;
     LegacyVector3 m_angVel;
     LegacyVector3 m_vel;
 

@@ -3,28 +3,33 @@
 class ASyncLoader
 {
   public:
-    [[nodiscard]] bool IsValid() const { return m_isValid; }
+    [[nodiscard]] bool IsValid() const noexcept { return m_isValid; }
 
-    void WaitForLoad() const
-    {
-      while (m_isLoading)
-        std::this_thread::yield();
-    }
+    void WaitForLoad() const noexcept { m_isLoading.wait(true); }
 
-    bool IsLoading() const { return m_isLoading; }
+    [[nodiscard]] bool IsLoading() const noexcept { return m_isLoading; }
 
   protected:
-    void StartLoading()
+    void StartLoading() noexcept
     {
-      DEBUG_ASSERT_TEXT(!m_isLoading, "Already loading");
-      m_isLoading = true;
+      bool expected = false;
+      bool exchanged = m_isLoading.compare_exchange_strong(expected, true);
+      DEBUG_ASSERT_TEXT(exchanged, "Already loading");
     }
 
-    void FinishLoading()
+    void FinishLoading() noexcept
+    {
+      DEBUG_ASSERT_TEXT(m_isLoading, "Not loading");
+      m_isValid = true;
+      m_isLoading = false;
+      m_isLoading.notify_all();
+    }
+
+    void FailLoading() noexcept
     {
       DEBUG_ASSERT_TEXT(m_isLoading, "Not loading");
       m_isLoading = false;
-      m_isValid = true;
+      m_isLoading.notify_all();
     }
 
     std::atomic_bool m_isValid{false};

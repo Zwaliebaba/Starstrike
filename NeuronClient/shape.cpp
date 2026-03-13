@@ -1,14 +1,9 @@
 #include "pch.h"
 #include "math_utils.h"
-#include "matrix33.h"
 #include "matrix34.h"
 #include "shape.h"
 #include "text_stream_readers.h"
 #include "resource.h"
-
-// ****************************************************************************
-// Class ShapeMarker
-// ****************************************************************************
 
 // *** Constructor
 // This constructor is used in the export process. The m_parents array is never
@@ -107,19 +102,30 @@ ShapeMarker::~ShapeMarker()
 {
   SAFE_FREE(m_parentName);
   SAFE_FREE(m_name);
-  //for(unsigned i=0;i<m_depth;i++) delete m_parents[i]; should we?
   SAFE_DELETE(m_parents);
 }
 
 // *** GetWorldMatrix
-Matrix34 ShapeMarker::GetWorldMatrix(const Matrix34& _rootTransform)
-{
-  Matrix34 mat = _rootTransform;
-  for (int i = 0; i < m_depth; ++i)
-    mat = m_parents[i]->m_transform * mat;
-  mat = m_transform * mat;
+Matrix34 ShapeMarker::GetWorldMatrix(const Matrix34& _rootTransform) { return Matrix34(GetWorldTransform(_rootTransform)); }
 
-  return mat;
+// *** GetWorldTransform
+// SIMD-accelerated version using Transform3D composition (XMMatrixMultiply).
+// Matrix34 members implicitly convert to Transform3D via operator Transform3D().
+Transform3D ShapeMarker::GetWorldTransform(const Transform3D& _rootTransform)
+{
+  using namespace DirectX;
+  XMMATRIX result = XMLoadFloat4x4(&_rootTransform.m);
+  for (int i = 0; i < m_depth; ++i)
+  {
+    XMMATRIX parent = XMLoadFloat4x4(&m_parents[i]->m_transform.m);
+    result = XMMatrixMultiply(parent, result);
+  }
+  XMMATRIX self = XMLoadFloat4x4(&static_cast<Transform3D>(m_transform).m);
+  result = XMMatrixMultiply(self, result);
+
+  Transform3D t;
+  XMStoreFloat4x4(&t.m, result);
+  return t;
 }
 
 void ShapeMarker::WriteToFile(FILE* _out) const
@@ -132,10 +138,6 @@ void ShapeMarker::WriteToFile(FILE* _out) const
   fprintf(_out, "\tPos:   %5.2f %5.2f %5.2f\n", m_transform.pos.x, m_transform.pos.y, m_transform.pos.z);
   fprintf(_out, "\tMarkerEnd\n\n\n");
 }
-
-// ****************************************************************************
-// Class ShapeFragment
-// ****************************************************************************
 
 // This constructor is used to load a shape from a file.
 ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
@@ -153,7 +155,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     m_triangles(nullptr),
     m_name(nullptr),
     m_parentName(nullptr),
-    m_transform(1),
+    m_transform(Neuron::Transform3D::Identity()),
     m_angVel(0, 0, 0),
     m_vel(0, 0, 0),
     m_centre(0.0f, 0.0f, 0.0f),
@@ -167,7 +169,6 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
   DEBUG_ASSERT(_name);
   m_name = strdup(_name);
 
-  m_transform.SetToIdentity();
   m_angVel.Zero();
   m_vel.Zero();
 
@@ -183,21 +184,21 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
       m_parentName = strdup(secondWord);
     else if (_stricmp(firstWord, "front") == 0)
     {
-      m_transform.f.x = static_cast<float>(atof(secondWord));
-      m_transform.f.y = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.f.z = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._31 = static_cast<float>(atof(secondWord));
+      m_transform.m._32 = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._33 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "up") == 0)
     {
-      m_transform.u.x = static_cast<float>(atof(secondWord));
-      m_transform.u.y = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.u.z = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._21 = static_cast<float>(atof(secondWord));
+      m_transform.m._22 = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._23 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "pos") == 0)
     {
-      m_transform.pos.x = static_cast<float>(atof(secondWord));
-      m_transform.pos.y = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.pos.z = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._41 = static_cast<float>(atof(secondWord));
+      m_transform.m._42 = static_cast<float>(atof(_in->GetNextToken()));
+      m_transform.m._43 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "Positions") == 0)
     {
@@ -233,7 +234,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     }
   }
 
-  m_transform.Normalise();
+  m_transform.Orthonormalize();
 
   if (!m_name)
     m_name = strdup("unknown");
@@ -268,7 +269,7 @@ ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
   m_maxTriangles = 1;
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
-  m_transform.SetToIdentity();
+  m_transform = Neuron::Transform3D::Identity();
   m_angVel.Zero();
   m_vel.Zero();
   m_name = strdup(_name);
@@ -327,9 +328,12 @@ void ShapeFragment::WriteToFile(FILE* _out) const
   {
     fprintf(_out, "Fragment: %s\n", m_name);
     fprintf(_out, "\tParentName: %s\n", m_parentName);
-    fprintf(_out, "\tup:    %5.2f %5.2f %5.2f\n", m_transform.u.x, m_transform.u.y, m_transform.u.z);
-    fprintf(_out, "\tfront: %5.2f %5.2f %5.2f\n", m_transform.f.x, m_transform.f.y, m_transform.f.z);
-    fprintf(_out, "\tpos: %.2f %.2f %.2f\n", m_transform.pos.x, m_transform.pos.y, m_transform.pos.z);
+    auto up = m_transform.UpF3();
+    auto fwd = m_transform.ForwardF3();
+    auto pos = m_transform.PositionF3();
+    fprintf(_out, "\tup:    %5.2f %5.2f %5.2f\n", up.x, up.y, up.z);
+    fprintf(_out, "\tfront: %5.2f %5.2f %5.2f\n", fwd.x, fwd.y, fwd.z);
+    fprintf(_out, "\tpos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 
     // Write out the positions
     fprintf(_out, "\tPositions: %d\n", m_numPositions);
@@ -388,7 +392,8 @@ void ShapeFragment::ParsePositionBlock(TextReader* _in, unsigned int _numPositio
   int expectedId = 0;
   while (expectedId < _numPositions)
   {
-    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
+    if (_in->ReadLine() == 0)
+      DEBUG_ASSERT(0);
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
@@ -425,13 +430,15 @@ void ShapeFragment::ParseNormalBlock(TextReader* _in, unsigned int _numNorms)
   int expectedId = 0;
   while (expectedId < _numNorms)
   {
-    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
+    if (_in->ReadLine() == 0)
+      DEBUG_ASSERT(0);
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numNorms) { DEBUG_ASSERT(0); }
+      if (id != expectedId || id >= _numNorms)
+        DEBUG_ASSERT(0);
 
       LegacyVector3* vect = &m_normals[id];
       c = _in->GetNextToken();
@@ -458,13 +465,15 @@ void ShapeFragment::ParseColourBlock(TextReader* _in, unsigned int _numColours)
   int expectedId = 0;
   while (expectedId < _numColours)
   {
-    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
+    if (_in->ReadLine() == 0)
+      DEBUG_ASSERT(0);
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numColours) { DEBUG_ASSERT(0); }
+      if (id != expectedId || id >= _numColours)
+        DEBUG_ASSERT(0);
 
       RGBAColour* col = &m_colours[id];
       c = _in->GetNextToken();
@@ -495,13 +504,15 @@ void ShapeFragment::ParseVertexBlock(TextReader* _in, unsigned int _numVerts)
   int expectedId = 0;
   while (expectedId < _numVerts)
   {
-    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
+    if (_in->ReadLine() == 0)
+      DEBUG_ASSERT(0);
 
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
       int id = atoi(c);
-      if (id != expectedId || id >= _numVerts) { DEBUG_ASSERT(0); }
+      if (id != expectedId || id >= _numVerts)
+        DEBUG_ASSERT(0);
 
       VertexPosCol* vert = &m_vertices[id];
       c = _in->GetNextToken();
@@ -543,7 +554,8 @@ void ShapeFragment::ParseStripBlock(TextReader* _in)
   int v1 = -1, v2 = -1;
   while (i < numVerts)
   {
-    if (_in->ReadLine() == 0) { DEBUG_ASSERT(0); }
+    if (_in->ReadLine() == 0)
+      DEBUG_ASSERT(0);
 
     while (_in->TokenAvailable())
     {
@@ -782,16 +794,19 @@ void ShapeFragment::RegisterTriangles(ShapeTriangle* _tris, unsigned int _numTri
 void ShapeFragment::Render(float _predictionTime)
 {
 #ifndef EXPORTER_BUILD
-  Matrix34 predictedTransform = m_transform;
-  predictedTransform.RotateAround(m_angVel * _predictionTime);
-  predictedTransform.pos += m_vel * _predictionTime;
+  using namespace DirectX;
+  Neuron::Transform3D predicted = m_transform;
+  predicted.RotateAround(XMVectorScale(
+    XMVectorSet(m_angVel.x, m_angVel.y, m_angVel.z, 0.0f), _predictionTime));
+  predicted.Translate(XMVectorScale(
+    XMVectorSet(m_vel.x, m_vel.y, m_vel.z, 0.0f), _predictionTime));
 
-  bool matrixIsIdentity = predictedTransform == g_identityMatrix34;
+  bool matrixIsIdentity = predicted.IsIdentity();
   auto& mv = OpenGLD3D::GetModelViewStack();
   if (!matrixIsIdentity)
   {
     mv.Push();
-    mv.Multiply(predictedTransform);
+    mv.Multiply(predicted);
   }
 
   RenderSlow();
@@ -899,7 +914,7 @@ ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
 bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
 {
 #ifndef EXPORTER_BUILD
-  Matrix34 totalMatrix = m_transform * _transform;
+  Matrix34 totalMatrix(m_transform * _transform);
   LegacyVector3 centre = m_centre * totalMatrix;
 
   // First do bounding sphere check
@@ -943,7 +958,7 @@ bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, boo
 bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate)
 {
 #ifndef EXPORTER_BUILD
-  Matrix34 totalMatrix = m_transform * _transform;
+  Matrix34 totalMatrix(m_transform * _transform);
   LegacyVector3 centre = m_centre * totalMatrix;
 
   if (m_radius > 0.0f && SphereSphereIntersection(_package->m_pos, _package->m_radius, centre, m_radius))
@@ -986,7 +1001,7 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
 {
 #ifndef EXPORTER_BUILD
 
-  Matrix34 totalMatrix = m_transform * _ourTransform;
+  Matrix34 totalMatrix(m_transform * _ourTransform);
   LegacyVector3 centre = m_centre * totalMatrix;
 
   if (m_radius > 0.0f)
@@ -1013,7 +1028,7 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
 
 void ShapeFragment::CalculateCentre(const Matrix34& _transform, LegacyVector3& _centre, int& _numFragments)
 {
-  Matrix34 totalMatrix = m_transform * _transform;
+  Matrix34 totalMatrix(m_transform * _transform);
   LegacyVector3 centre = m_centre * totalMatrix;
 
   _centre += centre;
@@ -1029,7 +1044,7 @@ void ShapeFragment::CalculateCentre(const Matrix34& _transform, LegacyVector3& _
 
 void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre, float& _radius)
 {
-  Matrix34 totalMatrix = m_transform * _transform;
+  Matrix34 totalMatrix(m_transform * _transform);
   LegacyVector3 centre = m_centre * totalMatrix;
 
   float distance = (centre - _centre).Mag();
@@ -1061,10 +1076,7 @@ Shape::Shape(const char* filename, bool _animating)
 
 Shape::Shape(TextReader* in, bool _animating)
   : m_animating(_animating),
-    m_rootFragment(nullptr)
-{
-  Load(in);
-}
+    m_rootFragment(nullptr) { Load(in); }
 
 Shape::~Shape()
 {
@@ -1155,12 +1167,9 @@ void Shape::Load(TextReader* _in)
 
 void Shape::WriteToFile(FILE* _out) const { m_rootFragment->WriteToFile(_out); }
 
-void Shape::Render(float _predictionTime, const Matrix34& _transform)
-{
-  Render(_predictionTime, static_cast<Neuron::Transform3D>(_transform));
-}
+void Shape::Render(float _predictionTime, const Matrix34& _transform) { Render(_predictionTime, static_cast<Transform3D>(_transform)); }
 
-void Shape::Render(float _predictionTime, const Neuron::Transform3D& _transform)
+void Shape::Render(float _predictionTime, const Transform3D& _transform)
 {
 #ifndef EXPORTER_BUILD
   glEnable(GL_COLOR_MATERIAL);

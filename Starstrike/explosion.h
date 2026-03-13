@@ -1,11 +1,9 @@
 #ifndef INCLUDED_EXPLOSION
 #define INCLUDED_EXPLOSION
 
-
 #include "matrix33.h"
 #include "rgb_colour.h"
 #include "shape.h"
-
 
 //*****************************************************************************
 // Class Tumbler
@@ -16,14 +14,13 @@
 // rotation multiplied on to it every frame.
 class Tumbler
 {
-public:
-	Matrix33	m_rotMat;
-	LegacyVector3		m_angVel;
+  public:
+    Matrix33 m_rotMat;
+    LegacyVector3 m_angVel;
 
-	Tumbler();
-	void Advance();
+    Tumbler();
+    void Advance();
 };
-
 
 //*****************************************************************************
 // Class ExplodingTri
@@ -31,16 +28,15 @@ public:
 
 class ExplodingTri
 {
-public:
-	LegacyVector3		m_vel;
-	LegacyVector3		m_pos;
-	LegacyVector3		m_v1, m_v2, m_v3;
-	LegacyVector3		m_norm;
-	Tumbler		*m_tumbler;
-	float		m_timeToDie;
-	RGBAColour	m_colour;
+  public:
+    LegacyVector3 m_vel;
+    LegacyVector3 m_pos;
+    LegacyVector3 m_v1, m_v2, m_v3;
+    LegacyVector3 m_norm;
+    Tumbler* m_tumbler;          // Non-owning; points into parent Explosion::m_tumblers
+    float m_timeToDie;
+    RGBAColour m_colour;
 };
-
 
 //*****************************************************************************
 // Class Explosion
@@ -48,23 +44,22 @@ public:
 
 class Explosion
 {
-protected:
-	Tumbler		 *m_tumblers;
-	unsigned int m_numTumblers;
-	ExplodingTri *m_tris;
-	unsigned int m_numTris;
-	float		 m_timeToDie;
+  protected:
+    std::vector<Tumbler> m_tumblers;
+    std::vector<ExplodingTri> m_tris;
+    float m_timeToDie;
 
-public:
-	Explosion(ShapeFragment *_frag, Matrix34 const &_transform, float _fraction);
-	~Explosion();
+  public:
+    Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fraction);
+    ~Explosion() = default;
+    Explosion(const Explosion&) = delete;
+    Explosion& operator=(const Explosion&) = delete;
 
-	bool Advance();	// Returns true if the explosion has finished
-	void Render();
+    bool Advance(); // Returns true if the explosion has finished
+    void Render() const;
 
-	LegacyVector3 GetCenter() const;
+    LegacyVector3 GetCenter() const;
 };
-
 
 //*****************************************************************************
 // Class ExplosionManager
@@ -72,25 +67,23 @@ public:
 
 class ExplosionManager
 {
-protected:
-	LList <Explosion *> m_explosions;
+  protected:
+    std::vector<Explosion*> m_explosions;
 
-public:
-	ExplosionManager();
-	~ExplosionManager();
+  public:
+    ExplosionManager();
+    ~ExplosionManager();
 
-	void AddExplosion(ShapeFragment *_frag, Matrix34 const &_transform, bool _recurse, float _fraction);
-	void AddExplosion(Shape *_shape, Matrix34 const &_transform, float _fraction=1.0f);
-	void Reset();
+    void AddExplosion(ShapeFragment* _frag, const Matrix34& _transform, bool _recurse, float _fraction);
+    void AddExplosion(const Shape* _shape, const Matrix34& _transform, float _fraction = 1.0f);
+    void Reset();
 
-	void Advance();
-	void Render();
+    void Advance();
+    void Render();
 
-	const LList <Explosion *> &GetExplosionList() {return m_explosions;} // read access for DeformEffect
+    const std::vector<Explosion*>& GetExplosionList() { return m_explosions; } // read access for DeformEffect
 };
 
-
-extern ExplosionManager g_explosionManager;
-
+inline ExplosionManager g_explosionManager;
 
 #endif

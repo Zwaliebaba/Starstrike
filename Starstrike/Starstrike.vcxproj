@@ -453,7 +453,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3d_sierpinski_gasket.cpp" />
-    <ClCompile Include="ai.cpp" />
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="attract.cpp" />
     <ClCompile Include="camera.cpp" />

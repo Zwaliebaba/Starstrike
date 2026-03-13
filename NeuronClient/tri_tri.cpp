@@ -25,8 +25,6 @@
  */
 
 #include "pch.h"
-#include <math.h>
-
 #include "LegacyVector3.h"
 
 #define FABS(x) ((float)fabs(x))        /* implement as is fastest on your machine */

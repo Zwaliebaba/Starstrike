@@ -861,7 +861,7 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
 void Renderer::MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transform)
 {
 #if USE_PIXEL_EFFECT_GRID_OPTIMISATION
-  Matrix34 total = _frag->m_transform * _transform; LegacyVector3 worldPos = _frag->m_centre * total;
+  Matrix34 total(_frag->m_transform * _transform); LegacyVector3 worldPos = _frag->m_centre * total;
 
   // Return early if this shape fragment isn't on the screen
   {

@@ -128,13 +128,20 @@ bool RadarDish::Advance()
       targetFront.y = minAngle;
     targetFront.Normalise();
     float amount = worldMat.u * targetFront;
-    m_dish->m_angVel = m_dish->m_transform.r * amount;
+    auto right = m_dish->m_transform.RightF3();
+    m_dish->m_angVel = LegacyVector3(right.x, right.y, right.z) * amount;
 
     m_verticallyAligned = (m_dish->m_angVel.Mag() < 0.001f);
   }
 
-  m_upperMount->m_transform.RotateAround(m_upperMount->m_angVel * SERVER_ADVANCE_PERIOD);
-  m_dish->m_transform.RotateAround(m_dish->m_angVel * SERVER_ADVANCE_PERIOD);
+  m_upperMount->m_transform.RotateAround(DirectX::XMVectorSet(
+    m_upperMount->m_angVel.x * SERVER_ADVANCE_PERIOD,
+    m_upperMount->m_angVel.y * SERVER_ADVANCE_PERIOD,
+    m_upperMount->m_angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
+  m_dish->m_transform.RotateAround(DirectX::XMVectorSet(
+    m_dish->m_angVel.x * SERVER_ADVANCE_PERIOD,
+    m_dish->m_angVel.y * SERVER_ADVANCE_PERIOD,
+    m_dish->m_angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
 
   if (m_movementSoundsPlaying && m_horizontallyAligned && m_dish->m_angVel.Mag() < 0.05f)
   {

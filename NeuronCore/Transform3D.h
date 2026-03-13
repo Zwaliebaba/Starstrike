@@ -66,6 +66,12 @@ namespace Neuron
       return DirectX::XMLoadFloat4(reinterpret_cast<const DirectX::XMFLOAT4*>(&m._41));
     }
 
+    // Float3 accessors — convenient for bridging to legacy types without SIMD.
+    [[nodiscard]] DirectX::XMFLOAT3 RightF3() const noexcept { return { m._11, m._12, m._13 }; }
+    [[nodiscard]] DirectX::XMFLOAT3 UpF3() const noexcept { return { m._21, m._22, m._23 }; }
+    [[nodiscard]] DirectX::XMFLOAT3 ForwardF3() const noexcept { return { m._31, m._32, m._33 }; }
+    [[nodiscard]] DirectX::XMFLOAT3 PositionF3() const noexcept { return { m._41, m._42, m._43 }; }
+
     // --- Operations -------------------------------------------------------------
 
     /// Forward transform: v * M (row-vector convention, includes translation).
@@ -99,6 +105,54 @@ namespace Neuron
           DirectX::XMLoadFloat4x4(&m),
           DirectX::XMLoadFloat4x4(&_rhs.m)));
       return *this;
+    }
+
+    /// Orthonormalize the 3×3 rotation part in-place.
+    /// Matches the legacy Matrix34::Normalise() convention: forward is
+    /// normalised first, then right = cross(up, forward), up = cross(forward, right).
+    void Orthonormalize() noexcept
+    {
+      using namespace DirectX;
+      XMVECTOR f = XMVector3Normalize(Forward());
+      XMVECTOR r = XMVector3Normalize(XMVector3Cross(Up(), f));
+      XMVECTOR u = XMVector3Cross(f, r);
+      XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&m._11), XMVectorSetW(r, 0.0f));
+      XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&m._21), XMVectorSetW(u, 0.0f));
+      XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&m._31), XMVectorSetW(f, 0.0f));
+    }
+
+    /// Rotate the orientation (rows 0-2) around an axis whose direction is the
+    /// normalised _axis and whose magnitude is the rotation angle in radians.
+    /// Position (row 3) is unchanged.  Matches Matrix34::RotateAround(LegacyVector3).
+    Transform3D& XM_CALLCONV RotateAround(DirectX::FXMVECTOR _axis) noexcept
+    {
+      using namespace DirectX;
+      float magSq = XMVectorGetX(XMVector3LengthSq(_axis));
+      if (magSq < 1e-10f) return *this;
+      float angle = sqrtf(magSq);
+      XMVECTOR norm = XMVectorScale(_axis, 1.0f / angle);
+      XMMATRIX rot = XMMatrixRotationAxis(norm, angle);
+      XMMATRIX mat = XMLoadFloat4x4(&m);
+      XMVECTOR savedPos = mat.r[3];
+      mat = XMMatrixMultiply(mat, rot);   // Post-multiply: each row rotated by R
+      mat.r[3] = savedPos;               // Restore position (rotation is orientation-only)
+      XMStoreFloat4x4(&m, mat);
+      return *this;
+    }
+
+    /// Add an offset to the position row (row 3).
+    void XM_CALLCONV Translate(DirectX::FXMVECTOR _offset) noexcept
+    {
+      using namespace DirectX;
+      XMVECTOR pos = XMLoadFloat4(reinterpret_cast<const XMFLOAT4*>(&m._41));
+      pos = XMVectorAdd(pos, _offset);
+      XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&m._41), pos);
+    }
+
+    /// Approximate identity comparison (matches DirectXMath tolerance).
+    [[nodiscard]] bool IsIdentity() const noexcept
+    {
+      return DirectX::XMMatrixIsIdentity(DirectX::XMLoadFloat4x4(&m));
     }
 
     // --- Conversion -------------------------------------------------------------

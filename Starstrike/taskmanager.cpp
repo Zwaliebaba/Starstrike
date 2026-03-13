@@ -699,8 +699,6 @@ bool TaskManager::IsValidTargetArea(int _id, const LegacyVector3& _pos)
     return success;
   }
   return true;
-
-  return false;
 }
 
 LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)

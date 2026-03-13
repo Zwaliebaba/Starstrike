@@ -6,39 +6,39 @@ namespace Neuron
 {
 #define ENUM_HELPER(T, S, E)                                                                                                                         \
    T inline operator ++(T& _value) noexcept { return _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) + 1); }                  \
-   T inline operator ++(T& _value, int) noexcept { return _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) + 1); }             \
+   T inline operator ++(T& _value, int) noexcept {                                                                                                   \
+     T old = _value; _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) + 1); return old; }                                      \
    T inline operator --(T& _value) noexcept { return _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) - 1); }                  \
-   T inline operator --(T& _value, int) noexcept { return _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) - 1); }             \
+   T inline operator --(T& _value, int) noexcept {                                                                                                   \
+     T old = _value; _value = static_cast<T>(static_cast<std::underlying_type_t<T>>(_value) - 1); return old; }                                      \
    inline T operator*(T _type) noexcept { return _type; }                                                                                            \
    constexpr size_t SizeOf##T() noexcept { return static_cast<size_t>(T::E) + 1; }                                                                   \
-   class It##T                                                                                                                                 \
+   class It##T                                                                                                                                       \
    {                                                                                                                                                 \
-    int value;                                                                                                                                       \
+    std::underlying_type_t<T> value;                                                                                                                 \
     public:                                                                                                                                          \
-      explicit It##T(int v) : value(v) {}                                                                                                      \
-      ##T operator*() const { return static_cast<##T>(value); }                                                                                      \
-      bool operator!=(const It##T& other) const { return value != other.value; }                                                               \
-      It##T& operator++() { ++value; return *this; }                                                                                           \
+      explicit It##T(std::underlying_type_t<T> v) : value(v) {}                                                                                      \
+      T operator*() const { return static_cast<T>(value); }                                                                                          \
+      bool operator==(const It##T& other) const { return value == other.value; }                                                                     \
+      bool operator!=(const It##T& other) const { return value != other.value; }                                                                     \
+      It##T& operator++() { ++value; return *this; }                                                                                                 \
    };                                                                                                                                                \
-   class Range##T {                                                                                                                                 \
+   class Range##T {                                                                                                                                  \
      public:                                                                                                                                         \
-      It##T begin() const { return It##T(static_cast<std::underlying_type_t<T>>(T::S)); }                                                 \
-      It##T end() const { return It##T(static_cast<std::underlying_type_t<T>>(T::E) + 1); }                                                \
+      It##T begin() const { return It##T(static_cast<std::underlying_type_t<T>>(T::S)); }                                                            \
+      It##T end() const { return It##T(static_cast<std::underlying_type_t<T>>(T::E) + 1); }                                                          \
    };                                                                                                                                                \
-   constexpr T operator | (T a, T b) noexcept { return T(((_ENUM_FLAG_SIZED_INTEGER<T>::type)a) | ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }         \
-   inline T &operator |= (T &a, T b) noexcept { return (T &)(((_ENUM_FLAG_SIZED_INTEGER<T>::type &)a) |= ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }  \
-   constexpr T operator & (T a, T b) noexcept { return T(((_ENUM_FLAG_SIZED_INTEGER<T>::type)a) & ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }         \
-   inline T &operator &= (T &a, T b) noexcept { return (T &)(((_ENUM_FLAG_SIZED_INTEGER<T>::type &)a) &= ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }  \
-   constexpr T operator ~ (T a) noexcept { return T(~((_ENUM_FLAG_SIZED_INTEGER<T>::type)a)); }                                                      \
-   constexpr T operator ^ (T a, T b) noexcept { return T(((_ENUM_FLAG_SIZED_INTEGER<T>::type)a) ^ ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }         \
-   inline T &operator ^= (T &a, T b) noexcept { return (T &)(((_ENUM_FLAG_SIZED_INTEGER<T>::type &)a) ^= ((_ENUM_FLAG_SIZED_INTEGER<T>::type)b)); }  \
-   constexpr bool operator ! (T a) noexcept { return !((_ENUM_FLAG_SIZED_INTEGER<T>::type)a); }
-  //template <> struct std::formatter<T> : std::formatter<int> {                                                                                     \
-  //  auto format(const T& id, std::format_context& ctx) const {return std::formatter<int>::format(static_cast<int>(id), ctx); }                     \
-  //}
-
-  template <typename T>
-  constexpr bool IsValidEnum(T _value) noexcept { return (_value >= begin(_value) && _value < end(_value)); }
+   constexpr T operator | (T a, T b) noexcept {                                                                                                      \
+     return static_cast<T>(static_cast<std::underlying_type_t<T>>(a) | static_cast<std::underlying_type_t<T>>(b)); }                                 \
+   inline T& operator |= (T& a, T b) noexcept { a = a | b; return a; }                                                                               \
+   constexpr T operator & (T a, T b) noexcept {                                                                                                      \
+     return static_cast<T>(static_cast<std::underlying_type_t<T>>(a) & static_cast<std::underlying_type_t<T>>(b)); }                                 \
+   inline T& operator &= (T& a, T b) noexcept { a = a & b; return a; }                                                                               \
+   constexpr T operator ~ (T a) noexcept { return static_cast<T>(~static_cast<std::underlying_type_t<T>>(a)); }                                      \
+   constexpr T operator ^ (T a, T b) noexcept {                                                                                                      \
+     return static_cast<T>(static_cast<std::underlying_type_t<T>>(a) ^ static_cast<std::underlying_type_t<T>>(b)); }                                 \
+   inline T& operator ^= (T& a, T b) noexcept { a = a ^ b; return a; }                                                                               \
+   constexpr bool operator ! (T a) noexcept { return !static_cast<std::underlying_type_t<T>>(a); }
 
   template <typename T>
   constexpr size_t I(T _value) noexcept { return static_cast<size_t>(_value); }

@@ -50,20 +50,21 @@ transformation.
 removing the OpenGL conceptual framing, the translation-layer indirection, and the
 thread-unsafe static buffer — not about transposing matrices.
 
-### Operator Conventions (Current)
+### Operator Conventions (Post Phase 2)
 
 | Operation | Formula | Convention |
 |---|---|---|
 | `Matrix33 * vec` | `dot(row_i, v)` for each row | M·v (column-vector, inverse rotation) |
-| `vec * Matrix33` | Same formula as above | **Identical** — should differ but doesn't |
-| `Matrix34 * vec` | `v.x*r + v.y*u + v.z*f + pos` | v·M (row-vector, forward transform) |
-| `vec * Matrix34` | Same formula as above | **Identical** — should differ but doesn't |
+| `vec * Matrix33` | `v.x*r_i + v.y*u_i + v.z*f_i` for each component | v·M (row-vector, forward rotation) ✓ |
+| `Matrix34 * vec` | `d = v − pos; { r·d, u·d, f·d }` | Inverse affine (world-to-local) ✓ |
+| `vec * Matrix34` | `v.x*r + v.y*u + v.z*f + pos` | v·M (row-vector, forward transform) ✓ |
 | `Matrix33 * Matrix33` | Standard row-major product | Row-major ✓ |
 | `Matrix34 *= Matrix34` | Standard row-major product + position | Row-major ✓ |
 | `MatrixStack::Multiply` | `XMMatrixMultiply(mat, current)` | Pre-multiply (= DX local-transform-first) ✓ |
+| `Transform3D * Transform3D` | `XMMatrixMultiply(lhs, rhs)` | Row-major ✓ |
 | Shader | `mul(v, WorldMatrix)` | Row-vector ✓ |
 
-### Rendering Pipeline (Current)
+### Rendering Pipeline (Post Phase 4.2)
 
 ```
 Building/Entity
@@ -71,27 +72,26 @@ Building/Entity
   ▼
 Building::Render()
   │  Matrix34 mat(m_front, g_upVector, m_pos);
-  │  m_shape->Render(predictionTime, mat);
+  │  m_shape->Render(predictionTime, mat);      ← implicit Matrix34 → Transform3D
   ▼
-Shape::Render(predictionTime, Matrix34& transform)
-  │  glPushMatrix();
-  │  glMultMatrixf(transform.ConvertToOpenGLFormat());     ← float[16] via static buffer
+Shape::Render(predictionTime, Transform3D& transform)
+  │  mv.Push();
+  │  mv.Multiply(transform);                    ← MatrixStack::Multiply(Transform3D)
   │  m_rootFragment->Render(predictionTime);
-  │  glPopMatrix();
+  │  mv.Pop();
   ▼
-ShapeFragment::Render(predictionTime)                       (recursive)
-  │  glPushMatrix();
-  │  glMultMatrixf(localTransform.ConvertToOpenGLFormat()); ← float[16] via static buffer
-  │  RenderSlow();                                          ← immediate-mode glBegin/glEnd
+ShapeFragment::Render(predictionTime)            (recursive)
+  │  Transform3D predicted = m_transform;        ← m_transform is now Transform3D
+  │  predicted.RotateAround(XMVectorScale(...)); ← SIMD via XMMatrixRotationAxis
+  │  predicted.Translate(XMVectorScale(...));     ← SIMD position offset
+  │  mv.Push();
+  │  mv.Multiply(predicted);                     ← direct Transform3D → XMFLOAT4X4
+  │  RenderSlow();                               ← still immediate-mode glBegin/glEnd
   │  recurse children
-  │  glPopMatrix();
-  ▼
-opengl_directx.cpp — glMultMatrixf(const float* m)
-  │  memcpy(&mat, m, sizeof(XMFLOAT4X4));                  ← no transpose
-  │  s_pTargetMatrixStack->Multiply(mat);                   ← pre-multiply
+  │  mv.Pop();
   ▼
 uploadAndBindConstants()
-  │  XMStoreFloat4x4(&cb.WorldMatrix, stack.GetTopXM());   ← direct copy
+  │  XMStoreFloat4x4(&cb.WorldMatrix, stack.GetTopXM());
   │  memcpy(ringBuffer, &cb, sizeof(cb));
   │  cmdList->SetGraphicsRootConstantBufferView(0, gpuAddr);
   ▼
@@ -104,15 +104,15 @@ Correct result
 
 ### Problems to Solve
 
-| # | Issue | Impact |
-|---|---|---|
-| P1 | `ConvertToOpenGLFormat` relies on `static float m_openGLFormat[16]` — **not thread-safe**, returns pointer to shared mutable state | Data corruption if two matrices convert in overlapping scopes |
-| P2 | OpenGL-named functions (`glMultMatrixf`, `glPushMatrix`, etc.) obscure that the backend is DX12; every matrix operation pays an indirection through the translation layer | Readability, performance, maintenance burden |
-| P3 | `operator*(Matrix33, vec)` and `operator*(vec, Matrix33)` return **identical results** — the convention is ambiguous | Confusing; bugs if someone relies on mathematical ordering |
-| P4 | `Matrix34 * vec` implements forward transform but reads as column-vector notation `M·v` — misleading | Confusing; hides the actual row-vector convention |
-| P5 | No SIMD — Matrix33/34 use scalar float arithmetic | Missed performance opportunity for hierarchy composition |
-| P6 | Legacy types force every render site to construct `Matrix34` from raw vectors and call `ConvertToOpenGLFormat` | Boilerplate, error-prone |
-| P7 | `Matrix33` and `Matrix34` live in NeuronClient but are `#include`d by GameLogic (14+ files) — cross-project dependency on a rendering-era type | Architectural layering violation |
+| # | Issue | Impact | Status |
+|---|---|---|---|
+| P1 | `ConvertToOpenGLFormat` relies on `static float m_openGLFormat[16]` — **not thread-safe**, returns pointer to shared mutable state | Data corruption if two matrices convert in overlapping scopes | ✅ Fixed (Phase 0) |
+| P2 | OpenGL-named functions (`glMultMatrixf`, `glPushMatrix`, etc.) obscure that the backend is DX12; every matrix operation pays an indirection through the translation layer | Readability, performance, maintenance burden | ✅ Fixed (Phase 1) — zero `gl*` matrix callers remain outside `opengl_directx.cpp` |
+| P3 | `operator*(Matrix33, vec)` and `operator*(vec, Matrix33)` return **identical results** — the convention is ambiguous | Confusing; bugs if someone relies on mathematical ordering | ✅ Fixed (Phase 2) |
+| P4 | `Matrix34 * vec` implements forward transform but reads as column-vector notation `M·v` — misleading | Confusing; hides the actual row-vector convention | ✅ Fixed (Phase 2) — now inverse affine |
+| P5 | No SIMD — Matrix33/34 use scalar float arithmetic | Missed performance opportunity for hierarchy composition | ⚠️ Partially fixed — `GetWorldTransform` and `ShapeFragment::Render` use SIMD; remaining scalar sites depend on Phase 4.3+ |
+| P6 | Legacy types force every render site to construct `Matrix34` from raw vectors and call `ConvertToOpenGLFormat` | Boilerplate, error-prone | ⚠️ Partially fixed — `ConvertToOpenGLFormat` eliminated; `Matrix34` construction remains in ~60 GameLogic files |
+| P7 | `Matrix33` and `Matrix34` live in NeuronClient but are `#include`d by GameLogic (14+ files) — cross-project dependency on a rendering-era type | Architectural layering violation | Pending (Phase 4.8–4.9) |
 
 ---
 
@@ -288,24 +288,64 @@ this is deferred to Phase 4 when `Matrix34` usage is removed file-by-file.
 **Goal:** Delete `Matrix33` and `Matrix34` once all consumers have migrated to
 `Transform3D` or raw `XMMATRIX`.
 
-#### 4.1 — Migrate `ShapeMarker::GetWorldMatrix`
+#### 4.1 — Migrate `ShapeMarker::GetWorldMatrix` ✅
 
-`GetWorldMatrix` composes a chain of `Matrix34` transforms via `operator*=`. Replace
-with `Transform3D` composition using `XMMatrixMultiply`.
+Added a SIMD-accelerated `GetWorldTransform(const Transform3D&)` overload that
+composes the hierarchy using `XMLoadFloat4x4` / `XMMatrixMultiply` /
+`XMStoreFloat4x4`. The legacy `GetWorldMatrix(const Matrix34&)` now delegates to it
+via `Matrix34(GetWorldTransform(_rootTransform))`.
 
-#### 4.2 — Migrate `ShapeFragment::m_transform` and animation
+New `XMFLOAT3` accessors (`RightF3`, `UpF3`, `ForwardF3`, `PositionF3`) added to
+`Transform3D` for caller bridging. An `explicit Matrix34(const Transform3D&)`
+constructor added for the reverse conversion. The `explicit` qualifier prevents
+implicit bidirectional conversions that would cause overload ambiguity.
 
-`ShapeFragment` stores `Matrix34 m_transform`, `LegacyVector3 m_angVel`, and
-`LegacyVector3 m_vel`. The `Render` method predicts the transform:
+| File | Change |
+|---|---|
+| `NeuronCore/Transform3D.h` | Added `RightF3()`, `UpF3()`, `ForwardF3()`, `PositionF3()` returning `XMFLOAT3` |
+| `NeuronClient/matrix34.h` | Added `explicit Matrix34(const Neuron::Transform3D&)` constructor |
+| `NeuronClient/shape.h` | Added `GetWorldTransform(const Neuron::Transform3D&)` declaration |
+| `NeuronClient/shape.cpp` | New `GetWorldTransform` — SIMD hierarchy composition; `GetWorldMatrix` delegates to it |
+
+#### 4.2 — Migrate `ShapeFragment::m_transform` and animation ✅
+
+Changed `ShapeFragment::m_transform` from `Matrix34` to `Neuron::Transform3D`.
+Added four methods to `Transform3D`:
+
+- **`Orthonormalize()`** — SIMD re-orthogonalisation matching `Matrix34::Normalise()`
+  convention (forward first, right = cross(up, forward), up = cross(forward, right)).
+- **`RotateAround(FXMVECTOR _axis)`** — orientation-only rotation where the axis
+  magnitude encodes the angle. Implemented as post-multiply by
+  `XMMatrixRotationAxis` with position row saved and restored.
+- **`Translate(FXMVECTOR _offset)`** — adds offset to position row.
+- **`IsIdentity()`** — approximate identity comparison via `XMMatrixIsIdentity`.
+
+`ShapeFragment::Render` prediction now uses the SIMD path:
 
 ```cpp
-Matrix34 predicted = m_transform;
-predicted.RotateAround(m_angVel * dt);
-predicted.pos += m_vel * dt;
+Neuron::Transform3D predicted = m_transform;
+predicted.RotateAround(XMVectorScale(
+  XMVectorSet(m_angVel.x, m_angVel.y, m_angVel.z, 0.0f), _predictionTime));
+predicted.Translate(XMVectorScale(
+  XMVectorSet(m_vel.x, m_vel.y, m_vel.z, 0.0f), _predictionTime));
 ```
 
-Replace with XMMATRIX rotation (using `XMMatrixRotationAxis` from `GameMath.h`) and
-XMVECTOR translation.
+Hit-test methods, `CalculateCentre`, `CalculateRadius` use explicit `Matrix34`
+construction from the `Transform3D * Matrix34` composition result. Method signatures
+still take `const Matrix34&` for callers that have not yet migrated.
+
+`GetWorldTransform` simplified: `m_parents[i]->m_transform.m` loads directly without
+`static_cast`.
+
+| File | Change |
+|---|---|
+| `NeuronCore/Transform3D.h` | Added `Orthonormalize()`, `RotateAround(FXMVECTOR)`, `Translate(FXMVECTOR)`, `IsIdentity()` |
+| `NeuronClient/matrix34.h` | Changed `Matrix34(const Neuron::Transform3D&)` to `explicit` |
+| `NeuronClient/shape.h` | `ShapeFragment::m_transform`: `Matrix34` → `Neuron::Transform3D` |
+| `NeuronClient/shape.cpp` | Constructors: `Transform3D::Identity()` init, parse into `m._XX` fields, `Orthonormalize()`; `WriteToFile`: `F3` accessors; `Render`: SIMD prediction; hit-tests: `Matrix34(m_transform * _transform)` |
+| `GameLogic/radardish.cpp` | `.r` → `RightF3()` + `LegacyVector3`; `RotateAround(LV3)` → `RotateAround(XMVectorSet(...))` |
+| `Starstrike/explosion.cpp` | 2 sites: `Matrix34 x = ...` → `Matrix34 x(...)` (explicit ctor) |
+| `Starstrike/renderer.cpp` | 1 site: same explicit ctor pattern |
 
 #### 4.3 — Migrate orientation functions
 
@@ -314,10 +354,29 @@ XMVECTOR translation.
 factory methods that compute the orthonormalised basis via `XMVector3Cross` and
 `XMVector3Normalize`.
 
+Callers span ~15 GameLogic files (building construction, entity orientation,
+weapons). Most construct a `Matrix34` from two axes then pass it to `Shape::Render`.
+Since `Shape::Render` now accepts `Transform3D`, these callers can construct
+`Transform3D::FromAxes(...)` directly once the orient helpers exist.
+
 #### 4.4 — Migrate `RotateAround*` family
 
-`RotateAroundR/U/F/X/Y/Z(angle)` and `RotateAround(axis, angle)` are used for entity
-animation and physics. Replace with `XMMatrixRotationAxis` and `XMMatrixMultiply`.
+`RotateAroundR/U/F(angle)` rotate around local basis axes. Used in camera, entity
+animation, and physics across ~20 call sites in 15 files. `RotateAroundX/Y/Z(angle)`
+rotate around world axes. Used mainly in camera.cpp (21 sites) and
+constructionyard/darwinian/researchitem/spam.
+
+**Note:** `Transform3D::RotateAround(FXMVECTOR)` (Phase 4.2) covers the
+general-axis case. The local-basis-axis variants (`RotateAroundR/U/F`) require
+extracting the basis vector from the matrix first, then calling
+`RotateAround`. The world-axis variants (`RotateAroundX/Y/Z`) can use
+`XMMatrixRotationX/Y/Z` directly.
+
+**Caveat:** `Matrix34::RotateAroundY(angle)` uses the opposite sign convention from
+`Matrix34::RotateAround(Y_axis, angle)` — they rotate in opposite directions for the
+same angle. When migrating callers that use named-axis variants, the sign must be
+preserved (negate if switching to the general `XMMatrixRotationAxis` path, or use the
+matching `XMMatrixRotationY` intrinsic directly).
 
 #### 4.5 — Migrate `Transpose` and `DecomposeToYDR`
 
@@ -325,21 +384,94 @@ animation and physics. Replace with `XMMatrixRotationAxis` and `XMMatrixMultiply
 - `DecomposeToYDR` (Euler extraction): Rewrite using `atan2f` on `XMFLOAT4X4`
   elements directly. The math is the same; only the accessors change.
 
+`DecomposeToYDR` is called in `camera.cpp`, `researchitem.cpp`, `darwinian.cpp`,
+`spam.cpp`, and `mine.cpp`. `Transpose` is called in `camera.cpp` only.
+
 #### 4.6 — Migrate `Matrix33` rotation-only usage
 
-`Matrix33` is used in `Camera`, `Explosion`, `LaserFence`, and `Location`. These
-typically need a 3×3 rotation only. Options:
+`Matrix33` is used in `camera.cpp` (2 sites), `explosion.h/cpp` (rotation member +
+usage), and `matrix34.h` (`GetOr()` helper). `LaserFence` and `Location` no longer
+reference `Matrix33` directly.
+
+Options:
 
 - Use `XMFLOAT3X3` + helper functions (lightweight).
 - Use `Transform3D` with translation = zero (uniform, slightly wasteful).
 
 **Recommended:** `XMFLOAT3X3` for pure rotation, `Transform3D` for full affine.
 
-#### 4.7 — Delete `matrix33.h/cpp` and `matrix34.h/cpp`
+#### 4.7 — Migrate `ShapeMarker::m_transform` to `Transform3D`
 
-Once all 22+ consumer files have been migrated and verified (build + visual
+`ShapeMarker` still stores `Matrix34 m_transform`. Its constructors parse `front`,
+`up`, `pos` from text files (same pattern as `ShapeFragment`). `GetWorldTransform`
+already casts it to `Transform3D`. Migration follows the same pattern as Phase 4.2:
+change the member type, update parsing to set `m._XX` fields directly, and update
+`WriteToFile` to use `F3` accessors.
+
+`GetWorldMatrix` can then be removed (or remain as a thin delegation for callers
+that still need `Matrix34`).
+
+#### 4.8 — Migrate remaining GameLogic `Matrix34` construction sites
+
+The following files construct `Matrix34(front, up, pos)` and pass it to
+`Shape::Render` or `GetWorldMatrix`. Each can be migrated to construct `Transform3D`
+directly once orient helpers (Phase 4.3) are available:
+
+| File | Sites | Pattern |
+|---|---|---|
+| `building.cpp` | 13 | Construct from `(m_front, m_up, m_pos)`, render + GetWorldMatrix |
+| `constructionyard.cpp` | 16 | GetWorldMatrix for markers, construct for render |
+| `controltower.cpp` | 14 | GetWorldMatrix for ports/lights, construct for render |
+| `mine.cpp` | 13 | GetWorldMatrix + RotateAround + render |
+| `rocket.cpp` | 13 | GetWorldMatrix + construct for render |
+| `radardish.cpp` | 11 | GetWorldMatrix, RotateAround (already partially migrated) |
+| `gunturret.cpp` | 10 | GetWorldMatrix for barrels/muzzles |
+| `bridge.cpp` | 9 | GetWorldMatrix × 6 |
+| `armour.cpp` | 9 | Construct, RotateAround, render |
+| `souldestroyer.cpp` | 9 | Construct, render |
+| `spiritreceiver.cpp` | 9 | GetWorldMatrix |
+| `generator.cpp` | 9 | GetWorldMatrix |
+| `blueprintstore.cpp` | 8 | GetWorldMatrix, construct for rendering |
+| `entity_leg.cpp` | 8 | GetWorldMatrix, construct from markers |
+| `insertion_squad.cpp` | 8 | GetWorldMatrix |
+| `laserfence.cpp` | 8 | GetWorldMatrix |
+| `incubator.cpp` | 7 | GetWorldMatrix |
+| `feedingtube.cpp` | 7 | GetWorldMatrix |
+| `staticshape.cpp` | 7 | Construct, render |
+| `sporegenerator.cpp` | 6 | Construct, RotateAround, render |
+| `researchitem.cpp` | 6 | GetWorldMatrix + DecomposeToYDR |
+| `math_utils.cpp` | 6 | Matrix utility functions |
+| `spawnpoint.cpp` | 5 | GetWorldMatrix |
+| `weapons.cpp` | 5 | Construct + GetWorldMatrix |
+| `officer.cpp` | 5 | GetWorldMatrix + RotateAround |
+| `explosion.cpp` | 5 | Construct from fragment transforms (2 sites already migrated) |
+| `spider.cpp` | 5 | Construct, render |
+| `spam.cpp` | 5 | Construct + RotateAround + DecomposeToYDR |
+| `switch.cpp` | 4 | GetWorldMatrix |
+| `trunkport.cpp` | 4 | GetWorldMatrix |
+| `entity.cpp` | 4 | Construct, render |
+| `armyant.cpp` | 4 | Construct, render |
+| `centipede.cpp` | 4 | Construct, render |
+| `engineer.cpp` | 4 | Construct, RotateAround, render |
+| `global_world.cpp` | 4 | Construct, render |
+| `cave.cpp` | 3 | GetWorldMatrix |
+| `renderer.cpp` | 3 | Fragment transform composition (1 site already migrated) |
+| `tripod.cpp` | 3 | Construct + RotateAround |
+| `triffid.cpp` | 15 | Construct, RotateAround, render (heaviest single-file user) |
+| Other files (≤2 sites each) | ~15 | `airstrike`, `anthill`, `darwinian`, `factory`, `lander`, `lasertrooper`, `library`, `location_input`, `safearea`, `scripttrigger`, `teleport`, `wall`, `3d_sierpinski_gasket`, `ai` |
+
+**Total:** ~60 files, ~350+ `Matrix34` references remaining.
+
+#### 4.9 — Delete `matrix33.h/cpp` and `matrix34.h/cpp`
+
+Once all consumer files have been migrated and verified (build + visual
 regression test), delete the legacy files from `NeuronClient` and remove them from
 `NeuronClient.vcxproj`.
+
+**Prerequisite check (current state):**
+- `Matrix34`: ~60 consumer files, ~350 references remaining.
+- `Matrix33`: 4 consumer files (`camera.cpp`, `explosion.h/cpp`, `matrix34.h`).
+- `InverseMultiplyVector`: still dead code in both types (zero callers).
 
 ---
 
@@ -375,31 +507,52 @@ code.
 ## Dependency Graph
 
 ```
-Phase 0 ─── Thread safety + rename
+Phase 0 ─── Thread safety + rename                                       ✅
    │
-Phase 1 ─── Expose MatrixStack directly
+Phase 1 ─── Expose MatrixStack directly                                   ✅
    │
-Phase 2 ─── Fix operator semantics ─── (can run in parallel with Phase 1)
+Phase 2 ─── Fix operator semantics ─── (ran in parallel with Phase 1)     ✅
    │
-Phase 3 ─── Introduce Transform3D (depends on Phase 0 + 1)
+Phase 3 ─── Introduce Transform3D (depends on Phase 0 + 1)               ✅
    │
-Phase 4 ─── Remove Matrix33/Matrix34 (depends on Phase 3 completing for each file)
+Phase 4.1 ── GetWorldMatrix → GetWorldTransform                          ✅
    │
-Phase 5 ─── Retire OpenGL layer (depends on Phase 1 + 4 + separate vertex buffer migration)
+Phase 4.2 ── ShapeFragment::m_transform → Transform3D                    ✅
+   │
+Phase 4.3 ── Orient* factory methods on Transform3D ─────────────────┐
+   │                                                                  │
+Phase 4.4 ── RotateAround* family (camera, entities)                 │
+   │                                                                  │
+Phase 4.5 ── Transpose + DecomposeToYDR                              ├── can run in parallel
+   │                                                                  │
+Phase 4.6 ── Matrix33 (camera, explosion)                            │
+   │                                                                  │
+Phase 4.7 ── ShapeMarker::m_transform → Transform3D                 │
+   │                                                                  │
+Phase 4.8 ── GameLogic Matrix34 construction sites (~60 files) ──────┘
+   │
+Phase 4.9 ── Delete matrix33.h/cpp + matrix34.h/cpp
+   │
+Phase 5 ─── Retire OpenGL layer (depends on Phase 4.9 + separate vertex buffer migration)
 ```
 
 ---
 
 ## Risk Assessment
 
-| Phase | Risk | Rollback Difficulty | Build Impact | Visual Impact |
-|---|---|---|---|---|
-| 0 | Low | Trivial | None (API-compatible overloads) | None |
-| 1 | Medium | Moderate (revert to gl* calls) | Additional `#include` | None if done correctly |
-| 2 | Medium | Moderate | None (operator signatures unchanged) | **Bugs if caller direction was assumed** |
-| 3 | Low–Medium | Easy (new additive type) | New header, new .cpp | None (runs alongside legacy) |
-| 4 | High | Difficult (API removal) | Removes files from projects | Potential visual regressions |
-| 5 | High | Difficult | Major rendering rewrite | High — immediate-mode to retained-mode |
+| Phase | Risk | Status | Rollback Difficulty | Build Impact | Visual Impact |
+|---|---|---|---|---|---|
+| 0 | Low | ✅ Done | Trivial | None (API-compatible overloads) | None |
+| 1 | Medium | ✅ Done | Moderate (revert to gl* calls) | Additional `#include` | None |
+| 2 | Medium | ✅ Done | Moderate | None (operator signatures unchanged) | None (verified) |
+| 3 | Low–Medium | ✅ Done | Easy (new additive type) | New header, new .cpp | None |
+| 4.1 | Low | ✅ Done | Easy (new additive overload) | None | None |
+| 4.2 | Medium | ✅ Done | Moderate (revert member type) | 3 external files updated | None if correct |
+| 4.3–4.5 | Medium | Pending | Moderate | Transform3D API additions | Potential if sign conventions wrong |
+| 4.6 | Medium | Pending | Moderate | Matrix33 removal | Potential camera/explosion regressions |
+| 4.7–4.8 | High | Pending | Difficult (~60 files) | Removes Matrix34 dependency | Potential visual regressions |
+| 4.9 | High | Pending | Difficult (API removal) | Removes files from projects | None if all consumers migrated |
+| 5 | High | Pending | Difficult | Major rendering rewrite | High — immediate-mode to retained-mode |
 
 ---
 
@@ -423,34 +576,36 @@ Each phase should be validated by:
 
 ## Appendix A — Files Affected by Matrix34
 
-| File | Project | Usage Pattern |
-|---|---|---|
-| `building.cpp` | GameLogic | Construct from (front, up, pos), pass to Shape::Render |
-| `blueprintstore.cpp` | GameLogic | GetWorldMatrix for markers, construct for rendering |
-| `controltower.cpp` | GameLogic | GetWorldMatrix for ports/lights, construct for render |
-| `constructionyard.cpp` | GameLogic | GetWorldMatrix for markers, construct for render |
-| `armour.cpp` | GameLogic | Construct, RotateAround, render |
-| `armyant.cpp` | GameLogic | Construct, render |
-| `centipede.cpp` | GameLogic | Construct, render |
-| `engineer.cpp` | GameLogic | Construct, render |
-| `souldestroyer.cpp` | GameLogic | Construct, render |
-| `sporegenerator.cpp` | GameLogic | Construct, render |
-| `entity_leg.cpp` | GameLogic | GetWorldMatrix, construct from markers |
-| `factory.cpp` | GameLogic | GetWorldMatrix |
-| `cave.cpp` | GameLogic | GetWorldMatrix |
-| `tree.cpp` | GameLogic | Construct, glMultMatrixf(mat.ConvertToOpenGLFormat()) |
-| `bridge.cpp` | GameLogic | Construct, GetWorldMatrix (6 instances) |
-| `airstrike.cpp` | GameLogic | Construct from predicted pos |
-| `anthill.cpp` | GameLogic | Construct, render |
-| `shape.cpp` | NeuronClient | Render entry point, fragment hierarchy, collision |
-| `math_utils.cpp` | NeuronClient | Matrix utility functions |
-| `camera.cpp` | Starstrike | Matrix33 for rotation, Matrix34 for camera transform |
-| `location_input.cpp` | Starstrike | Transform construction |
-| `3d_sierpinski_gasket.cpp` | Starstrike | Fractal rendering transform |
-| `location.cpp` | Starstrike | Location rendering |
-| `explosion.h` | Starstrike | Matrix33 member for rotation |
+| File | Project | Usage Pattern | Migrated? |
+|---|---|---|---|
+| `building.cpp` | GameLogic | Construct from (front, up, pos), pass to Shape::Render | No |
+| `blueprintstore.cpp` | GameLogic | GetWorldMatrix for markers, construct for rendering | No |
+| `controltower.cpp` | GameLogic | GetWorldMatrix for ports/lights, construct for render | No |
+| `constructionyard.cpp` | GameLogic | GetWorldMatrix for markers, construct for render | No |
+| `armour.cpp` | GameLogic | Construct, RotateAround, render | No |
+| `armyant.cpp` | GameLogic | Construct, render | No |
+| `centipede.cpp` | GameLogic | Construct, render | No |
+| `engineer.cpp` | GameLogic | Construct, render | No |
+| `souldestroyer.cpp` | GameLogic | Construct, render | No |
+| `sporegenerator.cpp` | GameLogic | Construct, render | No |
+| `entity_leg.cpp` | GameLogic | GetWorldMatrix, construct from markers | No |
+| `factory.cpp` | GameLogic | GetWorldMatrix | No |
+| `cave.cpp` | GameLogic | GetWorldMatrix | No |
+| `tree.cpp` | GameLogic | Construct, mv.Multiply(mat) | No |
+| `bridge.cpp` | GameLogic | Construct, GetWorldMatrix (6 instances) | No |
+| `airstrike.cpp` | GameLogic | Construct from predicted pos | No |
+| `anthill.cpp` | GameLogic | Construct, render | No |
+| `shape.cpp` | NeuronClient | `m_transform` migrated to Transform3D; hit-test sigs still Matrix34 | **Partial** |
+| `math_utils.cpp` | NeuronClient | Matrix utility functions | No |
+| `camera.cpp` | Starstrike | Matrix33 for rotation, Matrix34 for camera transform | No |
+| `location_input.cpp` | Starstrike | Transform construction | No |
+| `3d_sierpinski_gasket.cpp` | Starstrike | Fractal rendering transform | No |
+| `location.cpp` | Starstrike | Location rendering | No |
+| `explosion.h/cpp` | Starstrike | Matrix33 member for rotation; fragment transform (2 sites migrated) | **Partial** |
+| `radardish.cpp` | GameLogic | RotateAround migrated to SIMD; construction sites remain | **Partial** |
+| `renderer.cpp` | Starstrike | Fragment transform (1 site migrated); Matrix34 params remain | **Partial** |
 
-## Appendix B — `gl*` Matrix Function Callers
+## Appendix B — `gl*` Matrix Function Callers (Historical — All Migrated in Phase 1)
 
 | Function | File | Count |
 |---|---|---|
@@ -478,29 +633,28 @@ The following claims were verified against the source code:
 | Claim | Verdict | Evidence |
 |---|---|---|
 | ConvertToOpenGLFormat output is row-major-compatible (no transpose) | **Correct** | Flat `float[16]` packs `[r, 0, u, 0, f, 0, pos, 1]`; `glMultMatrixf` does raw `memcpy` into `XMFLOAT4X4`; shader uses `row_major float4x4` + `mul(v, M)`. Self-consistent. |
-| `operator*(M33, v)` ≡ `operator*(v, M33)` (identical formulas) | **Correct** | Both compute `[dot(r,v), dot(u,v), dot(f,v)]` — verified in `matrix33.h` L54–65. |
-| `operator*(M34, v)` ≡ `operator*(v, M34)` (identical formulas) | **Correct** | Both compute `r.x*v.x + u.x*v.y + f.x*v.z + pos.x, ...` — verified in `matrix34.h` L145–157. |
+| `operator*(M33, v)` ≡ `operator*(v, M33)` (identical formulas) | **Was correct, fixed in Phase 2** | Pre-fix: both computed `[dot(r,v), dot(u,v), dot(f,v)]`. Post-fix: `v * M33` now computes forward rotation (linear combination of basis rows). |
+| `operator*(M34, v)` ≡ `operator*(v, M34)` (identical formulas) | **Was correct, fixed in Phase 2** | Pre-fix: both computed forward transform. Post-fix: `M34 * v` now computes inverse affine (world-to-local). |
 | MatrixStack pre-multiplies: `Result = M * Current` | **Correct** | `XMMatrixMultiply(mat, current)` in `opengl_directx_matrix_stack.cpp` L34. Comment confirms intent. |
 | No `XMMatrixTranspose` anywhere in the pipeline | **Correct** | Grep found zero occurrences outside `MatrixConv.md`. |
-| 3 call sites for `ConvertToOpenGLFormat` | **Correct** | `shape.cpp:793`, `shape.cpp:1163`, `tree.cpp:295`. |
+| 3 call sites for `ConvertToOpenGLFormat` | **Correct (historical)** | All 3 eliminated in Phase 0. |
 | `Matrix33 * Matrix33` is standard row-major product | **Correct** | `result.r.x = r.x*_o.r.x + r.y*_o.u.x + r.z*_o.f.x` — verified in `matrix33.cpp` L510–525. |
 | `Matrix34 *= Matrix34` is standard row-major product | **Correct** | Verified in `matrix34.cpp` L425–445. Position handled as `pos * R_other + pos_other`. |
 | `FromLegacy(Matrix34)` is a memcpy | **WRONG** | `Matrix34` = 48 bytes (4×3 floats), `XMFLOAT4X4` = 64 bytes (4×4 floats). Padding insertion required. Corrected in Phase 3.1. |
+| `Transform3D::RotateAround` matches `Matrix34::RotateAround(LV3)` | **Correct** | Both apply Rodrigues' rotation to each basis row independently. `Transform3D` uses post-multiply by `XMMatrixRotationAxis` + position restore. Verified: `Matrix34::FastRotateAround` formula `v' = v·cos + (axis×v)·sin + axis·(axis·v)·(1-cos)` is equivalent to `v * R_row_major` where R = `XMMatrixRotationAxis(axis, angle)`. |
+| `RotateAroundY(θ)` ≠ `RotateAround(Y_axis, θ)` | **Correct — opposite signs** | `RotateAroundY` rotates each row by `Ry(-θ)` while `RotateAround(Y, θ)` rotates by `Ry(+θ)`. They produce opposite rotations for the same angle. Must preserve sign when migrating callers of named-axis variants. |
+| `Matrix34 → Transform3D → Matrix34` round-trip is lossless | **Correct** | `ToXMFLOAT4X4` inserts `[0,0,0,1]` w-column; `Matrix34(Transform3D)` extracts xyz from each row. No precision change; w components are generated/discarded deterministically. |
 
 ### Additional Findings
 
 1. **`InverseMultiplyVector` is dead code** — declared and implemented in both
    `Matrix33` and `Matrix34` but has **zero callers** across the entire codebase.
-   Can be deleted as dead code (CI.md Phase 4).
+   Can be deleted as dead code (Phase 4.9).
 
-2. **Semantic inconsistency between Matrix33 and Matrix34 operators:**
-   - `Matrix33 * v` computes `[dot(r,v), dot(u,v), dot(f,v)]` = **inverse rotation**
-     (projects world-space v onto local basis axes).
-   - `Matrix34 * v` computes `v.x*r + v.y*u + v.z*f + pos` = **forward transform**
-     (composes local basis vectors from v and adds translation).
-   - These are *mathematically different* operations despite the same `operator*`
-     syntax. This is the root cause of the ambiguity:
-     `Matrix33::operator*` does `M^T * v` while `Matrix34::operator*` does `v * M + t`.
+2. **Semantic inconsistency between Matrix33 and Matrix34 operators** — **RESOLVED
+   in Phase 2.** `M33 * v` = inverse rotation, `v * M33` = forward rotation.
+   `M34 * v` = inverse affine, `v * M34` = forward transform. Both types now follow
+   the standard row-vector convention.
 
 3. **Normal transform caveat:** The vertex shader computes normals as
    `mul(normal, (float3x3)WorldMatrix)` (VertexShader.hlsl L109). This is correct
@@ -514,5 +668,18 @@ The following claims were verified against the source code:
    migration surface beyond files that explicitly `#include "matrix34.h"`.
 
 5. **Multiply-order is self-consistent:** GPU pipeline verified end-to-end:
-   `gluLookAt` → `Load(View)` → `glMultMatrixf(World)` → `Result = World * View` →
+   `LookAtRH` → `Load(View)` → `mv.Multiply(World)` → `Result = World * View` →
    shader `v * Result = v * World * View` → vertex in world, then view space. ✓
+
+6. **`ShapeFragment::m_transform` has no external setters** — verified via
+   `find_symbol` and grep. All reads/writes are within `shape.cpp` (constructors,
+   parsers, render, hit-tests) plus 3 external composition sites
+   (`radardish.cpp`, `explosion.cpp`, `renderer.cpp`), all of which were updated in
+   Phase 4.2. `m_angVel` and `m_vel` similarly have no access outside `shape.cpp` +
+   `radardish.cpp`.
+
+7. **`explicit Matrix34(Transform3D)` prevents ambiguity** — without `explicit`,
+   bidirectional implicit conversions (`Matrix34 → Transform3D` via `operator` +
+   `Transform3D → Matrix34` via constructor) would create overload resolution
+   ambiguity in expressions like `Matrix34 * Transform3D`. The `explicit` qualifier
+   forces callers to write `Matrix34(expr)` for the reverse direction.

@@ -60,6 +60,14 @@ public:
 		RotateAroundY( _yaw );
 	}
 
+    explicit Matrix34(const Neuron::Transform3D& _t)
+	:	r(_t.m._11, _t.m._12, _t.m._13),
+		u(_t.m._21, _t.m._22, _t.m._23),
+		f(_t.m._31, _t.m._32, _t.m._33),
+		pos(_t.m._41, _t.m._42, _t.m._43)
+	{
+	}
+
 	void OrientRU( LegacyVector3 const & _r, LegacyVector3 const & _u );
 	void OrientRF( LegacyVector3 const & _r, LegacyVector3 const & _f );
 	void OrientUF( LegacyVector3 const & _u, LegacyVector3 const & _f );
