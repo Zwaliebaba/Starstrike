@@ -1,5 +1,4 @@
-#ifndef INCLUDED_DROP_DOWN_MENU_H
-#define INCLUDED_DROP_DOWN_MENU_H
+#pragma once
 
 
 #include <limits.h>
@@ -93,5 +92,3 @@ public:
     void MouseUp();
 };
 
-
-#endif

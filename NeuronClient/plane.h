@@ -1,5 +1,4 @@
-#ifndef INCLUDED_PLANE_H
-#define INCLUDED_PLANE_H
+#pragma once
 
 
 #include "LegacyVector3.h"
@@ -17,5 +16,3 @@ public:
 	void GetCartesianDefinition(float *x, float *y, float *z, float *d) const;
 };
 
-
-#endif

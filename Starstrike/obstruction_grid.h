@@ -1,6 +1,5 @@
 
-#ifndef _included_obstructiongrid_h
-#define _included_obstructiongrid_h
+#pragma once
 
 #include "2d_array.h"
 #include "2d_surface_map.h"
@@ -32,6 +31,3 @@ public:
     void Render();
 };
 
-
-
-#endif

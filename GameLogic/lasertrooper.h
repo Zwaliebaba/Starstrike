@@ -1,6 +1,5 @@
 
-#ifndef _included_lasertrooper_h
-#define _included_lasertrooper_h
+#pragma once
 
 #include "entity.h"
 
@@ -23,5 +22,3 @@ public:
     void AdvanceVictoryDance();
 };
 
-
-#endif

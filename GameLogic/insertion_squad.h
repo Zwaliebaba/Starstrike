@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INSERTION_SQUAD
-#define INCLUDED_INSERTION_SQUAD
+#pragma once
 
 
 #include "unit.h"
@@ -100,6 +99,3 @@ public:
 	LegacyVector3 GetSecondaryWeaponTarget();
 };
 
-
-
-#endif

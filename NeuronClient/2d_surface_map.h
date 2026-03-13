@@ -1,5 +1,4 @@
-#ifndef INCLUDE_2D_SURFACE_MAP_H
-#define INCLUDE_2D_SURFACE_MAP_H
+#pragma once
 
 
 #include "2d_array.h"
@@ -212,7 +211,4 @@ inline float SurfaceMap2D<T>::GetRealY(int _mapIndexY) const
 {
 	return _mapIndexY * m_cellSizeY + m_y0;
 }
-
-
-#endif
 

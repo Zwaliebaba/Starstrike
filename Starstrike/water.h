@@ -1,5 +1,4 @@
-#ifndef INCLUDED_WATER_H
-#define INCLUDED_WATER_H
+#pragma once
 
 // This module renders the sea. Conceptually the sea is a finite plane twice the
 // size of the land rectangle. The land rectangle has one corner at 0,0 and the
@@ -104,4 +103,3 @@ inline const RGBAColour& Water::GetColour(int _brightness)
   return m_colourTable[_brightness];
 }
 
-#endif

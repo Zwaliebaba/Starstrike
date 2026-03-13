@@ -1,6 +1,5 @@
 
-#ifndef _included_library_h
-#define _included_library_h
+#pragma once
 
 #include "building.h"
 
@@ -19,5 +18,3 @@ public:
     bool Advance();
 };
 
-
-#endif

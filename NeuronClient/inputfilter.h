@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTFILTER_H
-#define INCLUDED_INPUTFILTER_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -34,5 +33,3 @@ public:
 
 std::ostream &operator<<( std::ostream &stream, InputFilter const &filter );
 
-
-#endif // INCLUDED_INPUTFILTER_H

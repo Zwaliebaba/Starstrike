@@ -1,5 +1,4 @@
-#ifndef INCLUDED_LANDSCAPE_H
-#define INCLUDED_LANDSCAPE_H
+#pragma once
 
 #include "2d_array.h"
 #include "2d_surface_map.h"
@@ -114,6 +113,3 @@ public:
 	float		SphereHit(LegacyVector3 const &_centre, float _radius) const;
 };
 
-
-
-#endif

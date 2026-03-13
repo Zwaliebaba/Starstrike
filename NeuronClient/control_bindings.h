@@ -1,5 +1,4 @@
-#ifndef INCLUDED_CONTROL_BINDINGS_H
-#define INCLUDED_CONTROL_BINDINGS_H
+#pragma once
 
 #include <string>
 
@@ -68,5 +67,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_CONTROL_BINDINGS_H

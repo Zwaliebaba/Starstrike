@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTFILTERSPEC_H
-#define INCLUDED_INPUTFILTERSPEC_H
+#pragma once
 
 #include "inputspec.h"
 #include "input_types.h"
@@ -17,4 +16,3 @@ struct InputFilterSpec {
 	condition_t condition;   // Exact condition to poll
 };
 
-#endif // INCLUDED_INPUTFILTERSPEC_H

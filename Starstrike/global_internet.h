@@ -1,5 +1,4 @@
-#ifndef INCLUDED_GLOBAL_INTERNET
-#define INCLUDED_GLOBAL_INTERNET
+#pragma once
 
 #include "llist.h"
 #include "LegacyVector3.h"
@@ -71,4 +70,3 @@ class GlobalInternet
     void RenderPackets();
 };
 
-#endif

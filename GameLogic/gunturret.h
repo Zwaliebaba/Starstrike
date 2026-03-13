@@ -1,5 +1,4 @@
-#ifndef _included_gunturret_h
-#define _included_gunturret_h
+#pragma once
 
 #include "building.h"
 
@@ -75,5 +74,3 @@ public:
     void Render     ( float _time );
 };
 
-
-#endif

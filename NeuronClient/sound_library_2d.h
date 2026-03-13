@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_LIBRARY_2D
-#define INCLUDED_SOUND_LIBRARY_2D
+#pragma once
 
 
 #include <stdio.h>
@@ -69,5 +68,3 @@ public:
 
 extern SoundLibrary2d *g_soundLibrary2d;
 
-
-#endif

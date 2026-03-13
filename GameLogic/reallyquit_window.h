@@ -1,5 +1,4 @@
-#ifndef _included_reallyquit_window_h
-#define _included_reallyquit_window_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -11,4 +10,3 @@ public:
 	void Create();
 };
 
-#endif // _included_reallyquit_window_h

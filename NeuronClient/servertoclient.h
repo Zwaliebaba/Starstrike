@@ -1,8 +1,7 @@
 /* Represents one connection to one client. Server is expected to have a list of these. */
 
 
-#ifndef _SERVERTOCLIENT_H
-#define _SERVERTOCLIENT_H
+#pragma once
 
 
 class NetSocket;
@@ -22,8 +21,4 @@ public:
 
     int         m_lastKnownSequenceId;
 };
-
-
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef FILE_WRITER_H
-#define FILE_WRITER_H
+#pragma once
 
 #include <stdio.h>
 
@@ -18,5 +17,3 @@ public:
 	int printf(char const *fmt, ...);
 };
 
-
-#endif

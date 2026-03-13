@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTDRIVER_PIPE_H
-#define INCLUDED_INPUTDRIVER_PIPE_H
+#pragma once
 
 #include <sstream>
 
@@ -46,5 +45,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTDRIVER_PIPE_H

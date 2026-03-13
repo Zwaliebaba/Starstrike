@@ -1,5 +1,4 @@
-#ifndef INCLUDED_CONTROL_TYPES_H
-#define INCLUDED_CONTROL_TYPES_H
+#pragma once
 
 
 typedef int controltype_t;
@@ -17,5 +16,3 @@ enum ControlType {
 	NumControlTypes
 };
 
-
-#endif // INCLUDED_CONTROL_TYPES_H

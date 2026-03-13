@@ -1,5 +1,4 @@
-#ifndef _included_taskmanager_h
-#define _included_taskmanager_h
+#pragma once
 
 #include "llist.h"
 #include "entity.h"
@@ -111,5 +110,3 @@ public:
     void    Advance             ();
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef USER_INPUT_H
-#define USER_INPUT_H
+#pragma once
 
 #include "llist.h"
 #include "LegacyVector3.h"
@@ -33,5 +32,3 @@ public:
     LegacyVector3 GetMousePos3d();            // Returns the cached value "m_mousePos3d"
 };
 
-
-#endif

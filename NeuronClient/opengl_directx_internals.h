@@ -1,5 +1,4 @@
-#ifndef __OPENGL_DIRECTX_INTERNALS_H
-#define __OPENGL_DIRECTX_INTERNALS_H
+#pragma once
 
 namespace OpenGLD3D {
 
@@ -26,4 +25,3 @@ namespace OpenGLD3D {
 	void PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY topology);
 }
 
-#endif // __OPENGL_DIRECTX_INTERNALS_H

@@ -1,5 +1,4 @@
-#ifndef _included_engineer_h
-#define _included_engineer_h
+#pragma once
 
 #include "llist.h"
 
@@ -91,5 +90,3 @@ public:
     void ListSoundEvents        ( LList<char *> *_list );
 };
 
-
-#endif

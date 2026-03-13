@@ -1,5 +1,4 @@
-#ifndef OPENGL_DIRECTX_DLIST_H
-#define OPENGL_DIRECTX_DLIST_H
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -77,4 +76,3 @@ namespace OpenGLD3D {
 	};
 }
 
-#endif // OPENGL_DIRECTX_DLIST_H

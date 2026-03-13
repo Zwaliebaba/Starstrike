@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUT_FIELD_H
-#define INCLUDED_INPUT_FIELD_H
+#pragma once
 
 #include "rgb_colour.h"
 
@@ -128,6 +127,4 @@ public:
     void Create();
     void Render( bool hasFocus );
 };
-
-#endif
 

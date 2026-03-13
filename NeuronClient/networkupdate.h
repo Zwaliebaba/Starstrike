@@ -8,8 +8,7 @@
  */
 
 
-#ifndef _included_networkupdate_h
-#define _included_networkupdate_h
+#pragma once
 
 #define NETWORKUPDATE_BYTESTREAMSIZE        42
 
@@ -103,4 +102,3 @@ public:
 // Inlines
 #include "networkupdate.inc"
 
-#endif

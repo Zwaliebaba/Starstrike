@@ -1,5 +1,4 @@
-#ifndef INCLUDED_NET_LIB_WIN32_H
-#define INCLUDED_NET_LIB_WIN32_H
+#pragma once
 
 class NetUdpPacket;
 
@@ -35,4 +34,3 @@ using NetThreadFunc = unsigned long(WINAPI *)(void* ptr);
 #define NetIsConnected(a) 			(a == WSAEISCONN)
 #define NetIsReset(a) 				((a == WSAECONNRESET) || (a == WSAESHUTDOWN))
 
-#endif

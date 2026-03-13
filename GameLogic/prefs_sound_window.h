@@ -1,6 +1,5 @@
 
-#ifndef _included_prefssoundwindow_h
-#define _included_prefssoundwindow_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -23,5 +22,3 @@ public:
     void Render( bool _hasFocus );
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _INCLUDED_TEAM_H
-#define _INCLUDED_TEAM_H
+#pragma once
 
 #include "fast_darray.h"
 #include "slice_darray.h"
@@ -111,4 +110,3 @@ public:
     int             m_directUnitFireDy;
 };
 
-#endif

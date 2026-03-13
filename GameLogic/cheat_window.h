@@ -1,6 +1,5 @@
 
-#ifndef _included_cheatwindow_h
-#define _included_cheatwindow_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -14,6 +13,3 @@ public:
     void Create();
 };
 
-
-
-#endif

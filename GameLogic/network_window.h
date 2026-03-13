@@ -1,6 +1,5 @@
 
-#ifndef _included_networkwindow_h
-#define _included_networkwindow_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -13,5 +12,3 @@ public:
     void Render( bool hasFocus );
 };
 
-
-#endif

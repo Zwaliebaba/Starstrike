@@ -1,6 +1,5 @@
 
-#ifndef _included_flag_h
-#define _included_flag_h
+#pragma once
 
 #include "LegacyVector3.h"
 
@@ -32,5 +31,3 @@ public:
     void RenderText         ( int _posX, int _posY, char *_caption );
 };
 
-
-#endif

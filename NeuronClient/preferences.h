@@ -1,5 +1,4 @@
-#ifndef INCLUDED_PREFERENCES_H
-#define INCLUDED_PREFERENCES_H
+#pragma once
 
 #include <string>
 
@@ -87,5 +86,3 @@ public:
 
 extern PrefsManager *g_prefsManager;
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _included_spirit_h
-#define _included_spirit_h
+#pragma once
 
 #include "entity.h"
 #include "worldobject.h"
@@ -64,5 +63,3 @@ public:
     WorldObjectId  *GetNearbyEggs();
 };
 
-
-#endif

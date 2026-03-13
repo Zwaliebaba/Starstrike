@@ -1,6 +1,5 @@
 
-#ifndef _included_prefsotherwindow_h
-#define _included_prefsotherwindow_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -39,4 +38,3 @@ public:
 #define OTHER_LARGEMENUS		"LargeMenus"
 #define OTHER_AUTOMATICCAM      "AutomaticCamera"
 
-#endif

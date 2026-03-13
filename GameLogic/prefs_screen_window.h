@@ -1,6 +1,5 @@
 
-#ifndef _included_prefsscreenwindow_h
-#define _included_prefsscreenwindow_h
+#pragma once
 
 #include "darwinia_window.h"
 
@@ -24,4 +23,3 @@ public:
 void SetWindowed(bool _isWindowed, bool _isPermanent, bool &_isSwitchingWindowed);
 void RestartWindowManagerAndRenderer();
 
-#endif

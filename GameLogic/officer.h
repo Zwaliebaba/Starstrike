@@ -1,6 +1,5 @@
 
-#ifndef _included_officer_h
-#define _included_officer_h
+#pragma once
 
 #include "entity.h"
 #include "flag.h"
@@ -96,5 +95,3 @@ public:
     void Render( float _time );
 };
 
-
-#endif

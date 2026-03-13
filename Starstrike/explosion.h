@@ -1,5 +1,4 @@
-#ifndef INCLUDED_EXPLOSION
-#define INCLUDED_EXPLOSION
+#pragma once
 
 #include "matrix33.h"
 #include "rgb_colour.h"

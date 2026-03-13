@@ -1,5 +1,4 @@
-#ifndef _CLIENTTOSERVER_H
-#define _CLIENTTOSERVER_H
+#pragma once
 
 #include "llist.h"
 #include "LegacyVector3.h"
@@ -68,5 +67,3 @@ public:
     void RequestPause();
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _included_entity_h
-#define _included_entity_h
+#pragma once
 
 #include "llist.h"
 #include "texture_uv.h"
@@ -138,8 +137,4 @@ public:
     static char		*GetName   ( unsigned char _type );
     static float	 GetStat    ( unsigned char _type, int _stat );
 };
-
-
-
-#endif
 

@@ -1,5 +1,4 @@
-#ifndef _included_spawnpoint_h
-#define _included_spawnpoint_h
+#pragma once
 
 #include "building.h"
 
@@ -152,4 +151,3 @@ public:
     bool DoesShapeHit       (Shape *_shape, Matrix34 _transform);
 };
 
-#endif

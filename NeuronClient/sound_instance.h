@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_INSTANCE_H
-#define INCLUDED_SOUND_INSTANCE_H
+#pragma once
 
 #include "LegacyVector3.h"
 #include "sound_parameter.h"
@@ -180,5 +179,3 @@ public:
     static char *GetSourceTypeName      ( int _type );
 };
 
-
-#endif

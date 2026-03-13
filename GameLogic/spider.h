@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SPIDER_H
-#define INCLUDED_SPIDER_H
+#pragma once
 
 #include "entity.h"
 #include "shape.h"
@@ -91,4 +90,3 @@ class Spider : public Entity
     void ListSoundEvents(LList<char*>* _list) override;
 };
 
-#endif

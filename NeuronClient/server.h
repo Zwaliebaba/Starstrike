@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include "llist.h"
 #include "darray.h"
@@ -67,7 +66,4 @@ public:
     static int   ConvertIPToInt( const char *_ip );
     static char *ConvertIntToIP( const int _ip );
 };
-
-
-#endif
 

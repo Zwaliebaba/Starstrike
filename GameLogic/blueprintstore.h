@@ -1,5 +1,4 @@
-#ifndef _included_blueprintstore_h
-#define _included_blueprintstore_h
+#pragma once
 
 #include "building.h"
 
@@ -106,4 +105,3 @@ public:
     void Write  ( FileWriter *_out );
 };
 
-#endif

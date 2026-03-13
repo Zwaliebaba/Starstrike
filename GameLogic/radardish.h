@@ -1,5 +1,4 @@
-#ifndef _included_radardish_h
-#define _included_radardish_h
+#pragma once
 
 #define RADARDISH_TRANSPORTPERIOD    0.1f                        // Minimum wait time between sends
 #define RADARDISH_TRANSPORTSPEED     50.0f                       // Speed of in-transit entities (m/s)
@@ -62,6 +61,3 @@ public:
     void    ListSoundEvents ( LList<char *> *_list );
 };
 
-
-
-#endif
