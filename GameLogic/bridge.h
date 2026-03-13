@@ -1,5 +1,4 @@
-#ifndef _included_bridge_h
-#define _included_bridge_h
+#pragma once
 
 #include "teleport.h"
 
@@ -54,5 +53,3 @@ public:
     void Write          ( FileWriter *_out );
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _INCLUDED_APP_H
-#define _INCLUDED_APP_H
+#pragma once
 
 #include "rgb_colour.h"
 
@@ -112,4 +111,3 @@ class GameApp : public GameMain
 
 extern GameApp* g_app;
 
-#endif

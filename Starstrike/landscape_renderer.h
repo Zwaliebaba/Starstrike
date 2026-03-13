@@ -1,5 +1,4 @@
-#ifndef INCLUDED_LANDSCAPE_RENDERER_H
-#define INCLUDED_LANDSCAPE_RENDERER_H
+#pragma once
 
 #include "2d_surface_map.h"
 #include "fast_darray.h"
@@ -77,4 +76,3 @@ class LandscapeRenderer
     void Render();
 };
 
-#endif

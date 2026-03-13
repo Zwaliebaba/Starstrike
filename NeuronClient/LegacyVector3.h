@@ -1,5 +1,4 @@
-#ifndef VECTOR3_H
-#define VECTOR3_H
+#pragma once
 
 
 #include "math_utils.h"
@@ -208,5 +207,3 @@ inline LegacyVector3 operator * (	float _scale, LegacyVector3 const &_v )
 	return _v * _scale;
 }
 
-
-#endif

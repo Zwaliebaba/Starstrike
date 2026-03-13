@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTFILTER_DIRECTION_H
-#define INCLUDED_INPUTFILTER_DIRECTION_H
+#pragma once
 
 #include "inputfilter_withdelta.h"
 
@@ -22,5 +21,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTFILTER_DIRECTION_H

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SHAPE_H
-#define INCLUDED_SHAPE_H
+#pragma once
 
 #include <stdio.h>
 
@@ -197,4 +196,3 @@ class Shape
     float CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre);
 };
 
-#endif

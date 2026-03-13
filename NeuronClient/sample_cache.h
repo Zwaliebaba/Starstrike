@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SAMPLE_CACHE_H
-#define INCLUDED_SAMPLE_CACHE_H
+#pragma once
 
 #include "hash_table.h"
 
@@ -74,5 +73,3 @@ extern CachedSampleManager g_cachedSampleManager;
 
 extern bool g_deletingCachedSampleHandle;
 
-
-#endif

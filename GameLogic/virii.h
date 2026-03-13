@@ -1,5 +1,4 @@
-#ifndef _included_virii_h
-#define _included_virii_h
+#pragma once
 
 #include "entity.h"
 #include "unit.h"
@@ -107,5 +106,3 @@ public:
                                                         // false means its just to smooth out the path (eg height change)
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef OPENGL_DIRECTX_DLIST_DEV_H
-#define OPENGL_DIRECTX_DLIST_DEV_H
+#pragma once
 
 #include "opengl_directx_internals.h"
 #include "opengl_directx_dlist.h"
@@ -39,4 +38,3 @@ namespace OpenGLD3D {
 	};
 }
 
-#endif // OPENGL_DIRECTX_DLIST_DEV_H

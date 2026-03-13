@@ -1,5 +1,4 @@
-#ifndef MATRIX33_H
-#define MATRIX33_H
+#pragma once
 
 
 #include "LegacyVector3.h"
@@ -68,7 +67,4 @@ inline LegacyVector3 operator * (	LegacyVector3 const & _v, Matrix33 const &_m )
 				   _v.x * _m.r.y + _v.y * _m.u.y + _v.z * _m.f.y,
 				   _v.x * _m.r.z + _v.y * _m.u.z + _v.z * _m.f.z);
 }
-
-
-#endif
 

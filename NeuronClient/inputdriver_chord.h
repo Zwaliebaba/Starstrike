@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTDRIVER_CHORD_H
-#define INCLUDED_INPUTDRIVER_CHORD_H
+#pragma once
 
 #include "inputdriver.h"
 #include "inputspeclist.h"
@@ -42,5 +41,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTDRIVER_CHORD_H

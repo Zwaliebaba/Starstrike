@@ -1,5 +1,4 @@
-#ifndef INCLUDED_VECTOR2_H
-#define INCLUDED_VECTOR2_H
+#pragma once
 
 class LegacyVector3;
 
@@ -53,5 +52,3 @@ inline Vector2 operator * (	float _scale, Vector2 const &_v )
 	return _v * _scale;
 }
 
-
-#endif

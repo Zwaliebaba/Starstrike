@@ -1,5 +1,4 @@
-#ifndef _included_mine_h
-#define _included_mine_h
+#pragma once
 
 #include "building.h"
 
@@ -185,4 +184,3 @@ class Mine : public MineBuilding
     void TriggerCart(MineCart* _cart, float _initValue) override;
 };
 
-#endif

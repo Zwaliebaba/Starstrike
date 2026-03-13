@@ -1,5 +1,4 @@
-#ifndef INCLUDED_KEYBINDINGS_WINDOW_H
-#define INCLUDED_KEYBINDINGS_WINDOW_H
+#pragma once
 
 
 #include "auto_vector.h"
@@ -26,5 +25,3 @@ public:
     void Render( bool _hasFocus );
 };
 
-
-#endif

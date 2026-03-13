@@ -1,5 +1,4 @@
-#ifndef INCLUDED_BITMAP_H
-#define INCLUDED_BITMAP_H
+#pragma once
 
 
 class RGBAColour;
@@ -70,5 +69,3 @@ public:
 	int ConvertToTexture(bool _mipmapping = true) const;
 };
 
-
-#endif

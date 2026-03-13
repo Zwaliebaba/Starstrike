@@ -1,5 +1,4 @@
-#ifndef _included_generator_h
-#define _included_generator_h
+#pragma once
 
 #include "building.h"
 
@@ -138,4 +137,3 @@ class SolarPanel : public PowerBuilding
     void ListSoundEvents(LList<char*>* _list) override;
 };
 
-#endif

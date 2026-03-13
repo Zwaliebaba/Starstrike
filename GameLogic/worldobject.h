@@ -1,5 +1,4 @@
-#ifndef WORLDOBJECT_H
-#define WORLDOBJECT_H
+#pragma once
 
 #include "rgb_colour.h"
 #include "LegacyVector3.h"
@@ -115,5 +114,3 @@ public:
 	void Normalise();
 };
 
-
-#endif

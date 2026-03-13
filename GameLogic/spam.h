@@ -1,6 +1,5 @@
 
-#ifndef _included_spam_h
-#define _included_spam_h
+#pragma once
 
 #include "building.h"
 
@@ -88,5 +87,3 @@ public:
     void Render	    ( float _time );
 };
 
-
-#endif

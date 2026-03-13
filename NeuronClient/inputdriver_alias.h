@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTDRIVER_ALIAS_H
-#define INCLUDED_INPUTDRIVER_ALIAS_H
+#pragma once
 
 #include "inputdriver.h"
 
@@ -31,5 +30,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTDRIVER_ALIAS_H

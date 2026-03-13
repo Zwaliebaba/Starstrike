@@ -1,5 +1,4 @@
-#ifndef _included_ogl_extensions_h
-#define _included_ogl_extensions_h
+#pragma once
 
 // Extension 1: GL_ARB_multitexture
 #define GL_COMBINE_EXT                    0x8570
@@ -113,4 +112,3 @@ void InitialiseOGLExtensions();
 void ShutdownOGLExtensions();
 int IsOGLExtensionSupported(const char* extension);
 
-#endif

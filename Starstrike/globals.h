@@ -1,5 +1,4 @@
-#ifndef INCLUDED_GLOBALS_H
-#define INCLUDED_GLOBALS_H
+#pragma once
 
 #define NUM_TEAMS               4
 #define NUM_SLICES_PER_FRAME    10                              // Num slices to break up heavy weight physics into
@@ -9,5 +8,3 @@
 #define MINIMUM_RENDER_PERIOD   1.0f                            // Render at least this frequently
 #define GRAVITY	                10.0f
 
-
-#endif

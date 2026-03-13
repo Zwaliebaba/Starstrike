@@ -1,5 +1,4 @@
-#ifndef INCLUDED_ATTRACT_H
-#define INCLUDED_ATTRACT_H
+#pragma once
 
 class AttractMode
 {
@@ -16,4 +15,3 @@ public:
 
 };
 
-#endif

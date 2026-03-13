@@ -1,5 +1,4 @@
-#ifndef MATHUTILS_H
-#define MATHUTILS_H
+#pragma once
 
 #include "random.h"
 
@@ -108,4 +107,3 @@ bool SphereTriangleIntersection(const LegacyVector3& sphereCentre, float sphereR
 bool TriTriIntersection(const LegacyVector3& v0, const LegacyVector3& v1, const LegacyVector3& v2, const LegacyVector3& u0,
                         const LegacyVector3& u1, const LegacyVector3& u2);
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef INCLUDE_TEXT_STREAM_READERS_H
-#define INCLUDE_TEXT_STREAM_READERS_H
+#pragma once
 
 //*****************************************************************************
 // Class TextReader
@@ -78,5 +77,3 @@ public:
 	bool ReadLine				();
 };
 
-
-#endif

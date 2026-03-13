@@ -3,8 +3,7 @@
  *
  */
 
-#ifndef _included_resource_h
-#define _included_resource_h
+#pragma once
 
 #include "btree.h"
 #include "llist.h"
@@ -76,4 +75,3 @@ class Resource
     static std::vector<std::string> ListResources(const char* _dir, const char* _filter, bool _longResults = true);
 };
 
-#endif

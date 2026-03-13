@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_LIBRARY_3D_DSOUND_H
-#define INCLUDED_SOUND_LIBRARY_3D_DSOUND_H
+#pragma once
 
 
 #include "sound_library_3d.h"
@@ -62,5 +61,3 @@ public:
     void Advance            ();
 };
 
-
-#endif

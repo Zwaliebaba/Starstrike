@@ -1,6 +1,5 @@
 
-#ifndef _included_sporegenerator_h
-#define _included_sporegenerator_h
+#pragma once
 
 #include "entity.h"
 
@@ -52,6 +51,3 @@ public:
     void ListSoundEvents    ( LList<char *> *_list );
 };
 
-
-
-#endif

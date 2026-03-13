@@ -1,6 +1,5 @@
 
-#ifndef _included_egg_h
-#define _included_egg_h
+#pragma once
 
 #include "entity.h"
 
@@ -32,6 +31,3 @@ public:
     void Fertilise      ( int spiritId );
 };
 
-
-
-#endif

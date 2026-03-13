@@ -8,8 +8,7 @@
  *
  */
 
-#ifndef _included_eclipse_h
-#define _included_eclipse_h
+#pragma once
 
 #include "eclwindow.h"
 #include "eclbutton.h"
@@ -99,5 +98,3 @@ int EclGetAccurateTime          ();
 int EclGetScreenW				();
 int EclGetScreenH				();
 
-
-#endif

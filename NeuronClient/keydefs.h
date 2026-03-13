@@ -1,5 +1,4 @@
-#ifndef INCLUDED_W32KEYS_H
-#define INCLUDED_W32KEYS_H
+#pragma once
 
 #define KEY_BACKSPACE           8
 #define KEY_TAB                 9
@@ -108,5 +107,3 @@
   #define KEY_MAX               256
 #endif
 
-
-#endif // INCLUDED_W32KEYS_H

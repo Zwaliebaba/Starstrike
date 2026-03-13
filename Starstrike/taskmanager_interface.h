@@ -1,5 +1,4 @@
-#ifndef _included_taskmanagerinterface_h
-#define _included_taskmanagerinterface_h
+#pragma once
 
 #include "transform.h"
 
@@ -96,4 +95,3 @@ class TaskManagerInterface
     virtual bool AdviseOverSelectableZone() = 0;
 };
 
-#endif

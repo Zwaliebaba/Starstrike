@@ -1,5 +1,4 @@
-#ifndef _included_teleport_h
-#define _included_teleport_h
+#pragma once
 
 #include "LegacyVector3.h"
 
@@ -57,5 +56,3 @@ public:
 
 };
 
-
-#endif

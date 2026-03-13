@@ -8,8 +8,7 @@
  *
  */
 
-#ifndef _included_darwiniawindow_h
-#define _included_darwiniawindow_h
+#pragma once
 
 #include "eclipse.h"
 
@@ -111,4 +110,3 @@ public:
     void Render( int realX, int realY, bool highlighted, bool clicked );
 };
 
-#endif

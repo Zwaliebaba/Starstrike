@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_FILTER_H
-#define INCLUDED_SOUND_FILTER_H
+#pragma once
 
 
 //*****************************************************************************
@@ -149,5 +148,3 @@ public:
 	void Process		(signed short *_data, unsigned int _numSamples);
 };
 
-
-#endif

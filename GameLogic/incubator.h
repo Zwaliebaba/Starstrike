@@ -1,6 +1,5 @@
 
-#ifndef _included_incubator_h
-#define _included_incubator_h
+#pragma once
 
 #include "fast_darray.h"
 
@@ -59,5 +58,3 @@ public:
     void ListSoundEvents( LList<char *> *_list );
 };
 
-
-#endif

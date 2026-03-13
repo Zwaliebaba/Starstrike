@@ -1,6 +1,5 @@
 
-#ifndef _included_researchitem_h
-#define _included_researchitem_h
+#pragma once
 
 #include "building.h"
 
@@ -46,6 +45,3 @@ public:
     void ListSoundEvents    ( LList<char *> *_list );
 };
 
-
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_MESSAGE_DIALOG_H
-#define INCLUDED_MESSAGE_DIALOG_H
+#pragma once
 
 
 #include "darwinia_window.h"
@@ -18,5 +17,3 @@ public:
 	void Render(bool _hasFocus);
 };
 
-
-#endif

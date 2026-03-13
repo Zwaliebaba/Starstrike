@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTDRIVER_IDLE_H
-#define INCLUDED_INPUTDRIVER_IDLE_H
+#pragma once
 
 #include "inputdriver_simple.h"
 
@@ -40,5 +39,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTDRIVER_IDLE_H

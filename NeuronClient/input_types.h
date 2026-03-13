@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUT_TYPES_H
-#define INCLUDED_INPUT_TYPES_H
+#pragma once
 
 #include <string>
 #include <memory>
@@ -59,4 +58,3 @@ enum InputMode
   INPUT_MODE_GAMEPAD // Describes a driver that accepts input from a Gamepad
 };
 
-#endif INCLUDED_INPUT_TYPES_H

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTDRIVER_SIMPLE_H
-#define INCLUDED_INPUTDRIVER_SIMPLE_H
+#pragma once
 
 #include <string>
 
@@ -37,5 +36,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTDRIVER_SIMPLE_H

@@ -1,5 +1,4 @@
-#ifndef _included_feedingtube_h
-#define _included_feedingtube_h
+#pragma once
 
 #include "building.h"
 
@@ -41,4 +40,3 @@ class FeedingTube : public Building
     bool IsInView() override;
 };
 
-#endif

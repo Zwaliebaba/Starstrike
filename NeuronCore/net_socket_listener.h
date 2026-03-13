@@ -3,8 +3,7 @@
 // received, so you probably want to put it in its own thread.
 // ****************************************************************************
 
-#ifndef INCLUDED_NET_SOCKET_LISTENER_H
-#define INCLUDED_NET_SOCKET_LISTENER_H
+#pragma once
 
 
 #include "net_lib.h"
@@ -27,5 +26,3 @@ public:
 	void		StopListening();
 };
 
-
-#endif

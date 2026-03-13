@@ -1,5 +1,4 @@
-#ifndef _included_taskmanagerinterfaceicons_h
-#define _included_taskmanagerinterfaceicons_h
+#pragma once
 
 #include "llist.h"
 #include "entity.h"
@@ -114,4 +113,3 @@ class QuickUnitButton
     void ActivateButton();
 };
 
-#endif

@@ -1,5 +1,4 @@
- #ifndef INCLUDED_ENTITY_LEG_H
-#define INCLUDED_ENTITY_LEG_H
+#pragma once
 
 
 #include "LegacyVector3.h"
@@ -76,5 +75,3 @@ public:
 	bool	RenderPixelEffect(float _predictionTime, LegacyVector3 const &_predictedMovement);
 };
 
-
-#endif
