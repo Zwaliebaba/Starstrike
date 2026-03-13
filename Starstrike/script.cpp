@@ -708,9 +708,9 @@ void Script::TestScript(char* _filename)
   char fullFilename[256] = "scripts/";
   strcat(fullFilename, _filename);
   m_in = g_app->m_resource->GetTextReader(fullFilename);
-  if (!m_in) { ReportError(NULL, "Script file not found"); }
+  if (!m_in) { ReportError(nullptr, "Script file not found"); }
 
-  LevelFile* levelFile = NULL;
+  LevelFile* levelFile = nullptr;
 
   while (m_in->ReadLine())
   {
@@ -719,7 +719,7 @@ void Script::TestScript(char* _filename)
 
     char* firstWord = m_in->GetNextToken();
     int opCode = GetOpCode(firstWord);
-    char* nextWord = NULL;
+    char* nextWord = nullptr;
     float nextFloat = 0.0f;
     if (m_in->TokenAvailable())
     {
@@ -807,7 +807,7 @@ void Script::TestScript(char* _filename)
       }
     case OpExitLocation:
       delete levelFile;
-      levelFile = NULL;
+      levelFile = nullptr;
       break;
     case OpWaitSay:
     case OpWaitCam:
@@ -849,7 +849,7 @@ void Script::TestScript(char* _filename)
   }
 
   delete m_in;
-  m_in = NULL;
+  m_in = nullptr;
 }
 #endif // SCRIPT_TEST_ENABLED
 

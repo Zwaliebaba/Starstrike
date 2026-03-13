@@ -68,9 +68,6 @@ class ApplyOtherButton : public DarwiniaButton
     g_prefsManager->SetInt(OTHER_LARGEMENUS, parent->m_largeMenus);
     if (parent->m_largeMenus == 2) // (todo) or is running in media center and tenFootMode == -1
       g_app->m_largeMenus = true;
-#ifdef TARGET_OS_VISTA
-        else if (parent->m_largeMenus == 0 && g_mediaCenter == true) { g_app->m_largeMenus = true; }
-#endif
     else
       g_app->m_largeMenus = false;
 
@@ -101,7 +98,7 @@ PrefsOtherWindow::PrefsOtherWindow()
   m_helpEnabled = g_prefsManager->GetInt(OTHER_HELPENABLED, 1);
   m_controlHelpEnabled = g_prefsManager->GetInt(OTHER_CONTROLHELPENABLED, 1);
 
-  char* bootloader = g_prefsManager->GetString(OTHER_BOOTLOADER, "random");
+  const char* bootloader = g_prefsManager->GetString(OTHER_BOOTLOADER, "random");
   if (_stricmp(bootloader, "none") == 0)
     m_bootLoader = 0;
   else if (_stricmp(bootloader, "random") == 0)
@@ -195,7 +192,7 @@ void PrefsOtherWindow::Create()
   for (int i = 0; i < m_languages.Size(); ++i)
   {
     char languageString[256];
-    sprintf(languageString, "language_%s", m_languages[i]);
+    snprintf(languageString, sizeof(languageString), "language_%s", m_languages[i]);
     if (ISLANGUAGEPHRASE(languageString))
       language->AddOption(LANGUAGEPHRASE(languageString));
     else
@@ -216,15 +213,15 @@ void PrefsOtherWindow::Create()
     switch (i)
     {
     case 0:
-      sprintf(option, "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_standard_difficulty"));
+      snprintf(option, sizeof(option), "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_standard_difficulty"));
       break;
 
     case 9:
-      sprintf(option, "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_hard_difficulty"));
+      snprintf(option, sizeof(option), "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_hard_difficulty"));
       break;
 
     default:
-      sprintf(option, "%d", i + 1);
+      snprintf(option, sizeof(option), "%d", i + 1);
       break;
     }
     difficulty->AddOption(option, i);

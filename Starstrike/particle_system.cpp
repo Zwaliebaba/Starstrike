@@ -316,7 +316,7 @@ void ParticleSystem::CreateParticle(LegacyVector3 const &_pos, LegacyVector3 con
 {
 	Particle *aParticle = m_particles.GetPointer();
     aParticle->Initialise(_pos, _vel, _typeId, _size);
-	if( col != NULL)
+	if( col != RGBAColour(0))
 	{
 		aParticle->m_colour = col;
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
-#define MAX_PACKET_SIZE 1500
-#define DATALOAD_SIZE (MAX_PACKET_SIZE - 32) // Reserve some bytes for headers
+#define DATAREADER_BUFFER_SIZE 1500
+#define DATALOAD_SIZE (DATAREADER_BUFFER_SIZE - 32) // Reserve some bytes for headers
 
 namespace Neuron
 {

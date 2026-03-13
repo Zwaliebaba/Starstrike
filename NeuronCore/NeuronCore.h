@@ -1,7 +1,7 @@
 #pragma once
 
 #define TARGET_MSVC
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS  // TODO [CI §1.7]: Remove after §1.1 (unsafe string elimination) is complete
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #if defined (_DEBUG) 

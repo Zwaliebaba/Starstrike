@@ -546,7 +546,7 @@ void Armour::Render(float _predictionTime)
   if (m_numPassengers > 0)
   {
     char caption[16];
-    sprintf(caption, "%d", m_numPassengers);
+    snprintf(caption, sizeof(caption), "%d", m_numPassengers);
     m_flag.RenderText(2, 2, caption);
   }
 

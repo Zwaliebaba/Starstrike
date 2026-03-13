@@ -84,40 +84,14 @@ using namespace Neuron::Client;
 #define DARWINIA_EXE_VERSION 1,5,11,0
 #define STR_DARWINIA_EXE_VERSION "1, 5, 11, 0\0"
 
-// === PICK ONE OF THESE TARGETS ===
-
-//#define TARGET_FULLGAME
-//#define TARGET_DEMOGAME
-//#define TARGET_PURITYCONTROL
-//#define TARGET_DEMO2
 #define TARGET_DEBUG
-//#define TARGET_VISTA
-//#define TARGET_VISTA_DEMO2
-
-// === PICK ONE OF THESE TARGETS ===
-
-#define DEBUG_RENDER_ENABLED
-
-//#define USE_CRASHREPORTING
-
-#ifndef _OPENMP
-#define PROFILER_ENABLED
-#endif
-
-#ifdef TARGET_DEBUG
 #define DARWINIA_GAMETYPE "debug"
+
+#ifdef _DEBUG
 #define CHEATMENU_ENABLED
 #endif
 
-#if !defined(TARGET_DEBUG) &&       \
-    !defined(TARGET_FULLGAME) &&    \
-    !defined(TARGET_DEMOGAME) &&    \
-    !defined(TARGET_DEMO2) &&       \
-    !defined(TARGET_PURITYCONTROL) && \
-    !defined(TARGET_VISTA) && \
-    !defined(TARGET_VISTA_DEMO2 )
-#error "Unknown target, cannot determine game type"
-#endif
+#define DEBUG_RENDER_ENABLED
 
 #define DARWINIA_VERSION_STRING DARWINIA_GAMETYPE "-" DARWINIA_VERSION
 
@@ -135,9 +109,9 @@ using namespace Neuron::Client;
 
 #include "opengl_directx.h"
 
-#define SAFE_FREE(x) {free(x);x=NULL;}
-#define SAFE_DELETE(x) {delete x;x=NULL;}
-#define SAFE_DELETE_ARRAY(x) {delete[] x;x=NULL;}
-#define SAFE_RELEASE(x) {if(x){(x)->Release();x=NULL;}}
+#define SAFE_FREE(x) {free(x);x=nullptr;}
+#define SAFE_DELETE(x) {delete x;x=nullptr;}
+#define SAFE_DELETE_ARRAY(x) {delete[] x;x=nullptr;}
+#define SAFE_RELEASE(x) {if(x){(x)->Release();x=nullptr;}}
 
 #endif

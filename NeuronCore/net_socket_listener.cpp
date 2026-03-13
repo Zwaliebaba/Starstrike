@@ -40,7 +40,7 @@ NetRetCode NetSocketListener::StartListening(NetCallBack functionPointer)
 	servaddr.sin_port = htons(m_port);
 	
 	// Make sure incoming arguments make sense
-	if (functionPointer == (NetCallBack)NULL)
+	if (functionPointer == nullptr)
 	{
 		return NetBadArgs;
 	}

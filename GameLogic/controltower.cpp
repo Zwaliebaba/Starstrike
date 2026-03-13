@@ -38,10 +38,10 @@ ControlTower::ControlTower()
     m_beingReprogrammed[i] = false;
     char markerName[64];
 
-    sprintf(markerName, "MarkerReprogrammer%d", i);
+    snprintf(markerName, sizeof(markerName), "MarkerReprogrammer%d", i);
     m_reprogrammer[i] = m_shape->m_rootFragment->LookupMarker(markerName);
 
-    sprintf(markerName, "MarkerConsole%d", i);
+    snprintf(markerName, sizeof(markerName), "MarkerConsole%d", i);
     m_console[i] = m_shape->m_rootFragment->LookupMarker(markerName);
   }
 

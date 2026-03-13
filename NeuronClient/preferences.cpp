@@ -171,11 +171,6 @@ int GetDefaultSoundDSP()
 {
 #ifdef DEMOBUILD
   return 0;
-#elif defined(TARGET_OS_MACOSX)
-  if (MacOSXSlowCPU())
-    return 0;
-  else
-    return 1;
 #else
   return 1;
 #endif
@@ -183,41 +178,17 @@ int GetDefaultSoundDSP()
 
 int GetDefaultSoundChannels()
 {
-#ifdef TARGET_OS_MACOSX
-  if (MacOSXSlowCPU())
-    return 16;
-  else
-    return 32;
-#else
   return 32;
-#endif
 }
 
 int GetDefaultPixelShader()
 {
-#ifdef TARGET_OS_MACOSX
-  // Add call to graphics card check here
-  if (MacOSXGraphicsNoAcceleration() || MacOSXGraphicsLowMemory())
-    return 0;
-  else
-    return 1;
-#else
   return 1;
-#endif
 }
 
 int GetDefaultGraphicsDetail()
 {
-#ifdef TARGET_OS_MACOSX
-  if (MacOSXGraphicsNoAcceleration())
-    return 3;
-  else if (MacOSXGraphicsLowMemory())
-    return 2;
-  else
-    return 1;
-#else
   return 1;
-#endif
 }
 
 void PrefsManager::CreateDefaultValues()
@@ -280,16 +251,8 @@ void PrefsManager::CreateDefaultValues()
 
   AddLine("\n");
 
-#ifdef TARGET_OS_MACOSX
-  AddLine("ControlMouseButtons = 1");
-#else
-  AddLine("ControlMouseButtons = 3");
-#endif
-  AddLine("ControlMethod = 1");
-
-#if defined(TARGET_OS_LINUX) || defined(TARGET_OS_MACOSX)
-  AddLine("RenderLandscapeMode = 2"); AddLine("ManuallyScaleTextures = 0");
-#endif
+AddLine("ControlMouseButtons = 3");
+AddLine("ControlMethod = 1");
 
 #ifdef DEMOBUILD
 #ifndef DEMO2
@@ -455,7 +418,7 @@ int PrefsManager::GetInt(const char* _key, int _default) const
   return item->m_int;
 }
 
-char* PrefsManager::GetString(const char* _key, char* _default) const
+const char* PrefsManager::GetString(const char* _key, const char* _default) const
 {
   int index = m_items.GetIndex(_key);
   if (index == -1)

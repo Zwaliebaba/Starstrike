@@ -34,7 +34,8 @@ DropDownWindow *DropDownWindow::s_window = NULL;
 DropDownWindow::DropDownWindow( char *_name, char *_parentName )
 :   DarwiniaWindow(_name)
 {
-    strcpy( m_parentName, _parentName );
+    strncpy( m_parentName, _parentName, sizeof(m_parentName) );
+    m_parentName[sizeof(m_parentName) - 1] = '\0';
 }
 
 
@@ -250,7 +251,7 @@ void DropDownMenu::CreateMenu()
 
             char *thisOption = m_options[index]->m_word;
             char thisName[64];
-            sprintf( thisName, "%s %d", m_name, index );
+            snprintf( thisName, sizeof(thisName), "%s %d", m_name, index );
 
             int w = m_w - 4;
 

@@ -472,11 +472,11 @@ char *MasterSpawnPoint::GetObjectiveCounter()
     if( g_app->m_location->m_teams[1].m_teamType != Team::TeamTypeUnused )
     {
         int numRed = g_app->m_location->m_teams[1].m_others.NumUsed();
-        sprintf( result, "%s : %d", LANGUAGEPHRASE("objective_redpopulation"), numRed );
+        snprintf( result, sizeof(result), "%s : %d", LANGUAGEPHRASE("objective_redpopulation"), numRed );
     }
     else
     {
-        sprintf( result, "%s", LANGUAGEPHRASE("objective_redpopulation") );
+        snprintf( result, sizeof(result), "%s", LANGUAGEPHRASE("objective_redpopulation") );
     }
 
     return result;

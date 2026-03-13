@@ -181,8 +181,8 @@ char* BlueprintStore::GetObjectiveCounter()
   for (int i = 0; i < BLUEPRINTSTORE_NUMSEGMENTS; ++i)
     totalInfection += m_segments[i];
 
-  sprintf(result, "%s %d%%", LANGUAGEPHRASE("objective_totalinfection"),
-          static_cast<int>(100.0f * totalInfection / float(BLUEPRINTSTORE_NUMSEGMENTS * 100.0f)));
+  snprintf(result, sizeof(result), "%s %d%%", LANGUAGEPHRASE("objective_totalinfection"),
+           static_cast<int>(100.0f * totalInfection / float(BLUEPRINTSTORE_NUMSEGMENTS * 100.0f)));
 
   return result;
 }

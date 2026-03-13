@@ -20,8 +20,10 @@ ScrollBar::ScrollBar( EclWindow *parent )
     m_currentValue(0)
 {
     DEBUG_ASSERT( parent );
-    strcpy( m_parentWindow, parent->m_name );
-    strcpy( m_name, "New Scrollbar" );
+    strncpy( m_parentWindow, parent->m_name, SIZE_ECLWINDOW_NAME );
+    m_parentWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
+    strncpy( m_name, "New Scrollbar", SIZE_ECLBUTTON_NAME );
+    m_name[SIZE_ECLBUTTON_NAME - 1] = '\0';
 }
 
 ScrollBar::~ScrollBar()
@@ -34,7 +36,8 @@ void ScrollBar::Create( char *name,
                         int stepSize )
 {
 
-    strcpy( m_name, name );
+    strncpy( m_name, name, SIZE_ECLBUTTON_NAME );
+    m_name[SIZE_ECLBUTTON_NAME - 1] = '\0';
     m_x = x;
     m_y = y;
     m_w = w;
@@ -49,9 +52,9 @@ void ScrollBar::Create( char *name,
     char upName[256];
     char downName[256];
 
-    sprintf( barName, "%s bar", name );
-    sprintf( upName, "%s up", name );
-    sprintf( downName, "%s down", name );
+    snprintf( barName, sizeof(barName), "%s bar", name );
+    snprintf( upName, sizeof(upName), "%s up", name );
+    snprintf( downName, sizeof(downName), "%s down", name );
 
     ScrollChangeButton *up = new ScrollChangeButton(this, stepSize*-1);
     up->SetProperties( upName, x, y, w, 18, "^", " " );
@@ -76,9 +79,9 @@ void ScrollBar::Remove()
         char upName[256];
         char downName[256];
 
-        sprintf( barName, "%s bar", m_name );
-        sprintf( upName, "%s up", m_name );
-        sprintf( downName, "%s down", m_name );
+        snprintf( barName, sizeof(barName), "%s bar", m_name );
+        snprintf( upName, sizeof(upName), "%s up", m_name );
+        snprintf( downName, sizeof(downName), "%s down", m_name );
 
         parent->RemoveButton( barName );
         parent->RemoveButton( upName );

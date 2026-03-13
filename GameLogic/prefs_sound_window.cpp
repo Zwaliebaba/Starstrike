@@ -140,7 +140,7 @@ PrefsSoundWindow::PrefsSoundWindow()
     m_dspEffects    = g_prefsManager->GetInt( SOUND_DSPEFFECTS, 1 );
     m_memoryUsage   = g_prefsManager->GetInt( SOUND_MEMORY, 1 );
 
-    char *soundLib  = g_prefsManager->GetString( SOUND_LIBRARY );
+    const char *soundLib  = g_prefsManager->GetString( SOUND_LIBRARY );
 
     if( _stricmp( soundLib, "dsound" ) == 0 ) m_soundLib = 1;
     else                                     m_soundLib = 0;

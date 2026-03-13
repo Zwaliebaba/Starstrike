@@ -105,9 +105,9 @@ public:
 
     void RemoveTeam         ( unsigned char _teamId );
 
-    int GetBuildingId           ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float _maxDistance=FLT_MAX, float *_range=NULL );
-    int GetUnitId               ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float *_range=NULL );
-    WorldObjectId GetEntityId   ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float *_range=NULL );
+    int GetBuildingId           ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float _maxDistance=FLT_MAX, float *_range=nullptr );
+    int GetUnitId               ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float *_range=nullptr );
+    WorldObjectId GetEntityId   ( LegacyVector3 const &startRay, LegacyVector3 const &direction, unsigned char teamId, float *_range=nullptr );
 
     bool IsWalkable         ( LegacyVector3 const &_from, LegacyVector3 const &_to, bool _evaluateCliffs=false );
     bool IsVisible          ( LegacyVector3 const &_from, LegacyVector3 const &_to );

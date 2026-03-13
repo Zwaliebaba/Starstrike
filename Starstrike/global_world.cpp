@@ -139,12 +139,12 @@ bool GlobalEventCondition::Evaluate()
   case NotInLocation:
     return (g_app->m_location == nullptr);
 
-#ifdef JAMES_FIX
-  case DebugKey:
-    return g_keys[KEY_0 + m_id];
-#endif // JAMES_FIX
+case DebugKey:
+  // JAMES_FIX: g_keys[] is internal to inputdriver_win32.cpp with no extern.
+  // DebugKey conditions in data files will evaluate as false.
+  return false;
 
-  case NeverTrue:
+case NeverTrue:
     return false;
 
   default: DEBUG_ASSERT(false);

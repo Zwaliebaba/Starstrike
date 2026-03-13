@@ -32,7 +32,7 @@ ConstructionYard::ConstructionYard()
   for (int i = 0; i < YARD_NUMPRIMITIVES; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerPrimitive0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerPrimitive0%d", i + 1);
     m_primitives[i] = m_shape->m_rootFragment->LookupMarker(name);
     DEBUG_ASSERT(m_primitives[i]);
   }
@@ -40,7 +40,7 @@ ConstructionYard::ConstructionYard()
   for (int i = 0; i < YARD_NUMRUNGSPIKES; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerSpike0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerSpike0%d", i + 1);
     m_rungSpikes[i] = m_rung->m_rootFragment->LookupMarker(name);
     DEBUG_ASSERT(m_rungSpikes[i]);
   }
@@ -346,7 +346,7 @@ DisplayScreen::DisplayScreen()
   for (int i = 0; i < DISPLAYSCREEN_NUMRAYS; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerRay0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerRay0%d", i + 1);
     m_rays[i] = m_shape->m_rootFragment->LookupMarker(name);
   }
 }

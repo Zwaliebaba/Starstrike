@@ -294,6 +294,8 @@ void DarwiniaWindow::CreateValueControl(const char* name, int dataType, void* va
   input->m_lowBound = _lowBound;
   input->m_highBound = _highBound;
   input->SetCallback(callback);
+  // WARNING: Type-unsafe void* dispatch — see CI.md §1.5.
+  // dataType determines the cast target; mismatched dataType is UB.
   switch (dataType)
   {
   case InputField::TypeChar:
@@ -314,7 +316,7 @@ void DarwiniaWindow::CreateValueControl(const char* name, int dataType, void* va
   if (dataType != InputField::TypeString)
   {
     char nameLeft[64];
-    sprintf(nameLeft, "%s left", name);
+    snprintf(nameLeft, sizeof(nameLeft), "%s left", name);
     auto left = new InputScroller();
     left->SetProperties(nameLeft, input->m_x + input->m_w + 5, y, 15, 15, "<", "Value left");
     left->m_inputField = input;
@@ -322,7 +324,7 @@ void DarwiniaWindow::CreateValueControl(const char* name, int dataType, void* va
     RegisterButton(left);
 
     char nameRight[64];
-    sprintf(nameRight, "%s right", name);
+    snprintf(nameRight, sizeof(nameRight), "%s right", name);
     auto right = new InputScroller();
     right->SetProperties(nameRight, input->m_x + input->m_w + 22, y, 15, 15, ">", "Value right");
     right->m_inputField = input;
@@ -336,11 +338,11 @@ void DarwiniaWindow::RemoveValueControl(char* name)
   RemoveButton(name);
 
   char nameLeft[64];
-  sprintf(nameLeft, "%s left", name);
+  snprintf(nameLeft, sizeof(nameLeft), "%s left", name);
   RemoveButton(nameLeft);
 
   char nameRight[64];
-  sprintf(nameRight, "%s right", name);
+  snprintf(nameRight, sizeof(nameRight), "%s right", name);
   RemoveButton(nameRight);
 }
 

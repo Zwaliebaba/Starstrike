@@ -452,7 +452,7 @@ char* Triffid::GetSpawnNameTranslated(int _spawnType)
   char* spawnName = GetSpawnName(_spawnType);
 
   char stringId[256];
-  sprintf(stringId, "spawnname_%s", spawnName);
+  snprintf(stringId, sizeof(stringId), "spawnname_%s", spawnName);
 
   if (ISLANGUAGEPHRASE(stringId))
     return LANGUAGEPHRASE(stringId);

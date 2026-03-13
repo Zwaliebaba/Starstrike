@@ -36,16 +36,18 @@ namespace Neuron
   void __declspec(noreturn) Fatal(const std::string_view _fmt, Types&&... _args)
   {
     auto errorText = vformat(_fmt, std::make_format_args(_args...));
+    OutputDebugStringA(errorText.c_str());
     __debugbreak();
-    throw std::exception("Fatal Error");
+    throw std::exception(errorText.c_str());
   }
 
   template <class... Types>
   void __declspec(noreturn) Fatal(const std::wstring_view _fmt, Types&&... _args)
   {
     auto errorText = vformat(_fmt, std::make_wformat_args(_args...));
+    OutputDebugStringW(errorText.c_str());
     __debugbreak();
-    throw std::exception("Fatal Error");
+    throw std::exception(to_string(errorText).c_str());
   }
 }
 

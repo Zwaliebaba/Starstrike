@@ -18,9 +18,9 @@ EclButton::EclButton()
 EclButton::~EclButton()
 {
   if (m_caption)
-    delete m_caption;
+    delete[] m_caption;
   if (m_tooltip)
-    delete m_tooltip;
+    delete[] m_tooltip;
 }
 
 void EclButton::SetProperties(char* _name, int _x, int _y, int _w, int _h, char* _caption, char* _tooltip)

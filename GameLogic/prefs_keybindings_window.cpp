@@ -224,18 +224,12 @@ void PrefsKeybindingsWindow::Create()
     but->m_fontSize = GetMenuSize(15);
     but->m_centered = true;
     const char* keyName = m_bindings[i]->noun.c_str();
-    strcpy(but->m_caption, keyName);
+    but->SetCaption(keyName);
     RegisterButton(but);
     m_buttonOrder.PutData(but);
   }
 
-#ifdef TARGET_OS_MACOSX
-  DropDownMenu* numMouseButtons = new DropDownMenu(); numMouseButtons->SetShortProperties(" ", x, y += h, buttonW, buttonH); numMouseButtons
-    ->AddOption("1", 1); numMouseButtons->AddOption("3", 3); numMouseButtons->RegisterInt(&m_numMouseButtons);
-  RegisterButton(numMouseButtons); m_buttonOrder.PutData(numMouseButtons);
-#endif
-
-  y = m_h - (h + 5);
+y = m_h - (h + 5);
 
   auto restore = new RestoreDefaultsButton();
   restore->SetShortProperties(LANGUAGEPHRASE("dialog_restoredefaults"), border, y - h, m_w - border * 2, buttonH);
@@ -292,8 +286,4 @@ void PrefsKeybindingsWindow::Render(bool _hasFocus)
     const char* eventName = LANGUAGEPHRASE(s_controls[i].name);
     g_editorFont.DrawText2D(x, y += h, size, eventName);
   }
-
-#ifdef TARGET_OS_MACOSX
-  g_editorFont.DrawText2D(x, y += h, 13, LANGUAGEPHRASE("dialog_mousebuttons"));
-#endif
 }

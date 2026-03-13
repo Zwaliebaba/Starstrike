@@ -39,14 +39,14 @@ GunTurret::GunTurret()
   for (int i = 0; i < GUNTURRET_NUMBARRELS; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerBarrelEnd0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerBarrelEnd0%d", i + 1);
     m_barrelEnd[i] = m_barrel->m_rootFragment->LookupMarker(name);
   }
 
   for (int i = 0; i < GUNTURRET_NUMSTATUSMARKERS; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerStatus0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
     m_statusMarkers[i] = m_shape->m_rootFragment->LookupMarker(name);
   }
 }
@@ -251,11 +251,6 @@ bool GunTurret::Advance()
     }
     m_target = g_app->m_userInput->GetMousePos3d();
 
-#ifdef JAMES_FIX
-    primaryFire = g_controlBindings->
-      ControlMouseEvent(ControlBindings::ControlUnitPrimaryFire, team->m_currentMouseStatus, team->m_mouseDeltas); secondaryFire =
-      g_controlBindings->ControlMouseEvent(ControlBindings::ControlUnitSecondaryFire, team->m_currentMouseStatus, team->m_mouseDeltas);
-#endif // JAMES_FIX
     primaryFire = g_inputManager->controlEvent(ControlUnitPrimaryFireTarget) || g_inputManager->controlEvent(
       ControlUnitStartSecondaryFireDirected);
     secondaryFire = g_inputManager->controlEvent(ControlUnitSecondaryFireTarget);

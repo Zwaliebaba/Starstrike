@@ -62,8 +62,12 @@ ClientToServer::ClientToServer()
     m_netLib->Initialise();
 
     m_sendSocket = new NetSocket();
-    char* serverAddress = g_prefsManager->GetString("ServerAddress");
-    m_sendSocket->Connect(serverAddress, 4000);
+    const char* serverAddress = g_prefsManager->GetString("ServerAddress");
+    // NetSocket::Connect takes char* (to be fixed in CI §3.3); copy to mutable buffer
+    char addressBuf[256];
+    strncpy(addressBuf, serverAddress ? serverAddress : "", sizeof(addressBuf));
+    addressBuf[sizeof(addressBuf) - 1] = '\0';
+    m_sendSocket->Connect(addressBuf, 4000);
 
     NetStartThread(ListenThread);
   }

@@ -84,5 +84,3 @@ class ExplosionManager
 };
 
 inline ExplosionManager g_explosionManager;
-
-#endif

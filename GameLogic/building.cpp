@@ -838,7 +838,7 @@ char* Building::GetTypeNameTranslated(int _type)
   char* typeName = GetTypeName(_type);
 
   char stringId[256];
-  sprintf(stringId, "buildingname_%s", typeName);
+  snprintf(stringId, sizeof(stringId), "buildingname_%s", typeName);
 
   if (ISLANGUAGEPHRASE(stringId))
     return LANGUAGEPHRASE(stringId);

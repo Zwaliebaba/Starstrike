@@ -329,11 +329,7 @@ class ResetLocationButton : public DarwiniaButton
     EclRemoveWindow(m_parent->m_name);
     EclRemoveWindow(LANGUAGEPHRASE("dialog_locationmenu"));
 
-#ifdef DEMO2
-    g_app->ResetLevel(true);
-#else
-    g_app->ResetLevel(g_app->m_gameMode == GameApp::GameModePrologue);
-#endif
+g_app->ResetLevel(g_app->m_gameMode == GameApp::GameModePrologue);
   }
 };
 
@@ -493,7 +489,7 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   float fontSize = GetMenuSize(13);
 
   char about[512];
-  sprintf(about, "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
+  snprintf(about, sizeof(about), "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");

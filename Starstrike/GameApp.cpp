@@ -96,7 +96,7 @@ GameApp::GameApp()
   //
   // Determine default language if possible
 
-  char* language = g_prefsManager->GetString("TextLanguage");
+  const char* language = g_prefsManager->GetString("TextLanguage");
   if (_stricmp(language, "unknown") == 0)
   {
     char* defaultLang = g_systemInfo->m_localeInfo.m_language;
@@ -164,7 +164,7 @@ void GameApp::UpdateDifficultyFromPreferences()
     m_difficultyLevel = 0;
 }
 
-void GameApp::SetLanguage(char* _language, bool _test)
+void GameApp::SetLanguage(const char* _language, bool _test)
 {
   //
   // Delete existing language data
@@ -179,11 +179,7 @@ void GameApp::SetLanguage(char* _language, bool _test)
   // Load the language text file
 
   char langFilename[256];
-#if defined(TARGET_OS_LINUX) && defined(TARGET_DEMOGAME)
-  sprintf(langFilename, "language/%s_demo.txt", _language);
-#else
   sprintf(langFilename, "language/%s.txt", _language);
-#endif
 
   m_langTable = new LangTable(langFilename);
 
@@ -225,7 +221,7 @@ void GameApp::SetLanguage(char* _language, bool _test)
     m_langTable->RebuildTables();
 }
 
-void GameApp::SetProfileName(char* _profileName)
+void GameApp::SetProfileName(const char* _profileName)
 {
   strcpy(m_userProfileName, _profileName);
 
@@ -236,72 +232,9 @@ void GameApp::SetProfileName(char* _profileName)
   }
 }
 
-#if defined(TARGET_OS_LINUX) || defined(TARGET_OS_MACOSX)
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif
-
 const char* GameApp::GetProfileDirectory()
 {
-#if defined(TARGET_OS_LINUX)
-
-  static char userdir[256]; const char* home = getenv("HOME"); if (home != NULL)
-  {
-    sprintf(userdir, "%s/.darwinia", home);
-    mkdir(userdir, 0777);
-
-    sprintf(userdir, "%s/.darwinia/%s/", home, DARWINIA_GAMETYPE);
-    mkdir(userdir, 0777);
-    return userdir;
-  }
-  else // Current directory if no home
-    return "";
-
-#elif defined(TARGET_OS_MACOSX)
-
-  static char userdir[256]; const char* home = getenv("HOME"); if (home != NULL)
-  {
-    sprintf(userdir, "%s/Library", home);
-    mkdir(userdir, 0777);
-
-    sprintf(userdir, "%s/Library/Application Support", home);
-    mkdir(userdir, 0777);
-
-    sprintf(userdir, "%s/Library/Application Support/Darwinia", home);
-    mkdir(userdir, 0777);
-
-    sprintf(userdir, "%s/Library/Application Support/Darwinia/%s/", home, DARWINIA_GAMETYPE);
-    mkdir(userdir, 0777);
-
-    return userdir;
-  }
-  else // Current directory if no home
-    return "";
-
-#else
-#ifdef TARGET_OS_VISTA
-  if (IsRunningVista())
-  {
-    static char userdir[256];
-
-    PWSTR path;
-    SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &path);
-    wcstombs(userdir, path, sizeof(userdir));
-    CoTaskMemFree(path);
-
-#ifdef TARGET_VISTA_DEMO2
-  const char* subdir = "\\Darwinia Demo 2\\";
-#else
-  const char* subdir = "\\Darwinia\\";
-#endif
-  strncat(userdir, subdir, sizeof(userdir)); CreateDirectory(userdir); return userdir;
-    }
-    else
-#endif // TARGET_OS_VISTA
-  {
-    return "";
-  }
-#endif
+  return "";
 }
 
 const char* GameApp::GetPreferencesPath()
@@ -321,11 +254,7 @@ const char* GameApp::GetPreferencesPath()
 
 const char* GameApp::GetScreenshotDirectory()
 {
-#ifdef TARGET_OS_VISTA
-  static char dir[MAX_PATH]; SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, SHGFP_TYPE_CURRENT, dir); sprintf(dir, "%s\\", dir); return dir;
-#else
   return "";
-#endif
 }
 
 bool GameApp::LoadProfile()

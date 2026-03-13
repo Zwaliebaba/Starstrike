@@ -699,7 +699,7 @@ char *Entity::GetTypeNameTranslated ( int _troopType )
     char *typeName = GetTypeName( _troopType );
 
     char stringId[256];
-    sprintf( stringId, "entityname_%s", typeName );
+    snprintf( stringId, sizeof(stringId), "entityname_%s", typeName );
 
     if( ISLANGUAGEPHRASE( stringId ) )
     {

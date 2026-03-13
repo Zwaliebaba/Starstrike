@@ -114,11 +114,12 @@ void TrunkPort::Render( float predictionTime )
     char *locationName = g_app->m_globalWorld->GetLocationNameTranslated( m_targetLocationId );
     if( locationName )
     {
-        strcpy( caption, locationName );
+        strncpy( caption, locationName, sizeof(caption) );
+        caption[sizeof(caption) - 1] = '\0';
     }
     else
     {
-        sprintf( caption, "[%s]", LANGUAGEPHRASE("location_unknown") );
+        snprintf( caption, sizeof(caption), "[%s]", LANGUAGEPHRASE("location_unknown") );
     }
 
     START_PROFILE( g_app->m_profiler, "RenderDestination" );

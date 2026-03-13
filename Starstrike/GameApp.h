@@ -93,11 +93,11 @@ class GameApp : public GameMain
     void Update([[maybe_unused]] float _deltaT) override {}
     void RenderScene() override {}
 
-    void SetProfileName(char* _profileName);
+    void SetProfileName(const char* _profileName);
     bool LoadProfile();
     void ResetLevel(bool _global);
 
-    void SetLanguage(char* _language, bool _test);
+    void SetLanguage(const char* _language, bool _test);
 
     void LoadPrologue();
     void LoadCampaign();

@@ -18,7 +18,8 @@
 
 DynamicBase::DynamicBase()
   : Building(),
-    m_buildingLink(-1) { strcpy(m_shapeName, "none"); }
+    m_buildingLink(-1) { strncpy(m_shapeName, "none", sizeof(m_shapeName)); m_shapeName[sizeof(m_shapeName) - 1] = '\0'; }
+
 
 void DynamicBase::Initialise(Building* _template)
 {
@@ -67,7 +68,8 @@ void DynamicBase::SetBuildingLink(int _buildingId)
 
 void DynamicBase::SetShapeName(char* _shapeName)
 {
-  strcpy(m_shapeName, _shapeName);
+  strncpy(m_shapeName, _shapeName, sizeof(m_shapeName));
+  m_shapeName[sizeof(m_shapeName) - 1] = '\0';
 
   if (strcmp(m_shapeName, "none") != 0)
   {
@@ -246,10 +248,10 @@ char* DynamicHub::GetObjectiveCounter()
     float current = m_currentScore;
     float required = m_requiredScore;
     float percentComplete = current / required * 100.0f;
-    sprintf(result, "percent complete: %.0f", percentComplete);
+    snprintf(result, sizeof(result), "percent complete: %.0f", percentComplete);
   }
   else
-    sprintf(result, "");
+    result[0] = '\0';
   return result;
 }
 

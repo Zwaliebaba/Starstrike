@@ -40,7 +40,7 @@ SporeGenerator::SporeGenerator()
     for( int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i )
     {
         char name[256];
-        sprintf( name, "MarkerTail0%d", i+1 );
+        snprintf( name, sizeof(name), "MarkerTail0%d", i+1 );
         m_tail[i] = m_shape->m_rootFragment->LookupMarker( name );
     }
 }

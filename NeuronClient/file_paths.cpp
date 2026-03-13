@@ -57,7 +57,7 @@ const string & InputPrefs::GetLocalePrefsPath()
 		int localeID = int(GetKeyboardLayout( 0 )) & 0xFFFF;
 		localeIt it = s_localeNames.find( localeID );
 		if ( it != s_localeNames.end() ) defLocale = it->second;
-		string kb = g_prefsManager->GetString( KEYBOARD_LAYOUT.c_str(), const_cast<char*>(defLocale.c_str()) );
+		string kb = g_prefsManager->GetString( KEYBOARD_LAYOUT.c_str(), defLocale.c_str() );
 		if ( kb != "" ) {
 			path = INPUT_DATA_DIR + "keyboards/" + kb + ".txt";
 		}

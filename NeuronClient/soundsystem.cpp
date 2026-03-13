@@ -265,7 +265,7 @@ void SoundSystem::RestartSoundLibrary()
   int volume = g_prefsManager->GetInt("SoundMasterVolume", 255);
   m_numChannels = g_prefsManager->GetInt("SoundChannels", 32);
   int hw3d = g_prefsManager->GetInt("SoundHW3D", 0);
-  char* libName = g_prefsManager->GetString("SoundLibrary", "dsound");
+  const char* libName = g_prefsManager->GetString("SoundLibrary", "dsound");
   int bufSize = 20000;
 
   g_soundLibrary2d = new SoundLibrary2d;

@@ -132,7 +132,7 @@ void StartSequence::Render()
     if (timeNow >= caption->m_startTime && timeNow <= caption->m_endTime)
     {
       char theString[256];
-      sprintf(theString, caption->m_caption);
+      snprintf(theString, sizeof(theString), "%s", caption->m_caption);
       int stringLength = strlen(theString);
       int maxTimeLength = (timeNow - caption->m_startTime) * 20;
       if (maxTimeLength < stringLength)

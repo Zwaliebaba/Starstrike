@@ -15,7 +15,8 @@ StaticShape::StaticShape()
 {
   m_type = TypeStaticShape;
 
-  strcpy(m_shapeName, "none");
+  strncpy(m_shapeName, "none", sizeof(m_shapeName));
+  m_shapeName[sizeof(m_shapeName) - 1] = '\0';
 }
 
 void StaticShape::Initialise(Building* _template)
@@ -46,7 +47,8 @@ void StaticShape::SetDetail(int _detail)
 
 void StaticShape::SetShapeName(char* _shapeName)
 {
-  strcpy(m_shapeName, _shapeName);
+  strncpy(m_shapeName, _shapeName, sizeof(m_shapeName));
+  m_shapeName[sizeof(m_shapeName) - 1] = '\0';
 
   if (strcmp(m_shapeName, "none") != 0)
   {

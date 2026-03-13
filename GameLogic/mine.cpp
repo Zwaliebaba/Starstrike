@@ -734,7 +734,7 @@ char* Refinery::GetObjectiveCounter()
     numRefined = gb->m_link;
 
   static char result[256];
-  sprintf(result, "%s : %d", LANGUAGEPHRASE("objective_refined"), numRefined);
+  snprintf(result, sizeof(result), "%s : %d", LANGUAGEPHRASE("objective_refined"), numRefined);
   return result;
 }
 

@@ -358,7 +358,7 @@ void FuelGenerator::RenderAlphas(float _predictionTime)
 char* FuelGenerator::GetObjectiveCounter()
 {
   static char buffer[256];
-  sprintf(buffer, "%s %d%%", LANGUAGEPHRASE("objective_fuelpressure"), static_cast<int>(m_currentLevel * 100));
+  snprintf(buffer, sizeof(buffer), "%s %d%%", LANGUAGEPHRASE("objective_fuelpressure"), static_cast<int>(m_currentLevel * 100));
   return buffer;
 }
 
@@ -669,7 +669,7 @@ EscapeRocket::EscapeRocket()
   for (int i = 0; i < 3; ++i)
   {
     char name[256];
-    sprintf(name, "MarkerWindow0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerWindow0%d", i + 1);
     m_window[i] = m_shape->m_rootFragment->LookupMarker(name);
     ASSERT_TEXT(m_window[i], "%s not found", name);
   }
@@ -728,7 +728,7 @@ void EscapeRocket::SetupSounds()
 
   char fullName[256];
   if (requiredSoundName)
-    sprintf(fullName, "EscapeRocket %s", requiredSoundName);
+    snprintf(fullName, sizeof(fullName), "EscapeRocket %s", requiredSoundName);
 
   //
   // If we're not set up right, kill all sounds first
@@ -780,7 +780,7 @@ void EscapeRocket::Initialise(Building* _template)
 char* EscapeRocket::GetObjectiveCounter()
 {
   static char buffer[256];
-  sprintf(buffer, "%s %d%%, %s %d%%", LANGUAGEPHRASE("objective_fuel"), static_cast<int>(m_fuel), LANGUAGEPHRASE("objective_passengers"),
+  snprintf(buffer, sizeof(buffer), "%s %d%%, %s %d%%", LANGUAGEPHRASE("objective_fuel"), static_cast<int>(m_fuel), LANGUAGEPHRASE("objective_passengers"),
           static_cast<int>(m_passengers));
   return buffer;
 }

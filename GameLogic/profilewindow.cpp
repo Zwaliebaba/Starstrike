@@ -39,15 +39,15 @@ public:
 		}
 		else if (_stricmp(m_caption, "Min") == 0)
 		{
-			strcpy(m_caption, "Avg");
+			SetCaption("Avg");
 		}
 		else if (_stricmp(m_caption, "Avg") == 0)
 		{
-			strcpy(m_caption, "Max");
+			SetCaption("Max");
 		}
 		else if (_stricmp(m_caption, "Max") == 0)
 		{
-			strcpy(m_caption, "Min");
+			SetCaption("Min");
 		}
     }
 };
@@ -115,7 +115,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 			else if (minAvgMax == 2)	lastColumn = child->m_longest;
 			lastColumn *= 1000.0f;
 
-			sprintf(caption,
+			snprintf(caption, sizeof(caption),
 					"%*s%-*s:%5d x%4.2f = %4.0f %4.2f",
 					_indent + 1,
 					icon,

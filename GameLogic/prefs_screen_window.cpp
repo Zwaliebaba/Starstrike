@@ -35,7 +35,7 @@ class ScreenResDropDownMenu : public DropDownMenu
       {
         int thisRate = resolution->m_refreshRates[i];
         char caption[64];
-        sprintf(caption, "%d Hz", thisRate);
+        snprintf(caption, sizeof(caption), "%d Hz", thisRate);
         refresh->AddOption(caption, thisRate);
       }
       refresh->SelectOption(parent->m_refreshRate);
@@ -198,7 +198,7 @@ int fontSize = GetMenuSize(13);*/
   {
     Resolution* resolution = g_windowManager->m_resolutions[i];
     char caption[64];
-    sprintf(caption, "%d x %d", resolution->m_width, resolution->m_height);
+    snprintf(caption, sizeof(caption), "%d x %d", resolution->m_width, resolution->m_height);
     screenRes->AddOption(caption, i);
   }
   screenRes->m_fontSize = fontSize;

@@ -421,7 +421,7 @@ void SpiritProcessor::Initialise(Building* _building)
 char* SpiritProcessor::GetObjectiveCounter()
 {
   static char result[256];
-  sprintf(result, "%s : %2.2f", LANGUAGEPHRASE("objective_throughput"), m_throughput);
+  snprintf(result, sizeof(result), "%s : %2.2f", LANGUAGEPHRASE("objective_throughput"), m_throughput);
   return result;
 }
 
@@ -568,7 +568,7 @@ SpiritReceiver::SpiritReceiver()
   for (int i = 0; i < SPIRITRECEIVER_NUMSTATUSMARKERS; ++i)
   {
     char name[64];
-    sprintf(name, "MarkerStatus0%d", i + 1);
+    snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
     m_statusMarkers[i] = m_shape->m_rootFragment->LookupMarker(name);
   }
 
