@@ -5,8 +5,7 @@
 //
 //*********************************************************
 
-#ifndef __D3DX12_H__
-#define __D3DX12_H__
+#pragma once
 
 #include "d3d12.h"
 
@@ -8265,4 +8264,3 @@ inline HRESULT CD3DX12FeatureSupport::QueryProtectedResourceSessionTypes(UINT No
 
 #endif // defined( __cplusplus )
 
-#endif //__D3DX12_H__

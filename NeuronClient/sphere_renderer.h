@@ -1,5 +1,4 @@
-#ifndef SPHERE_RENDERER_H
-#define SPHERE_RENDERER_H
+#pragma once
 
 #include "LegacyVector3.h"
 
@@ -28,5 +27,3 @@ private:
 	void ConsiderTriangle(int level, LegacyVector3 const &a, LegacyVector3 const &b, LegacyVector3 const &c);
 };
 
-
-#endif

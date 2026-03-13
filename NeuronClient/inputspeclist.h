@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTSPECLIST_H
-#define INCLUDED_INPUTSPECLIST_H
+#pragma once
 
 #include <memory>
 
@@ -15,5 +14,3 @@ typedef std::unique_ptr<const InputSpec> InputSpecPtr;
 
 typedef std::unique_ptr<const InputSpecList> InputSpecListPtr;
 
-
-#endif // INCLUDED_INPUTSPECLIST_H

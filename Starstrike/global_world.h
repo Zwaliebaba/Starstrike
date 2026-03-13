@@ -1,5 +1,4 @@
-#ifndef _included_global_world_h
-#define _included_global_world_h
+#pragma once
 
 #include "llist.h"
 #include "LegacyVector3.h"
@@ -295,4 +294,3 @@ class GlobalWorld
     float GetSize();
 };
 
-#endif

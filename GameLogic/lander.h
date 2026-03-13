@@ -1,5 +1,4 @@
-#ifndef _included_lander_h
-#define _included_lander_h
+#pragma once
 
 #include "entity.h"
 
@@ -29,5 +28,3 @@ public:
 
 };
 
-
-#endif

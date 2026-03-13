@@ -1,5 +1,4 @@
-#ifndef _included_powerstation_h
-#define _included_powerstation_h
+#pragma once
 
 #include "building.h"
 
@@ -29,5 +28,3 @@ public:
 	void Write( FileWriter *out );
 };
 
-
-#endif

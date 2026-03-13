@@ -1,6 +1,5 @@
 
-#ifndef _included_anthill_h
-#define _included_anthill_h
+#pragma once
 
 #include "building.h"
 
@@ -63,6 +62,3 @@ public:
     void ListSoundEvents( LList<char *> *_list );
 };
 
-
-
-#endif

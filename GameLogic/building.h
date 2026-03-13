@@ -1,5 +1,4 @@
-#ifndef _included_building_h
-#define _included_building_h
+#pragma once
 
 #include "LegacyVector3.h"
 #include "matrix34.h"
@@ -173,4 +172,3 @@ class BuildingPort
     int m_counter[NUM_TEAMS];
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUT_W32_H
-#define INCLUDED_INPUT_W32_H
+#pragma once
 
 #include "inputdriver_simple.h"
 #include "keydefs.h"
@@ -79,4 +78,3 @@ class W32InputDriver : public SimpleInputDriver
     inline static signed char m_keyNewDeltas[KEY_MAX];
 };
 
-#endif //INCLUDED_INPUT_W32_H

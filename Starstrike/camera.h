@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include "LegacyVector3.h"
 
@@ -211,5 +210,3 @@ public:
 	void WaterReflect   ();
 };
 
-
-#endif

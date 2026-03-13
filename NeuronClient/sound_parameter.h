@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_PARAMETER
-#define INCLUDED_SOUND_PARAMETER
+#pragma once
 
 
 class TextReader;
@@ -82,5 +81,3 @@ public:
     static int   GetUpdateType          ( char *_name );
 };
 
-
-#endif

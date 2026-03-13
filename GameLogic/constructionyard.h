@@ -1,6 +1,5 @@
 
-#ifndef _included_constructionyard_h
-#define _included_constructionyard_h
+#pragma once
 
 #include "building.h"
 
@@ -66,5 +65,3 @@ public:
 
 };
 
-
-#endif

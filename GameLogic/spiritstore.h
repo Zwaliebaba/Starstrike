@@ -1,5 +1,4 @@
-#ifndef _included_spiritstore_h
-#define _included_spiritstore_h
+#pragma once
 
 #include "fast_darray.h"
 #include "LegacyVector3.h"
@@ -32,5 +31,3 @@ public:
     void RemoveSpirits  ( int _quantity );
 };
 
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUTFILTER_WITHDELTA_H
-#define INCLUDED_INPUTFILTER_WITHDELTA_H
+#pragma once
 
 #include "auto_vector.h"
 #include "inputfilterspec.h"
@@ -38,5 +37,3 @@ public:
 
 };
 
-
-#endif // INCLUDED_INPUTFILTER_WITHDELTA_H

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_SOUND_LIBRARY_3D_H
-#define INCLUDED_SOUND_LIBRARY_3D_H
+#pragma once
 
 
 //*****************************************************************************
@@ -111,5 +110,3 @@ public:
 
 extern SoundLibrary3d *g_soundLibrary3d;
 
-
-#endif

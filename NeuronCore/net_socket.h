@@ -2,8 +2,7 @@
 // A UDP socket sender class
 // ****************************************************************************
 
-#ifndef INCLUDED_NET_SOCKET_H
-#define INCLUDED_NET_SOCKET_H
+#pragma once
 
 
 #include <stdio.h>
@@ -73,5 +72,3 @@ protected:
 	char				m_hostname[MAX_HOSTNAME_LEN];
 };
 
-
-#endif

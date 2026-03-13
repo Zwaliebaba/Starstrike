@@ -1,5 +1,4 @@
-#ifndef _included_airstrike_h
-#define _included_airstrike_h
+#pragma once
 
 #include "unit.h"
 
@@ -56,5 +55,3 @@ public:
 
 };
 
-
-#endif

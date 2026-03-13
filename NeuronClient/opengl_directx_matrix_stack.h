@@ -1,5 +1,4 @@
-#ifndef __OPENGL_DIRECTX_MATRIX_STACK
-#define __OPENGL_DIRECTX_MATRIX_STACK
+#pragma once
 
 #include <DirectXMath.h>
 #include <stack>
@@ -44,4 +43,3 @@ namespace OpenGLD3D {
 
 };
 
-#endif // __OPENGL_DIRECTX_MATRIX_STACK

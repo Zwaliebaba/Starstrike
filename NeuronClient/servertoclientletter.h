@@ -1,5 +1,4 @@
-#ifndef SERVER_TO_CLIENT_LETTER_H
-#define SERVER_TO_CLIENT_LETTER_H
+#pragma once
 
 #include "LegacyVector3.h"
 #include "worldobject.h"
@@ -59,6 +58,3 @@ public:
 	char *GetByteStream(int *_linearSize);
 };
 
-
-
-#endif

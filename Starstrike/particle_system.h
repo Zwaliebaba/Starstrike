@@ -1,5 +1,4 @@
-#ifndef _included_particle_system_h
-#define _included_particle_system_h
+#pragma once
 
 #include "rgb_colour.h"
 #include "slice_darray.h"
@@ -96,4 +95,3 @@ public:
 	void Empty();
 };
 
-#endif

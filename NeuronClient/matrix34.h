@@ -1,5 +1,4 @@
-#ifndef _INCLUDED_MATRIX34_H
-#define _INCLUDED_MATRIX34_H
+#pragma once
 
 
 //#include <string.h>
@@ -146,5 +145,3 @@ inline LegacyVector3 operator * ( LegacyVector3 const &v, Matrix34 const &m )
 				   m.r.z*v.x + m.u.z*v.y + m.f.z*v.z + m.pos.z);
 }
 
-
-#endif

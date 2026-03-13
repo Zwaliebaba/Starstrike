@@ -1,5 +1,4 @@
-#ifndef INCLUDED_ROUTING_SYSTEM_H
-#define INCLUDED_ROUTING_SYSTEM_H
+#pragma once
 
 
 #include "llist.h"
@@ -58,5 +57,3 @@ public:
     void        Render();
 };
 
-
-#endif

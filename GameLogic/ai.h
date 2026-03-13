@@ -1,5 +1,4 @@
-#ifndef _included_ai_h
-#define _included_ai_h
+#pragma once
 
 #include "location.h"
 
@@ -91,4 +90,3 @@ class AISpawnPoint : public Building
     bool DoesShapeHit(Shape* _shape, Matrix34 _transform) override;
 };
 
-#endif

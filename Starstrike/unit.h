@@ -1,5 +1,4 @@
-#ifndef _included_unit_h
-#define _included_unit_h
+#pragma once
 
 #include "slice_darray.h"
 #include "LegacyVector3.h"
@@ -72,5 +71,3 @@ public:
 	Entity *RayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir);
 };
 
-
-#endif

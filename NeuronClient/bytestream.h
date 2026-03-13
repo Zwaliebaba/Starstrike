@@ -8,8 +8,7 @@
  *
  */
 
-#ifndef _included_bytestream_h
-#define _included_bytestream_h
+#pragma once
 
 
 
@@ -28,7 +27,3 @@
 #define WRITE_UNSIGNED_SHORT(_stream, _val) *((unsigned short*)_stream) = _val; _stream += sizeof(unsigned short);
 #define WRITE_WORLDOBJECTID(_stream, _val)  *((WorldObjectId*)_stream) = _val; _stream += sizeof(WorldObjectId);
 
-
-
-
-#endif

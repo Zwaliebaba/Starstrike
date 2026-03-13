@@ -1,5 +1,4 @@
-#ifndef INCLUDED_LEVEL_FILE
-#define INCLUDED_LEVEL_FILE
+#pragma once
 
 #include <stdlib.h>
 #include "llist.h"
@@ -216,4 +215,3 @@ class LevelFile
     void GenerateDynamicBuildings();
 };
 
-#endif

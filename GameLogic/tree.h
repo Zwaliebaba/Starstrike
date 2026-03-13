@@ -1,5 +1,4 @@
-#ifndef _included_tree_h
-#define _included_tree_h
+#pragma once
 
 #include "building.h"
 
@@ -62,4 +61,3 @@ class Tree : public Building
     void Write(FileWriter* _out) override;
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef INCLUDED_INPUT_XINPUT_H
-#define INCLUDED_INPUT_XINPUT_H
+#pragma once
 
 #include <string>
 #include <XInput.h>
@@ -81,5 +80,3 @@ public:
 
 };
 
-
-#endif //INCLUDED_INPUT_XINPUT_H

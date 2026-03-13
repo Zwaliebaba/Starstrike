@@ -1,5 +1,4 @@
-#ifndef INCLUDED_HASH_TABLE_H
-#define INCLUDED_HASH_TABLE_H
+#pragma once
 
 
 // Implements a simple hash table with null terminated char arrays for keys.
@@ -384,4 +383,3 @@ char const* HashTable<T>::GetName(unsigned int _index) const
 	return m_keys[_index];
 }
 
-#endif

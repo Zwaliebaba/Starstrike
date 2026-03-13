@@ -1,6 +1,5 @@
 
-#ifndef _included_trunkport_h
-#define _included_trunkport_h
+#pragma once
 
 #include "building.h"
 
@@ -38,6 +37,3 @@ public:
     void Write  ( FileWriter *_out );
 };
 
-
-
-#endif

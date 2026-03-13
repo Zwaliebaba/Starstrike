@@ -1,5 +1,4 @@
-#ifndef _included_cave_h
-#define _included_cave_h
+#pragma once
 
 #include "building.h"
 
@@ -23,5 +22,3 @@ public:
     void Damage( float _damage );
 };
 
-
-#endif

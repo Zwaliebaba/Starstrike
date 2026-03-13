@@ -1,6 +1,5 @@
 
-#ifndef _included_triffid_h
-#define _included_triffid_h
+#pragma once
 
 #include "building.h"
 
@@ -97,5 +96,3 @@ public:
     void ListSoundEvents    ( LList<char *> *_list );
 };
 
-
-#endif

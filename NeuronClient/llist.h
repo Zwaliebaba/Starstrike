@@ -5,8 +5,7 @@
 //                           V1.3                                //
 //===============================================================//
 
-#ifndef _included_llist_h
-#define _included_llist_h
+#pragma once
 
 
 //=================================================================
@@ -459,5 +458,3 @@ int LList<T>::FindData(const T& data)
     return -1;
 }
 
-
-#endif

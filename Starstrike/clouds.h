@@ -1,6 +1,5 @@
 
-#ifndef _included_clouds_h
-#define _included_clouds_h
+#pragma once
 
 #include "LegacyVector3.h"
 
@@ -26,5 +25,3 @@ public:
     void RenderSky		();
 };
 
-
-#endif

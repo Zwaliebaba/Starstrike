@@ -1,5 +1,4 @@
-#ifndef INCLUDED_MAIN_H
-#define INCLUDED_MAIN_H
+#pragma once
 
 extern double   g_gameTime;					  // Updated from GetHighResTime every frame
 extern double   g_startTime;
@@ -17,4 +16,3 @@ extern bool     IsRunningVista();
 
 void AppMain();
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef ENTITY_GRID_H
-#define ENTITY_GRID_H
+#pragma once
 
 #include "globals.h"
 
@@ -71,5 +70,3 @@ public:
     void Render ();
 };
 
-
-#endif
