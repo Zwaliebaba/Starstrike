@@ -148,6 +148,8 @@
     <ClInclude Include="switch.h" />
     <ClInclude Include="teleport.h" />
     <ClInclude Include="tree.h" />
+    <ClInclude Include="tree_mesh_data.h" />
+    <ClInclude Include="tree_render_interface.h" />
     <ClInclude Include="triffid.h" />
     <ClInclude Include="tripod.h" />
     <ClInclude Include="trunkport.h" />

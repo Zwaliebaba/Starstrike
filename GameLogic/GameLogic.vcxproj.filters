@@ -230,6 +230,8 @@
     <ClInclude Include="worldobject.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="tree_mesh_data.h" />
+    <ClInclude Include="tree_render_interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

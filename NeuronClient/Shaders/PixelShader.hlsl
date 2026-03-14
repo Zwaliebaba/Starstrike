@@ -1,56 +1,6 @@
 // Uber pixel shader — fixed-function emulation for OpenGL-on-D3D12
 
-cbuffer PerFrameConstants : register(b0)
-{
-    row_major float4x4 WorldMatrix;
-    row_major float4x4 ProjectionMatrix;
-
-    struct LightData
-    {
-        float4 Position;
-        float4 Direction;
-        float4 Diffuse;
-        float4 Specular;
-        float4 Ambient;
-        uint Enabled;
-        float3 _pad;
-    };
-    LightData Lights[8];
-
-    float4 MatAmbient;
-    float4 MatDiffuse;
-    float4 MatSpecular;
-    float4 MatEmissive;
-    float MatShininess;
-    float3 _matPad;
-
-    float4 GlobalAmbient;
-    uint LightingEnabled;
-    uint FogEnabled;
-    uint TexturingEnabled0;
-    uint TexturingEnabled1;
-
-    float4 FogColor;
-    float FogStart;
-    float FogEnd;
-    float FogDensity;
-    uint FogMode;
-
-    uint TexEnvMode0;
-    uint TexEnvMode1;
-
-    uint ColorMaterialEnabled;
-    uint ColorMaterialMode;
-
-    uint AlphaTestEnabled;
-    uint AlphaTestFunc; // 0 = LEQUAL, 1 = GREATER
-    float AlphaTestRef;
-
-    uint NormalizeNormals;
-    uint FlatShading;
-    float PointSize;
-    float _miscPad;
-};
+#include "PerFrameConstants.hlsli"
 
 // Texture env mode constants (match GL defines remapped to shader constants)
 #define TEXENV_MODULATE 0

@@ -1,28 +1,26 @@
 #include "pch.h"
-#include "input.h"
-
-#include "hi_res_time.h"
-#include "math_utils.h"
-#include "ogl_extensions.h"
-#include "preferences.h"
-#include "profiler.h"
-#include "resource.h"
-#include "text_renderer.h"
-#include "window_manager.h"
-#include "language_table.h"
+#include "renderer.h"
 #include "GameApp.h"
 #include "camera.h"
 #include "explosion.h"
+#include "gamecursor.h"
 #include "global_world.h"
+#include "hi_res_time.h"
+#include "input.h"
+#include "language_table.h"
 #include "location.h"
 #include "main.h"
+#include "math_utils.h"
+#include "ogl_extensions.h"
 #include "particle_system.h"
-#include "renderer.h"
-#include "taskmanager_interface.h"
-#include "user_input.h"
-#include "gamecursor.h"
+#include "preferences.h"
+#include "profiler.h"
+#include "resource.h"
 #include "startsequence.h"
-#include "soundsystem.h"
+#include "taskmanager_interface.h"
+#include "text_renderer.h"
+#include "user_input.h"
+#include "window_manager.h"
 
 Renderer::Renderer()
   : m_fps(60),
@@ -258,8 +256,6 @@ void Renderer::RenderPaused()
 
 void Renderer::RenderFrame(bool withFlip)
 {
-  int renderPixelShaderPref = g_prefsManager->GetInt("RenderPixelShader");
-
   SetOpenGLState();
 
   if (g_app->m_locationId == -1)

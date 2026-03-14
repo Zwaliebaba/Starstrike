@@ -6,6 +6,7 @@
 #include "ogl_extensions.h"
 #include "d3d12_backend.h"
 #include "matrix34.h"
+#include "tree_renderer.h"
 
 using namespace OpenGLD3D;
 
@@ -537,6 +538,9 @@ bool Direct3DInit()
   if (!g_backend.Init())
     return false;
 
+  TreeRenderer::Get().Init();
+  g_treeRenderBackend = &TreeRenderer::Get();
+
   InitialiseData();
   auto outputSize = Graphics::Core::Get().GetOutputSize();
   s_renderState.viewportW = static_cast<int>(outputSize.Width);
@@ -549,6 +553,10 @@ void Direct3DShutdown()
 {
   // Release all GPU resources held by the OpenGL translation layer before
   // the backend (and ultimately Core) destroys the device.
+
+  // Flush all in-flight GPU work so resources referenced by the last
+  // command list are no longer in use before we release them.
+  g_backend.WaitForGpu();
 
   // Textures
   s_textureResources.clear();
@@ -570,6 +578,9 @@ void Direct3DShutdown()
   delete[] s_drawArraysScratch;
   s_drawArraysScratch = nullptr;
   s_drawArraysScratchSize = 0;
+
+  TreeRenderer::Get().Shutdown();
+  g_treeRenderBackend = nullptr;
 
   g_backend.Shutdown();
 }
@@ -1812,6 +1823,29 @@ void glDrawArrays(GLenum mode, GLint first, GLsizei count)
   }
 
   issueDrawCall(topology, count, verts);
+}
+
+// ============================================================================
+// Public accessors for native renderers (bypassing GL translation layer)
+// ============================================================================
+
+OpenGLD3D::FogState OpenGLD3D::GetFogState()
+{
+  FogState fs;
+  fs.start = s_renderState.fogStart;
+  fs.end = s_renderState.fogEnd;
+  memcpy(fs.color, s_renderState.fogColor, sizeof(float) * 4);
+  fs.enabled = s_renderState.fogEnabled;
+  return fs;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE OpenGLD3D::GetTextureSRVGPUHandle(unsigned int texId)
+{
+  if (texId < s_textureResources.size() && s_textureResources[texId].valid)
+    return g_backend.GetSRVGPUHandle(s_textureResources[texId].srvIndex);
+
+  // Fallback: return default (white) texture
+  return g_backend.GetSRVGPUHandle(g_backend.GetDefaultTextureSRVIndex());
 }
 
 void __stdcall OpenGLD3D::glMultiTexCoord2fD3D(int _target, float _x, float _y)

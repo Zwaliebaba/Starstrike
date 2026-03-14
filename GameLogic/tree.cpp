@@ -7,16 +7,17 @@
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "tree.h"
+#include "tree_render_interface.h"
 #include "soundsystem.h"
 #include "GameApp.h"
 #include "globals.h"
 #include "particle_system.h"
 #include "location.h"
 
+ITreeRenderBackend* g_treeRenderBackend = nullptr;
+
 Tree::Tree()
   : Building(),
-    m_branchDisplayListId(-1),
-    m_leafDisplayListId(-1),
     m_fireDamage(0.0f),
     m_onFire(0.0f),
     m_burnSoundPlaying(false),
@@ -30,7 +31,11 @@ Tree::Tree()
     m_branchColour(0xffffffff),
     m_leafDropRate(0) { m_type = TypeTree; }
 
-Tree::~Tree() { DeleteDisplayLists(); }
+Tree::~Tree()
+{
+  if (g_treeRenderBackend)
+    g_treeRenderBackend->ReleaseTree(m_id.GetUniqueId());
+}
 
 void Tree::Initialise(Building* _template)
 {
@@ -109,9 +114,6 @@ bool Tree::Advance()
     //
     // Spread to nearby trees
 
-    LegacyVector3 hitCentre = m_pos + m_hitcheckCentre * actualHeight;
-    float hitRadius = m_hitcheckRadius * actualHeight;
-
     for (int b = 0; b < g_app->m_location->m_buildings.Size(); ++b)
     {
       if (g_app->m_location->m_buildings.ValidIndex(b))
@@ -188,21 +190,6 @@ static void intToArray(unsigned x, unsigned char* a)
   a[3] = x & 0xFF;
 }
 
-void Tree::DeleteDisplayLists()
-{
-  if (m_branchDisplayListId != -1)
-  {
-    glDeleteLists(m_branchDisplayListId, 1);
-    m_branchDisplayListId = -1;
-  }
-
-  if (m_leafDisplayListId != -1)
-  {
-    glDeleteLists(m_leafDisplayListId, 1);
-    m_leafDisplayListId = -1;
-  }
-}
-
 void Tree::Generate()
 {
   float timeNow = GetHighResTime();
@@ -210,8 +197,6 @@ void Tree::Generate()
   m_hitcheckCentre.Zero();
   m_hitcheckRadius = 0.0f;
   m_numLeafs = 0;
-
-  DeleteDisplayLists();
 
   intToArray(m_branchColour, m_branchColourArray);
   intToArray(m_leafColour, m_leafColourArray);
@@ -225,31 +210,25 @@ void Tree::Generate()
     m_leafColourArray[3] = alpha;
   }
 
+  // Generate branch mesh
+  m_branchMesh.Clear();
   darwiniaSeedRandom(m_seed);
-  m_branchDisplayListId = glGenLists(1);
-  glNewList(m_branchDisplayListId, GL_COMPILE);
-  glColor4ubv(m_branchColourArray);
-  glBegin(GL_QUADS);
-  RenderBranch(g_zeroVector, g_upVector, m_iterations, false, true, false);
-  glEnd();
-  glEndList();
+  GenerateBranch(g_zeroVector, g_upVector, m_iterations,
+                 false, true, false, m_branchMesh);
 
+  // Generate leaf mesh
+  m_leafMesh.Clear();
   darwiniaSeedRandom(m_seed);
-  m_leafDisplayListId = glGenLists(1);
-  glNewList(m_leafDisplayListId, GL_COMPILE);
-  glColor4ubv(m_leafColourArray);
-  glBegin(GL_QUADS);
-  RenderBranch(g_zeroVector, g_upVector, m_iterations, false, false, true);
-  glEnd();
-  glEndList();
+  GenerateBranch(g_zeroVector, g_upVector, m_iterations,
+                 false, false, true, m_leafMesh);
 
-  //
-  // We now have all the leaf positions accumulated in m_hitcheckCentre
-  // So we can calculate the actual centre position, then the radius
-
+  // Compute hit-check centre from accumulated leaf positions
   m_hitcheckCentre /= static_cast<float>(m_numLeafs);
+  // Compute hit-check radius (radius-only pass, no mesh output)
   RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, false);
   m_hitcheckRadius *= 0.8f;
+
+  m_meshDirty = true;
 
   float totalTime = GetHighResTime() - timeNow;
   DebugTrace("Tree generated in {}ms\n", static_cast<int>(totalTime * 1000.0f));
@@ -257,67 +236,12 @@ void Tree::Generate()
 
 void Tree::Render(float _predictionTime)
 {
-  //RenderHitCheck();
 }
 
 bool Tree::PerformDepthSort(LegacyVector3& _centrePos)
 {
   _centrePos = m_pos + m_hitcheckCentre * m_height;
   return true;
-}
-
-void Tree::RenderAlphas(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    intToArray(m_branchColour, m_branchColourArray);
-    intToArray(m_leafColour, m_leafColourArray);
-    DeleteDisplayLists();
-  }
-
-  if (m_branchDisplayListId == -1 || m_leafDisplayListId == -1)
-    Generate();
-
-  float actualHeight = GetActualHeight(_predictionTime);
-
-  glEnable(GL_TEXTURE_2D);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glDisable(GL_CULL_FACE);
-  glDepthMask(false);
-
-  auto& mv = OpenGLD3D::GetModelViewStack();
-  mv.Push();
-  Matrix34 mat(m_front, g_upVector, m_pos);
-  mv.Multiply(mat);
-  mv.Scale(actualHeight, actualHeight, actualHeight);
-
-  if (Location::ChristmasModEnabled() == 1)
-  {
-    m_branchColourArray[0] = 180;
-    m_branchColourArray[1] = 100;
-    m_branchColourArray[2] = 50;
-  }
-
-  glColor4ubv(m_branchColourArray);
-  glCallList(m_branchDisplayListId);
-
-  if (Location::ChristmasModEnabled() != 1)
-  {
-    glColor4ubv(m_leafColourArray);
-    glCallList(m_leafDisplayListId);
-  }
-
-  mv.Pop();
-
-  glDepthMask(true);
-  glEnable(GL_CULL_FACE);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_TEXTURE_2D);
-  glDisable(GL_BLEND);
 }
 
 void Tree::Damage(float _damage)
@@ -470,6 +394,102 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
     LegacyVector3 thisFrom = _from + thisBranch * distance;
     LegacyVector3 thisTo = thisFrom + thisRightAngle * thickness * 0.4f * m_pushOut + thisBranch * (1.0f - distance) * m_pushUp;
     RenderBranch(thisFrom, thisTo, _iterations, _calcRadius, _renderBranch, _renderLeaf);
+  }
+}
+
+// Mesh-filling overload: same recursive logic as RenderBranch, but emits TreeVertex
+// data into a TreeMeshData buffer instead of calling GL.  GL_QUADS (4-vert) are
+// converted to triangle pairs (6-vert) during emission.
+void Tree::GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
+                          bool _calcRadius, bool _renderBranch, bool _renderLeaf,
+                          TreeMeshData& _mesh)
+{
+  if (_iterations == 0)
+    return;
+  _iterations--;
+
+  if (_iterations == 0)
+  {
+    if (_calcRadius)
+    {
+      float distToCentre = (_to - m_hitcheckCentre).Mag();
+      if (distToCentre > m_hitcheckRadius)
+        m_hitcheckRadius = distToCentre;
+    }
+    else if (_renderLeaf)
+    {
+      m_hitcheckCentre += _to;
+      m_numLeafs++;
+    }
+  }
+
+  LegacyVector3 rightAngleA = ((_to - _from) ^ _to).Normalise();
+  LegacyVector3 rightAngleB = (rightAngleA ^ (_to - _from)).Normalise();
+
+  LegacyVector3 thisBranch = (_to - _from);
+
+  float thickness = thisBranch.Mag();
+
+  float budsize = 0.1f;
+
+  if (_iterations == 0)
+    budsize *= m_budsize;
+
+  LegacyVector3 camRightA = rightAngleA * thickness * budsize;
+  LegacyVector3 camRightB = rightAngleB * thickness * budsize;
+
+  if ((_iterations == 0 && _renderLeaf) || (_iterations != 0 && _renderBranch))
+  {
+    // Quad A: cross-quad along rightAngleA
+    // Vertices: A = from-camRightA, B = from+camRightA, C = to+camRightA, D = to-camRightA
+    LegacyVector3 a0 = _from - camRightA;
+    LegacyVector3 a1 = _from + camRightA;
+    LegacyVector3 a2 = _to + camRightA;
+    LegacyVector3 a3 = _to - camRightA;
+
+    // Triangle 1: A, B, C
+    _mesh.vertices.push_back({a0.x, a0.y, a0.z, 0.0f, 0.0f});
+    _mesh.vertices.push_back({a1.x, a1.y, a1.z, 0.0f, 1.0f});
+    _mesh.vertices.push_back({a2.x, a2.y, a2.z, 1.0f, 1.0f});
+    // Triangle 2: A, C, D
+    _mesh.vertices.push_back({a0.x, a0.y, a0.z, 0.0f, 0.0f});
+    _mesh.vertices.push_back({a2.x, a2.y, a2.z, 1.0f, 1.0f});
+    _mesh.vertices.push_back({a3.x, a3.y, a3.z, 1.0f, 0.0f});
+
+    // Quad B: cross-quad along rightAngleB
+    LegacyVector3 b0 = _from - camRightB;
+    LegacyVector3 b1 = _from + camRightB;
+    LegacyVector3 b2 = _to + camRightB;
+    LegacyVector3 b3 = _to - camRightB;
+
+    // Triangle 3: A, B, C
+    _mesh.vertices.push_back({b0.x, b0.y, b0.z, 0.0f, 0.0f});
+    _mesh.vertices.push_back({b1.x, b1.y, b1.z, 0.0f, 1.0f});
+    _mesh.vertices.push_back({b2.x, b2.y, b2.z, 1.0f, 1.0f});
+    // Triangle 4: A, C, D
+    _mesh.vertices.push_back({b0.x, b0.y, b0.z, 0.0f, 0.0f});
+    _mesh.vertices.push_back({b2.x, b2.y, b2.z, 1.0f, 1.0f});
+    _mesh.vertices.push_back({b3.x, b3.y, b3.z, 1.0f, 0.0f});
+  }
+
+  int numBranches = 4;
+
+  for (int i = 0; i < numBranches; ++i)
+  {
+    LegacyVector3 thisRightAngle;
+    if (i == 0)
+      thisRightAngle = rightAngleA;
+    if (i == 1)
+      thisRightAngle = -rightAngleA;
+    if (i == 2)
+      thisRightAngle = rightAngleB;
+    if (i == 3)
+      thisRightAngle = -rightAngleB;
+
+    float distance = 0.3f + frand(0.6f);
+    LegacyVector3 thisFrom = _from + thisBranch * distance;
+    LegacyVector3 thisTo = thisFrom + thisRightAngle * thickness * 0.4f * m_pushOut + thisBranch * (1.0f - distance) * m_pushUp;
+    GenerateBranch(thisFrom, thisTo, _iterations, _calcRadius, _renderBranch, _renderLeaf, _mesh);
   }
 }
 

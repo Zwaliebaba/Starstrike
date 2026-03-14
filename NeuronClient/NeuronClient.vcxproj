@@ -206,6 +206,7 @@
     <ClInclude Include="text_renderer.h" />
     <ClInclude Include="text_stream_readers.h" />
     <ClInclude Include="transform.h" />
+    <ClInclude Include="tree_renderer.h" />
     <ClInclude Include="user_info.h" />
     <ClInclude Include="vector2.h" />
     <ClInclude Include="LegacyVector3.h" />
@@ -305,6 +306,7 @@
     <ClCompile Include="text_renderer.cpp" />
     <ClCompile Include="text_stream_readers.cpp" />
     <ClCompile Include="transform.cpp" />
+    <ClCompile Include="tree_renderer.cpp" />
     <ClCompile Include="tri_tri.cpp" />
     <ClCompile Include="user_info.cpp" />
     <ClCompile Include="vector2.cpp" />
@@ -321,6 +323,7 @@
     <None Include="inputdriver_values.inc" />
     <None Include="networkupdate.inc" />
     <None Include="packages.config" />
+    <None Include="Shaders\PerFrameConstants.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">
@@ -334,6 +337,32 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_p%(Filename)</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\TreePixelShader.hlsl">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_p%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\TreeVertexShader.hlsl">
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_p%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/Qembed_debug %(AdditionalOptions)</AdditionalOptions>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_p%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)CompiledShaders\%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
     </FxCompile>
     <FxCompile Include="Shaders\VertexShader.hlsl">

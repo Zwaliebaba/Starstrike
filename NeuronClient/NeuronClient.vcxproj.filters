@@ -261,6 +261,7 @@
     <ClInclude Include="ogl_extensions.h">
       <Filter>Graphics\Legacy</Filter>
     </ClInclude>
+    <ClInclude Include="tree_renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -477,6 +478,7 @@
     <ClCompile Include="servertoclientletter.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="tree_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
@@ -517,6 +519,9 @@
     <None Include="networkupdate.inc">
       <Filter>Network</Filter>
     </None>
+    <None Include="Shaders\PerFrameConstants.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
@@ -531,6 +536,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TreePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TreeVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

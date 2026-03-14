@@ -1,13 +1,13 @@
 #pragma once
 
+#include "tree_mesh_data.h"
 #include "building.h"
 
 class Tree : public Building
 {
   protected:
-    int m_branchDisplayListId;
-    int m_leafDisplayListId;
     void RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf);
+    void GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf, TreeMeshData& _mesh);
 
     LegacyVector3 m_hitcheckCentre;
     float m_hitcheckRadius;
@@ -17,12 +17,16 @@ class Tree : public Building
     float m_onFire;
     bool m_burnSoundPlaying;
 
-    float GetActualHeight(float _predictionTime);
+    public:
+      TreeMeshData m_branchMesh;
+      TreeMeshData m_leafMesh;
+      bool m_meshDirty = true;
 
-    unsigned char m_leafColourArray[4];
-    unsigned char m_branchColourArray[4];
+      unsigned char m_leafColourArray[4];
+      unsigned char m_branchColourArray[4];
 
-  public:
+      float GetActualHeight(float _predictionTime);
+
     float m_height;
     float m_budsize;
     float m_pushUp;
@@ -41,10 +45,8 @@ class Tree : public Building
 
     bool Advance() override;
 
-    void DeleteDisplayLists();
     void Generate();
     void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     bool PerformDepthSort(LegacyVector3& _centrePos) override;
 

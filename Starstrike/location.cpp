@@ -29,6 +29,7 @@
 #include "taskmanager_interface.h"
 #include "team.h"
 #include "tree.h"
+#include "tree_renderer.h"
 #include "unit.h"
 #include "water.h"
 #include "weapons.h"
@@ -1063,6 +1064,11 @@ void Location::RenderBuildingAlphas()
   //
   // Render those sorted buildings in reverse depth order
 
+  // Ensure tree texture is loaded once before the loop.
+  static int s_treeTextureId = -1;
+  if (s_treeTextureId == -1)
+    s_treeTextureId = g_app->m_resource->GetTexture("textures/laser.bmp");
+
   for (int i = s_nextSortedBuilding - 1; i >= 0; i--)
   {
     int buildingIndex = s_sortedBuildings[i].m_buildingIndex;
@@ -1070,10 +1076,20 @@ void Location::RenderBuildingAlphas()
 
     START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
 
-    if (buildingIndex > m_buildings.GetLastUpdated())
-      building->RenderAlphas(timeSinceAdvance + SERVER_ADVANCE_PERIOD);
+    float predTime = (buildingIndex > m_buildings.GetLastUpdated())
+                       ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
+                       : timeSinceAdvance;
+
+    if (building->m_type == Building::TypeTree)
+    {
+      auto* tree = static_cast<Tree*>(building);
+      bool skipLeaves = (Location::ChristmasModEnabled() == 1);
+      TreeRenderer::Get().DrawTree(tree, predTime, s_treeTextureId, skipLeaves);
+    }
     else
-      building->RenderAlphas(timeSinceAdvance);
+    {
+      building->RenderAlphas(predTime);
+    }
 
     END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
   }
@@ -1952,19 +1968,9 @@ bool Location::IsFriend(unsigned char _teamId1, unsigned char _teamId2)
 
 void Location::FlushOpenGlState()
 {
-  int treeTypeId = Building::GetTypeId("Tree");
-  for (int i = 0; i < m_buildings.Size(); ++i)
-  {
-    if (m_buildings.ValidIndex(i))
-    {
-      Building* building = m_buildings[i];
-      if (building->m_type == treeTypeId)
-      {
-        auto tree = static_cast<Tree*>(building);
-        tree->DeleteDisplayLists();
-      }
-    }
-  }
+  // Tree GPU resources are released by TreeRenderer when trees are destroyed
+  // or when TreeRenderer::Shutdown() is called. No per-tree display list
+  // cleanup is needed here any more.
 }
 
 void Location::RegenerateOpenGlState()

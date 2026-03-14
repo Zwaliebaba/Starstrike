@@ -7,6 +7,19 @@ class Matrix34;
 namespace OpenGLD3D {
   MatrixStack& GetModelViewStack();
   MatrixStack& GetProjectionStack();
+
+  // Fog state query — returns current values set by glFog* calls.
+  struct FogState
+  {
+    float start;
+    float end;
+    float color[4];
+    bool enabled;
+  };
+  FogState GetFogState();
+
+  // Texture SRV accessor — returns the GPU descriptor handle for a GL texture.
+  D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSRVGPUHandle(unsigned int texId);
 }
 
 // Mode declarations for glBegin
