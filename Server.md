@@ -2,60 +2,52 @@
 
 ## Executive Summary
 
-The original plan assumed the server could link against `NeuronClient`.
-This is not viable: Windows Server Core does not support the WinRT runtime,
-and `NeuronClient` (and even the existing `NeuronServer`) both pull in WinRT
-through their aggregate umbrella headers.
+The blocker for running the server on Windows Server Core is not the WinRT
+headers in `NeuronCore.h`.  C++/WinRT is a header-only template library —
+its `#include <winrt/…>` directives are pure compile-time type definitions
+and generate no DLL imports unless the WinRT types are actually instantiated
+in code.  Since the server never instantiates any WinRT type, those headers
+are harmless and the existing `NeuronServer` PCH chain can stay unchanged.
 
-The contamination must be eliminated at two independent sources:
+The real blocker is the direct dependency on `GameApp.h` in three server
+source files:
 
-| Source | File | Symbol |
-|--------|------|--------|
-| Aggregate PCH chain | `NeuronServer.h` → `NeuronCore.h` | `#include <winrt/…>` + `using namespace winrt` |
-| Aggregate PCH chain | `NeuronClient.h` → `NeuronCore.h` | same |
-| Direct GameApp include | `server.cpp`, `servertoclient.cpp`, `preferences.cpp` | `#include "GameApp.h"` → `GameMain` → WinRT interfaces |
+| File | Dependency | Problem |
+|------|-----------|---------|
+| `NeuronClient/server.cpp` | `#include "GameApp.h"` | Requires `GameMain` (NeuronClient) as a compile-time dependency; `g_app` is never initialised in a server process |
+| `NeuronClient/servertoclient.cpp` | `#include "GameApp.h"` | Same |
+| `NeuronClient/preferences.cpp` | `#include "GameApp.h"` | Same |
 
-Both sources must be cut before the server can compile on Server Core.
+`GameApp` inherits from `GameMain` which is defined in `NeuronClient`.
+Pulling in `GameApp.h` therefore forces `NeuronClient` — the full
+rendering, audio, and input stack — onto the server's compile and link
+graph.  More critically, `g_app` (the `GameApp*` global) is never
+initialised in a standalone server process; every `g_app->` dereference is
+a null-pointer crash at runtime.
+
+The fix is a single preprocessor flag (`SERVER_BUILD`) that guards those
+includes and dereferences out of the server compilation units.
 
 ---
 
-## 1. WinRT Contamination — Exact Root Causes
+## 1. Root Cause Analysis
 
-### 1.1 The NeuronCore.h aggregate header (the primary poison)
+### 1.1 Why NeuronCore.h's WinRT includes are NOT the problem
 
-`NeuronCore/NeuronCore.h` lines 77–84:
+`NeuronCore/NeuronCore.h` includes six C++/WinRT headers (lines 77–84) and
+`using namespace winrt`.  These are **compile-time template definitions
+only**.  The C++/WinRT library is header-only: a `#include <winrt/…>` line
+brings in type aliases, concept constraints, and template specialisations —
+none of which produce object code or DLL import records unless you actually
+instantiate a WinRT type in a translation unit.
 
-```cpp
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.Globalization.h>
-#include <winrt/Windows.Storage.Streams.h>
-#include <winrt/Windows.System.Threading.Core.h>
-#include <winrt/Windows.System.UserProfile.h>
-#include <winrt/Windows.System.h>
-using namespace winrt;
-```
+Because the server code never creates a `winrt::` object, calls a WinRT
+factory, or co-awaits a WinRT async operation, the linker emits zero
+`Windows.Foundation.dll` (or similar) import entries.  The NeuronServer PCH
+chain — `pch.h` → `NeuronServer.h` → `NeuronCore.h` — is therefore safe
+and does not need to change.
 
-Every project in the solution routes its `pch.h` through one of the
-aggregate umbrella headers that include `NeuronCore.h`:
-
-```
-NeuronServer/pch.h
-  → NeuronServer/NeuronServer.h
-      → NeuronCore/NeuronCore.h          ← WinRT enters here
-
-NeuronClient/pch.h
-  → NeuronClient/NeuronClient.h
-      → NeuronCore/NeuronCore.h          ← WinRT enters here
-      → <winrt/Windows.Devices.Enumeration.h>
-      → <winrt/Windows.UI.Core.h>
-      → <winrt/Windows.UI.Popups.h>
-```
-
-Because every `.cpp` file begins with `#include "pch.h"`, every translation
-unit in both libraries is already WinRT-contaminated before a single
-project-specific header is reached.
-
-### 1.2 Direct GameApp.h includes
+### 1.2 Direct GameApp.h includes — the actual blocker
 
 Three server-related source files explicitly `#include "GameApp.h"`:
 
@@ -136,67 +128,24 @@ and serialisation functions.
 
 ## 4. Fix Strategy
 
-Two orthogonal fixes, applied together:
+One targeted fix:
 
-### Fix A — Replace the NeuronServer umbrella header with a WinRT-free version
+### Add `SERVER_BUILD` to `NeuronServer/NeuronServer.h`
 
-`NeuronServer/NeuronServer.h` currently chains through `NeuronCore.h`.
-Replace it with a hand-curated list of individual NeuronCore headers
-that are each WinRT-free:
+`NeuronServer.h` currently contains a single line: `#include "NeuronCore.h"`.
+Add one preprocessor definition before that include:
 
 ```cpp
-// NeuronServer/NeuronServer.h  —  NEW CONTENT (WinRT-free)
+// NeuronServer/NeuronServer.h  —  minimal addition
 #pragma once
-
-#define TARGET_MSVC
-#define _CRT_SECURE_NO_WARNINGS
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#define SERVER_BUILD                // enables conditional compilation guards
-
-#pragma warning(disable:4201)
-#pragma warning(disable:4238)
-#pragma warning(disable:4244)
-#pragma warning(disable:4324)
-
-// Standard C++ subset needed by server
-#include <algorithm>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <string>
-#include <format>
-#include <memory>
-#include <functional>
-
-#define NOMINMAX
-#define NODRAWTEXT
-#define NOMCX
-#define NOSERVICE
-#define NOHELP
-
-// Win32 networking — NOT WinRT
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <Windows.h>
-// NOTE: No <hstring.h>, <unknwn.h>, <winrt/…> here
-
-// Individual NeuronCore utility headers (all WinRT-free):
-#include "Debug.h"      // DEBUG_ASSERT, DebugTrace, ASSERT_TEXT
-#include "GameMath.h"   // basic math helpers
-// LegacyVector3.h, llist.h, darray.h etc. included on-demand by server headers
-
-#pragma comment(lib, "Ws2_32.lib")
+#define SERVER_BUILD    // gates GameApp.h dependencies out of server TUs
+#include "NeuronCore.h"
 ```
 
-`NeuronServer/pch.h` is unchanged (`#include "NeuronServer.h"`) — it
-inherits the new clean content automatically.
-
-### Fix B — Introduce `#ifdef SERVER_BUILD` guards in server source files
-
-The `SERVER_BUILD` macro defined in `NeuronServer.h` is picked up by the
-server PCH before any server `.cpp` file is processed.  Each of the
-offending references is then wrapped so the client build is unaffected.
+`NeuronCore.h` and the rest of the PCH chain are left entirely unchanged.
+The `SERVER_BUILD` macro is picked up by the NeuronServer PCH before any
+server `.cpp` file is processed, so all five offending references are
+guarded without touching the client build.
 
 ---
 
@@ -467,9 +416,9 @@ The GameLogic and Starstrike include paths are needed for `team.h`,
 
 **Important:** Do NOT add a project reference from `NeuronServer` to
 `NeuronClient`.  Adding those files as direct `<ClCompile>` items in
-`NeuronServer.vcxproj` means they compile with `NeuronServer`'s clean PCH
-(picked up via `/Yu"pch.h"` from the NeuronServer project) instead of
-NeuronClient's WinRT-contaminated one.
+`NeuronServer.vcxproj` means they compile with `NeuronServer`'s PCH
+(which defines `SERVER_BUILD`) instead of NeuronClient's PCH (which does
+not), so the `#ifdef SERVER_BUILD` guards take effect correctly.
 
 ---
 
@@ -499,7 +448,7 @@ NeuronClient's WinRT-contaminated one.
 
 ```cpp
 #pragma once
-#include "NeuronServer.h"   // inherits SERVER_BUILD + clean Win32 includes
+#include "NeuronServer.h"   // defines SERVER_BUILD, then includes NeuronCore.h
 ```
 
 ### `StarstrikeServer/pch.cpp`
@@ -600,11 +549,16 @@ Remove the now-dead in-process server code from the client:
 Windows Server Core (`mcr.microsoft.com/windows/servercore:ltsc2022`):
 - Supports Win32 API, WinSock2, and kernel32 — all that the server needs
 - Ships with `Ws2_32.dll`, `kernel32.dll`, `ntdll.dll`
-- **Does not ship the WinRT runtime** (`Windows.Foundation.dll`, etc.)
 - Does not ship DXGI, Direct3D, or any graphics stack
 
-After the fixes in sections 5–7, the server binary has zero WinRT imports
-in its import table, making it fully compatible with Server Core.
+Because the server never instantiates a WinRT type, the compiled binary
+will have no `Windows.Foundation.dll` (or similar) entries in its import
+table — even though the C++/WinRT template headers are pulled in through
+`NeuronCore.h`.  The WinRT runtime being absent from Server Core is
+therefore irrelevant to the server binary.
+
+Use `dumpbin /imports StarstrikeServer.exe` after the build to confirm: no
+WinRT DLL imports should appear.
 
 The MSVC C++ runtime (`vcruntime140.dll`, `msvcp140.dll`) is not present on
 Server Core by default and must be distributed alongside the binary.
@@ -670,7 +624,7 @@ ENTRYPOINT ["StarstrikeServer.exe"]
 
 ## 10. Implementation Order
 
-1. **Modify `NeuronServer/NeuronServer.h`** — replace `#include "NeuronCore.h"` with the curated WinRT-free content (section 4, Fix A).  This is the single change with the widest impact.
+1. **Add `#define SERVER_BUILD` to `NeuronServer/NeuronServer.h`** — one line before the existing `#include "NeuronCore.h"`.  This single change activates all guards below without touching any other file in the existing projects.
 
 2. **Add `#ifdef SERVER_BUILD` guards** in the five locations across `server.cpp`, `servertoclient.cpp`, and `preferences.cpp` (section 5).
 
@@ -684,7 +638,7 @@ ENTRYPOINT ["StarstrikeServer.exe"]
 
 7. **Update `Starstrike.slnx`** — add `StarstrikeServer` project entry.
 
-8. **Verify build** — `msbuild StarstrikeServer\StarstrikeServer.vcxproj /p:Configuration=Release /p:Platform=x64`.  Use `dumpbin /imports StarstrikeServer.exe` and confirm no `Windows.Foundation.dll` or other WinRT DLLs appear in the import table.
+8. **Verify build** — `msbuild StarstrikeServer\StarstrikeServer.vcxproj /p:Configuration=Release /p:Platform=x64`.  Run `dumpbin /imports StarstrikeServer.exe` and confirm no `Windows.Foundation.dll` or other WinRT DLLs appear in the import table.
 
 9. **Clean up client** — remove `m_server` from `GameApp.h`, remove server init/advance/cleanup from `main.cpp`, remove bypass branch from `clienttoserver.cpp` (section 8).
 
@@ -696,11 +650,11 @@ ENTRYPOINT ["StarstrikeServer.exe"]
 
 ```
 StarstrikeServer.exe
-  └── NeuronServer.lib  [SERVER_BUILD PCH — zero WinRT imports]
+  └── NeuronServer.lib  [SERVER_BUILD defined — GameApp.h excluded]
         ├── server.cpp / servertoclient.cpp
         ├── servertoclientletter.cpp / networkupdate.cpp
         ├── preferences.cpp
-        └── NeuronCore.lib  [individual net_*, math, debug headers — WinRT-free]
+        └── NeuronCore.lib  [winrt/ headers present but unused → no WinRT DLL imports]
               ├── net_lib / net_socket / net_socket_listener
               ├── net_thread / net_mutex / net_udp_packet
               └── LegacyVector3, Debug, GameMath, llist, darray …
@@ -717,7 +671,7 @@ Starstrike.exe  [unchanged WinRT/DirectX client — no m_server]
 
 | Action | File | What changes |
 |--------|------|-------------|
-| **Edit** | `NeuronServer/NeuronServer.h` | Replace `#include "NeuronCore.h"` with curated WinRT-free header list; add `#define SERVER_BUILD` |
+| **Edit** | `NeuronServer/NeuronServer.h` | Add `#define SERVER_BUILD` before the existing `#include "NeuronCore.h"` (one line) |
 | **Edit** | `NeuronClient/server.cpp` | Guard `#include "GameApp.h"`, add `s_server` static, guard bypass paths |
 | **Edit** | `NeuronClient/servertoclient.cpp` | Guard `#include "GameApp.h"`, guard bypass path in constructor |
 | **Edit** | `NeuronClient/preferences.cpp` | Guard `#include "GameApp.h"` + UI headers, guard `g_app->m_resource` block, guard `g_prefsManager` definition |
