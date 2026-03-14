@@ -19,36 +19,6 @@
 #include "rocket.h"
 
 //*****************************************************************************
-// Private Functions
-//*****************************************************************************
-
-#ifdef SCRIPT_TEST_ENABLED
-void Script::ReportError(LevelFile const* _levelFile, char* _fmt, ...)
-{
-  char buf[512];
-  va_list ap;
-  va_start(ap, _fmt);
-  vsnprintf(buf, sizeof(buf), _fmt, ap);
-
-  char location[128];
-
-  if (_levelFile)
-  {
-    snprintf(location, sizeof(location), " (%s %s line: %d)", _levelFile->m_mapFilename + 12, _levelFile->m_missionFilename + 12, m_in->m_lineNum);
-  }
-  else { snprintf(location, sizeof(location), " (no map, no mission, line: %d)", m_in->m_lineNum); }
-
-  strncat(buf, location, sizeof(buf) - strlen(buf) - 1);
-
-  if (g_app->m_testHarness) { g_app->m_testHarness->PrintError(buf); }
-  else
-  {
-    DEBUG_ASSERT(false); // Error message is in buf
-  }
-}
-#endif // SCRIPT_TEST_ENABLED
-
-//*****************************************************************************
 // Public Functions
 //*****************************************************************************
 
@@ -388,10 +358,6 @@ void Script::RunScript(const char* _filename)
 {
   if (strstr(_filename, ".txt"))
   {
-#ifdef SCRIPT_TEST_ENABLED
-    TestScript(_filename);
-#endif
-
     // Run a script, speficied by filename
     char fullFilename[256] = "scripts/";
     strncat(fullFilename, _filename, sizeof(fullFilename) - strlen(fullFilename) - 1);
@@ -704,158 +670,7 @@ void Script::AdvanceScript()
   }
 }
 
-#ifdef SCRIPT_TEST_ENABLED
-void Script::TestScript(char* _filename)
-{
-  char fullFilename[256] = "scripts/";
-  strncat(fullFilename, _filename, sizeof(fullFilename) - strlen(fullFilename) - 1);
-  m_in = g_app->m_resource->GetTextReader(fullFilename);
-  if (!m_in) { ReportError(nullptr, "Script file not found"); }
-
-  LevelFile* levelFile = nullptr;
-
-  while (m_in->ReadLine())
-  {
-    if (!m_in->TokenAvailable())
-      continue;
-
-    char* firstWord = m_in->GetNextToken();
-    int opCode = GetOpCode(firstWord);
-    char* nextWord = nullptr;
-    float nextFloat = 0.0f;
-    if (m_in->TokenAvailable())
-    {
-      nextWord = m_in->GetNextToken();
-      nextFloat = atof(nextWord);
-    }
-
-    switch (opCode)
-    {
-    case OpCamMove:
-      {
-        if (!nextWord)
-        {
-          ReportError(levelFile, "CamMove called with no mount specified");
-          break;
-        }
-        if (!levelFile)
-        {
-          ReportError(levelFile, "CamMove called when not in a location");
-          break;
-        }
-        if (!levelFile->GetCameraMount(nextWord))
-        {
-          ReportError(levelFile, "CamMove called with invalid mount name: %s", nextWord);
-          break;
-        }
-        if (!m_in->TokenAvailable())
-        {
-          ReportError(levelFile, "CamMove called with no duration parameter");
-          break;
-        }
-        float duration = atof(m_in->GetNextToken());
-        if (duration < 0.01f || duration > 20.0f)
-        {
-          ReportError(levelFile, "CamMove called with invalid duration parameter: %f", duration);
-          break;
-        }
-        break;
-      }
-    case OpCamCut:
-      if (!nextWord)
-      {
-        ReportError(levelFile, "CamCut called with no mount specified");
-        break;
-      }
-      if (!levelFile)
-      {
-        ReportError(levelFile, "CamCut called when not in a location");
-        break;
-      }
-      if (!levelFile->GetCameraMount(nextWord))
-      {
-        ReportError(levelFile, "CamCut called with invalid mount name: %s", nextWord);
-        break;
-      }
-      break;
-    case OpCamAnim:
-      if (!nextWord)
-      {
-        ReportError(levelFile, "CamAnim called with no anim name specified");
-        break;
-      }
-      if (g_app->m_location->m_levelFile->GetCameraAnimId(nextWord) == -1)
-      {
-        ReportError(levelFile, "CamAnim called with bad anim name specified");
-        break;
-      }
-      break;
-    case OpEnterLocation:
-      {
-        if (!nextWord)
-        {
-          ReportError(levelFile, "EnterLocation called with no location name specified");
-          break;
-        }
-        GlobalLocation* globalLoc = g_app->m_globalWorld->GetLocation(nextWord);
-        if (!globalLoc)
-        {
-          ReportError(levelFile, "EnterLocation called with an invalid location name: %s", nextWord);
-          break;
-        }
-        delete levelFile;
-        levelFile = new LevelFile(globalLoc->m_missionFilename.c_str(), globalLoc->m_mapFilename.c_str());
-        break;
-      }
-    case OpExitLocation:
-      delete levelFile;
-      levelFile = nullptr;
-      break;
-    case OpWaitSay:
-    case OpWaitCam:
-      break;
-    case OpSay:
-      if (!nextWord)
-      {
-        ReportError(levelFile, "Say called with no language symbol specified");
-        break;
-      }
-      if (!ISLANGUAGEPHRASE_ANY(nextWord))
-      {
-        ReportError(levelFile, "Say called with an invalid language symbol: %s", nextWord);
-        break;
-      }
-      break;
-    case OpWait:
-      if (nextFloat < 0.01f || nextFloat > 20.0f)
-      {
-        ReportError(levelFile, "Wait called with invalid duration: %f", nextFloat);
-        break;
-      }
-      break;
-
-    case OpHighlight:
-      if (!g_app->m_location->GetBuilding((int)nextFloat))
-      {
-        ReportError(levelFile, "HighlightBuilding called with invalid buildingId: %d", (int)nextFloat);
-      }
-      break;
-
-    case OpClearHighlights:
-      break;
-
-    default:
-      ReportError(levelFile, "Invalid script command: %s", firstWord);
-      break;
-    }
-  }
-
-  delete m_in;
-  m_in = nullptr;
-}
-#endif // SCRIPT_TEST_ENABLED
-
-static char* g_opCodeNames[] = {
+static const char* g_opCodeNames[] = {
   "CamCut", "CamMove", "CamAnim", "CamFov", "CamBuildingFocus", "CamBuildingApproach", "CamLocationFocus", "CamGlobalWorldFocus",
   "CamReset", "EnterLocation", "ExitLocation", "Say", "ShutUp", "Wait", "WaitSay", "WaitCam", "WaitFade", "WaitRocket", "WaitPlayerNotBusy",
   "Highlight", "ClearHighlights", "TriggerSound", "StopSound", "DemoGesture", "GiveResearch", "SetMission", "GameOver", "ResetResearch",
@@ -866,7 +681,7 @@ static char* g_opCodeNames[] = {
 
 int Script::GetOpCode(const char* _word)
 {
-  DEBUG_ASSERT(sizeof(g_opCodeNames) / sizeof(char *) == OpNumOps);
+  DEBUG_ASSERT(sizeof(g_opCodeNames) / sizeof(const char *) == OpNumOps);
 
   for (unsigned int i = 0; i < OpNumOps; ++i)
   {

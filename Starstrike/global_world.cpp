@@ -77,7 +77,7 @@ GlobalEventCondition::~GlobalEventCondition()
   delete [] m_cutScene;
 }
 
-void GlobalEventCondition::SetStringId(char* _stringId)
+void GlobalEventCondition::SetStringId(const char* _stringId)
 {
   delete [] m_stringId;
   m_stringId = NewStr(_stringId);
@@ -242,36 +242,6 @@ void GlobalEventAction::Write(FileWriter* _out)
 
 void GlobalEventAction::Execute()
 {
-#ifdef TEST_HARNESS_ENABLED
-  switch (m_type)
-  {
-  case SetMission:
-    {
-      if (g_app->m_testHarness)
-      {
-        fprintf(g_app->m_testHarness->m_out, "%sSetting Mission: %s in location %s\n", g_app->m_testHarness->m_indent, m_filename.c_str(),
-                g_app->m_globalWorld->GetLocationName(m_locationId));
-      }
-      break;
-    }
-  case RunScript:
-    if (g_app->m_testHarness)
-    {
-      fprintf(g_app->m_testHarness->m_out, "%sRunning script: %s\n", g_app->m_testHarness->m_indent, m_filename.c_str());
-    }
-    break;
-  case MakeAvailable:
-    if (g_app->m_testHarness)
-    {
-      fprintf(g_app->m_testHarness->m_out, "%sMaking location available: %s\n", g_app->m_testHarness->m_indent,
-              g_app->m_globalWorld->GetLocationName(m_locationId));
-    }
-    break;
-  default:
-    break;
-  }
-#endif // TEST_HARNESS_ENABLED
-
   switch (m_type)
   {
   case SetMission:
@@ -303,21 +273,6 @@ void GlobalEventAction::Execute()
 // ****************************************************************************
 
 GlobalEvent::GlobalEvent() {}
-
-GlobalEvent::GlobalEvent(GlobalEvent& _other)
-{
-  for (int i = 0; i < _other.m_conditions.Size(); ++i)
-  {
-    auto newCond = new GlobalEventCondition(*(_other.m_conditions.GetData(i)));
-    m_conditions.PutDataAtEnd(newCond);
-  }
-
-  for (int i = 0; i < _other.m_actions.Size(); ++i)
-  {
-    auto newAction = new GlobalEventAction(*(_other.m_actions.GetData(i)));
-    m_actions.PutDataAtEnd(newAction);
-  }
-}
 
 bool GlobalEvent::Evaluate()
 {
@@ -1209,33 +1164,6 @@ GlobalWorld::GlobalWorld()
   m_globalInternet = new GlobalInternet();
   m_sphereWorld = new SphereWorld();
   m_research = new GlobalResearch();
-}
-
-GlobalWorld::GlobalWorld(GlobalWorld& _other)
-  : m_globalInternet(nullptr),
-    m_sphereWorld(nullptr),
-    m_myTeamId(_other.m_myTeamId),
-    m_nextLocationId(0),
-    m_nextBuildingId(0),
-    m_locationRequested(-1)
-{
-  m_research = new GlobalResearch();
-
-  for (int i = 0; i < _other.m_locations.Size(); ++i)
-  {
-    auto newLoc = new GlobalLocation(*(_other.m_locations[i]));
-    m_locations.PutDataAtEnd(newLoc);
-  }
-  for (int i = 0; i < _other.m_buildings.Size(); ++i)
-  {
-    auto newBuilding = new GlobalBuilding(*(_other.m_buildings[i]));
-    m_buildings.PutDataAtEnd(newBuilding);
-  }
-  for (int i = 0; i < _other.m_events.Size(); ++i)
-  {
-    auto newEvent = new GlobalEvent(*(_other.m_events[i]));
-    m_events.PutDataAtEnd(newEvent);
-  }
 }
 
 GlobalWorld::~GlobalWorld()

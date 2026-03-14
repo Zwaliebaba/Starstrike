@@ -59,7 +59,7 @@ public:
     bool DoesRayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
                     float _rayLen, LegacyVector3 *_pos, LegacyVector3 *norm );
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 };
 
 

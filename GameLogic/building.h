@@ -140,14 +140,14 @@ class Building : public WorldObject
     virtual void OperatePort(int _portId, int _teamId);
     virtual int GetPortOperatorCount(int _portId, int _teamId);
 
-    virtual char* GetObjectiveCounter();
+    virtual const char* GetObjectiveCounter();
 
     virtual bool DoesSphereHit(const LegacyVector3& _pos, float _radius);
     virtual bool DoesShapeHit(Shape* _shape, Matrix34 _transform);
     virtual bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen = 1e10,
                             LegacyVector3* _pos = nullptr, LegacyVector3* _norm = nullptr); // pos/norm will not always be available
 
-    virtual void ListSoundEvents(LList<char*>* _list);
+    virtual void ListSoundEvents(LList<const char*>* _list);
 
     virtual void Read(TextReader* _in, bool _dynamic); // Use these to read/write additional building-specific
     virtual void Write(FileWriter* _out); // data to the level files
@@ -155,12 +155,12 @@ class Building : public WorldObject
     virtual int GetBuildingLink(); // Allows a building to link to another
     virtual void SetBuildingLink(int _buildingId); // eg control towers
 
-    static char* GetTypeName(int _type);
+    static const char* GetTypeName(int _type);
     static int GetTypeId(const char* _name);
     static Building* CreateBuilding(int _type);
-    static Building* CreateBuilding(char* _name);
+    static Building* CreateBuilding(const char* _name);
 
-    static char* GetTypeNameTranslated(int _type);
+    static const char* GetTypeNameTranslated(int _type);
 };
 
 class BuildingPort

@@ -60,10 +60,10 @@ public:
 	void AdvanceSender		();
     void Advance			();
 
-    void LoadHistory        ( char *_filename );
-    void SaveHistory        ( char *_filename );
+    void LoadHistory        ( const char *_filename );
+    void SaveHistory        ( const char *_filename );
 
     static int   ConvertIPToInt( const char *_ip );
-    static char *ConvertIntToIP( const int _ip );
+    static const char *ConvertIntToIP( const int _ip );
 };
 

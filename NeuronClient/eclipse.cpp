@@ -322,16 +322,16 @@ void EclShutdown()
   dirtyrects.EmptyAndDelete();
 }
 
-char* EclGetCurrentButton() { return currentButton; }
+const char* EclGetCurrentButton() { return currentButton; }
 
-char* EclGetCurrentClickedButton()
+const char* EclGetCurrentClickedButton()
 {
   if (lmb)
     return currentButton;
   return "None";
 }
 
-char* EclGenerateUniqueWindowName(char* name)
+const char* EclGenerateUniqueWindowName(const char* name)
 {
   static char uniqueName[SIZE_ECLWINDOW_NAME];
 
@@ -391,7 +391,7 @@ void EclRemovePopup()
   popupWindow[SIZE_ECLWINDOW_NAME - 1] = '\0';
 }
 
-void EclRemoveWindow(char* name)
+void EclRemoveWindow(const char* name)
 {
   int index = EclGetWindowIndex(name);
   if (index != -1)
@@ -412,7 +412,7 @@ void EclRemoveWindow(char* name)
   else {}
 }
 
-void EclSetWindowPosition(char* name, int x, int y)
+void EclSetWindowPosition(const char* name, int x, int y)
 {
   EclWindow* window = EclGetWindow(name);
   if (window)
@@ -425,7 +425,7 @@ void EclSetWindowPosition(char* name, int x, int y)
   else {}
 }
 
-void EclSetWindowSize(char* name, int w, int h)
+void EclSetWindowSize(const char* name, int w, int h)
 {
   EclWindow* window = EclGetWindow(name);
   if (window)
@@ -441,7 +441,7 @@ void EclSetWindowSize(char* name, int w, int h)
   else {}
 }
 
-void EclBringWindowToFront(char* name)
+void EclBringWindowToFront(const char* name)
 {
   int index = EclGetWindowIndex(name);
   if (index != -1)
@@ -475,7 +475,7 @@ bool EclIsTextEditing()
   return (currentWindow && strcmp(currentWindow->m_currentTextEdit, "None") != 0);
 }
 
-int EclGetWindowIndex(char* name)
+int EclGetWindowIndex(const char* name)
 {
   for (int i = 0; i < windows.Size(); ++i)
   {
@@ -487,7 +487,7 @@ int EclGetWindowIndex(char* name)
   return -1;
 }
 
-EclWindow* EclGetWindow(char* name)
+EclWindow* EclGetWindow(const char* name)
 {
   int index = EclGetWindowIndex(name);
   if (index == -1)
@@ -507,7 +507,7 @@ EclWindow* EclGetWindow(int x, int y)
   return nullptr;
 }
 
-void EclMaximiseWindow(char* name)
+void EclMaximiseWindow(const char* name)
 {
   EclUnMaximise();
   EclWindow* w = EclGetWindow(name);
@@ -638,9 +638,9 @@ bool EclRectangleOverlap(int x1, int y1, int w1, int h1, int x2, int y2, int w2,
   return false;
 }
 
-char* EclGetCurrentFocus() { return windowFocus; }
+const char* EclGetCurrentFocus() { return windowFocus; }
 
-void EclSetCurrentFocus(char* name)
+void EclSetCurrentFocus(const char* name)
 {
   if (strlen(name) < SIZE_ECLWINDOW_NAME)
   {

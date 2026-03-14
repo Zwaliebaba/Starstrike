@@ -714,7 +714,7 @@ bool Spider::RenderPixelEffect(float _predictionTime)
 
 bool Spider::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centrePos, m_radius); }
 
-void Spider::ListSoundEvents(LList<char*>* _list)
+void Spider::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

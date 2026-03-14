@@ -473,7 +473,7 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
   }
 }
 
-void Tree::ListSoundEvents(LList<char*>* _list)
+void Tree::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

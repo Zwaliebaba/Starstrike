@@ -88,6 +88,14 @@ class ApplyOtherButton : public DarwiniaButton
   }
 };
 
+PrefsOtherWindow::~PrefsOtherWindow()
+{
+  for (int i = 0; i < m_languages.Size(); ++i)
+  {
+    delete[] m_languages[i];
+  }
+}
+
 PrefsOtherWindow::PrefsOtherWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_otheroptions"))
 {

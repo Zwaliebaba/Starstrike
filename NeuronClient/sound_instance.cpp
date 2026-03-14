@@ -182,16 +182,18 @@ void SoundInstance::SetEventName( char const *_entityName, char const *_eventNam
     DEBUG_ASSERT(_entityName && _eventName);
 	DEBUG_ASSERT(g_app->m_soundSystem);
 
-	m_eventName = (char*)malloc(strlen(_entityName) + strlen(_eventName) + 2);
-	strcpy(m_eventName, _entityName);
-	strcat(m_eventName, " ");
-	strcat(m_eventName, _eventName);
+	size_t entityLen = strlen(_entityName);
+	size_t eventLen = strlen(_eventName);
+	m_eventName = (char*)malloc(entityLen + eventLen + 2);
+	memcpy(m_eventName, _entityName, entityLen);
+	m_eventName[entityLen] = ' ';
+	memcpy(m_eventName + entityLen + 1, _eventName, eventLen + 1);
 }
 
 
-char *SoundInstance::GetPositionTypeName( int _type )
+const char *SoundInstance::GetPositionTypeName( int _type )
 {
-    static char *types[] = {    "Type2D",
+    static const char *types[] = {    "Type2D",
                                 "Type3DStationary",
                                 "Type3DAttachedToObject",
                                 "TypeInEditor"
@@ -206,9 +208,9 @@ char *SoundInstance::GetPositionTypeName( int _type )
 }
 
 
-char *SoundInstance::GetInstanceTypeName( int _type )
+const char *SoundInstance::GetInstanceTypeName( int _type )
 {
-    static char *types[] = {    "Polyphonic",
+    static const char *types[] = {    "Polyphonic",
                                 "MonophonicRandom",
                                 "MonophonicNearest"
                             };
@@ -222,9 +224,9 @@ char *SoundInstance::GetInstanceTypeName( int _type )
 }
 
 
-char *SoundInstance::GetLoopTypeName( int _type )
+const char *SoundInstance::GetLoopTypeName( int _type )
 {
-    static char *types[] = {    "PlayOnce",
+    static const char *types[] = {    "PlayOnce",
                                 "Loop",
                                 "LoopADSR"
                                 };
@@ -238,9 +240,9 @@ char *SoundInstance::GetLoopTypeName( int _type )
 }
 
 
-char *SoundInstance::GetSourceTypeName( int _type )
+const char *SoundInstance::GetSourceTypeName( int _type )
 {
-    static char *types[] = {    "Sample",
+    static const char *types[] = {    "Sample",
                                 "SampleGroupRandom"
                                 };
 
@@ -518,7 +520,7 @@ void SoundInstance::OpenStream( bool _keepCurrentStream )
     m_cachedSampleHandle = NULL;
 	g_deletingCachedSampleHandle = false;
 
-	char *sampleName = m_soundName;
+	char const *sampleName = m_soundName;
     if (m_sourceType == SampleGroupRandom)
     {
 		SampleGroup *group = g_app->m_soundSystem->GetSampleGroup( m_soundName );
@@ -1042,7 +1044,7 @@ char *SoundInstance::GetDescriptor()
 {
     static char descriptor[256];
 
-    char *looping = GetLoopTypeName( m_loopType );
+    const char *looping = GetLoopTypeName( m_loopType );
     char const *inEditor = m_positionType == TypeInEditor ? " editor" : "       ";
 
     char priority[32];

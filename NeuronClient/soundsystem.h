@@ -57,8 +57,8 @@ class SoundSourceBlueprint
     LList<SoundEventBlueprint*> m_events;
 
     static int GetSoundSoundType(const char* _name);
-    static char* GetSoundSourceName(int _type);
-    static void ListSoundEvents(int _type, LList<char*>* _list);
+    static const char* GetSoundSourceName(int _type);
+    static void ListSoundEvents(int _type, LList<const char*>* _list);
 };
 
 //*****************************************************************************
@@ -96,11 +96,11 @@ class SampleGroup
 {
   public:
     char m_name[256];
-    LList<char*> m_samples;
+    LList<const char*> m_samples;
 
     ~SampleGroup();
-    void SetName(char* _name);
-    void AddSample(char* _sample);
+    void SetName(const char* _name);
+    void AddSample(const char* _sample);
 };
 
 //*****************************************************************************
@@ -169,18 +169,18 @@ class SoundSystem
     void ShutdownSound(SoundInstance* _instance); // Stops / deletes sound + removes refs
 
     int IsSoundPlaying(SoundInstanceId _id);
-    int NumInstancesPlaying(WorldObjectId _id, char* _eventName);
-    int NumInstances(WorldObjectId _id, char* _eventName);
+    int NumInstancesPlaying(WorldObjectId _id, const char* _eventName);
+    int NumInstances(WorldObjectId _id, const char* _eventName);
 
     int NumSoundInstances();
     int NumChannelsUsed();
     int NumSoundsDiscarded();
 
-    void TriggerEntityEvent(Entity* _entity, char* _eventName);
-    void TriggerBuildingEvent(Building* _building, char* _eventName);
-    void TriggerOtherEvent(WorldObject* _other, char* _eventName, int _type);
+    void TriggerEntityEvent(Entity* _entity, const char* _eventName);
+    void TriggerBuildingEvent(Building* _building, const char* _eventName);
+    void TriggerOtherEvent(WorldObject* _other, const char* _eventName, int _type);
 
-    void StopAllSounds(WorldObjectId _id, char* _eventName = nullptr); // Pass in NULL to stop every event.
+    void StopAllSounds(WorldObjectId _id, const char* _eventName = nullptr); // Pass in NULL to stop every event.
     // Full event name required, eg "Darwinian SeenThreat"
 
     void StopAllDSPEffects();
@@ -194,9 +194,9 @@ class SoundSystem
     // Tests that file names and file formats are OK, returns an error code from the SoundSource enum
     bool IsSampleUsed(const char* _soundName); // Looks to see if that sound name is used in any blueprints
 
-    SampleGroup* GetSampleGroup(char* _name);
-    SampleGroup* NewSampleGroup(char* _name = nullptr);
-    bool RenameSampleGroup(char* _oldName, char* _newName);
+    SampleGroup* GetSampleGroup(const char* _name);
+    SampleGroup* NewSampleGroup(const char* _name = nullptr);
+    bool RenameSampleGroup(const char* _oldName, const char* _newName);
 
     SoundInstance* GetSoundInstance(SoundInstanceId id);
 };

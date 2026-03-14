@@ -1096,7 +1096,7 @@ char* Engineer::GetCurrentAction()
   return LANGUAGEPHRASE("engineer_idle");
 }
 
-void Engineer::ListSoundEvents(LList<char*>* _list)
+void Engineer::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

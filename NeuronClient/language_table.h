@@ -37,7 +37,7 @@ private:
 	void RebuildTable( HashTable<int> *_phrases, std::ostringstream &stream, InputMode _mood );
 
 public:
-	LangTable   (char *_filename);
+	LangTable   (const char *_filename);
 	~LangTable  ();
 
     void ParseLanguageFile    (char const *_filename);
@@ -57,7 +57,7 @@ public:
 };
 
 
-LList <char *> *WordWrapText(const char *_string,
+LList <const char *> *WordWrapText(const char *_string,
                              float _linewidth,
                              float _fontWidth,
                              bool _wrapToWindow=true);

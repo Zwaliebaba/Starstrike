@@ -26,7 +26,7 @@ public:
     bool DoesRayHit             (LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
                                  float _rayLen=1e10, LegacyVector3 *_pos=NULL, LegacyVector3 *_norm=NULL);
 
-    char *GetObjectiveCounter();
+    const char* GetObjectiveCounter();
 
     void Read       ( TextReader *_in, bool _dynamic );
     void Write      ( FileWriter *_out );

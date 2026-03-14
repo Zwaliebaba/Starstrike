@@ -537,7 +537,7 @@ void Officer::SetWaypoint( LegacyVector3 const &_wayPoint )
 }
 
 
-void Officer::ListSoundEvents( LList<char *> *_list )
+void Officer::ListSoundEvents( LList<const char*> *_list )
 {
     Entity::ListSoundEvents( _list );
 
@@ -802,9 +802,9 @@ void Officer::SetPreviousMode()
     }
 }
 
-char *Officer::GetOrderType( int _orderType )
+const char *Officer::GetOrderType( int _orderType )
 {
-    static char *orders[] = {   "None",
+    static const char *orders[] = {   "None",
                                 "Goto",
                                 "Follow"
                             };

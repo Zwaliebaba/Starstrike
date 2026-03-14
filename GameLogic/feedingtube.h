@@ -36,7 +36,7 @@ class FeedingTube : public Building
 
     bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
     bool IsInView() override;
 };
 

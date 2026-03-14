@@ -8,7 +8,7 @@
 class CheatWindow : public DarwiniaWindow
 {
 public:
-    CheatWindow( char *_name );
+    CheatWindow( const char *_name );
 
     void Create();
 };

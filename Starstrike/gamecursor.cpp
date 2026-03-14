@@ -1017,7 +1017,7 @@ void MouseCursor::SetHotspot(float x, float y)
 }
 
 
-void MouseCursor::SetColour(RGBAColour &_col )
+void MouseCursor::SetColour(const RGBAColour &_col )
 {
     m_colour = _col;
 }

@@ -13,7 +13,7 @@
 
 #include "network_window.h"
 
-NetworkWindow::NetworkWindow(char* name)
+NetworkWindow::NetworkWindow(const char* name)
   : DarwiniaWindow(name) {}
 
 void NetworkWindow::Render(bool hasFocus)

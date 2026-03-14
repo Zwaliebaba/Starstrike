@@ -66,9 +66,9 @@ public:
     void Render         ( float _predictionTime );
     void RenderAlphas   ( float _predictionTime );
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 
-    char *GetObjectiveCounter();
+    const char* GetObjectiveCounter();
 };
 
 
@@ -82,7 +82,7 @@ public:
 
     bool Advance();
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 };
 
 
@@ -106,7 +106,7 @@ public:
     bool IsLoading();
     bool BoardRocket( WorldObjectId id );
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 
     bool PerformDepthSort( LegacyVector3 &_centrePos );
 };
@@ -183,10 +183,10 @@ public:
     void Read           ( TextReader *_in, bool _dynamic );
     void Write          ( FileWriter *_out );
 
-    char *GetObjectiveCounter();
+    const char* GetObjectiveCounter();
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 
-    static int GetStateId( char *_state );
+    static int GetStateId( const char *_state );
 };
 

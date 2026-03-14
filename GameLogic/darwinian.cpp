@@ -2317,7 +2317,7 @@ void Darwinian::Render(float _predictionTime, float _highDetail)
   }
 }
 
-void Darwinian::ListSoundEvents(LList<char*>* _list)
+void Darwinian::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

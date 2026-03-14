@@ -55,7 +55,7 @@ class Tree : public Building
     bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen = 1e10, LegacyVector3* _pos = nullptr,
                     LegacyVector3* _norm = nullptr) override; // pos/norm will not always be available
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;

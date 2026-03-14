@@ -309,7 +309,7 @@ void TrunkPort::ReprogramComplete()
 }
 
 
-void TrunkPort::ListSoundEvents( LList<char *> *_list )
+void TrunkPort::ListSoundEvents( LList<const char*> *_list )
 {
     Building::ListSoundEvents( _list );
 

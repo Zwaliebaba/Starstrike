@@ -438,18 +438,18 @@ void Triffid::Write(FileWriter* _out)
   }
 }
 
-char* Triffid::GetSpawnName(int _spawnType)
+const char* Triffid::GetSpawnName(int _spawnType)
 {
-  static char* names[NumSpawnTypes] = {
+  static const char* names[NumSpawnTypes] = {
     "SpawnVirii", "SpawnCentipedes", "SpawnSpider", "SpawnSpirits", "SpawnEggs", "SpawnTriffidEggs", "SpawnDarwinians"
   };
 
   return names[_spawnType];
 }
 
-char* Triffid::GetSpawnNameTranslated(int _spawnType)
+const char* Triffid::GetSpawnNameTranslated(int _spawnType)
 {
-  char* spawnName = GetSpawnName(_spawnType);
+  const char* spawnName = GetSpawnName(_spawnType);
 
   char stringId[256];
   snprintf(stringId, sizeof(stringId), "spawnname_%s", spawnName);
@@ -459,7 +459,7 @@ char* Triffid::GetSpawnNameTranslated(int _spawnType)
   return spawnName;
 }
 
-void Triffid::ListSoundEvents(LList<char*>* _list)
+void Triffid::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 
@@ -692,7 +692,7 @@ bool TriffidEgg::RenderPixelEffect(float _predictionTime)
   return true;
 }
 
-void TriffidEgg::ListSoundEvents(LList<char*>* _list)
+void TriffidEgg::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

@@ -739,7 +739,7 @@ void Squadie::FireSecondaryWeapon( LegacyVector3 const &_pos )
 }
 
 
-void Squadie::ListSoundEvents( LList<char *> *_list )
+void Squadie::ListSoundEvents( LList<const char*> *_list )
 {
     Entity::ListSoundEvents( _list );
 

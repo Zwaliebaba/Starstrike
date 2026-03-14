@@ -7,7 +7,7 @@
 
 struct ConditionInfo {
 	inputtype_t type;     // InputType
-	char *name;
+	const char *name;
 	condition_t cond;     // InputCondition
 };
 

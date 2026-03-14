@@ -778,7 +778,7 @@ bool Virii::IsInView()
   return g_app->m_camera->SphereInViewFrustum(centrePos, radius);
 }
 
-void Virii::ListSoundEvents(LList<char*>* _list)
+void Virii::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
   _list->PutData("ChangeDirection");

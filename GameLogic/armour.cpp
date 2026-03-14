@@ -405,7 +405,7 @@ void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)
   _exitDir = entranceMat.f;
 }
 
-void Armour::ListSoundEvents(LList<char*>* _list)
+void Armour::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

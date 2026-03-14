@@ -391,7 +391,7 @@ void AntHill::Render(float _predictionTime)
 #endif
 }
 
-void AntHill::ListSoundEvents(LList<char*>* _list)
+void AntHill::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

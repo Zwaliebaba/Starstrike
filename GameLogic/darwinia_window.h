@@ -65,7 +65,7 @@ public:
     DarwiniaButton();
 
     void Render( int realX, int realY, bool highlighted, bool clicked );
-	virtual void SetShortProperties(char const *_name, int x, int y, int w=-1, int h=-1, char *_caption=NULL, char *_tooltip=NULL);
+	virtual void SetShortProperties(char const *_name, int x, int y, int w=-1, int h=-1, const char *_caption=NULL, const char *_tooltip=NULL);
 	void SetDisabled( bool _disabled = true );
     void UpdateButtonHighlight();
 };
@@ -76,7 +76,7 @@ class BorderlessButton : public DarwiniaButton
 public:
     BorderlessButton();
     void Render( int realX, int realY, bool highlighted, bool clicked );
-    void SetShortProperties(char const *_name, int x, int y, int w=-1, int h=-1, char *_caption=NULL, char *_tooltip=NULL);
+    void SetShortProperties(char const *_name, int x, int y, int w=-1, int h=-1, const char *_caption=NULL, const char *_tooltip=NULL);
 };
 
 

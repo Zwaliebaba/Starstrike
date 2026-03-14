@@ -447,7 +447,7 @@ bool GunTurret::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& 
   return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, norm);
 }
 
-void GunTurret::ListSoundEvents(LList<char*>* _list)
+void GunTurret::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

@@ -16,7 +16,7 @@
 
 // ============================================================================
 
-ScreenZone::ScreenZone(char* _name, char* _tooltip, float _x, float _y, float _w, float _h, int _data)
+ScreenZone::ScreenZone(const char* _name, const char* _tooltip, float _x, float _y, float _w, float _h, int _data)
   : m_x(_x),
     m_y(_y),
     m_w(_w),

@@ -665,9 +665,9 @@ int Entity::GetTypeId( char const *_typeName )
 }
 
 
-char *Entity::GetTypeName( int _troopType )
+const char *Entity::GetTypeName( int _troopType )
 {
-    static char *typeNames[NumEntityTypes] = {
+    static const char *typeNames[NumEntityTypes] = {
                                                 "InvalidType",
                                                 "LaserTroop",
                                                 "Engineer",
@@ -694,9 +694,9 @@ char *Entity::GetTypeName( int _troopType )
 }
 
 
-char *Entity::GetTypeNameTranslated ( int _troopType )
+const char *Entity::GetTypeNameTranslated ( int _troopType )
 {
-    char *typeName = GetTypeName( _troopType );
+    const char *typeName = GetTypeName( _troopType );
 
     char stringId[256];
     snprintf( stringId, sizeof(stringId), "entityname_%s", typeName );
@@ -712,7 +712,7 @@ char *Entity::GetTypeNameTranslated ( int _troopType )
 }
 
 
-void Entity::ListSoundEvents( LList<char *> *_list )
+void Entity::ListSoundEvents( LList<const char*> *_list )
 {
     _list->PutData( "Create" );
     _list->PutData( "Attack" );

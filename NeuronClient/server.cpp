@@ -128,7 +128,7 @@ int Server::ConvertIPToInt(const char* _ip)
   return result;
 }
 
-char* Server::ConvertIntToIP(const int _ip)
+const char* Server::ConvertIntToIP(const int _ip)
 {
   static char result[16];
   snprintf(result, sizeof(result), "%d.%d.%d.%d", (_ip & 0x000000ff), (_ip & 0x0000ff00) >> 8, (_ip & 0x00ff0000) >> 16, (_ip & 0xff000000) >> 24);
@@ -437,7 +437,7 @@ void Server::Advance()
   END_PROFILE(g_app->m_profiler, "Advance Server");
 }
 
-void Server::LoadHistory(char* _filename)
+void Server::LoadHistory(const char* _filename)
 {
   FILE* file = fopen(_filename, "rb");
 
@@ -462,7 +462,7 @@ void Server::LoadHistory(char* _filename)
   fclose(file);
 }
 
-void Server::SaveHistory(char* _filename)
+void Server::SaveHistory(const char* _filename)
 {
   FILE* file = fopen(_filename, "wb");
 

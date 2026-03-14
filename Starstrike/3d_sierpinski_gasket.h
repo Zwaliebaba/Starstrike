@@ -4,11 +4,9 @@
 class Sierpinski3D
 {
 public:
-	LegacyVector3			*m_points;
-	unsigned int	m_numPoints;
+	std::vector<LegacyVector3>	m_points;
 
 	Sierpinski3D(unsigned int _numPoints);
-	~Sierpinski3D();
 
 	void Render(float _scale);
 };

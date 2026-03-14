@@ -312,7 +312,7 @@ bool FuelGenerator::Advance()
   return FuelBuilding::Advance();
 }
 
-void FuelGenerator::ListSoundEvents(LList<char*>* _list)
+void FuelGenerator::ListSoundEvents(LList<const char*>* _list)
 {
   FuelBuilding::ListSoundEvents(_list);
 
@@ -355,7 +355,7 @@ void FuelGenerator::RenderAlphas(float _predictionTime)
   //    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,90,0), 10, "Surges : %2.2f", m_surges );
 }
 
-char* FuelGenerator::GetObjectiveCounter()
+const char* FuelGenerator::GetObjectiveCounter()
 {
   static char buffer[256];
   snprintf(buffer, sizeof(buffer), "%s %d%%", LANGUAGEPHRASE("objective_fuelpressure"), static_cast<int>(m_currentLevel * 100));
@@ -387,7 +387,7 @@ bool FuelPipe::Advance()
   return FuelBuilding::Advance();
 }
 
-void FuelPipe::ListSoundEvents(LList<char*>* _list)
+void FuelPipe::ListSoundEvents(LList<const char*>* _list)
 {
   FuelBuilding::ListSoundEvents(_list);
 
@@ -490,7 +490,7 @@ bool FuelStation::BoardRocket(WorldObjectId _id)
   return false;
 }
 
-void FuelStation::ListSoundEvents(LList<char*>* _list)
+void FuelStation::ListSoundEvents(LList<const char*>* _list)
 {
   FuelBuilding::ListSoundEvents(_list);
 
@@ -675,7 +675,7 @@ EscapeRocket::EscapeRocket()
   }
 }
 
-void EscapeRocket::ListSoundEvents(LList<char*>* _list)
+void EscapeRocket::ListSoundEvents(LList<const char*>* _list)
 {
   FuelBuilding::ListSoundEvents(_list);
 
@@ -690,7 +690,7 @@ void EscapeRocket::ListSoundEvents(LList<char*>* _list)
 
 void EscapeRocket::SetupSounds()
 {
-  char* requiredSoundName = nullptr;
+  const char* requiredSoundName = nullptr;
 
   //
   // What ambience should be playing?
@@ -777,7 +777,7 @@ void EscapeRocket::Initialise(Building* _template)
   m_spawnCompleted = static_cast<EscapeRocket*>(_template)->m_spawnCompleted;
 }
 
-char* EscapeRocket::GetObjectiveCounter()
+const char* EscapeRocket::GetObjectiveCounter()
 {
   static char buffer[256];
   snprintf(buffer, sizeof(buffer), "%s %d%%, %s %d%%", LANGUAGEPHRASE("objective_fuel"), static_cast<int>(m_fuel), LANGUAGEPHRASE("objective_passengers"),
@@ -1317,9 +1317,9 @@ void EscapeRocket::Write(FileWriter* _out)
   _out->printf("%6.2f %6d %6d %6d", m_fuel, m_passengers, m_spawnBuildingId, static_cast<int>(m_spawnCompleted));
 }
 
-int EscapeRocket::GetStateId(char* _state)
+int EscapeRocket::GetStateId(const char* _state)
 {
-  static char* stateNames[] = {"Refueling", "Loading", "Ignition", "Ready", "Countdown", "Exploding", "Flight"};
+  static const char* stateNames[] = {"Refueling", "Loading", "Ignition", "Ready", "Countdown", "Exploding", "Flight"};
 
   for (int i = 0; i < NumStates; ++i)
   {

@@ -89,7 +89,7 @@ class GlobalEventCondition
 
     bool Evaluate();
 
-    void SetStringId(char* _stringId);
+    void SetStringId(const char* _stringId);
     void SetCutScene(char* _cutScene);
 
     void Save(FileWriter* _out);
@@ -129,7 +129,6 @@ class GlobalEvent
     LList<GlobalEventAction*> m_actions;
 
     GlobalEvent();
-    GlobalEvent(GlobalEvent& _other); // Copy constructor only used by TestHarness
 
     void Read(TextReader* _in);
     void Write(FileWriter* _file);
@@ -258,7 +257,6 @@ class GlobalWorld
 
   public:
     GlobalWorld();
-    GlobalWorld(GlobalWorld&); // Copy constructor only used in TestHarness
     ~GlobalWorld();
 
     void Advance();

@@ -7,7 +7,7 @@
 
 NetSocket::NetSocket()
 {
-	m_sockfd = -1;
+	m_sockfd = INVALID_SOCKET;
 	m_stdiofd = (FILE *)0;
 	m_timeout = 10000;
 	m_polltime = 100;
@@ -21,10 +21,10 @@ NetSocket::NetSocket()
 
 NetSocket::~NetSocket()
 {
-	if (m_sockfd != -1)
+	if (m_sockfd != INVALID_SOCKET)
 	{
 		NetCloseSocket(m_sockfd);
-		m_sockfd = -1;
+		m_sockfd = INVALID_SOCKET;
 	}
 }
 
@@ -102,10 +102,10 @@ NetRetCode NetSocket::Connect(char *host, unsigned short port)
 
 void NetSocket::Close()
 {
-	if (m_sockfd != -1)
+	if (m_sockfd != INVALID_SOCKET)
 	{
 		NetCloseSocket(m_sockfd);
-		m_sockfd = -1;
+		m_sockfd = INVALID_SOCKET;
 	}
 }
 

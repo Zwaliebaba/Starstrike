@@ -120,7 +120,8 @@ Transform3D ShapeMarker::GetWorldTransform(const Transform3D& _rootTransform)
     XMMATRIX parent = XMLoadFloat4x4(&m_parents[i]->m_transform.m);
     result = XMMatrixMultiply(parent, result);
   }
-  XMMATRIX self = XMLoadFloat4x4(&static_cast<Transform3D>(m_transform).m);
+  Transform3D selfTransform = static_cast<Transform3D>(m_transform);
+  XMMATRIX self = XMLoadFloat4x4(&selfTransform.m);
   result = XMMatrixMultiply(self, result);
 
   Transform3D t;

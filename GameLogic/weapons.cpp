@@ -47,7 +47,7 @@ ThrowableWeapon::ThrowableWeapon(int _type, const LegacyVector3& _startPos, cons
 
 void ThrowableWeapon::Initialise() { TriggerSoundEvent("Create"); }
 
-void ThrowableWeapon::TriggerSoundEvent(char* _event)
+void ThrowableWeapon::TriggerSoundEvent(const char* _event)
 {
   switch (m_type)
   {

@@ -38,7 +38,7 @@ LangPhrase::~LangPhrase()
 // Class LangTable
 // ****************************************************************************
 
-LangTable::LangTable(char *_filename)
+LangTable::LangTable(const char *_filename)
 {
 	// Create the "not found" Phrase that will be returned when
 	// the LookupPhrase is called with an unknown key
@@ -328,14 +328,14 @@ bool LangTable::RawDoesPhraseExist(char const *_key, InputMode _mood)
 			ans = true;
 		} else {
 			int len = strlen( _key );
-			char *key = new char[ len + 5 ];
-			strcpy( key, _key );
-			switch( _mood ) {
-				case INPUT_MODE_KEYBOARD: strcpy( key + len, "_kbd" ); break;
-				case INPUT_MODE_GAMEPAD: strcpy( key + len, "_xin" ); break;
-			}
-			ans = RawDoesPhraseExist( key );
-			delete [] key;
+				char *key = new char[ len + 5 ];
+				memcpy( key, _key, len + 1 );
+				switch( _mood ) {
+					case INPUT_MODE_KEYBOARD: memcpy( key + len, "_kbd", 5 ); break;
+					case INPUT_MODE_GAMEPAD: memcpy( key + len, "_xin", 5 ); break;
+				}
+				ans = RawDoesPhraseExist( key );
+				delete [] key;
 		}
 	}
 	return ans;
@@ -411,10 +411,10 @@ char *LangTable::RawLookupPhrase(char const *_key, InputMode _mood)
 		if ( !phrase ) {
 			int len = strlen( _key );
 			char *key = new char[ len + 5 ];
-			strcpy( key, _key );
+			memcpy( key, _key, len + 1 );
 			switch( _mood ) {
-				case INPUT_MODE_KEYBOARD: strcpy( key + len, "_kbd" ); break;
-				case INPUT_MODE_GAMEPAD: strcpy( key + len, "_xin" ); break;
+				case INPUT_MODE_KEYBOARD: memcpy( key + len, "_kbd", 5 ); break;
+				case INPUT_MODE_GAMEPAD: memcpy( key + len, "_xin", 5 ); break;
 			}
 			phrase = m_phrasesRaw.GetData( key );
 			delete [] key;
@@ -520,10 +520,10 @@ DArray<LangPhrase *> *LangTable::GetPhraseList()
 // Goes through the string and divides it up into several
 // smaller strings, taking into account newline characters,
 // and the width of the text area.
-LList <char *> *WordWrapText (const char *_string, float _lineWidth, float _fontWidth, bool _wrapToWindow)
+LList <const char *> *WordWrapText (const char *_string, float _lineWidth, float _fontWidth, bool _wrapToWindow)
 {
 	if ( !_string ) return NULL;
-    if ( _lineWidth < 0 && _wrapToWindow ) return NULL;
+	if ( _lineWidth < 0 && _wrapToWindow ) return NULL;
 
 	// Calculate the maximum width in characters for 1 line
     int linewidth = int(_lineWidth / _fontWidth);
@@ -534,12 +534,12 @@ LList <char *> *WordWrapText (const char *_string, float _lineWidth, float _font
 	// And add a newline on at the end (to make sure a newline will be found)
 
 	char *newstring = new char [ strlen(_string) + 2 ];
-	sprintf( newstring, "%s\n", _string );
+	snprintf( newstring, strlen(_string) + 2, "%s\n", _string );
 
 	// Build a linked list of pointers into this new string
 	// Each pointer representing another line
 
-	LList <char *> *llist = new LList <char *> ();
+	LList <const char *> *llist = new LList <const char *> ();
 
 	char *currentpos = newstring;
 	llist->PutData( currentpos );

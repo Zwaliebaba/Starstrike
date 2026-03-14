@@ -179,7 +179,7 @@ void PrefsGraphicsWindow::Create()
 }
 
 
-void RenderCPUUsage( LList<char *> *elements, int x, int y )
+void RenderCPUUsage( LList<const char*> *elements, int x, int y )
 {
 #ifdef PROFILER_ENABLED
     float totalOccup = 0.0f;
@@ -216,7 +216,7 @@ void PrefsGraphicsWindow::Render( bool _hasFocus )
     int x = m_x + 20;
     int y = m_y + GetClientRectY1() + border;
     int size = GetMenuSize(13);
-    LList<char *> elements;
+    LList<const char*> elements;
 
     g_editorFont.DrawText2D( x, y+=border, size, LANGUAGEPHRASE("dialog_landscapedetail") );
     g_editorFont.DrawText2D( x, y+=h, size, LANGUAGEPHRASE("dialog_waterdetail") );

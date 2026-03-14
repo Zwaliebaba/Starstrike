@@ -20,6 +20,7 @@ public:
 
 public:
     PrefsOtherWindow();
+    ~PrefsOtherWindow();
 
     void Create();
     void Render( bool _hasFocus );

@@ -51,7 +51,7 @@ public:
     void ChangeHealth   ( int _amount );
     void Render         ( float _predictionTime );
 
-    void    ListSoundEvents	( LList<char *> *_list );
+    void    ListSoundEvents	( LList<const char*> *_list );
 
 };
 

@@ -226,7 +226,7 @@ void SpaceInvader::ChangeHealth(int _amount)
   //    }
 }
 
-void SpaceInvader::ListSoundEvents(LList<char*>* _list)
+void SpaceInvader::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

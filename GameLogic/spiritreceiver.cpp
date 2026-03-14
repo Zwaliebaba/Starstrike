@@ -60,7 +60,7 @@ bool ReceiverBuilding::IsInView()
   return Building::IsInView();
 }
 
-void ReceiverBuilding::ListSoundEvents(LList<char*>* _list)
+void ReceiverBuilding::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 
@@ -418,7 +418,7 @@ void SpiritProcessor::Initialise(Building* _building)
   }
 }
 
-char* SpiritProcessor::GetObjectiveCounter()
+const char* SpiritProcessor::GetObjectiveCounter()
 {
   static char result[256];
   snprintf(result, sizeof(result), "%s : %2.2f", LANGUAGEPHRASE("objective_throughput"), m_throughput);

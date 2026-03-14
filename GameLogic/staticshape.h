@@ -17,7 +17,7 @@ public:
     void SetDetail      ( int _detail );
 
     void SetShapeName   ( char *_shapeName );
-    void SetStringId    ( char *_stringId );
+    void SetStringId    ( const char *_stringId );
 
     bool Advance();
     void Render( float _predictionTime );

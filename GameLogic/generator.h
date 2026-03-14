@@ -28,7 +28,7 @@ class PowerBuilding : public Building
     LegacyVector3 GetPowerLocation();
     virtual void TriggerSurge(float _initValue);
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
@@ -59,9 +59,9 @@ class Generator : public PowerBuilding
 
     void ReprogramComplete() override;
 
-    char* GetObjectiveCounter() override;
+    const char* GetObjectiveCounter() override;
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 
     bool Advance() override;
     void Render(float _predictionTime) override;
@@ -134,6 +134,6 @@ class SolarPanel : public PowerBuilding
     void RenderPorts() override;
     void RenderAlphas(float _predictionTime) override;
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 };
 

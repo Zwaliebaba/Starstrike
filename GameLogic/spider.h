@@ -87,6 +87,6 @@ class Spider : public Entity
     bool RenderPixelEffect(float _predictionTime) override;
 
     bool IsInView() override;
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 };
 

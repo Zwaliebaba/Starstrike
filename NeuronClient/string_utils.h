@@ -6,6 +6,9 @@ void StrToLower(char *_string);
 
 inline char *NewStr(const char *src)
 {
-	return strcpy(new char[strlen(src)+1], src);
+	size_t len = strlen(src) + 1;
+	char *dst = new char[len];
+	memcpy(dst, src, len);
+	return dst;
 }
 

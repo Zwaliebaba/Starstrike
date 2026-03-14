@@ -603,7 +603,7 @@ bool Centipede::AdvanceToTargetPosition()
   return (m_pos - m_targetPos).Mag() < 20.0f;
 }
 
-void Centipede::ListSoundEvents(LList<char*>* _list)
+void Centipede::ListSoundEvents(LList<const char*>* _list)
 {
   Entity::ListSoundEvents(_list);
 

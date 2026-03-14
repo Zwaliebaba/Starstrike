@@ -76,9 +76,9 @@ public:
     void SetPreviousMode ();
 
     void CancelOrderSounds();
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 
-    static char *GetOrderType( int _orderType );
+    static const char *GetOrderType( int _orderType );
 };
 
 

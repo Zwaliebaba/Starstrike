@@ -339,7 +339,7 @@ bool MineBuilding::Advance()
   return Building::Advance();
 }
 
-void MineBuilding::ListSoundEvents(LList<char*>* _list)
+void MineBuilding::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 
@@ -726,7 +726,7 @@ Refinery::Refinery()
   m_counter1 = m_shape->m_rootFragment->LookupMarker("MarkerCounter");
 }
 
-char* Refinery::GetObjectiveCounter()
+const char* Refinery::GetObjectiveCounter()
 {
   GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
   int numRefined = 0;

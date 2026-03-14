@@ -247,8 +247,9 @@ const char* GameApp::GetPreferencesPath()
   if (path == nullptr)
   {
     const char* profileDir = GetProfileDirectory();
-    path = new char[strlen(profileDir) + 32];
-    sprintf(path, "%spreferences.txt", profileDir);
+    size_t pathSize = strlen(profileDir) + 32;
+    path = new char[pathSize];
+    snprintf(path, pathSize, "%spreferences.txt", profileDir);
   }
 
   return path;

@@ -285,7 +285,7 @@ void Incubator::RenderAlphas(float _predictionTime)
   glEnable(GL_CULL_FACE);
 }
 
-void Incubator::ListSoundEvents(LList<char*>* _list)
+void Incubator::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

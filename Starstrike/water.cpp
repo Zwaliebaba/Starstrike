@@ -27,12 +27,7 @@ constexpr float shoreNoiseFactor = 0.25f;
 // ****************************************************************************
 
 Water::Water()
-  : m_waterDepths(nullptr),
-    m_shoreNoise(nullptr),
-    m_waterDepthMap(nullptr),
-    m_colourTable(nullptr),
-    m_waveTableX(nullptr),
-    m_waveTableZ(nullptr),
+  : m_waterDepthMap(nullptr),
     m_renderWaterEffect(false)
 {
   if (!g_app->m_editing)
@@ -63,8 +58,7 @@ Water::Water()
 
         BinaryReader* in = g_app->m_resource->GetBinaryReader(fullFilename);
         BitmapRGBA bmp(in, "bmp");
-        m_colourTable = new RGBAColour[bmp.m_width];
-        m_numColours = bmp.m_width;
+        m_colourTable.resize(bmp.m_width);
         for (int x = 0; x < bmp.m_width; ++x)
         {
           m_colourTable[x] = bmp.GetPixel(x, 1);
@@ -75,10 +69,8 @@ Water::Water()
 
       BuildTriangleStrips();
 
-      m_waveTableSizeX = (2.0f * land->GetWorldSizeX()) / m_cellSize + 2;
-      m_waveTableSizeZ = (2.0f * land->GetWorldSizeZ()) / m_cellSize + 2;
-      m_waveTableX = new float[m_waveTableSizeX];
-      m_waveTableZ = new float[m_waveTableSizeZ];
+      m_waveTableX.resize((int)((2.0f * land->GetWorldSizeX()) / m_cellSize + 2));
+      m_waveTableZ.resize((int)((2.0f * land->GetWorldSizeZ()) / m_cellSize + 2));
 
       BuildOpenGlState();
     }
@@ -88,16 +80,6 @@ Water::Water()
 Water::~Water()
 {
   m_renderVerts.Empty();
-  delete [] m_waterDepths;
-  m_waterDepths = nullptr;
-  delete [] m_shoreNoise;
-  m_shoreNoise = nullptr;
-  delete [] m_colourTable;
-  m_colourTable = nullptr;
-  delete [] m_waveTableX;
-  m_waveTableX = nullptr;
-  delete [] m_waveTableZ;
-  m_waveTableZ = nullptr;
 }
 
 void Water::GenerateLightMap()
@@ -341,8 +323,8 @@ void Water::BuildTriangleStrips()
   m_strips.SetSize(m_strips.NumUsed());
 
   // Up-size the empty FastDArrays to be the same size as the vertex array
-  m_waterDepths = new float[m_renderVerts.NumUsed()];
-  m_shoreNoise = new float[m_renderVerts.NumUsed()];
+  m_waterDepths.resize(m_renderVerts.NumUsed());
+  m_shoreNoise.resize(m_renderVerts.NumUsed());
 
   // Create other per-vertex arrays
   for (int i = 0; i < m_renderVerts.Size(); ++i)
@@ -499,14 +481,14 @@ void Water::UpdateDynamicWater()
   //
   // Generate lookup tables
 
-  for (int i = 0; i < m_waveTableSizeX; ++i)
+  for (int i = 0; i < (int)m_waveTableX.size(); ++i)
   {
     float x = static_cast<float>(i) * m_cellSize;
     float heightForX = sinf(x * 0.01f + g_gameTime * 0.65f) * 1.2f;
     heightForX += sinf(x * 0.03f + g_gameTime * 1.5f) * 0.9f;
     m_waveTableX[i] = heightForX * scaleFactor;
   }
-  for (int i = 0; i < m_waveTableSizeZ; ++i)
+  for (int i = 0; i < (int)m_waveTableZ.size(); ++i)
   {
     float z = static_cast<float>(i) * m_cellSize;
     float heightForZ = sinf(z * 0.02f + g_gameTime * 0.75f) * 0.9f;
@@ -543,8 +525,8 @@ void Water::UpdateDynamicWater()
       const float lowZ = -landSizeZ * 0.5f;
       int indexX = static_cast<int>((vertex1->m_pos.x - lowX) / m_cellSize + 0.1f);
       int indexZ = static_cast<int>((vertex1->m_pos.z - lowZ) / m_cellSize + 0.1f);
-      DEBUG_ASSERT(indexX < m_waveTableSizeX);
-      DEBUG_ASSERT(indexZ + 1 < m_waveTableSizeZ);
+      DEBUG_ASSERT(indexX < (int)m_waveTableX.size());
+      DEBUG_ASSERT(indexZ + 1 < (int)m_waveTableZ.size());
 
       // Update the height and calc brightness for FIRST vertex of the pair
       vertex1->m_pos.y = m_waveTableX[indexX] + m_waveTableZ[indexZ];

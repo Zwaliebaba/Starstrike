@@ -355,8 +355,8 @@ BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, L
   if (lpGUID)
   {
     char thisDriver[512];
-    sprintf(thisDriver, "%d : %s\n", DirectSoundData::m_hwNumDevices, lpszDesc);
-    strcat(DirectSoundData::m_hwDescription, thisDriver);
+    snprintf(thisDriver, sizeof(thisDriver), "%d : %s\n", DirectSoundData::m_hwNumDevices, lpszDesc);
+    strncat(DirectSoundData::m_hwDescription, thisDriver, strlen(thisDriver));
     DirectSoundData::m_hwNumDevices++;
   }
   return true;

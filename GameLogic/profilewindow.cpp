@@ -58,7 +58,7 @@ public:
 // Class ProfileWindow
 // ****************************************************************************
 
-ProfileWindow::ProfileWindow( char *name )
+ProfileWindow::ProfileWindow( const char *name )
 :   DarwiniaWindow( name ),
 	m_totalPerSecond(true)
 {

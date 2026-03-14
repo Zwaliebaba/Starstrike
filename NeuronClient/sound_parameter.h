@@ -71,13 +71,13 @@ public:
 
     bool        IsFixedValue( float _value );
 
-    static char *GetParameterTypeName   ( int _type );
+    static const char *GetParameterTypeName   ( int _type );
     static int   GetParameterType       ( char *_name );
 
-    static char *GetLinkName            ( int _type );
+    static const char *GetLinkName            ( int _type );
     static int   GetLinkType            ( char *_name );
 
-    static char *GetUpdateTypeName      ( int _type );
+    static const char *GetUpdateTypeName      ( int _type );
     static int   GetUpdateType          ( char *_name );
 };
 

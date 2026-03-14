@@ -24,7 +24,7 @@ EclButton::~EclButton()
     delete[] m_tooltip;
 }
 
-void EclButton::SetProperties(char* _name, int _x, int _y, int _w, int _h, char* _caption, char* _tooltip)
+void EclButton::SetProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (!_caption)
     _caption = _name;
@@ -48,8 +48,9 @@ void EclButton::SetCaption(const char* _caption)
     delete [] m_caption;
   if (_caption)
   {
-    m_caption = new char [strlen(_caption) + 1];
-    strcpy(m_caption, _caption);
+    size_t len = strlen(_caption) + 1;
+    m_caption = new char [len];
+    memcpy(m_caption, _caption, len);
   }
   else
   {
@@ -58,14 +59,15 @@ void EclButton::SetCaption(const char* _caption)
   }
 }
 
-void EclButton::SetTooltip(char* _tooltip)
+void EclButton::SetTooltip(const char* _tooltip)
 {
   if (!_tooltip)
     _tooltip = "";
   if (m_tooltip)
     delete [] m_tooltip;
-  m_tooltip = new char [strlen(_tooltip) + 1];
-  strcpy(m_tooltip, _tooltip);
+  size_t len = strlen(_tooltip) + 1;
+  m_tooltip = new char [len];
+  memcpy(m_tooltip, _tooltip, len);
 }
 
 void EclButton::SetParent(EclWindow* _parent) { m_parent = _parent; }

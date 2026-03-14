@@ -56,7 +56,7 @@ public:
 
     void Attack             ( LegacyVector3 const &_pos );
 
-    void ListSoundEvents    ( LList<char *> *_list );
+    void ListSoundEvents    ( LList<const char*> *_list );
 
 	void SetWaypoint( LegacyVector3 const _waypoint );
 };

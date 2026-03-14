@@ -30,7 +30,7 @@ public:
 
     bool Advance();
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 
     void SetAsResearch();
     void SendFromHeaven();

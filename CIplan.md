@@ -918,24 +918,6 @@ Process one project at a time.  Each project is one commit.
 
 ---
 
-### Step 4.3 — Rename `fixMeUp` variables
-
-**CI ref:** §4.3
-
-**File:** `Starstrike/camera.cpp`
-
-| Line | Current | Renamed |
-|------|---------|---------|
-| 291 | `static float fixMeUp = 45000.0f;` | `static float s_cameraBootFov = 45000.0f;` |
-| 327 | `static bool fixMeUp = true;` | `static bool s_cameraXNeedsInit = true;` |
-| 382 | `static bool fixMeUp = true;` | `static bool s_cameraYNeedsInit = true;` |
-
-Update all references within each function scope.
-
-**Build:** Incremental Starstrike.
-
----
-
 ### Step 4.4 — Remove `JAK HACK`
 
 **CI ref:** §4.4
@@ -1242,23 +1224,22 @@ indicate missed `sprintf`/`strcpy` sites from Phase 1.
 | **7** | §7.1 Last 2 header guards | ✅ DONE |
 | **1** | §1.2 `MAX_PACKET_SIZE` rename | ✅ DONE |
 | **1** | §1.1b GameLogic unsafe strings (90) | ✅ DONE — 5 deliberate skips (`strcpy(m_string,m_buf)` in `input_field.cpp`, `m_string` is `char*` with unknown external size) |
-| **1** | §1.1c NeuronClient unsafe strings (94) | ☐ ~86 sites remaining |
-| **1** | §1.1d Starstrike unsafe strings (114) | ☐ ~105 sites remaining |
+| **1** | §1.1c NeuronClient unsafe strings (94) | ✅ DONE — eclbutton.cpp, language_table.cpp, sound_instance.cpp, sound_library_3d_dsound.cpp, btree.h, string_utils.h converted; generic.cpp dead branch skipped |
+| **1** | §1.1d Starstrike unsafe strings (114) | ✅ DONE — GameApp.cpp, sepulveda_strings.cpp converted; 2 dead `JAL_DEBUG=0` sites skipped |
 | **1** | §1.9 `const_cast` fix | ✅ DONE — cascaded to `SetLanguage`/`SetProfileName` const, `clienttoserver.cpp` uses mutable buffer for `NetSocket::Connect` |
 | **1** | §1.5 Document `void*` dispatch | ✅ DONE |
 | **1** | §1.7 Document `_CRT_SECURE_NO_WARNINGS` | ✅ DONE |
-| **2** | §2.3 Fix `strdup` leaks (5 sites) | ☐ |
-| **2** | §2.4 Fix `memset(this,…)` | ☐ |
-| **2** | §2.1 Starstrike RAII conversion | ☐ |
-| **2** | §2.2 Document move-semantics gap | ☐ |
-| **7** | §7.6 Remove Win32 configs | ☐ |
-| **7** | §7.3 Enable Conformance Mode | ☐ |
+| **2** | §2.3 Fix `strdup` leaks (5 sites) | ✅ DONE — sites 1-4 were already fixed/documented in prior work; site 5 added `~PrefsOtherWindow()` destructor |
+| **2** | §2.4 Fix `memset(this,…)` | ✅ DONE — all 3 sites already converted to explicit member init (team.cpp, matrix33.cpp, matrix34.cpp) |
+| **2** | §2.1 Starstrike RAII conversion | ✅ DONE — 3d_sierpinski_gasket.cpp, entity_grid.cpp, water.cpp, global_internet.cpp all converted to `std::vector` |
+| **2** | §2.2 Document move-semantics gap | ✅ DONE — TODO comments on BitmapRGBA, EclButton, EclWindow |
+| **7** | §7.6 Remove Win32 configs | ✅ DONE |
+| **7** | §7.3 Enable Conformance Mode | ✅ DONE — extensive const-correctness cascade: Eclipse UI, SoundSystem, Building/Entity name APIs, ScreenZone, Server, darwinia_window, weapons, ~40 files total |
 | **7** | §7.2 Raise to /W4 | ☐ |
 | **7** | §7.4 Audit warning suppressions | ☐ |
 | **7** | §7.8 Evaluate NeuronServer | ☐ |
 | **4** | §4.1 Remove commented code | ☐ |
 | **4** | §4.3 Rename `fixMeUp` | ☐ |
-| **4** | §4.4 Remove JAK HACK | ☐ |
 | **4** | §4.5 Remove DELETEME | ☐ |
 | **4.2e** | §5.2 Remove duplicate `PROFILER_ENABLED` (batched) | ☐ |
 | **3** | §3.1a `NetRetCode` enum class | ☐ |

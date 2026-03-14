@@ -208,9 +208,7 @@ void LogEntityGridError( WorldObjectId _id, LegacyVector3 const &_pos, int _erro
 // *** Constructor
 EntityGrid::EntityGrid(float _cellSizeX, float _cellSizeZ)
 :   m_cellSizeX(_cellSizeX),
-    m_cellSizeZ(_cellSizeZ),
-    m_neighbours(nullptr),
-    m_maxNeighbours(0)
+    m_cellSizeZ(_cellSizeZ)
 {
     m_cellSizeXRecip = 1.0f / _cellSizeX;
     m_cellSizeZRecip = 1.0f / _cellSizeZ;
@@ -232,24 +230,15 @@ EntityGrid::EntityGrid(float _cellSizeX, float _cellSizeZ)
 
 void EntityGrid::EnsureMaxNeighbours( int _maxNeighbours )
 {
-    if( _maxNeighbours > m_maxNeighbours )
+    if( _maxNeighbours > (int)m_neighbours.size() )
     {
         float startTime = GetHighResTime();
 
-        int newMaxNeighbours = m_maxNeighbours + 100;
-        WorldObjectId *newNeighbours = new WorldObjectId[ newMaxNeighbours ];
-
-        if( m_neighbours )
-        {
-            memcpy( newNeighbours, m_neighbours, m_maxNeighbours * sizeof(WorldObjectId) );
-            delete m_neighbours;
-        }
-
-        m_neighbours = newNeighbours;
-        m_maxNeighbours = newMaxNeighbours;
+        int newMaxNeighbours = (int)m_neighbours.size() + 100;
+        m_neighbours.resize(newMaxNeighbours);
 
         float time = GetHighResTime() - startTime;
-        DebugTrace( "EntityGrid max neighbours set to {} (time taken {:2.2f}ms)\n", m_maxNeighbours, time*1000.0f );
+        DebugTrace( "EntityGrid max neighbours set to {} (time taken {:2.2f}ms)\n", (int)m_neighbours.size(), time*1000.0f );
     }
 }
 
@@ -542,7 +531,7 @@ WorldObjectId *EntityGrid::GetNeighbours(float _worldX, float _worldZ, float _ra
     }
 
     *_numFound = numFoundSoFar;
-    return m_neighbours;
+    return m_neighbours.data();
 }
 
 

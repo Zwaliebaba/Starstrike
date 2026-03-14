@@ -563,7 +563,7 @@ int Building::GetPortOperatorCount(int _portId, int _teamId)
   return -1;
 }
 
-char* Building::GetObjectiveCounter() { return ""; }
+const char* Building::GetObjectiveCounter() { return ""; }
 
 void Building::Read(TextReader* _in, bool _dynamic)
 {
@@ -605,7 +605,7 @@ void Building::Write(FileWriter* _out)
   _out->printf("%-8d", m_isGlobal);
 }
 
-Building* Building::CreateBuilding(char* _name)
+Building* Building::CreateBuilding(const char* _name)
 {
   for (int i = 0; i < NumBuildingTypes; ++i)
   {
@@ -813,9 +813,9 @@ int Building::GetTypeId(const char* _name)
   return -1;
 }
 
-char* Building::GetTypeName(int _type)
+const char* Building::GetTypeName(int _type)
 {
-  static char* buildingNames[] = {
+  static const char* buildingNames[] = {
     "Invalid", "Factory", // These must be in the
     "Cave", // Same order as defined
     "RadarDish", // in building.h
@@ -833,9 +833,9 @@ char* Building::GetTypeName(int _type)
   return nullptr;
 }
 
-char* Building::GetTypeNameTranslated(int _type)
+const char* Building::GetTypeNameTranslated(int _type)
 {
-  char* typeName = GetTypeName(_type);
+  const char* typeName = GetTypeName(_type);
 
   char stringId[256];
   snprintf(stringId, sizeof(stringId), "buildingname_%s", typeName);
@@ -845,7 +845,7 @@ char* Building::GetTypeNameTranslated(int _type)
   return typeName;
 }
 
-void Building::ListSoundEvents(LList<char*>* _list)
+void Building::ListSoundEvents(LList<const char*>* _list)
 {
   _list->PutData("Create");
   _list->PutData("Reprogramming"); // Remove me

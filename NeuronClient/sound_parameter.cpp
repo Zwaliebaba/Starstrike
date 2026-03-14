@@ -198,9 +198,9 @@ float SoundParameter::GetSmooth()
 }
 
 
-char *SoundParameter::GetParameterTypeName( int _type )
+const char *SoundParameter::GetParameterTypeName( int _type )
 {
-    char *names[] = {
+    const char *names[] = {
                         "TypeFixedValue",
                         "TypeRangedRandom",
                         "TypeLinked"
@@ -223,9 +223,9 @@ int SoundParameter::GetParameterType( char *_name )
 }
 
 
-char *SoundParameter::GetLinkName( int _type )
+const char *SoundParameter::GetLinkName( int _type )
 {
-    char *names[] = {
+    const char *names[] = {
                         "Nothing",
                         "HeightAboveGround",
                         "Xpos",
@@ -253,9 +253,9 @@ int SoundParameter::GetLinkType( char *_name )
 }
 
 
-char *SoundParameter::GetUpdateTypeName( int _type )
+const char *SoundParameter::GetUpdateTypeName( int _type )
 {
-    char *names[] = {
+    const char *names[] = {
                         "UpdateConstantly",
                         "UpdateOncePerLoop"
                     };

@@ -23,9 +23,7 @@ void GlobalInternetNode::AddLink(int _id)
 }
 
 GlobalInternet::GlobalInternet()
-  : m_nodes(nullptr),
-    m_numNodes(0),
-    m_links(nullptr),
+  : m_numNodes(0),
     m_numLinks(0),
     m_nearestNodeToCentre(-1),
     m_nearestDistance(FLT_MAX)
@@ -84,8 +82,8 @@ void GlobalInternet::GenerateInternet()
 {
   double timeStart = GetHighResTime();
 
-  m_links = new GlobalInternetLink[GLOBALINTERNET_MAXLINKS];
-  m_nodes = new GlobalInternetNode[GLOBALINTERNET_MAXNODES];
+  m_links.resize(GLOBALINTERNET_MAXLINKS);
+  m_nodes.resize(GLOBALINTERNET_MAXNODES);
 
   LegacyVector3 centre(-797, 1949, -1135);
   GenerateInternet(centre, GLOBALINTERNET_ITERATIONS);
@@ -112,9 +110,9 @@ void GlobalInternet::GenerateInternet()
 
 void GlobalInternet::DeleteInternet()
 {
-  delete [] m_nodes;
+  m_nodes.clear();
   m_numNodes = 0;
-  delete [] m_links;
+  m_links.clear();
   m_numLinks = 0;
   m_leafs.Empty();
   m_bursts.Empty();

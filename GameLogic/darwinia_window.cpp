@@ -29,7 +29,7 @@ DarwiniaButton::DarwiniaButton()
     m_highlightedThisFrame(false),
     m_mouseHighlightMode(false) {}
 
-void DarwiniaButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, char* _caption, char* _tooltip)
+void DarwiniaButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
     _w = strlen(_name) * 7 + 9;
@@ -37,7 +37,7 @@ void DarwiniaButton::SetShortProperties(const char* _name, int _x, int _y, int _
   if (_h == -1)
     _h = 15;
 
-  SetProperties((char*)_name, _x, _y, _w, _h, _caption, _tooltip);
+  SetProperties(_name, _x, _y, _w, _h, _caption, _tooltip);
 }
 
 void DarwiniaButton::SetDisabled(bool _disabled) { m_disabled = _disabled; }
@@ -165,7 +165,7 @@ void DarwiniaButton::UpdateButtonHighlight()
 BorderlessButton::BorderlessButton()
   : DarwiniaButton() {}
 
-void BorderlessButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, char* _caption, char* _tooltip)
+void BorderlessButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
     _w = strlen(_name) * 7 + 9;
@@ -173,7 +173,7 @@ void BorderlessButton::SetShortProperties(const char* _name, int _x, int _y, int
   if (_h == -1)
     _h = 15;
 
-  SetProperties((char*)_name, _x, _y, _w, _h, _caption, _tooltip);
+  SetProperties(_name, _x, _y, _w, _h, _caption, _tooltip);
 }
 
 void BorderlessButton::Render(int realX, int realY, bool highlighted, bool clicked)
@@ -263,7 +263,7 @@ DarwiniaWindow::DarwiniaWindow(const char* name)
     m_buttonChangedThisUpdate(false),
     m_skipUpdate(false)
 {
-  SetTitle((char*)name);
+  SetTitle(name);
   strupr(m_title);
 
   EclSetCurrentFocus(m_name);

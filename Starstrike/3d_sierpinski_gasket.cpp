@@ -11,9 +11,8 @@
 
 
 Sierpinski3D::Sierpinski3D(unsigned int _numPoints)
-:	m_numPoints(_numPoints)
 {
-	m_points = new LegacyVector3[_numPoints];
+	m_points.resize(_numPoints);
 
 	float size = 20;
 	float x1=    0, y1=    0, z1= size;
@@ -23,7 +22,7 @@ Sierpinski3D::Sierpinski3D(unsigned int _numPoints)
 	float x5=-size, y5=-size, z5=-size;
 	float x = x1, y = y1, z = z1;
 
-	for(unsigned int i = 0; i < m_numPoints; ++i)
+	for(unsigned int i = 0; i < m_points.size(); ++i)
 	{
 		switch( darwiniaRandom()%5 )
 		{
@@ -60,13 +59,6 @@ Sierpinski3D::Sierpinski3D(unsigned int _numPoints)
 }
 
 
-Sierpinski3D::~Sierpinski3D()
-{
-	delete [] m_points;
-	m_numPoints = 0;
-}
-
-
 void Sierpinski3D::Render(float scale)
 {
 	glEnable(GL_BLEND);
@@ -83,7 +75,7 @@ void Sierpinski3D::Render(float scale)
 	glColor4ub(alpha*0.4f, alpha*0.7f, alpha, 128);
 
 	glBegin(GL_POINTS);
-		for (unsigned int i = 0; i < m_numPoints; ++i)
+		for (unsigned int i = 0; i < m_points.size(); ++i)
 		{
 			glVertex3fv(m_points[i].GetData());
 		}

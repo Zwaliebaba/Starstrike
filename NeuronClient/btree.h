@@ -92,8 +92,9 @@ BTree<T>::BTree(const char* newid, const T& newdata)
 {
     ltree = NULL;
     rtree = NULL;
-    id = new char[strlen(newid) + 1];
-    strcpy(id, newid);
+    size_t len = strlen(newid) + 1;
+    id = new char[len];
+    memcpy(id, newid, len);
     data = newdata;
 }
 
@@ -115,8 +116,9 @@ void BTree<T>::Copy(const BTree<T>& copy)
     else rtree = NULL;
 
     if (copy.id) {
-        id = new char[strlen(copy.id) + 1];
-        strcpy(id, copy.id);
+        size_t len = strlen(copy.id) + 1;
+        id = new char[len];
+        memcpy(id, copy.id, len);
     }
     else
         id = NULL;
@@ -149,8 +151,9 @@ void BTree<T>::PutData(const char* newid, const T& newdata)
 {
     if (!id)
     {
-        id = new char[strlen(newid) + 1];
-        strcpy(id, newid);
+        size_t len = strlen(newid) + 1;
+        id = new char[len];
+        memcpy(id, newid, len);
         data = newdata;
 
         return;
@@ -192,8 +195,9 @@ void BTree<T>::RemoveData(const char* newid)
         //data := data->left
         if (Left())
         {
-            id = new char[strlen(Left()->id) + 1];
-            strcpy(id, Left()->id);
+            size_t len = strlen(Left()->id) + 1;
+            id = new char[len];
+            memcpy(id, Left()->id, len);
             data = Left()->data;                  // This bit requires a good copy constructor
             rtree = Left()->Right();
             ltree = Left()->Left();
@@ -206,8 +210,9 @@ void BTree<T>::RemoveData(const char* newid)
 
             if (Right())
             {
-                id = new char[strlen(Right()->id) + 1];
-                strcpy(id, Right()->id);
+                size_t len = strlen(Right()->id) + 1;
+                id = new char[len];
+                memcpy(id, Right()->id, len);
                 data = Right()->data;                  // This bit requires a good copy constructor
                 ltree = Right()->Left();
                 rtree = Right()->Right();

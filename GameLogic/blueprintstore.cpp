@@ -173,7 +173,7 @@ BlueprintStore::BlueprintStore()
   SetShape(g_app->m_resource->GetShape("blueprintstore.shp"));
 }
 
-char* BlueprintStore::GetObjectiveCounter()
+const char* BlueprintStore::GetObjectiveCounter()
 {
   static char result[256];
 

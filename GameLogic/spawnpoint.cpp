@@ -465,7 +465,7 @@ void MasterSpawnPoint::RenderAlphas ( float _predictionTime )
 
 
 
-char *MasterSpawnPoint::GetObjectiveCounter()
+const char *MasterSpawnPoint::GetObjectiveCounter()
 {
     static char result[256];
 

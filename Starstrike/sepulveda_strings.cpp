@@ -224,12 +224,13 @@ bool consumeKeyMarker( char const *_baseString, char *_dest, CaptionParserMode &
 				if ( g_inputManager->getBoundInputDescription( static_cast<ControlType>(eventId), desc ) )
 				{
 					char const *keyName = desc.noun.c_str();
+						size_t keyLen = strlen(keyName);
 
-					// Is the caption long enough
-					if( _mode.outOffset + strlen(keyName) < SEPULVEDA_MAX_PHRASE_LENGTH - 1 ) {
-						// Write the key name into the caption
-						strcpy(_dest + _mode.outOffset, keyName);
-						_mode.outOffset += strlen(keyName);
+						// Is the caption long enough
+						if( _mode.outOffset + keyLen < SEPULVEDA_MAX_PHRASE_LENGTH - 1 ) {
+							// Write the key name into the caption
+							memcpy(_dest + _mode.outOffset, keyName, keyLen + 1);
+							_mode.outOffset += keyLen;
 						done = true;
 					}
 				}

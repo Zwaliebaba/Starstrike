@@ -51,22 +51,19 @@ class Water
     FastDArray<WaterTriangleStrip*> m_strips;
 
     // Extra
-    float* m_waterDepths; // 1-to-1 mapping with verts. 1.0 is deepest, 0.0 is shallowest
-    float* m_shoreNoise; // 1-to-1 mapping with verts. Stores the extra whitening factor for polys near the shore
+    std::vector<float> m_waterDepths; // 1-to-1 mapping with verts. 1.0 is deepest, 0.0 is shallowest
+    std::vector<float> m_shoreNoise; // 1-to-1 mapping with verts. Stores the extra whitening factor for polys near the shore
     SurfaceMap2D<float>* m_waterDepthMap;
     Array2D<bool>* m_flatWaterTiles; // 16x16 array that stores whether the under water poly is needed
 
     float m_cellSize; // Size of quads in sea mesh
 
     // Lookup table containing a range of colours from black to white via some pretty colours
-    RGBAColour* m_colourTable;
-    unsigned short m_numColours;
+    std::vector<RGBAColour> m_colourTable;
 
     // Lookup tables containing some nice waves
-    float* m_waveTableX;
-    float* m_waveTableZ;
-    int m_waveTableSizeX;
-    int m_waveTableSizeZ;
+    std::vector<float> m_waveTableX;
+    std::vector<float> m_waveTableZ;
 
     bool m_renderWaterEffect;
 
@@ -95,8 +92,8 @@ class Water
 
 inline const RGBAColour& Water::GetColour(int _brightness)
 {
-  if (_brightness >= m_numColours)
-    return m_colourTable[m_numColours - 1];
+  if (_brightness >= (int)m_colourTable.size())
+    return m_colourTable[m_colourTable.size() - 1];
   if (_brightness < 0)
     return m_colourTable[0];
 

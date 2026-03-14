@@ -2,7 +2,7 @@
 #include "eclipse.h"
 #include "eclwindow.h"
 
-EclWindow::EclWindow(char* _name)
+EclWindow::EclWindow(const char* _name)
   : m_x(0),
     m_y(0),
     m_w(0),
@@ -28,7 +28,7 @@ EclWindow::~EclWindow()
   m_buttons.Empty();
 }
 
-void EclWindow::SetName(char* _name)
+void EclWindow::SetName(const char* _name)
 {
   if (strlen(_name) > SIZE_ECLWINDOW_NAME)
     return;
@@ -37,7 +37,7 @@ void EclWindow::SetName(char* _name)
   m_name[SIZE_ECLWINDOW_NAME - 1] = '\0';
 }
 
-void EclWindow::SetTitle(char* _title)
+void EclWindow::SetTitle(const char* _title)
 {
   if (strlen(_title) > SIZE_ECLWINDOW_TITLE)
     return;
@@ -77,7 +77,7 @@ void EclWindow::MakeAllOnScreen()
     m_y = screenH - m_h - 10;
 }
 
-void EclWindow::BeginTextEdit(char* _name) { strncpy(m_currentTextEdit, _name, SIZE_ECLWINDOW_NAME); m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0'; }
+void EclWindow::BeginTextEdit(const char* _name) { strncpy(m_currentTextEdit, _name, SIZE_ECLWINDOW_NAME); m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0'; }
 
 void EclWindow::EndTextEdit() { strncpy(m_currentTextEdit, "None", SIZE_ECLWINDOW_NAME); m_currentTextEdit[SIZE_ECLWINDOW_NAME - 1] = '\0'; }
 
@@ -96,7 +96,7 @@ void EclWindow::RegisterButton(EclButton* button)
   EclDirtyWindow(this);
 }
 
-void EclWindow::RemoveButton(char* _name)
+void EclWindow::RemoveButton(const char* _name)
 {
   for (int i = 0; i < m_buttons.Size(); ++i)
   {
@@ -109,7 +109,7 @@ void EclWindow::RemoveButton(char* _name)
   }
 }
 
-EclButton* EclWindow::GetButton(char* _name)
+EclButton* EclWindow::GetButton(const char* _name)
 {
   for (int i = 0; i < m_buttons.Size(); ++i)
   {

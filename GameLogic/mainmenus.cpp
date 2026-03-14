@@ -558,7 +558,7 @@ void SkipPrologueWindow::Render(bool _hasFocus)
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-  LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_skip1"), m_w * 1.70f, fontSize, true);
+  LList<const char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_skip1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
     g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
   delete wrapped->GetData(0);
@@ -626,7 +626,7 @@ void PlayPrologueWindow::Render(bool _hasFocus)
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-  LList<char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_prologue1"), m_w * 1.70f, fontSize, true);
+  LList<const char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_prologue1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
     g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
   delete wrapped->GetData(0);

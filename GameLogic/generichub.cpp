@@ -36,7 +36,7 @@ void DynamicBase::Render(float _predictionTime)
 
 bool DynamicBase::Advance() { return Building::Advance(); }
 
-void DynamicBase::ListSoundEvents(LList<char*>* _list)
+void DynamicBase::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 
@@ -115,7 +115,7 @@ void DynamicHub::ReprogramComplete()
   g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
 }
 
-void DynamicHub::ListSoundEvents(LList<char*>* _list)
+void DynamicHub::ListSoundEvents(LList<const char*>* _list)
 {
   DynamicBase::ListSoundEvents(_list);
 
@@ -239,7 +239,7 @@ void DynamicHub::Write(FileWriter* _out)
   _out->printf("%-8d", m_minActiveLinks);
 }
 
-char* DynamicHub::GetObjectiveCounter()
+const char* DynamicHub::GetObjectiveCounter()
 {
   static char result[256];
 
@@ -367,7 +367,7 @@ void DynamicNode::Render(float _predictionTime)
 
 void DynamicNode::RenderAlphas(float _predictionTime) { DynamicBase::RenderAlphas(_predictionTime); }
 
-void DynamicNode::ListSoundEvents(LList<char*>* _list)
+void DynamicNode::ListSoundEvents(LList<const char*>* _list)
 {
   DynamicBase::ListSoundEvents(_list);
 

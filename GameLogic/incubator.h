@@ -55,6 +55,6 @@ public:
 
     void GetDockPoint( LegacyVector3 &_pos, LegacyVector3 &_front );
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 };
 

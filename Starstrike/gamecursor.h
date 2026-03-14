@@ -106,7 +106,7 @@ public:
 	void SetAnimation   (bool _onOrOff);
     void SetShadowed    (bool _onOrOff);
 	void SetHotspot     (float x, float y);
-    void SetColour      (RGBAColour &_col );
+    void SetColour      (const RGBAColour &_col );
 
 	void Render         (float _x, float _y);
     void Render3D       (LegacyVector3 const &_pos, LegacyVector3 const &_front, LegacyVector3 const &_up, bool _cameraScale=true);

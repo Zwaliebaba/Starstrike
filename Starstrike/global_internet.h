@@ -46,9 +46,9 @@ class GlobalInternetLink
 class GlobalInternet
 {
   protected:
-    GlobalInternetNode* m_nodes;
+    std::vector<GlobalInternetNode> m_nodes;
     unsigned short m_numNodes;
-    GlobalInternetLink* m_links;
+    std::vector<GlobalInternetLink> m_links;
     unsigned short m_numLinks;
     LList<int> m_leafs;
     LList<int> m_bursts;

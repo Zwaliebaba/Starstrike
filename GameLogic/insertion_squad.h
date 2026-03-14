@@ -92,7 +92,7 @@ public:
     bool HasSecondaryWeapon     ();
     void FireSecondaryWeapon    ( LegacyVector3 const &_pos );
 
-    void ListSoundEvents	    ( LList<char *> *_list );
+    void ListSoundEvents	    ( LList<const char*> *_list );
 
 	LegacyVector3 GetCameraFocusPoint	();
 

@@ -180,7 +180,7 @@ void PowerBuilding::TriggerSurge(float _initValue)
   g_app->m_soundSystem->TriggerBuildingEvent(this, "TriggerSurge");
 }
 
-void PowerBuilding::ListSoundEvents(LList<char*>* _list)
+void PowerBuilding::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 
@@ -230,7 +230,7 @@ void Generator::TriggerSurge(float _initValue)
   }
 }
 
-char* Generator::GetObjectiveCounter()
+const char* Generator::GetObjectiveCounter()
 {
   static char result[256];
   snprintf(result, sizeof(result), "%s : %d Gq/s", LANGUAGEPHRASE("objective_output"), static_cast<int>(m_throughput * 10));
@@ -243,7 +243,7 @@ void Generator::ReprogramComplete()
   g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
 }
 
-void Generator::ListSoundEvents(LList<char*>* _list)
+void Generator::ListSoundEvents(LList<const char*>* _list)
 {
   PowerBuilding::ListSoundEvents(_list);
 
@@ -609,7 +609,7 @@ void SolarPanel::RenderAlphas(float _predictionTime)
   }
 }
 
-void SolarPanel::ListSoundEvents(LList<char*>* _list)
+void SolarPanel::ListSoundEvents(LList<const char*>* _list)
 {
   PowerBuilding::ListSoundEvents(_list);
 

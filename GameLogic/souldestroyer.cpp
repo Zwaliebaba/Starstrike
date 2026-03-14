@@ -411,7 +411,7 @@ bool SoulDestroyer::AdvanceToTargetPosition()
 }
 
 
-void SoulDestroyer::ListSoundEvents( LList<char *> *_list )
+void SoulDestroyer::ListSoundEvents( LList<const char*> *_list )
 {
     Entity::ListSoundEvents( _list );
 

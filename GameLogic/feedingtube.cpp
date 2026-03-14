@@ -250,7 +250,7 @@ LegacyVector3 FeedingTube::GetStartPoint() { return GetDishPos(0.0f); }
 
 LegacyVector3 FeedingTube::GetEndPoint() { return GetDishPos(0.0f) + (GetDishFront(0.0f) * m_range); }
 
-void FeedingTube::ListSoundEvents(LList<char*>* _list)
+void FeedingTube::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

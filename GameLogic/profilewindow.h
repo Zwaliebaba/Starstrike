@@ -24,7 +24,7 @@ protected:
 public:
 	bool	m_totalPerSecond;
 
-    ProfileWindow( char *name );
+	ProfileWindow( const char *name );
     ~ProfileWindow();
 
     void Render( bool hasFocus );

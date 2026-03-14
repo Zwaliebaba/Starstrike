@@ -304,7 +304,7 @@ void Team::Advance(int _slice)
           LegacyVector3 oldPos(ent->m_pos);
           WorldObjectId myId(m_teamId, -1, i, ent->m_id.GetUniqueId());
 
-          char* entityName = Entity::GetTypeName(ent->m_type);
+          const char* entityName = Entity::GetTypeName(ent->m_type);
           START_PROFILE(g_app->m_profiler, entityName);
           bool amIdead = ent->Advance(nullptr);
           END_PROFILE(g_app->m_profiler, entityName);

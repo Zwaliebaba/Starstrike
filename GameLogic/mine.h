@@ -53,7 +53,7 @@ class MineBuilding : public Building
 
     virtual void TriggerCart(MineCart* _cart, float _initValue);
 
-    void ListSoundEvents(LList<char*>* _list) override;
+    void ListSoundEvents(LList<const char*>* _list) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
@@ -161,7 +161,7 @@ class Refinery : public MineBuilding
     bool Advance() override;
     void Render(float _predictionTime) override;
 
-    char* GetObjectiveCounter() override;
+    const char* GetObjectiveCounter() override;
 
     void TriggerCart(MineCart* _cart, float _initValue) override;
 };

@@ -323,7 +323,7 @@ void ResearchItem::Write( FileWriter *_out )
 }
 
 
-void ResearchItem::ListSoundEvents( LList<char *> *_list )
+void ResearchItem::ListSoundEvents( LList<const char*> *_list )
 {
     Building::ListSoundEvents( _list );
 

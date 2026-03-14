@@ -63,7 +63,7 @@ public:
 
     int Capacity();
 
-    void ListSoundEvents    ( LList<char *> *_list );
+    void ListSoundEvents    ( LList<const char*> *_list );
 
     void GetEntrance( LegacyVector3 &_exitPos, LegacyVector3 &_exitDir );
 };

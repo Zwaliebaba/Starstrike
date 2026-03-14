@@ -540,7 +540,7 @@ bool LaserFence::DoesShapeHit(Shape* _shape, Matrix34 _transform)
   return DoesSphereHit(_transform.pos, _shape->m_rootFragment->m_radius);
 }
 
-void LaserFence::ListSoundEvents(LList<char*>* _list)
+void LaserFence::ListSoundEvents(LList<const char*>* _list)
 {
   Building::ListSoundEvents(_list);
 

@@ -1105,39 +1105,41 @@ void Camera::AdvanceEntityTrackMode()
   if (!g_app->m_location || !m_entityTrack)
     goto finishMode;
 
-  Entity* entity = g_app->m_location->GetEntity(m_objectId);
-  if (!entity || entity->m_dead)
   {
-    WorldObjectId id;
-    GetEntityToTrack(id);
-    m_objectId = id;
+    Entity* entity = g_app->m_location->GetEntity(m_objectId);
+    if (!entity || entity->m_dead)
+    {
+      WorldObjectId id;
+      GetEntityToTrack(id);
+      m_objectId = id;
+    }
+
+    entity = g_app->m_location->GetEntity(m_objectId);
+    if (!entity || entity->m_dead)
+      goto finishMode;
+
+    Task* currentTask = g_app->m_taskManager->GetCurrentTask();
+    if (currentTask && currentTask->m_state != Task::StateRunning)
+      goto finishMode;
+
+    if (!currentTask && entity->m_type != Entity::TypeOfficer)
+      goto finishMode;
+
+    if (!m_objectId.IsValid())
+      goto finishMode;
+
+    // Calculate the predicated position of the entity (where it should be at
+    // the next frame). This is used by the auxiliary functions.
+    m_predictedEntityPos = entity->m_pos + g_advanceTime * entity->m_vel;
+    m_trackingEntity = entity;
+
+    AdvanceAutomaticTracking();
+
+    // Ensure that the target cursor remains in the centre of the screen
+    int halfHeight = g_app->m_renderer->ScreenH() / 2;
+    int halfWidth = g_app->m_renderer->ScreenW() / 2;
+    g_target->SetMousePos(halfWidth, halfHeight);
   }
-
-  entity = g_app->m_location->GetEntity(m_objectId);
-  if (!entity || entity->m_dead)
-    goto finishMode;
-
-  Task* currentTask = g_app->m_taskManager->GetCurrentTask();
-  if (currentTask && currentTask->m_state != Task::StateRunning)
-    goto finishMode;
-
-  if (!currentTask && entity->m_type != Entity::TypeOfficer)
-    goto finishMode;
-
-  if (!m_objectId.IsValid())
-    goto finishMode;
-
-  // Calculate the predicated position of the entity (where it should be at
-  // the next frame). This is used by the auxiliary functions.
-  m_predictedEntityPos = entity->m_pos + g_advanceTime * entity->m_vel;
-  m_trackingEntity = entity;
-
-  AdvanceAutomaticTracking();
-
-  // Ensure that the target cursor remains in the centre of the screen
-  int halfHeight = g_app->m_renderer->ScreenH() / 2;
-  int halfWidth = g_app->m_renderer->ScreenW() / 2;
-  g_target->SetMousePos(halfWidth, halfHeight);
 
   return;
 

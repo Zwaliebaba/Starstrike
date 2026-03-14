@@ -14,8 +14,7 @@ class WorldObjectId;
 class EntityGrid
 {
 private:
-    WorldObjectId       *m_neighbours;
-    int                 m_maxNeighbours;
+	std::vector<WorldObjectId> m_neighbours;
 
 	EntityGridCell      *m_cells[NUM_TEAMS];
 

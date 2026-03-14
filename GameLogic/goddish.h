@@ -29,6 +29,6 @@ public:
 
     void TriggerSpam();
 
-    void ListSoundEvents( LList<char *> *_list );
+    void ListSoundEvents( LList<const char*> *_list );
 };
 
