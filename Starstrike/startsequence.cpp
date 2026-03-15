@@ -85,7 +85,7 @@ bool StartSequence::Advance()
   return false;
 }
 
-void StartSequence::Render()
+void StartSequence::Render2D()
 {
   float screenRatio = static_cast<float>(g_app->m_renderer->ScreenH()) / static_cast<float>(g_app->m_renderer->ScreenW());
   int screenH = 800 * screenRatio;
@@ -166,11 +166,18 @@ void StartSequence::Render()
       glEnd();
     }
   }
+}
 
-  g_app->m_renderer->SetupMatricesFor3D();
+void StartSequence::Render3D()
+{
+  float timeNow = GetHighResTime() - m_startTime;
+  if (timeNow <= 50.0f)
+    return;
 
   //
   // Render grid behind darwinia
+
+  auto& mv = OpenGLD3D::GetModelViewStack();
 
   float scale = 1000.0f;
 
@@ -188,50 +195,45 @@ void StartSequence::Render()
   float zStart = -4000.0f * r;
   float zEnd = 4000.0f + 4000.0f * r;
 
-  float fogColor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  mv.Push();
+  mv.Scale(scale, scale, scale);
 
-  if (timeNow > 50.0f)
+  glFogf(GL_FOG_DENSITY, 1.0f);
+  glFogf(GL_FOG_START, 0.0f);
+  glFogf(GL_FOG_END, static_cast<float>(fogVal));
+  glFogfv(GL_FOG_COLOR, fogCol);
+  glFogi(GL_FOG_MODE, GL_LINEAR);
+  glEnable(GL_FOG);
+
+  glEnable(GL_LINE_SMOOTH);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  glEnable(GL_DEPTH_TEST);
+
+  glColor4f(0.5, 0.5, 1.0, 0.5);
+
+  float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;
+  percentDrawn = max(percentDrawn, 0.0f);
+  xEnd -= (8000 + 4000 * r * percentDrawn);
+  zEnd -= (8000 + 4000 * r * percentDrawn);
+
+  for (int x = xStart; x < xEnd; x += gridSize)
   {
-    mv.Push();
-    mv.Scale(scale, scale, scale);
-
-    glFogf(GL_FOG_DENSITY, 1.0f);
-    glFogf(GL_FOG_START, 0.0f);
-    glFogf(GL_FOG_END, static_cast<float>(fogVal));
-    glFogfv(GL_FOG_COLOR, fogCol);
-    glFogi(GL_FOG_MODE, GL_LINEAR);
-    glEnable(GL_FOG);
-
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glEnable(GL_DEPTH_TEST);
-    
-    glColor4f(0.5, 0.5, 1.0, 0.5);
-
-    float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;
-    percentDrawn = max(percentDrawn, 0.0f);
-    xEnd -= (8000 + 4000 * r * percentDrawn);
-    zEnd -= (8000 + 4000 * r * percentDrawn);
-
-    for (int x = xStart; x < xEnd; x += gridSize)
-    {
-      glBegin(GL_LINES);
-      glVertex3f(x, height, zStart);
-      glVertex3f(x, height, zEnd);
-      glVertex3f(xStart, height, x);
-      glVertex3f(xEnd, height, x);
-      glEnd();
-    }
-
-    glDisable(GL_LINE_SMOOTH);
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(true);
-
-    g_app->m_globalWorld->SetupFog();
-    glDisable(GL_FOG);
-
-    mv.Pop();
+    glBegin(GL_LINES);
+    glVertex3f(x, height, zStart);
+    glVertex3f(x, height, zEnd);
+    glVertex3f(xStart, height, x);
+    glVertex3f(xEnd, height, x);
+    glEnd();
   }
+
+  glDisable(GL_LINE_SMOOTH);
+  glDisable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDepthMask(true);
+
+  g_app->m_globalWorld->SetupFog();
+  glDisable(GL_FOG);
+
+  mv.Pop();
 }

@@ -23,6 +23,7 @@
 #include "taskmanager.h"
 #include "taskmanager_interface_icons.h"
 #include "gamecursor.h"
+#include "gamecursor_2d.h"
 #include "level_file.h"
 
 GameApp* g_app = nullptr;
@@ -85,6 +86,7 @@ GameApp::GameApp()
   m_renderer->Initialise();
 
   m_gameCursor = new GameCursor();
+  m_gameCursor2D = new GameCursor2D(*m_gameCursor);
   m_soundSystem = new SoundSystem();
   m_clientToServer = new ClientToServer();
   m_userInput = new UserInput();
@@ -144,6 +146,7 @@ GameApp::~GameApp()
   SAFE_DELETE(m_userInput);
   SAFE_DELETE(m_clientToServer);
   SAFE_DELETE(m_soundSystem);
+  SAFE_DELETE(m_gameCursor2D);
   SAFE_DELETE(m_gameCursor);
   SAFE_DELETE(m_renderer);
 #ifdef PROFILER_ENABLED

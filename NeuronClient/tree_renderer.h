@@ -9,12 +9,12 @@ class Tree;
 // --- Per-tree GPU resources ---
 struct TreeGPUData
 {
-    winrt::com_ptr<ID3D12Resource> vertexBuffer;
-    D3D12_VERTEX_BUFFER_VIEW      vbView{};
-    UINT branchVertexStart = 0;
-    UINT branchVertexCount = 0;
-    UINT leafVertexStart   = 0;
-    UINT leafVertexCount   = 0;
+  com_ptr<ID3D12Resource> vertexBuffer;
+  D3D12_VERTEX_BUFFER_VIEW vbView{};
+  UINT branchVertexStart = 0;
+  UINT branchVertexCount = 0;
+  UINT leafVertexStart = 0;
+  UINT leafVertexCount = 0;
 };
 
 // --- Tree renderer (singleton) ---
@@ -24,7 +24,7 @@ struct TreeGPUData
 // without depending on DX12 headers.
 class TreeRenderer final : public ITreeRenderBackend
 {
-public:
+  public:
     static TreeRenderer& Get();
 
     void Init();
@@ -35,13 +35,13 @@ public:
     // ITreeRenderBackend
     void ReleaseTree(int _uniqueId) override;
 
-private:
+  private:
     TreeRenderer() = default;
     ~TreeRenderer() override = default;
 
     void EnsureUploaded(Tree* _tree);
 
-    GraphicsPSO   m_pso{ L"Tree PSO" };
+    GraphicsPSO m_pso{L"Tree PSO"};
 
     D3D12_GPU_DESCRIPTOR_HANDLE m_treeTextureSRV{};
     bool m_textureLoaded = false;
@@ -50,5 +50,5 @@ private:
 
     // One-shot upload resources awaiting GPU completion before release.
     // Cleared at the start of each frame after the previous frame's fence signals.
-    std::vector<winrt::com_ptr<ID3D12Resource>> m_pendingUploads;
+    std::vector<com_ptr<ID3D12Resource>> m_pendingUploads;
 };

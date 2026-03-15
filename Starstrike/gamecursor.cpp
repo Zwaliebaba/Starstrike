@@ -14,6 +14,7 @@
 #include "global_world.h"
 #include "main.h"
 #include "gamecursor.h"
+#include "gamecursor_2d.h"
 #include "renderer.h"
 #include "user_input.h"
 #include "taskmanager.h"
@@ -29,71 +30,34 @@
 
 GameCursor::GameCursor()
 :	m_selectionArrowBoost(0.0f),
-	m_highlightingSomething(false),
-	m_validPlacementOpportunity(false),
-	m_moveableEntitySelected(false)
+	m_wasOnScreenLastFrame(true)
 {
-    m_cursorStandard = new MouseCursor( "icons/mouse_main.bmp" );
-	m_cursorStandard->SetHotspot(0.055f, 0.070f);
-    m_cursorStandard->SetSize(25.0f);
-
-    m_cursorPlacement = new MouseCursor( "icons/mouse_placement.bmp" );
+	m_cursorPlacement = new MouseCursor( "icons/mouse_placement.bmp" );
 	m_cursorPlacement->SetHotspot(0.5f, 0.5f);
 	m_cursorPlacement->SetSize(40.0f);
 
-    m_cursorDisabled = new MouseCursor( "icons/mouse_disabled.bmp" );
+	m_cursorDisabled = new MouseCursor( "icons/mouse_disabled.bmp" );
 	m_cursorDisabled->SetHotspot(0.5f, 0.5f);
 	m_cursorDisabled->SetSize(60.0f);
-    m_cursorDisabled->SetColour(RGBAColour(255,0,0,255) );
+	m_cursorDisabled->SetColour(RGBAColour(255,0,0,255) );
 
-    m_cursorMoveHere = new MouseCursor( "icons/mouse_movehere.bmp" );
-    m_cursorMoveHere->SetHotspot( 0.5f, 0.5f);
-    m_cursorMoveHere->SetSize(30.0f);
-    m_cursorMoveHere->SetAnimation( true );
-    m_cursorMoveHere->SetColour(RGBAColour(255,255,150,255) );
+	m_cursorMoveHere = new MouseCursor( "icons/mouse_movehere.bmp" );
+	m_cursorMoveHere->SetHotspot( 0.5f, 0.5f);
+	m_cursorMoveHere->SetSize(30.0f);
+	m_cursorMoveHere->SetAnimation( true );
+	m_cursorMoveHere->SetColour(RGBAColour(255,255,150,255) );
 
-    m_cursorHighlight = new MouseCursor( "icons/mouse_highlight.bmp" );
-    m_cursorHighlight->SetHotspot( 0.5f, 0.5f );
-    m_cursorHighlight->SetAnimation( true );
-
-    m_cursorTurretTarget = new MouseCursor( "icons/mouse_turrettarget.bmp" );
-    m_cursorTurretTarget->SetHotspot( 0.5f, 0.5f );
-    m_cursorTurretTarget->SetColour(RGBAColour(255,255,255,255) );
-    m_cursorTurretTarget->SetShadowed(false);
-
-    m_cursorSelection = new MouseCursor( "icons/mouse_selection.bmp" );
-    m_cursorSelection->SetHotspot( 0.5f, 0.5f );
-
-	m_cursorMissile = nullptr;
-
-    //
-    // Load selection arrow graphic
-
-	snprintf( m_selectionArrowFilename, sizeof(m_selectionArrowFilename), "icons/selectionarrow.bmp" );
-
-    BinaryReader *binReader = g_app->m_resource->GetBinaryReader( m_selectionArrowFilename );
-	ASSERT_TEXT(binReader, "Failed to open mouse cursor resource %s", m_selectionArrowFilename );
-    BitmapRGBA bmp( binReader, "bmp" );
-	SAFE_DELETE(binReader);
-
-	g_app->m_resource->AddBitmap(m_selectionArrowFilename, bmp);
-
-	snprintf(m_selectionArrowShadowFilename, sizeof(m_selectionArrowShadowFilename), "shadow_%s", m_selectionArrowFilename);
-    bmp.ApplyBlurFilter( 10.0f );
-	g_app->m_resource->AddBitmap(m_selectionArrowShadowFilename, bmp);
-
+	m_cursorHighlight = new MouseCursor( "icons/mouse_highlight.bmp" );
+	m_cursorHighlight->SetHotspot( 0.5f, 0.5f );
+	m_cursorHighlight->SetAnimation( true );
 }
 
 GameCursor::~GameCursor()
 {
-	SAFE_DELETE(m_cursorStandard);
 	SAFE_DELETE(m_cursorPlacement);
 	SAFE_DELETE(m_cursorDisabled);
 	SAFE_DELETE(m_cursorMoveHere);
 	SAFE_DELETE(m_cursorHighlight);
-	SAFE_DELETE(m_cursorTurretTarget);
-	SAFE_DELETE(m_cursorSelection);
-	SAFE_DELETE(m_cursorMissile);
 }
 
 bool GameCursor::GetSelectedObject( WorldObjectId &_id, LegacyVector3 &_pos )
@@ -271,293 +235,277 @@ void GameCursor::RenderMarkers()
 }
 
 
-void GameCursor::Render()
+void GameCursor::PrepareCursorState()
 {
-    START_PROFILE( g_app->m_profiler, "Render GameCursor" );
+	START_PROFILE( g_app->m_profiler, "Prepare GameCursor" );
+
+	m_frame = {};
+
+	// Input state
+	m_frame.screenX = g_target->X();
+	m_frame.screenY = g_target->Y();
+	m_frame.mousePos = g_app->m_userInput->GetMousePos3d();
+	m_frame.mousePos.y = max( 1.0f, m_frame.mousePos.y );
+
+	// Context flags
+	m_frame.isEditing = g_app->m_editing || EclGetWindows()->Size() > 0;
+	m_frame.isInteractive = g_app->m_camera->IsInteractive();
+	m_frame.inLocation = g_app->m_location != nullptr;
+	m_frame.inGlobalWorld = g_app->m_locationId == -1;
+
+	// Mode-based suppressions
+	if( !m_frame.isEditing && !m_frame.isInteractive )
+	{
+		// Cut scene or non-interactive camera: suppress standard cursor
+		m_frame.suppressStandardCursor = true;
+	}
+
+	// Early-out: if editing or non-interactive, no further queries needed
+	if( m_frame.isEditing || !m_frame.isInteractive )
+	{
+		END_PROFILE( g_app->m_profiler, "Prepare GameCursor" );
+		return;
+	}
+
+	// Global world: no selection arrows or screen projections needed
+	if( !m_frame.inLocation )
+	{
+     // Query highlighted location while perspective matrices are active.
+		// GetHighlightedLocation calls GetClickRay which reads the GL
+		// projection stack via gluUnProject — must run before the 2D pass
+		// overwrites it with ortho.
+		GlobalLocation *highlightedLocation = g_app->m_globalWorld->GetHighlightedLocation();
+		m_frame.globalWorldLocAvailable = highlightedLocation &&
+										  highlightedLocation->m_missionFilename != "null" &&
+										  highlightedLocation->m_available;
+
+		// The global world path always renders a placement cursor; suppress the
+		// default standard cursor so it doesn't draw on top.
+		m_frame.suppressStandardCursor = true;
+
+		END_PROFILE( g_app->m_profiler, "Prepare GameCursor" );
+		return;
+	}
+
+	// ---- Location-specific queries ----
+
+	Task *task = g_app->m_taskManager->GetCurrentTask();
+	m_frame.currentTask = task;
+	if( task ) m_frame.taskType = task->m_type;
+
+	m_frame.somethingSelected = GetSelectedObject( m_frame.selectedId, m_frame.selectedWorldPos );
+	m_frame.somethingHighlighted = GetHighlightedObject( m_frame.highlightedId, m_frame.highlightedWorldPos, m_frame.highlightedRadius );
+
+	// Entity track mode suppression
+	if( g_app->m_camera->IsInMode( Camera::ModeEntityTrack ) &&
+		!g_app->m_taskManagerInterface->m_visible &&
+		!( task && task->m_state == Task::StateStarted &&
+		   task->m_type != GlobalResearch::TypeOfficer &&
+		   !m_frame.somethingHighlighted ) )
+	{
+		m_frame.suppressStandardCursor = true;
+	}
+
+	// ---- Pre-compute screen projections (while perspective matrices are active) ----
+
+	int screenH = g_app->m_renderer->ScreenH();
+	int screenW = g_app->m_renderer->ScreenW();
+
+	// Selected object screen position (for selection arrows)
+	if( m_frame.somethingSelected && m_frame.selectedId.GetUnitId() != UNIT_BUILDINGS )
+	{
+		// Entity/unit alive checks (moved from RenderSelectionArrows draw path)
+		Entity *ent = g_app->m_location->GetEntity( m_frame.selectedId );
+		Unit *unit = g_app->m_location->GetUnit( m_frame.selectedId );
+		bool alive = (ent || unit);
+		if( ent && ent->m_dead ) alive = false;
+		if( unit && unit->NumAliveEntities() == 0 ) alive = false;
+		m_frame.selectionArrowsValid = alive;
+
+		if( alive )
+		{
+			float rawScreenX, rawScreenY;
+			g_app->m_camera->Get2DScreenPos( m_frame.selectedWorldPos, &rawScreenX, &rawScreenY );
+			// Flip Y to match screen coordinates (Get2DScreenPos returns GL-convention Y)
+			m_frame.selectedScreenX = rawScreenX;
+			m_frame.selectedScreenY = screenH - rawScreenY;
+
+			// Determine if on-screen
+			LegacyVector3 toCam = g_app->m_camera->GetPos() - m_frame.selectedWorldPos;
+			float angle = toCam * g_app->m_camera->GetFront();
+
+			m_frame.selectedOnScreen = ( angle <= 0.0f &&
+										 m_frame.selectedScreenX >= 0 && m_frame.selectedScreenX < screenW &&
+										 m_frame.selectedScreenY >= 0 && m_frame.selectedScreenY < screenH );
+
+			// Off→on screen transition detection (was static bool onScreen in RenderSelectionArrows)
+			if( m_frame.selectedOnScreen && !m_wasOnScreenLastFrame )
+			{
+				BoostSelectionArrows( 2.0f );
+			}
+			m_wasOnScreenLastFrame = m_frame.selectedOnScreen;
+
+			// Pre-compute off-screen edge data
+			if( !m_frame.selectedOnScreen )
+			{
+				LegacyVector3 camPos = g_app->m_camera->GetPos() + g_app->m_camera->GetFront() * 1000;
+				LegacyVector3 camToTarget = ( m_frame.selectedWorldPos - camPos ).SetLength( 100 );
+
+				float camX = screenW / 2.0f;
+				float camY = screenH / 2.0f;
+				float posX, posY;
+				g_app->m_camera->Get2DScreenPos( camPos + camToTarget, &posX, &posY );
+
+				Vector2 lineNormal( posX - camX, posY - camY );
+				lineNormal.Normalise();
+
+				FindScreenEdge( lineNormal, &m_frame.selectedEdgeX, &m_frame.selectedEdgeY );
+
+				lineNormal.x *= -1;
+				m_frame.selectedEdgeNormal = lineNormal;
+			}
+		}
+	}
+
+	// Highlighted object screen position (for halo cursor)
+	if( m_frame.somethingHighlighted )
+	{
+		g_app->m_camera->Get2DScreenPos( m_frame.highlightedWorldPos, &m_frame.highlightedScreenX, &m_frame.highlightedScreenY );
+		m_frame.highlightedOnScreen = true;
+
+		// Pre-compute camera distance for halo sizing
+		m_frame.highlightedCamDist = ( g_app->m_camera->GetPos() - m_frame.highlightedWorldPos ).Mag();
+	}
+
+	// Radar dish entrance screen position
+	if( m_frame.somethingSelected && m_frame.somethingHighlighted &&
+		m_frame.selectedId.GetUnitId() != UNIT_BUILDINGS &&
+		m_frame.highlightedId.GetUnitId() == UNIT_BUILDINGS )
+	{
+		int entityType = Entity::TypeInvalid;
+		if( m_frame.selectedId.GetIndex() == -1 )
+			entityType = g_app->m_location->GetUnit( m_frame.selectedId )->m_troopType;
+		else
+			entityType = g_app->m_location->GetEntity( m_frame.selectedId )->m_type;
+
+		if( entityType == Entity::TypeInsertionSquadie || entityType == Entity::TypeOfficer )
+		{
+			Building *building = g_app->m_location->GetBuilding( m_frame.highlightedId.GetUniqueId() );
+			if( building && building->m_type == Building::TypeRadarDish )
+			{
+				RadarDish *dish = (RadarDish *) building;
+				if( dish->Connected() )
+				{
+					LegacyVector3 entrancePos, entranceFront;
+					dish->GetEntrance( entrancePos, entranceFront );
+					float posX, posY;
+					g_app->m_camera->Get2DScreenPos( entrancePos, &posX, &posY );
+					m_frame.radarDishEntranceValid = true;
+					m_frame.radarDishEntranceScreenX = posX;
+					m_frame.radarDishEntranceScreenY = posY;
+				}
+			}
+		}
+	}
+
+	// Copy selection arrow boost into frame state
+	m_frame.selectionArrowBoost = m_selectionArrowBoost;
+
+	END_PROFILE( g_app->m_profiler, "Prepare GameCursor" );
+}
+
+
+void GameCursor::Render3D()
+{
+	START_PROFILE( g_app->m_profiler, "Render GameCursor 3D" );
 
 	float nearPlaneStart = g_app->m_renderer->GetNearPlane();
 	g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.05f,
-							 			   g_app->m_renderer->GetFarPlane());
+										   g_app->m_renderer->GetFarPlane());
 
-	int screenX = g_target->X();
-	int screenY = g_target->Y();
-    LegacyVector3 mousePos = g_app->m_userInput->GetMousePos3d();
-    mousePos.y = max( 1.0f, mousePos.y );
-
-    bool cursorRendered = false;
-
-	m_highlightingSomething = false;
-	m_validPlacementOpportunity = false;
-	m_moveableEntitySelected = false;
-
-	// Set mip mapping for game cursor
+	// Set mip mapping for game cursor (3D pass)
 	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	glTexParameterf ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    if( g_app->m_editing || EclGetWindows()->Size() > 0 )
-    {
-        // Editing
-    }
-    else if( !g_app->m_camera->IsInteractive() )
-    {
-        // Cut scene of some sort, no player control, so no cursor
-        cursorRendered = true;
-    }
-    else if( !g_app->m_location )
-    {
-        // We are in the global world
-        GlobalLocation *highlightedLocation = g_app->m_globalWorld->GetHighlightedLocation();
-        bool locAvailable = highlightedLocation &&
-                            highlightedLocation->m_missionFilename != "null" &&
-                            highlightedLocation->m_available;
-        g_app->m_renderer->SetupMatricesFor2D();
-        m_cursorPlacement->SetAnimation( locAvailable );
-        m_cursorPlacement->SetSize( 40.0f );
-        m_cursorPlacement->Render(screenX,screenY);
-        if( !locAvailable ) m_cursorDisabled->Render(screenX,screenY);
-        g_app->m_renderer->SetupMatricesFor3D();
-        cursorRendered = true;
-    }
-    else if( g_app->m_location )
-    {
-        // We are at a location
-	    Task *task = g_app->m_taskManager->GetCurrentTask();
-
-        WorldObjectId selectedId;
-        LegacyVector3 selectedWorldPos;
-        LegacyVector3 highlightedWorldPos;
-        WorldObjectId highlightedId;
-        float highlightedRadius;
-
-        bool somethingSelected = GetSelectedObject( selectedId, selectedWorldPos );
-        bool somethingHighlighted = GetHighlightedObject( highlightedId, highlightedWorldPos, highlightedRadius );
-
-        if( g_app->m_taskManagerInterface->m_visible )
-        {
-            // Looking at the task manager
-            if( somethingSelected && selectedId.GetUnitId() != UNIT_BUILDINGS )
-            {
-                RenderSelectionArrows( selectedId, selectedWorldPos );
-            }
-
-            if( somethingHighlighted )
-            {
-                float camDist = ( g_app->m_camera->GetPos() - highlightedWorldPos ).Mag();
-                float posX, posY;
-                g_app->m_camera->Get2DScreenPos( highlightedWorldPos, &posX, &posY );
-                m_cursorSelection->SetSize( highlightedRadius * 100 / sqrt(camDist) );
-                m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
-                m_cursorSelection->SetAnimation( false );
-                g_app->m_renderer->SetupMatricesFor2D();
-                m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
-                g_app->m_renderer->SetupMatricesFor3D();
-            }
-
-        }
-        else if( task &&
-                task->m_state == Task::StateStarted &&
-                task->m_type != GlobalResearch::TypeOfficer &&
-                !somethingHighlighted )
-        {
-            // The player is placing a task
-            bool validPlacement = g_app->m_taskManager->IsValidTargetArea(task->m_id, mousePos);
-            m_cursorPlacement->SetAnimation( validPlacement );
-            m_cursorPlacement->SetSize( 40.0f );
-            LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(mousePos.x, mousePos.z);
-            LegacyVector3 front = (landNormal ^ g_upVector).Normalise();
-            m_cursorPlacement->Render3D( mousePos, front, landNormal );
-            if( !validPlacement)
-				m_cursorDisabled->Render3D(mousePos, front, landNormal);
-			else
-				m_validPlacementOpportunity = true;
-
-            cursorRendered = true;
-        }
-		else if( g_app->m_camera->IsInMode( Camera::ModeEntityTrack ) )
+	if( m_frame.isEditing || !m_frame.isInteractive || !m_frame.inLocation )
+	{
+		// No 3D cursors needed in editing, cut-scene, or global world modes
+	}
+	else
+	{
+		if( m_frame.currentTask &&
+			m_frame.currentTask->m_state == Task::StateStarted &&
+			m_frame.currentTask->m_type != GlobalResearch::TypeOfficer &&
+			!m_frame.somethingHighlighted &&
+			!g_app->m_taskManagerInterface->m_visible )
 		{
-            if (false) {
-			    if( task &&
-				    task->m_type == GlobalResearch::TypeSquad &&
-				    task->m_state == Task::StateRunning )
-			    {
-				    if( g_inputManager->controlEvent( ControlUnitPrimaryFireDirected /* ControlUnitStartSecondaryFireDirected */ ) )
-				    {
-					    InputDetails details;
-					    g_inputManager->controlEvent( ControlUnitPrimaryFireDirected, details );
+			// The player is placing a task
+			bool validPlacement = g_app->m_taskManager->IsValidTargetArea( m_frame.currentTask->m_id, m_frame.mousePos );
+			m_cursorPlacement->SetAnimation( validPlacement );
+			m_cursorPlacement->SetSize( 40.0f );
+			LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue( m_frame.mousePos.x, m_frame.mousePos.z );
+			LegacyVector3 front = (landNormal ^ g_upVector).Normalise();
+			m_cursorPlacement->Render3D( m_frame.mousePos, front, landNormal );
+			if( !validPlacement )
+				m_cursorDisabled->Render3D( m_frame.mousePos, front, landNormal );
 
-					    InsertionSquad *squad = ( InsertionSquad *)g_app->m_location->GetMyTeam()->GetMyUnit();
-					    Squadie *pointMan = (Squadie *)squad->GetPointMan();
-
-					    LegacyVector3 t = pointMan->GetSecondaryWeaponTarget();
-
-					    LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(t.x, t.z);
-					    LegacyVector3 front = (landNormal ^ g_upVector).Normalise();
-
-					    RenderWeaponMarker( t, front, landNormal );
-				    }
-			    }
-            }
-		    cursorRendered = true;
+			m_frame.suppressStandardCursor = true;
+			m_frame.cursorRendered3D = true;
 		}
-        else
-        {
-            if( somethingHighlighted &&
-                !(somethingSelected && highlightedId.GetUnitId() == UNIT_BUILDINGS) )
-            {
-                float camDist = ( g_app->m_camera->GetPos() - highlightedWorldPos ).Mag();
-                if( camDist > 100 || !somethingSelected || selectedId != highlightedId )
-                {
-                    float posX, posY;
-                    g_app->m_camera->Get2DScreenPos( highlightedWorldPos, &posX, &posY );
-                    m_cursorSelection->SetSize( highlightedRadius * 100 / sqrt(camDist) );
-                    m_cursorSelection->SetColour( RGBAColour(255,255,100,255) );
-                    m_cursorSelection->SetAnimation( false );
-                    g_app->m_renderer->SetupMatricesFor2D();
-                    m_cursorSelection->Render( posX, g_app->m_renderer->ScreenH() - posY );
-                    g_app->m_renderer->SetupMatricesFor3D();
+		else if( !g_app->m_taskManagerInterface->m_visible &&
+				 !g_app->m_camera->IsInMode( Camera::ModeEntityTrack ) )
+		{
+			if( m_frame.somethingSelected && m_frame.selectedId.GetUnitId() != UNIT_BUILDINGS )
+			{
+				// Selected a unit OR an entity — move-here marker on terrain
+				if( !m_frame.somethingHighlighted || m_frame.highlightedId.GetUnitId() == UNIT_BUILDINGS )
+				{
+					LegacyVector3 targetFront = (m_frame.mousePos - m_frame.selectedWorldPos).Normalise();
+					LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue( m_frame.mousePos.x, m_frame.mousePos.z );
+					LegacyVector3 targetRight = (targetFront ^ landNormal).Normalise();
+					targetFront = (targetRight ^ landNormal).Normalise();
+					m_cursorMoveHere->SetSize( 30.0f );
+					m_cursorMoveHere->Render3D( m_frame.mousePos, targetFront, landNormal );
+					m_frame.suppressStandardCursor = true;
+					m_frame.cursorRendered3D = true;
+				}
+			}
 
-					m_highlightingSomething = true;
-                }
-            }
+			if( !m_frame.somethingSelected && !m_frame.somethingHighlighted )
+			{
+				// Looking at empty landscape
+				LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue( m_frame.mousePos.x, m_frame.mousePos.z );
+				LegacyVector3 front = (landNormal ^ g_upVector).Normalise();
+				m_cursorHighlight->SetAnimation( false );
+				m_cursorHighlight->SetSize( 30.0f );
+				m_cursorHighlight->Render3D( m_frame.mousePos, front, landNormal );
+				m_frame.suppressStandardCursor = true;
+				m_frame.cursorRendered3D = true;
+			}
+		}
+	}
 
-            if( somethingSelected && selectedId.GetUnitId() != UNIT_BUILDINGS )
-            {
-                int entityType = Entity::TypeInvalid;
-                if( selectedId.GetIndex() == -1 )   entityType = g_app->m_location->GetUnit(selectedId)->m_troopType;
-                else                                entityType = g_app->m_location->GetEntity(selectedId)->m_type;
-
-                RenderSelectionArrows( selectedId, selectedWorldPos );
-				m_moveableEntitySelected = true;
-
-                bool highlightedBuilding = ( somethingHighlighted && highlightedId.GetUnitId() == UNIT_BUILDINGS );
-
-                if( (entityType == Entity::TypeInsertionSquadie ||
-                     entityType == Entity::TypeOfficer)
-                     && highlightedBuilding )
-                {
-                    Building *building = g_app->m_location->GetBuilding( highlightedId.GetUniqueId() );
-
-                    if( building && building->m_type == Building::TypeRadarDish)
-                    {
-                        // Squadies/officer trying to get into a teleport
-                        RadarDish *dish = (RadarDish *) building;
-                        if( dish->Connected() )
-                        {
-                            LegacyVector3 entrancePos, entranceFront;
-                            dish->GetEntrance( entrancePos, entranceFront );
-                            float posX, posY;
-                            g_app->m_camera->Get2DScreenPos( entrancePos, &posX, &posY );
-                            g_app->m_renderer->SetupMatricesFor2D();
-                            m_cursorPlacement->SetSize( 60.0f );
-                            m_cursorPlacement->SetAnimation( true );
-                            m_cursorPlacement->Render( posX, g_app->m_renderer->ScreenH() - posY );
-                            g_app->m_renderer->SetupMatricesFor3D();
-                        }
-                    }
-                }
-
-                // Selected a unit OR an entity
-                if( !somethingHighlighted || highlightedId.GetUnitId() == UNIT_BUILDINGS )
-                {
-                    LegacyVector3 targetFront = (mousePos - selectedWorldPos).Normalise();
-                    LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(mousePos.x, mousePos.z);
-                    LegacyVector3 targetRight = (targetFront ^ landNormal).Normalise();
-                    targetFront = (targetRight ^ landNormal).Normalise();
-                    m_cursorMoveHere->SetSize( 30.0f );
-                    m_cursorMoveHere->Render3D( mousePos, targetFront, landNormal );
-                    cursorRendered = true;
-                }
-            }
-
-            if( somethingSelected && selectedId.GetUnitId() == UNIT_BUILDINGS )
-            {
-                // Selected a building - render a targetting crosshair
-                g_app->m_renderer->SetupMatricesFor2D();
-                m_cursorTurretTarget->SetSize( 200.0f );
-                m_cursorTurretTarget->Render( screenX, screenY );
-                g_app->m_renderer->SetupMatricesFor3D();
-            }
-
-            if( !somethingSelected && !somethingHighlighted )
-            {
-                // Looking at empty landscape
-                LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(mousePos.x, mousePos.z);
-                LegacyVector3 front = (landNormal ^ g_upVector).Normalise();
-                m_cursorHighlight->SetAnimation( false );
-                m_cursorHighlight->SetSize( 30.0f );
-                m_cursorHighlight->Render3D( mousePos, front, landNormal );
-                cursorRendered = true;
-            }
-        }
-    }
-
-    if( !cursorRendered &&
-        g_inputManager->getInputMode() != INPUT_MODE_GAMEPAD )
-    {
-        // Nobody has drawn a cursor yet
-        // So give us the default
-        g_app->m_renderer->SetupMatricesFor2D();
-        RenderStandardCursor(screenX,screenY);
-        g_app->m_renderer->SetupMatricesFor3D();
-    }
-
-    if( g_app->m_location && g_app->m_location->GetMyTeam() )
-    {
-        //RenderSphere( g_app->m_location->GetMyTeam()->m_currentMousePos, 10 );
-    }
-
-    RenderMarkers();
+	RenderMarkers();
 
 	g_app->m_camera->SetupProjectionMatrix(nearPlaneStart,
-								 		   g_app->m_renderer->GetFarPlane());
+										   g_app->m_renderer->GetFarPlane());
 
-    END_PROFILE( g_app->m_profiler, "Render GameCursor" );
+	END_PROFILE( g_app->m_profiler, "Render GameCursor 3D" );
 }
 
 
-void GameCursor::RenderStandardCursor( float _screenX, float _screenY )
+void GameCursor::WriteBackArrowBoost( float _boost )
 {
-    m_cursorStandard->Render(_screenX,_screenY);
+	m_selectionArrowBoost = _boost;
 }
 
 
-void LeftArrow(int x, int y, int size)
+void GameCursor::RenderWeaponMarker ( LegacyVector3 _pos, LegacyVector3 _front, LegacyVector3 _up )
 {
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size, y - size/2 );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size, y + size/2 );
-	glEnd();
-}
-
-
-void RightArrow(int x, int y, int size)
-{
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size, y - size/2 );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,        y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size, y + size/2 );
-	glEnd();
-}
-
-
-void TopArrow(int x, int y, int size)
-{
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x - size/2, y - size );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x + size/2, y - size );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x,          y );
-	glEnd();
-}
-
-
-void BottomArrow(int x, int y, int size)
-{
-	glBegin( GL_TRIANGLES );
-		glTexCoord2f(1.0f, 0.5f);	glVertex2i( x, y );
-		glTexCoord2f(0.0f, 1.0f);	glVertex2i( x + size/2, y + size );
-		glTexCoord2f(0.0f, 0.0f);	glVertex2i( x - size/2, y + size );
-	glEnd();
+	m_cursorPlacement->SetSize(40.0f);
+	m_cursorPlacement->SetShadowed( true );
+	m_cursorPlacement->SetAnimation( true );
+	m_cursorPlacement->Render3D( _pos, _front, _up );
 }
 
 
@@ -567,378 +515,62 @@ void GameCursor::FindScreenEdge( Vector2 const &_line, float *_posX, float *_pos
 //    c = y - mx
 //    x = (y - c) / m
 
-    int screenH = g_app->m_renderer->ScreenH();
-    int screenW = g_app->m_renderer->ScreenW();
+	int screenH = g_app->m_renderer->ScreenH();
+	int screenW = g_app->m_renderer->ScreenW();
 
-    float m = _line.y / _line.x;
-    float c = ( screenH / 2.0f ) - m * ( screenW / 2.0f );
+	float m = _line.y / _line.x;
+	float c = ( screenH / 2.0f ) - m * ( screenW / 2.0f );
 
-    if( _line.y < 0 )
-    {
-        // Intersect with top view plane
-        float x = ( 0 - c ) / m;
-        if( x >= 0 && x <= screenW )
-        {
-            *_posX = x;
-            *_posY = 0;
-            return;
-        }
-    }
-    else
-    {
-        // Intersect with the bottom view plane
-        float x = ( screenH - c ) / m;
-        if( x >= 0 && x <= screenW )
-        {
-            *_posX = x;
-            *_posY = screenH;
-            return;
-        }
-    }
-
-    if( _line.x < 0 )
-    {
-        // Intersect with left view plane
-        float y = m * 0 + c;
-        if( y >= 0 && y <= screenH )
-        {
-            *_posX = 0;
-            *_posY = y;
-            return;
-        }
-    }
-    else
-    {
-        // Intersect with right view plane
-        float y = m * screenW + c;
-        if( y >= 0 && y <= screenH )
-        {
-            *_posX = screenW;
-            *_posY = y;
-            return;
-        }
-    }
-
-    // We should never ever get here
-    DEBUG_ASSERT( false );
-    *_posX = 0;
-    *_posY = 0;
-}
-
-
-void GameCursor::RenderSelectionArrow( float _screenX, float _screenY, float _screenDX, float _screenDY, float _size, float _alpha )
-{
-    Vector2 pos( _screenX, _screenY );
-    Vector2 gradient( _screenDX, _screenDY );
-    Vector2 rightAngle = gradient;
-    float tempX = rightAngle.x;
-    rightAngle.x = rightAngle.y;
-    rightAngle.y = tempX * -1;
-
-    glEnable        ( GL_BLEND );
-    glDisable       ( GL_CULL_FACE );
-    glDepthMask     ( false );
-
-    glColor4f       ( _alpha, _alpha, _alpha, 0.0f );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR );
-
-    glEnable        ( GL_TEXTURE_2D );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( m_selectionArrowShadowFilename ) );
-
-    glBegin( GL_QUADS );
-        glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-        glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-        glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-        glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-    glEnd();
-
-    glColor4f       ( 1.0f, 1.0f, 0.3f, _alpha );
-	glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( m_selectionArrowFilename ) );
-
-    glBegin( GL_QUADS );
-        glTexCoord2i( 0, 1 );       glVertex2fv( (pos - rightAngle * _size / 2.0f).GetData() );
-        glTexCoord2i( 0, 0 );       glVertex2fv( (pos - rightAngle * _size / 2.0f + gradient * _size).GetData() );
-        glTexCoord2i( 1, 0 );       glVertex2fv( (pos + rightAngle * _size / 2.0f + gradient * _size).GetData() );
-        glTexCoord2i( 1, 1 );       glVertex2fv( (pos + rightAngle * _size / 2.0f).GetData() );
-    glEnd();
-
-    glDepthMask     ( true );
-    glDisable       ( GL_TEXTURE_2D );
-    glEnable        ( GL_CULL_FACE );
-
-}
-
-
-void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &_pos )
-{
-	Entity *ent = g_app->m_location->GetEntity( _id );
-	Unit *unit = g_app->m_location->GetUnit( _id );
-	if( !ent && !unit ) return;
-	if( ent && ent->m_dead ) return;
-	if( unit && unit->NumAliveEntities() == 0 ) return;
-
-    float triSize = 40.0f;
-
-    static bool onScreen = true;
-
-    int screenH = g_app->m_renderer->ScreenH();
-    int screenW = g_app->m_renderer->ScreenW();
-
-    //
-    // Project worldTarget into screen co-ordinates
-    // Is the _pos on screen or not?
-
-    float screenX, screenY;
-    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
-    screenY = screenH - screenY;
-
-	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
-	float angle = toCam * g_app->m_camera->GetFront();
-	LegacyVector3 rotationVector = toCam ^ g_app->m_camera->GetFront();
-
-    if( angle <= 0.0f &&
-        screenX >= 0 && screenX < screenW &&
-        screenY >= 0 && screenY < screenH )
-    {
-        // _pos is onscreen
-        float camDist = toCam.Mag();
-	    m_selectionArrowBoost -= g_advanceTime * 0.4f;
-
-        float distanceOut = 1000 / sqrtf( camDist );
-        float alpha = min( m_selectionArrowBoost, 0.9f );
-
-        if( camDist > 200.0f )
-        {
-            alpha = max( min( ( camDist - 200.0f ) / 200.0f, 0.9f ), alpha );
-        }
-        g_app->m_renderer->SetupMatricesFor2D();
-        RenderSelectionArrow( screenX, screenY - distanceOut, 0, -1, triSize, alpha );
-        RenderSelectionArrow( screenX, screenY + distanceOut, 0, 1, triSize, alpha );
-        RenderSelectionArrow( screenX - distanceOut, screenY, -1, 0, triSize, alpha );
-        RenderSelectionArrow( screenX + distanceOut, screenY, 1, 0, triSize, alpha );
-        g_app->m_renderer->SetupMatricesFor3D();
-
-        if( !onScreen ) BoostSelectionArrows(2.0f);
-        onScreen = true;
-    }
-    else
-    {
-        // _pos is offscreen
-        LegacyVector3 camPos = g_app->m_camera->GetPos() + g_app->m_camera->GetFront() * 1000;
-        LegacyVector3 camToTarget = ( _pos - camPos ).SetLength( 100 );
-
-        float camX = screenW / 2.0f;
-        float camY = screenH / 2.0f;
-        float posX, posY;
-        g_app->m_camera->Get2DScreenPos( camPos + camToTarget, &posX, &posY );
-
-        Vector2 lineNormal( posX - camX, posY - camY );
-        lineNormal.Normalise();
-
-        float edgeX, edgeY;
-        FindScreenEdge( lineNormal, &edgeX, &edgeY );
-
-        lineNormal.x *= -1;
-
-        g_app->m_renderer->SetupMatricesFor2D();
-        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize * 1.5f, 0.9f );
-        g_app->m_renderer->SetupMatricesFor3D();
-
-        onScreen = false;
-    }
-}
-
-
-/*
-void GameCursor::RenderSelectionArrows( WorldObjectId _id, LegacyVector3 const &_pos )
-{
-	float triSize = 36.0f;          // + fabs(sinf(g_gameTime*4)) * 10;
-	float xOut = 24.0f;
-	float yOut = 24.0f;
-
-    static bool onScreen = true;
-
-	// Project worldTarget into screen co-ordinates
-    int screenH = g_app->m_renderer->ScreenH();
-    int screenW = g_app->m_renderer->ScreenW();
-    float screenX, screenY;
-    g_app->m_camera->Get2DScreenPos( _pos, &screenX, &screenY );
-    screenY = screenH - screenY;
-
-	// Calculate alpha
-	LegacyVector3 toCam = g_app->m_camera->GetPos() - _pos;
-	float distance = toCam.Mag();
-
-    if( distance < 400.0f )
-    {
-        xOut += ( 100.0f - distance/4.0f );
-        yOut += ( 100.0f - distance/4.0f );
-    }
-
-    float alpha = 0.0f;
-	if (distance > 350.0f)
+	if( _line.y < 0 )
 	{
-		distance -= 350.0f;
-		alpha = distance / 300.0f;
-		alpha = min(alpha, SELECTION_ARROWS_MAX_ALPHA);
-	}
-
-	if (m_selectionArrowBoost > alpha)
-	{
-		alpha = min(m_selectionArrowBoost, SELECTION_ARROWS_MAX_ALPHA);
-	}
-	static double lastTime = g_gameTime;
-	double deltaTime = g_gameTime - lastTime;
-	lastTime = g_gameTime;
-	m_selectionArrowBoost -= g_advanceTime * BOOST_FADE_RATE;
-
-	// Deal with the selected unit not being on screen
-	float angle = toCam * g_app->m_camera->GetFront();
-	LegacyVector3 rotationVector = toCam ^ g_app->m_camera->GetFront();
-	if (angle > 0.0f)
-	{
-		// Unit is behind camera
-
-		alpha = SELECTION_ARROWS_MAX_ALPHA;
-
-		if (rotationVector.y < 0.0f)
+		// Intersect with top view plane
+		float x = ( 0 - c ) / m;
+		if( x >= 0 && x <= screenW )
 		{
-			screenX = screenW + xOut - triSize / 3.0f;
+			*_posX = x;
+			*_posY = 0;
+			return;
 		}
-		else
-		{
-			screenX = -xOut + triSize / 3.0f;
-		}
-		screenY = screenH / 2;
-
-        triSize *= 1.5f;
-        onScreen = false;
 	}
 	else
 	{
-		// Unit is infront of camera
-
-        if( !onScreen )
-        {
-            BoostSelectionArrows( 2.0f );
-        }
-
-		if (screenX > screenW + xOut)
+		// Intersect with the bottom view plane
+		float x = ( screenH - c ) / m;
+		if( x >= 0 && x <= screenW )
 		{
-			alpha = SELECTION_ARROWS_MAX_ALPHA;
-			screenX = screenW + xOut - triSize / 3.0f;
-			screenY = screenH / 2.0f;
-            //screenY = min( screenY, screenH );
-            //screenY = max( screenY, 0 );
-            onScreen = false;
-            triSize *= 1.5f;
+			*_posX = x;
+			*_posY = screenH;
+			return;
 		}
-		else if (screenX < -xOut)
+	}
+
+	if( _line.x < 0 )
+	{
+		// Intersect with left view plane
+		float y = m * 0 + c;
+		if( y >= 0 && y <= screenH )
 		{
-			alpha = SELECTION_ARROWS_MAX_ALPHA;
-			screenX = -xOut + triSize / 3.0f;
-			screenY = screenH / 2.0f;
-            //screenY = min( screenY, screenH );
-            //screenY = max( screenY, 0 );
-            triSize *= 1.5f;
-            onScreen = false;
+			*_posX = 0;
+			*_posY = y;
+			return;
 		}
-		else if (screenY > screenH + yOut)
+	}
+	else
+	{
+		// Intersect with right view plane
+		float y = m * screenW + c;
+		if( y >= 0 && y <= screenH )
 		{
-			alpha = SELECTION_ARROWS_MAX_ALPHA;
-			screenX = screenW / 2.0f;
-			screenY = screenH + yOut - triSize / 3.0f;
-            triSize *= 1.5f;
-            onScreen = false;
+			*_posX = screenW;
+			*_posY = y;
+			return;
 		}
-		else if (screenY < -yOut)
-		{
-			alpha = SELECTION_ARROWS_MAX_ALPHA;
-			screenX = screenW / 2.0f;
-			screenY = -yOut + triSize / 3.0f;
-            triSize *= 1.5f;
-            onScreen = false;
-		}
-        else
-        {
-            onScreen = true;
-        }
-   	}
+	}
 
-    if( !onScreen )
-    {
-        LegacyVector3 camPos = g_app->m_camera->GetPos() + g_app->m_camera->GetFront() * 1000;
-        LegacyVector3 camToTarget = ( _pos - camPos ).SetLength( 100 );
-
-        float camX = screenW / 2.0f;
-        float camY = screenH / 2.0f;
-        float posX, posY;
-        g_app->m_camera->Get2DScreenPos( camPos + camToTarget, &posX, &posY );
-
-        Vector2 lineNormal( posX - camX, posY - camY );
-        lineNormal.Normalise();
-
-        float edgeX, edgeY;
-        FindScreenEdge( lineNormal, &edgeX, &edgeY );
-
-        lineNormal.x *= -1;
-
-        g_app->m_renderer->SetupMatricesFor2D();
-
-        RenderSelectionArrow( edgeX, screenH - edgeY, lineNormal.x, lineNormal.y, triSize, 1.0f );
-
-        g_app->m_renderer->SetupMatricesFor3D();
-    }
-    else
-    {
-	    // Get ready to render
-        g_app->m_renderer->SetupMatricesFor2D();
-        glEnable        ( GL_BLEND );
-        glDisable       ( GL_CULL_FACE );
-    //	glEnable		( GL_TEXTURE_2D );
-    //	glBindTexture	( GL_TEXTURE_2D, g_app->m_resource->GetTexture("selection_arrow") );
-
-	    // Do subtractive pass
-	    {
-		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha/2.0f );
-		    glBlendFunc		( GL_ZERO, GL_ONE_MINUS_SRC_ALPHA );
-
-		    LeftArrow ( screenX - xOut, screenY, triSize );
-		    RightArrow( screenX + xOut, screenY, triSize );
-		    TopArrow  ( screenX, screenY - yOut, triSize );
-		    BottomArrow(screenX, screenY + yOut, triSize );
-	    }
-
-	    // Do additive pass
-	    {
-		    float myTriSize = triSize - 8.0f;
-		    float myXOut = xOut + 5.0f;
-		    float myYOut = yOut + 5.0f;
-
-		    glColor4f       ( 0.9f, 0.9f, 0.1f, alpha );
-		    glBlendFunc		( GL_SRC_ALPHA, GL_ONE );
-
-		    LeftArrow ( screenX - myXOut, screenY, myTriSize );
-		    RightArrow( screenX + myXOut, screenY, myTriSize );
-		    TopArrow  ( screenX, screenY - myYOut, myTriSize );
-		    BottomArrow(screenX, screenY + myYOut, myTriSize );
-	    }
-
-        glDisable       ( GL_BLEND );
-        glEnable        ( GL_CULL_FACE );
-    //	glDisable		( GL_TEXTURE_2D );
-
-        g_app->m_renderer->SetupMatricesFor3D();
-    }
-}*/
-
-void GameCursor::RenderWeaponMarker ( LegacyVector3 _pos, LegacyVector3 _front, LegacyVector3 _up )
-{
-    m_cursorPlacement->SetSize(40.0f);
-    m_cursorPlacement->SetShadowed( true );
-    m_cursorPlacement->SetAnimation( true );
-    m_cursorPlacement->Render3D( _pos, _front, _up );
+	// We should never ever get here
+	DEBUG_ASSERT( false );
+	*_posX = 0;
+	*_posY = 0;
 }
 
 

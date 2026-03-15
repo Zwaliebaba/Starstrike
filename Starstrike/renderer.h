@@ -43,6 +43,7 @@ class Renderer
     void RenderLogo();
 
     void RenderFadeOut();
+   void RenderHUD();
     void RenderFrame(bool withFlip = true);
     void RenderPaused();
 

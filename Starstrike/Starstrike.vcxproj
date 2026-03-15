@@ -461,6 +461,7 @@
     <ClCompile Include="entity_grid.cpp" />
     <ClCompile Include="explosion.cpp" />
     <ClCompile Include="gamecursor.cpp" />
+    <ClCompile Include="gamecursor_2d.cpp" />
     <ClCompile Include="global_internet.cpp" />
     <ClCompile Include="global_world.cpp" />
     <ClCompile Include="landscape.cpp" />
@@ -497,6 +498,7 @@
     <ClInclude Include="entity_grid.h" />
     <ClInclude Include="explosion.h" />
     <ClInclude Include="gamecursor.h" />
+    <ClInclude Include="gamecursor_2d.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="global_internet.h" />
     <ClInclude Include="global_world.h" />

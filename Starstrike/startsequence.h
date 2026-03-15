@@ -19,7 +19,8 @@ public:
     ~StartSequence();
 
     bool Advance();
-    void Render();
+    void Render2D();
+    void Render3D();
 };
 
 

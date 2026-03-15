@@ -20,6 +20,7 @@ class Script;
 class Profiler;
 class MouseCursor;
 class GameCursor;
+class GameCursor2D;
 class StartSequence;
 class BitmapRGBA;
 
@@ -49,6 +50,7 @@ class GameApp : public GameMain
     TaskManagerInterface* m_taskManagerInterface;
     Script* m_script;
     GameCursor* m_gameCursor;
+    GameCursor2D* m_gameCursor2D;
     StartSequence* m_startSequence;
 
     bool m_bypassNetworking;

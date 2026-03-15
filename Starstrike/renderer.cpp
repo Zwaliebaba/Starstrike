@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "explosion.h"
 #include "gamecursor.h"
+#include "gamecursor_2d.h"
 #include "global_world.h"
 #include "hi_res_time.h"
 #include "input.h"
@@ -242,46 +243,9 @@ void Renderer::RenderPaused()
   font.EndText2D();
 }
 
-void Renderer::RenderFrame(bool withFlip)
+void Renderer::RenderHUD()
 {
-  SetOpenGLState();
-
-  if (g_app->m_locationId == -1)
-  {
-    m_nearPlane = 50.0f;
-    m_farPlane = 10000000.0f;
-  }
-  else
-  {
-    m_nearPlane = 5.0f;
-    m_farPlane = 15000.0f;
-  }
-
-  FPSMeterAdvance();
-  SetupMatricesFor3D();
-
-  START_PROFILE(g_app->m_profiler, "Render Clear");
-  RGBAColour* col = &g_app->m_backgroundColour;
-  if (g_app->m_location)
-    glClearColor(col->r / 255.0f, col->g / 255.0f, col->b / 255.0f, col->a / 255.0f);
-  else
-    glClearColor(0.05f, 0.0f, 0.05f, 0.1f);
-  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-  END_PROFILE(g_app->m_profiler, "Render Clear");
-
-  if (g_app->m_locationId != -1)
-    g_app->m_location->Render();
-  else
-    g_app->m_globalWorld->Render();
-
-  g_explosionManager.Render();
-  g_app->m_particleSystem->Render();
-  g_app->m_userInput->Render();
-  g_app->m_gameCursor->Render();
-  g_app->m_taskManagerInterface->Render();
-  g_app->m_camera->Render();
-
-  g_editorFont.BeginText2D();
+  // Caller provides ortho matrix via g_editorFont.BeginText2D().
 
   if (m_displayFPS)
   {
@@ -295,9 +259,6 @@ void Renderer::RenderFrame(bool withFlip)
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     g_editorFont.DrawText2D(12, 10, DEF_FONT_SIZE, "FPS: %d", m_fps);
-    //		g_editorFont.DrawText2D( 150, 10, DEF_FONT_SIZE, "TFPS: %2.0f", g_targetFrameRate);
-    //		LegacyVector3 const camPos = g_app->m_camera->GetPos();
-    //		g_editorFont.DrawText2D( 150, 10, DEF_FONT_SIZE, "cam: %.1f, %.1f, %.1f", camPos.x, camPos.y, camPos.z);
   }
 
   if (m_displayInputMode)
@@ -355,9 +316,15 @@ void Renderer::RenderFrame(bool withFlip)
 #endif
   }
 
+  // StartSequence::Render2D() sets its own ortho (OrthoOffCenterRH(0, 800, ...))
+  // which differs from the BeginText2D ortho.  This is intentional — the start
+  // sequence uses a fixed 800-wide virtual coordinate system for its captions.
   if (g_app->m_startSequence)
-    g_app->m_startSequence->Render();
+    g_app->m_startSequence->Render2D();
 
+  // Darwin logo: uses g_gameFont.DrawText2DCentre() inside the g_editorFont
+  // BeginText2D/EndText2D pair.  This works because both TextRenderer instances
+  // compute identical ortho matrices (viewport-based).
   if (m_renderDarwinLogo >= 0.0f)
   {
     int textureId = g_app->m_resource->GetTexture("icons/darwin_research_associates.bmp");
@@ -432,6 +399,65 @@ void Renderer::RenderFrame(bool withFlip)
     glColor4f(1.0f, 1.0f, 1.0f, alpha);
     g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
   }
+}
+
+void Renderer::RenderFrame(bool withFlip)
+{
+  SetOpenGLState();
+
+  if (g_app->m_locationId == -1)
+  {
+    m_nearPlane = 50.0f;
+    m_farPlane = 10000000.0f;
+  }
+  else
+  {
+    m_nearPlane = 5.0f;
+    m_farPlane = 15000.0f;
+  }
+
+  FPSMeterAdvance();
+  SetupMatricesFor3D();
+
+  START_PROFILE(g_app->m_profiler, "Render Clear");
+  RGBAColour* col = &g_app->m_backgroundColour;
+  if (g_app->m_location)
+    glClearColor(col->r / 255.0f, col->g / 255.0f, col->b / 255.0f, col->a / 255.0f);
+  else
+    glClearColor(0.05f, 0.0f, 0.05f, 0.1f);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+  END_PROFILE(g_app->m_profiler, "Render Clear");
+
+  if (g_app->m_locationId != -1)
+    g_app->m_location->Render();
+  else
+    g_app->m_globalWorld->Render();
+
+  g_explosionManager.Render();
+  g_app->m_particleSystem->Render();
+
+  // ====== 3D PASS ======
+  g_app->m_gameCursor->PrepareCursorState();
+  g_app->m_gameCursor->Render3D();
+  g_app->m_taskManagerInterface->Render3D();
+
+  if (g_app->m_startSequence)
+    g_app->m_startSequence->Render3D();
+
+  g_app->m_camera->Render();
+
+  // ====== 2D PASS ======
+  // BeginText2D sets ortho projection and the 2D state contract:
+  // GL_DEPTH_TEST off, glDepthMask(false), GL_CULL_FACE off, GL_BLEND on.
+  g_editorFont.BeginText2D();
+
+  g_app->m_userInput->Render();
+  g_app->m_taskManagerInterface->Render2D();
+  g_app->m_gameCursor2D->Render();
+  g_app->m_gameCursor->WriteBackArrowBoost(
+    g_app->m_gameCursor2D->GetUpdatedArrowBoost());
+
+  RenderHUD();
 
   g_editorFont.EndText2D();
 

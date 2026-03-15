@@ -112,25 +112,12 @@ void UserInput::Render()
 
   //
   // Render 2D overlays
-
-  g_editorFont.BeginText2D();
+  // Caller provides ortho matrix and 2D GL state (depth off, blend on, cull off).
 
   //
   // Eclipse
 
-  glEnable(GL_BLEND);
-  glDisable(GL_CULL_FACE);
-  glDisable(GL_DEPTH_TEST);
-  glDepthMask(false);
-
   EclRender();
-
-  glDepthMask(true);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_BLEND);
-
-  g_editorFont.EndText2D();
 
   //
   // Render 3d mouse history

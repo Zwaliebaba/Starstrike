@@ -80,7 +80,8 @@ class TaskManagerInterface
     void RunDefaultObjective(GlobalEventCondition* _cond); // Runs basic cut-scene for trunk ports + research items
 
     virtual void Advance() = 0;
-    virtual void Render() = 0;
+    virtual void Render3D() {}
+    virtual void Render2D() {}
 
     void AdvanceTab();
 

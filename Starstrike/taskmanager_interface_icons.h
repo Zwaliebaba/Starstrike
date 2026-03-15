@@ -85,7 +85,8 @@ class TaskManagerInterfaceIcons : public TaskManagerInterface
     TaskManagerInterfaceIcons();
 
     void Advance() override;
-    void Render() override;
+    void Render3D() override;
+    void Render2D() override;
 
     bool ControlEvent(TMControl _type) override;
     bool AdviseCreateControlHelpBlue() override;

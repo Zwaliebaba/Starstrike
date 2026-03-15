@@ -15,6 +15,7 @@
 #include "clienttoserver.h"
 #include "GameApp.h"
 #include "gamecursor.h"
+#include "gamecursor_2d.h"
 #include "global_world.h"
 #include "location.h"
 #include "renderer.h"
@@ -337,12 +338,10 @@ void TaskManagerInterfaceIcons::ConvertMousePosition(float& _x, float& _y)
 
 void TaskManagerInterfaceIcons::RestoreRenderMatrices() { g_app->m_renderer->SetupMatricesFor2D(); }
 
-void TaskManagerInterfaceIcons::Render()
+void TaskManagerInterfaceIcons::Render3D()
 {
   if (g_app->m_editing || !g_app->m_location || EclGetWindows()->Size())
     return;
-
-  START_PROFILE(g_app->m_profiler, "Render Taskman");
 
   glEnable(GL_BLEND);
   glDisable(GL_CULL_FACE);
@@ -350,7 +349,16 @@ void TaskManagerInterfaceIcons::Render()
   if (g_app->m_locationId != -1)
     RenderTargetAreas();
 
-  g_gameFont.BeginText2D();
+  glEnable(GL_CULL_FACE);
+  glDisable(GL_BLEND);
+}
+
+void TaskManagerInterfaceIcons::Render2D()
+{
+  // Caller provides ortho matrix and 2D GL state (depth off, blend on, cull off).
+  if (g_app->m_editing || !g_app->m_location || EclGetWindows()->Size())
+    return;
+
   SetupRenderMatrices(ScreenOverlay);
 
   RenderMessages();
@@ -413,15 +421,8 @@ void TaskManagerInterfaceIcons::Render()
   {
     float mouseX = g_target->X();
     float mouseY = g_target->Y();
-    g_app->m_gameCursor->RenderStandardCursor(mouseX, mouseY);
+    g_app->m_gameCursor2D->RenderStandardCursor(mouseX, mouseY);
   }
-
-  g_gameFont.EndText2D();
-
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_BLEND);
-
-  END_PROFILE(g_app->m_profiler, "Render Taskman");
 }
 
 void TaskManagerInterfaceIcons::AdvanceScreenZones()
