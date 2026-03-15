@@ -53,8 +53,8 @@ bool PowerBuilding::IsInView()
 
   if (powerLink)
   {
-    LegacyVector3 midPoint = (powerLink->m_centrePos + m_centrePos) / 2.0f;
-    float radius = (powerLink->m_centrePos - m_centrePos).Mag() / 2.0f;
+    LegacyVector3 midPoint = (powerLink->m_centerPos + m_centerPos) / 2.0f;
+    float radius = (powerLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
 
     return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
@@ -305,10 +305,10 @@ void Generator::Render(float _predictionTime)
 {
   PowerBuilding::Render(_predictionTime);
 
-  //g_gameFont.DrawText3DCentre( m_pos + LegacyVector3(0,215,0), 10.0f, "NumThisSecond : %d", m_numThisSecond );
+  //g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,215,0), 10.0f, "NumThisSecond : %d", m_numThisSecond );
 
-  //if( m_enabled ) g_gameFont.DrawText3DCentre( m_pos + LegacyVector3(0,180,0), 10.0f, "Enabled" );
-  //g_gameFont.DrawText3DCentre( m_pos + LegacyVector3(0,170,0), 10.0f, "Output : %d Gq/s", int(m_throughput*10.0f) );
+  //if( m_enabled ) g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,180,0), 10.0f, "Enabled" );
+  //g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,170,0), 10.0f, "Output : %d Gq/s", int(m_throughput*10.0f) );
 
   Matrix34 generatorMat(m_front, g_upVector, m_pos);
   Matrix34 counterMat = m_counter->GetWorldMatrix(generatorMat);

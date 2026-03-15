@@ -4,10 +4,7 @@
 #include "input.h"
 #include "targetcursor.h"
 #include "vector2.h"
-
 #include "resource.h"
-#include "bitmap.h"
-#include "profiler.h"
 #include "hi_res_time.h"
 #include "language_table.h"
 #include "preferences.h"
@@ -1064,11 +1061,11 @@ void TaskManagerInterfaceIcons::RenderMessages()
 
     g_gameFont.SetRenderOutline(true);
     glColor4f(outlineAlpha, outlineAlpha, outlineAlpha, 0.0f);
-    g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
+    g_gameFont.DrawText2DCenter(m_screenW / 2.0f, 370.0f, size, fullMessage);
 
     g_gameFont.SetRenderOutline(false);
     glColor4f(1.0f, 1.0f, 1.0f, alpha);
-    g_gameFont.DrawText2DCentre(m_screenW / 2.0f, 370.0f, size, fullMessage);
+    g_gameFont.DrawText2DCenter(m_screenW / 2.0f, 370.0f, size, fullMessage);
   }
 }
 
@@ -1088,11 +1085,11 @@ void TaskManagerInterfaceIcons::RenderTargetAreas()
       float angle = g_gameTime * 3.0f;
       LegacyVector3 dif(tta->m_radius * sinf(angle), 0.0f, tta->m_radius * cosf(angle));
 
-      LegacyVector3 pos = tta->m_centre + dif;
+      LegacyVector3 pos = tta->m_center + dif;
       pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 5.0f;
       g_app->m_particleSystem->CreateParticle(pos, g_zeroVector, Particle::TypeMuzzleFlash, 60.0f);
 
-      pos = tta->m_centre - dif;
+      pos = tta->m_center - dif;
       pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z) + 5.0f;
       g_app->m_particleSystem->CreateParticle(pos, g_zeroVector, Particle::TypeMuzzleFlash, 60.0f);
     }
@@ -1241,8 +1238,8 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
 
   g_gameFont.SetRenderShadow(true);
   glColor4ub(255, 255, 150, 30);
-  g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
-  g_gameFont.DrawText2DCentre(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
+  g_gameFont.DrawText2DCenter(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
+  g_gameFont.DrawText2DCenter(x + w / 2.0f, y - titleHeight / 2 + 1, 13, LANGUAGEPHRASE("newcontrols_createnewtask"));
   g_gameFont.SetRenderShadow(false);
 
   //
@@ -1449,17 +1446,17 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
   for (int i = 0; i < numSlots; ++i)
   {
-    Vector2 iconCentre(iconX, iconY);
+    Vector2 iconCenter(iconX, iconY);
 
     glBegin(GL_QUADS);
     glTexCoord2i(0, 1);
-    glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+    glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
     glTexCoord2i(1, 1);
-    glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+    glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
     glTexCoord2i(1, 0);
-    glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+    glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
     glTexCoord2i(0, 0);
-    glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+    glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
     glEnd();
 
     iconY += iconSize;
@@ -1498,7 +1495,7 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
     bool invisible = (task->m_state == Task::StateStarted && fmod(g_gameTime, 1.0) < 0.4);
 
-    Vector2 iconCentre(iconX, iconY);
+    Vector2 iconCenter(iconX, iconY);
 
     if (!invisible)
     {
@@ -1513,13 +1510,13 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
       glBegin(GL_QUADS);
       glTexCoord2i(0, 1);
-      glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+      glVertex2f(iconCenter.x - iconSize / 2, iconCenter.y - iconSize / 2);
       glTexCoord2i(1, 1);
-      glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+      glVertex2f(iconCenter.x + iconSize / 2, iconCenter.y - iconSize / 2);
       glTexCoord2i(1, 0);
-      glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+      glVertex2f(iconCenter.x + iconSize / 2, iconCenter.y + iconSize / 2);
       glTexCoord2i(0, 0);
-      glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+      glVertex2f(iconCenter.x - iconSize / 2, iconCenter.y + iconSize / 2);
       glEnd();
 
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1535,13 +1532,13 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
           g_gameFont.SetRenderShadow(true);
           glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
-          g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
-          g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
+          g_gameFont.DrawText2DCenter(iconCenter.x + 3, iconCenter.y + 25, 7, state);
+          g_gameFont.DrawText2DCenter(iconCenter.x + 3, iconCenter.y + 2, 12, "%d", numSpirits);
 
           g_gameFont.SetRenderShadow(false);
           glColor4f(1.0f, 1.0f, 1.0f, 0.9f);
-          g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 25, 7, state);
-          g_gameFont.DrawText2DCentre(iconCentre.x + 3, iconCentre.y + 2, 12, "%d", numSpirits);
+          g_gameFont.DrawText2DCenter(iconCenter.x + 3, iconCenter.y + 25, 7, state);
+          g_gameFont.DrawText2DCenter(iconCenter.x + 3, iconCenter.y + 2, 12, "%d", numSpirits);
         }
       }
       else if (task->m_type == GlobalResearch::TypeSquad)
@@ -1553,11 +1550,11 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
           glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
           g_gameFont.SetRenderShadow(true);
-          g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
+          g_gameFont.DrawText2D(iconCenter.x + 11, iconCenter.y + 5, 10, "x%d", numSquaddies);
 
           glColor4f(1.0f, 1.0f, 1.0f, 0.9f);
           g_gameFont.SetRenderShadow(false);
-          g_gameFont.DrawText2D(iconCentre.x + 11, iconCentre.y + 5, 10, "x%d", numSquaddies);
+          g_gameFont.DrawText2D(iconCenter.x + 11, iconCenter.y + 5, 10, "x%d", numSquaddies);
         }
       }
 
@@ -1570,14 +1567,14 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
       Unit* unit = g_app->m_location->GetUnit(task->m_objId);
       Entity* entity = g_app->m_location->GetEntity(task->m_objId);
       if (unit)
-        taskWorldPos = unit->m_centrePos;
+        taskWorldPos = unit->m_centerPos;
       if (entity)
         taskWorldPos = entity->m_pos;
       float compassSize = iconSize * 0.75f;
 
       if (taskWorldPos != g_zeroVector)
       {
-        RenderCompass(iconCentre.x, iconCentre.y, taskWorldPos, task->m_id == g_app->m_taskManager->m_currentTaskId, compassSize);
+        RenderCompass(iconCenter.x, iconCenter.y, taskWorldPos, task->m_id == g_app->m_taskManager->m_currentTaskId, compassSize);
       }
 
       if (task->m_state != Task::StateStarted && m_visible && task->m_id == g_app->m_taskManager->m_currentTaskId)
@@ -1601,8 +1598,8 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
           float weaponSize = iconSize * 0.5f;
           float weaponGap = weaponSize * 0.15f;
-          float weaponX = iconCentre.x + iconSize / 1.2f;
-          float weaponY = iconCentre.y + iconSize / 5;
+          float weaponX = iconCenter.x + iconSize / 1.2f;
+          float weaponY = iconCenter.y + iconSize / 5;
 
           glEnable(GL_TEXTURE_2D);
 
@@ -1669,8 +1666,8 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
 
     if (m_visible)
     {
-      float deleteX = iconCentre.x - iconSize / 1.7f;
-      float deleteY = iconCentre.y - iconSize / 1.7f;
+      float deleteX = iconCenter.x - iconSize / 1.7f;
+      float deleteY = iconCenter.y - iconSize / 1.7f;
       float deleteSize = iconSize * 0.4f;
 
       glEnable(GL_TEXTURE_2D);
@@ -1824,13 +1821,13 @@ void TaskManagerInterfaceIcons::RenderOverview()
   float boxX = (m_screenW / 2.0f) - (boxW / 2) + (m_screenY * boxW);
   float boxY = 95;
   float boxH = 16;
-  float screenCentre = m_screenW / 2.0f;
+  float screenCenter = m_screenW / 2.0f;
 
   g_gameFont.SetRenderShadow(true);
   glColor4ub(255, 255, 150, 30);
-  g_gameFont.DrawText2DCentre(screenCentre - boxW, 105, 12, LANGUAGEPHRASE("taskmanager_research"));
-  g_gameFont.DrawText2DCentre(screenCentre, 105, 12, LANGUAGEPHRASE("taskmanager_taskmanager"));
-  g_gameFont.DrawText2DCentre(screenCentre + boxW, 105, 12, LANGUAGEPHRASE("taskmanager_objectives"));
+  g_gameFont.DrawText2DCenter(screenCenter - boxW, 105, 12, LANGUAGEPHRASE("taskmanager_research"));
+  g_gameFont.DrawText2DCenter(screenCenter, 105, 12, LANGUAGEPHRASE("taskmanager_taskmanager"));
+  g_gameFont.DrawText2DCenter(screenCenter + boxW, 105, 12, LANGUAGEPHRASE("taskmanager_objectives"));
   g_gameFont.SetRenderShadow(false);
 
   glColor4f(0.0f, 0.0f, 0.5f, 0.6f);
@@ -1917,8 +1914,8 @@ void TaskManagerInterfaceIcons::RenderObjectives()
     g_gameFont.SetRenderShadow(true);
     glColor4ub(255, 255, 150, 30);
     const char* theString = (o == 0 ? LANGUAGEPHRASE("taskmanager_primarys") : LANGUAGEPHRASE("taskmanager_secondarys"));
-    g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
-    g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
+    g_gameFont.DrawText2DCenter(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
+    g_gameFont.DrawText2DCenter(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
     g_gameFont.SetRenderShadow(false);
 
     //
@@ -2046,7 +2043,7 @@ void TaskManagerInterfaceIcons::RenderResearch()
   g_gameFont.SetRenderOutline(false);
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DDown(m_screenW - 65, 100, 45, LANGUAGEPHRASE("taskmanager_research"));
-  //g_gameFont.DrawText2DCentre( m_screenW/2.0f, 80, 20, "ResearchPoints : %d", g_app->m_globalWorld->m_research->m_researchPoints );
+  //g_gameFont.DrawText2DCenter( m_screenW/2.0f, 80, 20, "ResearchPoints : %d", g_app->m_globalWorld->m_research->m_researchPoints );
 
   float mouseX = g_target->X();
   float mouseY = g_target->Y();
@@ -2085,8 +2082,8 @@ void TaskManagerInterfaceIcons::RenderResearch()
   g_gameFont.SetRenderShadow(true);
   glColor4ub(255, 255, 150, 30);
   const char* theString = LANGUAGEPHRASE("taskmanager_research");
-  g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
-  g_gameFont.DrawText2DCentre(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
+  g_gameFont.DrawText2DCenter(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
+  g_gameFont.DrawText2DCenter(boxX + boxW / 2.0f, boxY - titleHeight / 2 + 1, 13, theString);
   g_gameFont.SetRenderShadow(false);
 
   //
@@ -2504,17 +2501,15 @@ void TaskManagerInterfaceIcons::RenderQuickUnit()
   if (!m_quickUnitVisible)
     return;
 
-  float iconSize = 110;
-  float iconGap = 10;
-  float iconX = (g_app->m_renderer->ScreenW() / 2.0f);
-  float iconY = g_app->m_renderer->ScreenH() - iconSize;
-  float iconAlpha = 0.9f;
+  constexpr float ICON_SIZE = 110;
+  const float iconX = (g_app->m_renderer->ScreenW() / 2.0f);
+  const float iconY = g_app->m_renderer->ScreenH() - ICON_SIZE;
+  constexpr float ICON_ALPHA = 0.9f;
 
-  Vector2 iconCentre(iconX, iconY);
+  Vector2 iconCenter(iconX, iconY);
 
   float shadowOffset = 0;
-  float shadowSize = iconSize;
-  //float totalWidth = (numSlots-1) * ( iconSize + iconGap );   */
+  float shadowSize = ICON_SIZE;
 
   for (int i = 0; i < m_quickUnitButtons.Size(); ++i)
     m_quickUnitButtons[i]->Render();
@@ -2526,16 +2521,16 @@ void TaskManagerInterfaceIcons::RenderQuickUnit()
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(shadowFileName));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
   glDepthMask(false);
-  glColor4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
+  glColor4f(ICON_ALPHA, ICON_ALPHA, ICON_ALPHA, 0.0f);
   glBegin(GL_QUADS);
   glTexCoord2i(0, 1);
-  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
   glTexCoord2i(1, 1);
-  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
   glTexCoord2i(1, 0);
-  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
   glTexCoord2i(0, 0);
-  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
   glEnd();
 
   char bmpFilename[256];
@@ -2546,17 +2541,17 @@ void TaskManagerInterfaceIcons::RenderQuickUnit()
   glBindTexture(GL_TEXTURE_2D, texId);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-  glColor4f(1.0f, 1.0f, 0.0f, iconAlpha);
+  glColor4f(1.0f, 1.0f, 0.0f, ICON_ALPHA);
 
   glBegin(GL_QUADS);
   glTexCoord2i(0, 1);
-  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+  glVertex2f(iconCenter.x - ICON_SIZE / 2, iconCenter.y - ICON_SIZE / 2);
   glTexCoord2i(1, 1);
-  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+  glVertex2f(iconCenter.x + ICON_SIZE / 2, iconCenter.y - ICON_SIZE / 2);
   glTexCoord2i(1, 0);
-  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+  glVertex2f(iconCenter.x + ICON_SIZE / 2, iconCenter.y + ICON_SIZE / 2);
   glTexCoord2i(0, 0);
-  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+  glVertex2f(iconCenter.x - ICON_SIZE / 2, iconCenter.y + ICON_SIZE / 2);
   glEnd();
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2755,7 +2750,7 @@ void QuickUnitButton::Render()
   float shadowOffset = 0;
   float shadowSize = iconSize + 10;
 
-  auto iconCentre = Vector2(m_x, m_y);
+  auto iconCenter = Vector2(m_x, m_y);
 
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("icons/icon_shadow.bmp"));
@@ -2764,13 +2759,13 @@ void QuickUnitButton::Render()
   glColor4f(iconAlpha, iconAlpha, iconAlpha, 0.0f);
   glBegin(GL_QUADS);
   glTexCoord2i(0, 1);
-  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
   glTexCoord2i(1, 1);
-  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y - shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y - shadowSize / 2 + shadowOffset);
   glTexCoord2i(1, 0);
-  glVertex2f(iconCentre.x + shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x + shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
   glTexCoord2i(0, 0);
-  glVertex2f(iconCentre.x - shadowSize / 2 + shadowOffset, iconCentre.y + shadowSize / 2 + shadowOffset);
+  glVertex2f(iconCenter.x - shadowSize / 2 + shadowOffset, iconCenter.y + shadowSize / 2 + shadowOffset);
   glEnd();
 
   char bmpFilename[256];
@@ -2788,13 +2783,13 @@ void QuickUnitButton::Render()
 
   glBegin(GL_QUADS);
   glTexCoord2i(0, 1);
-  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y - iconSize / 2);
+  glVertex2f(iconCenter.x - iconSize / 2, iconCenter.y - iconSize / 2);
   glTexCoord2i(1, 1);
-  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y - iconSize / 2);
+  glVertex2f(iconCenter.x + iconSize / 2, iconCenter.y - iconSize / 2);
   glTexCoord2i(1, 0);
-  glVertex2f(iconCentre.x + iconSize / 2, iconCentre.y + iconSize / 2);
+  glVertex2f(iconCenter.x + iconSize / 2, iconCenter.y + iconSize / 2);
   glTexCoord2i(0, 0);
-  glVertex2f(iconCentre.x - iconSize / 2, iconCentre.y + iconSize / 2);
+  glVertex2f(iconCenter.x - iconSize / 2, iconCenter.y + iconSize / 2);
   glEnd();
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

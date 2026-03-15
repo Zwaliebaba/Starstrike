@@ -76,8 +76,8 @@ void AirstrikeUnit::Begin()
   m_enterPosition = startPositions[enterIndex];
   m_exitPosition = startPositions[exitIndex];
 
-  LegacyVector3 centre(landSizeX / 2.0f, 0.0f, landSizeZ / 2.0f);
-  LegacyVector3 front = (centre - m_enterPosition).Normalise();
+  LegacyVector3 center(landSizeX / 2.0f, 0.0f, landSizeZ / 2.0f);
+  LegacyVector3 front = (center - m_enterPosition).Normalise();
 
   m_wayPoint = m_enterPosition;
   m_front = front;

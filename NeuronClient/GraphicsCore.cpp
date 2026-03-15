@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "GraphicsCore.h"
 #include "GraphicsCommon.h"
+#include "FrameListener.h"
+#include "UploadRingBuffer.h"
 
 using namespace Neuron::Graphics;
 
@@ -193,11 +195,22 @@ void Core::CreateDeviceResources()
 
   // Common state was moved to GraphicsCommon.*
   InitializeCommonState();
+
+  // Create per-frame upload ring buffers.  Must happen after the device and
+  // command list are ready but before any consumer (e.g. OpenGLTranslationState::Init)
+  // that needs to upload GPU data.
+  CreateUploadBuffers();
 }
 
 void Core::ReleaseDeviceResources()
 {
+  ShutdownUploadBuffers();
+  DescriptorAllocator::DestroyAll();
   DestroyCommonState();
+
+  // Reset cached descriptor handles so they are re-allocated after device recreation.
+  m_rtvDescriptors.fill({});
+  m_dsvDescriptor = {};
 
   m_fenceEvent.close();
   m_fence = nullptr;
@@ -298,7 +311,8 @@ void Core::CreateWindowSizeDependentResources()
     rtvDesc.Format = m_backBufferFormat;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-    m_rtvDescriptors[n] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    if (m_rtvDescriptors[n].ptr == 0)
+      m_rtvDescriptors[n] = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     m_d3dDevice->CreateRenderTargetView(m_renderTargets[n].GetResource(), &rtvDesc, m_rtvDescriptors[n]);
   }
 
@@ -331,7 +345,8 @@ void Core::CreateWindowSizeDependentResources()
     dsvDesc.Format = m_depthBufferFormat;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 
-    m_dsvDescriptor = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    if (m_dsvDescriptor.ptr == 0)
+      m_dsvDescriptor = AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
     m_d3dDevice->CreateDepthStencilView(m_depthStencil.GetResource(), &dsvDesc, m_dsvDescriptor);
   }
 
@@ -349,7 +364,7 @@ void Core::CreateWindowSizeDependentResources()
 
 void Core::ReleaseWindowSizeDependentResources()
 {
-  DescriptorAllocator::DestroyAll();
+  DescriptorAllocator::DestroyWindowSizeDependent();
 
   for (UINT n = 0; n < m_backBufferCount; n++)
   {
@@ -422,9 +437,15 @@ void Core::Prepare()
 {
   ResetCommandAllocatorAndCommandlist();
 
-  DescriptorAllocator::SetDescriptorHeaps(m_commandList.get());
+  // Reset the current frame's upload ring buffer before any rendering.
+  ResetCurrentUploadBuffer();
 
   sm_gpuResourceStateTracker.TransitionResource(m_renderTargets[m_backBufferIndex], D3D12_RESOURCE_STATE_RENDER_TARGET, true);
+
+  // Notify listeners (e.g. OpenGL translation layer sets descriptor heaps,
+  // root signature, and render targets here).
+  for (auto* listener : m_frameListeners)
+    listener->OnFrameBegin(m_commandList.get());
 }
 
 // Present the contents of the swap chain to the screen.
@@ -673,4 +694,17 @@ Windows::Foundation::Size Core::GetScreenSize()
 
   // Fallback to Win32 API if no adapter with outputs is found
   return {static_cast<float>(GetSystemMetrics(SM_CXSCREEN)), static_cast<float>(GetSystemMetrics(SM_CYSCREEN))};
+}
+
+void Core::RegisterFrameListener(IFrameListener* listener)
+{
+  DEBUG_ASSERT(listener != nullptr);
+  m_frameListeners.push_back(listener);
+}
+
+void Core::UnregisterFrameListener(IFrameListener* listener)
+{
+  auto it = std::find(m_frameListeners.begin(), m_frameListeners.end(), listener);
+  if (it != m_frameListeners.end())
+    m_frameListeners.erase(it);
 }

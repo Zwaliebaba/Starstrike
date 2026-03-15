@@ -69,7 +69,7 @@ bool GameCursor::GetSelectedObject( WorldObjectId &_id, LegacyVector3 &_pos )
         Entity *selectedEnt = team->GetMyEntity();
         if( selectedEnt )
         {
-            _pos = selectedEnt->m_pos + selectedEnt->m_centrePos + selectedEnt->m_vel * g_predictionTime;
+            _pos = selectedEnt->m_pos + selectedEnt->m_centerPos + selectedEnt->m_vel * g_predictionTime;
             _id = selectedEnt->m_id;
             return true;
         }
@@ -78,7 +78,7 @@ bool GameCursor::GetSelectedObject( WorldObjectId &_id, LegacyVector3 &_pos )
             Building *building = g_app->m_location->GetBuilding( team->m_currentBuildingId );
             if( building )
             {
-                _pos = building->m_centrePos;
+                _pos = building->m_centerPos;
                 _id = building->m_id;
                 return true;
             }
@@ -88,16 +88,16 @@ bool GameCursor::GetSelectedObject( WorldObjectId &_id, LegacyVector3 &_pos )
             Unit *selected = team->GetMyUnit();
             if( selected )
             {
-                _pos = selected->m_centrePos + selected->m_vel * g_predictionTime;
+                _pos = selected->m_centerPos + selected->m_vel * g_predictionTime;
                 _id.Set( selected->m_teamId, selected->m_unitId, -1, -1 );
 
-                // Add the centre pos
+                // Add the center pos
                 for( int i = 0; i < selected->m_entities.Size(); ++i )
                 {
                     if( selected->m_entities.ValidIndex(i) )
                     {
                         Entity *ent = selected->m_entities[i];
-                        _pos += ent->m_centrePos;
+                        _pos += ent->m_centerPos;
                         break;
                     }
                 }
@@ -144,7 +144,7 @@ bool GameCursor::GetHighlightedObject( WorldObjectId &_id, LegacyVector3 &_pos, 
                 building->m_type == Building::TypeFenceSwitch )
             {
                 _id = id;
-                _pos = building->m_centrePos;
+                _pos = building->m_centerPos;
                 _radius = building->m_radius;
                 found = true;
                 if( building->m_type == Building::TypeGunTurret )
@@ -160,17 +160,17 @@ bool GameCursor::GetHighlightedObject( WorldObjectId &_id, LegacyVector3 &_pos, 
             if( unit )
             {
                 _id = id;
-                _pos = unit->m_centrePos + unit->m_vel * g_predictionTime;
+                _pos = unit->m_centerPos + unit->m_vel * g_predictionTime;
                 _radius = unit->m_radius;
                 found = true;
 
-                // Add the centre pos
+                // Add the center pos
                 for( int i = 0; i < unit->m_entities.Size(); ++i )
                 {
                     if( unit->m_entities.ValidIndex(i) )
                     {
                         Entity *ent = unit->m_entities[i];
-                        _pos += ent->m_centrePos;
+                        _pos += ent->m_centerPos;
                         break;
                     }
                 }
@@ -181,7 +181,7 @@ bool GameCursor::GetHighlightedObject( WorldObjectId &_id, LegacyVector3 &_pos, 
             // Found an entity
             Entity *entity = g_app->m_location->GetEntity(id);
             _id = id;
-            _pos = entity->m_pos + entity->m_vel * g_predictionTime + entity->m_centrePos;
+            _pos = entity->m_pos + entity->m_vel * g_predictionTime + entity->m_centerPos;
             _radius = entity->m_radius*1.5f;
             if( entity->m_type == Entity::TypeDarwinian ) _radius = entity->m_radius*2.0f;
             found = true;

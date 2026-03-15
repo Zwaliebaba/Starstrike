@@ -334,8 +334,8 @@ void Entity::Begin()
 
     if( m_shape )
     {
-        m_centrePos = m_shape->CalculateCentre( g_identityMatrix34 );
-        m_radius = m_shape->CalculateRadius( g_identityMatrix34, m_centrePos );
+        m_centerPos = m_shape->CalculateCenter( g_identityMatrix34 );
+        m_radius = m_shape->CalculateRadius( g_identityMatrix34, m_centerPos );
     }
 }
 

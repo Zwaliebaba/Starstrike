@@ -108,7 +108,7 @@ public:
 
     void ListSoundEvents( LList<const char*> *_list );
 
-    bool PerformDepthSort( LegacyVector3 &_centrePos );
+    bool PerformDepthSort( LegacyVector3 &_centerPos );
 };
 
 

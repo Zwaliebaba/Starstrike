@@ -175,7 +175,7 @@ bool RadarDish::Advance()
 
     // Does our "ray" hit their dish
     auto otherDish = static_cast<RadarDish*>(building);
-    bool hit = RaySphereIntersection(dishPos, dishFront, otherDish->m_centrePos, otherDish->m_radius, 1e9);
+    bool hit = RaySphereIntersection(dishPos, dishFront, otherDish->m_centerPos, otherDish->m_radius, 1e9);
     if (hit)
     {
       // Make sure we aren't hitting the back of the receiving dish

@@ -27,7 +27,7 @@ public:
     void Render             ( float predictionTime );
     void RenderAlphas       ( float predictionTime );
 
-    bool PerformDepthSort   ( LegacyVector3 &_centrePos );
+    bool PerformDepthSort   ( LegacyVector3 &_centerPos );
 
     void ReprogramComplete();
 

@@ -66,6 +66,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)NeuronCore;$(SolutionDir)GameLogic;$(SolutionDir)StarStrike;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -120,6 +121,7 @@
     <ClInclude Include="filesys_utils.h" />
     <ClInclude Include="file_paths.h" />
     <ClInclude Include="file_writer.h" />
+    <ClInclude Include="FrameListener.h" />
     <ClInclude Include="GameMain.h" />
     <ClInclude Include="generic.h" />
     <ClInclude Include="GpuBuffer.h" />
@@ -207,6 +209,7 @@
     <ClInclude Include="text_stream_readers.h" />
     <ClInclude Include="transform.h" />
     <ClInclude Include="tree_renderer.h" />
+    <ClInclude Include="UploadRingBuffer.h" />
     <ClInclude Include="user_info.h" />
     <ClInclude Include="vector2.h" />
     <ClInclude Include="LegacyVector3.h" />
@@ -308,6 +311,7 @@
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="tree_renderer.cpp" />
     <ClCompile Include="tri_tri.cpp" />
+    <ClCompile Include="UploadRingBuffer.cpp" />
     <ClCompile Include="user_info.cpp" />
     <ClCompile Include="vector2.cpp" />
     <ClCompile Include="vector3.cpp" />

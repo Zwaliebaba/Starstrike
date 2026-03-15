@@ -54,10 +54,11 @@ namespace Neuron::Graphics
     ~DescriptorHeap() { Destroy(); }
 
     void Create(const std::wstring& DebugHeapName, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t MaxCount, bool _forceCPU = false);
-    void Destroy() { m_Heap = nullptr; }
+    void Destroy() { m_Heap = nullptr; m_FreeList.clear(); m_BumpRemaining = 0; }
 
     bool HasAvailableSpace(uint32_t Count) const { return Count <= m_NumFreeDescriptors; }
     DescriptorHandle Alloc(uint32_t Count = 1);
+    void Free(DescriptorHandle handle);
 
     DescriptorHandle operator[] (uint32_t arrayIdx) const { return m_FirstHandle + arrayIdx * m_DescriptorSize; }
 
@@ -80,20 +81,33 @@ namespace Neuron::Graphics
     uint32_t m_NumFreeDescriptors;
     DescriptorHandle m_FirstHandle;
     DescriptorHandle m_NextFreeHandle;
+    std::vector<uint32_t> m_FreeList;   // Indices of freed slots
+    uint32_t m_BumpRemaining = 0;       // Contiguous slots left at bump frontier
   };
 
   class DescriptorAllocator
   {
   public:
     static void Create();
-    static DescriptorHandle Allocate(D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t _count, bool _forceCpu = false);
+    static DescriptorHandle Allocate(D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t _count = 1, bool _forceCpu = false);
+    static void Free(D3D12_DESCRIPTOR_HEAP_TYPE Type, DescriptorHandle handle);
 
     static void SetDescriptorHeaps(ID3D12GraphicsCommandList* _commandlist);
-    static void DestroyAll();
+    static void DestroyWindowSizeDependent();  // RTV + DSV only
+    static void DestroyAll();                  // Everything (shutdown / device-lost)
+
+    static uint32_t GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE Type)
+    {
+      return sm_descriptorHeapPool[static_cast<size_t>(Type)].GetDescriptorSize();
+    }
 
   protected:
 
-    static constexpr uint32_t NUM_DESCRIPTORS_PER_HEAP = 256;
+    // Per-type heap sizes
+    static constexpr uint32_t MAX_SRV_DESCRIPTORS = 1024;
+    static constexpr uint32_t MAX_SAMPLER_DESCRIPTORS = 24;
+    static constexpr uint32_t MAX_CPU_SRV_DESCRIPTORS = 256;
+
     inline static std::mutex sm_allocationMutex;
     inline static std::array<DescriptorHeap, D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES+1> sm_descriptorHeapPool;
   };

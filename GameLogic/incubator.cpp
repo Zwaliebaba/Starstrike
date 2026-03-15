@@ -13,7 +13,7 @@
 
 Incubator::Incubator()
   : Building(),
-    m_spiritCentre(nullptr),
+    m_spiritCenter(nullptr),
     m_troopType(Entity::TypeDarwinian),
     m_timer(INCUBATOR_PROCESSTIME),
     m_numStartingSpirits(0)
@@ -22,7 +22,7 @@ Incubator::Incubator()
 
   SetShape(g_app->m_resource->GetShape("incubator.shp"));
 
-  m_spiritCentre = m_shape->m_rootFragment->LookupMarker("MarkerSpirits");
+  m_spiritCenter = m_shape->m_rootFragment->LookupMarker("MarkerSpirits");
   m_exit = m_shape->m_rootFragment->LookupMarker("MarkerExit");
   m_dock = m_shape->m_rootFragment->LookupMarker("MarkerDock");
 
@@ -30,7 +30,7 @@ Incubator::Incubator()
   m_spiritEntrance[1] = m_shape->m_rootFragment->LookupMarker("MarkerSpiritIncoming1");
   m_spiritEntrance[2] = m_shape->m_rootFragment->LookupMarker("MarkerSpiritIncoming2");
 
-  DEBUG_ASSERT(m_spiritCentre);
+  DEBUG_ASSERT(m_spiritCenter);
   DEBUG_ASSERT(m_exit);
   DEBUG_ASSERT(m_dock);
   DEBUG_ASSERT(m_spiritEntrance[0]);
@@ -47,14 +47,14 @@ void Incubator::Initialise(Building* _template)
   Building::Initialise(_template);
 
   Matrix34 mat(m_front, g_upVector, m_pos);
-  LegacyVector3 spiritCentre = m_spiritCentre->GetWorldMatrix(mat).pos;
+  LegacyVector3 spiritCenter = m_spiritCenter->GetWorldMatrix(mat).pos;
 
   m_numStartingSpirits = static_cast<Incubator*>(_template)->m_numStartingSpirits;
 
   for (int i = 0; i < m_numStartingSpirits; ++i)
   {
     Spirit* s = m_spirits.GetPointer();
-    s->m_pos = spiritCentre + LegacyVector3(sfrand(20.0f), sfrand(20.0f), sfrand(20.0f));
+    s->m_pos = spiritCenter + LegacyVector3(sfrand(20.0f), sfrand(20.0f), sfrand(20.0f));
     s->m_teamId = m_id.GetTeamId();
     s->Begin();
     s->m_state = Spirit::StateInStore;
@@ -168,10 +168,10 @@ void Incubator::SpawnEntity()
 void Incubator::AddSpirit(Spirit* _spirit)
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
-  LegacyVector3 spiritCentre = m_spiritCentre->GetWorldMatrix(mat).pos;
+  LegacyVector3 spiritCenter = m_spiritCenter->GetWorldMatrix(mat).pos;
 
   Spirit* s = m_spirits.GetPointer();
-  s->m_pos = spiritCentre + LegacyVector3(sfrand(20.0f), sfrand(20.0f), sfrand(20.0f));
+  s->m_pos = spiritCenter + LegacyVector3(sfrand(20.0f), sfrand(20.0f), sfrand(20.0f));
   s->m_teamId = _spirit->m_teamId;
   s->m_state = Spirit::StateInStore;
 

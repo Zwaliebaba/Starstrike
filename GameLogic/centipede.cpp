@@ -651,7 +651,7 @@ void Centipede::Render(float _predictionTime)
   }
 }
 
-bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centrePos, m_radius); }
+bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
 
 bool Centipede::RenderPixelEffect(float _predictionTime)
 {

@@ -129,17 +129,6 @@ Transform3D ShapeMarker::GetWorldTransform(const Transform3D& _rootTransform)
   return t;
 }
 
-void ShapeMarker::WriteToFile(FILE* _out) const
-{
-  fprintf(_out, "Marker: %s\n", m_name);
-  fprintf(_out, "\tParentName: %s\n", m_parentName);
-  fprintf(_out, "\tDepth: %d\n", m_depth);
-  fprintf(_out, "\tUp:    %5.2f %5.2f %5.2f\n", m_transform.u.x, m_transform.u.y, m_transform.u.z);
-  fprintf(_out, "\tFront: %5.2f %5.2f %5.2f\n", m_transform.f.x, m_transform.f.y, m_transform.f.z);
-  fprintf(_out, "\tPos:   %5.2f %5.2f %5.2f\n", m_transform.pos.x, m_transform.pos.y, m_transform.pos.z);
-  fprintf(_out, "\tMarkerEnd\n\n\n");
-}
-
 // This constructor is used to load a shape from a file.
 ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
   : m_numPositions(0),
@@ -159,7 +148,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     m_transform(Neuron::Transform3D::Identity()),
     m_angVel(0, 0, 0),
     m_vel(0, 0, 0),
-    m_centre(0.0f, 0.0f, 0.0f),
+    m_center(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
     m_mostNegativeY(0.0f)
@@ -262,7 +251,7 @@ ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
     m_numTriangles(0),
     m_maxTriangles(0),
     m_triangles(nullptr),
-    m_centre(0.0f, 0.0f, 0.0f),
+    m_center(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
     m_mostNegativeY(0.0f)
@@ -319,70 +308,6 @@ ShapeFragment::~ShapeFragment()
   m_triangles = nullptr;
   m_childFragments.EmptyAndDelete();
   m_childMarkers.EmptyAndDelete();
-}
-
-void ShapeFragment::WriteToFile(FILE* _out) const
-{
-  int i;
-
-  if (_stricmp(m_name, "SceneRoot") != 0)
-  {
-    fprintf(_out, "Fragment: %s\n", m_name);
-    fprintf(_out, "\tParentName: %s\n", m_parentName);
-    auto up = m_transform.UpF3();
-    auto fwd = m_transform.ForwardF3();
-    auto pos = m_transform.PositionF3();
-    fprintf(_out, "\tup:    %5.2f %5.2f %5.2f\n", up.x, up.y, up.z);
-    fprintf(_out, "\tfront: %5.2f %5.2f %5.2f\n", fwd.x, fwd.y, fwd.z);
-    fprintf(_out, "\tpos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
-
-    // Write out the positions
-    fprintf(_out, "\tPositions: %d\n", m_numPositions);
-    for (i = 0; i < m_numPositions; i++)
-    {
-      const LegacyVector3& v = m_positions[i];
-      fprintf(_out, "\t\t%d: %7.3f %7.3f %7.3f\n", i, v.x, v.y, v.z);
-    }
-
-    // Write out the normals
-    fprintf(_out, "\tNormals: %d\n", m_numNormals);
-    for (i = 0; i < m_numNormals; i++)
-    {
-      const LegacyVector3& n = m_normals[i];
-      fprintf(_out, "\t\t%d: %6.3f %6.3f %6.3f\n", i, n.x, n.y, n.z);
-    }
-
-    // Write out the colours
-    fprintf(_out, "\tColours: %d\n", m_numColours);
-    for (i = 0; i < m_numColours; i++)
-    {
-      const RGBAColour& c = m_colours[i];
-      fprintf(_out, "\t\t%d: %d %d %d\n", i, c.r, c.g, c.b);
-    }
-
-    // Write out the vertices
-    fprintf(_out, "\tVertices: %d    # Position ID then Colour ID\n", m_numVertices);
-    for (i = 0; i < m_numVertices; i++)
-    {
-      const VertexPosCol& v = m_vertices[i];
-      fprintf(_out, "\t\t%d: %3d %3d\n", i, v.m_posId, v.m_colId);
-    }
-
-    // Write out the triangles
-    fprintf(_out, "\tTriangles: %d\n", m_numTriangles);
-    for (i = 0; i < m_numTriangles; ++i)
-      fprintf(_out, "\t\t%d,%d,%d\n", m_triangles[i].v1, m_triangles[i].v2, m_triangles[i].v3);
-
-    fprintf(_out, "\n");
-  }
-
-  // Write out all the child fragments
-  for (i = 0; i < m_childFragments.Size(); ++i)
-    m_childFragments.GetData(i)->WriteToFile(_out);
-
-  // Write out all the child markers
-  for (i = 0; i < m_childMarkers.Size(); ++i)
-    m_childMarkers.GetData(i)->WriteToFile(_out);
 }
 
 // *** ParsePositionBlock
@@ -692,7 +617,7 @@ void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _n
 
   // Calculate bounding sphere
   {
-    // Find the centre of the fragment
+    // Find the center of the fragment
     {
       float minX = FLT_MAX;
       float maxX = -FLT_MAX;
@@ -715,16 +640,16 @@ void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _n
         if (m_positions[i].z > maxZ)
           maxZ = m_positions[i].z;
       }
-      m_centre.x = (maxX + minX) / 2;
-      m_centre.y = (maxY + minY) / 2;
-      m_centre.z = (maxZ + minZ) / 2;
+      m_center.x = (maxX + minX) / 2;
+      m_center.y = (maxY + minY) / 2;
+      m_center.z = (maxZ + minZ) / 2;
     }
 
-    // Find the point furthest from the centre
+    // Find the point furthest from the center
     float radiusSquared = 0.0f;
     for (i = 0; i < m_numPositions; ++i)
     {
-      LegacyVector3 delta = m_centre - m_positions[i];
+      LegacyVector3 delta = m_center - m_positions[i];
       float magSquared = delta.MagSquared();
       if (magSquared > radiusSquared)
         radiusSquared = magSquared;
@@ -745,7 +670,7 @@ void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _n
         m_mostPositiveY = m_positions[i].y;
       if (m_positions[i].y < m_mostNegativeY)
         m_mostNegativeY = m_positions[i].y;
-      LegacyVector3 delta = m_centre - m_positions[i];
+      LegacyVector3 delta = m_center - m_positions[i];
       delta.y = 0.0f;
       float magSquared = delta.MagSquared();
       if (magSquared > radiusSquared)
@@ -916,10 +841,10 @@ bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, boo
 {
 #ifndef EXPORTER_BUILD
   Matrix34 totalMatrix(m_transform * _transform);
-  LegacyVector3 centre = m_centre * totalMatrix;
+  LegacyVector3 center = m_center * totalMatrix;
 
   // First do bounding sphere check
-  if (m_radius > 0.0f && RaySphereIntersection(_package->m_rayStart, _package->m_rayDir, centre, m_radius, _package->m_rayLen))
+  if (m_radius > 0.0f && RaySphereIntersection(_package->m_rayStart, _package->m_rayDir, center, m_radius, _package->m_rayLen))
   {
     // Exit early to save loads of work if we don't care about accuracy too much
     if (_accurate == false)
@@ -960,9 +885,9 @@ bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transfor
 {
 #ifndef EXPORTER_BUILD
   Matrix34 totalMatrix(m_transform * _transform);
-  LegacyVector3 centre = m_centre * totalMatrix;
+  LegacyVector3 center = m_center * totalMatrix;
 
-  if (m_radius > 0.0f && SphereSphereIntersection(_package->m_pos, _package->m_radius, centre, m_radius))
+  if (m_radius > 0.0f && SphereSphereIntersection(_package->m_pos, _package->m_radius, center, m_radius))
   {
     // Exit early to save loads of work if we don't care about accuracy too much
     if (_accurate == false)
@@ -1003,11 +928,11 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
 #ifndef EXPORTER_BUILD
 
   Matrix34 totalMatrix(m_transform * _ourTransform);
-  LegacyVector3 centre = m_centre * totalMatrix;
+  LegacyVector3 center = m_center * totalMatrix;
 
   if (m_radius > 0.0f)
   {
-    SpherePackage package(centre, m_radius);
+    SpherePackage package(center, m_radius);
     if (_shape->SphereHit(&package, _theTransform, _accurate))
       return true;
   }
@@ -1027,28 +952,28 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
   return false;
 }
 
-void ShapeFragment::CalculateCentre(const Matrix34& _transform, LegacyVector3& _centre, int& _numFragments)
+void ShapeFragment::CalculateCenter(const Matrix34& _transform, LegacyVector3& _center, int& _numFragments)
 {
   Matrix34 totalMatrix(m_transform * _transform);
-  LegacyVector3 centre = m_centre * totalMatrix;
+  LegacyVector3 center = m_center * totalMatrix;
 
-  _centre += centre;
+  _center += center;
   _numFragments++;
 
   int numFragments = m_childFragments.Size();
   for (int i = 0; i < numFragments; ++i)
   {
     ShapeFragment* frag = m_childFragments.GetData(i);
-    frag->CalculateCentre(totalMatrix, _centre, _numFragments);
+    frag->CalculateCenter(totalMatrix, _center, _numFragments);
   }
 }
 
-void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre, float& _radius)
+void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center, float& _radius)
 {
   Matrix34 totalMatrix(m_transform * _transform);
-  LegacyVector3 centre = m_centre * totalMatrix;
+  LegacyVector3 center = m_center * totalMatrix;
 
-  float distance = (centre - _centre).Mag();
+  float distance = (center - _center).Mag();
   if (distance + m_radius > _radius)
     _radius = distance + m_radius;
 
@@ -1056,7 +981,7 @@ void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVect
   for (int i = 0; i < numFragments; ++i)
   {
     ShapeFragment* frag = m_childFragments.GetData(i);
-    frag->CalculateRadius(totalMatrix, _centre, _radius);
+    frag->CalculateRadius(totalMatrix, _center, _radius);
   }
 }
 
@@ -1166,13 +1091,10 @@ void Shape::Load(TextReader* _in)
   }
 }
 
-void Shape::WriteToFile(FILE* _out) const { m_rootFragment->WriteToFile(_out); }
+void Shape::Render(float _predictionTime, const Matrix34& _transform) const { Render(_predictionTime, static_cast<Transform3D>(_transform)); }
 
-void Shape::Render(float _predictionTime, const Matrix34& _transform) { Render(_predictionTime, static_cast<Transform3D>(_transform)); }
-
-void Shape::Render(float _predictionTime, const Transform3D& _transform)
+void XM_CALLCONV Shape::Render(float _predictionTime, XMMATRIX _transform) const
 {
-#ifndef EXPORTER_BUILD
   glEnable(GL_COLOR_MATERIAL);
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
@@ -1182,57 +1104,43 @@ void Shape::Render(float _predictionTime, const Transform3D& _transform)
 
   glDisable(GL_COLOR_MATERIAL);
   mv.Pop();
-
-#endif
 }
 
 bool Shape::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
 {
-#ifndef EXPORTER_BUILD
   bool rv = m_rootFragment->RayHit(_package, _transform, _accurate);
   return rv;
-#else
-  return false;
-#endif
 }
 
 bool Shape::SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate)
 {
-#ifndef EXPORTER_BUILD
   bool hit = m_rootFragment->SphereHit(_package, _transform, _accurate);
   return hit;
-#else
-  return false;
-#endif
 }
 
 bool Shape::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const Matrix34& _ourTransform, bool _accurate)
 {
-#ifndef _EXPORTER_BUILDING
   bool hit = m_rootFragment->ShapeHit(_shape, _theTransform, _ourTransform, _accurate);
   return hit;
-#else
-  return false;
-#endif
 }
 
-LegacyVector3 Shape::CalculateCentre(const Matrix34& _transform)
+LegacyVector3 Shape::CalculateCenter(const Matrix34& _transform)
 {
-  LegacyVector3 centre;
+  LegacyVector3 center;
   int numFragments = 0;
 
-  m_rootFragment->CalculateCentre(_transform, centre, numFragments);
+  m_rootFragment->CalculateCenter(_transform, center, numFragments);
 
-  centre /= static_cast<float>(numFragments);
+  center /= static_cast<float>(numFragments);
 
-  return centre;
+  return center;
 }
 
-float Shape::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre)
+float Shape::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center)
 {
   float radius = 0.0f;
 
-  m_rootFragment->CalculateRadius(_transform, _centre, radius);
+  m_rootFragment->CalculateRadius(_transform, _center, radius);
 
   return radius;
 }

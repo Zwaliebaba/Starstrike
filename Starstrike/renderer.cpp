@@ -232,12 +232,12 @@ void Renderer::RenderPaused()
   // Black Background
   g_gameFont.SetRenderShadow(true);
   glColor4f(0.3f, 0.3f, 0.3f, 0.0f);
-  font.DrawText2DCentre(x, y, 80, msg);
+  font.DrawText2DCenter(x, y, 80, msg);
 
   // White Foreground
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   font.SetRenderShadow(false);
-  font.DrawText2DCentre(x, y, 80, msg);
+  font.DrawText2DCenter(x, y, 80, msg);
 
   font.EndText2D();
 }
@@ -307,7 +307,7 @@ void Renderer::RenderHUD()
       glVertex2f(m_screenW / 2 - 200, 80);
       glEnd();
       glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-      g_editorFont.DrawText2DCentre(m_screenW / 2, 100, 20, "Client LAG %dms behind Server ", latency * 100);
+      g_editorFont.DrawText2DCenter(m_screenW / 2, 100, 20, "Client LAG %dms behind Server ", latency * 100);
     }
   }
 
@@ -768,11 +768,11 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
 {
   const float screenToGridFactor = static_cast<float>(PIXEL_EFFECT_GRID_RES) / static_cast<float>(m_screenW);
   Camera* cam = g_app->m_camera;
-  LegacyVector3 centre;
+  LegacyVector3 center;
   LegacyVector3 topLeft;
   LegacyVector3 bottomRight;
   const LegacyVector3 camUpRight = (cam->GetRight() + cam->GetUp()) * _radius;
-  Get2DScreenPos(_pos, &centre);
+  Get2DScreenPos(_pos, &center);
   Get2DScreenPos(_pos + camUpRight, &topLeft);
   Get2DScreenPos(_pos - camUpRight, &bottomRight);
 
@@ -786,7 +786,7 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
   clamp(y1, 0, PIXEL_EFFECT_GRID_RES);
   clamp(y2, 0, PIXEL_EFFECT_GRID_RES);
 
-  const float nearestZ = centre.z - _radius;
+  const float nearestZ = center.z - _radius;
 
   for (int y = y1; y < y2; ++y)
   {
@@ -801,7 +801,7 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
 void Renderer::MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transform)
 {
 #if USE_PIXEL_EFFECT_GRID_OPTIMISATION
-  Matrix34 total(_frag->m_transform * _transform); LegacyVector3 worldPos = _frag->m_centre * total;
+  Matrix34 total(_frag->m_transform * _transform); LegacyVector3 worldPos = _frag->m_center * total;
 
   // Return early if this shape fragment isn't on the screen
   {

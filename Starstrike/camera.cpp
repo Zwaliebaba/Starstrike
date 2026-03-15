@@ -1135,7 +1135,7 @@ void Camera::AdvanceEntityTrackMode()
 
     AdvanceAutomaticTracking();
 
-    // Ensure that the target cursor remains in the centre of the screen
+    // Ensure that the target cursor remains in the center of the screen
     int halfHeight = g_app->m_renderer->ScreenH() / 2;
     int halfWidth = g_app->m_renderer->ScreenW() / 2;
     g_target->SetMousePos(halfWidth, halfHeight);
@@ -1658,7 +1658,7 @@ void Camera::SetupProjectionMatrix(float _nearPlane, float _farPlane)
   float screenH = g_app->m_renderer->ScreenH();
   float screenHHalf = screenH / 2.0;
 
-  // Distance from camera to top-centre and bottom-centre of screen
+  // Distance from camera to top-center and bottom-center of screen
   float dtc = screenHHalf / sin(fovRadians / 2.0);
 
   // Distance from camera to any corner of the screen
@@ -1696,9 +1696,9 @@ bool Camera::PosInViewFrustum(const LegacyVector3& _pos)
   return true;
 }
 
-bool Camera::SphereInViewFrustum(const LegacyVector3& _centre, float _radius)
+bool Camera::SphereInViewFrustum(const LegacyVector3& _center, float _radius)
 {
-  LegacyVector3 dirToPos = _centre - m_pos;
+  LegacyVector3 dirToPos = _center - m_pos;
   float distance = dirToPos.Mag();
   if (distance < _radius)
     return true;
@@ -2054,7 +2054,7 @@ void Camera::RequestBuildingFocusMode(Building* _building, float _range, float _
 {
   m_framesInThisMode = 0;
   m_mode = ModeBuildingFocus;
-  m_targetPos = _building->m_centrePos;
+  m_targetPos = _building->m_centerPos;
   m_trackRange = _range;
   m_trackHeight = _height;
   m_trackTimer = GetHighResTime();

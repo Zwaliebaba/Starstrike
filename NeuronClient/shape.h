@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdio.h>
-
 #include "llist.h"
 #include "matrix34.h"
 #include "rgb_colour.h"
@@ -66,9 +64,7 @@ class ShapeMarker
     ~ShapeMarker();
 
     Matrix34 GetWorldMatrix(const Matrix34& _rootTransform);
-    Neuron::Transform3D GetWorldTransform(const Neuron::Transform3D& _rootTransform);
-
-    void WriteToFile(FILE* _out) const;
+    Transform3D GetWorldTransform(const Transform3D& _rootTransform);
 };
 
 // ******************
@@ -128,11 +124,11 @@ class ShapeFragment
 
     char* m_name;
     char* m_parentName;
-    Neuron::Transform3D m_transform;
+    Transform3D m_transform;
     LegacyVector3 m_angVel;
     LegacyVector3 m_vel;
 
-    LegacyVector3 m_centre;
+    LegacyVector3 m_center;
     float m_radius;
     float m_mostPositiveY;
     float m_mostNegativeY;
@@ -150,16 +146,14 @@ class ShapeFragment
     void RegisterVertices(VertexPosCol* verts, unsigned int numVerts);
     void RegisterTriangles(ShapeTriangle* tris, unsigned int numTris);
 
-    void WriteToFile(FILE* _out) const;
-
     void Render(float _predictionTime); // Uses display list
     void RenderSlow(); // Doesn't use display list
 
     ShapeFragment* LookupFragment(const char* _name); // Recurses into child fragments
     ShapeMarker* LookupMarker(const char* _name); // Recurses into child fragments
 
-    void CalculateCentre(const Matrix34& _transform, LegacyVector3& _centre, int& _numFragments); // Recursive
-    void CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre, float& _radius); // Recursive
+    void CalculateCenter(const Matrix34& _transform, LegacyVector3& _center, int& _numFragments); // Recursive
+    void CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center, float& _radius); // Recursive
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false);
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false);
@@ -172,7 +166,7 @@ class Shape
 {
   protected:
     void Load(TextReader* _in);
-    bool m_animating; // If false then whole shape in one display list otherwise one display list per fragment
+    bool m_animating; 
 
   public:
     ShapeFragment* m_rootFragment;
@@ -183,10 +177,8 @@ class Shape
     Shape(TextReader* in, bool _animating);
     ~Shape();
 
-    void WriteToFile(FILE* _out) const;
-
-    void Render(float _predictionTime, const Matrix34& _transform);
-    void Render(float _predictionTime, const Neuron::Transform3D& _transform);
+    void Render(float _predictionTime, const Matrix34& _transform) const;
+    void XM_CALLCONV Render(float _predictionTime, XMMATRIX _transform) const;
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false);
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false);
@@ -194,7 +186,6 @@ class Shape
                   const Matrix34& _ourTransform, // Transform of this
                   bool _accurate = false);
 
-    LegacyVector3 CalculateCentre(const Matrix34& _transform);
-    float CalculateRadius(const Matrix34& _transform, const LegacyVector3& _centre);
+    LegacyVector3 CalculateCenter(const Matrix34& _transform);
+    float CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center);
 };
-

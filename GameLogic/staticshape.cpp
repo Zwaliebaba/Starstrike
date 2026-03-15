@@ -40,8 +40,8 @@ void StaticShape::SetDetail(int _detail)
     mat.r *= m_scale;
     mat.f *= m_scale;
 
-    m_centrePos = m_shape->CalculateCentre(mat);
-    m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+    m_centerPos = m_shape->CalculateCenter(mat);
+    m_radius = m_shape->CalculateRadius(mat, m_centerPos);
   }
 }
 
@@ -59,8 +59,8 @@ void StaticShape::SetShapeName(char* _shapeName)
     mat.r *= m_scale;
     mat.f *= m_scale;
 
-    m_centrePos = m_shape->CalculateCentre(mat);
-    m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+    m_centerPos = m_shape->CalculateCenter(mat);
+    m_radius = m_shape->CalculateRadius(mat, m_centerPos);
   }
 }
 

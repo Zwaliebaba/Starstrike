@@ -24,7 +24,7 @@ bool ViriiUnit::Advance(int _slice)
 {
   float searchRadius = m_radius + VIRII_MAXSEARCHRANGE;
 
-  m_enemiesFound = g_app->m_location->m_entityGrid->AreEnemiesPresent(m_centrePos.x, m_centrePos.z, searchRadius, m_teamId);
+  m_enemiesFound = g_app->m_location->m_entityGrid->AreEnemiesPresent(m_centerPos.x, m_centerPos.z, searchRadius, m_teamId);
 
   return Unit::Advance(_slice);
 }
@@ -57,7 +57,7 @@ void ViriiUnit::Render(float _predictionTime)
     viriiDetail = 4;
   else
   {
-    float rangeToCam = (m_centrePos - g_app->m_camera->GetPos()).Mag();
+    float rangeToCam = (m_centerPos - g_app->m_camera->GetPos()).Mag();
     if (entityDetail == 1 && rangeToCam > 1000.0f)
       viriiDetail = 2;
     else if (entityDetail == 2 && rangeToCam > 1000.0f)
@@ -271,12 +271,12 @@ void Virii::RecordHistoryPosition(bool _required)
 
   float totalDistance = 0.0f;
   int removeFrom = -1;
-  int entityDetail = g_prefsManager->GetInt("RenderEntityDetail", 1);
-  float tailLength = 175.0f; // - (entityDetail-1) * 50.0f;
+
+  float tailLength = 175.0f; 
   for (int i = 0; i < m_positionHistory.Size(); ++i)
   {
-    ViriiHistory* history = m_positionHistory[i];
-    totalDistance += history->m_distance;
+    ViriiHistory* viriiHistory = m_positionHistory[i];
+    totalDistance += viriiHistory->m_distance;
 
     if (totalDistance > tailLength)
     {
@@ -289,9 +289,9 @@ void Virii::RecordHistoryPosition(bool _required)
   {
     while (m_positionHistory.ValidIndex(removeFrom))
     {
-      ViriiHistory* history = m_positionHistory[removeFrom];
+      ViriiHistory* viriiHistory = m_positionHistory[removeFrom];
       m_positionHistory.RemoveData(removeFrom);
-      delete history;
+      delete viriiHistory;
     }
   }
 
@@ -763,19 +763,19 @@ bool Virii::AdvanceDead()
 
 bool Virii::IsInView()
 {
-  LegacyVector3 centrePos = m_pos;
+  LegacyVector3 centerPos = m_pos;
   float radiusSqd = 0.0f;
 
   for (int i = 0; i < m_positionHistory.Size(); ++i)
   {
     LegacyVector3 pos = m_positionHistory[i]->m_pos;
-    float distance = (pos - centrePos).MagSquared();
+    float distance = (pos - centerPos).MagSquared();
     if (distance > radiusSqd)
       radiusSqd = distance;
   }
 
   float radius = sqrtf(radiusSqd);
-  return g_app->m_camera->SphereInViewFrustum(centrePos, radius);
+  return g_app->m_camera->SphereInViewFrustum(centerPos, radius);
 }
 
 void Virii::ListSoundEvents(LList<const char*>* _list)

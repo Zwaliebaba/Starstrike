@@ -150,7 +150,7 @@ public:
 	void SetupModelviewMatrix		();
 
 	bool PosInViewFrustum			(LegacyVector3 const &_pos);
-    bool SphereInViewFrustum        (LegacyVector3 const &_centre, float _radius );
+    bool SphereInViewFrustum        (LegacyVector3 const &_center, float _radius );
 
     Building *GetBestBuildingInView ();  // Is the player currently looking at a building?
 

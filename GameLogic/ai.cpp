@@ -467,8 +467,8 @@ void AITarget::Render(float _predictionTime)
   if (g_app->m_editing)
     Building::Render(_predictionTime);
 
-  //    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,80,0), 10.0f, "Green  : f%d e%d i%d", m_friendCount[0], m_enemyCount[0], m_idleCount[0] );
-  //    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,70,0), 10.0f, "Red    : f%d e%d i%d", m_friendCount[1], m_enemyCount[1], m_idleCount[1] );
+  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,80,0), 10.0f, "Green  : f%d e%d i%d", m_friendCount[0], m_enemyCount[0], m_idleCount[0] );
+  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,70,0), 10.0f, "Red    : f%d e%d i%d", m_friendCount[1], m_enemyCount[1], m_idleCount[1] );
 
   //for( int t = 0; t < NUM_TEAMS; ++t )
   //    {
@@ -477,7 +477,7 @@ void AITarget::Render(float _predictionTime)
   //        if( team->m_teamType != Team::TeamTypeUnused )
   //        {
   //            glColor3ubv( team->m_colour.GetData() );
-  //            g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,60+t*15,0), 10.0f, "%2.2f", m_priority[t] );
+  //            g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,60+t*15,0), 10.0f, "%2.2f", m_priority[t] );
   //        }
   //    }
 }

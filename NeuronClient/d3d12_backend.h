@@ -1,12 +1,10 @@
 #pragma once
 
 #include "RootSignature.h"
+#include "FrameListener.h"
 
 namespace OpenGLD3D
 {
-  // --- Constants ---
-  constexpr UINT UPLOAD_BUFFER_SIZE = 64 * 1024 * 1024; // 64 MB ring buffer
-
   // --- Constant buffer layouts (must match HLSL exactly) ---
 
   struct LightConstants
@@ -107,101 +105,45 @@ namespace OpenGLD3D
     }
   };
 
-  // --- Upload ring buffer ---
+  // --- OpenGL Translation State ---
+  // Owns the GL→D3D12 translation concerns: root signature, PSO cache,
+  // default white texture, static samplers.  Engine infrastructure (device,
+  // command list, descriptor heaps, upload buffers) lives in Graphics::Core
+  // and DescriptorAllocator.
 
-  class UploadRingBuffer
-  {
-    public:
-      void Init(ID3D12Device* device, SIZE_T size);
-      void Shutdown();
-      void Reset();
-
-      // Allocate space and return CPU pointer + GPU virtual address
-      struct Allocation
-      {
-        void* cpuPtr;
-        D3D12_GPU_VIRTUAL_ADDRESS gpuAddr;
-        SIZE_T offset;
-      };
-
-      Allocation Allocate(SIZE_T sizeBytes, SIZE_T alignment = 4);
-
-      ID3D12Resource* GetResource() const { return m_resource.get(); }
-      SIZE_T GetOffset() const { return m_offset; }
-      SIZE_T GetHighWaterMark() const { return m_highWaterMark; }
-      void ResetHighWaterMark() { m_highWaterMark = 0; }
-
-    private:
-      com_ptr<ID3D12Resource> m_resource;
-      UINT8* m_cpuBase = nullptr;
-      D3D12_GPU_VIRTUAL_ADDRESS m_gpuBase = 0;
-      SIZE_T m_size = 0;
-      SIZE_T m_offset = 0;
-      SIZE_T m_highWaterMark = 0;
-  };
-
-  // --- D3D12 Backend ---
-  // After Phase 1: device, swap chain, command queue, command list, fence,
-  // command allocators, render targets, and depth stencil are all owned by
-  // Neuron::Graphics::Core.  This class retains descriptor heaps, root
-  // signature, PSO cache, upload ring buffers, samplers, and default texture.
-
-  class D3D12Backend
+  class OpenGLTranslationState : public Neuron::Graphics::IFrameListener
   {
     public:
       bool Init();
       void Shutdown();
-      void BeginFrame();
-      void EndFrame(); // Transition, present via Core, prepare next frame
-      void WaitForGpu();
 
-      // Accessors — device / command list now delegate to Core
-      ID3D12Device* GetDevice() const;
-      ID3D12GraphicsCommandList* GetCommandList() const;
+      // IFrameListener — sets descriptor heaps, root signature, and render targets.
+      void OnFrameBegin(ID3D12GraphicsCommandList* cmdList) override;
+
+      // Accessors
       ID3D12RootSignature* GetRawRootSignature() const { return m_rootSignature.GetSignature(); }
       const RootSignature& GetRootSignature() const { return m_rootSignature; }
-      UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[Graphics::Core::Get().GetCurrentFrameIndex()]; }
 
       // PSO management
       ID3D12PipelineState* GetOrCreatePSO(const PSOKey& key);
 
-      // Descriptor heap management
-      ID3D12DescriptorHeap* GetSRVCBVHeap() const { return m_srvCbvHeap.get(); }
-      ID3D12DescriptorHeap* GetSamplerHeap() const { return m_samplerHeap.get(); }
-      UINT GetSRVDescriptorSize() const { return m_srvDescriptorSize; }
-      UINT GetSamplerDescriptorSize() const { return m_samplerDescriptorSize; }
-
-      // Allocate SRV/CBV slots
-      D3D12_CPU_DESCRIPTOR_HANDLE AllocateSRVSlot(UINT& outIndex);
-      D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUHandle(UINT index) const;
+      // Allocate an SRV slot from the unified DescriptorAllocator heap.
+      Graphics::DescriptorHandle AllocateSRVSlot();
 
       // Pre-built sampler descriptors: [0]=linear/wrap, [1]=point/wrap, [2]=linear/clamp, [3]=point/clamp
       // + mip variants: [4]=linear/wrap/mipLinear, ...
       static constexpr UINT NUM_STATIC_SAMPLERS = 8;
 
-      // Default (white) texture SRV index
-      UINT GetDefaultTextureSRVIndex() const { return m_defaultTextureSRVIndex; }
+      // Default (white) texture GPU handle
+      D3D12_GPU_DESCRIPTOR_HANDLE GetDefaultTextureSRVGPUHandle() const { return m_defaultTextureSRVHandle; }
 
-      // RTV/DSV handle access (for glClear) — delegate to Core
-      D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRTVHandle() const;
-      D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentDSVHandle() const;
+      // Sampler base GPU handle (index 0 of the contiguous sampler block)
+      D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerBaseGPUHandle() const { return m_samplerBaseHandle; }
 
     private:
       void CreateRootSignature();
-      void CreateDescriptorHeaps();
-      void CreateUploadBuffer();
       void CreateDefaultTexture();
       void CreateSamplers();
-
-      // SRV/CBV descriptor heap (shader-visible)
-      com_ptr<ID3D12DescriptorHeap> m_srvCbvHeap;
-      UINT m_srvDescriptorSize = 0;
-      UINT m_srvNextFreeSlot = 0;
-      static constexpr UINT MAX_SRV_DESCRIPTORS = 1024;
-
-      // Sampler descriptor heap (shader-visible)
-      com_ptr<ID3D12DescriptorHeap> m_samplerHeap;
-      UINT m_samplerDescriptorSize = 0;
 
       // Root signature
       RootSignature m_rootSignature;
@@ -209,14 +151,14 @@ namespace OpenGLD3D
       // PSO cache
       std::unordered_map<PSOKey, com_ptr<ID3D12PipelineState>, PSOKeyHash> m_psoCache;
 
-      // Upload ring buffers (one per frame to avoid GPU data races)
-      std::vector<UploadRingBuffer> m_uploadBuffers;
-
       // Default 1x1 white texture
       com_ptr<ID3D12Resource> m_defaultTexture;
-      UINT m_defaultTextureSRVIndex = 0;
+      Graphics::DescriptorHandle m_defaultTextureSRVHandle;
+
+      // Sampler base handle (contiguous block of NUM_STATIC_SAMPLERS)
+      Graphics::DescriptorHandle m_samplerBaseHandle;
   };
 
-  // Global backend instance
-  extern D3D12Backend g_backend;
+  // Global OpenGL translation state instance
+  extern OpenGLTranslationState g_glState;
 } // namespace OpenGLD3D

@@ -69,8 +69,8 @@ bool BlueprintBuilding::IsInView()
 
   if (link)
   {
-    LegacyVector3 midPoint = (link->m_centrePos + m_centrePos) / 2.0f;
-    float radius = (link->m_centrePos - m_centrePos).Mag();
+    LegacyVector3 midPoint = (link->m_centerPos + m_centerPos) / 2.0f;
+    float radius = (link->m_centerPos - m_centerPos).Mag();
     radius += m_radius;
     return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
   }
@@ -129,7 +129,7 @@ void BlueprintBuilding::RenderAlphas(float _predictionTime)
     glDisable(GL_TEXTURE_2D);
   }
 
-  //g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,50,0), 10.0f, "%d Infected %2.2f", m_segment, m_infected );
+  //g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,50,0), 10.0f, "%d Infected %2.2f", m_segment, m_infected );
 }
 
 void BlueprintBuilding::SendBlueprint(int _segment, bool _infected)
@@ -314,7 +314,7 @@ void BlueprintStore::Render(float _predictionTime)
 
   //    for( int i = 0; i < BLUEPRINTSTORE_NUMSEGMENTS; ++i )
   //    {
-  //        g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,170+i*20,0), 20, "Segment %d : %2.2f", i, m_segments[i] );
+  //        g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,170+i*20,0), 20, "Segment %d : %2.2f", i, m_segments[i] );
   //    }
 }
 
@@ -615,7 +615,7 @@ void BlueprintRelay::Initialise(Building* _template)
 
   m_pos.y = m_altitude;
   Matrix34 mat(m_front, m_up, m_pos);
-  m_centrePos = m_shape->CalculateCentre(mat);
+  m_centerPos = m_shape->CalculateCenter(mat);
 }
 
 void BlueprintRelay::SetDetail(int _detail)
@@ -623,8 +623,8 @@ void BlueprintRelay::SetDetail(int _detail)
   m_pos.y = m_altitude;
 
   Matrix34 mat(m_front, m_up, m_pos);
-  m_centrePos = m_shape->CalculateCentre(mat);
-  m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+  m_centerPos = m_shape->CalculateCenter(mat);
+  m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 }
 
 bool BlueprintRelay::Advance()
@@ -639,7 +639,7 @@ bool BlueprintRelay::Advance()
 
   m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
 
-  m_centrePos = m_pos;
+  m_centerPos = m_pos;
 
   return BlueprintBuilding::Advance();
 }

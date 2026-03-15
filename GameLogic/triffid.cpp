@@ -243,7 +243,7 @@ void Triffid::RenderAlphas(float _predictionTime)
         }
         glEnd();
 
-        g_editorFont.DrawText3DCentre(triggerPos + LegacyVector3(0, 50, 0), 10.0f, "UseTrigger: %d", m_useTrigger);
+        g_editorFont.DrawText3DCenter(triggerPos + LegacyVector3(0, 50, 0), 10.0f, "UseTrigger: %d", m_useTrigger);
       }
     }
 #endif
@@ -518,7 +518,7 @@ void TriffidEgg::Spawn()
       int size = 5 + syncrand() % 5;
       Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
       int unitId;
-      Unit* unit = team->NewUnit(TypeCentipede, size, &unitId, m_pos);
+      team->NewUnit(TypeCentipede, size, &unitId, m_pos);
       g_app->m_location->SpawnEntities(m_pos, teamId, unitId, TypeCentipede, size, g_zeroVector, 0.0f, 200.0f);
       break;
     }

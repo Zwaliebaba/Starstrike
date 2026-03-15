@@ -352,8 +352,8 @@ Squadie::Squadie()
     m_shape = g_app->m_resource->GetShape( "squad.shp" );
     DEBUG_ASSERT( m_shape );
 
-	m_centrePos = m_shape->CalculateCentre(g_identityMatrix34);
-    m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centrePos );
+	m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
+    m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centerPos );
 
     m_laser = m_shape->m_rootFragment->LookupMarker( "MarkerLaser" );
     m_brass = m_shape->m_rootFragment->LookupMarker( "MarkerBrass" );

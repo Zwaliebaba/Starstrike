@@ -51,8 +51,8 @@ void ResearchItem::SetDetail([[maybe_unused]] int _detail)
   m_pos.y += 20.0f;
 
   Matrix34 mat(m_front, m_up, m_pos);
-  m_centrePos = m_shape->CalculateCentre(mat);
-  m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+  m_centerPos = m_shape->CalculateCenter(mat);
+  m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 }
 
 bool ResearchItem::Advance()
@@ -64,7 +64,7 @@ bool ResearchItem::Advance()
     m_vel *= (1.0f - SERVER_ADVANCE_PERIOD * 0.5f);
 
     Matrix34 mat(m_front, g_upVector, m_pos);
-    m_centrePos = m_shape->CalculateCentre(mat);
+    m_centerPos = m_shape->CalculateCenter(mat);
   }
   else
     m_vel.Zero();
@@ -133,8 +133,8 @@ void ResearchItem::Render(float _predictionTime)
 
   if (g_app->m_editing && m_researchType != -1)
   {
-    g_gameFont.DrawText3DCentre(predictedPos + LegacyVector3(0, 25, 0), 5, GlobalResearch::GetTypeName(m_researchType));
-    g_gameFont.DrawText3DCentre(predictedPos + LegacyVector3(0, 20, 0), 5, "%2.2f", m_reprogrammed);
+    g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 25, 0), 5, GlobalResearch::GetTypeName(m_researchType));
+    g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 20, 0), 5, "%2.2f", m_reprogrammed);
   }
 }
 
@@ -164,7 +164,7 @@ void ResearchItem::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < maxBlobs; ++i)
   {
-    LegacyVector3 pos = m_centrePos;
+    LegacyVector3 pos = m_centerPos;
     pos.x += sinf(timeIndex + i) * i * 0.3f;
     pos.y += cosf(timeIndex + i) * sinf(i * 10) * 5;
     pos.z += cosf(timeIndex + i) * i * 0.3f;
@@ -205,7 +205,7 @@ void ResearchItem::RenderAlphas(float _predictionTime)
 
     for (int i = 0; i < numStars; ++i)
     {
-      LegacyVector3 pos = m_centrePos;
+      LegacyVector3 pos = m_centerPos;
       pos.x += sinf(timeIndex + i) * i * 0.3f;
       pos.y += (cosf(timeIndex + i) * cosf(i * 10) * 2);
       pos.z += cosf(timeIndex + i) * i * 0.3f;

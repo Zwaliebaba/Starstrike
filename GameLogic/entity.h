@@ -65,7 +65,7 @@ public:
     LegacyVector3				m_angVel;
 
     Shape               *m_shape;                   // Might be NULL
-    LegacyVector3             m_centrePos;
+    LegacyVector3             m_centerPos;
     float               m_radius;                   // Can be Zero, which means its a sprite
 
     bool                m_renderDamaged;

@@ -502,13 +502,13 @@ void LevelFile::ParseLandFlattenAreas(TextReader* _in)
     auto def = new LandscapeFlattenArea();
     m_landscape.m_flattenAreas.PutDataAtEnd(def);
 
-    def->m_centre.x = static_cast<float>(atof(word));
+    def->m_center.x = static_cast<float>(atof(word));
 
     word = _in->GetNextToken();
-    def->m_centre.y = static_cast<float>(atof(word));
+    def->m_center.y = static_cast<float>(atof(word));
 
     word = _in->GetNextToken();
-    def->m_centre.z = static_cast<float>(atof(word));
+    def->m_center.z = static_cast<float>(atof(word));
 
     word = _in->GetNextToken();
     def->m_size = static_cast<float>(atof(word));
@@ -920,7 +920,7 @@ void LevelFile::WriteLandFlattenAreas(FileWriter* _out)
   for (int i = 0; i < m_landscape.m_flattenAreas.Size(); ++i)
   {
     LandscapeFlattenArea* area = m_landscape.m_flattenAreas.GetData(i);
-    _out->printf("\t%6.1f %6.1f %6.1f %6.1f\n", area->m_centre.x, area->m_centre.y, area->m_centre.z, area->m_size);
+    _out->printf("\t%6.1f %6.1f %6.1f %6.1f\n", area->m_center.x, area->m_center.y, area->m_center.z, area->m_size);
   }
   _out->printf("LandFlattenAreas_EndDefinition\n\n");
 }
@@ -1126,7 +1126,7 @@ void LevelFile::GenerateInstantUnits()
         {
           Unit* unit = team->m_units[u];
 
-          LegacyVector3 centrePos;
+          LegacyVector3 centerPos;
           float roamRange = 0;
           int numFound = 0;
           for (int i = 0; i < unit->m_entities.Size(); ++i)
@@ -1134,20 +1134,20 @@ void LevelFile::GenerateInstantUnits()
             if (unit->m_entities.ValidIndex(i))
             {
               Entity* entity = unit->m_entities[i];
-              centrePos += entity->m_spawnPoint;
+              centerPos += entity->m_spawnPoint;
               roamRange += entity->m_roamRange;
               numFound++;
             }
           }
 
-          centrePos /= static_cast<float>(numFound);
+          centerPos /= static_cast<float>(numFound);
           roamRange /= static_cast<float>(numFound);
 
           auto instant = new InstantUnit();
           instant->m_type = unit->m_troopType;
           instant->m_teamId = unit->m_teamId;
-          instant->m_posX = centrePos.x;
-          instant->m_posZ = centrePos.z;
+          instant->m_posX = centerPos.x;
+          instant->m_posZ = centerPos.z;
           instant->m_number = numFound;
           instant->m_inAUnit = true;
           instant->m_spread = roamRange;

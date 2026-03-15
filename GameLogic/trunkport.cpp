@@ -156,9 +156,9 @@ void TrunkPort::Render( float predictionTime )
 }
 
 
-bool TrunkPort::PerformDepthSort( LegacyVector3 &_centrePos )
+bool TrunkPort::PerformDepthSort( LegacyVector3 &_centerPos )
 {
-    _centrePos = m_centrePos;
+    _centerPos = m_centerPos;
 
     return true;
 }
@@ -192,12 +192,12 @@ void TrunkPort::RenderAlphas( float predictionTime )
         {
             for( int z = 0; z < m_heightMapSize; ++z )
             {
-                float centreDif = (m_heightMap[z*m_heightMapSize+x] - markerPos).Mag();
-                float fractionOut = centreDif / maxDistance;
+                float centerDif = (m_heightMap[z*m_heightMapSize+x] - markerPos).Mag();
+                float fractionOut = centerDif / maxDistance;
                 if( fractionOut > 1.0f ) fractionOut = 1.0f;
 
-                float wave1 = cosf(centreDif * 0.15f);
-                float wave2 = cosf(centreDif * 0.05f);
+                float wave1 = cosf(centerDif * 0.15f);
+                float wave2 = cosf(centerDif * 0.05f);
 
                 LegacyVector3 thisDif = m_front * sinf(g_gameTime * 2) * wave1 * (1.0f-fractionOut) * 15 * timeScale;
                 thisDif += m_front * sinf(g_gameTime * 2.5) * wave2 * (1.0f-fractionOut) * 15 * timeScale;

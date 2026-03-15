@@ -9,7 +9,7 @@ class Tree : public Building
     void RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf);
     void GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf, TreeMeshData& _mesh);
 
-    LegacyVector3 m_hitcheckCentre;
+    LegacyVector3 m_hitcheckCenter;
     float m_hitcheckRadius;
     int m_numLeafs;
 
@@ -46,9 +46,8 @@ class Tree : public Building
     bool Advance() override;
 
     void Generate();
-    void Render(float _predictionTime) override;
 
-    bool PerformDepthSort(LegacyVector3& _centrePos) override;
+    bool PerformDepthSort(LegacyVector3& _centerPos) override;
 
     void Damage(float _damage) override;
 

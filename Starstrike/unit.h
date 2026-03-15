@@ -19,7 +19,7 @@ public:
     int                 m_troopType;
     SliceDArray         <Entity *> m_entities;
 
-    LegacyVector3             m_centrePos;
+    LegacyVector3             m_centerPos;
     LegacyVector3             m_vel;
     float               m_radius;
 
@@ -40,7 +40,7 @@ public:
     LegacyVector3 GetOffset           (int _formation, int _index);  // Takes into account formation AND obstructions
 
 protected:
-    LegacyVector3     m_accumulatedCentre;
+    LegacyVector3     m_accumulatedCenter;
     float       m_accumulatedRadiusSquared;
     int         m_numAccumulated;
 

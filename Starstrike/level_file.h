@@ -97,7 +97,7 @@ class InstantUnit
 class LandscapeFlattenArea
 {
   public:
-    LegacyVector3 m_centre;
+    LegacyVector3 m_center;
     float m_size;
 };
 

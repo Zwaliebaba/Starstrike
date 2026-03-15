@@ -27,7 +27,7 @@ void SafeArea::Initialise(Building* _template)
   m_entityTypeRequired = static_cast<SafeArea*>(_template)->m_entityTypeRequired;
 
   m_radius = m_size;
-  m_centrePos = m_pos + LegacyVector3(0, m_radius / 2, 0);
+  m_centerPos = m_pos + LegacyVector3(0, m_radius / 2, 0);
 }
 
 bool SafeArea::Advance()

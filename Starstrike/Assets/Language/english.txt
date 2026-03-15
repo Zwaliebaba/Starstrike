@@ -570,7 +570,7 @@ pixelmines_objective1                  Refine 20 Primitives
 pixelmines_objective2                  Enable Yard Trunk Port
 
 pixelmines_intro_1                     This entire location is one giant mining facility, unfortunately now overrun by this damn Virus.
-pixelmines_refinery_1                  This building at the centre of the facility is the Refinery.  It converts mined Polygons into Primitives which can be used later to build things.
+pixelmines_refinery_1                  This building at the center of the facility is the Refinery.  It converts mined Polygons into Primitives which can be used later to build things.
 pixelmines_refinery_1b                 It also drives the motor system that moves the carts around the track.
 pixelmines_refinery_2                  This Refinery needs Darwinians at its control pads or else it's useless.  You'll need to safely escort some Darwinians up here to get the facility moving.
 pixelmines_mines_1                     There are four underground mines built into the side of the landscape.  Each one pulls raw Polygons from the mountainside.
@@ -970,7 +970,7 @@ launchpad_finalisland_7                In order to capture the first Spawn Point
 launchpad_finalisland_8                The Red Darwinians will attack you as soon as you take the first Spawn Point from them, so be careful.
 launchpad_finalisland_9                And good luck!
 
-launchpad_reprogram2_1                 Align this Radar dish to the centre island.
+launchpad_reprogram2_1                 Align this Radar dish to the center island.
 launchpad_reprogram2_2                 You can then guide Darwinians through the link using an Officer.
 
 launchpad_success_1                    We've done it!
@@ -1096,7 +1096,7 @@ containmentend_5                       So the Mines produce refined Primitives a
 containmentend_5b                      The Yard also requires Energy, which comes from the Generator.
 
 containmentend_generator1              This is the Generator.  Here the Energy that drives Darwinia is produced and regulated.
-containmentend_generator1b             The Solar Panels dotted around this location harness the energy radiated out by the Soul Repository at the centre of Darwinia.
+containmentend_generator1b             The Solar Panels dotted around this location harness the energy radiated out by the Soul Repository at the center of Darwinia.
 containmentend_generator2              Like most buildings in Darwinia, these Solar Panels require Darwinians at their control pads in order to operate.
 containmentend_generator3              This building is Darwinia's Primary Power Generator.
 containmentend_generator3b             It modulates the power from the Solar Panels into a Regulated Energy Stream that we can use.
@@ -1135,7 +1135,7 @@ generator_objective1                   Generate 65 Gq/s Energy
 generator_primary_1                    This building is Darwinia's primary power Generator.  It supplies power to every location and every building in this world.
 generator_primary_2                    We're going to start building things we can use as weapons against the invasion, and for that we're going to need a lot more Energy.
 generator_panels_1                     There are three groups of Solar Panels dotted around the landscape.  Like most of the buildings in this world, they require Darwinians manning them in order to operate.
-generator_panels_2                     Once they're online, they will harness the energy radiated out from the Soul Repository at the centre of Darwinia.
+generator_panels_2                     Once they're online, they will harness the energy radiated out from the Soul Repository at the center of Darwinia.
 generator_panels_3                     That energy is then transferred through pylons to the primary Generator, where it is modulated into a form that can be used by buildings all around the world.
 generator_panels_4                     We'll need to achieve a power output of at least 65 Gigaquads per second in order to do anything substantial.
 generator_panels_5                     This trunk port would normally transfer the modulated energy to the Construction Yard.
@@ -1204,7 +1204,7 @@ biospherealpha_primary5                This is the ultimate target area.  Once t
 yardend_1                              It's an unfortunate fact that the areas of Darwinia that used to be heavily populated are now the most heavily infected.
 yardend_1b                             Those are the areas we must now visit.
 yardend_2                              We need to make a concerted effort to rebuild the Darwinian population to its former strength, and wipe out the Viral Infection once and for all.
-yardend_3                              The Soul Repository at the centre of Darwinia is the key to the Evolution and Rebirth system for the Darwinians.
+yardend_3                              The Soul Repository at the center of Darwinia is the key to the Evolution and Rebirth system for the Darwinians.
 yardend_3b                             The Souls of all the dead creatures eventually rise up and merge into the Repository, adding their experiences and wisdom to the group.
 yardend_4                              The Souls are slowly ordered based on how successful they were in life, and are sent back down to the Receiver location, to be eventually reborn into new Darwinians.
 
@@ -1308,7 +1308,7 @@ rockhead_4                             It made me realise what an enormous respo
 
 temple_intro_1                         Long ago, the Darwinians began work on a temple.  It was their dream, I think, to somehow begin communicating with me.
 temple_intro_2                         It never occurred to me that one day they might actually succeed.
-temple_intro_3                         It's really quite ingenious.  They found a way to align one of the Trunk Ports with what they believed was Heaven...the Soul Repository at the centre of Darwinia.
+temple_intro_3                         It's really quite ingenious.  They found a way to align one of the Trunk Ports with what they believed was Heaven...the Soul Repository at the center of Darwinia.
 temple_intro_4                         Thinking they were talking to God, they'd managed to open up a data stream and began downloading files from my computer.
 temple_intro_5                         My Research Programs were the first files to move through the link.
 temple_intro_6                         My attention was elsewhere.  I should have been watching them more closely.

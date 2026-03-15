@@ -262,6 +262,8 @@
       <Filter>Graphics\Legacy</Filter>
     </ClInclude>
     <ClInclude Include="tree_renderer.h" />
+    <ClInclude Include="FrameListener.h" />
+    <ClInclude Include="UploadRingBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -479,6 +481,7 @@
       <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="tree_renderer.cpp" />
+    <ClCompile Include="UploadRingBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

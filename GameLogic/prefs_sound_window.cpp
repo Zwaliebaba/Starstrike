@@ -269,7 +269,7 @@ void PrefsSoundWindow::Render( bool _hasFocus )
 	unsigned int deviceId = g_systemInfo->m_audioInfo.m_preferredDevice;
     char const *hwDescription = g_systemInfo->m_audioInfo.m_deviceNames[deviceId];
     float fontSize = 1.2f * m_w / strlen(hwDescription);
-    g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + GetMenuSize(30), fontSize, hwDescription );
+    g_editorFont.DrawText2DCenter( m_x + m_w/2, m_y + GetMenuSize(30), fontSize, hwDescription );
 
 	int border = GetClientRectX1() + 10;
     int x = m_x + 20;
@@ -287,7 +287,7 @@ void PrefsSoundWindow::Render( bool _hasFocus )
 
 
 //    int numChannels = g_soundLibrary3d->m_numChannels;
-//    g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - 70, 12, "%d channels allocated", numChannels );
+//    g_editorFont.DrawText2DCenter( m_x + m_w/2, m_y + m_h - 70, 12, "%d channels allocated", numChannels );
 
 #ifdef PROFILER_ENABLED
     ProfiledElement *element = g_app->m_profiler->m_rootElement->m_children.GetData( "Advance SoundSystem" );
@@ -295,12 +295,12 @@ void PrefsSoundWindow::Render( bool _hasFocus )
     {
         float occup = element->m_lastTotalTime * 100;
         if( occup > 15 ) glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
-        g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - GetMenuSize(50), GetMenuSize(17), "%s %d%%", LANGUAGEPHRASE("dialog_cpuusage"), int(occup) );
+        g_editorFont.DrawText2DCenter( m_x + m_w/2, m_y + m_h - GetMenuSize(50), GetMenuSize(17), "%s %d%%", LANGUAGEPHRASE("dialog_cpuusage"), int(occup) );
     }
     else
     {
         glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
-        g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - GetMenuSize(50), size, LANGUAGEPHRASE("dialog_cpuusageunknown") );
+        g_editorFont.DrawText2DCenter( m_x + m_w/2, m_y + m_h - GetMenuSize(50), size, LANGUAGEPHRASE("dialog_cpuusageunknown") );
     }
 #endif
 
@@ -308,6 +308,6 @@ void PrefsSoundWindow::Render( bool _hasFocus )
     float memoryUsage = g_cachedSampleManager.GetMemoryUsage();
     memoryUsage /= 1024.0f;
     memoryUsage /= 1024.0f;
-    g_editorFont.DrawText2DCentre( m_x + m_w/2, m_y + m_h - GetMenuSize(70), size, "%s %2.1f Mb", LANGUAGEPHRASE("dialog_memoryusage"), memoryUsage );
+    g_editorFont.DrawText2DCenter( m_x + m_w/2, m_y + m_h - GetMenuSize(70), size, "%s %2.1f Mb", LANGUAGEPHRASE("dialog_memoryusage"), memoryUsage );
 }
 

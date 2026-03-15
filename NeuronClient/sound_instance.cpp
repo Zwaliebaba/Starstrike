@@ -744,7 +744,7 @@ bool SoundInstance::Update3DPosition()
 
             if( obj->m_id.GetUnitId() == UNIT_BUILDINGS )
             {
-                m_pos = ((Building *) obj)->m_centrePos;
+                m_pos = ((Building *) obj)->m_centerPos;
             }
 
             g_soundLibrary3d->SetChannelPosition( m_channelIndex, m_pos, m_vel );

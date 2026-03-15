@@ -45,14 +45,14 @@ LegacyVector3 EntityLeg::CalcFootHomePos(float _targetHoverHeight)
 {
   LegacyVector3 rootWorldPos = GetLegRootPos();
 
-  LegacyVector3 fromCentreToRoot = rootWorldPos - m_parent->m_pos;
-  fromCentreToRoot.HorizontalAndNormalise();
+  LegacyVector3 fromCenterToRoot = rootWorldPos - m_parent->m_pos;
+  fromCenterToRoot.HorizontalAndNormalise();
 
   LegacyVector3 groundNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(m_parent->m_pos.x, m_parent->m_pos.z);
-  fromCentreToRoot *= groundNormal.y;
+  fromCenterToRoot *= groundNormal.y;
 
   LegacyVector3 returnVal = rootWorldPos;
-  returnVal += fromCentreToRoot * (m_idealLegSlope * _targetHoverHeight);
+  returnVal += fromCenterToRoot * (m_idealLegSlope * _targetHoverHeight);
   returnVal.y -= _targetHoverHeight;
 
   return returnVal;
@@ -90,16 +90,16 @@ LegacyVector3 EntityLeg::CalcDesiredFootPos(float _targetHoverHeight)
   return rv;
 }
 
-LegacyVector3 EntityLeg::CalcKneePos(const LegacyVector3& _footPos, const LegacyVector3& _rootPos, const LegacyVector3& _centrePos)
+LegacyVector3 EntityLeg::CalcKneePos(const LegacyVector3& _footPos, const LegacyVector3& _rootPos, const LegacyVector3& _centerPos)
 {
   LegacyVector3 rootToFoot(_footPos - _rootPos);
   float rootToFootLen = rootToFoot.Mag();
 
   LegacyVector3 rootToFootHoriNorm(rootToFoot);
   rootToFootHoriNorm.HorizontalAndNormalise();
-  LegacyVector3 centreToRoot(_rootPos - _centrePos);
-  centreToRoot.HorizontalAndNormalise();
-  LegacyVector3 axis((centreToRoot ^ g_upVector).Normalise());
+  LegacyVector3 centerToRoot(_rootPos - _centerPos);
+  centerToRoot.HorizontalAndNormalise();
+  LegacyVector3 axis((centerToRoot ^ g_upVector).Normalise());
   float cosTheta = (rootToFootLen * 0.4f) / m_thighLen;
   // FIXME
   // cosTheta should never be greater than one, yet sometimes it is

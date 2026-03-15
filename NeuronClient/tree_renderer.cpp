@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "tree_renderer.h"
 #include "d3d12_backend.h"
+#include "UploadRingBuffer.h"
 #include "matrix34.h"
 #include "opengl_directx.h"
 #include "tree.h"
@@ -58,8 +59,11 @@ void TreeRenderer::Init()
   depthDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
   depthDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-  // --- PSO (uses shared root signature from backend) ---
-  m_pso.SetRootSignature(OpenGLD3D::g_backend.GetRootSignature());
+  // --- PSO (uses shared root signature from OpenGL translation layer) ---
+  // NOTE: shares root signature with OpenGL translation layer.
+  // If tree shaders diverge (new params, different SRV layout),
+  // create a dedicated root sig here instead.
+  m_pso.SetRootSignature(OpenGLD3D::g_glState.GetRootSignature());
   m_pso.SetInputLayout(&inputLayout);
   m_pso.SetBlendState(blendDesc);
   m_pso.SetRasterizerState(rasterDesc);
@@ -109,8 +113,8 @@ void TreeRenderer::EnsureUploaded(Tree* _tree)
 
   SIZE_T vertexSize = sizeof(TreeVertex);
   SIZE_T bufferSize = static_cast<SIZE_T>(totalCount) * vertexSize;
-  auto* device = OpenGLD3D::g_backend.GetDevice();
-  auto* cmdList = OpenGLD3D::g_backend.GetCommandList();
+  auto* device = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // --- Create default-heap vertex buffer ---
   D3D12_HEAP_PROPERTIES defaultHeap = {};
@@ -130,7 +134,7 @@ void TreeRenderer::EnsureUploaded(Tree* _tree)
                                                 IID_GRAPHICS_PPV_ARGS(gpu.vertexBuffer)));
 
   // --- Upload via ring buffer ---
-  auto alloc = OpenGLD3D::g_backend.GetUploadBuffer().Allocate(bufferSize, sizeof(float));
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(bufferSize, sizeof(float));
 
   auto* dst = static_cast<uint8_t*>(alloc.cpuPtr);
   if (branchCount > 0)
@@ -147,7 +151,7 @@ void TreeRenderer::EnsureUploaded(Tree* _tree)
   barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
   cmdList->ResourceBarrier(1, &barrier);
 
-  cmdList->CopyBufferRegion(gpu.vertexBuffer.get(), 0, OpenGLD3D::g_backend.GetUploadBuffer().GetResource(), alloc.offset, bufferSize);
+  cmdList->CopyBufferRegion(gpu.vertexBuffer.get(), 0, Graphics::GetCurrentUploadBuffer().GetResource(), alloc.offset, bufferSize);
 
   // Transition COPY_DEST → VERTEX_AND_CONSTANT_BUFFER
   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -216,9 +220,8 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
   cmdList->SetGraphicsRootDescriptorTable(2, m_treeTextureSRV);
 
   // --- Bind sampler (param 4) — linear/wrap/trilinear (index 0) ---
-  D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = OpenGLD3D::g_backend.GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
   // Index 0 = linear/wrap/mipLinear — matches the old static sampler
-  cmdList->SetGraphicsRootDescriptorTable(4, samplerHandle);
+  cmdList->SetGraphicsRootDescriptorTable(4, OpenGLD3D::g_glState.GetSamplerBaseGPUHandle());
 
   // --- Bind vertex buffer ---
   cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -234,7 +237,7 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
   dc.MatDiffuse = XMFLOAT4(_tree->m_branchColourArray[0] / 255.0f, _tree->m_branchColourArray[1] / 255.0f,
                            _tree->m_branchColourArray[2] / 255.0f, _tree->m_branchColourArray[3] / 255.0f);
 
-  auto cbAlloc = OpenGLD3D::g_backend.GetUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
+  auto cbAlloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
   memcpy(cbAlloc.cpuPtr, &dc, sizeof(dc));
   cmdList->SetGraphicsRootConstantBufferView(1, cbAlloc.gpuAddr);
   cmdList->DrawInstanced(gpu.branchVertexCount, 1, gpu.branchVertexStart, 0);
@@ -245,7 +248,7 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
     dc.MatDiffuse = XMFLOAT4(_tree->m_leafColourArray[0] / 255.0f, _tree->m_leafColourArray[1] / 255.0f,
                              _tree->m_leafColourArray[2] / 255.0f, _tree->m_leafColourArray[3] / 255.0f);
 
-    auto cbAlloc2 = OpenGLD3D::g_backend.GetUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
+    auto cbAlloc2 = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
     memcpy(cbAlloc2.cpuPtr, &dc, sizeof(dc));
     cmdList->SetGraphicsRootConstantBufferView(1, cbAlloc2.gpuAddr);
     cmdList->DrawInstanced(gpu.leafVertexCount, 1, gpu.leafVertexStart, 0);

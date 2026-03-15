@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ogl_extensions.h"
 #include "opengl_directx_internals.h"
-#include "d3d12_backend.h"
+#include "UploadRingBuffer.h"
 
 MultiTexCoord2fARB gglMultiTexCoord2fARB = nullptr;
 ActiveTextureARB gglActiveTextureARB = nullptr;
@@ -72,8 +72,8 @@ void __stdcall glBufferDataD3D(GLenum _target, GLsizeiptrARB _size, const GLvoid
   DEBUG_ASSERT(_target == GL_ARRAY_BUFFER_ARB);
   DEBUG_ASSERT(s_currentVBO != nullptr);
 
-  auto* device = g_backend.GetDevice();
-  auto* cmdList = g_backend.GetCommandList();
+  auto* device = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // Release old buffer
   s_currentVBO->resource = nullptr;
@@ -96,7 +96,7 @@ void __stdcall glBufferDataD3D(GLenum _target, GLsizeiptrARB _size, const GLvoid
   DEBUG_ASSERT(SUCCEEDED(hr));
 
   // Upload via ring buffer
-  auto alloc = g_backend.GetUploadBuffer().Allocate(static_cast<SIZE_T>(_size), sizeof(float));
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(static_cast<SIZE_T>(_size), sizeof(float));
   memcpy(alloc.cpuPtr, _data, _size);
 
   D3D12_RESOURCE_BARRIER barrier = {};
@@ -107,7 +107,7 @@ void __stdcall glBufferDataD3D(GLenum _target, GLsizeiptrARB _size, const GLvoid
   barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
   cmdList->ResourceBarrier(1, &barrier);
 
-  cmdList->CopyBufferRegion(s_currentVBO->resource.get(), 0, g_backend.GetUploadBuffer().GetResource(), alloc.offset, _size);
+  cmdList->CopyBufferRegion(s_currentVBO->resource.get(), 0, Graphics::GetCurrentUploadBuffer().GetResource(), alloc.offset, _size);
 
   barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
   barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;

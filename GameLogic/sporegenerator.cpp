@@ -313,7 +313,7 @@ void SporeGenerator::Render( float _predictionTime )
 
 //    RenderArrow( m_pos, m_pos+m_front*20.0f, 1.0f );
 //    RenderArrow( m_pos, m_targetPos, 2.0f );
-//    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,50,0), 10.0f, "%d", (int) m_stats[StatHealth] );
+//    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,50,0), 10.0f, "%d", (int) m_stats[StatHealth] );
 
     LegacyVector3 entityFront = LegacyVector3(0,0,1);
     LegacyVector3 entityUp = g_upVector;
@@ -412,7 +412,7 @@ void SporeGenerator::Render( float _predictionTime )
 
 bool SporeGenerator::IsInView()
 {
-    return g_app->m_camera->SphereInViewFrustum( m_pos+m_centrePos, m_radius );
+    return g_app->m_camera->SphereInViewFrustum( m_pos+m_centerPos, m_radius );
 }
 
 

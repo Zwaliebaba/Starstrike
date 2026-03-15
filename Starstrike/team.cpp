@@ -128,7 +128,7 @@ void Team::SelectUnit(int _unitId, int _entityId, int _buildingId)
   //        if( m_units.ValidIndex(_unitId) )
   //        {
   //            Unit *unit = m_units[_unitId];
-  //            worldpos = unit->m_centrePos - g_app->m_camera->GetFront() * 200.0f;
+  //            worldpos = unit->m_centerPos - g_app->m_camera->GetFront() * 200.0f;
   //        }
   //        else if( m_others.ValidIndex(_entityId) )
   //        {

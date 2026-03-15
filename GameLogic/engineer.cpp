@@ -35,8 +35,8 @@ Engineer::Engineer()
   m_shape = g_app->m_resource->GetShape("engineer.shp");
 
   Matrix34 mat(LegacyVector3(0, 0, 1), g_upVector, g_zeroVector);
-  m_centrePos = m_shape->CalculateCentre(mat);
-  m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+  m_centerPos = m_shape->CalculateCenter(mat);
+  m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 }
 
 void Engineer::Begin()

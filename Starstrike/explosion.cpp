@@ -43,7 +43,7 @@ Explosion::Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fr
   triangles.reserve(_frag->m_numTriangles);
 
   Matrix34 totalTransform(_frag->m_transform * _transform);
-  LegacyVector3 transformedFragCentre = _frag->m_centre * totalTransform;
+  LegacyVector3 transformedFragCenter = _frag->m_center * totalTransform;
 
   for (int j = 0; j < _frag->m_numTriangles; ++j)
   {
@@ -72,11 +72,11 @@ Explosion::Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fr
       continue;
     }
 
-    LegacyVector3 centre = (tri.m_v1 + tri.m_v2 + tri.m_v3) * 0.3333f;
+    LegacyVector3 center = (tri.m_v1 + tri.m_v2 + tri.m_v3) * 0.3333f;
 
-    tri.m_v1 -= centre;
-    tri.m_v2 -= centre;
-    tri.m_v3 -= centre;
+    tri.m_v1 -= center;
+    tri.m_v2 -= center;
+    tri.m_v3 -= center;
 
     LegacyVector3 a = tri.m_v1 - tri.m_v2;
     LegacyVector3 b = tri.m_v2 - tri.m_v3;
@@ -84,9 +84,9 @@ Explosion::Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fr
     if (j & 1)
       tri.m_norm = -tri.m_norm;
 
-    tri.m_vel = (centre - transformedFragCentre) * (MAX_INITIAL_SPEED);
+    tri.m_vel = (center - transformedFragCenter) * (MAX_INITIAL_SPEED);
     tri.m_vel.y += INITIAL_VERTICAL_SPEED;
-    tri.m_pos = centre;
+    tri.m_pos = center;
     tri.m_tumbler = &m_tumblers[darwiniaRandom() % NUM_TUMBLERS];
     tri.m_timeToDie = g_gameTime + EXPLOSION_LIFETIME;
 

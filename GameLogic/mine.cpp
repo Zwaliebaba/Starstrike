@@ -86,8 +86,8 @@ bool MineBuilding::IsInView()
   Building* trackLink = g_app->m_location->GetBuilding(m_trackLink);
   if (trackLink)
   {
-    LegacyVector3 midPoint = (trackLink->m_centrePos + m_centrePos) / 2.0f;
-    float radius = (trackLink->m_centrePos - m_centrePos).Mag() / 2.0f;
+    LegacyVector3 midPoint = (trackLink->m_centerPos + m_centerPos) / 2.0f;
+    float radius = (trackLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
 
     if (g_app->m_camera->SphereInViewFrustum(midPoint, radius))

@@ -90,7 +90,7 @@ bool LaserFence::Advance()
     Building* building = g_app->m_location->GetBuilding(m_nextLaserFenceId);
     if (building)
     {
-      m_centrePos = (building->m_pos + m_pos) / 2.0f;
+      m_centerPos = (building->m_pos + m_pos) / 2.0f;
       m_radius = (building->m_pos - m_pos).Mag() / 2.0f + m_radius;
     }
     m_radiusSet = true;
@@ -200,14 +200,14 @@ bool LaserFence::IsInView()
   // correctly fill the obstruction grid.
 }
 
-bool LaserFence::PerformDepthSort(LegacyVector3& _centrePos)
+bool LaserFence::PerformDepthSort(LegacyVector3& _centerPos)
 {
   if (m_mode == ModeDisabled)
     return false;
 
   if (m_nextLaserFenceId != -1)
   {
-    _centrePos = m_centrePos;
+    _centerPos = m_centerPos;
     return true;
   }
 

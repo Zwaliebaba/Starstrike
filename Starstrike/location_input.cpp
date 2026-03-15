@@ -167,7 +167,7 @@ void LocationInput::AdvanceNoSelection()
 		float unitDist = FLT_MAX;
 		float entDist = FLT_MAX;
 		if (buildId != -1) buildDist = (rayStart - g_app->m_location->GetBuilding(buildId)->m_pos).Mag();
-		if (unitId != -1) unitDist = (rayStart - team->m_units.GetData(unitId)->m_centrePos).Mag();
+		if (unitId != -1) unitDist = (rayStart - team->m_units.GetData(unitId)->m_centerPos).Mag();
 		if (entId.IsValid())  entDist = (rayStart - g_app->m_location->GetEntity(entId)->m_pos).Mag();
 
 		if (buildId != -1 || unitId != -1 || entId.IsValid() )

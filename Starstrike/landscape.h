@@ -110,6 +110,6 @@ public:
 
 	bool		RayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir, LegacyVector3 *_result) const;
 	bool		RayHitCell(int x0, int z0, LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir, LegacyVector3 *_result) const;
-	float		SphereHit(LegacyVector3 const &_centre, float _radius) const;
+	float		SphereHit(LegacyVector3 const &_center, float _radius) const;
 };
 

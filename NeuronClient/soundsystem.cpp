@@ -1281,16 +1281,6 @@ void SoundSystem::Advance()
 
 void SoundSystem::RuntimeVerify()
 {
-  //
-  // Make sure all sounds that believe they are playing have an opened sound stream
-
-  for (int i = 0; i < m_numChannels; ++i)
-  {
-    SoundInstanceId id1 = m_channels[i];
-    SoundInstance* currentSound = GetSoundInstance(id1);
-    if (currentSound && !currentSound->m_cachedSampleHandle)
-      int b = 10;
-  }
 }
 
 void SoundSystem::LoadtimeVerify()

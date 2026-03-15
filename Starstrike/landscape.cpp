@@ -208,7 +208,7 @@ void LandscapeTile::GenerateMidpoints(int _x1, int _z1, int _x2, int _z2)
   int midX = _x1 + halfSize;
   int midZ = _z1 + halfSize;
 
-  // Create a new point in the centre of the parent square
+  // Create a new point in the center of the parent square
   GenerateSquareMidpoint(midX, midZ, halfSize);
 
   // Create a new point at the mid point of the top edge of the parent square
@@ -293,14 +293,14 @@ void LandscapeTile::Generate(LandscapeDef* _def)
 
 void Landscape::FlattenArea(const LandscapeFlattenArea* _area)
 {
-  int x1 = m_heightMap->GetMapIndexX(_area->m_centre.x - _area->m_size) + 1;
-  int x2 = m_heightMap->GetMapIndexX(_area->m_centre.x + _area->m_size) + 1;
-  int z1 = m_heightMap->GetMapIndexY(_area->m_centre.z - _area->m_size) + 1;
-  int z2 = m_heightMap->GetMapIndexY(_area->m_centre.z + _area->m_size) + 1;
+  int x1 = m_heightMap->GetMapIndexX(_area->m_center.x - _area->m_size) + 1;
+  int x2 = m_heightMap->GetMapIndexX(_area->m_center.x + _area->m_size) + 1;
+  int z1 = m_heightMap->GetMapIndexY(_area->m_center.z - _area->m_size) + 1;
+  int z2 = m_heightMap->GetMapIndexY(_area->m_center.z + _area->m_size) + 1;
   for (int z = z1; z < z2; ++z)
   {
     for (int x = x1; x < x2; ++x)
-      m_heightMap->PutData(x, z, _area->m_centre.y);
+      m_heightMap->PutData(x, z, _area->m_center.y);
   }
 }
 
@@ -405,12 +405,12 @@ void Landscape::GenerateNormals()
         continue;
       }
 
-      float heightCentre = m_heightMap->GetData(x, z);
+      float heightCenter = m_heightMap->GetData(x, z);
 
-      LegacyVector3 vectN(0.0f, heightCentre - heightN, m_heightMap->m_cellSizeY);
-      LegacyVector3 vectW(-m_heightMap->m_cellSizeX, heightCentre - heightW, 0.0f);
-      LegacyVector3 vectS(0.0f, heightCentre - heightS, -m_heightMap->m_cellSizeY);
-      LegacyVector3 vectE(m_heightMap->m_cellSizeX, heightCentre - heightE, 0.0f);
+      LegacyVector3 vectN(0.0f, heightCenter - heightN, m_heightMap->m_cellSizeY);
+      LegacyVector3 vectW(-m_heightMap->m_cellSizeX, heightCenter - heightW, 0.0f);
+      LegacyVector3 vectS(0.0f, heightCenter - heightS, -m_heightMap->m_cellSizeY);
+      LegacyVector3 vectE(m_heightMap->m_cellSizeX, heightCenter - heightE, 0.0f);
 
       LegacyVector3 normA = (vectW ^ vectN).Normalise();
       LegacyVector3 normB = (vectE ^ vectS).Normalise();
@@ -812,16 +812,16 @@ bool Landscape::RayHitCell(int x0, int z0, const LegacyVector3& _rayStart, const
 
 // Returns the distance to the nearest point on the landscape if it is
 // within the specified radius. Otherwise returns -1.0f.
-float Landscape::SphereHit(const LegacyVector3& _centre, float _radius) const
+float Landscape::SphereHit(const LegacyVector3& _center, float _radius) const
 {
   // Make sure the specified radius is +ve and not so large to cause
   // major efficiency problems
   DEBUG_ASSERT(_radius > 0.0f && _radius < 200.0f);
 
-  int x1 = m_heightMap->GetMapIndexX(_centre.x - _radius);
-  int x2 = m_heightMap->GetMapIndexX(_centre.x + _radius);
-  int y1 = m_heightMap->GetMapIndexY(_centre.z - _radius);
-  int y2 = m_heightMap->GetMapIndexY(_centre.z + _radius);
+  int x1 = m_heightMap->GetMapIndexX(_center.x - _radius);
+  int x2 = m_heightMap->GetMapIndexX(_center.x + _radius);
+  int y1 = m_heightMap->GetMapIndexY(_center.z - _radius);
+  int y2 = m_heightMap->GetMapIndexY(_center.z + _radius);
 
   clamp(x1, 0, m_heightMap->GetNumColumns());
   clamp(x2, 0, m_heightMap->GetNumColumns());
@@ -838,7 +838,7 @@ float Landscape::SphereHit(const LegacyVector3& _centre, float _radius) const
     {
       pos.x = m_heightMap->GetRealX(x);
       pos.y = m_heightMap->GetData(x, y);
-      float distSqrd = (_centre - pos).MagSquared();
+      float distSqrd = (_center - pos).MagSquared();
       if (distSqrd < nearestSqrd)
         nearestSqrd = distSqrd;
     }

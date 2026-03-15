@@ -34,8 +34,8 @@ Armour::Armour()
   m_markerEntrance = m_shape->m_rootFragment->LookupMarker("MarkerEntrance");
   m_markerFlag = m_shape->m_rootFragment->LookupMarker("MarkerFlag");
 
-  m_centrePos = m_shape->CalculateCentre(g_identityMatrix34);
-  m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centrePos);
+  m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
+  m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centerPos);
 }
 
 Armour::~Armour()
@@ -423,7 +423,7 @@ void Armour::SetMissileTarget( LegacyVector3 const &_startRay, LegacyVector3 con
     Entity *entity = g_app->m_location->GetEntity( id );
     if( entity )
     {
-        m_missileTarget = entity->m_pos+entity->m_centrePos;
+        m_missileTarget = entity->m_pos+entity->m_centerPos;
         return;
     }
 

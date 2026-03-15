@@ -28,9 +28,9 @@ Unit::Unit(int troopType, int teamId, int unitId, int numEntities, LegacyVector3
     m_teamId(teamId),
     m_unitId(unitId),
     m_radius(0.0f),
-    m_centrePos(_pos),
+    m_centerPos(_pos),
     m_vel(0,0,0),
-    m_accumulatedCentre(0,0,0),
+    m_accumulatedCenter(0,0,0),
     m_accumulatedRadiusSquared(0.0f),
     m_numAccumulated(0),
     m_wayPoint(0,0,0),
@@ -124,7 +124,7 @@ void Unit::AdvanceEntities(int _slice)
 
 bool Unit::IsInView()
 {
-    return( g_app->m_camera->SphereInViewFrustum( m_centrePos, m_radius ) );
+    return( g_app->m_camera->SphereInViewFrustum( m_centerPos, m_radius ) );
 }
 
 
@@ -159,12 +159,12 @@ void Unit::Render( float _predictionTime )
 bool Unit::Advance( int _slice )
 {
     //
-    // Maintain our centre and radius values
+    // Maintain our center and radius values
 
-    LegacyVector3 oldPos = m_centrePos;
-    m_centrePos = m_accumulatedCentre;
-    if( m_numAccumulated != 0 ) m_centrePos /= m_numAccumulated;
-    m_vel = (m_centrePos - oldPos) / SERVER_ADVANCE_PERIOD;
+    LegacyVector3 oldPos = m_centerPos;
+    m_centerPos = m_accumulatedCenter;
+    if( m_numAccumulated != 0 ) m_centerPos /= m_numAccumulated;
+    m_vel = (m_centerPos - oldPos) / SERVER_ADVANCE_PERIOD;
     m_radius = sqrtf( m_accumulatedRadiusSquared );
 
     if( m_entities.NumUsed() == 0 )
@@ -173,7 +173,7 @@ bool Unit::Advance( int _slice )
         return true;
     }
 
-    m_accumulatedCentre.Zero();
+    m_accumulatedCenter.Zero();
     m_accumulatedRadiusSquared = 0.0f;
     m_numAccumulated = 0;
 
@@ -334,16 +334,16 @@ void Unit::Attack( LegacyVector3 pos, bool _withGrenade )
 
 void Unit::UpdateEntityPosition( LegacyVector3 pos, float _radius )
 {
-    m_accumulatedCentre += pos;
+    m_accumulatedCenter += pos;
     ++m_numAccumulated;
 
-    float distanceFromCentre = (pos - m_centrePos).Mag();
-    distanceFromCentre += _radius;
-    float distanceFromCentreSquared = distanceFromCentre * distanceFromCentre;
+    float distanceFromCenter = (pos - m_centerPos).Mag();
+    distanceFromCenter += _radius;
+    float distanceFromCenterSquared = distanceFromCenter * distanceFromCenter;
 
-    if( distanceFromCentreSquared > m_accumulatedRadiusSquared )
+    if( distanceFromCenterSquared > m_accumulatedRadiusSquared )
     {
-        m_accumulatedRadiusSquared = distanceFromCentreSquared;
+        m_accumulatedRadiusSquared = distanceFromCenterSquared;
     }
 }
 
@@ -497,7 +497,7 @@ void Unit::FollowRoute()
 
     WayPoint *waypoint = route->m_wayPoints.GetData(m_routeWayPointId);
     m_wayPoint = waypoint->GetPos();
-	LegacyVector3 targetVect = m_wayPoint - m_centrePos;
+	LegacyVector3 targetVect = m_wayPoint - m_centerPos;
 
     if (waypoint->m_type != WayPoint::TypeBuilding &&
         targetVect.Mag() < 10.0f)

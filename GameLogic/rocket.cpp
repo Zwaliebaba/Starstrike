@@ -192,7 +192,7 @@ void FuelBuilding::RenderAlphas(float _predictionTime)
   }
 
   //    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-  //    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,70,0), 5, "Fuel Pressure : %2.2f", m_currentLevel );
+  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,70,0), 5, "Fuel Pressure : %2.2f", m_currentLevel );
 }
 
 void FuelBuilding::Read(TextReader* _in, bool _dynamic)
@@ -352,7 +352,7 @@ void FuelGenerator::RenderAlphas(float _predictionTime)
   FuelBuilding::RenderAlphas(_predictionTime);
 
   //    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-  //    g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,90,0), 10, "Surges : %2.2f", m_surges );
+  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,90,0), 10, "Surges : %2.2f", m_surges );
 }
 
 const char* FuelGenerator::GetObjectiveCounter()
@@ -637,9 +637,9 @@ void FuelStation::RenderAlphas(float _predictionTime)
   }
 }
 
-bool FuelStation::PerformDepthSort(LegacyVector3& _centrePos)
+bool FuelStation::PerformDepthSort(LegacyVector3& _centerPos)
 {
-  _centrePos = m_centrePos;
+  _centerPos = m_centerPos;
   return true;
 }
 
@@ -952,7 +952,7 @@ void EscapeRocket::AdvanceFlight()
   m_vel.Set(0, thrust, 0);
 
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
-  m_centrePos += m_vel * SERVER_ADVANCE_PERIOD;
+  m_centerPos += m_vel * SERVER_ADVANCE_PERIOD;
 
   SetupSpectacle();
 }

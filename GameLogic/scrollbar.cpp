@@ -217,8 +217,8 @@ void ScrollBarButton::MouseDown()
         DEBUG_ASSERT( m_scrollBar );
         int pixelsInside = g_target->Y() - ( m_parent->m_y + m_y );
         float fractionInside = (float) pixelsInside / (float) m_h;
-        int centreVal = fractionInside * m_scrollBar->m_numRows;
-        int desiredVal = centreVal - m_grabOffset;
+        int centerVal = fractionInside * m_scrollBar->m_numRows;
+        int desiredVal = centerVal - m_grabOffset;
         m_scrollBar->SetCurrentValue( desiredVal );
     }
     else

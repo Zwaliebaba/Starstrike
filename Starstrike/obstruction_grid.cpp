@@ -21,8 +21,8 @@ void ObstructionGrid::CalculateBuildingArea(int _buildingId)
   Building* building = g_app->m_location->GetBuilding(_buildingId);
   if (building)
   {
-    int buildingCellX = m_cells.GetMapIndexX(building->m_centrePos.x);
-    int buildingCellZ = m_cells.GetMapIndexY(building->m_centrePos.z);
+    int buildingCellX = m_cells.GetMapIndexX(building->m_centerPos.x);
+    int buildingCellZ = m_cells.GetMapIndexY(building->m_centerPos.z);
     int range = ceil(building->m_radius / m_cells.m_cellSizeX);
 
     int minX = max(buildingCellX - range, 0);
@@ -35,11 +35,11 @@ void ObstructionGrid::CalculateBuildingArea(int _buildingId)
       for (int z = minZ; z <= maxZ; ++z)
       {
         ObstructionGridCell* cell = m_cells.GetPointer(x, z);
-        float cellCentreX = static_cast<float>(x) * m_cells.m_cellSizeX + m_cells.m_cellSizeX / 2.0f;
-        float cellCentreZ = static_cast<float>(z) * m_cells.m_cellSizeY + m_cells.m_cellSizeY / 2.0f;
+        float cellCenterX = static_cast<float>(x) * m_cells.m_cellSizeX + m_cells.m_cellSizeX / 2.0f;
+        float cellCenterZ = static_cast<float>(z) * m_cells.m_cellSizeY + m_cells.m_cellSizeY / 2.0f;
         float cellRadius = m_cells.m_cellSizeX * 0.5f;
 
-        LegacyVector3 cellPos(cellCentreX, 0.0f, cellCentreZ);
+        LegacyVector3 cellPos(cellCenterX, 0.0f, cellCenterZ);
         cellPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(cellPos.x, cellPos.z);
 
         if (building->DoesSphereHit(cellPos, cellRadius))

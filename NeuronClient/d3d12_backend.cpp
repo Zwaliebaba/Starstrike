@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "d3d12_backend.h"
+#include "UploadRingBuffer.h"
 
 #include "CompiledShaders/VertexShader.h"
 #include "CompiledShaders/PixelShader.h"
 
 using namespace OpenGLD3D;
 
-D3D12Backend OpenGLD3D::g_backend;
+OpenGLTranslationState OpenGLD3D::g_glState;
 
 // ---- Helpers ----
 
@@ -30,145 +31,41 @@ static D3D12_BLEND ToAlphaBlend(D3D12_BLEND blend)
   }
 }
 
-// ---- UploadRingBuffer ----
+// ---- OpenGLTranslationState ----
 
-void UploadRingBuffer::Init(ID3D12Device* device, SIZE_T size)
+bool OpenGLTranslationState::Init()
 {
-  m_size = size;
-  m_offset = 0;
-
-  D3D12_HEAP_PROPERTIES heapProps = {};
-  heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-  D3D12_RESOURCE_DESC desc = {};
-  desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-  desc.Width = size;
-  desc.Height = 1;
-  desc.DepthOrArraySize = 1;
-  desc.MipLevels = 1;
-  desc.SampleDesc.Count = 1;
-  desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-  check_hresult(device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-                                                IID_GRAPHICS_PPV_ARGS(m_resource)));
-
-  D3D12_RANGE readRange = {0, 0};
-  check_hresult(m_resource->Map(0, &readRange, reinterpret_cast<void**>(&m_cpuBase)));
-
-  m_gpuBase = m_resource->GetGPUVirtualAddress();
-}
-
-void UploadRingBuffer::Shutdown()
-{
-  if (m_resource)
-  {
-    m_resource->Unmap(0, nullptr);
-    m_resource = nullptr;
-  }
-  m_cpuBase = nullptr;
-  m_gpuBase = 0;
-  m_size = 0;
-  m_offset = 0;
-}
-
-void UploadRingBuffer::Reset() { m_offset = 0; }
-
-UploadRingBuffer::Allocation UploadRingBuffer::Allocate(SIZE_T sizeBytes, SIZE_T alignment)
-{
-  // Align offset
-  m_offset = (m_offset + alignment - 1) & ~(alignment - 1);
-
-  // Wrap if we've exceeded the buffer.
-  // This overwrites data from earlier draw calls in the same frame that the
-  // GPU has not yet consumed (the command list is deferred).  The GPU will
-  // read garbage, causing spiky/flickering geometry.  Trigger a debug assert
-  // so the developer knows the buffer is too small, then wrap anyway to
-  // avoid a hard crash in release builds.
-  if (m_offset + sizeBytes > m_size)
-  {
-    DEBUG_ASSERT(false && "UploadRingBuffer wrapped mid-frame — increase UPLOAD_BUFFER_SIZE");
-    m_offset = 0;
-  }
-
-  Allocation alloc;
-  alloc.cpuPtr = m_cpuBase + m_offset;
-  alloc.gpuAddr = m_gpuBase + m_offset;
-  alloc.offset = m_offset;
-
-  m_offset += sizeBytes;
-  if (m_offset > m_highWaterMark)
-    m_highWaterMark = m_offset;
-  return alloc;
-}
-
-// ---- D3D12Backend ----
-
-bool D3D12Backend::Init()
-{
-  auto* device = GetDevice();
-
-  CreateDescriptorHeaps();
   CreateRootSignature();
-  CreateUploadBuffer();
 
   // Core::Prepare() has already opened the command list.
   CreateDefaultTexture();
   CreateSamplers();
 
-  // Set up per-frame rendering state.
-  BeginFrame();
+  // Register as frame listener so OnFrameBegin is called each frame.
+  Graphics::Core::Get().RegisterFrameListener(this);
+
+  // Initial per-frame rendering state (first frame).
+  OnFrameBegin(Graphics::Core::Get().GetCommandList());
 
   return true;
 }
 
-void D3D12Backend::Shutdown()
+void OpenGLTranslationState::Shutdown()
 {
+  // Unregister before releasing resources so Core::Prepare() never dispatches
+  // to a dangling listener.
+  Graphics::Core::Get().UnregisterFrameListener(this);
+
   // Wait for the GPU to finish all outstanding work so resources can be
   // safely released.  Must happen before Core::Shutdown() destroys the device.
-  WaitForGpu();
+  Graphics::Core::Get().WaitForGpu();
 
   m_psoCache.clear();
   m_rootSignature.Reset(0, 0);
-  m_srvCbvHeap = nullptr;
-  m_samplerHeap = nullptr;
   m_defaultTexture = nullptr;
-
-  for (auto& buffer : m_uploadBuffers)
-    buffer.Shutdown();
-  m_uploadBuffers.clear();
 }
 
-ID3D12Device* D3D12Backend::GetDevice() const { return Graphics::Core::Get().GetD3DDevice(); }
-
-ID3D12GraphicsCommandList* D3D12Backend::GetCommandList() const { return Graphics::Core::Get().GetCommandList(); }
-
-void D3D12Backend::CreateDescriptorHeaps()
-{
-  auto* device = GetDevice();
-
-  // SRV/CBV heap (shader-visible)
-  {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = MAX_SRV_DESCRIPTORS;
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    check_hresult(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_srvCbvHeap)));
-    m_srvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    m_srvNextFreeSlot = 0;
-  }
-
-  // Sampler heap (shader-visible)
-  {
-    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = NUM_STATIC_SAMPLERS + 16; // extra room
-    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    check_hresult(device->CreateDescriptorHeap(&desc, IID_GRAPHICS_PPV_ARGS(m_samplerHeap)));
-    m_samplerDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-  }
-}
-
-void D3D12Backend::CreateRootSignature()
+void OpenGLTranslationState::CreateRootSignature()
 {
   // Shared root signature — used by uber and tree pipelines.
   // Param 0: CBV  b0  (SceneConstants  — per-frame)
@@ -192,19 +89,10 @@ void D3D12Backend::CreateRootSignature()
                            D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 }
 
-void D3D12Backend::CreateUploadBuffer()
+void OpenGLTranslationState::CreateDefaultTexture()
 {
-  const UINT bufferCount = Graphics::Core::Get().GetBackBufferCount();
-  m_uploadBuffers.resize(bufferCount);
-  for (UINT i = 0; i < bufferCount; i++)
-    m_uploadBuffers[i].Init(GetDevice(), UPLOAD_BUFFER_SIZE);
-}
-
-void D3D12Backend::CreateDefaultTexture()
-{
-  auto* device = GetDevice();
-  auto* cmdList = GetCommandList();
-  UINT frameIndex = Graphics::Core::Get().GetCurrentFrameIndex();
+  auto* device = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
   // Create a 1x1 white texture for use when texturing is disabled
   D3D12_HEAP_PROPERTIES heapProps = {};
   heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -226,7 +114,7 @@ void D3D12Backend::CreateDefaultTexture()
   D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
   device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, nullptr, nullptr, &uploadSize);
 
-  auto alloc = m_uploadBuffers[frameIndex].Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
   auto dest = static_cast<UINT8*>(alloc.cpuPtr);
   // RGBA white
   dest[0] = 255;
@@ -235,7 +123,7 @@ void D3D12Backend::CreateDefaultTexture()
   dest[3] = 255;
 
   D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
-  srcLoc.pResource = m_uploadBuffers[frameIndex].GetResource();
+  srcLoc.pResource = Graphics::GetCurrentUploadBuffer().GetResource();
   srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
   srcLoc.PlacedFootprint = footprint;
   srcLoc.PlacedFootprint.Offset = alloc.offset;
@@ -257,19 +145,17 @@ void D3D12Backend::CreateDefaultTexture()
   cmdList->ResourceBarrier(1, &barrier);
 
   // Create SRV
-  UINT srvIndex;
-  D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = AllocateSRVSlot(srvIndex);
-  m_defaultTextureSRVIndex = srvIndex;
+  m_defaultTextureSRVHandle = AllocateSRVSlot();
 
   D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
   srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
   srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
   srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
   srvDesc.Texture2D.MipLevels = 1;
-  device->CreateShaderResourceView(m_defaultTexture.get(), &srvDesc, srvHandle);
+  device->CreateShaderResourceView(m_defaultTexture.get(), &srvDesc, m_defaultTextureSRVHandle);
 }
 
-void D3D12Backend::CreateSamplers()
+void OpenGLTranslationState::CreateSamplers()
 {
   // Create standard sampler combinations
   struct SamplerConfig
@@ -290,7 +176,12 @@ void D3D12Backend::CreateSamplers()
     {D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_TEXTURE_ADDRESS_MODE_CLAMP}, // 7: point/clamp/mipLinear
   };
 
-  D3D12_CPU_DESCRIPTOR_HANDLE samplerHandle = m_samplerHeap->GetCPUDescriptorHandleForHeapStart();
+  // Allocate a contiguous block of sampler descriptors from the unified heap.
+  m_samplerBaseHandle = Graphics::DescriptorAllocator::Allocate(
+    D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, NUM_STATIC_SAMPLERS);
+
+  UINT samplerDescSize = Graphics::DescriptorAllocator::GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+  D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_samplerBaseHandle;
 
   for (UINT i = 0; i < NUM_STATIC_SAMPLERS; i++)
   {
@@ -302,28 +193,17 @@ void D3D12Backend::CreateSamplers()
     desc.MaxLOD = D3D12_FLOAT32_MAX;
     desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 
-    GetDevice()->CreateSampler(&desc, samplerHandle);
-    samplerHandle.ptr += m_samplerDescriptorSize;
+    Graphics::Core::Get().GetD3DDevice()->CreateSampler(&desc, cpuHandle);
+    cpuHandle.ptr += samplerDescSize;
   }
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::AllocateSRVSlot(UINT& outIndex)
+Graphics::DescriptorHandle OpenGLTranslationState::AllocateSRVSlot()
 {
-  ASSERT_TEXT(m_srvNextFreeSlot < MAX_SRV_DESCRIPTORS, L"SRV descriptor heap full");
-  outIndex = m_srvNextFreeSlot++;
-  D3D12_CPU_DESCRIPTOR_HANDLE handle = m_srvCbvHeap->GetCPUDescriptorHandleForHeapStart();
-  handle.ptr += outIndex * m_srvDescriptorSize;
-  return handle;
+  return Graphics::DescriptorAllocator::Allocate(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE D3D12Backend::GetSRVGPUHandle(UINT index) const
-{
-  D3D12_GPU_DESCRIPTOR_HANDLE handle = m_srvCbvHeap->GetGPUDescriptorHandleForHeapStart();
-  handle.ptr += index * m_srvDescriptorSize;
-  return handle;
-}
-
-ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
+ID3D12PipelineState* OpenGLTranslationState::GetOrCreatePSO(const PSOKey& key)
 {
   auto it = m_psoCache.find(key);
   if (it != m_psoCache.end())
@@ -404,24 +284,20 @@ ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
   psoDesc.DSVFormat = Graphics::Core::Get().GetDepthBufferFormat();
 
   com_ptr<ID3D12PipelineState> pso;
-  check_hresult(GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_GRAPHICS_PPV_ARGS(pso)));
+  check_hresult(Graphics::Core::Get().GetD3DDevice()->CreateGraphicsPipelineState(&psoDesc, IID_GRAPHICS_PPV_ARGS(pso)));
 
   auto* rawPtr = pso.get();
   m_psoCache[key] = std::move(pso);
   return rawPtr;
 }
 
-void D3D12Backend::BeginFrame()
+void OpenGLTranslationState::OnFrameBegin(ID3D12GraphicsCommandList* cmdList)
 {
   // Core::Prepare() has already reset the command allocator/list and
-  // transitioned the back buffer to RENDER_TARGET.  We just need to set
-  // our shader-visible descriptor heaps, root signature, and render targets.
+  // transitioned the back buffer to RENDER_TARGET.  Set the unified
+  // shader-visible descriptor heaps, root signature, and render targets.
 
-  auto* cmdList = GetCommandList();
-
-  // Set our shader-visible descriptor heaps (overrides Core's CPU-only heaps)
-  ID3D12DescriptorHeap* heaps[] = {m_srvCbvHeap.get(), m_samplerHeap.get()};
-  cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
+  Graphics::DescriptorAllocator::SetDescriptorHeaps(cmdList);
 
   // Set root signature
   cmdList->SetGraphicsRootSignature(m_rootSignature.GetSignature());
@@ -431,29 +307,3 @@ void D3D12Backend::BeginFrame()
   D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = Graphics::Core::Get().GetDepthStencilView();
   cmdList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 }
-
-void D3D12Backend::EndFrame()
-{
-  using namespace Neuron::Graphics;
-
-  // Transition back buffer to present state via Core's resource state tracker
-  Core::Get().GetGpuResourceStateTracker()->TransitionResource(Core::Get().GetRenderTarget(), D3D12_RESOURCE_STATE_PRESENT, true);
-
-  // Close command list, execute, present, move to next frame
-  Core::Get().Present();
-
-  // Prepare next frame (reset allocator/cmdlist, transition back buffer to RT)
-  Core::Get().Prepare();
-
-  // Reset this frame's upload buffer
-  m_uploadBuffers[Core::Get().GetCurrentFrameIndex()].Reset();
-
-  // Set up our per-frame rendering state
-  BeginFrame();
-}
-
-void D3D12Backend::WaitForGpu() { Graphics::Core::Get().WaitForGpu(); }
-
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentRTVHandle() const { return Graphics::Core::Get().GetRenderTargetView(); }
-
-D3D12_CPU_DESCRIPTOR_HANDLE D3D12Backend::GetCurrentDSVHandle() const { return Graphics::Core::Get().GetDepthStencilView(); }

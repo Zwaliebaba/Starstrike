@@ -49,7 +49,7 @@ public:
     void RenderAlphas   ( float predictionTime );
     void RenderLights   ();
 
-    bool PerformDepthSort   ( LegacyVector3 &_centrePos );
+    bool PerformDepthSort   ( LegacyVector3 &_centerPos );
     bool IsInView           ();
 
     void Read   ( TextReader *_in, bool _dynamic );

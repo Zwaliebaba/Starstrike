@@ -1030,10 +1030,10 @@ void Location::RenderBuildingAlphas()
       Building* building = m_buildings.GetData(i);
       if (building->IsInView())
       {
-        LegacyVector3 centrePos;
-        if (building->PerformDepthSort(centrePos))
+        LegacyVector3 centerPos;
+        if (building->PerformDepthSort(centerPos))
         {
-          float distance = (centrePos - g_app->m_camera->GetPos()).MagSquared();
+          float distance = (centerPos - g_app->m_camera->GetPos()).MagSquared();
           s_sortedBuildings[s_nextSortedBuilding].m_buildingIndex = i;
           s_sortedBuildings[s_nextSortedBuilding].m_distance = distance;
           s_nextSortedBuilding++;
@@ -1366,7 +1366,7 @@ void Location::UpdateTeam(unsigned char teamId, const TeamControls& teamControls
     if (unitMove)
     {
       unit->SetWayPoint(teamControls.m_mousePos);
-      unit->m_targetDir = (teamControls.m_mousePos - unit->m_centrePos).Normalise();
+      unit->m_targetDir = (teamControls.m_mousePos - unit->m_centerPos).Normalise();
       unit->RecalculateOffsets();
 
       //
@@ -1446,7 +1446,7 @@ int Location::GetUnitId(const LegacyVector3& startRay, const LegacyVector3& dire
 
   //
   // Perform quick preselection by doing ray-sphere intersection tests
-  // against the units centrepos and radius.  However we do then need to
+  // against the units centerpos and radius.  However we do then need to
   // zoom in and perform ray-sphere checks against each entity, because a unit
   // can become seperated so its bounding sphere covers a very large area.
 
@@ -1455,7 +1455,7 @@ int Location::GetUnitId(const LegacyVector3& startRay, const LegacyVector3& dire
     if (m_teams[team].m_units.ValidIndex(unit))
     {
       Unit* theUnit = m_teams[team].m_units.GetData(unit);
-      bool rayHit = RaySphereIntersection(startRay, direction, theUnit->m_centrePos, theUnit->m_radius * 1.5f);
+      bool rayHit = RaySphereIntersection(startRay, direction, theUnit->m_centerPos, theUnit->m_radius * 1.5f);
       if (rayHit && theUnit->NumAliveEntities() > 0)
       {
         for (int i = 0; i < theUnit->m_entities.Size(); ++i)
@@ -1463,18 +1463,18 @@ int Location::GetUnitId(const LegacyVector3& startRay, const LegacyVector3& dire
           if (theUnit->m_entities.ValidIndex(i))
           {
             Entity* entity = theUnit->m_entities[i];
-            LegacyVector3 spherePos = entity->m_pos + entity->m_centrePos;
+            LegacyVector3 spherePos = entity->m_pos + entity->m_centerPos;
             float sphereRadius = entity->m_radius * 1.5f;
             LegacyVector3 hitPos;
 
             bool entityHit = RaySphereIntersection(startRay, direction, spherePos, sphereRadius, 1e10, &hitPos);
             if (entityHit && !entity->m_dead)
             {
-              float centrePosX, centrePosY, rayHitX, rayHitY;
-              g_app->m_camera->Get2DScreenPos(spherePos, &centrePosX, &centrePosY);
+              float centerPosX, centerPosY, rayHitX, rayHitY;
+              g_app->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
               g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
-              float rangeSqd = pow(centrePosX - rayHitX, 2) + pow(centrePosY - rayHitY, 2);
+              float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
               if (rangeSqd < closestRangeSqd)
               {
                 closestRangeSqd = rangeSqd;
@@ -1509,17 +1509,17 @@ WorldObjectId Location::GetEntityId(const LegacyVector3& startRay, const LegacyV
       Entity* ent = m_teams[teamId].m_others.GetData(i);
       if (!ent->m_dead)
       {
-        LegacyVector3 spherePos = ent->m_pos + ent->m_centrePos;
+        LegacyVector3 spherePos = ent->m_pos + ent->m_centerPos;
         float sphereRadius = ent->m_radius * 1.5f;
         LegacyVector3 hitPos;
         bool rayHit = RaySphereIntersection(startRay, direction, spherePos, sphereRadius, 1e10, &hitPos);
         if (rayHit)
         {
-          float centrePosX, centrePosY, rayHitX, rayHitY;
-          g_app->m_camera->Get2DScreenPos(spherePos, &centrePosX, &centrePosY);
+          float centerPosX, centerPosY, rayHitX, rayHitY;
+          g_app->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
           g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
-          float rangeSqd = pow(centrePosX - rayHitX, 2) + pow(centrePosY - rayHitY, 2);
+          float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
           if (rangeSqd < closestRangeSqd)
           {
             closestRangeSqd = rangeSqd;
@@ -1558,19 +1558,19 @@ int Location::GetBuildingId(const LegacyVector3& rayStart, const LegacyVector3& 
         {
           rayHit = building->DoesRayHit(rayStart, rayDir, 1e10);
           if (rayHit)
-            RaySphereIntersection(rayStart, rayDir, building->m_centrePos, building->m_radius, _maxDistance, &hitPos);
+            RaySphereIntersection(rayStart, rayDir, building->m_centerPos, building->m_radius, _maxDistance, &hitPos);
           // Have to do the raySphereIntersection in order to calculate the hitPos
         }
         else
-          rayHit = RaySphereIntersection(rayStart, rayDir, building->m_centrePos, building->m_radius, _maxDistance, &hitPos);
+          rayHit = RaySphereIntersection(rayStart, rayDir, building->m_centerPos, building->m_radius, _maxDistance, &hitPos);
 
         if (rayHit)
         {
-          float centrePosX, centrePosY, rayHitX, rayHitY;
-          g_app->m_camera->Get2DScreenPos(building->m_centrePos, &centrePosX, &centrePosY);
+          float centerPosX, centerPosY, rayHitX, rayHitY;
+          g_app->m_camera->Get2DScreenPos(building->m_centerPos, &centerPosX, &centerPosY);
           g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
-          float rangeSqd = pow(centrePosX - rayHitX, 2) + pow(centrePosY - rayHitY, 2);
+          float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
           if (rangeSqd < closestRangeSqd)
           {
             buildingId = building->m_id.GetUniqueId();

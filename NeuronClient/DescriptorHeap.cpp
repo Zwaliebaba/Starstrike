@@ -30,6 +30,8 @@ void DescriptorHeap::Create(const std::wstring& Name, D3D12_DESCRIPTOR_HEAP_TYPE
 
   m_DescriptorSize = Core::Get().GetD3DDevice()->GetDescriptorHandleIncrementSize(m_HeapDesc.Type);
   m_NumFreeDescriptors = m_HeapDesc.NumDescriptors;
+  m_BumpRemaining = m_HeapDesc.NumDescriptors;
+  m_FreeList.clear();
 
   if (gpuHeap)
     m_FirstHandle = DescriptorHandle(m_Heap->GetCPUDescriptorHandleForHeapStart(), m_Heap->GetGPUDescriptorHandleForHeapStart());
@@ -41,11 +43,31 @@ void DescriptorHeap::Create(const std::wstring& Name, D3D12_DESCRIPTOR_HEAP_TYPE
 
 DescriptorHandle DescriptorHeap::Alloc(uint32_t Count)
 {
-  DEBUG_ASSERT_TEXT(HasAvailableSpace(Count), "Descriptor Heap out of space.  Increase heap size.");
+  // Single-slot requests can be satisfied from the free-list
+  if (Count == 1 && !m_FreeList.empty())
+  {
+    uint32_t index = m_FreeList.back();
+    m_FreeList.pop_back();
+    m_NumFreeDescriptors--;
+    return (*this)[index];
+  }
+
+  // Multi-slot or empty free-list: bump-allocate.
+  DEBUG_ASSERT_TEXT(m_BumpRemaining >= Count, "Descriptor Heap out of contiguous space.");
   DescriptorHandle ret = m_NextFreeHandle;
   m_NextFreeHandle += Count * m_DescriptorSize;
+  m_BumpRemaining -= Count;
   m_NumFreeDescriptors -= Count;
   return ret;
+}
+
+void DescriptorHeap::Free(DescriptorHandle handle)
+{
+  DEBUG_ASSERT(handle.IsShaderVisible() && "Free() only valid for shader-visible heaps");
+  DEBUG_ASSERT(ValidateHandle(handle));
+  uint32_t index = GetOffsetOfHandle(handle);
+  m_FreeList.push_back(index);
+  m_NumFreeDescriptors++;
 }
 
 bool DescriptorHeap::ValidateHandle(const DescriptorHandle& DHandle) const
@@ -60,6 +82,12 @@ bool DescriptorHeap::ValidateHandle(const DescriptorHandle& DHandle) const
   return true;
 }
 
+void DescriptorAllocator::DestroyWindowSizeDependent()
+{
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Destroy();
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Destroy();
+}
+
 void DescriptorAllocator::DestroyAll()
 {
   for (auto& desc : sm_descriptorHeapPool)
@@ -68,11 +96,16 @@ void DescriptorAllocator::DestroyAll()
 
 void DescriptorAllocator::Create()
 {
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create(L"CBV_SRV_UAV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NUM_DESCRIPTORS_PER_HEAP);
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create(L"Sampler Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, NUM_DESCRIPTORS_PER_HEAP);
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(L"RTV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Core::Get().GetBackBufferCount());
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Create(L"DSV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES].Create(L"CBV_SRV_UAV CPU Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, NUM_DESCRIPTORS_PER_HEAP);
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].Create(
+    L"CBV_SRV_UAV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, MAX_SRV_DESCRIPTORS);
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].Create(
+    L"Sampler Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, MAX_SAMPLER_DESCRIPTORS);
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_RTV].Create(
+    L"RTV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Core::Get().GetBackBufferCount());
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_DSV].Create(
+    L"DSV Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+  sm_descriptorHeapPool[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES].Create(
+    L"CBV_SRV_UAV CPU Descriptor Heap", D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, MAX_CPU_SRV_DESCRIPTORS);
 }
 
 DescriptorHandle DescriptorAllocator::Allocate(D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32_t _count, bool _forceCpu)
@@ -81,6 +114,11 @@ DescriptorHandle DescriptorAllocator::Allocate(D3D12_DESCRIPTOR_HEAP_TYPE Type, 
     Type = D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES;
 
   return sm_descriptorHeapPool[Type].Alloc(_count);
+}
+
+void DescriptorAllocator::Free(D3D12_DESCRIPTOR_HEAP_TYPE Type, DescriptorHandle handle)
+{
+  sm_descriptorHeapPool[static_cast<size_t>(Type)].Free(handle);
 }
 
 void DescriptorAllocator::SetDescriptorHeaps(ID3D12GraphicsCommandList* _commandlist)

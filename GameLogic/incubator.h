@@ -22,7 +22,7 @@ class Incubator: public Building
 {
 protected:
     FastDArray      <Spirit> m_spirits;
-    ShapeMarker     *m_spiritCentre;
+    ShapeMarker     *m_spiritCenter;
     ShapeMarker     *m_exit;
     ShapeMarker     *m_dock;
     ShapeMarker     *m_spiritEntrance[3];

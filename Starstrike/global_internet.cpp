@@ -25,7 +25,7 @@ void GlobalInternetNode::AddLink(int _id)
 GlobalInternet::GlobalInternet()
   : m_numNodes(0),
     m_numLinks(0),
-    m_nearestNodeToCentre(-1),
+    m_nearestNodeToCenter(-1),
     m_nearestDistance(FLT_MAX)
 {
   darwiniaSeedRandom(1);
@@ -45,11 +45,11 @@ unsigned short GlobalInternet::GenerateInternet(const LegacyVector3& _pos, unsig
   m_numNodes++;
   DEBUG_ASSERT(m_numNodes < GLOBALINTERNET_MAXNODES);
 
-  float distanceToCentre = _pos.Mag();
-  if (distanceToCentre < m_nearestDistance)
+  float distanceToCenter = _pos.Mag();
+  if (distanceToCenter < m_nearestDistance)
   {
-    m_nearestDistance = distanceToCentre;
-    m_nearestNodeToCentre = nodeIndex;
+    m_nearestDistance = distanceToCenter;
+    m_nearestNodeToCenter = nodeIndex;
   }
 
   unsigned char numLinks = _size;
@@ -85,8 +85,8 @@ void GlobalInternet::GenerateInternet()
   m_links.resize(GLOBALINTERNET_MAXLINKS);
   m_nodes.resize(GLOBALINTERNET_MAXNODES);
 
-  LegacyVector3 centre(-797, 1949, -1135);
-  GenerateInternet(centre, GLOBALINTERNET_ITERATIONS);
+  LegacyVector3 center(-797, 1949, -1135);
+  GenerateInternet(center, GLOBALINTERNET_ITERATIONS);
 
   m_nodes[m_numNodes].m_pos.Zero();
   m_nodes[m_numNodes].m_size = 0.0f;
@@ -94,7 +94,7 @@ void GlobalInternet::GenerateInternet()
   m_numNodes++;
   DEBUG_ASSERT(m_numNodes <= GLOBALINTERNET_MAXNODES);
 
-  m_links[m_numLinks].m_from = m_nearestNodeToCentre;
+  m_links[m_numLinks].m_from = m_nearestNodeToCenter;
   m_links[m_numLinks].m_to = nodeIndex;
   m_links[m_numLinks].m_size = 1.0f;
   m_numLinks++;

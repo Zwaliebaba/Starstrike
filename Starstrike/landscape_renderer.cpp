@@ -211,10 +211,10 @@ void LandscapeRenderer::BuildColourArray()
       const LegacyVector3& v1 = m_verts[strip->m_firstVertIndex + j].m_pos;
       const LegacyVector3& v2 = m_verts[strip->m_firstVertIndex + j + 1].m_pos;
       const LegacyVector3& v3 = m_verts[strip->m_firstVertIndex + j + 2].m_pos;
-      LegacyVector3 centre = (v1 + v2 + v3) * 0.33333f;
+      LegacyVector3 center = (v1 + v2 + v3) * 0.33333f;
       const LegacyVector3& norm = m_verts[strip->m_firstVertIndex + j + 2].m_norm;
       RGBAColour col;
-      GetLandscapeColour(centre.y, norm.y, static_cast<unsigned int>(centre.x), static_cast<unsigned int>(centre.z), &col);
+      GetLandscapeColour(center.y, norm.y, static_cast<unsigned int>(center.x), static_cast<unsigned int>(center.z), &col);
       m_verts[nextColId++].m_col = col;
     }
   }

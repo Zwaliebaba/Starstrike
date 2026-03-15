@@ -3,7 +3,7 @@
 #include "opengl_directx.h"
 #include "opengl_directx_internals.h"
 #include "opengl_directx_matrix_stack.h"
-#include "d3d12_backend.h"
+#include "UploadRingBuffer.h"
 
 using namespace OpenGLD3D;
 
@@ -15,7 +15,7 @@ DisplayList::DisplayList(std::vector<std::unique_ptr<DLCommand>>&& commands,
 
 	if (!vertices.empty())
 	{
-		auto* device = g_backend.GetDevice();
+		auto* device = Graphics::Core::Get().GetD3DDevice();
 		UINT vbSize = static_cast<UINT>(vertices.size() * sizeof(CustomVertex));
 
 		// Create a default-heap vertex buffer
@@ -37,10 +37,10 @@ DisplayList::DisplayList(std::vector<std::unique_ptr<DLCommand>>&& commands,
 			IID_GRAPHICS_PPV_ARGS(m_vertexBuffer));
 
 		// Upload via the ring buffer — note: this must happen while a command list is open
-		auto alloc = g_backend.GetUploadBuffer().Allocate(vbSize, sizeof(CustomVertex));
+		auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(vbSize, sizeof(CustomVertex));
 		memcpy(alloc.cpuPtr, vertices.data(), vbSize);
 
-		auto* cmdList = g_backend.GetCommandList();
+		auto* cmdList = Graphics::Core::Get().GetCommandList();
 
 		// Transition to copy dest
 		D3D12_RESOURCE_BARRIER barrier = {};
@@ -51,7 +51,7 @@ DisplayList::DisplayList(std::vector<std::unique_ptr<DLCommand>>&& commands,
 		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		cmdList->ResourceBarrier(1, &barrier);
 
-		cmdList->CopyBufferRegion(m_vertexBuffer.get(), 0, g_backend.GetUploadBuffer().GetResource(), alloc.offset, vbSize);
+		cmdList->CopyBufferRegion(m_vertexBuffer.get(), 0, Graphics::GetCurrentUploadBuffer().GetResource(), alloc.offset, vbSize);
 
 		// Transition to vertex buffer
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
@@ -72,7 +72,7 @@ void DisplayList::Draw()
 {
 	if (m_vertexBuffer)
 	{
-		auto* cmdList = g_backend.GetCommandList();
+		auto* cmdList = Graphics::Core::Get().GetCommandList();
 		cmdList->IASetVertexBuffers(0, 1, &m_vbView);
 	}
 
@@ -91,7 +91,7 @@ void DLCommandDraw::Execute()
 {
 	PrepareDrawState(m_topology);
 
-	auto* cmdList = g_backend.GetCommandList();
+	auto* cmdList = Graphics::Core::Get().GetCommandList();
 	cmdList->DrawInstanced(m_vertexCount, 1, m_startVertex, 0);
 
 	OpenGLD3D::RecordDrawCall();
@@ -114,7 +114,7 @@ DLCommandMultiplyMatrix::DLCommandMultiplyMatrix(MatrixStack* stack, const Direc
 
 void DLCommandMultiplyMatrix::Execute()
 {
-	m_stack->Multiply(m_matrix);
+	m_stack->Multiply(XMLoadFloat4x4(&m_matrix));
 }
 
 DLCommandPushMatrix::DLCommandPushMatrix(MatrixStack* stack)

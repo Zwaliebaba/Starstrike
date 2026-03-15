@@ -562,7 +562,7 @@ pixelmines_objective1                  Raffiner 20 primitifs
 pixelmines_objective2                  Activer le point de passage vers le dépôt
 
 pixelmines_intro_1                     Ce secteur est un complexe minier, malheureusement occupé par ce maudit virus.
-pixelmines_refinery_1                  L'édifice au centre de ce complexe est la raffinerie. Elle raffine les polygones bruts extraits en primitifs qui servent plus tard aux constructions sur Darwinia.
+pixelmines_refinery_1                  L'édifice au center de ce complexe est la raffinerie. Elle raffine les polygones bruts extraits en primitifs qui servent plus tard aux constructions sur Darwinia.
 pixelmines_refinery_1b                 Elle contrôle également le système qui déplace les chariots sur les rails.
 pixelmines_refinery_2                  La raffinerie a besoin de Darwiniens pour fonctionner, elle ne sert sinon à rien. Vous allez devoir escorter des Darwiniens jusqu'ici pour qu'ils la remettent en marche.
 pixelmines_mines_1                     Ce complexe dispose de quatre mines souterraines. Chacune extrait des montagnes des polygones bruts.
@@ -1089,7 +1089,7 @@ containmentend_5                       Cette mine produit ainsi des primitifs ra
 containmentend_5b                      Le dépôt a également besoin d'énergie, qui est fournie par le générateur.
 
 containmentend_generator1              Voici le générateur. L'énergie qui fait fonctionner Darwinia y est produite et régulée.
-containmentend_generator1b             Les panneaux solaires répartis dans ce secteur exploitent l'énergie diffusée par la mémoire morte au centre de Darwinia.
+containmentend_generator1b             Les panneaux solaires répartis dans ce secteur exploitent l'énergie diffusée par la mémoire morte au center de Darwinia.
 containmentend_generator2              Comme la plupart des constructions de Darwinia, ces panneaux solaires nécessitent des Darwiniens à leur base pour pouvoir fonctionner.
 containmentend_generator3              Voici le générateur d'énergie principal.
 containmentend_generator3b             Il module l'énergie des panneaux solaires en courant d'énergie utilisable.
@@ -1128,7 +1128,7 @@ generator_objective1                   Générer 65 Gq/s d'énergie
 generator_primary_1                    Cet édifice est le générateur d'énergie principal. Il fournit de l'énergie à chaque secteur et à chaque construction de ce monde.
 generator_primary_2                    Nous allons commencer à construire des choses nous servant à combattre cette invasion, et nous allons avoir besoin de beaucoup plus d'énergie.
 generator_panels_1                     Il y a trois groupes de panneaux solaires sur ces terres. Comme la plupart des constructions ici, des Darwiniens doivent opérer à leur base pour les faire fonctionner.
-generator_panels_2                     Une fois qu'ils fonctionneront, ils exploiteront l'énergie émanant de la mémoire morte au centre de Darwinia.
+generator_panels_2                     Une fois qu'ils fonctionneront, ils exploiteront l'énergie émanant de la mémoire morte au center de Darwinia.
 generator_panels_3                     Cette énergie est ensuite transférée par des pylônes jusqu'au générateur principal, où elle est modulée sous une forme utile à la construction.
 generator_panels_4                     Nous allons devoir atteindre un flux constant d'au moins 65 Gigaquads par seconde pour pouvoir accomplir quelque chose de conséquent.
 generator_panels_5                     Ce point de passage transfère d'habitude l'énergie modulée jusqu'au dépôt de construction.
@@ -1197,7 +1197,7 @@ biospherealpha_primary5                C'est la zone cible ultime. Une fois que 
 yardend_1                              Il est malheureux de constater que les secteurs autrefois les plus peuplés de Darwinia sont à présent les plus infectés.
 yardend_1b                             Ce sont les secteurs que nous devons maintenant visiter.
 yardend_2                              Nous devons fournir un effort concerté pour redonner à la population darwinienne sa force passée, et nettoyer le virus une bonne fois pour toutes.
-yardend_3                              La mémoire morte, au centre de Darwinia, est le cœur de l'évolution et de la renaissance pour les Darwiniens.
+yardend_3                              La mémoire morte, au center de Darwinia, est le cœur de l'évolution et de la renaissance pour les Darwiniens.
 yardend_3b                             Les esprits de toutes les créatures mortes finissent par s'élever et arriver jusqu'à la mémoire morte. L'expérience et la sagesse de chacun s'ajoutent à celles du groupe.
 yardend_4                              Les esprits sont lentement triés selon la réussite qu'ils ont obtenu dans la vie, puis ils sont renvoyés vers le récepteur, pour finalement renaître en nouveaux Darwiniens.
 
@@ -1301,7 +1301,7 @@ rockhead_4                             Cela me fait réaliser quelle responsabili
 
 temple_intro_1                         Il y a longtemps, les Darwiniens commencèrent à travailler à un temple. Leur rêve, je crois, était de commencer à communiquer avec moi.
 temple_intro_2                         Je n'aurais jamais cru qu'ils y parviendraient un jour.
-temple_intro_3                         Le système est très ingénieux. Ils ont découvert un moyen d'aligner l'un des points de passage à ce qu'ils croyaient être le Paradis… la mémoire morte au centre de Darwinia.
+temple_intro_3                         Le système est très ingénieux. Ils ont découvert un moyen d'aligner l'un des points de passage à ce qu'ils croyaient être le Paradis… la mémoire morte au center de Darwinia.
 temple_intro_4                         Croyant communiquer avec Dieu, ils parvinrent à ouvrir un réseau de données et commencèrent à télécharger des fichiers à partir de mon ordinateur.
 temple_intro_5                         Mes programmes de recherche furent les premiers à passer par cette liaison.
 temple_intro_6                         Mes pensées étaient tournées vers d'autres problèmes. Mais j'aurais du être plus attentif.

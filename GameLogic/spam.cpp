@@ -44,8 +44,8 @@ void Spam::SetDetail(int _detail)
   }
 
   Matrix34 mat(m_front, m_up, m_pos);
-  m_centrePos = m_shape->CalculateCentre(mat);
-  m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+  m_centerPos = m_shape->CalculateCenter(mat);
+  m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 }
 
 void Spam::Damage(float _damage)
@@ -113,8 +113,8 @@ void Spam::Render(float _predictionTime)
 
 void Spam::RenderAlphas(float _predictionTime)
 {
-  //g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,100,0), 10.0f, "timer %d", (int) m_timer );
-  //g_editorFont.DrawText3DCentre( m_pos+LegacyVector3(0,90,0), 10.0f, "Damage %d", (int) m_damage );
+  //g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,100,0), 10.0f, "timer %d", (int) m_timer );
+  //g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,90,0), 10.0f, "Damage %d", (int) m_damage );
 
   LegacyVector3 camUp = g_app->m_camera->GetUp();
   LegacyVector3 camRight = g_app->m_camera->GetRight();
@@ -137,11 +137,11 @@ void Spam::RenderAlphas(float _predictionTime)
   float alpha = 1.0f;
 
   LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  LegacyVector3 centreToMpos = m_pos - m_centrePos;
+  LegacyVector3 centerToMpos = m_pos - m_centerPos;
 
   for (int i = 0; i < maxBlobs; ++i)
   {
-    LegacyVector3 pos = predictedPos + centreToMpos;
+    LegacyVector3 pos = predictedPos + centerToMpos;
     pos.x += sinf(timeIndex + i) * i * 0.3f;
     pos.y += cosf(timeIndex + i) * sinf(i * 10) * 5;
     pos.z += cosf(timeIndex + i) * i * 0.3f;
@@ -183,7 +183,7 @@ void Spam::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < numStars; ++i)
   {
-    LegacyVector3 pos = predictedPos + centreToMpos;
+    LegacyVector3 pos = predictedPos + centerToMpos;
     pos.x += sinf(timeIndex + i) * i * 0.3f;
     pos.y += (cosf(timeIndex + i) * cosf(i * 10) * 2);
     pos.z += cosf(timeIndex + i) * i * 0.3f;
@@ -225,7 +225,7 @@ void Spam::SpawnInfection()
     vel.SetLength(100.0f);
 
     auto infection = new SpamInfection();
-    infection->m_pos = m_centrePos;
+    infection->m_pos = m_centerPos;
     infection->m_vel = vel;
     infection->m_parentId = m_id.GetUniqueId();
     int index = g_app->m_location->m_effects.PutData(infection);
@@ -258,7 +258,7 @@ bool Spam::Advance()
     }
 
     Matrix34 mat(m_front, m_up, m_pos);
-    m_centrePos = m_shape->CalculateCentre(mat);
+    m_centerPos = m_shape->CalculateCenter(mat);
   }
   else if (m_onGround)
   {
@@ -270,7 +270,7 @@ bool Spam::Advance()
       m_pos.y = landHeight + 20.0f;
 
       Matrix34 mat(m_front, m_up, m_pos);
-      m_centrePos = m_shape->CalculateCentre(mat);
+      m_centerPos = m_shape->CalculateCenter(mat);
     }
     else
       m_vel.Zero();
@@ -285,7 +285,7 @@ bool Spam::Advance()
         Building* b = g_app->m_location->m_buildings[i];
         if (b && b->m_type == TypeSpam)
         {
-          bool intersect = SphereSphereIntersection(m_centrePos, m_radius, b->m_centrePos, b->m_radius);
+          bool intersect = SphereSphereIntersection(m_centerPos, m_radius, b->m_centerPos, b->m_radius);
           if (intersect)
           {
             LegacyVector3 dir = (m_pos - b->m_pos);

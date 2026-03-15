@@ -99,7 +99,7 @@ void Script::RunCommand_CamBuildingApproach(int _buildingId, float _range, float
 
   if (building)
   {
-    g_app->m_camera->SetTarget(building->m_centrePos, _range, _height);
+    g_app->m_camera->SetTarget(building->m_centerPos, _range, _height);
     g_app->m_camera->SetMoveDuration(_duration);
     g_app->m_camera->RequestMode(Camera::ModeMoveToTarget);
   }

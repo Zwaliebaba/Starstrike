@@ -87,8 +87,8 @@ void DarwiniaButton::Render(int realX, int realY, bool highlighted, bool clicked
 
     if (m_centered)
     {
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, y, m_fontSize, m_caption);
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, y, m_fontSize, m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, y, m_fontSize, m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, y, m_fontSize, m_caption);
     }
     else
     {
@@ -130,7 +130,7 @@ void DarwiniaButton::Render(int realX, int realY, bool highlighted, bool clicked
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     if (m_centered)
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, y, m_fontSize, m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, y, m_fontSize, m_caption);
     else
       g_editorFont.DrawText2D(realX + 5, y, m_fontSize, m_caption);
   }
@@ -198,8 +198,8 @@ void BorderlessButton::Render(int realX, int realY, bool highlighted, bool click
     glColor4ub(255, 255, 150, 30);
     if (m_centered)
     {
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
     }
     else
     {
@@ -234,7 +234,7 @@ void BorderlessButton::Render(int realX, int realY, bool highlighted, bool click
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     if (m_centered)
-      g_editorFont.DrawText2DCentre(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
+      g_editorFont.DrawText2DCenter(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
     else
       g_editorFont.DrawText2D(realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
 
@@ -242,7 +242,7 @@ void BorderlessButton::Render(int realX, int realY, bool highlighted, bool click
     {
       glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
       if (m_centered)
-        g_editorFont.DrawText2DCentre(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
+        g_editorFont.DrawText2DCenter(realX + m_w / 2, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
       else
         g_editorFont.DrawText2D(realX + 5, realY + 10, parent->GetMenuSize(m_fontSize), m_caption);
     }
@@ -471,8 +471,8 @@ void DarwiniaWindow::Render(bool hasFocus)
   int fontSize = GetMenuSize(12);
   if (g_app->m_largeMenus)
     y = m_y + fontSize / 2;
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y, fontSize, m_title);
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y, fontSize, m_title);
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y, fontSize, m_title);
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y, fontSize, m_title);
   g_gameFont.SetRenderShadow(false);
 
   EclWindow::Render(hasFocus);

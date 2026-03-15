@@ -19,7 +19,7 @@ struct TreeGPUData
 
 // --- Tree renderer (singleton) ---
 // Owns the dedicated DX12 PSO and per-tree GPU vertex buffers.  Uses the
-// shared root signature from D3D12Backend.
+// shared root signature from OpenGLTranslationState.
 // Implements ITreeRenderBackend so Tree::~Tree() can release GPU resources
 // without depending on DX12 headers.
 class TreeRenderer final : public ITreeRenderBackend

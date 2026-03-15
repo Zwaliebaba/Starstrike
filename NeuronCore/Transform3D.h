@@ -20,11 +20,8 @@ namespace Neuron
       return t;
     }
 
-    [[nodiscard]] static Transform3D XM_CALLCONV FromAxes(
-      DirectX::FXMVECTOR _right,
-      DirectX::FXMVECTOR _up,
-      DirectX::FXMVECTOR _forward,
-      DirectX::GXMVECTOR _pos) noexcept
+    [[nodiscard]] static Transform3D XM_CALLCONV FromAxes(DirectX::FXMVECTOR _right, DirectX::FXMVECTOR _up, DirectX::FXMVECTOR _forward,
+                                                          DirectX::GXMVECTOR _pos) noexcept
     {
       Transform3D t;
       // Build row-major: rows = right, up, forward, pos.
@@ -39,10 +36,7 @@ namespace Neuron
     }
 
     /// Construct from a raw 4×4 float array (must already be row-major).
-    [[nodiscard]] static Transform3D FromXMFLOAT4X4(const DirectX::XMFLOAT4X4& _m) noexcept
-    {
-      return Transform3D{_m};
-    }
+    [[nodiscard]] static Transform3D FromXMFLOAT4X4(const DirectX::XMFLOAT4X4& _m) noexcept { return Transform3D{_m}; }
 
     // --- Access -----------------------------------------------------------------
 
@@ -67,10 +61,10 @@ namespace Neuron
     }
 
     // Float3 accessors — convenient for bridging to legacy types without SIMD.
-    [[nodiscard]] DirectX::XMFLOAT3 RightF3() const noexcept { return { m._11, m._12, m._13 }; }
-    [[nodiscard]] DirectX::XMFLOAT3 UpF3() const noexcept { return { m._21, m._22, m._23 }; }
-    [[nodiscard]] DirectX::XMFLOAT3 ForwardF3() const noexcept { return { m._31, m._32, m._33 }; }
-    [[nodiscard]] DirectX::XMFLOAT3 PositionF3() const noexcept { return { m._41, m._42, m._43 }; }
+    [[nodiscard]] DirectX::XMFLOAT3 RightF3() const noexcept { return {m._11, m._12, m._13}; }
+    [[nodiscard]] DirectX::XMFLOAT3 UpF3() const noexcept { return {m._21, m._22, m._23}; }
+    [[nodiscard]] DirectX::XMFLOAT3 ForwardF3() const noexcept { return {m._31, m._32, m._33}; }
+    [[nodiscard]] DirectX::XMFLOAT3 PositionF3() const noexcept { return {m._41, m._42, m._43}; }
 
     // --- Operations -------------------------------------------------------------
 
@@ -91,19 +85,13 @@ namespace Neuron
     [[nodiscard]] Transform3D operator*(const Transform3D& _rhs) const noexcept
     {
       Transform3D result;
-      DirectX::XMStoreFloat4x4(&result.m,
-        DirectX::XMMatrixMultiply(
-          DirectX::XMLoadFloat4x4(&m),
-          DirectX::XMLoadFloat4x4(&_rhs.m)));
+      DirectX::XMStoreFloat4x4(&result.m, DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&m), DirectX::XMLoadFloat4x4(&_rhs.m)));
       return result;
     }
 
     Transform3D& operator*=(const Transform3D& _rhs) noexcept
     {
-      DirectX::XMStoreFloat4x4(&m,
-        DirectX::XMMatrixMultiply(
-          DirectX::XMLoadFloat4x4(&m),
-          DirectX::XMLoadFloat4x4(&_rhs.m)));
+      DirectX::XMStoreFloat4x4(&m, DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&m), DirectX::XMLoadFloat4x4(&_rhs.m)));
       return *this;
     }
 
@@ -128,14 +116,15 @@ namespace Neuron
     {
       using namespace DirectX;
       float magSq = XMVectorGetX(XMVector3LengthSq(_axis));
-      if (magSq < 1e-10f) return *this;
+      if (magSq < 1e-10f)
+        return *this;
       float angle = sqrtf(magSq);
       XMVECTOR norm = XMVectorScale(_axis, 1.0f / angle);
       XMMATRIX rot = XMMatrixRotationAxis(norm, angle);
       XMMATRIX mat = XMLoadFloat4x4(&m);
       XMVECTOR savedPos = mat.r[3];
-      mat = XMMatrixMultiply(mat, rot);   // Post-multiply: each row rotated by R
-      mat.r[3] = savedPos;               // Restore position (rotation is orientation-only)
+      mat = XMMatrixMultiply(mat, rot); // Post-multiply: each row rotated by R
+      mat.r[3] = savedPos; // Restore position (rotation is orientation-only)
       XMStoreFloat4x4(&m, mat);
       return *this;
     }
@@ -150,15 +139,12 @@ namespace Neuron
     }
 
     /// Approximate identity comparison (matches DirectXMath tolerance).
-    [[nodiscard]] bool IsIdentity() const noexcept
-    {
-      return DirectX::XMMatrixIsIdentity(DirectX::XMLoadFloat4x4(&m));
-    }
+    [[nodiscard]] bool IsIdentity() const noexcept { return DirectX::XMMatrixIsIdentity(DirectX::XMLoadFloat4x4(&m)); }
 
     // --- Conversion -------------------------------------------------------------
 
     [[nodiscard]] const DirectX::XMFLOAT4X4& AsXMFLOAT4X4() const noexcept { return m; }
     [[nodiscard]] DirectX::XMMATRIX AsXMMATRIX() const noexcept { return DirectX::XMLoadFloat4x4(&m); }
+    operator DirectX::XMMATRIX() const noexcept { return DirectX::XMLoadFloat4x4(&m); }
   };
-
 } // namespace Neuron

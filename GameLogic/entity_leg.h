@@ -56,7 +56,7 @@ protected:
 	LegacyVector3 GetLegRootPos();
 	LegacyVector3 CalcFootHomePos(float _targetHoverHeight);
 	LegacyVector3 CalcDesiredFootPos(float _targetHoverHeight);
-	LegacyVector3 CalcKneePos(LegacyVector3 const &_footPos, LegacyVector3 const &_rootPos, LegacyVector3 const &_centrePos);
+	LegacyVector3 CalcKneePos(LegacyVector3 const &_footPos, LegacyVector3 const &_rootPos, LegacyVector3 const &_centerPos);
 	LegacyVector3	GetIdealSwingingFootPos(float _fractionComplete);
 
 public:

@@ -597,7 +597,7 @@ void SoulDestroyer::Render( float _predictionTime )
 
 
         //glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-        //g_editorFont.DrawText3DCentre( predictedPos+LegacyVector3(0,50,0), 20, "%2.2f", m_panic );
+        //g_editorFont.DrawText3DCenter( predictedPos+LegacyVector3(0,50,0), 20, "%2.2f", m_panic );
     }
 }
 

@@ -53,7 +53,7 @@ class GlobalInternet
     LList<int> m_leafs;
     LList<int> m_bursts;
 
-    int m_nearestNodeToCentre;
+    int m_nearestNodeToCenter;
     float m_nearestDistance;
 
     void GenerateInternet();

@@ -930,7 +930,6 @@ bool Missile::AdvanceToTargetPosition(const LegacyVector3& _pos)
 
 bool Missile::Advance()
 {
-  bool dead = false;
   m_life -= SERVER_ADVANCE_PERIOD;
   if (m_life < 0.0f)
   {
@@ -938,12 +937,6 @@ bool Missile::Advance()
     return true;
   }
 
-  //    Tank *tank = (Tank *) g_app->m_location->GetEntitySafe( m_tankId, Entity::TypeTank );
-  //    if( tank )
-  //    {
-  //        m_target = tank->GetMissileTarget();
-  //    }
-  //
   bool arrived = AdvanceToTargetPosition(m_target);
   if (arrived)
   {
@@ -961,7 +954,6 @@ bool Missile::Advance()
   vel.y += syncsfrand(2.0f);
   vel.z += syncsfrand(2.0f);
   float size = 50.0f + syncfrand(150.0f);
-  float backPos = syncfrand(3.0f);
 
   Matrix34 mat(m_front, m_up, m_pos);
   LegacyVector3 boosterPos = m_booster->GetWorldMatrix(mat).pos;
@@ -1050,10 +1042,10 @@ bool TurretShell::Advance()
   //
   // Did we hit anyone?
 
-  LegacyVector3 centrePos = (m_pos + oldPos) / 2.0f;
+  LegacyVector3 centerPos = (m_pos + oldPos) / 2.0f;
   float radius = (m_pos - oldPos).Mag() / 1.0f;
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(centrePos.x, centrePos.z, radius, &numFound);
+  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(centerPos.x, centerPos.z, radius, &numFound);
 
   for (int i = 0; i < numFound; ++i)
   {
@@ -1097,7 +1089,7 @@ bool TurretShell::Advance()
         {
           for (int p = 0; p < 3; ++p)
           {
-            LegacyVector3 vel = (m_pos - building->m_centrePos).Normalise();
+            LegacyVector3 vel = (m_pos - building->m_centerPos).Normalise();
             vel *= 50.0f;
             vel.x += sfrand(10.0f);
             vel.y += frand(10.0f);

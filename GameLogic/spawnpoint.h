@@ -109,7 +109,7 @@ public:
 
     bool            Advance();
 
-    bool PerformDepthSort( LegacyVector3 &_centrePos );
+    bool PerformDepthSort( LegacyVector3 &_centerPos );
 
     void            TriggerSpirit( SpawnBuildingSpirit *_spirit );
 

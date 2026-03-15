@@ -1,6 +1,5 @@
 // Shared constant buffer layouts.
 // Must match C++ OpenGLD3D::SceneConstants / DrawConstants structs exactly
-// (d3d12_backend.h).
 
 // Lighting struct (used by DrawConstants)
 struct LightData

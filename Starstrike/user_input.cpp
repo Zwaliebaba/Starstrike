@@ -167,12 +167,12 @@ void UserInput::RecalcMousePos3d()
     // We are in the global world
     // So hit against the outer sphere
 
-    LegacyVector3 sphereCentre(0, 0, 0);
+    LegacyVector3 sphereCenter(0, 0, 0);
     float sphereRadius = 36000.0f;
 
     rayStart += rayDir * (sphereRadius * 4.0f);
     rayDir = -rayDir;
-    landscapeHit = RaySphereIntersection(rayStart, rayDir, sphereCentre, sphereRadius, 1e10, &m_mousePos3d);
+    landscapeHit = RaySphereIntersection(rayStart, rayDir, sphereCenter, sphereRadius, 1e10, &m_mousePos3d);
     return;
   }
 
@@ -180,19 +180,19 @@ void UserInput::RecalcMousePos3d()
   {
     // OK, we didn't hit against the landscape mesh, so hit against a sphere that
     // encloses the whole world
-    LegacyVector3 sphereCentre;
-    sphereCentre.x = g_app->m_globalWorld->GetSize() * 0.5f;
-    sphereCentre.y = 0.0f;
-    sphereCentre.z = g_app->m_globalWorld->GetSize() * 0.5f;
+    LegacyVector3 sphereCenter;
+    sphereCenter.x = g_app->m_globalWorld->GetSize() * 0.5f;
+    sphereCenter.y = 0.0f;
+    sphereCenter.z = g_app->m_globalWorld->GetSize() * 0.5f;
 
     float sphereRadius = g_app->m_globalWorld->GetSize() * 40.0f;
 
-    float dist = (rayStart - sphereCentre).Mag();
+    float dist = (rayStart - sphereCenter).Mag();
     //DEBUG_ASSERT(dist < sphereRadius);
 
     rayStart += rayDir * (sphereRadius * 4.0f);
     rayDir = -rayDir;
-    landscapeHit = RaySphereIntersection(rayStart, rayDir, sphereCentre, sphereRadius, 1e10, &m_mousePos3d);
+    landscapeHit = RaySphereIntersection(rayStart, rayDir, sphereCenter, sphereRadius, 1e10, &m_mousePos3d);
     //DEBUG_ASSERT(landscapeHit);
   }
 }

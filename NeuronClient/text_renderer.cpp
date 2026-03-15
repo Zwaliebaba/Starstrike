@@ -301,7 +301,7 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
 
 // Draw the text, justified depending on the _xJustification parameter.
 //		_xJustification < 0		Right justified text
-//	    _xJustification == 0	Centred text
+//	    _xJustification == 0	Centerd text
 //		_xJustification > 0		Left justified text
 void TextRenderer::DrawText2DJustified( float _x, float _y, float _size, int _xJustification, char const *_text, ... )
 {
@@ -318,7 +318,7 @@ void TextRenderer::DrawText2DJustified( float _x, float _y, float _size, int _xJ
 		if (_xJustification < 0)
 			DrawText2DSimple( _x - width, _y, _size, buf );	// Right Justification
 		else
-			DrawText2DSimple( _x - width/2, _y, _size, buf );	// Centre
+			DrawText2DSimple( _x - width/2, _y, _size, buf );	// Center
 	}
 }
 
@@ -345,7 +345,7 @@ void TextRenderer::DrawText2DRight( float _x, float _y, float _size, char const 
 }
 
 
-void TextRenderer::DrawText2DCentre( float _x, float _y, float _size, char const *_text, ... )
+void TextRenderer::DrawText2DCenter( float _x, float _y, float _size, char const *_text, ... )
 {
     char buf[512];
     va_list ap;
@@ -519,7 +519,7 @@ void TextRenderer::DrawText3D( LegacyVector3 const &_pos, float _size, char cons
 }
 
 
-void TextRenderer::DrawText3DCentre( LegacyVector3 const &_pos, float _size, char const *_text, ... )
+void TextRenderer::DrawText3DCenter( LegacyVector3 const &_pos, float _size, char const *_text, ... )
 {
     char buf[512];
     va_list ap;

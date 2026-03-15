@@ -97,15 +97,15 @@ void Building::Initialise(Building* _template)
   if (m_shape)
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    m_centrePos = m_shape->CalculateCentre(mat);
-    m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+    m_centerPos = m_shape->CalculateCenter(mat);
+    m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 
     SetShapeLights(m_shape->m_rootFragment);
     SetShapePorts(m_shape->m_rootFragment);
   }
   else
   {
-    m_centrePos = m_pos;
+    m_centerPos = m_pos;
     m_radius = 13.0f;
   }
 
@@ -123,15 +123,15 @@ void Building::SetDetail(int _detail)
   if (m_shape)
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    m_centrePos = m_shape->CalculateCentre(mat);
-    m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+    m_centerPos = m_shape->CalculateCenter(mat);
+    m_radius = m_shape->CalculateRadius(mat, m_centerPos);
 
     m_ports.EmptyAndDelete();
     SetShapePorts(m_shape->m_rootFragment);
   }
   else
   {
-    m_centrePos = m_pos;
+    m_centerPos = m_pos;
     m_radius = 13.0f;
   }
 }
@@ -253,9 +253,9 @@ LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius
   return result;
 }
 
-bool Building::IsInView() { return (g_app->m_camera->SphereInViewFrustum(m_centrePos, m_radius)); }
+bool Building::IsInView() { return (g_app->m_camera->SphereInViewFrustum(m_centerPos, m_radius)); }
 
-bool Building::PerformDepthSort(LegacyVector3& _centrePos) { return false; }
+bool Building::PerformDepthSort(LegacyVector3& _centerPos) { return false; }
 
 void Building::Render(float predictionTime)
 {

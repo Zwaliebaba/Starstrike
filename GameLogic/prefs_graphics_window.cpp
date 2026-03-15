@@ -196,12 +196,12 @@ void RenderCPUUsage( LList<const char*> *elements, int x, int y )
     if( totalOccup > 0.0f )
     {
         //if( totalOccup > 25 ) glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
-        g_editorFont.DrawText2DCentre( x, y, 15, "%d%%", int(totalOccup) );
+        g_editorFont.DrawText2DCenter( x, y, 15, "%d%%", int(totalOccup) );
     }
     else
     {
         glColor4f( 1.0f, 0.3f, 0.3f, 1.0f );
-        g_editorFont.DrawText2DCentre( x, y, 15, "-" );
+        g_editorFont.DrawText2DCenter( x, y, 15, "-" );
     }
     glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 #endif
@@ -227,6 +227,6 @@ void PrefsGraphicsWindow::Render( bool _hasFocus )
 
     char fpsCaption[64];
     snprintf( fpsCaption, sizeof(fpsCaption), "%d FPS", g_app->m_renderer->m_fps );
-    g_editorFont.DrawText2DCentre( m_x+m_w/2, m_y + m_h - GetMenuSize(60), GetMenuSize(20), fpsCaption );
+    g_editorFont.DrawText2DCenter( m_x+m_w/2, m_y + m_h - GetMenuSize(60), GetMenuSize(20), fpsCaption );
 
 }

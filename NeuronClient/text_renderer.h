@@ -45,7 +45,7 @@ public:
     void DrawText2DSimple( float _x, float _y, float _size, char const *_text );
     void DrawText2D      ( float _x, float _y, float _size, char const *_text, ... );	// Like simple but with variable args
     void DrawText2DRight ( float _x, float _y, float _size, char const *_text, ... );	// Like above but with right justify
-    void DrawText2DCentre( float _x, float _y, float _size, char const *_text, ... );	// Like above but with centre justify
+    void DrawText2DCenter( float _x, float _y, float _size, char const *_text, ... );	// Like above but with center justify
 	void DrawText2DJustified( float _x, float _y, float _size, int _xJustification, char const *_text, ... );	// Like above but with variable justification
     void DrawText2DUp    ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 ccw
     void DrawText2DDown  ( float _x, float _y, float _size, char const *_text, ... );   // Like above but rotated 90 cw
@@ -53,7 +53,7 @@ public:
 
 	void DrawText3DSimple( LegacyVector3 const &_pos, float _size, char const *_text );
 	void DrawText3D		 ( LegacyVector3 const &_pos, float _size, char const *_text, ... );
-	void DrawText3DCentre( LegacyVector3 const &_pos, float _size, char const *_text, ... );
+	void DrawText3DCenter( LegacyVector3 const &_pos, float _size, char const *_text, ... );
 	void DrawText3DRight ( LegacyVector3 const &_pos, float _size, char const *_text, ... );
 
     void DrawText3D      ( LegacyVector3 const &_pos, LegacyVector3 const &_front, LegacyVector3 const &_up,

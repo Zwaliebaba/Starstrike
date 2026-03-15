@@ -81,7 +81,7 @@ void GodDish::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < maxBlobs; ++i)
   {
-    LegacyVector3 pos = m_centrePos;
+    LegacyVector3 pos = m_centerPos;
     pos.x += sinf(timeIndex + i) * i * 1.7f;
     pos.y += fabs(cosf(timeIndex + i) * cosf(i * 20) * 64);
     pos.z += cosf(timeIndex + i) * i * 1.7f;
@@ -115,7 +115,7 @@ void GodDish::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < numStars; ++i)
   {
-    LegacyVector3 pos = m_centrePos;
+    LegacyVector3 pos = m_centerPos;
     pos.x += sinf(timeIndex + i) * i * 1.7f;
     pos.y += fabs(cosf(timeIndex + i) * cosf(i * 20) * 64);
     pos.z += cosf(timeIndex + i) * i * 1.7f;

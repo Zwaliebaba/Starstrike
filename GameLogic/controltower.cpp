@@ -69,7 +69,7 @@ bool ControlTower::Advance()
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
       LegacyVector3 dishPos = m_dishPos->GetWorldMatrix(mat).pos;
-      LegacyVector3 dishFront = (dishPos - targetBuilding->m_centrePos).Normalise();
+      LegacyVector3 dishFront = (dishPos - targetBuilding->m_centerPos).Normalise();
       LegacyVector3 dishRight = dishFront ^ g_upVector;
       LegacyVector3 dishUp = dishRight ^ dishFront;
       m_dishMatrix = Matrix34(dishFront, dishUp, dishPos);

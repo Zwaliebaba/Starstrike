@@ -90,7 +90,7 @@ class Building : public WorldObject
     float m_timeOfDeath;
     bool m_dynamic; // Only appears on this level, not all levels for this map
     bool m_isGlobal;
-    LegacyVector3 m_centrePos;
+    LegacyVector3 m_centerPos;
     float m_radius;
 
     bool m_destroyed; // Building has been destroyed using the script command DestroyBuilding, remove it next Advance
@@ -120,7 +120,7 @@ class Building : public WorldObject
     virtual void RenderLights();
     virtual void RenderPorts();
 
-    virtual bool PerformDepthSort(LegacyVector3& _centrePos); // Return true if you plan to use transparencies
+    virtual bool PerformDepthSort(LegacyVector3& _centerPos); // Return true if you plan to use transparencies
 
     virtual void SetTeamId(int _teamId);
     virtual void Reprogram(float _complete);

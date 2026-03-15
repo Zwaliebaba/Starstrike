@@ -6,6 +6,8 @@
 
 namespace Neuron::Graphics
 {
+  class IFrameListener;
+
   // Controls all the DirectX device resources.
   class Core
   {
@@ -14,6 +16,11 @@ namespace Neuron::Graphics
       static constexpr unsigned int ENABLE_HDR = 0x2;
 
       static Core& Get();
+
+      // Frame listener registration — listeners are called in registration order
+      // at the end of Prepare(), after allocator reset and RT transition.
+      void RegisterFrameListener(IFrameListener* listener);
+      void UnregisterFrameListener(IFrameListener* listener);
 
       // Device notification callback for game-layer resource management.
       void RegisterDeviceNotify(Neuron::IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
@@ -143,5 +150,8 @@ namespace Neuron::Graphics
 
       // Occlusion tracking.
       bool m_isOccluded{};
+
+      // Frame listeners — called at the end of Prepare().
+      std::vector<IFrameListener*> m_frameListeners;
   };
 }

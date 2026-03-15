@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "opengl_directx_matrix_stack.h"
-#include "Transform3D.h"
-#include "Transform3D.h"
 
 using namespace DirectX;
 using namespace OpenGLD3D;
@@ -24,20 +22,14 @@ void MatrixStack::Load(const XMFLOAT4X4& m)
 	m_dirty = true;
 }
 
-void MatrixStack::Multiply(const XMFLOAT4X4& m)
+void XM_CALLCONV MatrixStack::Multiply(XMMATRIX m)
 {
 	// OpenGL post-multiplies: Result = Current * M
 	// But D3D9 code used MultMatrixLocal which is pre-multiply: Result = M * Current
 	// We preserve the same semantic: local pre-multiply
 	XMMATRIX current = XMLoadFloat4x4(&m_current);
-	XMMATRIX mat = XMLoadFloat4x4(&m);
-	XMStoreFloat4x4(&m_current, XMMatrixMultiply(mat, current));
+	XMStoreFloat4x4(&m_current, XMMatrixMultiply(m, current));
 	m_dirty = true;
-}
-
-void MatrixStack::Multiply(const Neuron::Transform3D& t)
-{
-	Multiply(t.AsXMFLOAT4X4());
 }
 
 void MatrixStack::Push()
@@ -57,14 +49,14 @@ void MatrixStack::Translate(float x, float y, float z)
 {
 	XMFLOAT4X4 mat;
 	XMStoreFloat4x4(&mat, XMMatrixTranslation(x, y, z));
-	Multiply(mat);
+	Multiply(XMLoadFloat4x4(&mat));
 }
 
 void MatrixStack::Scale(float x, float y, float z)
 {
 	XMFLOAT4X4 mat;
 	XMStoreFloat4x4(&mat, XMMatrixScaling(x, y, z));
-	Multiply(mat);
+	Multiply(XMLoadFloat4x4(&mat));
 }
 
 void MatrixStack::RotateAxis(float angleDegrees, float x, float y, float z)
@@ -72,7 +64,7 @@ void MatrixStack::RotateAxis(float angleDegrees, float x, float y, float z)
 	XMVECTOR axis = XMVectorSet(x, y, z, 0);
 	XMFLOAT4X4 mat;
 	XMStoreFloat4x4(&mat, XMMatrixRotationAxis(axis, XMConvertToRadians(angleDegrees)));
-	Multiply(mat);
+	Multiply(XMLoadFloat4x4(&mat));
 }
 
 void MatrixStack::LookAtRH(float eyeX, float eyeY, float eyeZ,

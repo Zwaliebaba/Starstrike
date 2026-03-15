@@ -57,7 +57,7 @@ void Darwinian::Begin()
   Entity::Begin();
   m_onGround = true;
   m_wayPoint = m_pos;
-  m_centrePos.Set(0, 2, 0);
+  m_centerPos.Set(0, 2, 0);
   m_radius = 4.0f;
 }
 
@@ -274,7 +274,7 @@ bool Darwinian::AdvanceWatchingSpectacle()
   // Face the spectacle
 
   float amountToTurn = SERVER_ADVANCE_PERIOD * 4.0f;
-  LegacyVector3 targetPos = building->m_centrePos;
+  LegacyVector3 targetPos = building->m_centerPos;
   targetPos += LegacyVector3(sinf(g_gameTime) * 30.0f, cosf(g_gameTime) * 20.0f, sinf(g_gameTime) * 25.0f);
   LegacyVector3 targetDir = (targetPos - m_pos).Normalise();
 
@@ -830,7 +830,7 @@ bool Darwinian::AdvanceUnderControl()
         //
         // There are no more waypoints
         // So just head directly for the squad that is controlling us
-        m_wayPoint = controller->m_centrePos;
+        m_wayPoint = controller->m_centerPos;
         positionError = 70.0f;
       }
     }
@@ -1812,7 +1812,7 @@ LegacyVector3 Darwinian::PushFromObstructions(const LegacyVector3& pos, bool kil
         else if (building->DoesSphereHit(result, closest))
         {
           auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(static_cast<LaserFence*>(building)->GetBuildingLink()));
-          LegacyVector3 pushForce = (building->m_centrePos - result).SetLength(1.0f);
+          LegacyVector3 pushForce = (building->m_centerPos - result).SetLength(1.0f);
           if (nextFence)
           {
             LegacyVector3 fenceVector = nextFence->m_pos - building->m_pos;

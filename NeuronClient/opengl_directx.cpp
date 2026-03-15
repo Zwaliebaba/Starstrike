@@ -5,6 +5,7 @@
 #include "opengl_directx_matrix_stack.h"
 #include "ogl_extensions.h"
 #include "d3d12_backend.h"
+#include "UploadRingBuffer.h"
 #include "matrix34.h"
 #include "tree_renderer.h"
 
@@ -83,7 +84,7 @@ static int s_quadVertexCount = 0;
 struct TextureResource
 {
   com_ptr<ID3D12Resource> resource;
-  UINT srvIndex = 0;
+  Graphics::DescriptorHandle srvHandle;  // unified SRV slot from DescriptorAllocator
   UINT width = 0, height = 0;
   bool valid = false;
 };
@@ -329,7 +330,7 @@ static void uploadAndBindConstants()
 {
   // --- Scene constants (b0) — lazy per-frame upload ---
   ensureSceneConstantsUploaded();
-  auto* cmdList = g_backend.GetCommandList();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
   cmdList->SetGraphicsRootConstantBufferView(0, s_sceneConstantsCache.gpuAddr);
 
   // --- Draw constants (b1) — per draw call ---
@@ -380,7 +381,7 @@ static void uploadAndBindConstants()
 
   // Allocate a unique constant buffer region per draw call from the ring buffer.
   // A single fixed slot would be overwritten by later draws before the GPU reads it.
-  auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(DrawConstants), 256);
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(DrawConstants), 256);
   memcpy(alloc.cpuPtr, &dc, sizeof(DrawConstants));
   cmdList->SetGraphicsRootConstantBufferView(1, alloc.gpuAddr);
 
@@ -412,26 +413,26 @@ static UINT getSamplerIndex(unsigned texUnit)
 
 static void bindTexturesAndSamplers()
 {
-  auto* cmdList = g_backend.GetCommandList();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // Texture 0
-  UINT srvIndex0 = g_backend.GetDefaultTextureSRVIndex();
+  D3D12_GPU_DESCRIPTOR_HANDLE srvGpu0 = g_glState.GetDefaultTextureSRVGPUHandle();
   if (s_currentAttribs.texturingEnabled[0] && s_textureStates[0].target < s_textureResources.size() && s_textureResources[s_textureStates[0]
     .target].valid)
-    srvIndex0 = s_textureResources[s_textureStates[0].target].srvIndex;
-  cmdList->SetGraphicsRootDescriptorTable(2, g_backend.GetSRVGPUHandle(srvIndex0));
+    srvGpu0 = static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>(s_textureResources[s_textureStates[0].target].srvHandle);
+  cmdList->SetGraphicsRootDescriptorTable(2, srvGpu0);
 
   // Texture 1
-  UINT srvIndex1 = g_backend.GetDefaultTextureSRVIndex();
+  D3D12_GPU_DESCRIPTOR_HANDLE srvGpu1 = g_glState.GetDefaultTextureSRVGPUHandle();
   if (MAX_ACTIVE_TEXTURES > 1 && s_currentAttribs.texturingEnabled[1] && s_textureStates[1].target < s_textureResources.size() &&
     s_textureResources[s_textureStates[1].target].valid)
-    srvIndex1 = s_textureResources[s_textureStates[1].target].srvIndex;
-  cmdList->SetGraphicsRootDescriptorTable(3, g_backend.GetSRVGPUHandle(srvIndex1));
+    srvGpu1 = static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>(s_textureResources[s_textureStates[1].target].srvHandle);
+  cmdList->SetGraphicsRootDescriptorTable(3, srvGpu1);
 
   // Samplers — bind a pair starting at sampler index for unit 0
   UINT samplerIdx = getSamplerIndex(0);
-  D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = g_backend.GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
-  samplerHandle.ptr += samplerIdx * g_backend.GetSamplerDescriptorSize();
+  D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = g_glState.GetSamplerBaseGPUHandle();
+  samplerHandle.ptr += samplerIdx * Graphics::DescriptorAllocator::GetDescriptorSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
   cmdList->SetGraphicsRootDescriptorTable(4, samplerHandle);
 }
 
@@ -451,9 +452,9 @@ void OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY topology)
 
   UINT8 topoType = topologyTypeFromTopology(topology);
   PSOKey key = buildPSOKey(topoType);
-  auto* pso = g_backend.GetOrCreatePSO(key);
+  auto* pso = g_glState.GetOrCreatePSO(key);
 
-  auto* cmdList = g_backend.GetCommandList();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // Track actual PSO transitions
   if (pso != s_lastBoundPSO)
@@ -492,11 +493,11 @@ static void issueDrawCall(D3D_PRIMITIVE_TOPOLOGY topology, UINT vertexCount, con
   if (vertexCount == 0)
     return;
 
-  auto* cmdList = g_backend.GetCommandList();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // Upload vertices to ring buffer
   UINT vbSize = vertexCount * sizeof(CustomVertex);
-  auto alloc = g_backend.GetUploadBuffer().Allocate(vbSize, sizeof(float));
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(vbSize, sizeof(float));
 
   memcpy(alloc.cpuPtr, vertices, vbSize);
 
@@ -559,7 +560,7 @@ static void InitialiseData()
 
 bool Direct3DInit()
 {
-  if (!g_backend.Init())
+  if (!g_glState.Init())
     return false;
 
   TreeRenderer::Get().Init();
@@ -580,7 +581,7 @@ void Direct3DShutdown()
 
   // Flush all in-flight GPU work so resources referenced by the last
   // command list are no longer in use before we release them.
-  g_backend.WaitForGpu();
+  Graphics::Core::Get().WaitForGpu();
 
   // Textures
   s_textureResources.clear();
@@ -606,12 +607,18 @@ void Direct3DShutdown()
   TreeRenderer::Get().Shutdown();
   g_treeRenderBackend = nullptr;
 
-  g_backend.Shutdown();
+  g_glState.Shutdown();
 }
 
 void Direct3DSwapBuffers()
 {
-  g_backend.EndFrame();
+  auto& core = Graphics::Core::Get();
+
+  // Transition RT → PRESENT
+  core.GetGpuResourceStateTracker()->TransitionResource(core.GetRenderTarget(), D3D12_RESOURCE_STATE_PRESENT, true);
+
+  core.Present();   // close, execute, present, move to next frame
+  core.Prepare();   // reset allocator/cmdlist, transition RT, invoke listeners
 
 #ifdef FRAMES_PER_SECOND_COUNTER
   static DWORD s_startTime = GetTickCount();
@@ -638,7 +645,8 @@ void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 
 void glClear(GLbitfield mask)
 {
-  auto* cmdList = g_backend.GetCommandList();
+  auto& core = Graphics::Core::Get();
+  auto* cmdList = core.GetCommandList();
 
   if (mask & GL_COLOR_BUFFER_BIT)
   {
@@ -647,12 +655,12 @@ void glClear(GLbitfield mask)
       ((s_clearColor >> 24) & 0xFF) / 255.0f
     };
 
-    cmdList->ClearRenderTargetView(g_backend.GetCurrentRTVHandle(), clearColor, 0, nullptr);
+    cmdList->ClearRenderTargetView(core.GetRenderTargetView(), clearColor, 0, nullptr);
   }
 
   if (mask & GL_DEPTH_BUFFER_BIT)
   {
-    cmdList->ClearDepthStencilView(g_backend.GetCurrentDSVHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    cmdList->ClearDepthStencilView(core.GetDepthStencilView(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
   }
 
   DEBUG_ASSERT((mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)) == 0);
@@ -725,12 +733,13 @@ void glMultMatrixf(const GLfloat* m)
   XMFLOAT4X4 mat;
   // OpenGL column-major → our row-major (same as D3D9 code which copied directly)
   memcpy(&mat, m, sizeof(XMFLOAT4X4));
-  s_pTargetMatrixStack->Multiply(mat);
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void glMultMatrixf(const Matrix34& m)
 {
-  s_pTargetMatrixStack->Multiply(m);
+  XMFLOAT4X4 mat = m.ToXMFLOAT4X4();
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void glLoadMatrixd(const GLdouble* _m)
@@ -745,14 +754,14 @@ void glTranslatef(GLfloat x, GLfloat y, GLfloat z)
 {
   XMFLOAT4X4 mat;
   XMStoreFloat4x4(&mat, XMMatrixTranslation(x, y, z));
-  s_pTargetMatrixStack->Multiply(mat);
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void glScalef(GLfloat x, GLfloat y, GLfloat z)
 {
   XMFLOAT4X4 mat;
   XMStoreFloat4x4(&mat, XMMatrixScaling(x, y, z));
-  s_pTargetMatrixStack->Multiply(mat);
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar)
@@ -762,7 +771,7 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
 
   XMFLOAT4X4 mat;
   XMStoreFloat4x4(&mat, m);
-  s_pTargetMatrixStack->Multiply(mat);
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
@@ -770,7 +779,7 @@ void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
   XMVECTOR axis = XMVectorSet(x, y, z, 0);
   XMFLOAT4X4 mat;
   XMStoreFloat4x4(&mat, XMMatrixRotationAxis(axis, XMConvertToRadians(angle)));
-  s_pTargetMatrixStack->Multiply(mat);
+  s_pTargetMatrixStack->Multiply(XMLoadFloat4x4(&mat));
 }
 
 void SwapToViewMatrix()
@@ -1341,6 +1350,10 @@ void glDeleteTextures(GLsizei n, const GLuint* textures)
     GLuint texIdx = textures[i];
     if (texIdx < s_textureResources.size() && s_textureResources[texIdx].valid)
     {
+      // Reclaim the SRV slot so it can be reused by future textures.
+      Graphics::DescriptorAllocator::Free(
+        D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+        s_textureResources[texIdx].srvHandle);
       s_textureResources[texIdx].resource = nullptr;
       s_textureResources[texIdx].valid = false;
     }
@@ -1364,8 +1377,8 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     return -1;
 
   auto& tex = s_textureResources[texIdx];
-  auto* device = g_backend.GetDevice();
-  auto* cmdList = g_backend.GetCommandList();
+  auto* device = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
 
   // Release old resource
   tex.resource = nullptr;
@@ -1393,7 +1406,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
   D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
   device->GetCopyableFootprints(&texDesc, 0, 1, 0, &footprint, nullptr, nullptr, &uploadSize);
 
-  auto alloc = g_backend.GetUploadBuffer().Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(uploadSize, D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
 
   // Copy row by row (respecting row pitch alignment)
   auto srcData = static_cast<const UINT8*>(data);
@@ -1404,7 +1417,7 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
     memcpy(destData + row * dstRowPitch, srcData + row * srcRowPitch, srcRowPitch);
 
   D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
-  srcLoc.pResource = g_backend.GetUploadBuffer().GetResource();
+  srcLoc.pResource = Graphics::GetCurrentUploadBuffer().GetResource();
   srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
   srcLoc.PlacedFootprint = footprint;
   srcLoc.PlacedFootprint.Offset = alloc.offset;
@@ -1428,25 +1441,23 @@ int gluBuild2DMipmaps(GLenum target, GLint components, GLint width, GLint height
   // Create SRV
   if (!tex.valid)
   {
-    D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.AllocateSRVSlot(tex.srvIndex);
+    tex.srvHandle = g_glState.AllocateSRVSlot();
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
-    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, tex.srvHandle);
   }
   else
   {
-    // Update existing SRV
-    D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.GetSRVCBVHeap()->GetCPUDescriptorHandleForHeapStart();
-    srvHandle.ptr += tex.srvIndex * g_backend.GetSRVDescriptorSize();
+    // Update existing SRV (reuse the same descriptor slot)
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Texture2D.MipLevels = 1;
-    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, tex.srvHandle);
   }
 
   tex.width = width;
@@ -1489,8 +1500,8 @@ void glCopyTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLint x
     return;
 
   auto& tex = s_textureResources[texIdx];
-  auto* device = g_backend.GetDevice();
-  auto* cmdList = g_backend.GetCommandList();
+  auto* device = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
   auto* stateTracker = Graphics::Core::Get().GetGpuResourceStateTracker();
 
   // Release old resource
@@ -1560,14 +1571,12 @@ void glCopyTexImage2D(GLenum target, GLint level, GLenum internalFormat, GLint x
 
   if (!tex.valid)
   {
-    D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.AllocateSRVSlot(tex.srvIndex);
-    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    tex.srvHandle = g_glState.AllocateSRVSlot();
+    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, tex.srvHandle);
   }
   else
   {
-    D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = g_backend.GetSRVCBVHeap()->GetCPUDescriptorHandleForHeapStart();
-    srvHandle.ptr += tex.srvIndex * g_backend.GetSRVDescriptorSize();
-    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, srvHandle);
+    device->CreateShaderResourceView(tex.resource.get(), &srvDesc, tex.srvHandle);
   }
 
   tex.width = width;
@@ -1869,10 +1878,10 @@ OpenGLD3D::FogState OpenGLD3D::GetFogState()
 D3D12_GPU_DESCRIPTOR_HANDLE OpenGLD3D::GetTextureSRVGPUHandle(unsigned int texId)
 {
   if (texId < s_textureResources.size() && s_textureResources[texId].valid)
-    return g_backend.GetSRVGPUHandle(s_textureResources[texId].srvIndex);
+    return static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>(s_textureResources[texId].srvHandle);
 
   // Fallback: return default (white) texture
-  return g_backend.GetSRVGPUHandle(g_backend.GetDefaultTextureSRVIndex());
+  return g_glState.GetDefaultTextureSRVGPUHandle();
 }
 
 void __stdcall OpenGLD3D::glMultiTexCoord2fD3D(int _target, float _x, float _y)
@@ -2133,12 +2142,12 @@ void OpenGLD3D::ResetFrameStats()
 {
   s_liveStats = {};
   s_lastBoundPSO = nullptr;
-  g_backend.GetUploadBuffer().ResetHighWaterMark();
+  Graphics::GetCurrentUploadBuffer().ResetHighWaterMark();
 }
 
 void OpenGLD3D::SnapshotFrameStats()
 {
-  s_liveStats.uploadHighWaterMark = static_cast<unsigned int>(g_backend.GetUploadBuffer().GetHighWaterMark());
+  s_liveStats.uploadHighWaterMark = static_cast<unsigned int>(Graphics::GetCurrentUploadBuffer().GetHighWaterMark());
   s_snapshotStats = s_liveStats;
 }
 
@@ -2162,7 +2171,7 @@ static void ensureSceneConstantsUploaded()
   sc.FogMode    = 0; // linear
   sc.FadeAlpha  = s_fadeAlpha;
 
-  auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(SceneConstants), 256);
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(SceneConstants), 256);
   memcpy(alloc.cpuPtr, &sc, sizeof(SceneConstants));
   s_sceneConstantsCache.gpuAddr = alloc.gpuAddr;
   s_sceneConstantsCache.uploaded = true;
@@ -2189,7 +2198,7 @@ void glClipPlane(GLenum plane, const GLdouble* equation)
   // TODO: implement via constant buffer clip planes in shader
 }
 
-void glFinish() { g_backend.WaitForGpu(); }
+void glFinish() { Graphics::Core::Get().WaitForGpu(); }
 
 void glScissorRect(GLint x, GLint y, GLsizei width, GLsizei height)
 {

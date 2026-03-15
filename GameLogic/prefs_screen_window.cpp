@@ -81,18 +81,18 @@ static void AdjustWindowPositions(int _newWidth, int _newHeight, int _oldWidth, 
     {
       EclWindow* w = windows->GetData(i);
 
-      // We attempt to keep the centre of the window in the same place
+      // We attempt to keep the center of the window in the same place
 
       double halfWidth = w->m_w / 2.0;
       double halfHeight = w->m_h / 2.0;
 
-      double oldCentreX = w->m_x + halfWidth;
-      double oldCentreY = w->m_y + halfHeight;
+      double oldCenterX = w->m_x + halfWidth;
+      double oldCenterY = w->m_y + halfHeight;
 
-      double newCentreX = oldCentreX * _newWidth / _oldWidth;
-      double newCentreY = oldCentreY * _newHeight / _oldHeight;
+      double newCenterX = oldCenterX * _newWidth / _oldWidth;
+      double newCenterY = oldCenterY * _newHeight / _oldHeight;
 
-      w->SetPosition(static_cast<int>(newCentreX - halfWidth), static_cast<int>(newCentreY - halfHeight));
+      w->SetPosition(static_cast<int>(newCenterX - halfWidth), static_cast<int>(newCenterY - halfHeight));
     }
   }
 }

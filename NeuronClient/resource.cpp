@@ -169,7 +169,6 @@ Shape* Resource::GetShape(const char* _name)
 
 Shape* Resource::GetShapeCopy(const char* _name, bool _animating)
 {
-  char fullPath[512];
   Shape* theShape = nullptr;
 
   if (!theShape)
@@ -180,7 +179,7 @@ Shape* Resource::GetShapeCopy(const char* _name, bool _animating)
       theShape = NEW Shape(to_string(fullFilename).c_str(), _animating);
   }
 
-  ASSERT_TEXT(theShape, "Couldn't create shape file %s", _name);
+  ASSERT_TEXT(theShape, "Couldn't create shape file {}", _name);
   return theShape;
 }
 

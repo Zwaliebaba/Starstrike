@@ -416,7 +416,7 @@ bool TaskManager::RunTask(int _type)
             controller->m_type = _type;
             controller->m_objId = WorldObjectId(squad->m_teamId, squad->m_unitId, -1, -1);
             controller->m_route = new Route(-1);
-            controller->m_route->AddWayPoint(squad->m_centrePos);
+            controller->m_route->AddWayPoint(squad->m_centerPos);
             bool success = RunTask(controller);
             if (success)
             {
@@ -688,7 +688,7 @@ bool TaskManager::IsValidTargetArea(int _id, const LegacyVector3& _pos)
     for (int i = 0; i < targetAreas->Size(); ++i)
     {
       TaskTargetArea* targetArea = targetAreas->GetPointer(i);
-      if ((_pos - targetArea->m_centre).Mag() <= targetArea->m_radius)
+      if ((_pos - targetArea->m_center).Mag() <= targetArea->m_radius)
       {
         success = true;
         break;
@@ -720,7 +720,7 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
             if (building && building->m_type == Building::TypeTrunkPort && static_cast<TrunkPort*>(building)->m_openTimer > 0.0f)
             {
               TaskTargetArea tta;
-              tta.m_centre = building->m_pos;
+              tta.m_center = building->m_pos;
               tta.m_radius = 120.0f;
               tta.m_stationary = true;
               result->PutData(tta);
@@ -741,7 +741,7 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
             if (unit->m_troopType == Entity::TypeInsertionSquadie)
             {
               TaskTargetArea tta;
-              tta.m_centre = unit->m_centrePos;
+              tta.m_center = unit->m_centerPos;
               tta.m_radius = 100.0f;
               tta.m_stationary = false;
               result->PutData(tta);
@@ -761,7 +761,7 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
             m_teamId)
           {
             TaskTargetArea tta;
-            tta.m_centre = building->m_pos;
+            tta.m_center = building->m_pos;
             tta.m_radius = 75.0f;
             tta.m_stationary = true;
             result->PutData(tta);
@@ -773,7 +773,7 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
     case GlobalResearch::TypeOfficer:
       {
         TaskTargetArea tta;
-        tta.m_centre.Set(0, 0, 0);
+        tta.m_center.Set(0, 0, 0);
         tta.m_radius = 99999.9f;
         result->PutData(tta);
         break;

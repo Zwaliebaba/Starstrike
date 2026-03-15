@@ -195,7 +195,7 @@ void ConstructionYard::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < maxBlobs; ++i)
   {
-    LegacyVector3 pos = m_centrePos;
+    LegacyVector3 pos = m_centerPos;
     pos.x += sinf(timeIndex + i) * i * 1.7f;
     pos.y += fabs(cosf(timeIndex + i) * cosf(i * 20) * 64);
     pos.z += cosf(timeIndex + i) * i * 1.7f;
@@ -231,7 +231,7 @@ void ConstructionYard::RenderAlphas(float _predictionTime)
 
   for (int i = 0; i < numStars; ++i)
   {
-    LegacyVector3 pos = m_centrePos;
+    LegacyVector3 pos = m_centerPos;
     pos.x += sinf(timeIndex + i) * i * 1.7f;
     pos.y += fabs(cosf(timeIndex + i) * cosf(i * 20) * 64);
     pos.z += cosf(timeIndex + i) * i * 1.7f;
@@ -298,10 +298,10 @@ void ConstructionYard::RenderAlphas(float _predictionTime)
   glDepthMask(true);
 
   //    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-  //    g_gameFont.DrawText3DCentre( m_pos+LegacyVector3(0,300,0), 20.0f, "Surges : %d", m_numSurges );
-  //    g_gameFont.DrawText3DCentre( m_pos+LegacyVector3(0,270,0), 20.0f, "Primitives : %d", m_numPrimitives );
-  //    g_gameFont.DrawText3DCentre( m_pos+LegacyVector3(0,240,0), 20.0f, "Timer : %2.2f", m_timer );
-  //    g_gameFont.DrawText3DCentre( m_pos+LegacyVector3(0,210,0), 20.0f, "Armour : %d", m_numTanksProduced );
+  //    g_gameFont.DrawText3DCenter( m_pos+LegacyVector3(0,300,0), 20.0f, "Surges : %d", m_numSurges );
+  //    g_gameFont.DrawText3DCenter( m_pos+LegacyVector3(0,270,0), 20.0f, "Primitives : %d", m_numPrimitives );
+  //    g_gameFont.DrawText3DCenter( m_pos+LegacyVector3(0,240,0), 20.0f, "Timer : %2.2f", m_timer );
+  //    g_gameFont.DrawText3DCenter( m_pos+LegacyVector3(0,210,0), 20.0f, "Armour : %d", m_numTanksProduced );
 }
 
 bool ConstructionYard::IsPopulationLocked()
@@ -355,7 +355,7 @@ void DisplayScreen::RenderAlphas(float _predictionTime)
 {
   Building::RenderAlphas(_predictionTime);
 
-  LegacyVector3 armourPos = m_centrePos + LegacyVector3(0, 75, 0);
+  LegacyVector3 armourPos = m_centerPos + LegacyVector3(0, 75, 0);
   LegacyVector3 armourFront(0, 0, 1);
   armourFront.RotateAroundY(g_gameTime * -0.75f);
 

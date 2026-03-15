@@ -52,8 +52,8 @@ bool ReceiverBuilding::IsInView()
 
   if (spiritLink)
   {
-    LegacyVector3 midPoint = (spiritLink->m_centrePos + m_centrePos) / 2.0f;
-    float radius = (spiritLink->m_centrePos - m_centrePos).Mag() / 2.0f;
+    LegacyVector3 midPoint = (spiritLink->m_centerPos + m_centerPos) / 2.0f;
+    float radius = (spiritLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
     return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
   }

@@ -162,7 +162,7 @@ void Tripod::DoFallForTwoLegs()
     RayRayDist(m_legs[0]->m_foot.m_pos, footToFoot, m_pos, g_upVector, &pointBetweenFeet, &pointUnderBody);
   }
 
-  // Calc moment due to centre of gravity and the contact point on the ground not being vertically aligned
+  // Calc moment due to center of gravity and the contact point on the ground not being vertically aligned
   LegacyVector3 lever(pointBetweenFeet - pointUnderBody);
   float momentPerUnitMass = lever.Mag() * GRAVITY;
 
@@ -518,9 +518,9 @@ bool Tripod::Advance(Unit* _unit)
   {
     float targetHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     targetHeight += m_targetHoverHeight;
-    float factor1 = 1.0f * SERVER_ADVANCE_PERIOD;
-    float factor2 = 1.0f - factor1;
-    m_pos.y = factor1 * targetHeight + factor2 * m_pos.y;
+    float fact1 = 1.0f * SERVER_ADVANCE_PERIOD;
+    float fact2 = 1.0f - fact1;
+    m_pos.y = fact1 * targetHeight + fact2 * m_pos.y;
   }
 
   //

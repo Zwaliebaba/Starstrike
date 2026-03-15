@@ -1006,7 +1006,7 @@ void SphereWorld::RenderHeaven()
     {
       GlobalLocation *loc = g_app->m_globalWorld->m_locations.GetData(i);
           LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id );
-          LegacyVector3 centrePos = g_zeroVector;
+          LegacyVector3 centerPos = g_zeroVector;
   
           for( int j = 0; j < 6; ++j )
           {
@@ -1016,17 +1016,17 @@ void SphereWorld::RenderHeaven()
               godRayPos.y += sinf( g_gameTime + i + j/2 ) * 1000;
               godRayPos.z += cosf( g_gameTime + i + j/2 ) * 1000;
   
-              LegacyVector3 camToCentre = g_app->m_camera->GetPos() - centrePos;
-              LegacyVector3 lineToCentre = camToCentre ^ ( centrePos - godRayPos );
-              lineToCentre.Normalise();
+              LegacyVector3 camToCenter = g_app->m_camera->GetPos() - centerPos;
+              LegacyVector3 lineToCenter = camToCenter ^ ( centerPos - godRayPos );
+              lineToCenter.Normalise();
   
               glColor4f( 0.6f, 0.2f, 0.1f, 0.8f);
   
               glBegin( GL_QUADS );
-                  glTexCoord2f(0.75f,0);      glVertex3fv( (centrePos - lineToCentre * 1000).GetData() );
-                  glTexCoord2f(0.75f,1);      glVertex3fv( (centrePos + lineToCentre * 1000).GetData() );
-                  glTexCoord2f(0.05f,1);      glVertex3fv( (godRayPos + lineToCentre * 1000).GetData() );
-                  glTexCoord2f(0.05f,0);      glVertex3fv( (godRayPos - lineToCentre * 1000).GetData() );
+                  glTexCoord2f(0.75f,0);      glVertex3fv( (centerPos - lineToCenter * 1000).GetData() );
+                  glTexCoord2f(0.75f,1);      glVertex3fv( (centerPos + lineToCenter * 1000).GetData() );
+                  glTexCoord2f(0.05f,1);      glVertex3fv( (godRayPos + lineToCenter * 1000).GetData() );
+                  glTexCoord2f(0.05f,0);      glVertex3fv( (godRayPos - lineToCenter * 1000).GetData() );
               glEnd();
           }
       }
@@ -1118,12 +1118,12 @@ void SphereWorld::RenderIslands()
 
       g_gameFont.SetRenderShadow(true);
       glColor4f(0.7f, 0.7f, 0.7f, 0.0f);
-      g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
+      g_gameFont.DrawText3DCenter(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
       if (g_app->m_editing)
       {
-        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename.c_str());
-        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
+        g_gameFont.DrawText3DCenter(islandPos, size, loc->m_mapFilename.c_str());
+        g_gameFont.DrawText3DCenter(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
       }
 
       islandPos += camUp * size * 0.3f;
@@ -1134,12 +1134,12 @@ void SphereWorld::RenderIslands()
       if (_stricmp(loc->m_missionFilename.c_str(), "null") == 0)
         glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
-      g_gameFont.DrawText3DCentre(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
+      g_gameFont.DrawText3DCenter(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
       if (g_app->m_editing)
       {
-        g_gameFont.DrawText3DCentre(islandPos, size, loc->m_mapFilename.c_str());
-        g_gameFont.DrawText3DCentre(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
+        g_gameFont.DrawText3DCenter(islandPos, size, loc->m_mapFilename.c_str());
+        g_gameFont.DrawText3DCenter(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
       }
 
       free(islandName);

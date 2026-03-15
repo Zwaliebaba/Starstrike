@@ -378,14 +378,14 @@ void ResetLocationWindow::Render(bool _hasFocus)
   float fontSize = GetMenuSize(13);
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset1"));
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset2"));
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset1"));
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset2"));
 
   y += h;
 
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset3"));
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset4"));
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset5"));
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset3"));
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset4"));
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, LANGUAGEPHRASE("dialog_reset5"));
 }
 
 void MainMenuWindow::Create()
@@ -492,9 +492,9 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   snprintf(about, sizeof(about), "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += 2 * h, fontSize, about);
-  g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, "http://www.introversion.co.uk");
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += 2 * h, fontSize, about);
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, "http://www.introversion.co.uk");
 }
 
 SkipPrologueWindow::SkipPrologueWindow()
@@ -560,7 +560,7 @@ void SkipPrologueWindow::Render(bool _hasFocus)
 
   LList<const char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_skip1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
-    g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
+    g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
   delete wrapped->GetData(0);
   delete wrapped;
 };
@@ -628,7 +628,7 @@ void PlayPrologueWindow::Render(bool _hasFocus)
 
   LList<const char*>* wrapped = WordWrapText(LANGUAGEPHRASE("dialog_prologue1"), m_w * 1.70f, fontSize, true);
   for (int i = 0; i < wrapped->Size(); ++i)
-    g_gameFont.DrawText2DCentre(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
+    g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, wrapped->GetData(i));
   delete wrapped->GetData(0);
   delete wrapped;
 };

@@ -101,7 +101,7 @@ bool RaySphereIntersection(const LegacyVector3& rayStart, const LegacyVector3& r
 bool SphereSphereIntersection(const LegacyVector3& _sphere1Pos, float _sphere1Radius, const LegacyVector3& _sphere2Pos,
                               float _sphere2Radius);
 
-bool SphereTriangleIntersection(const LegacyVector3& sphereCentre, float sphereRadius, const LegacyVector3& t1, const LegacyVector3& t2,
+bool SphereTriangleIntersection(const LegacyVector3& sphereCenter, float sphereRadius, const LegacyVector3& t1, const LegacyVector3& t2,
                                 const LegacyVector3& t3);
 
 bool TriTriIntersection(const LegacyVector3& v0, const LegacyVector3& v1, const LegacyVector3& v2, const LegacyVector3& u0,

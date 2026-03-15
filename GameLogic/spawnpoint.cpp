@@ -53,12 +53,12 @@ bool SpawnBuilding::IsInView()
         if( m_links.Size() == 0 )
         {
             m_visibilityRadius = m_radius;
-            m_visibilityMidpoint = m_centrePos;
+            m_visibilityMidpoint = m_centerPos;
             return Building::IsInView();
         }
         else
         {
-            m_visibilityMidpoint = m_centrePos;
+            m_visibilityMidpoint = m_centerPos;
             int numLinks = 1;
             m_visibilityRadius = 0.0f;
 
@@ -70,7 +70,7 @@ bool SpawnBuilding::IsInView()
                 SpawnBuilding *building = (SpawnBuilding *) g_app->m_location->GetBuilding( link->m_targetBuildingId );
                 if( building )
                 {
-                    m_visibilityMidpoint += building->m_centrePos;
+                    m_visibilityMidpoint += building->m_centerPos;
                     ++numLinks;
                 }
             }
@@ -85,7 +85,7 @@ bool SpawnBuilding::IsInView()
                 SpawnBuilding *building = (SpawnBuilding *) g_app->m_location->GetBuilding( link->m_targetBuildingId );
                 if( building )
                 {
-                    float distance = ( building->m_centrePos - m_visibilityMidpoint ).Mag();
+                    float distance = ( building->m_centerPos - m_visibilityMidpoint ).Mag();
                     distance += building->m_radius / 2.0f;
                     m_visibilityRadius = max( m_visibilityRadius, distance );
                 }
@@ -617,9 +617,9 @@ void SpawnPoint::TriggerSpirit( SpawnBuildingSpirit *_spirit )
 }
 
 
-bool SpawnPoint::PerformDepthSort( LegacyVector3 &_centrePos )
+bool SpawnPoint::PerformDepthSort( LegacyVector3 &_centerPos )
 {
-    _centrePos = m_centrePos;
+    _centerPos = m_centerPos;
     return true;
 }
 
@@ -700,7 +700,7 @@ void SpawnPoint::RenderAlphas( float _predictionTime )
 
     for( int i = 0; i < maxBlobs; ++i )
     {
-        LegacyVector3 pos = m_centrePos;
+        LegacyVector3 pos = m_centerPos;
         pos += LegacyVector3(0,25,0);
         pos.x += sinf(timeIndex+i) * i * 0.7f;
         pos.y += cosf(timeIndex+i) * sinf(i*10) * 12;

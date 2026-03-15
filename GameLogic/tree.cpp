@@ -69,7 +69,7 @@ void Tree::SetDetail(int _detail)
   Generate();
 
   m_iterations = oldIterations;
-  m_centrePos = m_pos + m_hitcheckCentre * m_height;
+  m_centerPos = m_pos + m_hitcheckCenter * m_height;
   m_radius = m_hitcheckRadius * m_height * 1.5f;
 }
 
@@ -194,7 +194,7 @@ void Tree::Generate()
 {
   float timeNow = GetHighResTime();
 
-  m_hitcheckCentre.Zero();
+  m_hitcheckCenter.Zero();
   m_hitcheckRadius = 0.0f;
   m_numLeafs = 0;
 
@@ -222,8 +222,8 @@ void Tree::Generate()
   GenerateBranch(g_zeroVector, g_upVector, m_iterations,
                  false, false, true, m_leafMesh);
 
-  // Compute hit-check centre from accumulated leaf positions
-  m_hitcheckCentre /= static_cast<float>(m_numLeafs);
+  // Compute hit-check center from accumulated leaf positions
+  m_hitcheckCenter /= static_cast<float>(m_numLeafs);
   // Compute hit-check radius (radius-only pass, no mesh output)
   RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, false);
   m_hitcheckRadius *= 0.8f;
@@ -234,13 +234,9 @@ void Tree::Generate()
   DebugTrace("Tree generated in {}ms\n", static_cast<int>(totalTime * 1000.0f));
 }
 
-void Tree::Render(float _predictionTime)
+bool Tree::PerformDepthSort(LegacyVector3& _centerPos)
 {
-}
-
-bool Tree::PerformDepthSort(LegacyVector3& _centrePos)
-{
-  _centrePos = m_pos + m_hitcheckCentre * m_height;
+  _centerPos = m_pos + m_hitcheckCenter * m_height;
   return true;
 }
 
@@ -276,7 +272,7 @@ bool Tree::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 
   float actualHeight = GetActualHeight(0.0f);
 
-  if (SphereSphereIntersection(m_pos + m_hitcheckCentre * actualHeight, m_hitcheckRadius * actualHeight, _pos, _radius))
+  if (SphereSphereIntersection(m_pos + m_hitcheckCenter * actualHeight, m_hitcheckRadius * actualHeight, _pos, _radius))
     return true;
 
   return false;
@@ -290,7 +286,7 @@ bool Tree::DoesShapeHit(Shape* _shape, Matrix34 _transform)
 
   float actualHeight = GetActualHeight(0.0f);
 
-  SpherePackage packageB(m_pos + m_hitcheckCentre * actualHeight, m_hitcheckRadius * actualHeight);
+  SpherePackage packageB(m_pos + m_hitcheckCenter * actualHeight, m_hitcheckRadius * actualHeight);
   if (_shape->SphereHit(&packageB, _transform))
     return true;
 
@@ -305,7 +301,7 @@ bool Tree::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayD
 
   float actualHeight = GetActualHeight(0.0f);
 
-  if (RaySphereIntersection(_rayStart, _rayDir, m_pos + m_hitcheckCentre * actualHeight, m_hitcheckRadius * actualHeight, _rayLen, _pos,
+  if (RaySphereIntersection(_rayStart, _rayDir, m_pos + m_hitcheckCenter * actualHeight, m_hitcheckRadius * actualHeight, _rayLen, _pos,
                             _norm))
     return true;
 
@@ -322,13 +318,13 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
   {
     if (_calcRadius)
     {
-      float distToCentre = (_to - m_hitcheckCentre).Mag();
-      if (distToCentre > m_hitcheckRadius)
-        m_hitcheckRadius = distToCentre;
+      float distToCenter = (_to - m_hitcheckCenter).Mag();
+      if (distToCenter > m_hitcheckRadius)
+        m_hitcheckRadius = distToCenter;
     }
     else if (_renderLeaf)
     {
-      m_hitcheckCentre += _to;
+      m_hitcheckCenter += _to;
       m_numLeafs++;
     }
   }
@@ -412,13 +408,13 @@ void Tree::GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iteration
   {
     if (_calcRadius)
     {
-      float distToCentre = (_to - m_hitcheckCentre).Mag();
-      if (distToCentre > m_hitcheckRadius)
-        m_hitcheckRadius = distToCentre;
+      float distToCenter = (_to - m_hitcheckCenter).Mag();
+      if (distToCenter > m_hitcheckRadius)
+        m_hitcheckRadius = distToCenter;
     }
     else if (_renderLeaf)
     {
-      m_hitcheckCentre += _to;
+      m_hitcheckCenter += _to;
       m_numLeafs++;
     }
   }

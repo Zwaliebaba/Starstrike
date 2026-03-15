@@ -61,7 +61,7 @@ void GunTurret::Initialise(Building* _template)
 
   m_turretFront = m_front;
   m_barrelUp = g_upVector;
-  m_centrePos = m_pos;
+  m_centerPos = m_pos;
   m_radius = 30.0f;
 
   SearchForRandomPos();
@@ -71,7 +71,7 @@ void GunTurret::SetDetail(int _detail)
 {
   Building::SetDetail(_detail);
 
-  m_centrePos = m_pos;
+  m_centerPos = m_pos;
   m_radius = 30.0f;
 }
 

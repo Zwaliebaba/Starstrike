@@ -77,8 +77,8 @@ void DynamicBase::SetShapeName(char* _shapeName)
 
     Matrix34 mat(m_front, m_up, m_pos);
 
-    m_centrePos = m_shape->CalculateCentre(mat);
-    m_radius = m_shape->CalculateRadius(mat, m_centrePos);
+    m_centerPos = m_shape->CalculateCenter(mat);
+    m_radius = m_shape->CalculateRadius(mat, m_centerPos);
   }
 }
 

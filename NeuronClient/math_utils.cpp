@@ -160,11 +160,11 @@ void GetPlaneMatrix(const LegacyVector3& t1, const LegacyVector3& t2, const Lega
 // result
 float ProjectPointOntoPlane(const LegacyVector3& point, const Matrix34& planeMat, LegacyVector3* result)
 {
-  LegacyVector3 posToCentre = point - planeMat.pos;
-  float distFromCentreToPlane = posToCentre * planeMat.u;
+  LegacyVector3 posToCenter = point - planeMat.pos;
+  float distFromCenterToPlane = posToCenter * planeMat.u;
 
-  *result = point - planeMat.u * distFromCentreToPlane;
-  return distFromCentreToPlane;
+  *result = point - planeMat.u * distFromCenterToPlane;
+  return distFromCenterToPlane;
 }
 
 // Imagine that the plane is a 2D co-ordinate system embedded in a 3D co-ordinate system.
@@ -405,13 +405,13 @@ bool RaySphereIntersection(const LegacyVector3& rayStart, const LegacyVector3& r
 {
   LegacyVector3 l = spherePos - rayStart;
 
-  // Find tca the distance along ray of point nearest to sphere centre.
+  // Find tca the distance along ray of point nearest to sphere center.
   // We'll call this point P
   float tca = l * rayDir;
   if (tca < 0.0f)
     return false;
 
-  // Use Pythagoras now to find dist from P to sphere centre. Actually
+  // Use Pythagoras now to find dist from P to sphere center. Actually
   // cheaper to calc dist sqrd and compare to radius sqrd
   float radiusSqrd = sphereRadius * sphereRadius;
   float lMagSqrd = l.MagSquared();
@@ -511,14 +511,14 @@ bool SphereSphereIntersection(const LegacyVector3& _sphere1Pos, float _sphere1Ra
   return (distanceSqrd <= radiiSummed * radiiSummed);
 }
 
-bool SphereTriangleIntersection(const LegacyVector3& sphereCentre, float sphereRadius, const LegacyVector3& t1, const LegacyVector3& t2,
+bool SphereTriangleIntersection(const LegacyVector3& sphereCenter, float sphereRadius, const LegacyVector3& t1, const LegacyVector3& t2,
                                 const LegacyVector3& t3)
 {
   Matrix34 planeMat;
   GetPlaneMatrix(t1, t2, t3, &planeMat);
 
   LegacyVector3 result;
-  float dist = ProjectPointOntoPlane(sphereCentre, planeMat, &result);
+  float dist = ProjectPointOntoPlane(sphereCenter, planeMat, &result);
   if (dist > sphereRadius)
     return false;
 
@@ -561,8 +561,8 @@ bool SphereTriangleIntersection(const LegacyVector3& sphereCentre, float sphereR
     //		DrawPoint(result);
   }
 
-  LegacyVector3 centreToNearestPointInPlane = sphereCentre - result;
-  if (centreToNearestPointInPlane.MagSquared() > sphereRadius * sphereRadius)
+  LegacyVector3 centerToNearestPointInPlane = sphereCenter - result;
+  if (centerToNearestPointInPlane.MagSquared() > sphereRadius * sphereRadius)
     return false;
 
   return true;

@@ -31,7 +31,7 @@ END
 EFFECT DSound_Distortion
     Gain                -60     0       -18         0
     Edge                0       100     15          0
-    PostEQCentreFreq    100     8000    2400        0
+    PostEQCenterFreq    100     8000    2400        0
     PostEQBandwidth     100     8000    2400        0
     PreLowpassCutoff    100     8000    8000        0
 END
@@ -76,7 +76,7 @@ EFFECT DSound_I3DL2Reverb
 END
 
 EFFECT DSound_ParamEQ	
-    Centre              80      16000   8000        0
+    Center              80      16000   8000        0
     Bandwidth           1       36      12          0
     Gain                -15     15      0           0
 END

@@ -409,6 +409,11 @@ bool LocationGameLoop()
     g_app->m_globalWorld->TransferSpirits(g_app->m_locationId);
 
   g_app->m_clientToServer->ClientLeave();
+
+  // Wait for the GPU to finish all in-flight command lists before destroying
+  // any D3D12 resources (landscape buffers, tree meshes, water textures, etc.).
+  Graphics::Core::Get().WaitForGpu();
+
   g_app->m_location->Empty();
   g_app->m_particleSystem->Empty();
 

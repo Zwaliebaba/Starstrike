@@ -380,9 +380,9 @@ void AntHill::Render(float _predictionTime)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 #ifdef DEBUG_RENDER_ENABLED
-  //g_editorFont.DrawText3DCentre( m_pos + LegacyVector3(0,140,0), 20, "Health %d", m_health );
-  //g_editorFont.DrawText3DCentre( m_pos + LegacyVector3(0,120,0), 20, "%d Ants Inside", m_numAntsInside );
-  //g_editorFont.DrawText3DCentre( m_pos + LegacyVector3(0,100,0), 20, "%d Spirits Inside", m_numSpiritsInside );
+  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,140,0), 20, "Health %d", m_health );
+  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,120,0), 20, "%d Ants Inside", m_numAntsInside );
+  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,100,0), 20, "%d Spirits Inside", m_numSpiritsInside );
   //    for( int i = 0; i < m_objectives.Size(); ++i )
   //    {
   //        AntObjective *objective = m_objectives[i];

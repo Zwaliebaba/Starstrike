@@ -720,7 +720,7 @@ void EntityGrid::Render ()
                         glVertex3f( worldX, worldY, worldZ + cellSizeZ );
                      glEnd();
 
-                     g_editorFont.DrawText3DCentre( LegacyVector3(worldX,worldY,worldZ), 5.0f, "%d", numEntities );
+                     g_editorFont.DrawText3DCenter( LegacyVector3(worldX,worldY,worldZ), 5.0f, "%d", numEntities );
                 }
             }
         }
