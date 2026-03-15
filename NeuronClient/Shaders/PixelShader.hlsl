@@ -78,5 +78,8 @@ float4 main(PSInput input) : SV_TARGET
             discard;
     }
 
+    // --- Screen fade (applied last) ---
+    color.rgb *= (1.0f - FadeAlpha);
+
     return color;
 }

@@ -1,12 +1,13 @@
 #pragma once
 
+#include "RootSignature.h"
+
 namespace OpenGLD3D
 {
   // --- Constants ---
   constexpr UINT UPLOAD_BUFFER_SIZE = 64 * 1024 * 1024; // 64 MB ring buffer
-  constexpr UINT CBV_SIZE_ALIGNED = (sizeof(float) * 512 + 255) & ~255; // Aligned constant buffer
 
-  // --- Per-frame constant buffer layout (must match HLSL exactly) ---
+  // --- Constant buffer layouts (must match HLSL exactly) ---
 
   struct LightConstants
   {
@@ -19,7 +20,21 @@ namespace OpenGLD3D
     float _pad[3];
   };
 
-  struct alignas(256) PerFrameConstants
+  // --- Per-frame scene constants (b0) — uploaded once per frame ---
+  struct alignas(256) SceneConstants
+  {
+    XMFLOAT4 GlobalAmbient;
+    XMFLOAT4 FogColor;
+    float    FogStart;
+    float    FogEnd;
+    float    FogDensity;
+    UINT     FogMode;
+    float    FadeAlpha;       // 0 = fully visible, 1 = fully black
+    UINT     _pad[3];
+  };
+
+  // --- Per-draw constants (b1) — uploaded per draw call ---
+  struct alignas(256) DrawConstants
   {
     XMFLOAT4X4 WorldMatrix;
     XMFLOAT4X4 ProjectionMatrix;
@@ -30,20 +45,13 @@ namespace OpenGLD3D
     XMFLOAT4 MatDiffuse;
     XMFLOAT4 MatSpecular;
     XMFLOAT4 MatEmissive;
-    float MatShininess;
-    float _matPad[3];
+    float    MatShininess;
+    float    _matPad[3];
 
-    XMFLOAT4 GlobalAmbient;
     UINT LightingEnabled;
     UINT FogEnabled;
     UINT TexturingEnabled0;
     UINT TexturingEnabled1;
-
-    XMFLOAT4 FogColor;
-    float FogStart;
-    float FogEnd;
-    float FogDensity;
-    UINT FogMode;
 
     UINT TexEnvMode0;
     UINT TexEnvMode1;
@@ -51,14 +59,14 @@ namespace OpenGLD3D
     UINT ColorMaterialEnabled;
     UINT ColorMaterialMode;
 
-    UINT AlphaTestEnabled;
-    UINT AlphaTestFunc;
+    UINT  AlphaTestEnabled;
+    UINT  AlphaTestFunc;
     float AlphaTestRef;
 
-    UINT NormalizeNormals;
-    UINT FlatShading;
+    UINT  NormalizeNormals;
+    UINT  FlatShading;
     float PointSize;
-    float _miscPad;
+    float _drawPad;
   };
 
   // --- PSO key for caching pipeline states ---
@@ -147,7 +155,8 @@ namespace OpenGLD3D
       // Accessors — device / command list now delegate to Core
       ID3D12Device* GetDevice() const;
       ID3D12GraphicsCommandList* GetCommandList() const;
-      ID3D12RootSignature* GetRootSignature() const { return m_rootSignature.get(); }
+      ID3D12RootSignature* GetRawRootSignature() const { return m_rootSignature.GetSignature(); }
+      const RootSignature& GetRootSignature() const { return m_rootSignature; }
       UploadRingBuffer& GetUploadBuffer() { return m_uploadBuffers[Graphics::Core::Get().GetCurrentFrameIndex()]; }
 
       // PSO management
@@ -192,7 +201,7 @@ namespace OpenGLD3D
       UINT m_samplerDescriptorSize = 0;
 
       // Root signature
-      com_ptr<ID3D12RootSignature> m_rootSignature;
+      RootSignature m_rootSignature;
 
       // PSO cache
       std::unordered_map<PSOKey, com_ptr<ID3D12PipelineState>, PSOKeyHash> m_psoCache;

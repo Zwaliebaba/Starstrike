@@ -85,5 +85,6 @@ class Renderer
     bool IsFadeComplete() const;
     void StartFadeOut();
     void StartFadeIn(float _delay);
+    void AdvanceFade();
 };
 

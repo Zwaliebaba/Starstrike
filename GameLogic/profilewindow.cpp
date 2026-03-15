@@ -191,7 +191,6 @@ void ProfileWindow::Render( bool hasFocus )
 	}
 
     ProfiledElement *root = g_app->m_profiler->m_rootElement;
-    int tableSize = root->m_children.Size();
 
     m_yPos = m_y + 42;
 

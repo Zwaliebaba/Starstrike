@@ -223,7 +223,7 @@ bool RadarDish::Advance()
   return Teleport::Advance();
 }
 
-LegacyVector3 RadarDish::GetDishPos(float _predictionTime)
+LegacyVector3 RadarDish::GetDishPos([[maybe_unused]] float _predictionTime)
 {
   Matrix34 rootMat(m_front, g_upVector, m_pos);
   Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);

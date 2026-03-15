@@ -19,7 +19,7 @@ public:
 	// Constructors
 	Matrix34() {}
 
-	Matrix34(int _ignored)
+	Matrix34([[maybe_unused]] int _ignored)
 	{
 		SetToIdentity();
 	}

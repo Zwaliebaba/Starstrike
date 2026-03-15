@@ -22,5 +22,8 @@ float4 main(PSInput input) : SV_TARGET
         color.rgb = lerp(FogColor.rgb, color.rgb, fogFactor);
     }
 
+    // --- Screen fade (applied last) ---
+    color.rgb *= (1.0f - FadeAlpha);
+
     return color;
 }

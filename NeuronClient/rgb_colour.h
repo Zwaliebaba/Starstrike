@@ -19,7 +19,7 @@ public:
 	RGBAColour operator * (float const b) const;
 	RGBAColour operator / (float const b) const;
 
-    RGBAColour const &operator = (RGBAColour const &b)
+    RGBAColour const &operator = (RGBAColour const &_b)
 	{
 		// only this one is inlined, because only this inline has visible effect on fps (1%)
 		// clean code:
@@ -30,7 +30,7 @@ public:
 		// faster code:
 		//  but not completely safe (c++ aliasing rules)
 		DEBUG_ASSERT(sizeof(int)==4);
-		*(int*)this = *(int*)&b;
+		*(int*)this = *(int*)&_b;
 		return *this;
 	}
 	RGBAColour const &operator *= (float const b);

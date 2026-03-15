@@ -20,6 +20,14 @@ namespace OpenGLD3D {
 
   // Texture SRV accessor — returns the GPU descriptor handle for a GL texture.
   D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSRVGPUHandle(unsigned int texId);
+
+  // Fade alpha accessor — set once per frame by Renderer, read by CB upload.
+  void  SetFadeAlpha(float alpha);
+
+  // Scene constants — uploaded lazily once per frame; tree renderer re-binds
+  // the cached GPU address without re-uploading.
+  void EnsureSceneConstantsUploaded();
+  D3D12_GPU_VIRTUAL_ADDRESS GetSceneConstantsGPUAddr();
 }
 
 // Mode declarations for glBegin

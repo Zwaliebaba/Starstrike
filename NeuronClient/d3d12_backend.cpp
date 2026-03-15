@@ -126,7 +126,7 @@ void D3D12Backend::Shutdown()
   WaitForGpu();
 
   m_psoCache.clear();
-  m_rootSignature = nullptr;
+  m_rootSignature.Reset(0, 0);
   m_srvCbvHeap = nullptr;
   m_samplerHeap = nullptr;
   m_defaultTexture = nullptr;
@@ -168,66 +168,26 @@ void D3D12Backend::CreateDescriptorHeaps()
 
 void D3D12Backend::CreateRootSignature()
 {
-  // Root parameter 0: CBV (constant buffer at b0)
-  // Root parameter 1: Descriptor table for SRV (t0) — texture 0
-  // Root parameter 2: Descriptor table for SRV (t1) — texture 1
-  // Root parameter 3: Descriptor table for samplers
+  // Shared root signature — used by uber and tree pipelines.
+  // Param 0: CBV  b0  (SceneConstants  — per-frame)
+  // Param 1: CBV  b1  (DrawConstants   — per-draw)
+  // Param 2: SRV table t0  (texture 0)
+  // Param 3: SRV table t1  (texture 1)
+  // Param 4: Sampler table s0-s1
 
-  D3D12_ROOT_PARAMETER rootParams[4] = {};
+  m_rootSignature.Reset(5, 0);
 
-  // Param 0: CBV
-  rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-  rootParams[0].Descriptor.ShaderRegister = 0;
-  rootParams[0].Descriptor.RegisterSpace = 0;
-  rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+  m_rootSignature[0].InitAsConstantBuffer(0); // b0 — SceneConstants
+  m_rootSignature[1].InitAsConstantBuffer(1); // b1 — DrawConstants
+  m_rootSignature[2].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 1,
+                                           D3D12_SHADER_VISIBILITY_PIXEL); // t0
+  m_rootSignature[3].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1,
+                                           D3D12_SHADER_VISIBILITY_PIXEL); // t1
+  m_rootSignature[4].InitAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 0, 2,
+                                           D3D12_SHADER_VISIBILITY_PIXEL); // s0-s1
 
-  // Param 1: SRV table (t0)
-  D3D12_DESCRIPTOR_RANGE srvRange0 = {};
-  srvRange0.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-  srvRange0.NumDescriptors = 1;
-  srvRange0.BaseShaderRegister = 0;
-  rootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-  rootParams[1].DescriptorTable.NumDescriptorRanges = 1;
-  rootParams[1].DescriptorTable.pDescriptorRanges = &srvRange0;
-  rootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-  // Param 2: SRV table (t1)
-  D3D12_DESCRIPTOR_RANGE srvRange1 = {};
-  srvRange1.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-  srvRange1.NumDescriptors = 1;
-  srvRange1.BaseShaderRegister = 1;
-  rootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-  rootParams[2].DescriptorTable.NumDescriptorRanges = 1;
-  rootParams[2].DescriptorTable.pDescriptorRanges = &srvRange1;
-  rootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-  // Param 3: Sampler table
-  D3D12_DESCRIPTOR_RANGE samplerRange = {};
-  samplerRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
-  samplerRange.NumDescriptors = 2; // s0 and s1
-  samplerRange.BaseShaderRegister = 0;
-  rootParams[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-  rootParams[3].DescriptorTable.NumDescriptorRanges = 1;
-  rootParams[3].DescriptorTable.pDescriptorRanges = &samplerRange;
-  rootParams[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-
-  D3D12_ROOT_SIGNATURE_DESC rootSigDesc = {};
-  rootSigDesc.NumParameters = _countof(rootParams);
-  rootSigDesc.pParameters = rootParams;
-  rootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-  com_ptr<ID3DBlob> signature;
-  com_ptr<ID3DBlob> error;
-  HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, signature.put(), error.put());
-  if (FAILED(hr))
-  {
-    if (error)
-      OutputDebugStringA(static_cast<const char*>(error->GetBufferPointer()));
-    check_hresult(hr);
-  }
-
-  check_hresult(GetDevice()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(),
-                                                 IID_GRAPHICS_PPV_ARGS(m_rootSignature)));
+  m_rootSignature.Finalize(L"Shared Root Signature",
+                           D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 }
 
 void D3D12Backend::CreateUploadBuffer()
@@ -369,7 +329,7 @@ ID3D12PipelineState* D3D12Backend::GetOrCreatePSO(const PSOKey& key)
 
   // Build PSO
   D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-  psoDesc.pRootSignature = m_rootSignature.get();
+  psoDesc.pRootSignature = m_rootSignature.GetSignature();
 
   // Shaders (pre-compiled headers)
   psoDesc.VS = {g_pVertexShader, sizeof(g_pVertexShader)};
@@ -462,7 +422,7 @@ void D3D12Backend::BeginFrame()
   cmdList->SetDescriptorHeaps(_countof(heaps), heaps);
 
   // Set root signature
-  cmdList->SetGraphicsRootSignature(m_rootSignature.get());
+  cmdList->SetGraphicsRootSignature(m_rootSignature.GetSignature());
 
   // Set render targets from Core
   D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::Core::Get().GetRenderTargetView();

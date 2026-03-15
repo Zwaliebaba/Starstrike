@@ -43,6 +43,15 @@ static bool s_cullBackFace = true;
 static GLenum s_fogHint = GL_DONT_CARE;
 static GLenum s_polygonSmoothHint = GL_DONT_CARE;
 
+// --- Fade ---
+static float s_fadeAlpha = 0.0f;
+
+// --- Scene constants cache (uploaded once per frame) ---
+static struct {
+  D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = 0;
+  bool uploaded = false;
+} s_sceneConstantsCache;
+
 // --- Matrix ---
 static GLenum s_matrixMode = GL_MODELVIEW;
 static MatrixStack* s_pTargetMatrixStack = nullptr;
@@ -309,69 +318,66 @@ static PSOKey buildPSOKey(UINT8 topologyType)
   return key;
 }
 
+static void ensureSceneConstantsUploaded();
+
 static void uploadAndBindConstants()
 {
-  PerFrameConstants cb = {};
+  // --- Scene constants (b0) — lazy per-frame upload ---
+  ensureSceneConstantsUploaded();
+  auto* cmdList = g_backend.GetCommandList();
+  cmdList->SetGraphicsRootConstantBufferView(0, s_sceneConstantsCache.gpuAddr);
+
+  // --- Draw constants (b1) — per draw call ---
+  DrawConstants dc = {};
 
   // Matrices
-  XMStoreFloat4x4(&cb.WorldMatrix, s_modelViewMatrixStack.GetTopXM());
-  XMStoreFloat4x4(&cb.ProjectionMatrix, s_projectionMatrixStack.GetTopXM());
+  XMStoreFloat4x4(&dc.WorldMatrix, s_modelViewMatrixStack.GetTopXM());
+  XMStoreFloat4x4(&dc.ProjectionMatrix, s_projectionMatrixStack.GetTopXM());
 
   // Lights
   for (int i = 0; i < 8; i++)
   {
-    cb.Lights[i].Enabled = s_renderState.lightsEnabled[i] ? 1 : 0;
-    memcpy(&cb.Lights[i].Position, s_renderState.lights[i].position, sizeof(float) * 4);
-    memcpy(&cb.Lights[i].Diffuse, s_renderState.lights[i].diffuse, sizeof(float) * 4);
-    memcpy(&cb.Lights[i].Specular, s_renderState.lights[i].specular, sizeof(float) * 4);
-    memcpy(&cb.Lights[i].Ambient, s_renderState.lights[i].ambient, sizeof(float) * 4);
+    dc.Lights[i].Enabled = s_renderState.lightsEnabled[i] ? 1 : 0;
+    memcpy(&dc.Lights[i].Position, s_renderState.lights[i].position, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Diffuse, s_renderState.lights[i].diffuse, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Specular, s_renderState.lights[i].specular, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Ambient, s_renderState.lights[i].ambient, sizeof(float) * 4);
   }
 
   // Material
-  memcpy(&cb.MatAmbient, s_renderState.matAmbient, sizeof(float) * 4);
-  memcpy(&cb.MatDiffuse, s_renderState.matDiffuse, sizeof(float) * 4);
-  memcpy(&cb.MatSpecular, s_renderState.matSpecular, sizeof(float) * 4);
-  memcpy(&cb.MatEmissive, s_renderState.matEmissive, sizeof(float) * 4);
-  cb.MatShininess = s_renderState.matShininess;
+  memcpy(&dc.MatAmbient, s_renderState.matAmbient, sizeof(float) * 4);
+  memcpy(&dc.MatDiffuse, s_renderState.matDiffuse, sizeof(float) * 4);
+  memcpy(&dc.MatSpecular, s_renderState.matSpecular, sizeof(float) * 4);
+  memcpy(&dc.MatEmissive, s_renderState.matEmissive, sizeof(float) * 4);
+  dc.MatShininess = s_renderState.matShininess;
 
-  memcpy(&cb.GlobalAmbient, s_renderState.globalAmbient, sizeof(float) * 4);
-
-  cb.LightingEnabled = s_renderState.lightingEnabled ? 1 : 0;
-  cb.FogEnabled = s_renderState.fogEnabled ? 1 : 0;
-  cb.TexturingEnabled0 = s_currentAttribs.texturingEnabled[0] ? 1 : 0;
-  cb.TexturingEnabled1 = (MAX_ACTIVE_TEXTURES > 1 && s_currentAttribs.texturingEnabled[1]) ? 1 : 0;
-
-  // Fog
-  memcpy(&cb.FogColor, s_renderState.fogColor, sizeof(float) * 4);
-  cb.FogStart = s_renderState.fogStart;
-  cb.FogEnd = s_renderState.fogEnd;
-  cb.FogDensity = s_renderState.fogDensity;
-  cb.FogMode = 0; // linear
+  dc.LightingEnabled = s_renderState.lightingEnabled ? 1 : 0;
+  dc.FogEnabled = s_renderState.fogEnabled ? 1 : 0;
+  dc.TexturingEnabled0 = s_currentAttribs.texturingEnabled[0] ? 1 : 0;
+  dc.TexturingEnabled1 = (MAX_ACTIVE_TEXTURES > 1 && s_currentAttribs.texturingEnabled[1]) ? 1 : 0;
 
   // Tex env
-  cb.TexEnvMode0 = glTexEnvModeToShader(s_textureStates[0].envMode);
-  cb.TexEnvMode1 = (MAX_ACTIVE_TEXTURES > 1) ? glTexEnvModeToShader(s_textureStates[1].envMode) : 0;
+  dc.TexEnvMode0 = glTexEnvModeToShader(s_textureStates[0].envMode);
+  dc.TexEnvMode1 = (MAX_ACTIVE_TEXTURES > 1) ? glTexEnvModeToShader(s_textureStates[1].envMode) : 0;
 
   // Color material
-  cb.ColorMaterialEnabled = s_currentAttribs.colorMaterialEnabled ? 1 : 0;
-  cb.ColorMaterialMode = (s_currentAttribs.colorMaterialMode == GL_AMBIENT_AND_DIFFUSE) ? 1 : 0;
+  dc.ColorMaterialEnabled = s_currentAttribs.colorMaterialEnabled ? 1 : 0;
+  dc.ColorMaterialMode = (s_currentAttribs.colorMaterialMode == GL_AMBIENT_AND_DIFFUSE) ? 1 : 0;
 
   // Alpha test
-  cb.AlphaTestEnabled = s_renderState.alphaTestEnabled ? 1 : 0;
-  cb.AlphaTestFunc = glAlphaFuncToShader(s_renderState.alphaFunc);
-  cb.AlphaTestRef = s_renderState.alphaRef;
+  dc.AlphaTestEnabled = s_renderState.alphaTestEnabled ? 1 : 0;
+  dc.AlphaTestFunc = glAlphaFuncToShader(s_renderState.alphaFunc);
+  dc.AlphaTestRef = s_renderState.alphaRef;
 
-  cb.NormalizeNormals = s_renderState.normalizeEnabled ? 1 : 0;
-  cb.FlatShading = (s_renderState.shadeModel == GL_FLAT) ? 1 : 0;
-  cb.PointSize = s_renderState.pointSize;
+  dc.NormalizeNormals = s_renderState.normalizeEnabled ? 1 : 0;
+  dc.FlatShading = (s_renderState.shadeModel == GL_FLAT) ? 1 : 0;
+  dc.PointSize = s_renderState.pointSize;
 
   // Allocate a unique constant buffer region per draw call from the ring buffer.
   // A single fixed slot would be overwritten by later draws before the GPU reads it.
-  auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(PerFrameConstants), 256);
-  memcpy(alloc.cpuPtr, &cb, sizeof(PerFrameConstants));
-
-  auto* cmdList = g_backend.GetCommandList();
-  cmdList->SetGraphicsRootConstantBufferView(0, alloc.gpuAddr);
+  auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(DrawConstants), 256);
+  memcpy(alloc.cpuPtr, &dc, sizeof(DrawConstants));
+  cmdList->SetGraphicsRootConstantBufferView(1, alloc.gpuAddr);
 }
 
 static UINT getSamplerIndex(unsigned texUnit)
@@ -406,20 +412,20 @@ static void bindTexturesAndSamplers()
   if (s_currentAttribs.texturingEnabled[0] && s_textureStates[0].target < s_textureResources.size() && s_textureResources[s_textureStates[0]
     .target].valid)
     srvIndex0 = s_textureResources[s_textureStates[0].target].srvIndex;
-  cmdList->SetGraphicsRootDescriptorTable(1, g_backend.GetSRVGPUHandle(srvIndex0));
+  cmdList->SetGraphicsRootDescriptorTable(2, g_backend.GetSRVGPUHandle(srvIndex0));
 
   // Texture 1
   UINT srvIndex1 = g_backend.GetDefaultTextureSRVIndex();
   if (MAX_ACTIVE_TEXTURES > 1 && s_currentAttribs.texturingEnabled[1] && s_textureStates[1].target < s_textureResources.size() &&
     s_textureResources[s_textureStates[1].target].valid)
     srvIndex1 = s_textureResources[s_textureStates[1].target].srvIndex;
-  cmdList->SetGraphicsRootDescriptorTable(2, g_backend.GetSRVGPUHandle(srvIndex1));
+  cmdList->SetGraphicsRootDescriptorTable(3, g_backend.GetSRVGPUHandle(srvIndex1));
 
   // Samplers — bind a pair starting at sampler index for unit 0
   UINT samplerIdx = getSamplerIndex(0);
   D3D12_GPU_DESCRIPTOR_HANDLE samplerHandle = g_backend.GetSamplerHeap()->GetGPUDescriptorHandleForHeapStart();
   samplerHandle.ptr += samplerIdx * g_backend.GetSamplerDescriptorSize();
-  cmdList->SetGraphicsRootDescriptorTable(3, samplerHandle);
+  cmdList->SetGraphicsRootDescriptorTable(4, samplerHandle);
 }
 
 static UINT8 topologyTypeFromTopology(D3D_PRIMITIVE_TOPOLOGY topology)
@@ -632,6 +638,9 @@ void glClear(GLbitfield mask)
   }
 
   DEBUG_ASSERT((mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)) == 0);
+
+  // Reset per-frame scene constants cache so the next draw re-uploads.
+  s_sceneConstantsCache.uploaded = false;
 }
 
 // ============================================================================
@@ -2097,6 +2106,33 @@ int gluUnProject(GLdouble winx, GLdouble winy, GLdouble winz, const GLdouble mod
 // ============================================================================
 
 void glPointSize(GLfloat size) { s_renderState.pointSize = size; }
+
+void OpenGLD3D::SetFadeAlpha(float alpha) { s_fadeAlpha = alpha; }
+
+// --- Scene constants lazy upload ---
+
+static void ensureSceneConstantsUploaded()
+{
+  if (s_sceneConstantsCache.uploaded)
+    return;
+
+  SceneConstants sc = {};
+  memcpy(&sc.GlobalAmbient, s_renderState.globalAmbient, sizeof(float) * 4);
+  memcpy(&sc.FogColor, s_renderState.fogColor, sizeof(float) * 4);
+  sc.FogStart   = s_renderState.fogStart;
+  sc.FogEnd     = s_renderState.fogEnd;
+  sc.FogDensity = s_renderState.fogDensity;
+  sc.FogMode    = 0; // linear
+  sc.FadeAlpha  = s_fadeAlpha;
+
+  auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(SceneConstants), 256);
+  memcpy(alloc.cpuPtr, &sc, sizeof(SceneConstants));
+  s_sceneConstantsCache.gpuAddr = alloc.gpuAddr;
+  s_sceneConstantsCache.uploaded = true;
+}
+
+void OpenGLD3D::EnsureSceneConstantsUploaded() { ensureSceneConstantsUploaded(); }
+D3D12_GPU_VIRTUAL_ADDRESS OpenGLD3D::GetSceneConstantsGPUAddr() { return s_sceneConstantsCache.gpuAddr; }
 
 void glHint(GLenum target, GLenum mode)
 {

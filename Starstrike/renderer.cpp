@@ -156,6 +156,9 @@ void Renderer::Render()
   g_app->m_profiler->RenderStarted();
 #endif
 
+  AdvanceFade();
+  OpenGLD3D::SetFadeAlpha(m_fadedness);
+
   RenderFrame();
 
 #ifdef PROFILER_ENABLED
@@ -184,20 +187,20 @@ void Renderer::StartFadeIn(float _delay)
   m_fadeRate = -1.0f;
 }
 
-void Renderer::RenderFadeOut()
+void Renderer::AdvanceFade()
 {
   static double lastTime = GetHighResTime();
   double timeNow = GetHighResTime();
   double timeIncrement = timeNow - lastTime;
-  if (timeIncrement > 0.05f)
-    timeIncrement = 0.05f;
+  if (timeIncrement > 0.05)
+    timeIncrement = 0.05;
   lastTime = timeNow;
 
   if (m_fadeDelay > 0.0f)
-    m_fadeDelay -= timeIncrement;
+    m_fadeDelay -= static_cast<float>(timeIncrement);
   else
   {
-    m_fadedness += m_fadeRate * timeIncrement;
+    m_fadedness += m_fadeRate * static_cast<float>(timeIncrement);
     if (m_fadedness < 0.0f)
     {
       m_fadedness = 0.0f;
@@ -209,27 +212,12 @@ void Renderer::RenderFadeOut()
       m_fadedness = 1.0f;
     }
   }
+}
 
-  if (m_fadedness > 0.0001f)
-  {
-    glEnable(GL_BLEND);
-    glDepthMask(false);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glColor4ub(0, 0, 0, static_cast<int>(m_fadedness * 255.0f));
-    glBegin(GL_QUADS);
-    glVertex2i(-1, -1);
-    glVertex2i(m_screenW, -1);
-    glVertex2i(m_screenW, m_screenH);
-    glVertex2i(-1, m_screenH);
-    glEnd();
-
-    glDisable(GL_BLEND);
-    glDepthMask(true);
-    glEnable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  }
+void Renderer::RenderFadeOut()
+{
+  // Fade is now applied per-fragment in the pixel shader via FadeAlpha.
+  // Time advance has moved to AdvanceFade().
 }
 
 void Renderer::RenderPaused()
@@ -294,8 +282,6 @@ void Renderer::RenderFrame(bool withFlip)
   g_app->m_camera->Render();
 
   g_editorFont.BeginText2D();
-
-  RenderFadeOut();
 
   if (m_displayFPS)
   {

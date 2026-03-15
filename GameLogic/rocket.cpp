@@ -940,9 +940,6 @@ void EscapeRocket::AdvanceCountdown()
   if (m_countdown == 0.0f)
   {
     m_state = StateFlight;
-
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
-    //if( gb ) gb->m_online = true;
   }
 }
 
