@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "GraphicsCore.h"
-
 #include "GraphicsCommon.h"
 
 using namespace Neuron::Graphics;
@@ -455,6 +454,11 @@ void Core::Present()
                static_cast<unsigned int>((hr == DXGI_ERROR_DEVICE_REMOVED) ? m_d3dDevice->GetDeviceRemovedReason() : hr));
     HandleDeviceLost();
   }
+  else if (hr == DXGI_STATUS_OCCLUDED)
+  {
+    // Window is fully occluded — stop wasting GPU cycles.
+    m_isOccluded = true;
+  }
   else
   {
     check_hresult(hr);
@@ -466,6 +470,18 @@ void Core::Present()
       // Output information is cached on the DXGI Factory. If it is stale we need to create a new factory.
       check_hresult(CreateDXGIFactory2(m_dxgiFactoryFlags, IID_GRAPHICS_PPV_ARGS(m_dxgiFactory)));
     }
+  }
+}
+
+// Poll whether the window is still occluded. Call periodically from the game loop
+// instead of rendering when IsOccluded() returns true.
+void Core::CheckForOcclusion()
+{
+  if (m_isOccluded && m_swapChain)
+  {
+    // DXGI_PRESENT_TEST does not present — it only tests the occluded status.
+    if (m_swapChain->Present(0, DXGI_PRESENT_TEST) == S_OK)
+      m_isOccluded = false;
   }
 }
 

@@ -322,8 +322,6 @@ void Script::RunCommand_PurityControl()
 
 void Script::RunCommand_ShowDarwinLogo()
 {
-  g_app->m_renderer->m_renderDarwinLogo = GetHighResTime();
-  g_app->m_soundSystem->TriggerOtherEvent(nullptr, "ShowLogo", SoundSourceBlueprint::TypeInterface);
 }
 
 void Script::RunCommand_ShowDemoEndSequence() {  }
@@ -388,7 +386,6 @@ bool Script::Skip()
   m_waitForCamera = false;
   m_waitForRocket = false;
   m_waitForPlayerNotBusy = false;
-  g_app->m_renderer->m_renderDarwinLogo = -1.0f;
 
   if (m_permitEscape)
   {

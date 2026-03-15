@@ -102,16 +102,12 @@ public:
 
   ~RootSignature()
   {
-    if (m_signature)
-    {
-      m_signature->Release();
-      m_signature = nullptr;
-    }
+    m_signature = nullptr;
   }
 
   void Load(const std::wstring_view _name, const void* _shader, size_t _size)
   {
-    check_hresult(Graphics::Core::Get().GetD3DDevice()->CreateRootSignature(0, _shader, _size, IID_PPV_ARGS(&m_signature)));
+    check_hresult(Graphics::Core::Get().GetD3DDevice()->CreateRootSignature(0, _shader, _size, IID_GRAPHICS_PPV_ARGS(m_signature)));
     m_signature->SetName(_name.data());
     m_Finalized = true;
   }
@@ -147,20 +143,20 @@ public:
   void InitStaticSampler(UINT Register, const D3D12_SAMPLER_DESC& NonStaticSamplerDesc,
     D3D12_SHADER_VISIBILITY Visibility = D3D12_SHADER_VISIBILITY_ALL);
 
-  void Finalize(std::wstring _name, D3D12_ROOT_SIGNATURE_FLAGS Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
+  void Finalize(const std::wstring& _name, D3D12_ROOT_SIGNATURE_FLAGS Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
 
   [[nodiscard]] ID3D12RootSignature* GetSignature() const
   {
     if (m_Finalized)
-      return m_signature;
+      return m_signature.get();
 
     while (!m_Finalized)
       std::this_thread::yield();
-    return m_signature;
+    return m_signature.get();
   }
 
 protected:
-  BOOL m_Finalized;
+  bool m_Finalized;
   UINT m_NumParameters{};
   UINT m_NumSamplers{};
   UINT m_NumInitializedStaticSamplers{};
@@ -169,5 +165,5 @@ protected:
   uint32_t m_DescriptorTableSize[16]{};		// Non-sampler descriptor tables need to know their descriptor count
   std::unique_ptr<RootParameter[]> m_ParamArray{};
   std::unique_ptr<D3D12_STATIC_SAMPLER_DESC[]> m_SamplerArray{};
-  ID3D12RootSignature* m_signature{};
+  com_ptr<ID3D12RootSignature> m_signature;
 };

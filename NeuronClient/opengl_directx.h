@@ -28,6 +28,22 @@ namespace OpenGLD3D {
   // the cached GPU address without re-uploading.
   void EnsureSceneConstantsUploaded();
   D3D12_GPU_VIRTUAL_ADDRESS GetSceneConstantsGPUAddr();
+
+  // --- Per-frame GPU pipeline statistics ---
+  // Counters accumulated during a frame and snapshotted at EndFrame.
+  // Read the previous frame's snapshot via GetFrameStats().
+  struct FrameStats
+  {
+    unsigned int drawCalls = 0;           // Total issueDrawCall invocations
+    unsigned int psoSwitches = 0;         // Actual PSO transitions (key changed)
+    unsigned int uploadBytes = 0;         // Bytes written to the upload ring buffer
+    unsigned int uploadHighWaterMark = 0; // Peak ring buffer offset this frame
+  };
+
+  const FrameStats& GetFrameStats();     // Returns previous frame's snapshot
+  void ResetFrameStats();                // Called at start of frame
+  void SnapshotFrameStats();             // Called at end of frame (copies live → snapshot)
+  void RecordDrawCall();                 // Increment draw call counter (display list replays)
 }
 
 // Mode declarations for glBegin

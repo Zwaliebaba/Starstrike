@@ -2750,12 +2750,7 @@ void QuickUnitButton::Advance()
 
 void QuickUnitButton::Render()
 {
-  //if( m_positionId == 0 || m_positionId == 4 ) return;
-
   float iconSize = 100.0f;
-  float iconGap = 10.0f;
-  float iconX = (g_app->m_renderer->ScreenW() / 2.0f); // - iconSize - iconGap;
-  float iconY = g_app->m_renderer->ScreenH() - iconSize - iconGap;
   float iconAlpha = m_alpha;
   float shadowOffset = 0;
   float shadowSize = iconSize + 10;

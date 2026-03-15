@@ -14,10 +14,7 @@ class Renderer
   public:
     int m_fps;
     bool m_displayFPS;
-    bool m_renderDebug;
     bool m_displayInputMode;
-
-    float m_renderDarwinLogo;
 
   private:
     float m_nearPlane;

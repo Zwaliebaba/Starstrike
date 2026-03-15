@@ -53,6 +53,8 @@ public:
     void			(*m_callback) (StereoSample *buf, unsigned int numSamples);
 
 	void			Stop();
+	void			Pause();
+	void			Resume();
 
 public:
 	SoundLibrary2d();

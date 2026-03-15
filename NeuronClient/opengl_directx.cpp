@@ -46,6 +46,11 @@ static GLenum s_polygonSmoothHint = GL_DONT_CARE;
 // --- Fade ---
 static float s_fadeAlpha = 0.0f;
 
+// --- Per-frame GPU pipeline statistics ---
+static OpenGLD3D::FrameStats s_liveStats;      // Accumulated during current frame
+static OpenGLD3D::FrameStats s_snapshotStats;   // Previous frame's stats (read by HUD)
+static ID3D12PipelineState* s_lastBoundPSO = nullptr; // Tracks actual PSO transitions
+
 // --- Scene constants cache (uploaded once per frame) ---
 static struct {
   D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = 0;
@@ -378,6 +383,8 @@ static void uploadAndBindConstants()
   auto alloc = g_backend.GetUploadBuffer().Allocate(sizeof(DrawConstants), 256);
   memcpy(alloc.cpuPtr, &dc, sizeof(DrawConstants));
   cmdList->SetGraphicsRootConstantBufferView(1, alloc.gpuAddr);
+
+  s_liveStats.uploadBytes += sizeof(DrawConstants);
 }
 
 static UINT getSamplerIndex(unsigned texUnit)
@@ -447,6 +454,14 @@ void OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY topology)
   auto* pso = g_backend.GetOrCreatePSO(key);
 
   auto* cmdList = g_backend.GetCommandList();
+
+  // Track actual PSO transitions
+  if (pso != s_lastBoundPSO)
+  {
+    s_liveStats.psoSwitches++;
+    s_lastBoundPSO = pso;
+  }
+
   cmdList->SetPipelineState(pso);
   cmdList->IASetPrimitiveTopology(topology);
 
@@ -494,6 +509,9 @@ static void issueDrawCall(D3D_PRIMITIVE_TOPOLOGY topology, UINT vertexCount, con
   cmdList->IASetVertexBuffers(0, 1, &vbView);
 
   cmdList->DrawInstanced(vertexCount, 1, 0, 0);
+
+  s_liveStats.drawCalls++;
+  s_liveStats.uploadBytes += vbSize;
 }
 
 // ============================================================================
@@ -2108,6 +2126,25 @@ int gluUnProject(GLdouble winx, GLdouble winy, GLdouble winz, const GLdouble mod
 void glPointSize(GLfloat size) { s_renderState.pointSize = size; }
 
 void OpenGLD3D::SetFadeAlpha(float alpha) { s_fadeAlpha = alpha; }
+
+// --- Per-frame GPU pipeline statistics ---
+
+void OpenGLD3D::ResetFrameStats()
+{
+  s_liveStats = {};
+  s_lastBoundPSO = nullptr;
+  g_backend.GetUploadBuffer().ResetHighWaterMark();
+}
+
+void OpenGLD3D::SnapshotFrameStats()
+{
+  s_liveStats.uploadHighWaterMark = static_cast<unsigned int>(g_backend.GetUploadBuffer().GetHighWaterMark());
+  s_snapshotStats = s_liveStats;
+}
+
+const OpenGLD3D::FrameStats& OpenGLD3D::GetFrameStats() { return s_snapshotStats; }
+
+void OpenGLD3D::RecordDrawCall() { s_liveStats.drawCalls++; }
 
 // --- Scene constants lazy upload ---
 

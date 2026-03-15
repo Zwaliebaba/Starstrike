@@ -184,6 +184,25 @@ bool LocationGameLoop()
   bool fadingOut = false;
   while (!g_app->m_requestQuit)
   {
+    // Yield CPU when the window is suspended or inactive.
+    if (g_app->IsSuspended())
+    {
+      WaitMessage();
+      continue;
+    }
+    if (!g_app->IsActive())
+    {
+      // Still pump messages but throttle to ~10 FPS.
+      Sleep(100);
+    }
+    // When the window is fully occluded, skip rendering and poll.
+    if (Graphics::Core::Get().IsOccluded())
+    {
+      Graphics::Core::Get().CheckForOcclusion();
+      Sleep(100);
+      continue;
+    }
+
     if (!fadingOut)
     {
       if (g_app->m_requestedLocationId != g_app->m_locationId)
@@ -421,6 +440,23 @@ bool GlobalWorldGameLoop()
   {
     if (g_app->m_atMainMenu)
       break;
+
+    // Yield CPU when the window is suspended or inactive.
+    if (g_app->IsSuspended())
+    {
+      WaitMessage();
+      continue;
+    }
+    if (!g_app->IsActive())
+    {
+      Sleep(100);
+    }
+    if (Graphics::Core::Get().IsOccluded())
+    {
+      Graphics::Core::Get().CheckForOcclusion();
+      Sleep(100);
+      continue;
+    }
 
     g_inputManager->PollForEvents();
 

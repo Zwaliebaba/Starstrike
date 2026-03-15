@@ -96,6 +96,8 @@ UploadRingBuffer::Allocation UploadRingBuffer::Allocate(SIZE_T sizeBytes, SIZE_T
   alloc.offset = m_offset;
 
   m_offset += sizeBytes;
+  if (m_offset > m_highWaterMark)
+    m_highWaterMark = m_offset;
   return alloc;
 }
 

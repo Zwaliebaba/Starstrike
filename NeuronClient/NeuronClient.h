@@ -32,9 +32,6 @@ namespace Neuron::Client
 
         static void Run();
 
-        static void OnDeviceLost();
-        static void OnDeviceRestored();
-
         static HINSTANCE Instance() {
             return m_instance;
         }
@@ -46,22 +43,7 @@ namespace Neuron::Client
         }
         static Windows::Foundation::Point OutputTopLeft();
 
-        static void RegisterDeviceNotify(IDeviceNotify* deviceNotify)
-        {
-            m_deviceNotify = deviceNotify;
-
-            // On RS4 and higher, applications that handle device removal
-            // should declare themselves as being able to do so
-            __if_exists(DXGIDeclareAdapterRemovalSupport)
-            {
-                if (deviceNotify)
-                    if (FAILED(DXGIDeclareAdapterRemovalSupport()))
-                        OutputDebugString(L"Warning: application failed to declare adapter removal support.\n");
-            }
-        }
-
     protected:
-        inline static IDeviceNotify* m_deviceNotify{};
         inline static HINSTANCE m_instance;
         inline static HWND m_hwnd;
         inline static Windows::Foundation::Size m_outputSize;

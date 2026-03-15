@@ -40,7 +40,6 @@ namespace Neuron::Graphics
   D3D12_BLEND_DESC BlendTraditionalAdditive;
 
   D3D12_DEPTH_STENCIL_DESC DepthStateDisabled;
-  D3D12_DEPTH_STENCIL_DESC DepthStateDefault;
   D3D12_DEPTH_STENCIL_DESC DepthStateReadWrite;
   D3D12_DEPTH_STENCIL_DESC DepthStateReadOnly;
   D3D12_DEPTH_STENCIL_DESC DepthStateReadOnlyReversed;

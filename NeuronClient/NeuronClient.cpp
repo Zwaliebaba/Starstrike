@@ -74,12 +74,14 @@ void ClientEngine::StartGame(const com_ptr<GameMain>& _gameMain)
     m_main = _gameMain;
     SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(m_main.get()));
     m_main->Startup();
+    Graphics::Core::Get().RegisterDeviceNotify(m_main.get());
 }
 
 void ClientEngine::Shutdown()
 {
     if (m_main)
     {
+        Graphics::Core::Get().RegisterDeviceNotify(nullptr);
         m_main->Shutdown();
         m_main = nullptr;
     }
@@ -299,10 +301,4 @@ LRESULT CALLBACK WndProc(const HWND _hWnd, const UINT _message, WPARAM _wParam, 
         return DefWindowProc(_hWnd, _message, _wParam, _lParam);
 
     return 0;
-}
-
-void ClientEngine::OnDeviceLost() {
-}
-
-void ClientEngine::OnDeviceRestored() {
 }

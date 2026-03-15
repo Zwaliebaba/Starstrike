@@ -337,6 +337,19 @@ LRESULT CALLBACK W32InputDriver::WndProc(HWND hWnd, UINT message, WPARAM wParam,
       break;
     }
 
+  case WM_ACTIVATEAPP:
+    if (!wParam)
+    {
+      // Focus lost — clear all input state so keys/buttons don't stick.
+      memset(g_keys, 0, KEY_MAX);
+      memset(g_keyDeltas, 0, KEY_MAX);
+      memset(m_keyNewDeltas, 0, KEY_MAX);
+      memset(m_mb, 0, sizeof(m_mb));
+      memset(m_mbOld, 0, sizeof(m_mbOld));
+      memset(m_mbDeltas, 0, sizeof(m_mbDeltas));
+    }
+    break;
+
   default:
     return -1; // Not processed
   }

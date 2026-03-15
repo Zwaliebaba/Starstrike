@@ -38,7 +38,7 @@ void RootSignature::InitStaticSampler(UINT Register, const D3D12_SAMPLER_DESC& N
   }
 }
 
-void RootSignature::Finalize(const std::wstring _name, D3D12_ROOT_SIGNATURE_FLAGS Flags)
+void RootSignature::Finalize(const std::wstring& _name, D3D12_ROOT_SIGNATURE_FLAGS Flags)
 {
   if (!m_Finalized)
   {
@@ -85,9 +85,9 @@ void RootSignature::Finalize(const std::wstring _name, D3D12_ROOT_SIGNATURE_FLAG
       check_hresult(hr);
     }
     check_hresult(Core::Get().GetD3DDevice()->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(),
-      IID_PPV_ARGS(&m_signature)));
+      IID_GRAPHICS_PPV_ARGS(m_signature)));
 
-    check_hresult(m_signature->SetName(_name.c_str()));
+    m_signature->SetName(_name.c_str());
 
     m_Finalized = true;
   }

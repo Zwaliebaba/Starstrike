@@ -9,6 +9,7 @@
 #include "filesys_utils.h"
 #include "file_writer.h"
 #include "prefs_other_window.h"
+#include "sound_library_2d.h"
 #include "soundsystem.h"
 #include "GameApp.h"
 #include "camera.h"
@@ -373,4 +374,38 @@ void GameApp::LoadCampaign()
   g_prefsManager->SetInt("RenderSpecialLighting", 0);
   g_prefsManager->SetInt("CurrentGameMode", 1);
   g_prefsManager->Save();
+}
+
+// --- Lifecycle overrides ---
+
+void GameApp::OnActivated()
+{
+  GameMain::OnActivated();
+
+  if (g_soundLibrary2d)
+    g_soundLibrary2d->Resume();
+}
+
+void GameApp::OnDeactivated()
+{
+  GameMain::OnDeactivated();
+
+  if (g_soundLibrary2d)
+    g_soundLibrary2d->Pause();
+}
+
+void GameApp::OnSuspending()
+{
+  GameMain::OnSuspending();
+
+  if (g_soundLibrary2d)
+    g_soundLibrary2d->Pause();
+}
+
+void GameApp::OnResuming()
+{
+  GameMain::OnResuming();
+
+  if (g_soundLibrary2d)
+    g_soundLibrary2d->Resume();
 }

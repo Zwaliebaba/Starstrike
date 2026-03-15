@@ -38,13 +38,39 @@ namespace Neuron
       virtual void UpdateTouch([[maybe_unused]] int _id, [[maybe_unused]] Windows::Foundation::Point _point) {}
       virtual void RemoveTouch([[maybe_unused]] int _id) {}
 
-      virtual void OnActivated() {}
+      // --- Activation ---
 
-      virtual void OnDeactivated() {}
+      virtual void OnActivated()
+      {
+        m_isActive = true;
+        // Ensure the cursor is hidden — loop handles ShowCursor reference-count drift.
+        while (ShowCursor(FALSE) >= 0) {}
+        Timer::Core::ResetElapsedTime();
+      }
 
-      virtual void OnSuspending() {}
+      virtual void OnDeactivated()
+      {
+        m_isActive = false;
+        // Ensure the cursor is visible — loop handles ShowCursor reference-count drift.
+        while (ShowCursor(TRUE) < 0) {}
+        ClipCursor(nullptr);
+      }
 
-      virtual void OnResuming() { Timer::Core::ResetElapsedTime(); }
+      // --- Suspend / Resume ---
+
+      virtual void OnSuspending()
+      {
+        m_isSuspended = true;
+        Graphics::Core::Get().WaitForGpu();
+      }
+
+      virtual void OnResuming()
+      {
+        m_isSuspended = false;
+        Timer::Core::ResetElapsedTime();
+      }
+
+      // --- Window events ---
 
       virtual void OnWindowMoved()
       {
@@ -54,11 +80,36 @@ namespace Neuron
 
       virtual void OnDisplayChange() { Graphics::Core::Get().UpdateColorSpace(); }
 
-      virtual void OnWindowSizeChanged(int width, int height) { Graphics::Core::Get().WindowSizeChanged(width, height); }
+      virtual void OnWindowSizeChanged(int width, int height)
+      {
+        if (Graphics::Core::Get().WindowSizeChanged(width, height))
+        {
+          ReleaseWindowSizeDependentResources();
+          CreateWindowSizeDependentResources();
+        }
+      }
 
-      // IDeviceNotify
-      void OnDeviceLost() override {}
+      // --- IDeviceNotify ---
 
-      void OnDeviceRestored() override {}
+      void OnDeviceLost() override
+      {
+        ReleaseWindowSizeDependentResources();
+        ReleaseDeviceDependentResources();
+      }
+
+      void OnDeviceRestored() override
+      {
+        CreateDeviceDependentResources();
+        CreateWindowSizeDependentResources();
+      }
+
+      // --- State accessors ---
+
+      bool IsActive() const { return m_isActive; }
+      bool IsSuspended() const { return m_isSuspended; }
+
+    protected:
+      bool m_isActive = true;
+      bool m_isSuspended = false;
   };
 }

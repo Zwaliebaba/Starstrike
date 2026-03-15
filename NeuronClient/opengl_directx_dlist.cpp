@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "opengl_directx_dlist.h"
+#include "opengl_directx.h"
 #include "opengl_directx_internals.h"
 #include "opengl_directx_matrix_stack.h"
 #include "d3d12_backend.h"
@@ -92,6 +93,8 @@ void DLCommandDraw::Execute()
 
 	auto* cmdList = g_backend.GetCommandList();
 	cmdList->DrawInstanced(m_vertexCount, 1, m_startVertex, 0);
+
+	OpenGLD3D::RecordDrawCall();
 }
 
 DLCommandLoadMatrix::DLCommandLoadMatrix(MatrixStack* stack, const DirectX::XMFLOAT4X4& matrix)

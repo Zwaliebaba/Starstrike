@@ -22,13 +22,12 @@
 #include "text_renderer.h"
 #include "user_input.h"
 #include "window_manager.h"
+#include "opengl_directx.h"
 
 Renderer::Renderer()
   : m_fps(60),
-    m_displayFPS(false),
-    m_renderDebug(false),
+    m_displayFPS(true),
     m_displayInputMode(false),
-    m_renderDarwinLogo(-1.0f),
     m_nearPlane(5.0f),
     m_farPlane(150000.0f),
     m_tileIndex(0),
@@ -249,16 +248,23 @@ void Renderer::RenderHUD()
 
   if (m_displayFPS)
   {
+    const auto& gpuStats = OpenGLD3D::GetFrameStats();
+
     glColor4f(0, 0, 0, 0.6);
     glBegin(GL_QUADS);
     glVertex2f(8.0, 1.0f);
-    glVertex2f(70.0, 1.0f);
-    glVertex2f(70.0, 15.0f);
+    glVertex2f(290.0, 1.0f);
+    glVertex2f(290.0, 15.0f);
     glVertex2f(8.0, 15.0f);
     glEnd();
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    g_editorFont.DrawText2D(12, 10, DEF_FONT_SIZE, "FPS: %d", m_fps);
+    g_editorFont.DrawText2D(12, 10, DEF_FONT_SIZE,
+      "FPS:%d  DC:%u  PSO:%u  Upload:%uKB",
+      m_fps,
+      gpuStats.drawCalls,
+      gpuStats.psoSwitches,
+      gpuStats.uploadHighWaterMark / 1024);
   }
 
   if (m_displayInputMode)
@@ -321,88 +327,12 @@ void Renderer::RenderHUD()
   // sequence uses a fixed 800-wide virtual coordinate system for its captions.
   if (g_app->m_startSequence)
     g_app->m_startSequence->Render2D();
-
-  // Darwin logo: uses g_gameFont.DrawText2DCentre() inside the g_editorFont
-  // BeginText2D/EndText2D pair.  This works because both TextRenderer instances
-  // compute identical ortho matrices (viewport-based).
-  if (m_renderDarwinLogo >= 0.0f)
-  {
-    int textureId = g_app->m_resource->GetTexture("icons/darwin_research_associates.bmp");
-
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glEnable(GL_TEXTURE_2D);
-
-    float y = m_screenH * 0.05f;
-    float h = m_screenH * 0.7f;
-
-    float w = h;
-    float x = m_screenW / 2 - w / 2;
-
-    float alpha = 0.0f;
-
-    float timeNow = GetHighResTime();
-    if (timeNow > m_renderDarwinLogo + 10)
-      m_renderDarwinLogo = -1.0f;
-    else if (timeNow < m_renderDarwinLogo + 3)
-      alpha = (timeNow - m_renderDarwinLogo) / 3.0f;
-    else if (timeNow > m_renderDarwinLogo + 8)
-      alpha = 1.0f - (timeNow - m_renderDarwinLogo - 8) / 2.0f;
-    else
-      alpha = 1.0f;
-
-    alpha = max(alpha, 0.0f);
-    alpha = min(alpha, 1.0f);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-    glEnable(GL_BLEND);
-    glColor4f(alpha, alpha, alpha, 0.0f);
-
-    for (float dx = -4; dx <= 4; dx += 4)
-    {
-      for (float dy = -4; dy <= 4; dy += 4)
-      {
-        glBegin(GL_QUADS);
-        glTexCoord2i(0, 1);
-        glVertex2f(x + dx, y + dy);
-        glTexCoord2i(1, 1);
-        glVertex2f(x + w + dx, y + dy);
-        glTexCoord2i(1, 0);
-        glVertex2f(x + w + dx, y + h + dy);
-        glTexCoord2i(0, 0);
-        glVertex2f(x + dx, y + h + dy);
-        glEnd();
-      }
-    }
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glColor4f(1.0f, 1.0f, 1.0f, alpha);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 1);
-    glVertex2f(x, y);
-    glTexCoord2i(1, 1);
-    glVertex2f(x + w, y);
-    glTexCoord2i(1, 0);
-    glVertex2f(x + w, y + h);
-    glTexCoord2i(0, 0);
-    glVertex2f(x, y + h);
-    glEnd();
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_TEXTURE_2D);
-
-    float textSize = m_screenH / 9.0f;
-    g_gameFont.SetRenderOutline(true);
-    glColor4f(alpha, alpha, alpha, 0.0f);
-    g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
-    g_gameFont.SetRenderOutline(false);
-    glColor4f(1.0f, 1.0f, 1.0f, alpha);
-    g_gameFont.DrawText2DCentre(m_screenW / 2, m_screenH * 0.8f, textSize, "DARWINIA");
-  }
 }
 
 void Renderer::RenderFrame(bool withFlip)
 {
+  OpenGLD3D::ResetFrameStats();
+
   SetOpenGLState();
 
   if (g_app->m_locationId == -1)
@@ -460,6 +390,8 @@ void Renderer::RenderFrame(bool withFlip)
   RenderHUD();
 
   g_editorFont.EndText2D();
+
+  OpenGLD3D::SnapshotFrameStats();
 
   START_PROFILE(g_app->m_profiler, "GL Flip");
 

@@ -128,6 +128,8 @@ namespace OpenGLD3D
 
       ID3D12Resource* GetResource() const { return m_resource.get(); }
       SIZE_T GetOffset() const { return m_offset; }
+      SIZE_T GetHighWaterMark() const { return m_highWaterMark; }
+      void ResetHighWaterMark() { m_highWaterMark = 0; }
 
     private:
       com_ptr<ID3D12Resource> m_resource;
@@ -135,6 +137,7 @@ namespace OpenGLD3D
       D3D12_GPU_VIRTUAL_ADDRESS m_gpuBase = 0;
       SIZE_T m_size = 0;
       SIZE_T m_offset = 0;
+      SIZE_T m_highWaterMark = 0;
   };
 
   // --- D3D12 Backend ---

@@ -1,20 +1,11 @@
 #pragma once
 
+#include "DeviceNotify.h"
 #include "DescriptorHeap.h"
 #include "ResourceStateTracker.h"
 
 namespace Neuron::Graphics
 {
-  // Provides an interface for an application that owns Core to be notified of the device being lost or created.
-  interface IDeviceNotify
-  {
-    virtual void OnDeviceLost() = 0;
-    virtual void OnDeviceRestored() = 0;
-
-    protected:
-      ~IDeviceNotify() = default;
-  };
-
   // Controls all the DirectX device resources.
   class Core
   {
@@ -23,6 +14,9 @@ namespace Neuron::Graphics
       static constexpr unsigned int ENABLE_HDR = 0x2;
 
       static Core& Get();
+
+      // Device notification callback for game-layer resource management.
+      void RegisterDeviceNotify(Neuron::IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
 
       Core(const Core&) = delete;
       Core& operator=(const Core&) = delete;
@@ -43,7 +37,6 @@ namespace Neuron::Graphics
       void SetWindow(HWND window, int width, int height) noexcept;
       bool WindowSizeChanged(int width, int height);
       void HandleDeviceLost();
-      void RegisterDeviceNotify(IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
       void Prepare();
       void Present();
       void WaitForGpu() noexcept;
@@ -51,7 +44,7 @@ namespace Neuron::Graphics
       void ExecuteCommandList(bool force = false);
 
       // Device Accessors.
-      Windows::Foundation::Size GetOutputSize() noexcept { return m_outputSize; }
+      Windows::Foundation::Size GetOutputSize() const noexcept { return m_outputSize; }
       Windows::Foundation::Size GetScreenSize();
 
       // Direct3D Accessors.
@@ -86,6 +79,10 @@ namespace Neuron::Graphics
       }
 
       void UpdateColorSpace();
+
+      // Occlusion state — when fully occluded, skip rendering to save GPU.
+      bool IsOccluded() const noexcept { return m_isOccluded; }
+      void CheckForOcclusion();
 
     private:
       Core() = default;
@@ -141,7 +138,10 @@ namespace Neuron::Graphics
       // Core options (see flags above)
       unsigned int m_options{};
 
-      // The IDeviceNotify can be held directly as it owns the Core.
-      IDeviceNotify* m_deviceNotify{};
+      // Device notification callback.
+      Neuron::IDeviceNotify* m_deviceNotify{};
+
+      // Occlusion tracking.
+      bool m_isOccluded{};
   };
 }

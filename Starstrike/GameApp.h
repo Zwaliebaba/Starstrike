@@ -24,6 +24,8 @@ class GameCursor2D;
 class StartSequence;
 class BitmapRGBA;
 
+class SoundLibrary2d;
+
 class GameApp : public GameMain
 {
   public:
@@ -94,6 +96,13 @@ class GameApp : public GameMain
     void Shutdown() override {}
     void Update([[maybe_unused]] float _deltaT) override {}
     void RenderScene() override {}
+
+    // --- Lifecycle overrides ---
+
+    void OnActivated() override;
+    void OnDeactivated() override;
+    void OnSuspending() override;
+    void OnResuming() override;
 
     void SetProfileName(const char* _profileName);
     bool LoadProfile();

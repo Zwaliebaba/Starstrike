@@ -24,6 +24,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE SamplerDesc::CreateDescriptor() const
 
   D3D12_CPU_DESCRIPTOR_HANDLE Handle = Core::Get().AllocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
   device->CreateSampler(this, Handle);
+  s_SamplerCache[hashValue] = Handle;
   return Handle;
 }
 

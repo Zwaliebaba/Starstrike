@@ -230,28 +230,23 @@ inline HRESULT UploadTextureData(
   if (!_device || !_commandQueue || !_texture || _subresources.empty())
     return E_INVALIDARG;
 
-  HRESULT hr = S_OK;
-
   // Create command allocator
-  ID3D12CommandAllocator* cmdAlloc = nullptr;
-  hr = _device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&cmdAlloc));
+  com_ptr<ID3D12CommandAllocator> cmdAlloc;
+  HRESULT hr = _device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_GRAPHICS_PPV_ARGS(cmdAlloc));
   if (FAILED(hr))
     return hr;
 
   // Create command list
-  ID3D12GraphicsCommandList* cmdList = nullptr;
-  hr = _device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc, nullptr, IID_PPV_ARGS(&cmdList));
+  com_ptr<ID3D12GraphicsCommandList> cmdList;
+  hr = _device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAlloc.get(), nullptr, IID_GRAPHICS_PPV_ARGS(cmdList));
   if (FAILED(hr))
-  {
-    cmdAlloc->Release();
     return hr;
-  }
 
   // Calculate upload buffer size
   const UINT64 uploadBufferSize = GetRequiredIntermediateSize(_texture, 0, static_cast<UINT>(_subresources.size()));
 
   // Create upload buffer
-  ID3D12Resource* uploadBuffer = nullptr;
+  com_ptr<ID3D12Resource> uploadBuffer;
   CD3DX12_HEAP_PROPERTIES uploadHeapProps(D3D12_HEAP_TYPE_UPLOAD);
   CD3DX12_RESOURCE_DESC uploadBufferDesc = CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize);
 
@@ -261,14 +256,10 @@ inline HRESULT UploadTextureData(
     &uploadBufferDesc,
     D3D12_RESOURCE_STATE_GENERIC_READ,
     nullptr,
-    IID_PPV_ARGS(&uploadBuffer));
+    IID_GRAPHICS_PPV_ARGS(uploadBuffer));
 
   if (FAILED(hr))
-  {
-    cmdList->Release();
-    cmdAlloc->Release();
     return hr;
-  }
 
   // Transition to copy destination if needed
   if (_initialState != D3D12_RESOURCE_STATE_COPY_DEST)
@@ -279,7 +270,7 @@ inline HRESULT UploadTextureData(
   }
 
   // Upload subresources
-  UpdateSubresources(cmdList, _texture, uploadBuffer, 0, 0,
+  UpdateSubresources(cmdList.get(), _texture, uploadBuffer.get(), 0, 0,
                      static_cast<UINT>(_subresources.size()), _subresources.data());
 
   // Transition to final state if needed
@@ -292,43 +283,25 @@ inline HRESULT UploadTextureData(
 
   // Close and execute command list
   cmdList->Close();
-  ID3D12CommandList* cmdLists[] = {cmdList};
+  ID3D12CommandList* cmdLists[] = {cmdList.get()};
   _commandQueue->ExecuteCommandLists(1, cmdLists);
 
   // Create fence and wait for completion
-  ID3D12Fence* fence = nullptr;
-  hr = _device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+  com_ptr<ID3D12Fence> fence;
+  hr = _device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_GRAPHICS_PPV_ARGS(fence));
   if (FAILED(hr))
-  {
-    uploadBuffer->Release();
-    cmdList->Release();
-    cmdAlloc->Release();
     return hr;
-  }
 
-  HANDLE fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+  handle fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr));
   if (!fenceEvent)
-  {
-    fence->Release();
-    uploadBuffer->Release();
-    cmdList->Release();
-    cmdAlloc->Release();
     return HRESULT_FROM_WIN32(GetLastError());
-  }
 
-  _commandQueue->Signal(fence, 1);
+  _commandQueue->Signal(fence.get(), 1);
   if (fence->GetCompletedValue() < 1)
   {
-    fence->SetEventOnCompletion(1, fenceEvent);
-    WaitForSingleObject(fenceEvent, INFINITE);
+    fence->SetEventOnCompletion(1, fenceEvent.get());
+    WaitForSingleObject(fenceEvent.get(), INFINITE);
   }
-
-  // Cleanup
-  CloseHandle(fenceEvent);
-  fence->Release();
-  uploadBuffer->Release();
-  cmdList->Release();
-  cmdAlloc->Release();
 
   return S_OK;
 }

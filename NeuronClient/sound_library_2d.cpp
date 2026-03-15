@@ -127,6 +127,20 @@ SoundLibrary2d::~SoundLibrary2d()
 }
 
 
+void SoundLibrary2d::Pause()
+{
+	if (s_device)
+		waveOutPause(s_device);
+}
+
+
+void SoundLibrary2d::Resume()
+{
+	if (s_device)
+		waveOutRestart(s_device);
+}
+
+
 void SoundLibrary2d::SetCallback(void (*_callback)(StereoSample *, unsigned int))
 {
 	m_callback = _callback;
