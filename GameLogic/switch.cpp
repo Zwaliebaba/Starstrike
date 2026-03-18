@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "file_writer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "clienttoserver.h"
 #include "GameApp.h"
@@ -30,7 +30,7 @@ FenceSwitch::FenceSwitch()
     m_switchValue(-1)
 {
   m_type = TypeFenceSwitch;
-  SetShape(g_app->m_resource->GetShape("fenceswitch.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("fenceswitch.shp"));
   strncpy(m_script, "none", sizeof(m_script));
   m_script[sizeof(m_script) - 1] = '\0';
 }
@@ -347,9 +347,9 @@ void FenceSwitch::RenderLights()
     {
       for (int i = 0; i < m_lights.Size(); ++i)
       {
-        ShapeMarker* marker = m_lights[i];
+        ShapeMarkerData* marker = m_lights[i];
         Matrix34 rootMat(m_front, m_up, m_pos);
-        Matrix34 worldMat = marker->GetWorldMatrix(rootMat);
+        Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(marker, rootMat);
         LegacyVector3 lightPos = worldMat.pos;
 
         float signalSize = 6.0f;
@@ -401,12 +401,12 @@ LegacyVector3 FenceSwitch::GetConnectionLocation()
 {
   if (!m_connectionLocation)
   {
-    m_connectionLocation = m_shape->m_rootFragment->LookupMarker("MarkerConnectionLocation");
+    m_connectionLocation = m_shape->GetMarkerData("MarkerConnectionLocation");
     DEBUG_ASSERT(m_connectionLocation);
   }
 
   Matrix34 rootMat(m_front, m_up, m_pos);
-  Matrix34 worldPos = m_connectionLocation->GetWorldMatrix(rootMat);
+  Matrix34 worldPos = m_shape->GetMarkerWorldMatrix(m_connectionLocation, rootMat);
   return worldPos.pos;
 }
 

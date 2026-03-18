@@ -2,7 +2,7 @@
 #include "file_writer.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 #include "language_table.h"
 #include "staticshape.h"
@@ -52,7 +52,7 @@ void StaticShape::SetShapeName(char* _shapeName)
 
   if (strcmp(m_shapeName, "none") != 0)
   {
-    SetShape(g_app->m_resource->GetShape(m_shapeName));
+    SetShape(g_app->m_resource->GetShapeStatic(m_shapeName));
 
     Matrix34 mat(m_front, m_up, m_pos);
     mat.u *= m_scale;
@@ -94,7 +94,7 @@ bool StaticShape::DoesSphereHit(const LegacyVector3& _pos, float _radius)
   return (distance <= _radius + m_radius);
 }
 
-bool StaticShape::DoesShapeHit(Shape* _shape, Matrix34 _theTransform)
+bool StaticShape::DoesShapeHit(ShapeStatic* _shape, Matrix34 _theTransform)
 {
   if (m_shape)
   {

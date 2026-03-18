@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "file_writer.h"
 #include "language_table.h"
@@ -23,7 +23,7 @@ void BlueprintBuilding::Initialise(Building* _template)
 {
   Building::Initialise(_template);
 
-  m_marker = m_shape->m_rootFragment->LookupMarker("MarkerBlueprint");
+  m_marker = m_shape->GetMarkerData("MarkerBlueprint");
   DEBUG_ASSERT(m_marker);
 
   auto blueprintBuilding = static_cast<BlueprintBuilding*>(_template);
@@ -57,7 +57,7 @@ Matrix34 BlueprintBuilding::GetMarker(float _predictionTime)
 
   if (m_marker)
   {
-    Matrix34 markerMat = m_marker->GetWorldMatrix(mat);
+    Matrix34 markerMat = m_shape->GetMarkerWorldMatrix(m_marker, mat);
     return markerMat;
   }
   return mat;
@@ -170,7 +170,7 @@ BlueprintStore::BlueprintStore()
 {
   m_type = TypeBlueprintStore;
 
-  SetShape(g_app->m_resource->GetShape("blueprintstore.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("blueprintstore.shp"));
 }
 
 const char* BlueprintStore::GetObjectiveCounter()
@@ -465,7 +465,7 @@ BlueprintConsole::BlueprintConsole()
 {
   m_type = TypeBlueprintConsole;
 
-  SetShape(g_app->m_resource->GetShape("blueprintconsole.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("blueprintconsole.shp"));
 }
 
 void BlueprintConsole::Initialise(Building* _template)
@@ -558,7 +558,7 @@ void BlueprintConsole::RenderPorts()
     LegacyVector3 camR = g_app->m_camera->GetRight() * size;
     LegacyVector3 camU = g_app->m_camera->GetUp() * size;
 
-    LegacyVector3 statusPos = s_controlPadStatus->GetWorldMatrix(mat).pos;
+    LegacyVector3 statusPos = s_controlPad->GetMarkerWorldMatrix(s_controlPadStatus, mat).pos;
     statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
     statusPos.y += 5.0f;
 
@@ -603,7 +603,7 @@ BlueprintRelay::BlueprintRelay()
 {
   m_type = TypeBlueprintRelay;
 
-  SetShape(g_app->m_resource->GetShape("blueprintrelay.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("blueprintrelay.shp"));
 }
 
 void BlueprintRelay::Initialise(Building* _template)

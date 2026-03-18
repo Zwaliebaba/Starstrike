@@ -8,8 +8,8 @@ class ResearchItem : public Building
 {
 protected:
     float           m_reprogrammed;
-    ShapeMarker     *m_end1;
-    ShapeMarker     *m_end2;
+    ShapeMarkerData *m_end1;
+    ShapeMarkerData *m_end2;
 
 public:
     int     m_researchType;                             // indexes into GlobalResearch::m_type
@@ -36,7 +36,7 @@ public:
     void GetEndPositions    ( LegacyVector3 &_end1, LegacyVector3 &_end2 );
 
     bool DoesSphereHit      (LegacyVector3 const &_pos, float _radius);
-    bool DoesShapeHit       (Shape *_shape, Matrix34 _transform);
+    bool DoesShapeHit       (ShapeStatic *_shape, Matrix34 _transform);
     bool DoesRayHit         (LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
                                      float _rayLen, LegacyVector3 *_pos, LegacyVector3 *norm );
 

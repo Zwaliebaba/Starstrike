@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 #include "input.h"
 #include "globals.h"
@@ -28,26 +28,26 @@ GunTurret::GunTurret()
     m_health(60.0f),
     m_ownershipTimer(0.0f)
 {
-  SetShape(g_app->m_resource->GetShape("battlecannonbase.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("battlecannonbase.shp"));
   m_type = TypeGunTurret;
 
-  m_turret = g_app->m_resource->GetShape("battlecannonturret.shp");
-  m_barrel = g_app->m_resource->GetShape("battlecannonbarrel.shp");
+  m_turret = g_app->m_resource->GetShapeStatic("battlecannonturret.shp");
+  m_barrel = g_app->m_resource->GetShapeStatic("battlecannonbarrel.shp");
 
-  m_barrelMount = m_turret->m_rootFragment->LookupMarker("MarkerBarrel");
+  m_barrelMount = m_turret->GetMarkerData("MarkerBarrel");
 
   for (int i = 0; i < GUNTURRET_NUMBARRELS; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerBarrelEnd0%d", i + 1);
-    m_barrelEnd[i] = m_barrel->m_rootFragment->LookupMarker(name);
+    m_barrelEnd[i] = m_barrel->GetMarkerData(name);
   }
 
   for (int i = 0; i < GUNTURRET_NUMSTATUSMARKERS; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name);
   }
 }
 
@@ -86,8 +86,8 @@ void GunTurret::Damage(float _damage)
 void GunTurret::ExplodeBody()
 {
   Matrix34 turretPos(m_turretFront, m_up, m_pos);
-  LegacyVector3 barrelPos = m_barrelMount->GetWorldMatrix(turretPos).pos;
-  LegacyVector3 barrelFront = m_barrelMount->GetWorldMatrix(turretPos).f;
+  LegacyVector3 barrelPos = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).pos;
+  LegacyVector3 barrelFront = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).f;
   Matrix34 barrelMat(barrelFront, m_up, barrelPos);
 
   g_explosionManager.AddExplosion(m_turret, turretPos);
@@ -166,12 +166,12 @@ void GunTurret::PrimaryFire()
     if (GetPortOccupant(m_nextBarrel).IsValid())
     {
       Matrix34 turretMat(m_turretFront, g_upVector, m_pos);
-      LegacyVector3 barrelMountPos = m_barrelMount->GetWorldMatrix(turretMat).pos;
-      LegacyVector3 barrelMountFront = m_barrelMount->GetWorldMatrix(turretMat).f;
+      LegacyVector3 barrelMountPos = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretMat).pos;
+      LegacyVector3 barrelMountFront = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretMat).f;
       LegacyVector3 barrelRight = barrelMountFront ^ m_barrelUp;
       barrelMountFront = m_barrelUp ^ barrelRight;
       Matrix34 barrelMountMat(barrelMountFront, m_barrelUp, barrelMountPos);
-      Matrix34 barrelMat = m_barrelEnd[m_nextBarrel]->GetWorldMatrix(barrelMountMat);
+      Matrix34 barrelMat = m_barrel->GetMarkerWorldMatrix(m_barrelEnd[m_nextBarrel], barrelMountMat);
 
       LegacyVector3 shellPos = barrelMat.pos;
       LegacyVector3 shellVel = barrelMountFront.SetLength(500.0f);
@@ -294,7 +294,7 @@ bool GunTurret::Advance()
   // Face our target
 
   Matrix34 turretPos(m_turretFront, m_up, m_pos);
-  LegacyVector3 barrelPos = m_barrelMount->GetWorldMatrix(turretPos).pos;
+  LegacyVector3 barrelPos = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).pos;
   LegacyVector3 toTarget = m_target - barrelPos;
   toTarget.HorizontalAndNormalise();
   float angle = acosf(toTarget * m_turretFront);
@@ -339,8 +339,8 @@ void GunTurret::Render(float _predictionTime)
   Matrix34 turretPos(m_turretFront, g_upVector, m_pos);
   m_turret->Render(_predictionTime, turretPos);
 
-  LegacyVector3 barrelPos = m_barrelMount->GetWorldMatrix(turretPos).pos;
-  LegacyVector3 barrelFront = m_barrelMount->GetWorldMatrix(turretPos).f;
+  LegacyVector3 barrelPos = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).pos;
+  LegacyVector3 barrelFront = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).f;
   LegacyVector3 barrelRight = barrelFront ^ m_barrelUp;
   barrelFront = m_barrelUp ^ barrelRight;
   barrelFront.Normalise();
@@ -400,7 +400,7 @@ void GunTurret::RenderPorts()
   for (int i = 0; i < GetNumPorts(); ++i)
   {
     Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_statusMarkers[i]->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
 
     //
     // Render the status light

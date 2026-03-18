@@ -15,7 +15,7 @@ class ReceiverBuilding : public Building
 {
 protected:
     int             m_spiritLink;
-    ShapeMarker     *m_spiritLocation;
+    ShapeMarkerData *m_spiritLocation;
 
     LList           <float> m_spirits;
 
@@ -114,10 +114,10 @@ public:
 class SpiritReceiver : public ReceiverBuilding
 {
 protected:
-    ShapeMarker *m_headMarker;
-    Shape       *m_headShape;
-    ShapeMarker *m_spiritLink;
-    ShapeMarker *m_statusMarkers[SPIRITRECEIVER_NUMSTATUSMARKERS];
+    ShapeMarkerData *m_headMarker;
+    ShapeStatic       *m_headShape;
+    ShapeMarkerData *m_spiritLink;
+    ShapeMarkerData *m_statusMarkers[SPIRITRECEIVER_NUMSTATUSMARKERS];
 
 public:
     SpiritReceiver();

@@ -22,7 +22,7 @@ protected:
     float       m_sendPeriod;                                   // Minimum time between sends
     static      LList<TeleportMap> m_teleportMap;               // Maps units going in onto units comingout
 
-    ShapeMarker *m_entrance;
+    ShapeMarkerData *m_entrance;
 
 protected:
 
@@ -34,7 +34,7 @@ public:
 public:
     Teleport();
 
-    void SetShape       ( Shape *_shape );
+    void SetShape       ( ShapeStatic *_shape );
 
     bool Advance        ();
     void RenderAlphas   ( float predictionTime );

@@ -11,7 +11,7 @@
 #include "math_utils.h"
 #include "preferences.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 #include "taskmanager_interface.h"
 #include "text_renderer.h"
@@ -29,12 +29,12 @@ ResearchItem::ResearchItem()
   m_type = TypeResearchItem;
   m_researchType = GlobalResearch::TypeEngineer;
 
-  Building::SetShape(g_app->m_resource->GetShape("researchitem.shp"));
+  Building::SetShape(g_app->m_resource->GetShapeStatic("researchitem.shp"));
 
   m_front.RotateAroundY(frand(2.0f * M_PI));
 
-  m_end1 = m_shape->m_rootFragment->LookupMarker("MarkerGrab1");
-  m_end2 = m_shape->m_rootFragment->LookupMarker("MarkerGrab2");
+  m_end1 = m_shape->GetMarkerData("MarkerGrab1");
+  m_end2 = m_shape->GetMarkerData("MarkerGrab2");
 }
 
 void ResearchItem::Initialise(Building* _template)
@@ -109,8 +109,8 @@ void ResearchItem::GetEndPositions(LegacyVector3& _end1, LegacyVector3& _end2)
 {
   Matrix34 mat(m_front, m_up, m_pos);
 
-  _end1 = m_end1->GetWorldMatrix(mat).pos;
-  _end2 = m_end2->GetWorldMatrix(mat).pos;
+  _end1 = m_shape->GetMarkerWorldMatrix(m_end1, mat).pos;
+  _end2 = m_shape->GetMarkerWorldMatrix(m_end2, mat).pos;
 }
 
 void ResearchItem::Render(float _predictionTime)
@@ -315,7 +315,7 @@ void ResearchItem::ListSoundEvents(LList<const char*>* _list)
 
 bool ResearchItem::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
 
-bool ResearchItem::DoesShapeHit(Shape* _shape, Matrix34 _transform) { return false; }
+bool ResearchItem::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
 
 bool ResearchItem::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                               LegacyVector3* norm) { return RaySphereIntersection(_rayStart, _rayDir, m_pos, m_radius, _rayLen); }

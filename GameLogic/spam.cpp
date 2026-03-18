@@ -30,7 +30,7 @@ Spam::Spam()
 
   m_front.RotateAroundY(frand(2.0f * M_PI));
 
-  SetShape(g_app->m_resource->GetShape("researchitem.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("researchitem.shp"));
 }
 
 void Spam::Initialise(Building* _template) { Building::Initialise(_template); }

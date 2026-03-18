@@ -2,7 +2,7 @@
 #include "math_utils.h"
 #include "file_writer.h"
 #include "matrix33.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "resource.h"
 #include "text_stream_readers.h"
 #include "ogl_extensions.h"
@@ -31,10 +31,10 @@ LaserFence::LaserFence()
 {
   m_type = TypeLaserFence;
 
-  SetShape(g_app->m_resource->GetShape("laserfence.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("laserfence.shp"));
 
-  m_marker1 = m_shape->m_rootFragment->LookupMarker("MarkerFence01");
-  m_marker2 = m_shape->m_rootFragment->LookupMarker("MarkerFence02");
+  m_marker1 = m_shape->GetMarkerData("MarkerFence01");
+  m_marker2 = m_shape->GetMarkerData("MarkerFence02");
 
   ASSERT_TEXT(m_marker1, "MarkerFence01 not found in laserfence.shp");
   ASSERT_TEXT(m_marker2, "MarkerFence02 not found in laserfence.shp");
@@ -184,8 +184,8 @@ float LaserFence::GetFenceFullHeight()
   mat.u *= m_scale;
   mat.r *= m_scale;
   mat.f *= m_scale;
-  LegacyVector3 marker1 = m_marker1->GetWorldMatrix(mat).pos;
-  LegacyVector3 marker2 = m_marker2->GetWorldMatrix(mat).pos;
+  LegacyVector3 marker1 = m_shape->GetMarkerWorldMatrix(m_marker1, mat).pos;
+  LegacyVector3 marker2 = m_shape->GetMarkerWorldMatrix(m_marker2, mat).pos;
 
   return (marker2.y - marker1.y);
 }
@@ -535,7 +535,7 @@ bool LaserFence::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3&
   return m_shape->RayHit(&ray, transform, true);
 }
 
-bool LaserFence::DoesShapeHit(Shape* _shape, Matrix34 _transform)
+bool LaserFence::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform)
 {
   return DoesSphereHit(_transform.pos, _shape->m_rootFragment->m_radius);
 }
@@ -554,5 +554,5 @@ LegacyVector3 LaserFence::GetTopPosition()
   mat.u *= m_scale;
   mat.r *= m_scale;
   mat.f *= m_scale;
-  return m_marker2->GetWorldMatrix(mat).pos;
+  return m_shape->GetMarkerWorldMatrix(m_marker2, mat).pos;
 }

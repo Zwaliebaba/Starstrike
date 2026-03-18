@@ -3,7 +3,7 @@
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_renderer.h"
 #include "text_stream_readers.h"
 #include "language_table.h"
@@ -38,12 +38,12 @@ LegacyVector3 PowerBuilding::GetPowerLocation()
 {
   if (!m_powerLocation)
   {
-    m_powerLocation = m_shape->m_rootFragment->LookupMarker("MarkerPowerLocation");
+    m_powerLocation = m_shape->GetMarkerData("MarkerPowerLocation");
     DEBUG_ASSERT(m_powerLocation);
   }
 
   Matrix34 rootMat(m_front, m_up, m_pos);
-  Matrix34 worldPos = m_powerLocation->GetWorldMatrix(rootMat);
+  Matrix34 worldPos = m_shape->GetMarkerWorldMatrix(m_powerLocation, rootMat);
   return worldPos.pos;
 }
 
@@ -216,9 +216,9 @@ Generator::Generator()
     m_throughput(0.0f)
 {
   m_type = TypeGenerator;
-  SetShape(g_app->m_resource->GetShape("generator.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("generator.shp"));
 
-  m_counter = m_shape->m_rootFragment->LookupMarker("MarkerCounter");
+  m_counter = m_shape->GetMarkerData("MarkerCounter");
 }
 
 void Generator::TriggerSurge(float _initValue)
@@ -311,7 +311,7 @@ void Generator::Render(float _predictionTime)
   //g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,170,0), 10.0f, "Output : %d Gq/s", int(m_throughput*10.0f) );
 
   Matrix34 generatorMat(m_front, g_upVector, m_pos);
-  Matrix34 counterMat = m_counter->GetWorldMatrix(generatorMat);
+  Matrix34 counterMat = m_shape->GetMarkerWorldMatrix(m_counter, generatorMat);
 
   glColor4f(0.6f, 0.8f, 0.9f, 1.0f);
   g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", static_cast<int>(m_throughput * 10.0f));
@@ -332,7 +332,7 @@ Pylon::Pylon()
   : PowerBuilding()
 {
   m_type = TypePylon;
-  SetShape(g_app->m_resource->GetShape("pylon.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
 }
 
 bool Pylon::Advance() { return PowerBuilding::Advance(); }
@@ -346,7 +346,7 @@ PylonStart::PylonStart()
     m_reqBuildingId(-1)
 {
   m_type = TypePylonStart;
-  SetShape(g_app->m_resource->GetShape("pylon.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
 };
 
 void PylonStart::Initialise(Building* _template)
@@ -415,7 +415,7 @@ PylonEnd::PylonEnd()
   : PowerBuilding()
 {
   m_type = TypePylonEnd;
-  SetShape(g_app->m_resource->GetShape("pylon.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
 };
 
 void PylonEnd::TriggerSurge(float _initValue)
@@ -449,15 +449,15 @@ SolarPanel::SolarPanel()
     m_operating(false)
 {
   m_type = TypeSolarPanel;
-  SetShape(g_app->m_resource->GetShape("solarpanel.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("solarpanel.shp"));
 
-  memset(m_glowMarker, 0, SOLARPANEL_NUMGLOWS * sizeof(ShapeMarker*));
+  memset(m_glowMarker, 0, SOLARPANEL_NUMGLOWS * sizeof(ShapeMarkerData*));
 
   for (int i = 0; i < SOLARPANEL_NUMGLOWS; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerGlow0%d", i + 1);
-    m_glowMarker[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_glowMarker[i] = m_shape->GetMarkerData(name);
     DEBUG_ASSERT(m_glowMarker[i]);
   }
 
@@ -465,7 +465,7 @@ SolarPanel::SolarPanel()
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name);
   }
 }
 
@@ -514,7 +514,7 @@ void SolarPanel::RenderPorts()
   for (int i = 0; i < GetNumPorts(); ++i)
   {
     Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_statusMarkers[i]->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
 
     //
     // Render the status light
@@ -587,7 +587,7 @@ void SolarPanel::RenderAlphas(float _predictionTime)
 
     for (int i = 0; i < SOLARPANEL_NUMGLOWS; ++i)
     {
-      Matrix34 thisGlow = m_glowMarker[i]->GetWorldMatrix(mat);
+      Matrix34 thisGlow = m_shape->GetMarkerWorldMatrix(m_glowMarker[i], mat);
 
       glBegin(GL_QUADS);
       glTexCoord2i(0, 0);

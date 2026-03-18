@@ -3,7 +3,7 @@
 #include <math.h>
 
 
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 
 
@@ -38,11 +38,11 @@ Teleport::Teleport()
 
 
 // *** Initialise
-void Teleport::SetShape( Shape *_shape )
+void Teleport::SetShape( ShapeStatic *_shape )
 {
     Building::SetShape( _shape );
 
-    m_entrance = m_shape->m_rootFragment->LookupMarker( "MarkerTeleportEntrance" );
+    m_entrance = m_shape->GetMarkerData( "MarkerTeleportEntrance" );
 }
 
 
@@ -341,7 +341,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
 bool Teleport::GetEntrance( LegacyVector3 &_pos, LegacyVector3 &_front )
 {
     Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_entrance->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_entrance, rootMat);
     _pos = worldMat.pos;
     _front = worldMat.f;
     return true;

@@ -2,7 +2,7 @@
 #include "file_writer.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "GameApp.h"
 #include "entity_grid.h"
@@ -20,8 +20,8 @@ Bridge::Bridge()
   m_type = TypeBridge;
   m_sendPeriod = BRIDGE_TRANSPORTPERIOD;
 
-  m_shapes[0] = g_app->m_resource->GetShape("bridgeend.shp");
-  m_shapes[1] = g_app->m_resource->GetShape("bridgetower.shp");
+  m_shapes[0] = g_app->m_resource->GetShapeStatic("bridgeend.shp");
+  m_shapes[1] = g_app->m_resource->GetShapeStatic("bridgetower.shp");
 
   DEBUG_ASSERT(m_shapes[0]);
   DEBUG_ASSERT(m_shapes[1]);
@@ -43,7 +43,7 @@ void Bridge::SetBridgeType(int _type)
   m_bridgeType = _type;
   SetShape(m_shapes[m_bridgeType]);
 
-  m_signal = m_shape->m_rootFragment->LookupMarker("MarkerSignal");
+  m_signal = m_shape->GetMarkerData("MarkerSignal");
   DEBUG_ASSERT(m_signal);
 }
 
@@ -111,7 +111,7 @@ bool Bridge::Advance()
 bool Bridge::GetAvailablePosition(LegacyVector3& _pos, LegacyVector3& _front)
 {
   Matrix34 ourMat(m_front, g_upVector, m_pos);
-  Matrix34 ourEngineer = m_signal->GetWorldMatrix(ourMat);
+  Matrix34 ourEngineer = m_shape->GetMarkerWorldMatrix(m_signal, ourMat);
   _pos = ourEngineer.pos;
   _front = ourEngineer.f;
 
@@ -155,7 +155,7 @@ bool Bridge::ReadyToSend()
 LegacyVector3 Bridge::GetStartPoint()
 {
   Matrix34 ourMat(m_front, g_upVector, m_pos);
-  Matrix34 ourSignal = m_signal->GetWorldMatrix(ourMat);
+  Matrix34 ourSignal = m_shape->GetMarkerWorldMatrix(m_signal, ourMat);
   return ourSignal.pos;
 }
 
@@ -187,7 +187,7 @@ bool Bridge::GetExit(LegacyVector3& _pos, LegacyVector3& _front)
     return false;
 
   Matrix34 theirMat(nextBridge->m_front, g_upVector, nextBridge->m_pos);
-  Matrix34 theirEntrance = nextBridge->m_entrance->GetWorldMatrix(theirMat);
+  Matrix34 theirEntrance = nextBridge->m_shape->GetMarkerWorldMatrix(nextBridge->m_entrance, theirMat);
 
   _pos = theirEntrance.pos;
   _front = theirEntrance.f;
@@ -205,7 +205,7 @@ bool Bridge::UpdateEntityInTransit(Entity* _entity)
   if (m_status > 0.0f && nextBridge && nextBridge->m_type == TypeBridge && nextBridge->m_status > 0.0f)
   {
     Matrix34 theirMat(nextBridge->m_front, g_upVector, nextBridge->m_pos);
-    Matrix34 theirSignal = nextBridge->m_signal->GetWorldMatrix(theirMat);
+    Matrix34 theirSignal = nextBridge->m_shape->GetMarkerWorldMatrix(nextBridge->m_signal, theirMat);
     LegacyVector3 offset = (theirSignal.pos - _entity->m_pos).Normalise();
     float dist = (_entity->m_pos - theirSignal.pos).Mag();
     bool arrived = false;

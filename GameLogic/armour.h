@@ -4,8 +4,8 @@
 #include "entity.h"
 #include "flag.h"
 
-class ShapeMarker;
-class Shape;
+class ShapeMarkerData;
+class ShapeStatic;
 
 #define ARMOUR_UNLOADPERIOD   0.1f
 
@@ -13,8 +13,8 @@ class Shape;
 class Armour: public Entity
 {
 protected:
-    ShapeMarker     *m_markerEntrance;
-    ShapeMarker     *m_markerFlag;
+    ShapeMarkerData     *m_markerEntrance;
+    ShapeMarkerData     *m_markerFlag;
     LegacyVector3         m_up;
     LegacyVector3         m_conversionPoint;
     float           m_speed;

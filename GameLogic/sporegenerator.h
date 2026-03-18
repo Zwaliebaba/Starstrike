@@ -26,8 +26,8 @@ protected:
     void    RenderTail( LegacyVector3 const &_from, LegacyVector3 const &_to, float _size );
 
 protected:
-    ShapeMarker     *m_eggMarker;
-    ShapeMarker     *m_tail[SPOREGENERATOR_NUMTAILS];
+    ShapeMarkerData *m_eggMarker;
+    ShapeMarkerData *m_tail[SPOREGENERATOR_NUMTAILS];
 
     enum
     {

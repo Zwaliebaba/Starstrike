@@ -6,7 +6,7 @@
 #include "location.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "team.h"
 #include "text_stream_readers.h"
 #include "unit.h"
@@ -23,7 +23,7 @@ Factory::Factory()
     m_state(StateUnused)
 {
   m_type = TypeFactory;
-  SetShape(g_app->m_resource->GetShape("factory.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("factory.shp"));
 }
 
 void Factory::Initialise(Building* _template)
@@ -34,9 +34,9 @@ void Factory::Initialise(Building* _template)
 
   Building::Initialise(_template);
 
-  ShapeMarker* markerSpiritStore = m_shape->m_rootFragment->LookupMarker("MarkerSpiritStore");
+  ShapeMarkerData* markerSpiritStore = m_shape->GetMarkerData("MarkerSpiritStore");
   Matrix34 rootTransform(m_front, g_upVector, m_pos);
-  const Matrix34& storeMat = markerSpiritStore->GetWorldMatrix(rootTransform);
+  const Matrix34& storeMat = m_shape->GetMarkerWorldMatrix(markerSpiritStore, rootTransform);
 
   LegacyVector3 spiritStorePos = storeMat.pos + LegacyVector3(0, 11.0f, 0);
   m_spiritStore.Initialise(m_initialCapacity, 200, spiritStorePos, 5.0f, 10.0f, 5.0f);

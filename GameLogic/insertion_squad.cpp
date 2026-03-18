@@ -3,7 +3,7 @@
 
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "input.h"
 #include "input_types.h"
 #include "GameApp.h"
@@ -349,16 +349,16 @@ Squadie::Squadie()
     m_secondaryTimer(0.0f),
     m_retargetTimer(0.0f)
 {
-    m_shape = g_app->m_resource->GetShape( "squad.shp" );
+    m_shape = g_app->m_resource->GetShapeStatic( "squad.shp" );
     DEBUG_ASSERT( m_shape );
 
 	m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
     m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centerPos );
 
-    m_laser = m_shape->m_rootFragment->LookupMarker( "MarkerLaser" );
-    m_brass = m_shape->m_rootFragment->LookupMarker( "MarkerBrass" );
-    m_eye1 = m_shape->m_rootFragment->LookupMarker( "MarkerEye1" );
-    m_eye2 = m_shape->m_rootFragment->LookupMarker( "MarkerEye2" );
+    m_laser = m_shape->GetMarkerData( "MarkerLaser" );
+    m_brass = m_shape->GetMarkerData( "MarkerBrass" );
+    m_eye1 = m_shape->GetMarkerData( "MarkerEye1" );
+    m_eye2 = m_shape->GetMarkerData( "MarkerEye2" );
 }
 
 
@@ -665,7 +665,7 @@ void Squadie::Attack( LegacyVector3 const &_pos )
         // Fire laser
 
         Matrix34 mat( m_front, g_upVector, m_pos );
-        LegacyVector3 laserPos = m_laser->GetWorldMatrix( mat ).pos;
+        LegacyVector3 laserPos = m_shape->GetMarkerWorldMatrix(m_laser, mat).pos;
 
         LegacyVector3 fromPos = laserPos;
 	    LegacyVector3 toPos( _pos.x + syncsfrand(7.0f),
@@ -678,7 +678,7 @@ void Squadie::Attack( LegacyVector3 const &_pos )
         //
         // Create ejected brass particle
 
-        Matrix34 brass = m_brass->GetWorldMatrix( mat );
+        Matrix34 brass = m_shape->GetMarkerWorldMatrix(m_brass, mat);
         LegacyVector3 particleVel = brass.f * ( 5.0f + syncfrand(10.0f));
         particleVel += LegacyVector3( syncsfrand(5.0f), syncsfrand(5.0f), syncsfrand(5.0f) );
         g_app->m_particleSystem->CreateParticle( brass.pos, particleVel, Particle::TypeBrass );
@@ -707,7 +707,7 @@ void Squadie::FireSecondaryWeapon( LegacyVector3 const &_pos )
     if( g_app->m_globalWorld->m_research->HasResearch( squad->m_weaponType ) )
     {
         Matrix34 mat( m_front, g_upVector, m_pos );
-        LegacyVector3 laserPos = m_laser->GetWorldMatrix( mat ).pos;
+        LegacyVector3 laserPos = m_shape->GetMarkerWorldMatrix(m_laser, mat).pos;
 
         switch( squad->m_weaponType )
         {

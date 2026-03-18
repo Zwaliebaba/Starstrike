@@ -6,7 +6,7 @@
 #include "building.h"
 #include "spirit.h"
 
-class ShapeMarker;
+class ShapeMarkerData;
 
 #define INCUBATOR_PROCESSTIME       5.0f
 
@@ -22,10 +22,10 @@ class Incubator: public Building
 {
 protected:
     FastDArray      <Spirit> m_spirits;
-    ShapeMarker     *m_spiritCenter;
-    ShapeMarker     *m_exit;
-    ShapeMarker     *m_dock;
-    ShapeMarker     *m_spiritEntrance[3];
+    ShapeMarkerData     *m_spiritCenter;
+    ShapeMarkerData     *m_exit;
+    ShapeMarkerData     *m_dock;
+    ShapeMarkerData     *m_spiritEntrance[3];
 
     int             m_troopType;
     float           m_timer;

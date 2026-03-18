@@ -27,7 +27,7 @@
 #include "renderer.h"
 #include "resource.h"
 #include "routing_system.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "souldestroyer.h"
 #include "soundsystem.h"
 #include "spider.h"

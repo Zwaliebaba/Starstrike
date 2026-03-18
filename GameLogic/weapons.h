@@ -3,7 +3,8 @@
 #include "entity.h"
 #include "worldobject.h"
 
-class Shape;
+class ShapeStatic;
+class ShapeMarkerData;
 
 // ****************************************************************************
 //  Class ThrowableWeapon
@@ -12,7 +13,7 @@ class Shape;
 class ThrowableWeapon : public WorldObject
 {
   protected:
-    Shape* m_shape;
+    ShapeStatic* m_shape;
     float m_birthTime;
     float m_force;
 
@@ -83,7 +84,7 @@ class Rocket : public WorldObject
   public:
     unsigned char m_fromTeamId;
 
-    Shape* m_shape;
+    ShapeStatic* m_shape;
     float m_timer;
 
     LegacyVector3 m_target;
@@ -141,7 +142,7 @@ class TurretShell : public WorldObject
 class Shockwave : public WorldObject
 {
   public:
-    Shape* m_shape;
+    ShapeStatic* m_shape;
     int m_teamId;
     float m_size;
     float m_life;
@@ -179,8 +180,8 @@ class Missile : public WorldObject
   protected:
     float m_life;
     LList<LegacyVector3> m_history;
-    Shape* m_shape;
-    ShapeMarker* m_booster;
+    ShapeStatic* m_shape;
+    ShapeMarkerData* m_booster;
     MuzzleFlash m_fire;
 
   public:

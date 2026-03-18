@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "file_writer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 #include "text_renderer.h"
 #include "profiler.h"
@@ -253,13 +253,13 @@ LegacyVector3 SpawnBuilding::GetSpiritLink()
 {
     if( !m_spiritLink )
     {
-        m_spiritLink = m_shape->m_rootFragment->LookupMarker( "MarkerSpiritLink" );
+        m_spiritLink = m_shape->GetMarkerData( "MarkerSpiritLink" );
         DEBUG_ASSERT( m_spiritLink );
     }
 
     Matrix34 mat( m_front, g_upVector, m_pos );
 
-    return m_spiritLink->GetWorldMatrix(mat).pos;
+    return m_shape->GetMarkerWorldMatrix(m_spiritLink, mat).pos;
 }
 
 
@@ -355,7 +355,7 @@ SpawnLink::SpawnLink()
 {
     m_type = TypeSpawnLink;
 
-    SetShape( g_app->m_resource->GetShape("spawnlink.shp") );
+    SetShape( g_app->m_resource->GetShapeStatic("spawnlink.shp") );
 }
 
 
@@ -370,7 +370,7 @@ MasterSpawnPoint::MasterSpawnPoint()
 {
     m_type = TypeSpawnPointMaster;
 
-    SetShape( g_app->m_resource->GetShape("masterspawnpoint.shp") );
+    SetShape( g_app->m_resource->GetShapeStatic("masterspawnpoint.shp") );
 }
 
 
@@ -494,8 +494,8 @@ SpawnPoint::SpawnPoint()
 {
     m_type = Building::TypeSpawnPoint;
 
-    SetShape( g_app->m_resource->GetShape("spawnpoint.shp") );
-    m_doorMarker = m_shape->m_rootFragment->LookupMarker( "MarkerDoor" );
+    SetShape( g_app->m_resource->GetShapeStatic("spawnpoint.shp") );
+    m_doorMarker = m_shape->GetMarkerData( "MarkerDoor" );
 
     m_evaluateTimer = syncfrand(2.0f);
     m_spawnTimer = 2.0f + syncfrand(2.0f);
@@ -604,7 +604,7 @@ void SpawnPoint::TriggerSpirit( SpawnBuildingSpirit *_spirit )
         if( m_id.GetTeamId() != 255 )
         {
             Matrix34 mat( m_front, m_up, m_pos );
-            Matrix34 doorMat = m_doorMarker->GetWorldMatrix(mat);
+            Matrix34 doorMat = m_shape->GetMarkerWorldMatrix(m_doorMarker, mat);
             g_app->m_location->SpawnEntities( doorMat.pos, m_id.GetTeamId(), -1, Entity::TypeDarwinian, 1, g_zeroVector, 0.0f );
         }
 
@@ -750,7 +750,7 @@ void SpawnPoint::RenderPorts()
         LegacyVector3 camR = g_app->m_camera->GetRight() * size;
         LegacyVector3 camU = g_app->m_camera->GetUp() * size;
 
-        LegacyVector3 statusPos = s_controlPadStatus->GetWorldMatrix( mat ).pos;
+        LegacyVector3 statusPos = s_controlPad->GetMarkerWorldMatrix(s_controlPadStatus, mat).pos;
         statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
         statusPos.y += 5.0f;
 
@@ -908,7 +908,7 @@ bool SpawnPopulationLock::DoesSphereHit(LegacyVector3 const &_pos, float _radius
 }
 
 
-bool SpawnPopulationLock::DoesShapeHit(Shape *_shape, Matrix34 _transform)
+bool SpawnPopulationLock::DoesShapeHit(ShapeStatic *_shape, Matrix34 _transform)
 {
     return false;
 }

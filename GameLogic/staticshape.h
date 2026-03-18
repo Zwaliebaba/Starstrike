@@ -23,7 +23,7 @@ public:
     void Render( float _predictionTime );
 
     bool DoesSphereHit          (LegacyVector3 const &_pos, float _radius);
-    bool DoesShapeHit           (Shape *_shape, Matrix34 _transform);
+    bool DoesShapeHit           (ShapeStatic *_shape, Matrix34 _transform);
     bool DoesRayHit             (LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
                                  float _rayLen=1e10, LegacyVector3 *_pos=NULL, LegacyVector3 *_norm=NULL);        // pos/norm will not always be available
 

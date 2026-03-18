@@ -1,17 +1,21 @@
 #include "pch.h"
 #include "math_utils.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "resource.h"
 
+// ****************************************************************************
+// Class ShapeMarkerData
+// ****************************************************************************
+
 // *** Constructor
-// This constructor is used in the export process. The m_parents array is never
+// This constructor is used in the export process. The m_parentIndices array is never
 // populated in the exporter, so it is intentionally left blank
-ShapeMarker::ShapeMarker(const char* _name, const char* _parentName, int _depth, const Matrix34& _transform)
+ShapeMarkerData::ShapeMarkerData(const char* _name, const char* _parentName, int _depth, const Matrix34& _transform)
   : m_transform(_transform),
     m_depth(_depth),
-    m_parents(nullptr)
+    m_parentIndices(nullptr)
 {
   m_name = strdup(_name);
   m_parentName = strdup(_parentName);
@@ -42,7 +46,7 @@ ShapeMarker::ShapeMarker(const char* _name, const char* _parentName, int _depth,
 }
 
 // *** Constructor
-ShapeMarker::ShapeMarker(TextReader* _in, const char* _name)
+ShapeMarkerData::ShapeMarkerData(TextReader* _in, const char* _name)
 {
   m_name = strdup(_name);
   m_parentName = nullptr;
@@ -90,7 +94,7 @@ ShapeMarker::ShapeMarker(TextReader* _in, const char* _name)
 
   m_transform.Normalise();
 
-  m_parents = new ShapeFragment*[m_depth];
+  m_parentIndices = new int[m_depth];
 
   if (!m_name)
     m_name = strdup("unknown");
@@ -98,26 +102,30 @@ ShapeMarker::ShapeMarker(TextReader* _in, const char* _name)
     m_parentName = strdup("unknown");
 }
 
-ShapeMarker::~ShapeMarker()
+ShapeMarkerData::~ShapeMarkerData()
 {
   SAFE_FREE(m_parentName);
   SAFE_FREE(m_name);
-  SAFE_DELETE(m_parents);
+  SAFE_DELETE(m_parentIndices);
 }
 
 // *** GetWorldMatrix
-Matrix34 ShapeMarker::GetWorldMatrix(const Matrix34& _rootTransform) { return Matrix34(GetWorldTransform(_rootTransform)); }
+Matrix34 ShapeMarkerData::GetWorldMatrix(const FragmentState* _states, const Matrix34& _rootTransform) const
+{
+  return Matrix34(GetWorldTransform(_states, static_cast<Transform3D>(_rootTransform)));
+}
 
 // *** GetWorldTransform
 // SIMD-accelerated version using Transform3D composition (XMMatrixMultiply).
-// Matrix34 members implicitly convert to Transform3D via operator Transform3D().
-Transform3D ShapeMarker::GetWorldTransform(const Transform3D& _rootTransform)
+// Uses fragment indices into the states array instead of chasing raw pointers.
+Transform3D ShapeMarkerData::GetWorldTransform(const FragmentState* _states, const Transform3D& _rootTransform) const
 {
   using namespace DirectX;
   XMMATRIX result = XMLoadFloat4x4(&_rootTransform.m);
   for (int i = 0; i < m_depth; ++i)
   {
-    XMMATRIX parent = XMLoadFloat4x4(&m_parents[i]->m_transform.m);
+    const Transform3D& parentTransform = _states[m_parentIndices[i]].transform;
+    XMMATRIX parent = XMLoadFloat4x4(&parentTransform.m);
     result = XMMatrixMultiply(parent, result);
   }
   Transform3D selfTransform = static_cast<Transform3D>(m_transform);
@@ -129,8 +137,12 @@ Transform3D ShapeMarker::GetWorldTransform(const Transform3D& _rootTransform)
   return t;
 }
 
+// ****************************************************************************
+// Class ShapeFragmentData
+// ****************************************************************************
+
 // This constructor is used to load a shape from a file.
-ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
+ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
   : m_numPositions(0),
     m_positions(nullptr),
     m_positionsInWS(nullptr),
@@ -145,22 +157,18 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     m_triangles(nullptr),
     m_name(nullptr),
     m_parentName(nullptr),
-    m_transform(Neuron::Transform3D::Identity()),
-    m_angVel(0, 0, 0),
-    m_vel(0, 0, 0),
+    m_baseTransform(Neuron::Transform3D::Identity()),
     m_center(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
-    m_mostNegativeY(0.0f)
+    m_mostNegativeY(0.0f),
+    m_fragmentIndex(-1)
 {
   m_maxTriangles = 1;
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
   DEBUG_ASSERT(_name);
   m_name = strdup(_name);
-
-  m_angVel.Zero();
-  m_vel.Zero();
 
   while (_in->ReadLine())
   {
@@ -174,21 +182,21 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
       m_parentName = strdup(secondWord);
     else if (_stricmp(firstWord, "front") == 0)
     {
-      m_transform.m._31 = static_cast<float>(atof(secondWord));
-      m_transform.m._32 = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.m._33 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._31 = static_cast<float>(atof(secondWord));
+      m_baseTransform.m._32 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._33 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "up") == 0)
     {
-      m_transform.m._21 = static_cast<float>(atof(secondWord));
-      m_transform.m._22 = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.m._23 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._21 = static_cast<float>(atof(secondWord));
+      m_baseTransform.m._22 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._23 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "pos") == 0)
     {
-      m_transform.m._41 = static_cast<float>(atof(secondWord));
-      m_transform.m._42 = static_cast<float>(atof(_in->GetNextToken()));
-      m_transform.m._43 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._41 = static_cast<float>(atof(secondWord));
+      m_baseTransform.m._42 = static_cast<float>(atof(_in->GetNextToken()));
+      m_baseTransform.m._43 = static_cast<float>(atof(_in->GetNextToken()));
     }
     else if (_stricmp(firstWord, "Positions") == 0)
     {
@@ -224,7 +232,7 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
     }
   }
 
-  m_transform.Orthonormalize();
+  m_baseTransform.Orthonormalize();
 
   if (!m_name)
     m_name = strdup("unknown");
@@ -237,8 +245,8 @@ ShapeFragment::ShapeFragment(TextReader* _in, const char* _name)
 }
 
 // This constructor is used when you want to build a shape from scratch yourself,
-// eg in the exporter.
-ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
+// eg in the exporter, or for the SceneRoot node.
+ShapeFragmentData::ShapeFragmentData(const char* _name, const char* _parentName)
   : m_numPositions(0),
     m_positions(nullptr),
     m_positionsInWS(nullptr),
@@ -254,14 +262,13 @@ ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
     m_center(0.0f, 0.0f, 0.0f),
     m_radius(-1.0f),
     m_mostPositiveY(0.0f),
-    m_mostNegativeY(0.0f)
+    m_mostNegativeY(0.0f),
+    m_fragmentIndex(-1)
 {
   m_maxTriangles = 1;
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
-  m_transform = Neuron::Transform3D::Identity();
-  m_angVel.Zero();
-  m_vel.Zero();
+  m_baseTransform = Neuron::Transform3D::Identity();
   m_name = strdup(_name);
   m_parentName = strdup(_parentName);
 
@@ -290,7 +297,7 @@ ShapeFragment::ShapeFragment(const char* _name, const char* _parentName)
   c[0] = '\0';
 }
 
-ShapeFragment::~ShapeFragment()
+ShapeFragmentData::~ShapeFragmentData()
 {
   SAFE_DELETE_ARRAY(m_positions);
   SAFE_DELETE_ARRAY(m_positionsInWS);
@@ -311,7 +318,7 @@ ShapeFragment::~ShapeFragment()
 }
 
 // *** ParsePositionBlock
-void ShapeFragment::ParsePositionBlock(TextReader* _in, unsigned int _numPositions)
+void ShapeFragmentData::ParsePositionBlock(TextReader* _in, unsigned int _numPositions)
 {
   auto positions = new LegacyVector3[_numPositions];
 
@@ -347,7 +354,7 @@ void ShapeFragment::ParsePositionBlock(TextReader* _in, unsigned int _numPositio
 }
 
 // *** ParseNormalBlock
-void ShapeFragment::ParseNormalBlock(TextReader* _in, unsigned int _numNorms)
+void ShapeFragmentData::ParseNormalBlock(TextReader* _in, unsigned int _numNorms)
 {
   if (_numNorms != 0)
     m_normals = new LegacyVector3[_numNorms];
@@ -383,7 +390,7 @@ void ShapeFragment::ParseNormalBlock(TextReader* _in, unsigned int _numNorms)
 }
 
 // *** ParseColourBlock
-void ShapeFragment::ParseColourBlock(TextReader* _in, unsigned int _numColours)
+void ShapeFragmentData::ParseColourBlock(TextReader* _in, unsigned int _numColours)
 {
   m_colours = new RGBAColour[_numColours];
   m_numColours = _numColours;
@@ -422,7 +429,7 @@ void ShapeFragment::ParseColourBlock(TextReader* _in, unsigned int _numColours)
 }
 
 // *** ParseVertexBlock
-void ShapeFragment::ParseVertexBlock(TextReader* _in, unsigned int _numVerts)
+void ShapeFragmentData::ParseVertexBlock(TextReader* _in, unsigned int _numVerts)
 {
   m_vertices = new VertexPosCol[_numVerts];
   m_numVertices = _numVerts;
@@ -452,7 +459,7 @@ void ShapeFragment::ParseVertexBlock(TextReader* _in, unsigned int _numVerts)
 }
 
 // *** ParseStripBlock
-void ShapeFragment::ParseStripBlock(TextReader* _in)
+void ShapeFragmentData::ParseStripBlock(TextReader* _in)
 {
   _in->ReadLine();
   char* c = _in->GetNextToken();
@@ -526,7 +533,7 @@ void ShapeFragment::ParseStripBlock(TextReader* _in)
 }
 
 // *** ParseAllStripBlocks
-void ShapeFragment::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips)
+void ShapeFragmentData::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips)
 {
   int expectedId = 0;
   while (_in->ReadLine())
@@ -556,7 +563,7 @@ void ShapeFragment::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips
   m_triangles = newTriangles;
 }
 
-void ShapeFragment::ParseTriangleBlock(TextReader* _in, unsigned int _numTriangles)
+void ShapeFragmentData::ParseTriangleBlock(TextReader* _in, unsigned int _numTriangles)
 {
   DEBUG_ASSERT(m_numTriangles == 0 && m_maxTriangles == 1 && m_triangles != NULL);
   delete [] m_triangles;
@@ -582,7 +589,7 @@ void ShapeFragment::ParseTriangleBlock(TextReader* _in, unsigned int _numTriangl
 // Currently this function generates one normal for each face in all the
 // strips, rather than one normal per vertex. This is what we need for
 // facet shading, rather than smooth (gouraud) shading.
-void ShapeFragment::GenerateNormals()
+void ShapeFragmentData::GenerateNormals()
 {
   m_numNormals = m_numTriangles;
   m_normals = new LegacyVector3[m_numNormals];
@@ -601,13 +608,12 @@ void ShapeFragment::GenerateNormals()
     LegacyVector3 bc = c - b;
     m_normals[normId] = ab ^ bc;
     m_normals[normId].Normalise();
-    //		if (!(j & 1)) m_normals[normId] = -m_normals[normId];
     normId++;
   }
 }
 
 // *** RegisterPositions
-void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _numPositions)
+void ShapeFragmentData::RegisterPositions(LegacyVector3* _positions, unsigned int _numPositions)
 {
   int i;
 
@@ -659,8 +665,6 @@ void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _n
 
   // Calculate bounding vertical cylinder
   {
-    // Find the vertical extents of the fragment and minimum enclosing
-    // cylinder radius
     float radiusSquared = 0.0f;
     m_mostPositiveY = -FLT_MAX;
     m_mostNegativeY = FLT_MAX;
@@ -683,49 +687,68 @@ void ShapeFragment::RegisterPositions(LegacyVector3* _positions, unsigned int _n
 
     if (cylinderVolume < sphereVolume)
     {
-      //			m_radius = radius;
-      //			m_useCylinder = true;
     }
   }
 }
 
-void ShapeFragment::RegisterNormals(LegacyVector3* _norms, unsigned int _numNorms)
+void ShapeFragmentData::RegisterNormals(LegacyVector3* _norms, unsigned int _numNorms)
 {
   delete [] m_normals;
   m_normals = _norms;
   m_numNormals = _numNorms;
 }
 
-void ShapeFragment::RegisterColours(RGBAColour* _colours, unsigned int _numColours)
+void ShapeFragmentData::RegisterColours(RGBAColour* _colours, unsigned int _numColours)
 {
   delete [] m_colours;
   m_colours = _colours;
   m_numColours = _numColours;
 }
 
-void ShapeFragment::RegisterVertices(VertexPosCol* _verts, unsigned int _numVerts)
+void ShapeFragmentData::RegisterVertices(VertexPosCol* _verts, unsigned int _numVerts)
 {
   delete [] m_vertices;
   m_vertices = _verts;
   m_numVertices = _numVerts;
 }
 
-void ShapeFragment::RegisterTriangles(ShapeTriangle* _tris, unsigned int _numTris)
+void ShapeFragmentData::RegisterTriangles(ShapeTriangle* _tris, unsigned int _numTris)
 {
   delete [] m_triangles;
   m_triangles = _tris;
   m_numTriangles = _numTris;
 }
 
-void ShapeFragment::Render(float _predictionTime)
+// *** AssignIndices
+// Depth-first traversal to assign fragment ordinals
+int ShapeFragmentData::AssignIndices(int _nextIndex)
+{
+  m_fragmentIndex = _nextIndex;
+  int next = _nextIndex + 1;
+  int numChildren = m_childFragments.Size();
+  for (int i = 0; i < numChildren; ++i)
+    next = m_childFragments.GetData(i)->AssignIndices(next);
+  return next;
+}
+
+void ShapeFragmentData::Render(const FragmentState* _states, float _predictionTime) const
 {
 #ifndef EXPORTER_BUILD
   using namespace DirectX;
-  Neuron::Transform3D predicted = m_transform;
-  predicted.RotateAround(XMVectorScale(
-    XMVectorSet(m_angVel.x, m_angVel.y, m_angVel.z, 0.0f), _predictionTime));
-  predicted.Translate(XMVectorScale(
-    XMVectorSet(m_vel.x, m_vel.y, m_vel.z, 0.0f), _predictionTime));
+  Neuron::Transform3D predicted;
+  if (_states)
+  {
+    const FragmentState& state = _states[m_fragmentIndex];
+    predicted = state.transform;
+    predicted.RotateAround(XMVectorScale(
+      XMVectorSet(state.angVel.x, state.angVel.y, state.angVel.z, 0.0f), _predictionTime));
+    predicted.Translate(XMVectorScale(
+      XMVectorSet(state.vel.x, state.vel.y, state.vel.z, 0.0f), _predictionTime));
+  }
+  else
+  {
+    predicted = m_baseTransform;
+  }
 
   bool matrixIsIdentity = predicted.IsIdentity();
   auto& mv = OpenGLD3D::GetModelViewStack();
@@ -739,14 +762,14 @@ void ShapeFragment::Render(float _predictionTime)
 
   int numChildren = m_childFragments.Size();
   for (int i = 0; i < numChildren; ++i)
-    m_childFragments.GetData(i)->Render(_predictionTime);
+    m_childFragments.GetData(i)->Render(_states, _predictionTime);
 
   if (!matrixIsIdentity)
     mv.Pop();
 #endif
 }
 
-void ShapeFragment::RenderSlow()
+void ShapeFragmentData::RenderSlow() const
 {
 #ifndef EXPORTER_BUILD
   if (!m_numTriangles)
@@ -761,21 +784,6 @@ void ShapeFragment::RenderSlow()
     const VertexPosCol* vertC = &m_vertices[m_triangles[i].v3];
 
     constexpr unsigned char alpha = 255;
-
-    /*/ calculate normal
-    float u[3],v[3],n[3],l;
-    u[0]=m_positions[vertB->m_posId].x-m_positions[vertA->m_posId].x;
-    u[1]=m_positions[vertB->m_posId].y-m_positions[vertA->m_posId].y;
-    u[2]=m_positions[vertB->m_posId].z-m_positions[vertA->m_posId].z;
-    v[0]=m_positions[vertC->m_posId].x-m_positions[vertA->m_posId].x;
-    v[1]=m_positions[vertC->m_posId].y-m_positions[vertA->m_posId].y;
-    v[2]=m_positions[vertC->m_posId].z-m_positions[vertA->m_posId].z;
-    n[0]=u[1]*v[2]-u[2]*v[1];
-    n[1]=-u[0]*v[2]+u[2]*v[0];
-    n[2]=u[0]*v[1]-u[1]*v[0];
-    l=(float)sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
-    n[0]/=l; n[1]/=l; n[2]/=l;
-    glNormal3fv(n);*/
 
     glNormal3fv(m_normals[norm].GetData());
     glColor4ub(m_colours[vertA->m_colId].r, m_colours[vertA->m_colId].g, m_colours[vertA->m_colId].b, alpha);
@@ -796,14 +804,14 @@ void ShapeFragment::RenderSlow()
 
 // *** LookupFragment
 // Recursively look through all child fragments until we find a name match
-ShapeFragment* ShapeFragment::LookupFragment(const char* _name)
+ShapeFragmentData* ShapeFragmentData::LookupFragment(const char* _name)
 {
   if (_stricmp(_name, m_name) == 0)
     return this;
   int numChildFragments = m_childFragments.Size();
   for (int i = 0; i < numChildFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i)->LookupFragment(_name);
+    ShapeFragmentData* frag = m_childFragments.GetData(i)->LookupFragment(_name);
     if (frag)
       return frag;
   }
@@ -814,14 +822,14 @@ ShapeFragment* ShapeFragment::LookupFragment(const char* _name)
 // *** LookupMarker
 // Recursively look through all child fragments until we find one with a marker
 // matching the specified name
-ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
+ShapeMarkerData* ShapeFragmentData::LookupMarker(const char* _name)
 {
   int i;
 
   int numMarkers = m_childMarkers.Size();
   for (i = 0; i < numMarkers; ++i)
   {
-    ShapeMarker* marker = m_childMarkers.GetData(i);
+    ShapeMarkerData* marker = m_childMarkers.GetData(i);
     if (_stricmp(_name, marker->m_name) == 0)
       return marker;
   }
@@ -829,7 +837,7 @@ ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
   int numChildFragments = m_childFragments.Size();
   for (i = 0; i < numChildFragments; ++i)
   {
-    ShapeMarker* marker = m_childFragments.GetData(i)->LookupMarker(_name);
+    ShapeMarkerData* marker = m_childFragments.GetData(i)->LookupMarker(_name);
     if (marker)
       return marker;
   }
@@ -837,10 +845,11 @@ ShapeMarker* ShapeFragment::LookupMarker(const char* _name)
   return nullptr;
 }
 
-bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
+bool ShapeFragmentData::RayHit(const FragmentState* _states, RayPackage* _package, const Matrix34& _transform, bool _accurate) const
 {
 #ifndef EXPORTER_BUILD
-  Matrix34 totalMatrix(m_transform * _transform);
+  const Transform3D& fragTransform = _states ? _states[m_fragmentIndex].transform : m_baseTransform;
+  Matrix34 totalMatrix(fragTransform * _transform);
   LegacyVector3 center = m_center * totalMatrix;
 
   // First do bounding sphere check
@@ -870,9 +879,8 @@ bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, boo
   int numFragments = m_childFragments.Size();
   for (int i = 0; i < numFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i);
-    //		if (frag->RayHit(&package, totalMatrix))
-    if (frag->RayHit(_package, totalMatrix, _accurate))
+    ShapeFragmentData* frag = m_childFragments.GetData(i);
+    if (frag->RayHit(_states, _package, totalMatrix, _accurate))
       return true;
   }
 
@@ -881,10 +889,11 @@ bool ShapeFragment::RayHit(RayPackage* _package, const Matrix34& _transform, boo
 }
 
 // *** SphereHit
-bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate)
+bool ShapeFragmentData::SphereHit(const FragmentState* _states, SpherePackage* _package, const Matrix34& _transform, bool _accurate) const
 {
 #ifndef EXPORTER_BUILD
-  Matrix34 totalMatrix(m_transform * _transform);
+  const Transform3D& fragTransform = _states ? _states[m_fragmentIndex].transform : m_baseTransform;
+  Matrix34 totalMatrix(fragTransform * _transform);
   LegacyVector3 center = m_center * totalMatrix;
 
   if (m_radius > 0.0f && SphereSphereIntersection(_package->m_pos, _package->m_radius, center, m_radius))
@@ -913,8 +922,8 @@ bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transfor
   int numFragments = m_childFragments.Size();
   for (int i = 0; i < numFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i);
-    if (frag->SphereHit(_package, totalMatrix, _accurate))
+    ShapeFragmentData* frag = m_childFragments.GetData(i);
+    if (frag->SphereHit(_states, _package, totalMatrix, _accurate))
       return true;
   }
 
@@ -923,11 +932,12 @@ bool ShapeFragment::SphereHit(SpherePackage* _package, const Matrix34& _transfor
 }
 
 // *** ShapeHit
-bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const Matrix34& _ourTransform, bool _accurate)
+bool ShapeFragmentData::ShapeHit(const FragmentState* _states, ShapeStatic* _shape, const Matrix34& _theTransform, const Matrix34& _ourTransform, bool _accurate) const
 {
 #ifndef EXPORTER_BUILD
 
-  Matrix34 totalMatrix(m_transform * _ourTransform);
+  const Transform3D& fragTransform = _states ? _states[m_fragmentIndex].transform : m_baseTransform;
+  Matrix34 totalMatrix(fragTransform * _ourTransform);
   LegacyVector3 center = m_center * totalMatrix;
 
   if (m_radius > 0.0f)
@@ -943,8 +953,8 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
   int numFragments = m_childFragments.Size();
   for (i = 0; i < numFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i);
-    if (frag->ShapeHit(_shape, _theTransform, totalMatrix, _accurate))
+    ShapeFragmentData* frag = m_childFragments.GetData(i);
+    if (frag->ShapeHit(_states, _shape, _theTransform, totalMatrix, _accurate))
       return true;
   }
 
@@ -952,9 +962,10 @@ bool ShapeFragment::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const
   return false;
 }
 
-void ShapeFragment::CalculateCenter(const Matrix34& _transform, LegacyVector3& _center, int& _numFragments)
+void ShapeFragmentData::CalculateCenter(const FragmentState* _states, const Matrix34& _transform, LegacyVector3& _center, int& _numFragments) const
 {
-  Matrix34 totalMatrix(m_transform * _transform);
+  const Transform3D& fragTransform = _states ? _states[m_fragmentIndex].transform : m_baseTransform;
+  Matrix34 totalMatrix(fragTransform * _transform);
   LegacyVector3 center = m_center * totalMatrix;
 
   _center += center;
@@ -963,14 +974,15 @@ void ShapeFragment::CalculateCenter(const Matrix34& _transform, LegacyVector3& _
   int numFragments = m_childFragments.Size();
   for (int i = 0; i < numFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i);
-    frag->CalculateCenter(totalMatrix, _center, _numFragments);
+    ShapeFragmentData* frag = m_childFragments.GetData(i);
+    frag->CalculateCenter(_states, totalMatrix, _center, _numFragments);
   }
 }
 
-void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center, float& _radius)
+void ShapeFragmentData::CalculateRadius(const FragmentState* _states, const Matrix34& _transform, const LegacyVector3& _center, float& _radius) const
 {
-  Matrix34 totalMatrix(m_transform * _transform);
+  const Transform3D& fragTransform = _states ? _states[m_fragmentIndex].transform : m_baseTransform;
+  Matrix34 totalMatrix(fragTransform * _transform);
   LegacyVector3 center = m_center * totalMatrix;
 
   float distance = (center - _center).Mag();
@@ -980,37 +992,45 @@ void ShapeFragment::CalculateRadius(const Matrix34& _transform, const LegacyVect
   int numFragments = m_childFragments.Size();
   for (int i = 0; i < numFragments; ++i)
   {
-    ShapeFragment* frag = m_childFragments.GetData(i);
-    frag->CalculateRadius(totalMatrix, _center, _radius);
+    ShapeFragmentData* frag = m_childFragments.GetData(i);
+    frag->CalculateRadius(_states, totalMatrix, _center, _radius);
   }
 }
 
 // ****************************************************************************
-// Class Shape
+// Class ShapeStatic
 // ****************************************************************************
 
-Shape::Shape() {}
+ShapeStatic::ShapeStatic()
+  : m_rootFragment(nullptr),
+    m_name(nullptr),
+    m_numFragments(0),
+    m_defaultStates(nullptr) {}
 
-Shape::Shape(const char* filename, bool _animating)
-  : m_animating(_animating),
-    m_rootFragment(nullptr),
-    m_name(nullptr)
+ShapeStatic::ShapeStatic(const char* _filename)
+  : m_rootFragment(nullptr),
+    m_name(nullptr),
+    m_numFragments(0),
+    m_defaultStates(nullptr)
 {
-  TextFileReader in(filename);
+  TextFileReader in(_filename);
   Load(&in);
 }
 
-Shape::Shape(TextReader* in, bool _animating)
-  : m_animating(_animating),
-    m_rootFragment(nullptr) { Load(in); }
+ShapeStatic::ShapeStatic(TextReader* _in)
+  : m_rootFragment(nullptr),
+    m_name(nullptr),
+    m_numFragments(0),
+    m_defaultStates(nullptr) { Load(_in); }
 
-Shape::~Shape()
+ShapeStatic::~ShapeStatic()
 {
   delete m_rootFragment;
   free(m_name);
+  delete [] m_defaultStates;
 }
 
-void Shape::Load(TextReader* _in)
+void ShapeStatic::Load(TextReader* _in)
 {
   m_name = strdup(_in->GetFilename());
 
@@ -1018,8 +1038,8 @@ void Shape::Load(TextReader* _in)
   constexpr int maxMarkers = 100;
   int currentFrag = 0;
   int currentMarker = 0;
-  ShapeFragment* allFrags[maxFrags];
-  ShapeMarker* allMarkers[maxMarkers];
+  ShapeFragmentData* allFrags[maxFrags];
+  ShapeMarkerData* allMarkers[maxMarkers];
 
   while (_in->ReadLine())
   {
@@ -1032,19 +1052,19 @@ void Shape::Load(TextReader* _in)
     {
       DEBUG_ASSERT(currentFrag < maxFrags);
       c = _in->GetNextToken();
-      allFrags[currentFrag] = new ShapeFragment(_in, c);
+      allFrags[currentFrag] = new ShapeFragmentData(_in, c);
       currentFrag++;
     }
     else if (_stricmp(c, "marker") == 0)
     {
       DEBUG_ASSERT(currentMarker < maxMarkers);
       c = _in->GetNextToken();
-      allMarkers[currentMarker] = new ShapeMarker(_in, c);
+      allMarkers[currentMarker] = new ShapeMarkerData(_in, c);
       currentMarker++;
     }
   }
 
-  m_rootFragment = new ShapeFragment("SceneRoot", "");
+  m_rootFragment = new ShapeFragmentData("SceneRoot", "");
 
   // We need to build the hierarchy of fragments from the flat array
   for (int i = 0; i < currentFrag; ++i)
@@ -1070,77 +1090,123 @@ void Shape::Load(TextReader* _in)
     }
   }
 
-  // Add the ShapeMarkers into the fragment tree
+  // Assign fragment indices via depth-first traversal
+  m_numFragments = m_rootFragment->AssignIndices(0);
+
+  // Build rest-pose default states from base transforms
+  m_defaultStates = new FragmentState[m_numFragments];
+  for (int i = 0; i < m_numFragments; ++i)
+  {
+    m_defaultStates[i].angVel.Zero();
+    m_defaultStates[i].vel.Zero();
+  }
+  // Fill transforms from the fragment tree via DFS — helper lambda
+  struct FillStates
+  {
+    static void Fill(const ShapeFragmentData* _frag, FragmentState* _states)
+    {
+      _states[_frag->m_fragmentIndex].transform = _frag->m_baseTransform;
+      int numChildren = _frag->m_childFragments.Size();
+      for (int i = 0; i < numChildren; ++i)
+        Fill(_frag->m_childFragments.GetData(i), _states);
+    }
+  };
+  FillStates::Fill(m_rootFragment, m_defaultStates);
+
+  // Add the ShapeMarkers into the fragment tree and build parent index arrays
   for (int i = 0; i < currentMarker; ++i)
   {
-    ShapeFragment* parent = m_rootFragment->LookupFragment(allMarkers[i]->m_parentName);
+    ShapeFragmentData* parent = m_rootFragment->LookupFragment(allMarkers[i]->m_parentName);
     DEBUG_ASSERT(parent);
     parent->m_childMarkers.PutData(allMarkers[i]);
 
     int depth = allMarkers[i]->m_depth - 1;
-    allMarkers[i]->m_parents[depth] = parent;
+    allMarkers[i]->m_parentIndices[depth] = parent->m_fragmentIndex;
     depth--;
     while (_stricmp(parent->m_name, "SceneRoot") != 0)
     {
       parent = m_rootFragment->LookupFragment(parent->m_parentName);
       DEBUG_ASSERT(parent && depth >= 0);
-      allMarkers[i]->m_parents[depth] = parent;
+      allMarkers[i]->m_parentIndices[depth] = parent->m_fragmentIndex;
       depth--;
     }
     DEBUG_ASSERT(depth == -1);
   }
 }
 
-void Shape::Render(float _predictionTime, const Matrix34& _transform) const { Render(_predictionTime, static_cast<Transform3D>(_transform)); }
+void ShapeStatic::Render(float _predictionTime, const Matrix34& _transform) const { Render(_predictionTime, static_cast<Transform3D>(_transform)); }
 
-void XM_CALLCONV Shape::Render(float _predictionTime, XMMATRIX _transform) const
+void XM_CALLCONV ShapeStatic::Render(float _predictionTime, XMMATRIX _transform) const
 {
   glEnable(GL_COLOR_MATERIAL);
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
   mv.Multiply(_transform);
 
-  m_rootFragment->Render(_predictionTime);
+  m_rootFragment->Render(m_defaultStates, _predictionTime);
 
   glDisable(GL_COLOR_MATERIAL);
   mv.Pop();
 }
 
-bool Shape::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate)
+bool ShapeStatic::RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate) const
 {
-  bool rv = m_rootFragment->RayHit(_package, _transform, _accurate);
-  return rv;
+  return m_rootFragment->RayHit(m_defaultStates, _package, _transform, _accurate);
 }
 
-bool Shape::SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate)
+bool ShapeStatic::SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate) const
 {
-  bool hit = m_rootFragment->SphereHit(_package, _transform, _accurate);
-  return hit;
+  return m_rootFragment->SphereHit(m_defaultStates, _package, _transform, _accurate);
 }
 
-bool Shape::ShapeHit(Shape* _shape, const Matrix34& _theTransform, const Matrix34& _ourTransform, bool _accurate)
+bool ShapeStatic::ShapeHit(ShapeStatic* _shape, const Matrix34& _theTransform, const Matrix34& _ourTransform, bool _accurate) const
 {
-  bool hit = m_rootFragment->ShapeHit(_shape, _theTransform, _ourTransform, _accurate);
-  return hit;
+  return m_rootFragment->ShapeHit(m_defaultStates, _shape, _theTransform, _ourTransform, _accurate);
 }
 
-LegacyVector3 Shape::CalculateCenter(const Matrix34& _transform)
+LegacyVector3 ShapeStatic::CalculateCenter(const Matrix34& _transform) const
 {
   LegacyVector3 center;
   int numFragments = 0;
 
-  m_rootFragment->CalculateCenter(_transform, center, numFragments);
+  m_rootFragment->CalculateCenter(m_defaultStates, _transform, center, numFragments);
 
   center /= static_cast<float>(numFragments);
 
   return center;
 }
 
-float Shape::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center)
+float ShapeStatic::CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center) const
 {
   float radius = 0.0f;
 
-  m_rootFragment->CalculateRadius(_transform, _center, radius);
+  m_rootFragment->CalculateRadius(m_defaultStates, _transform, _center, radius);
 
   return radius;
+}
+
+int ShapeStatic::GetFragmentIndex(const char* _name) const
+{
+  ShapeFragmentData* frag = m_rootFragment->LookupFragment(_name);
+  return frag ? frag->m_fragmentIndex : -1;
+}
+
+ShapeFragmentData* ShapeStatic::GetFragmentData(const char* _name) const
+{
+  return m_rootFragment->LookupFragment(_name);
+}
+
+ShapeMarkerData* ShapeStatic::GetMarkerData(const char* _name) const
+{
+  return m_rootFragment->LookupMarker(_name);
+}
+
+Matrix34 ShapeStatic::GetMarkerWorldMatrix(const ShapeMarkerData* _marker, const Matrix34& _rootTransform) const
+{
+  return _marker->GetWorldMatrix(m_defaultStates, _rootTransform);
+}
+
+Transform3D ShapeStatic::GetMarkerWorldTransform(const ShapeMarkerData* _marker, const Transform3D& _rootTransform) const
+{
+  return _marker->GetWorldTransform(m_defaultStates, _rootTransform);
 }

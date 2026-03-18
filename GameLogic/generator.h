@@ -12,7 +12,7 @@ class PowerBuilding : public Building
 {
   protected:
     int m_powerLink;
-    ShapeMarker* m_powerLocation;
+    ShapeMarkerData* m_powerLocation;
 
     LList<float> m_surges;
 
@@ -44,7 +44,7 @@ class PowerBuilding : public Building
 class Generator : public PowerBuilding
 {
   protected:
-    ShapeMarker* m_counter;
+    ShapeMarkerData* m_counter;
 
     float m_timerSync;
     int m_numThisSecond;
@@ -119,8 +119,8 @@ class PylonEnd : public PowerBuilding
 class SolarPanel : public PowerBuilding
 {
   protected:
-    ShapeMarker* m_glowMarker[SOLARPANEL_NUMGLOWS];
-    ShapeMarker* m_statusMarkers[SOLARPANEL_NUMSTATUSMARKERS];
+    ShapeMarkerData* m_glowMarker[SOLARPANEL_NUMGLOWS];
+    ShapeMarkerData* m_statusMarkers[SOLARPANEL_NUMSTATUSMARKERS];
 
     bool m_operating;
 

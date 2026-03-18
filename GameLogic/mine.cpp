@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "text_stream_readers.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "file_writer.h"
 #include "resource.h"
 #include "math_utils.h"
@@ -25,15 +25,15 @@
 // Class MineBuilding
 // ****************************************************************************
 
-Shape* MineBuilding::s_wheelShape = nullptr;
+ShapeStatic* MineBuilding::s_wheelShape = nullptr;
 
-Shape* MineBuilding::s_cartShape = nullptr;
-ShapeMarker* MineBuilding::s_cartMarker1 = nullptr;
-ShapeMarker* MineBuilding::s_cartMarker2 = nullptr;
-ShapeMarker* MineBuilding::s_cartContents[] = {nullptr, nullptr, nullptr};
+ShapeStatic* MineBuilding::s_cartShape = nullptr;
+ShapeMarkerData* MineBuilding::s_cartMarker1 = nullptr;
+ShapeMarkerData* MineBuilding::s_cartMarker2 = nullptr;
+ShapeMarkerData* MineBuilding::s_cartContents[] = {nullptr, nullptr, nullptr};
 
-Shape* MineBuilding::s_polygon1 = nullptr;
-Shape* MineBuilding::s_primitive1 = nullptr;
+ShapeStatic* MineBuilding::s_polygon1 = nullptr;
+ShapeStatic* MineBuilding::s_primitive1 = nullptr;
 
 float MineBuilding::s_refineryPopulation = 0.0f;
 float MineBuilding::s_refineryRecalculateTimer = 0.0f;
@@ -48,16 +48,16 @@ MineBuilding::MineBuilding()
 {
   if (!s_cartShape)
   {
-    s_wheelShape = g_app->m_resource->GetShape("wheel.shp");
-    s_cartShape = g_app->m_resource->GetShape("minecart.shp");
-    s_cartMarker1 = s_cartShape->m_rootFragment->LookupMarker("MarkerTrack1");
-    s_cartMarker2 = s_cartShape->m_rootFragment->LookupMarker("MarkerTrack2");
-    s_cartContents[0] = s_cartShape->m_rootFragment->LookupMarker("MarkerContents1");
-    s_cartContents[1] = s_cartShape->m_rootFragment->LookupMarker("MarkerContents2");
-    s_cartContents[2] = s_cartShape->m_rootFragment->LookupMarker("MarkerContents3");
+    s_wheelShape = g_app->m_resource->GetShapeStatic("wheel.shp");
+    s_cartShape = g_app->m_resource->GetShapeStatic("minecart.shp");
+    s_cartMarker1 = s_cartShape->GetMarkerData("MarkerTrack1");
+    s_cartMarker2 = s_cartShape->GetMarkerData("MarkerTrack2");
+    s_cartContents[0] = s_cartShape->GetMarkerData("MarkerContents1");
+    s_cartContents[1] = s_cartShape->GetMarkerData("MarkerContents2");
+    s_cartContents[2] = s_cartShape->GetMarkerData("MarkerContents3");
 
-    s_polygon1 = g_app->m_resource->GetShape("minepolygon1.shp");
-    s_primitive1 = g_app->m_resource->GetShape("mineprimitive1.shp");
+    s_polygon1 = g_app->m_resource->GetShapeStatic("minepolygon1.shp");
+    s_primitive1 = g_app->m_resource->GetShapeStatic("mineprimitive1.shp");
   }
 }
 
@@ -237,8 +237,8 @@ void MineBuilding::RenderCart(MineCart* _cart, float _predictionTime)
       s_cartShape->Render(0.0f, transform);
       //END_PROFILE(g_app->m_profiler, "RenderCartShape" );
 
-      LegacyVector3 cartLinkLeft = s_cartMarker1->GetWorldMatrix(transform).pos;
-      LegacyVector3 cartLinkRight = s_cartMarker2->GetWorldMatrix(transform).pos;
+      LegacyVector3 cartLinkLeft = s_cartShape->GetMarkerWorldMatrix(s_cartMarker1, transform).pos;
+      LegacyVector3 cartLinkRight = s_cartShape->GetMarkerWorldMatrix(s_cartMarker2, transform).pos;
 
       //START_PROFILE(g_app->m_profiler, "RenderLines" );
       LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.5f;
@@ -260,13 +260,13 @@ void MineBuilding::RenderCart(MineCart* _cart, float _predictionTime)
       {
         if (_cart->m_polygons[i])
         {
-          Matrix34 polyMat = s_cartContents[i]->GetWorldMatrix(transform);
+          Matrix34 polyMat = s_cartShape->GetMarkerWorldMatrix(s_cartContents[i], transform);
           s_polygon1->Render(0.0f, polyMat);
         }
 
         if (_cart->m_primitives[i])
         {
-          Matrix34 polyMat = s_cartContents[i]->GetWorldMatrix(transform);
+          Matrix34 polyMat = s_cartShape->GetMarkerWorldMatrix(s_cartContents[i], transform);
           s_primitive1->Render(0.0f, polyMat);
 
           if (buildingDetail < 3)
@@ -356,10 +356,10 @@ LegacyVector3 MineBuilding::GetTrackMarker1()
 {
   if (!m_trackMarker1 || g_app->m_editing)
   {
-    m_trackMarker1 = m_shape->m_rootFragment->LookupMarker("MarkerTrack1");
+    m_trackMarker1 = m_shape->GetMarkerData("MarkerTrack1");
     DEBUG_ASSERT(m_trackMarker1);
     Matrix34 rootMat(m_front, g_upVector, m_pos);
-    m_trackMatrix1 = m_trackMarker1->GetWorldMatrix(rootMat);
+    m_trackMatrix1 = m_shape->GetMarkerWorldMatrix(m_trackMarker1, rootMat);
   }
 
   return m_trackMatrix1.pos;
@@ -369,10 +369,10 @@ LegacyVector3 MineBuilding::GetTrackMarker2()
 {
   if (!m_trackMarker2 || g_app->m_editing)
   {
-    m_trackMarker2 = m_shape->m_rootFragment->LookupMarker("MarkerTrack2");
+    m_trackMarker2 = m_shape->GetMarkerData("MarkerTrack2");
     DEBUG_ASSERT(m_trackMarker2);
     Matrix34 rootMat(m_front, g_upVector, m_pos);
-    m_trackMatrix2 = m_trackMarker2->GetWorldMatrix(rootMat);
+    m_trackMatrix2 = m_shape->GetMarkerWorldMatrix(m_trackMarker2, rootMat);
   }
 
   return m_trackMatrix2.pos;
@@ -485,7 +485,7 @@ TrackLink::TrackLink()
   : MineBuilding()
 {
   m_type = TypeTrackLink;
-  SetShape(g_app->m_resource->GetShape("tracklink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
 }
 
 bool TrackLink::Advance() { return MineBuilding::Advance(); }
@@ -498,7 +498,7 @@ TrackJunction::TrackJunction()
   : MineBuilding()
 {
   m_type = TypeTrackJunction;
-  SetShape(g_app->m_resource->GetShape("tracklink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
 }
 
 void TrackJunction::Initialise(Building* _template)
@@ -560,7 +560,7 @@ TrackStart::TrackStart()
     m_reqBuildingId(-1)
 {
   m_type = TypeTrackStart;
-  SetShape(g_app->m_resource->GetShape("tracklink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
 }
 
 void TrackStart::Initialise(Building* _template)
@@ -631,7 +631,7 @@ TrackEnd::TrackEnd()
     m_reqBuildingId(-1)
 {
   m_type = TypeTrackEnd;
-  SetShape(g_app->m_resource->GetShape("trackLink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("trackLink.shp"));
 }
 
 void TrackEnd::Initialise(Building* _template)
@@ -717,13 +717,13 @@ Refinery::Refinery()
     m_counter1(nullptr)
 {
   m_type = TypeRefinery;
-  SetShape(g_app->m_resource->GetShape("refinery.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("refinery.shp"));
 
-  m_wheel1 = m_shape->m_rootFragment->LookupMarker("MarkerWheel01");
-  m_wheel2 = m_shape->m_rootFragment->LookupMarker("MarkerWheel02");
-  m_wheel3 = m_shape->m_rootFragment->LookupMarker("MarkerWheel03");
+  m_wheel1 = m_shape->GetMarkerData("MarkerWheel01");
+  m_wheel2 = m_shape->GetMarkerData("MarkerWheel02");
+  m_wheel3 = m_shape->GetMarkerData("MarkerWheel03");
 
-  m_counter1 = m_shape->m_rootFragment->LookupMarker("MarkerCounter");
+  m_counter1 = m_shape->GetMarkerData("MarkerCounter");
 }
 
 const char* Refinery::GetObjectiveCounter()
@@ -801,9 +801,9 @@ void Refinery::Render(float _predictionTime)
   // Render wheels
 
   Matrix34 refineryMat(m_front, g_upVector, m_pos);
-  Matrix34 wheel1Mat = m_wheel1->GetWorldMatrix(refineryMat);
-  Matrix34 wheel2Mat = m_wheel2->GetWorldMatrix(refineryMat);
-  Matrix34 wheel3Mat = m_wheel3->GetWorldMatrix(refineryMat);
+  Matrix34 wheel1Mat = m_shape->GetMarkerWorldMatrix(m_wheel1, refineryMat);
+  Matrix34 wheel2Mat = m_shape->GetMarkerWorldMatrix(m_wheel2, refineryMat);
+  Matrix34 wheel3Mat = m_shape->GetMarkerWorldMatrix(m_wheel3, refineryMat);
 
   float refinerySpeed = RefinerySpeed();
   float predictedWheelRotate = m_wheelRotate - 3.0f * refinerySpeed * _predictionTime;
@@ -832,7 +832,7 @@ void Refinery::Render(float _predictionTime)
   if (gb)
     numRefined = gb->m_link;
 
-  Matrix34 counterMat = m_counter1->GetWorldMatrix(refineryMat);
+  Matrix34 counterMat = m_shape->GetMarkerWorldMatrix(m_counter1, refineryMat);
   glColor4f(0.6f, 0.8f, 0.9f, 1.0f);
   g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined);
   counterMat.pos += counterMat.f * 0.1f;
@@ -854,10 +854,10 @@ Mine::Mine()
     m_wheel2(nullptr)
 {
   m_type = TypeMine;
-  SetShape(g_app->m_resource->GetShape("mine.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("mine.shp"));
 
-  m_wheel1 = m_shape->m_rootFragment->LookupMarker("MarkerWheel01");
-  m_wheel2 = m_shape->m_rootFragment->LookupMarker("MarkerWheel02");
+  m_wheel1 = m_shape->GetMarkerData("MarkerWheel01");
+  m_wheel2 = m_shape->GetMarkerData("MarkerWheel02");
 }
 
 void Mine::Render(float _predictionTime)
@@ -868,8 +868,8 @@ void Mine::Render(float _predictionTime)
   // Render wheels
 
   Matrix34 mineMat(m_front, g_upVector, m_pos);
-  Matrix34 wheel1Mat = m_wheel1->GetWorldMatrix(mineMat);
-  Matrix34 wheel2Mat = m_wheel2->GetWorldMatrix(mineMat);
+  Matrix34 wheel1Mat = m_shape->GetMarkerWorldMatrix(m_wheel1, mineMat);
+  Matrix34 wheel2Mat = m_shape->GetMarkerWorldMatrix(m_wheel2, mineMat);
 
   float refinerySpeed = RefinerySpeed();
   float predictedWheelRotate = m_wheelRotate - 3.0f * refinerySpeed * _predictionTime;

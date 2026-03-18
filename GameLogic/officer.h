@@ -39,7 +39,7 @@ public:
     LegacyVector3     m_orderPosition;                // Position in the world
     int         m_ordersBuildingId;             // Id of target building eg Teleport
 
-    ShapeMarker *m_flagMarker;
+    ShapeMarkerData *m_flagMarker;
     Flag        m_flag;
 
 protected:

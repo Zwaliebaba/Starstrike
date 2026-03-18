@@ -798,10 +798,10 @@ void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
   }
 }
 
-void Renderer::MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transform)
+void Renderer::MarkUsedCells(const ShapeFragmentData* _frag, const Matrix34& _transform)
 {
 #if USE_PIXEL_EFFECT_GRID_OPTIMISATION
-  Matrix34 total(_frag->m_transform * _transform); LegacyVector3 worldPos = _frag->m_center * total;
+  Matrix34 total(Matrix34(_frag->m_baseTransform) * _transform); LegacyVector3 worldPos = _frag->m_center * total;
 
   // Return early if this shape fragment isn't on the screen
   {
@@ -813,13 +813,13 @@ void Renderer::MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transf
   // Recurse into all child fragments
   int numChildren = _frag->m_childFragments.Size(); for (int i = 0; i < numChildren; ++i)
   {
-    const ShapeFragment* child = _frag->m_childFragments.GetData(i);
+    const ShapeFragmentData* child = _frag->m_childFragments.GetData(i);
     MarkUsedCells(child, total);
   }
 #endif // USE_PIXEL_EFFECT_GRID_OPTIMISATION
 }
 
-void Renderer::MarkUsedCells(const Shape* _shape, const Matrix34& _transform)
+void Renderer::MarkUsedCells(const ShapeStatic* _shape, const Matrix34& _transform)
 {
   START_PROFILE(g_app->m_profiler, "MarkUsedCells");
   MarkUsedCells(_shape->m_rootFragment, _transform);

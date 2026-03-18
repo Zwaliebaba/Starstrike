@@ -27,7 +27,7 @@ class SpawnBuilding : public Building
 {
 protected:
     LList       <SpawnBuildingLink *> m_links;
-    ShapeMarker *m_spiritLink;
+    ShapeMarkerData *m_spiritLink;
 
     LegacyVector3     m_visibilityMidpoint;
     float       m_visibilityRadius;
@@ -102,7 +102,7 @@ protected:
     float           m_spawnTimer;
     int             m_populationLock;               // Building ID (if found), -1 = not yet searched, -2 = nothing found
     int             m_numFriendsNearby;
-    ShapeMarker     *m_doorMarker;
+    ShapeMarkerData     *m_doorMarker;
 
 public:
     SpawnPoint();
@@ -148,6 +148,6 @@ public:
     void Write  ( FileWriter *_out );
 
     bool DoesSphereHit      (LegacyVector3 const &_pos, float _radius);
-    bool DoesShapeHit       (Shape *_shape, Matrix34 _transform);
+    bool DoesShapeHit       (ShapeStatic *_shape, Matrix34 _transform);
 };
 

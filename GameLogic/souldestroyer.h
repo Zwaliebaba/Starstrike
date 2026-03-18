@@ -8,7 +8,7 @@
 #define SOULDESTROYER_DAMAGERANGE          25.0f
 #define SOULDESTROYER_MAXSPIRITS           50
 
-class Shape;
+class ShapeStatic;
 
 
 
@@ -24,9 +24,9 @@ protected:
     float           m_retargetTimer;
     float           m_panic;
 
-    static Shape        *s_shapeHead;
-    static Shape        *s_shapeTail;
-    static ShapeMarker  *s_tailMarker;
+    static ShapeStatic        *s_shapeHead;
+    static ShapeStatic        *s_shapeTail;
+    static ShapeMarkerData  *s_tailMarker;
 
     LegacyVector3      m_spiritPosition[SOULDESTROYER_MAXSPIRITS];
 

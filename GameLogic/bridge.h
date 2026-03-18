@@ -20,8 +20,8 @@ public:
     float   m_status;                           // Construction status, 0=not started, 100=finished, < 0.0f = shutdown
 
 protected:
-    Shape       *m_shapes[NumBridgeTypes];
-    ShapeMarker *m_signal;
+    ShapeStatic       *m_shapes[NumBridgeTypes];
+    ShapeMarkerData *m_signal;
 
     bool    m_beingOperated;
 

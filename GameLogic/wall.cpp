@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "wall.h"
 #include "GameApp.h"
 #include "location.h"
@@ -13,7 +13,7 @@ Wall::Wall()
 {
   m_type = TypeWall;
 
-  SetShape(g_app->m_resource->GetShape("wall.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("wall.shp"));
 }
 
 bool Wall::Advance()

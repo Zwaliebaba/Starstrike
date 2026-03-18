@@ -2,7 +2,7 @@
 
 #include "building.h"
 
-class ShapeMarker;
+class ShapeMarkerData;
 
 
 class Cave : public Building
@@ -13,7 +13,7 @@ protected:
     float           m_spawnTimer;
     bool            m_dead;
 
-    ShapeMarker     *m_spawnPoint;
+    ShapeMarkerData     *m_spawnPoint;
 
 public:
     Cave();

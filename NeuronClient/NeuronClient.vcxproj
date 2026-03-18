@@ -188,7 +188,8 @@
     <ClInclude Include="server.h" />
     <ClInclude Include="servertoclient.h" />
     <ClInclude Include="servertoclientletter.h" />
-    <ClInclude Include="shape.h" />
+    <ClInclude Include="ShapeStatic.h" />
+    <ClInclude Include="ShapeInstance.h" />
     <ClInclude Include="slice_darray.h" />
     <ClInclude Include="sorting_hash_table.h" />
     <ClInclude Include="soundsystem.h" />
@@ -291,7 +292,8 @@
     <ClCompile Include="server.cpp" />
     <ClCompile Include="servertoclient.cpp" />
     <ClCompile Include="servertoclientletter.cpp" />
-    <ClCompile Include="shape.cpp" />
+    <ClCompile Include="ShapeStatic.cpp" />
+    <ClCompile Include="ShapeInstance.cpp" />
     <ClCompile Include="soundsystem.cpp" />
     <ClCompile Include="sound_filter.cpp" />
     <ClCompile Include="sound_instance.cpp" />

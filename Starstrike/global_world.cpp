@@ -7,7 +7,7 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "string_utils.h"
 #include "text_renderer.h"
 #include "text_stream_readers.h"
@@ -51,7 +51,7 @@ GlobalBuilding::GlobalBuilding()
     m_type(Building::TypeTrunkPort),
     m_online(false),
     m_link(-1),
-    m_shape(nullptr) { m_shape = g_app->m_resource->GetShape("trunkport.shp"); }
+    m_shape(nullptr) { m_shape = g_app->m_resource->GetShapeStatic("trunkport.shp"); }
 
 // ****************************************************************************
 // Class GlobalEventCondition
@@ -616,7 +616,7 @@ int GlobalResearch::GetType(const char* _name)
 // Class GlobalWorld
 // ****************************************************************************
 
-void ColourShapeFragment(ShapeFragment* _frag, const RGBAColour& _colour)
+void ColourShapeFragment(ShapeFragmentData* _frag, const RGBAColour& _colour)
 {
   if (_frag->m_numColours == 0)
     _frag->m_colours = new RGBAColour [1];
@@ -639,11 +639,9 @@ SphereWorld::SphereWorld()
     m_numLocations(0),
     m_spirits(nullptr)
 {
-  //#ifndef DEMOBUILD
-  m_shapeOuter = g_app->m_resource->GetShape("globalworld_outer.shp");
-  m_shapeMiddle = g_app->m_resource->GetShape("globalworld_middle.shp");
-  m_shapeInner = g_app->m_resource->GetShape("globalworld_inner.shp");
-  //#endif
+  m_shapeOuter = g_app->m_resource->GetShapeStatic("globalworld_outer.shp");
+  m_shapeMiddle = g_app->m_resource->GetShapeStatic("globalworld_middle.shp");
+  m_shapeInner = g_app->m_resource->GetShapeStatic("globalworld_inner.shp");
 }
 
 void SphereWorld::AddLocation(int _locationId)

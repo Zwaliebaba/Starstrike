@@ -10,8 +10,8 @@ class ArmyAnt : public Entity
 {
 protected:
     float       m_scale;
-    Shape       *m_shapes[3];
-    ShapeMarker *m_carryMarker;
+    ShapeStatic       *m_shapes[3];
+    ShapeMarkerData *m_carryMarker;
 
     bool    AdvanceScoutArea();
     bool    AdvanceCollectSpirit();

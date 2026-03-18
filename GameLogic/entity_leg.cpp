@@ -2,7 +2,7 @@
 
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "entity.h"
 #include "entity_leg.h"
 #include "GameApp.h"
@@ -14,20 +14,20 @@ EntityLeg::EntityLeg(int _legNum, Entity* _parent, const char* _shapeNameUpper, 
   : m_legNum(_legNum),
     m_parent(_parent)
 {
-  m_shapeUpper = g_app->m_resource->GetShape(_shapeNameUpper);
-  m_shapeLower = g_app->m_resource->GetShape(_shapeNameLower);
+  m_shapeUpper = g_app->m_resource->GetShapeStatic(_shapeNameUpper);
+  m_shapeLower = g_app->m_resource->GetShapeStatic(_shapeNameLower);
   ASSERT_TEXT(m_shapeUpper, "EntityLeg: Couldn't load leg shape %s", _shapeNameUpper);
   ASSERT_TEXT(m_shapeLower, "EntityLeg: Couldn't load leg shape %s", _shapeNameLower);
 
-  ShapeMarker* endMarker = m_shapeUpper->m_rootFragment->LookupMarker("MarkerEnd");
-  const Matrix34& endMatrix = endMarker->GetWorldMatrix(Matrix34(0));
+  ShapeMarkerData* endMarker = m_shapeUpper->GetMarkerData("MarkerEnd");
+  const Matrix34 endMatrix = m_shapeUpper->GetMarkerWorldMatrix(endMarker, Matrix34(0));
   m_thighLen = endMatrix.pos.Mag();
 
-  endMarker = m_shapeLower->m_rootFragment->LookupMarker("MarkerEnd");
-  const Matrix34& endMatrixLower = endMarker->GetWorldMatrix(Matrix34(0));
+  endMarker = m_shapeLower->GetMarkerData("MarkerEnd");
+  const Matrix34 endMatrixLower = m_shapeLower->GetMarkerWorldMatrix(endMarker, Matrix34(0));
   m_shinLen = endMatrixLower.pos.Mag();
 
-  m_rootMarker = m_parent->m_shape->m_rootFragment->LookupMarker(_rootMarkerName);
+  m_rootMarker = m_parent->m_shape->GetMarkerData(_rootMarkerName);
   ASSERT_TEXT(m_rootMarker, "EntityLeg: Couldn't find root marker %s", _rootMarkerName);
 
   m_foot.m_state = EntityFoot::OnGround;
@@ -36,7 +36,7 @@ EntityLeg::EntityLeg(int _legNum, Entity* _parent, const char* _shapeNameUpper, 
 LegacyVector3 EntityLeg::GetLegRootPos()
 {
   Matrix34 rootMat(m_parent->m_front, g_upVector, m_parent->m_pos);
-  const Matrix34& resultMat = m_rootMarker->GetWorldMatrix(rootMat);
+  const Matrix34& resultMat = m_parent->m_shape->GetMarkerWorldMatrix(m_rootMarker, rootMat);
 
   return resultMat.pos;
 }

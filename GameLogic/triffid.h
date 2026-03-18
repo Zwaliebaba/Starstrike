@@ -7,8 +7,8 @@
 class Triffid : public Building
 {
 protected:
-    ShapeMarker     *m_launchPoint;
-    ShapeMarker     *m_stem;
+    ShapeMarkerData *m_launchPoint;
+    ShapeMarkerData *m_stem;
     float           m_timerSync;
     float           m_damage;
     bool            m_triggered;

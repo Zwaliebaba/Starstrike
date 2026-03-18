@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "preferences.h"
 #include "constructionyard.h"
 #include "researchitem.h"
@@ -24,16 +24,16 @@ ConstructionYard::ConstructionYard()
     m_alpha(0.0f)
 {
   m_type = TypeYard;
-  SetShape(g_app->m_resource->GetShape("constructionyard.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("constructionyard.shp"));
 
-  m_rung = g_app->m_resource->GetShape("constructionyardrung.shp");
-  m_primitive = g_app->m_resource->GetShape("mineprimitive1.shp");
+  m_rung = g_app->m_resource->GetShapeStatic("constructionyardrung.shp");
+  m_primitive = g_app->m_resource->GetShapeStatic("mineprimitive1.shp");
 
   for (int i = 0; i < YARD_NUMPRIMITIVES; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerPrimitive0%d", i + 1);
-    m_primitives[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_primitives[i] = m_shape->GetMarkerData(name);
     DEBUG_ASSERT(m_primitives[i]);
   }
 
@@ -41,7 +41,7 @@ ConstructionYard::ConstructionYard()
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerSpike0%d", i + 1);
-    m_rungSpikes[i] = m_rung->m_rootFragment->LookupMarker(name);
+    m_rungSpikes[i] = m_rung->GetMarkerData(name);
     DEBUG_ASSERT(m_rungSpikes[i]);
   }
 }
@@ -80,7 +80,7 @@ bool ConstructionYard::Advance()
         m_numSurges = 1;
 
         Matrix34 mat(m_front, g_upVector, m_pos);
-        Matrix34 prim = m_primitives[5]->GetWorldMatrix(mat);
+        Matrix34 prim = m_shape->GetMarkerWorldMatrix(m_primitives[5], mat);
         WorldObjectId objId = g_app->m_location->SpawnEntities(prim.pos, 2, -1, Entity::TypeArmour, 1, g_zeroVector, 0.0f);
         Entity* entity = g_app->m_location->GetEntity(objId);
         auto armour = static_cast<Armour*>(entity);
@@ -146,7 +146,7 @@ void ConstructionYard::Render(float _predictionTime)
   for (int i = 0; i < m_numPrimitives; ++i)
   {
     Matrix34 mat(m_front, g_upVector, m_pos);
-    Matrix34 prim = m_primitives[i]->GetWorldMatrix(mat);
+    Matrix34 prim = m_shape->GetMarkerWorldMatrix(m_primitives[i], mat);
     prim.pos.y += sinf(g_gameTime + i) * 5.0f;
 
     m_primitive->Render(_predictionTime, prim);
@@ -270,7 +270,7 @@ void ConstructionYard::RenderAlphas(float _predictionTime)
 
       for (int i = 0; i < YARD_NUMRUNGSPIKES; ++i)
       {
-        Matrix34 spikeMat = m_rungSpikes[i]->GetWorldMatrix(rungMat);
+        Matrix34 spikeMat = m_rung->GetMarkerWorldMatrix(m_rungSpikes[i], rungMat);
         LegacyVector3 pos = spikeMat.pos;
 
         for (int j = 0; j < numStars; ++j)
@@ -339,15 +339,15 @@ DisplayScreen::DisplayScreen()
   : Building()
 {
   m_type = TypeDisplayScreen;
-  SetShape(g_app->m_resource->GetShape("displayscreen.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("displayscreen.shp"));
 
-  m_armour = g_app->m_resource->GetShape("armour.shp");
+  m_armour = g_app->m_resource->GetShapeStatic("armour.shp");
 
   for (int i = 0; i < DISPLAYSCREEN_NUMRAYS; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerRay0%d", i + 1);
-    m_rays[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_rays[i] = m_shape->GetMarkerData(name);
   }
 }
 
@@ -404,7 +404,7 @@ void DisplayScreen::RenderAlphas(float _predictionTime)
   for (int i = 0; i < DISPLAYSCREEN_NUMRAYS; ++i)
   {
     Matrix34 buildingMat(m_front, m_up, m_pos);
-    Matrix34 rayMat = m_rays[i]->GetWorldMatrix(buildingMat);
+    Matrix34 rayMat = m_shape->GetMarkerWorldMatrix(m_rays[i], buildingMat);
 
     LegacyVector3 rayToArmour = (rayMat.pos - targetPos).Normalise();
     LegacyVector3 right = (g_app->m_camera->GetPos() - rayMat.pos) ^ rayToArmour;

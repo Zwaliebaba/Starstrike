@@ -13,11 +13,11 @@
 class GunTurret : public Building
 {
 protected:
-    Shape           *m_turret;
-    Shape           *m_barrel;
-    ShapeMarker     *m_barrelMount;
-    ShapeMarker     *m_barrelEnd[GUNTURRET_NUMBARRELS];
-    ShapeMarker     *m_statusMarkers[GUNTURRET_NUMSTATUSMARKERS];
+    ShapeStatic     *m_turret;
+    ShapeStatic     *m_barrel;
+    ShapeMarkerData *m_barrelMount;
+    ShapeMarkerData *m_barrelEnd[GUNTURRET_NUMBARRELS];
+    ShapeMarkerData *m_statusMarkers[GUNTURRET_NUMSTATUSMARKERS];
 
     LegacyVector3         m_turretFront;
     LegacyVector3         m_barrelUp;

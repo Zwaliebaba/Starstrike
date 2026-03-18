@@ -2,7 +2,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "vector2.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "hi_res_time.h"
 
 #include "weapons.h"
@@ -31,7 +31,7 @@ ThrowableWeapon::ThrowableWeapon(int _type, const LegacyVector3& _startPos, cons
     m_force(1.0f),
     m_numFlashes(0)
 {
-  m_shape = g_app->m_resource->GetShape("throwable.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("throwable.shp");
   m_pos = _startPos;
   m_vel = _front * _force;
 
@@ -329,7 +329,7 @@ Rocket::Rocket(LegacyVector3 _startPos, LegacyVector3 _targetPos)
   m_pos = _startPos + LegacyVector3(0, 2, 0);
   m_vel = (_targetPos - m_pos).Normalise() * 50.0f;
 
-  m_shape = g_app->m_resource->GetShape("throwable.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("throwable.shp");
 
   m_timer = GetHighResTime();
   m_type = EffectRocket;
@@ -648,7 +648,7 @@ Shockwave::Shockwave(int _teamId, float _size)
     m_size(_size),
     m_life(_size)
 {
-  //    m_shape = g_app->m_resource->GetShape( "shockwave.shp" );
+  //    m_shape = g_app->m_resource->GetShapeStatic( "shockwave.shp" );
   m_type = EffectShockwave;
 }
 
@@ -885,8 +885,8 @@ void MuzzleFlash::Render(float _predictionTime)
 Missile::Missile()
   : WorldObject()
 {
-  m_shape = g_app->m_resource->GetShape("missile.shp");
-  m_booster = m_shape->m_rootFragment->LookupMarker("MarkerBooster");
+  m_shape = g_app->m_resource->GetShapeStatic("missile.shp");
+  m_booster = m_shape->GetMarkerData("MarkerBooster");
 
   int rocketResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeRocket);
   m_life = 5.0f + rocketResearch * 5.0f;
@@ -956,7 +956,7 @@ bool Missile::Advance()
   float size = 50.0f + syncfrand(150.0f);
 
   Matrix34 mat(m_front, m_up, m_pos);
-  LegacyVector3 boosterPos = m_booster->GetWorldMatrix(mat).pos;
+  LegacyVector3 boosterPos = m_shape->GetMarkerWorldMatrix(m_booster, mat).pos;
   g_app->m_particleSystem->CreateParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 2.0f, vel, Particle::TypeMissileTrail, size);
   g_app->m_particleSystem->CreateParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 1.5f, vel, Particle::TypeMissileTrail, size);
 
@@ -985,7 +985,7 @@ void Missile::Render(float _predictionTime)
   glDisable(GL_COLOR_MATERIAL);
   glDisable(GL_CULL_FACE);
 
-  LegacyVector3 boosterPos = m_booster->GetWorldMatrix(mat).pos;
+  LegacyVector3 boosterPos = m_shape->GetMarkerWorldMatrix(m_booster, mat).pos;
   m_fire.m_pos = boosterPos;
   m_fire.m_vel = m_vel;
   m_fire.m_size = 30.0f + frand(20.0f);
@@ -1142,7 +1142,7 @@ void TurretShell::Render(float predictionTime)
   predictedFront.Normalise();
   LegacyVector3 right = predictedFront ^ g_upVector;
   LegacyVector3 up = right ^ predictedFront;
-  Shape* shape = g_app->m_resource->GetShape("turretshell.shp");
+  ShapeStatic* shape = g_app->m_resource->GetShapeStatic("turretshell.shp");
 
   Matrix34 shellMat(predictedFront, up, predictedPos);
 

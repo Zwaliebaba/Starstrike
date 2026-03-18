@@ -6,7 +6,7 @@
 #include "file_writer.h"
 #include "profiler.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 
 #include "GameApp.h"
@@ -27,7 +27,7 @@ Powerstation::Powerstation()
     m_linkedBuildingId(-1)
 {
     m_type = Building::TypePowerstation;
-	SetShape( g_app->m_resource->GetShape("powerstation.shp") );
+	SetShape( g_app->m_resource->GetShapeStatic("powerstation.shp") );
 }
 
 

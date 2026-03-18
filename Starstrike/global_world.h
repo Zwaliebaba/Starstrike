@@ -5,7 +5,7 @@
 
 class FileWriter;
 class TextReader;
-class Shape;
+class ShapeStatic;
 class Building;
 class GlobalInternet;
 
@@ -46,7 +46,7 @@ class GlobalBuilding
     int m_type;
     bool m_online;
     int m_link;
-    Shape* m_shape;
+    ShapeStatic* m_shape;
 
     GlobalBuilding();
 };
@@ -205,9 +205,9 @@ class GlobalResearch
 class SphereWorld
 {
   public:
-    Shape* m_shapeOuter;
-    Shape* m_shapeMiddle;
-    Shape* m_shapeInner;
+    ShapeStatic* m_shapeOuter;
+    ShapeStatic* m_shapeMiddle;
+    ShapeStatic* m_shapeInner;
 
     int m_numLocations;
     LList<float>* m_spirits; // An array with one LList<float> per location

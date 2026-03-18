@@ -12,7 +12,7 @@
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 
 #define FOOT_MOVE_THRESHOLD	        5.0f	// Lower means feet are lifted when less distant from their ideal pos, and thus smaller steps are taken
@@ -53,8 +53,8 @@ Spider::Spider()
 {
   m_stats[StatHealth] = 200;
 
-  m_shape = g_app->m_resource->GetShape("spider.shp");
-  m_eggLay = m_shape->m_rootFragment->LookupMarker("MarkerEggLay");
+  m_shape = g_app->m_resource->GetShapeStatic("spider.shp");
+  m_eggLay = m_shape->GetMarkerData("MarkerEggLay");
 
   m_parameters[0].m_legLift = 3.0f;
   m_parameters[0].m_idealLegSlope = 2.6f;
@@ -583,7 +583,7 @@ bool Spider::AdvanceEggLaying()
   if (arrived)
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    Matrix34 eggLayMat = m_eggLay->GetWorldMatrix(mat);
+    Matrix34 eggLayMat = m_shape->GetMarkerWorldMatrix(m_eggLay, mat);
 
     g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, g_zeroVector, 0.0f);
 

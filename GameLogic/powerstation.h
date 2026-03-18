@@ -3,9 +3,9 @@
 #include "building.h"
 
 
-class Shape;
-class ShapeFragment;
-class ShapeMarker;
+class ShapeStatic;
+class ShapeFragmentData;
+class ShapeMarkerData;
 
 
 class Powerstation : public Building

@@ -35,14 +35,17 @@ void Tumbler::Advance()
   m_angVel *= 1.0f - (g_advanceTime * ROT_FRICTION_COEF);
 }
 
-Explosion::Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fraction)
+Explosion::Explosion(const ShapeFragmentData* _frag, const FragmentState* _states, const Matrix34& _transform, float _fraction)
   : m_tumblers(NUM_TUMBLERS),
     m_timeToDie(g_gameTime + EXPLOSION_LIFETIME)
 {
   std::vector<ExplodingTri> triangles;
   triangles.reserve(_frag->m_numTriangles);
 
-  Matrix34 totalTransform(_frag->m_transform * _transform);
+  Matrix34 localTransform = _states
+    ? Matrix34(_states[_frag->m_fragmentIndex].transform)
+    : Matrix34(_frag->m_baseTransform);
+  Matrix34 totalTransform(localTransform * _transform);
   LegacyVector3 transformedFragCenter = _frag->m_center * totalTransform;
 
   for (int j = 0; j < _frag->m_numTriangles; ++j)
@@ -188,33 +191,36 @@ ExplosionManager::~ExplosionManager()
     delete e;
 }
 
-void ExplosionManager::AddExplosion(ShapeFragment* _frag, const Matrix34& _transform, bool _recurse, float _fraction)
+void ExplosionManager::AddExplosion(const ShapeFragmentData* _frag, const FragmentState* _states, const Matrix34& _transform, bool _recurse, float _fraction)
 {
   if (_fraction <= 0.0f)
     return;
 
   if (_frag->m_numTriangles > 0)
   {
-    auto explosion = new Explosion(_frag, _transform, _fraction);
+    auto explosion = new Explosion(_frag, _states, _transform, _fraction);
     m_explosions.push_back(explosion);
   }
 
   if (_recurse)
   {
-    Matrix34 totalMatrix(_frag->m_transform * _transform);
+    Matrix34 localTransform = _states
+      ? Matrix34(_states[_frag->m_fragmentIndex].transform)
+      : Matrix34(_frag->m_baseTransform);
+    Matrix34 totalMatrix(localTransform * _transform);
 
     for (unsigned int i = 0; i < _frag->m_childFragments.Size(); ++i)
     {
-      ShapeFragment* child = _frag->m_childFragments[i];
-      AddExplosion(child, totalMatrix, true, _fraction);
+      ShapeFragmentData* child = _frag->m_childFragments.GetData(i);
+      AddExplosion(child, _states, totalMatrix, true, _fraction);
     }
   }
 }
 
-void ExplosionManager::AddExplosion(const Shape* _shape, const Matrix34& _transform, float _fraction)
+void ExplosionManager::AddExplosion(const ShapeStatic* _shape, const Matrix34& _transform, float _fraction)
 {
   if (_fraction > 0.0f)
-    AddExplosion(_shape->m_rootFragment, _transform, true, _fraction);
+    AddExplosion(_shape->m_rootFragment, _shape->m_defaultStates, _transform, true, _fraction);
 }
 
 void ExplosionManager::Reset()

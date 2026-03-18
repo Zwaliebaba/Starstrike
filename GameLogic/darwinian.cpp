@@ -22,7 +22,7 @@
 #include "resource.h"
 #include "rocket.h"
 #include "routing_system.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 #include "taskmanager.h"
 #include "team.h"
@@ -2338,7 +2338,7 @@ BoxKite::BoxKite()
     m_birthTime(0.0f),
     m_deathTime(0.0f)
 {
-  m_shape = g_app->m_resource->GetShape("boxkite.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("boxkite.shp");
   m_birthTime = GetHighResTime();
 
   m_size = 1.0f + syncsfrand(1.0f);

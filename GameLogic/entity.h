@@ -7,7 +7,7 @@
 
 class Unit;
 class InsertionSquad;
-class Shape;
+class ShapeStatic;
 class TeamControls;
 
 // ****************************************************************************
@@ -64,7 +64,7 @@ public:
     LegacyVector3             m_front;
     LegacyVector3				m_angVel;
 
-    Shape               *m_shape;                   // Might be NULL
+    ShapeStatic               *m_shape;                   // Might be NULL
     LegacyVector3             m_centerPos;
     float               m_radius;                   // Can be Zero, which means its a sprite
 

@@ -1,43 +1,35 @@
 #include "pch.h"
 #include "resource.h"
-
-
-
 #include "upgrade_port.h"
-
 #include "GameApp.h"
 #include "global_world.h"
 
-
 UpgradePort::UpgradePort()
-:   Building()
+  : Building()
 {
-	m_type = TypeUpgradePort;
-	SetShape( g_app->m_resource->GetShape("upgrade_port.shp") );
+  m_type = TypeUpgradePort;
+  SetShape(g_app->m_resource->GetShapeStatic("upgrade_port.shp"));
 }
-
-
 
 PrimaryUpgradePort::PrimaryUpgradePort()
-:   Building(),
+  : Building(),
     m_controlTowersOwned(0)
 {
-    m_type = TypePrimaryUpgradePort;
-    SetShape( g_app->m_resource->GetShape("primaryupgradeport.shp" ) );
+  m_type = TypePrimaryUpgradePort;
+  SetShape(g_app->m_resource->GetShapeStatic("primaryupgradeport.shp"));
 }
-
 
 void PrimaryUpgradePort::ReprogramComplete()
 {
-    m_controlTowersOwned++;
+  m_controlTowersOwned++;
 
-    if( m_controlTowersOwned == 3 )
+  if (m_controlTowersOwned == 3)
+  {
+    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    if (gb)
     {
-        GlobalBuilding *gb = g_app->m_globalWorld->GetBuilding( m_id.GetUniqueId(), g_app->m_locationId );
-        if( gb )
-        {
-            gb->m_online = true;
-            g_app->m_globalWorld->EvaluateEvents();
-        }
+      gb->m_online = true;
+      g_app->m_globalWorld->EvaluateEvents();
     }
+  }
 }

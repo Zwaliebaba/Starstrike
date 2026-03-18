@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "input.h"
@@ -30,9 +30,9 @@ Armour::Armour()
 {
   SetType(TypeArmour);
 
-  m_shape = g_app->m_resource->GetShape("armour.shp");
-  m_markerEntrance = m_shape->m_rootFragment->LookupMarker("MarkerEntrance");
-  m_markerFlag = m_shape->m_rootFragment->LookupMarker("MarkerFlag");
+  m_shape = g_app->m_resource->GetShapeStatic("armour.shp");
+  m_markerEntrance = m_shape->GetMarkerData("MarkerEntrance");
+  m_markerFlag = m_shape->GetMarkerData("MarkerFlag");
 
   m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
   m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centerPos);
@@ -400,7 +400,7 @@ void Armour::RemovePassenger()
 void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)
 {
   Matrix34 mat(m_front, m_up, m_pos);
-  Matrix34 entranceMat = m_markerEntrance->GetWorldMatrix(mat);
+  Matrix34 entranceMat = m_shape->GetMarkerWorldMatrix(m_markerEntrance, mat);
   _exitPos = entranceMat.pos;
   _exitDir = entranceMat.f;
 }
@@ -523,7 +523,7 @@ void Armour::Render(float _predictionTime)
   // Render the flag
 
   float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-  Matrix34 flagMat = m_markerFlag->GetWorldMatrix(bodyMat);
+  Matrix34 flagMat = m_shape->GetMarkerWorldMatrix(m_markerFlag, bodyMat);
   m_flag.SetPosition(flagMat.pos);
   m_flag.SetOrientation(predictedFront * -1, predictedUp);
   m_flag.SetSize(20.0f);

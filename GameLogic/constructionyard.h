@@ -14,10 +14,10 @@
 class ConstructionYard : public Building
 {
 protected:
-    Shape           *m_rung;
-    Shape           *m_primitive;
-    ShapeMarker     *m_primitives[YARD_NUMPRIMITIVES];
-    ShapeMarker     *m_rungSpikes[YARD_NUMRUNGSPIKES];
+    ShapeStatic     *m_rung;
+    ShapeStatic     *m_primitive;
+    ShapeMarkerData *m_primitives[YARD_NUMPRIMITIVES];
+    ShapeMarkerData *m_rungSpikes[YARD_NUMRUNGSPIKES];
 
     int     m_numPrimitives;
     int     m_numSurges;
@@ -55,8 +55,8 @@ public:
 class DisplayScreen : public Building
 {
 protected:
-    Shape       *m_armour;
-    ShapeMarker *m_rays[DISPLAYSCREEN_NUMRAYS];
+    ShapeStatic       *m_armour;
+    ShapeMarkerData *m_rays[DISPLAYSCREEN_NUMRAYS];
 
 public:
     DisplayScreen();

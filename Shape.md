@@ -1,10 +1,11 @@
-# Shape System Refactor: ShapeMaster / ShapeInstance Split
+# Shape System Refactor: ShapeStatic / ShapeInstance Split
 
 ## ADR-002: Separate Shared Shape Geometry from Per-Instance Animation State
 
 **Status**: Proposed  
+**Status**: Implemented  
 **Date**: 2025-07-24  
-**Review Date**: 2025-07-24
+**Implemented**: 2025-07-26
 
 ---
 
@@ -111,12 +112,12 @@ All of these treat `m_shape` as read-only during render and hit-test. They pass 
 ### 3.1 New Class Hierarchy
 
 ```
-ShapeMaster                (shared, loaded once per .shp file)
+ShapeStatic                (shared, loaded once per .shp file)
 ├── ShapeFragmentData[]    (geometry, names, bounds, tree structure)
 └── ShapeMarkerData[]      (name, parentName, depth, base transform)
 
 ShapeInstance              (per-entity, lightweight)
-├── ShapeMaster*           (back-pointer to shared data)
+├── ShapeStatic*           (back-pointer to shared data)
 └── FragmentState[]        (flat array indexed by fragment ordinal)
      ├── Transform3D  transform
      ├── LegacyVector3 angVel
@@ -126,8 +127,8 @@ ShapeInstance              (per-entity, lightweight)
 ### 3.2 ShapeFragmentData (new — replaces immutable half of ShapeFragment)
 
 ```cpp
-// Immutable geometry and metadata for one fragment. Owned by ShapeMaster.
-// Shared by all ShapeInstances that reference the same ShapeMaster.
+// Immutable geometry and metadata for one fragment. Owned by ShapeStatic.
+// Shared by all ShapeInstances that reference the same ShapeStatic.
 class ShapeFragmentData
 {
 public:
@@ -155,7 +156,7 @@ public:
     float               m_mostNegativeY;
 
     // Tree structure
-    int                 m_fragmentIndex;    // Ordinal in ShapeMaster's flat array
+    int                 m_fragmentIndex;    // Ordinal in ShapeStatic's flat array
     LList<ShapeFragmentData*> m_childFragments;
     LList<ShapeMarkerData*>   m_childMarkers;
 
@@ -213,19 +214,19 @@ public:
 
 **Key change**: `m_parents` (array of `ShapeFragment*`) becomes `m_parentIndices` (array of `int`). World-matrix computation indexes into the `FragmentState[]` array passed by the caller, eliminating the pointer coupling that currently forces full shape copies.
 
-### 3.5 ShapeMaster (replaces the shared-shape role of Shape)
+### 3.5 ShapeStatic (replaces the shared-shape role of Shape)
 
 ```cpp
-class ShapeMaster
+class ShapeStatic
 {
 public:
     ShapeFragmentData*  m_rootFragment;
     char*               m_name;
     int                 m_numFragments;     // Total fragment count (flat)
 
-    ShapeMaster(const char* _filename);
-    ShapeMaster(TextReader* _in);
-    ~ShapeMaster();
+    ShapeStatic(const char* _filename);
+    ShapeStatic(TextReader* _in);
+    ~ShapeStatic();
 
     void Load(TextReader* _in);
 
@@ -235,7 +236,7 @@ public:
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false) const;
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false) const;
-    bool ShapeHit(ShapeMaster* _shape, const Matrix34& _theTransform,
+    bool ShapeHit(ShapeStatic* _shape, const Matrix34& _theTransform,
                   const Matrix34& _ourTransform, bool _accurate = false) const;
 
     LegacyVector3 CalculateCenter(const Matrix34& _transform) const;
@@ -255,7 +256,7 @@ public:
 };
 ```
 
-When called without a `ShapeInstance`, `ShapeMaster` uses the `m_baseTransform` from each `ShapeFragmentData` (i.e., the rest pose loaded from the file). This covers all current `GetShape` users — they never modify transforms, so they don't need a `ShapeInstance` at all.
+When called without a `ShapeInstance`, `ShapeStatic` uses the `m_baseTransform` from each `ShapeFragmentData` (i.e., the rest pose loaded from the file). This covers all current `GetShape` users — they never modify transforms, so they don't need a `ShapeInstance` at all.
 
 ### 3.6 ShapeInstance (replaces GetShapeCopy for animating entities)
 
@@ -263,10 +264,10 @@ When called without a `ShapeInstance`, `ShapeMaster` uses the `m_baseTransform` 
 class ShapeInstance
 {
 public:
-    ShapeMaster*    m_master;           // Non-owning; Resource owns all masters
+    ShapeStatic*    m_master;           // Non-owning; Resource owns all masters
     FragmentState*  m_fragmentStates;   // Flat array [m_master->m_numFragments]
 
-    explicit ShapeInstance(ShapeMaster* _master);
+    explicit ShapeInstance(ShapeStatic* _master);
     ~ShapeInstance();
 
     // Non-copyable, movable (owns heap-allocated FragmentState[])
@@ -288,7 +289,7 @@ public:
 
     bool RayHit(RayPackage* _package, const Matrix34& _transform, bool _accurate = false) const;
     bool SphereHit(SpherePackage* _package, const Matrix34& _transform, bool _accurate = false) const;
-    bool ShapeHit(ShapeMaster* _shape, const Matrix34& _theTransform,
+    bool ShapeHit(ShapeStatic* _shape, const Matrix34& _theTransform,
                   const Matrix34& _ourTransform, bool _accurate = false) const;
 
     // Marker world-matrix using this instance's fragment transforms
@@ -301,7 +302,7 @@ public:
     float CalculateRadius(const Matrix34& _transform, const LegacyVector3& _center) const;
 
     // Access the master for geometry queries
-    ShapeMaster* GetMaster() const { return m_master; }
+    ShapeStatic* GetMaster() const { return m_master; }
 };
 ```
 
@@ -311,12 +312,12 @@ public:
 class Resource
 {
     // ...existing members...
-    HashTable<ShapeMaster*> m_shapes;   // Was HashTable<Shape*>
+    HashTable<ShapeStatic*> m_shapes;   // Was HashTable<Shape*>
 
 public:
     // Shared geometry — replaces GetShape.
     // Returns cached master; loads from disk on first call.
-    ShapeMaster* GetShapeMaster(const char* _name);
+    ShapeStatic* GetShapeStatic(const char* _name);
 
     // Deprecated compatibility wrappers (Phase 2 removal)
     // Shape* GetShape(const char* _name);       // REMOVED
@@ -342,72 +343,72 @@ Options:
 ### Phase 1: Introduce New Types Alongside Old (Non-Breaking)
 
 **Files to create**:
-- `NeuronClient/ShapeMaster.h` / `NeuronClient/ShapeMaster.cpp`
+- `NeuronClient/ShapeStatic.h` / `NeuronClient/ShapeStatic.cpp`
 - `NeuronClient/ShapeInstance.h` / `NeuronClient/ShapeInstance.cpp`
 
 **Changes to existing files**:
 - `NeuronClient/shape.h` — Add `ShapeFragmentData`, `ShapeMarkerData`, `FragmentState`. Keep old `Shape`, `ShapeFragment`, `ShapeMarker` intact.
-- `NeuronClient/resource.h/.cpp` — Add `GetShapeMaster`. Keep `GetShape` and `GetShapeCopy` working (delegating internally to `ShapeMaster`).
+- `NeuronClient/resource.h/.cpp` — Add `GetShapeStatic`. Keep `GetShape` and `GetShapeCopy` working (delegating internally to `ShapeStatic`).
 
 **Goal**: Both old and new APIs compile and work. No gameplay code changes yet.
 
-### Phase 2: Mechanical `GetShape` → `GetShapeMaster` Type Migration
+### Phase 2: Mechanical `GetShape` → `GetShapeStatic` Type Migration
 
-**Rationale for doing this before RadarDish**: RadarDish inherits `Teleport` → `Building`. Its constructor calls `SetShape(...)`, which writes to `Building::m_shape`. If `Building::m_shape` is still `Shape*` when we try to give RadarDish a `ShapeMaster*`, we need awkward adapters. By migrating the base types first, Phase 3 can cleanly use `ShapeMaster*` everywhere.
+**Rationale for doing this before RadarDish**: RadarDish inherits `Teleport` → `Building`. Its constructor calls `SetShape(...)`, which writes to `Building::m_shape`. If `Building::m_shape` is still `Shape*` when we try to give RadarDish a `ShapeStatic*`, we need awkward adapters. By migrating the base types first, Phase 3 can cleanly use `ShapeStatic*` everywhere.
 
-This phase is a large (~30-35 files) but mechanical find-and-replace. `ShapeMaster` mirrors the read-only API surface of `Shape` exactly, so most call sites compile with just a type substitution.
+This phase is a large (~30-35 files) but mechanical find-and-replace. `ShapeStatic` mirrors the read-only API surface of `Shape` exactly, so most call sites compile with just a type substitution.
 
 #### 2a. Building Hierarchy
 
 | Change | Scope |
 |---|---|
-| `Building::m_shape` type | `Shape*` → `ShapeMaster*` |
-| `Building::SetShape` | Takes `ShapeMaster*` instead of `Shape*` |
-| `Building::s_controlPad` | `Shape*` → `ShapeMaster*` |
+| `Building::m_shape` type | `Shape*` → `ShapeStatic*` |
+| `Building::SetShape` | Takes `ShapeStatic*` instead of `Shape*` |
+| `Building::s_controlPad` | `Shape*` → `ShapeStatic*` |
 | `Building::s_controlPadStatus` | `ShapeMarker*` → `ShapeMarkerData*` |
 | `Building::m_lights` | `LList<ShapeMarker*>` → `LList<ShapeMarkerData*>` |
 | `BuildingPort::m_marker` | `ShapeMarker*` → `ShapeMarkerData*` |
 | `Building::SetShapeLights` | `ShapeFragment*` → `const ShapeFragmentData*` |
 | `Building::SetShapePorts` | `ShapeFragment*` → `const ShapeFragmentData*` |
-| `Building::DoesShapeHit` | `Shape*` → `ShapeMaster*` (virtual, ~10 overrides) |
-| `Building::Render` | Calls `m_shape->Render(...)` — same API, `ShapeMaster::Render` uses rest-pose |
-| `Teleport::SetShape` | Override signature: `Shape*` → `ShapeMaster*` |
+| `Building::DoesShapeHit` | `Shape*` → `ShapeStatic*` (virtual, ~10 overrides) |
+| `Building::Render` | Calls `m_shape->Render(...)` — same API, `ShapeStatic::Render` uses rest-pose |
+| `Teleport::SetShape` | Override signature: `Shape*` → `ShapeStatic*` |
 | `Teleport::m_entrance` | `ShapeMarker*` → `ShapeMarkerData*` |
-| All `g_app->m_resource->GetShape(...)` calls in buildings | → `g_app->m_resource->GetShapeMaster(...)` |
-| Static shapes (`s_shapeHead`, `s_rung`, etc.) | `Shape*` → `ShapeMaster*` — type change only |
+| All `g_app->m_resource->GetShape(...)` calls in buildings | → `g_app->m_resource->GetShapeStatic(...)` |
+| Static shapes (`s_shapeHead`, `s_rung`, etc.) | `Shape*` → `ShapeStatic*` — type change only |
 
 #### 2b. Entity Hierarchy
 
 | Change | Scope |
 |---|---|
-| `Entity::m_shape` | `Shape*` → `ShapeMaster*` |
-| `EntityLeg::m_shapeUpper`, `m_shapeLower` | `Shape*` → `ShapeMaster*` |
+| `Entity::m_shape` | `Shape*` → `ShapeStatic*` |
+| `EntityLeg::m_shapeUpper`, `m_shapeLower` | `Shape*` → `ShapeStatic*` |
 | `EntityLeg::m_rootMarker` | `ShapeMarker*` → `ShapeMarkerData*` |
-| All entity `GetShape` calls | → `GetShapeMaster` |
+| All entity `GetShape` calls | → `GetShapeStatic` |
 
 #### 2c. Weapons
 
 | Change | Scope |
 |---|---|
-| `ThrowableWeapon::m_shape` | `Shape*` → `ShapeMaster*` |
-| `Rocket::m_shape` | `Shape*` → `ShapeMaster*` |
-| `Shockwave::m_shape` | `Shape*` → `ShapeMaster*` |
-| `Missile::m_shape` | `Shape*` → `ShapeMaster*` |
+| `ThrowableWeapon::m_shape` | `Shape*` → `ShapeStatic*` |
+| `Rocket::m_shape` | `Shape*` → `ShapeStatic*` |
+| `Shockwave::m_shape` | `Shape*` → `ShapeStatic*` |
+| `Missile::m_shape` | `Shape*` → `ShapeStatic*` |
 | `Missile::m_booster` | `ShapeMarker*` → `ShapeMarkerData*` |
 
 #### 2d. Global World
 
 | Change | Scope |
 |---|---|
-| `GlobalBuilding::m_shape` | `Shape*` → `ShapeMaster*` |
-| `SphereWorld::m_shapeOuter/Middle/Inner` | `Shape*` → `ShapeMaster*` |
+| `GlobalBuilding::m_shape` | `Shape*` → `ShapeStatic*` |
+| `SphereWorld::m_shapeOuter/Middle/Inner` | `Shape*` → `ShapeStatic*` |
 
 #### 2e. Renderer
 
 | Change | Scope |
 |---|---|
 | `Renderer::MarkUsedCells(const ShapeFragment*, ...)` | → `MarkUsedCells(const ShapeFragmentData*, ...)` |
-| `Renderer::MarkUsedCells(const Shape*, ...)` | → `MarkUsedCells(const ShapeMaster*, ...)` |
+| `Renderer::MarkUsedCells(const Shape*, ...)` | → `MarkUsedCells(const ShapeStatic*, ...)` |
 
 #### 2f. Explosion System
 
@@ -415,7 +416,7 @@ This phase is a large (~30-35 files) but mechanical find-and-replace. `ShapeMast
 |---|---|
 | `Explosion` constructor | `ShapeFragment*` → `const ShapeFragmentData*` + optional `const FragmentState*` (nullable — use `m_baseTransform` when null) |
 | `ExplosionManager::AddExplosion(ShapeFragment*, ...)` | → `AddExplosion(const ShapeFragmentData*, const FragmentState*, ...)` |
-| `ExplosionManager::AddExplosion(const Shape*, ...)` | → `AddExplosion(const ShapeMaster*, ...)` |
+| `ExplosionManager::AddExplosion(const Shape*, ...)` | → `AddExplosion(const ShapeStatic*, ...)` |
 
 Concrete new signatures:
 ```cpp
@@ -426,13 +427,13 @@ Explosion(const ShapeFragmentData* _frag, const FragmentState* _state,
 
 void ExplosionManager::AddExplosion(const ShapeFragmentData* _frag, const FragmentState* _state,
                                      const Matrix34& _transform, bool _recurse, float _fraction);
-void ExplosionManager::AddExplosion(const ShapeMaster* _shape, const Matrix34& _transform,
+void ExplosionManager::AddExplosion(const ShapeStatic* _shape, const Matrix34& _transform,
                                      float _fraction = 1.0f);
 ```
 
 #### 2g. ShapeMarker → ShapeMarkerData Call Sites (~45 GetWorldMatrix calls)
 
-All `ShapeMarker*` member fields become `ShapeMarkerData*`. All `marker->GetWorldMatrix(rootMat)` calls become `m_shape->GetMarkerWorldMatrix(marker, rootMat)` (using the rest-pose convenience method on `ShapeMaster`). This is the most numerous change but each is a one-line substitution.
+All `ShapeMarker*` member fields become `ShapeMarkerData*`. All `marker->GetWorldMatrix(rootMat)` calls become `m_shape->GetMarkerWorldMatrix(marker, rootMat)` (using the rest-pose convenience method on `ShapeStatic`). This is the most numerous change but each is a one-line substitution.
 
 **Representative examples**:
 ```cpp
@@ -451,13 +452,13 @@ Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_entrance, rootMat);
 
 ### Phase 3: Migrate `GetShapeCopy` Call Sites to `ShapeInstance`
 
-**Prerequisite**: Phase 2 is complete — `Building::m_shape` is `ShapeMaster*`, `Teleport::SetShape` takes `ShapeMaster*`, all `ShapeMarker*` members are `ShapeMarkerData*`.
+**Prerequisite**: Phase 2 is complete — `Building::m_shape` is `ShapeStatic*`, `Teleport::SetShape` takes `ShapeStatic*`, all `ShapeMarker*` members are `ShapeMarkerData*`.
 
 Migrate entities that currently call `GetShapeCopy` to use `ShapeInstance`:
 
 | Entity | Current | After |
 |---|---|---|
-| `RadarDish` | `m_shape = GetShapeCopy("radardish.shp", true)` + `delete m_shape` in dtor | `m_shapeInstance = ShapeInstance(GetShapeMaster("radardish.shp"))`. Stores fragment indices for `Dish` and `UpperMount`. Writes `m_shapeInstance.GetState(idx)` instead of `m_dish->m_angVel`. No manual delete needed — instance is a member, destroyed with the entity. |
+| `RadarDish` | `m_shape = GetShapeCopy("radardish.shp", true)` + `delete m_shape` in dtor | `m_shapeInstance = ShapeInstance(GetShapeStatic("radardish.shp"))`. Stores fragment indices for `Dish` and `UpperMount`. Writes `m_shapeInstance.GetState(idx)` instead of `m_dish->m_angVel`. No manual delete needed — instance is a member, destroyed with the entity. |
 
 **Detailed migration for RadarDish**:
 
@@ -469,7 +470,7 @@ ShapeFragment* m_upperMount;
 ShapeMarkerData* m_focusMarker; // ← already changed in Phase 2
 
 // radardish.cpp constructor
-ShapeMaster* radarShape = g_app->m_resource->GetShapeCopy("radardish.shp", true); // still uses copy!
+ShapeStatic* radarShape = g_app->m_resource->GetShapeCopy("radardish.shp", true); // still uses copy!
 SetShape(radarShape);
 m_dish       = m_shape->m_rootFragment->LookupFragment("Dish");
 m_upperMount = m_shape->m_rootFragment->LookupFragment("UpperMount");
@@ -495,7 +496,7 @@ int              m_upperMountIndex;
 ShapeMarkerData* m_focusMarker;
 
 // radardish.cpp constructor
-ShapeMaster* master = g_app->m_resource->GetShapeMaster("radardish.shp");
+ShapeStatic* master = g_app->m_resource->GetShapeStatic("radardish.shp");
 SetShape(master);                                       // Sets Building::m_shape (shared)
 m_shapeInstance = ShapeInstance(master);                 // Move-assigns; allocates FragmentState[]
 m_dishIndex       = master->GetFragmentIndex("Dish");
@@ -523,7 +524,7 @@ For marker world-matrix calls in RadarDish (e.g., `SetDetail`), use `m_shapeInst
 - Remove `GetShape`, `GetShapeCopy` from `Resource`.
 - Drop `Shape::m_animating` — this field is dead code (set in constructors but never read anywhere).
 - Audit `ShapeExporter` (declared `friend class` of `ShapeFragment` at `shape.h:97`). If it's part of the asset pipeline, update it to use `ShapeFragmentData`. If it's unused, remove it.
-- Rename `ShapeMaster` → `Shape` if desired (optional, for familiarity).
+- Rename `ShapeStatic` → `Shape` if desired (optional, for familiarity).
 
 ### Phase 5: Scratch Buffer Improvement (Optional Follow-Up)
 
@@ -544,24 +545,24 @@ For marker world-matrix calls in RadarDish (e.g., `SetDetail`), use `m_shapeInst
 5. Port discovery: `SetShapePorts(m_shape->m_rootFragment)` — stores `ShapeMarker*` into `BuildingPort::m_marker`, calls `marker->GetWorldMatrix(buildingMat)`.
 6. Center/radius: `m_shape->CalculateCenter(mat)` — read-only.
 
-All of these are satisfied by `ShapeMaster*` with no `ShapeInstance` needed. The `SetShapeLights`/`SetShapePorts` recursion switches from `ShapeFragment*` to `const ShapeFragmentData*`, and marker world-matrix calls become `m_shape->GetMarkerWorldMatrix(marker, buildingMat)`.
+All of these are satisfied by `ShapeStatic*` with no `ShapeInstance` needed. The `SetShapeLights`/`SetShapePorts` recursion switches from `ShapeFragment*` to `const ShapeFragmentData*`, and marker world-matrix calls become `m_shape->GetMarkerWorldMatrix(marker, buildingMat)`.
 
 ```cpp
 class Building : public WorldObject
 {
 public:
-    ShapeMaster* m_shape;                   // Shared geometry (was Shape*)
+    ShapeStatic* m_shape;                   // Shared geometry (was Shape*)
     LList<ShapeMarkerData*> m_lights;       // Was LList<ShapeMarker*>
     LList<BuildingPort*> m_ports;
 
-    static ShapeMaster* s_controlPad;       // Was Shape*
+    static ShapeStatic* s_controlPad;       // Was Shape*
     static ShapeMarkerData* s_controlPadStatus; // Was ShapeMarker*
 
-    virtual void SetShape(ShapeMaster* _shape);
+    virtual void SetShape(ShapeStatic* _shape);
     void SetShapeLights(const ShapeFragmentData* _fragment);
     void SetShapePorts(const ShapeFragmentData* _fragment);
 
-    virtual bool DoesShapeHit(ShapeMaster* _shape, Matrix34 _transform);
+    virtual bool DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform);
     // ...rest unchanged...
 };
 
@@ -577,7 +578,7 @@ public:
 
 `Teleport::SetShape` overrides `Building::SetShape` and does:
 ```cpp
-void Teleport::SetShape(ShapeMaster* _shape)   // Was Shape*
+void Teleport::SetShape(ShapeStatic* _shape)   // Was Shape*
 {
     Building::SetShape(_shape);
     m_entrance = _shape->GetMarkerData("MarkerTeleportEntrance");
@@ -631,7 +632,7 @@ class RadarDish : public Teleport    // Teleport : Building
 | `ShapeMarker::m_parents` is an array of raw `ShapeFragment*` | Replaced by `m_parentIndices` (int array). This is the most invasive single change but eliminates the root cause of the copy requirement. |
 | `ShapeInstance` copy semantics cause double-free | Copy constructor and copy assignment are explicitly deleted. Move constructor and move assignment are provided (see §3.6). |
 | `ShapeExporter` is a friend of `ShapeFragment` | Audit `ShapeExporter` usage during Phase 4. If it's part of the asset pipeline, update to use `ShapeFragmentData`. |
-| ~45 `GetWorldMatrix` call sites need signature change | Non-animating callers use `ShapeMaster::GetMarkerWorldMatrix(marker, rootMat)` — a one-line substitution per site. Animating callers (RadarDish) use `ShapeInstance::GetMarkerWorldMatrix`. |
+| ~45 `GetWorldMatrix` call sites need signature change | Non-animating callers use `ShapeStatic::GetMarkerWorldMatrix(marker, rootMat)` — a one-line substitution per site. Animating callers (RadarDish) use `ShapeInstance::GetMarkerWorldMatrix`. |
 | `m_maxTriangles` not in `ShapeFragmentData` | `m_maxTriangles` is only used as a dynamic-array capacity during parsing; after load it equals `m_numTriangles`. Intentionally omitted from `ShapeFragmentData` — no migration needed. |
 
 ---
@@ -639,8 +640,8 @@ class RadarDish : public Teleport    // Teleport : Building
 ## 8. Verification Checklist
 
 - [ ] All `GetShapeCopy` call sites migrated to `ShapeInstance`
-- [ ] All `GetShape` call sites migrated to `GetShapeMaster`
-- [ ] All `Shape*` members migrated to `ShapeMaster*` (Building, Entity, weapons, EntityLeg, GlobalBuilding, SphereWorld)
+- [ ] All `GetShape` call sites migrated to `GetShapeStatic`
+- [ ] All `Shape*` members migrated to `ShapeStatic*` (Building, Entity, weapons, EntityLeg, GlobalBuilding, SphereWorld)
 - [ ] All `ShapeMarker*` members migrated to `ShapeMarkerData*` (~20 fields across codebase)
 - [ ] All ~45 `GetWorldMatrix`/`GetWorldTransform` call sites updated
 - [ ] `RadarDish` dish rotation works identically (visual + gameplay)
@@ -649,11 +650,11 @@ class RadarDish : public Teleport    // Teleport : Building
 - [ ] `ShapeMarker::GetWorldMatrix` produces identical results via index-based lookup
 - [ ] `Explosion` fragments spawn correctly from both shared and instanced shapes
 - [ ] Hit-testing (`RayHit`, `SphereHit`, `ShapeHit`) produces identical results
-- [ ] `Building::DoesShapeHit` and all overrides compile and work with `ShapeMaster*`
+- [ ] `Building::DoesShapeHit` and all overrides compile and work with `ShapeStatic*`
 - [ ] `Building::SetShapeLights`/`SetShapePorts` work with `ShapeFragmentData`
 - [ ] `Building::SetDetail` port/light discovery works with `ShapeFragmentData`
-- [ ] `Renderer::MarkUsedCells` works with `ShapeFragmentData`/`ShapeMaster`
-- [ ] `FlushOpenGlState` / `RegenerateOpenGlState` handle `ShapeMaster` correctly
+- [ ] `Renderer::MarkUsedCells` works with `ShapeFragmentData`/`ShapeStatic`
+- [ ] `FlushOpenGlState` / `RegenerateOpenGlState` handle `ShapeStatic` correctly
 - [ ] `ShapeExporter` audited and updated or removed (Phase 4)
 - [ ] `Shape::m_animating` dead code removed (Phase 4)
 - [ ] No `Shape*`, `ShapeFragment*`, or `ShapeMarker*` types remain in the codebase (Phase 4)

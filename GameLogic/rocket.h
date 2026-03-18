@@ -7,8 +7,8 @@
 class FuelBuilding : public Building
 {
 protected:
-    ShapeMarker     *m_fuelMarker;
-    static Shape    *s_fuelPipe;
+    ShapeMarkerData *m_fuelMarker;
+    static ShapeStatic *s_fuelPipe;
 
 public:
     int             m_fuelLink;
@@ -47,8 +47,8 @@ public:
 class FuelGenerator : public FuelBuilding
 {
 protected:
-    Shape           *m_pump;
-    ShapeMarker     *m_pumpTip;
+    ShapeStatic           *m_pump;
+    ShapeMarkerData     *m_pumpTip;
     float           m_pumpMovement;
     float           m_previousPumpPos;
 
@@ -92,7 +92,7 @@ public:
 class FuelStation : public FuelBuilding
 {
 protected:
-    ShapeMarker *m_entrance;
+    ShapeMarkerData *m_entrance;
 
 public:
     FuelStation();
@@ -118,9 +118,9 @@ public:
 class EscapeRocket : public FuelBuilding
 {
 protected:
-    ShapeMarker     *m_booster;
-    ShapeMarker     *m_window[3];
-    Shape           *m_rocketLowRes;
+    ShapeMarkerData     *m_booster;
+    ShapeMarkerData     *m_window[3];
+    ShapeStatic           *m_rocketLowRes;
     float           m_shadowTimer;
     float           m_cameraShake;
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "math_utils.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "GameApp.h"
 #include "location.h"
 #include "particle_system.h"
@@ -17,7 +17,7 @@ Lander::Lander()
 {
   m_type = TypeLander;
 
-  m_shape = g_app->m_resource->GetShape("lander.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("lander.shp");
   DEBUG_ASSERT(m_shape);
 }
 

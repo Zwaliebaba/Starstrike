@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "eclipse.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_renderer.h"
 #include "targetcursor.h"
 #include "input.h"

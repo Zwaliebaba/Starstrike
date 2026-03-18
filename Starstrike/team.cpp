@@ -3,7 +3,7 @@
 #include "profiler.h"
 #include "resource.h"
 
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "preferences.h"
 
 #include "bitmap.h"

@@ -100,7 +100,7 @@ void LaserTrooper::Render(float predictionTime, int teamId)
   entityFront.RotateAround(m_angVel * predictionTime);
 
   //	Matrix34 transform(entityFront, entityUp, predictedPos);
-  //	Shape *aShape = g_app->m_resource->GetShape("laser_troop.shp");
+  //	ShapeStatic *aShape = g_app->m_resource->GetShapeStatic("laser_troop.shp");
   //	aShape->Render(predictionTime, transform);
 
   LegacyVector3 entityRight = entityFront ^ entityUp;

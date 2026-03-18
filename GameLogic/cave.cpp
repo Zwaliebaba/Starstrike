@@ -2,7 +2,7 @@
 
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 
 #include "explosion.h"
@@ -27,9 +27,9 @@ Cave::Cave()
     m_type = TypeCave;
     m_troopType = Entity::TypeVirii;
 
-    SetShape( g_app->m_resource->GetShape( "cave.shp" ) );
+    SetShape( g_app->m_resource->GetShapeStatic( "cave.shp" ) );
 
-    m_spawnPoint = m_shape->m_rootFragment->LookupMarker( "MarkerSpawnPoint" );
+    m_spawnPoint = m_shape->GetMarkerData( "MarkerSpawnPoint" );
     DEBUG_ASSERT( m_spawnPoint );
 }
 
@@ -49,7 +49,7 @@ bool Cave::Advance()
         // Only spawn if the area is sufficiently empty
 
         Matrix34 rootMat(m_front, g_upVector, m_pos);
-        Matrix34 worldMat = m_spawnPoint->GetWorldMatrix(rootMat);
+        Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_spawnPoint, rootMat);
         LegacyVector3 spawnPoint = worldMat.pos;
         spawnPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue( spawnPoint.x, spawnPoint.z );
 

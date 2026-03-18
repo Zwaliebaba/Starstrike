@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 #include "soundsystem.h"
 #include "GameApp.h"
@@ -23,12 +23,12 @@ ArmyAnt::ArmyAnt()
 {
   m_type = TypeArmyAnt;
 
-  m_shapes[0] = g_app->m_resource->GetShape("armyant.shp");
-  m_shapes[1] = g_app->m_resource->GetShape("armyant2.shp");
-  m_shapes[2] = g_app->m_resource->GetShape("armyant3.shp");
+  m_shapes[0] = g_app->m_resource->GetShapeStatic("armyant.shp");
+  m_shapes[1] = g_app->m_resource->GetShapeStatic("armyant2.shp");
+  m_shapes[2] = g_app->m_resource->GetShapeStatic("armyant3.shp");
 
   m_shape = m_shapes[0];
-  m_carryMarker = m_shape->m_rootFragment->LookupMarker("MarkerCarry");
+  m_carryMarker = m_shape->GetMarkerData("MarkerCarry");
 }
 
 void ArmyAnt::Begin()
@@ -517,7 +517,7 @@ void ArmyAnt::GetCarryMarker(LegacyVector3& _pos, LegacyVector3& _vel)
 {
   LegacyVector3 groundUp = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
   Matrix34 mat(m_front, groundUp, m_pos);
-  _pos = m_carryMarker->GetWorldMatrix(mat).pos;
+  _pos = m_shape->GetMarkerWorldMatrix(m_carryMarker, mat).pos;
   _vel = m_vel;
 }
 

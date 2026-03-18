@@ -5,7 +5,7 @@
 class FeedingTube : public Building
 {
   protected:
-    ShapeMarker* m_focusMarker;
+    ShapeMarkerData* m_focusMarker;
 
     int m_receiverId;
     float m_range;

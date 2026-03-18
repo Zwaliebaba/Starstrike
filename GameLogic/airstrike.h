@@ -42,7 +42,7 @@ class SpaceInvader : public Entity
 protected:
     LegacyVector3         m_targetPos;
     bool            m_armed;
-    Shape           *m_bombShape;
+    ShapeStatic           *m_bombShape;
 
 public:
     SpaceInvader();

@@ -124,7 +124,7 @@ public:
 class BoxKite : public WorldObject
 {
 public:
-    Shape       *m_shape;
+    ShapeStatic       *m_shape;
     LegacyVector3     m_front;
     LegacyVector3     m_up;
 

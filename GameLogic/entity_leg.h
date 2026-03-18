@@ -4,8 +4,8 @@
 #include "LegacyVector3.h"
 
 class Entity;
-class ShapeMarker;
-class Shape;
+class ShapeMarkerData;
+class ShapeStatic;
 
 
 //*****************************************************************************
@@ -45,9 +45,9 @@ public:
 
 	int				m_legNum;
 	EntityFoot		m_foot;
-	ShapeMarker		*m_rootMarker;
-	Shape			*m_shapeUpper;
-    Shape           *m_shapeLower;
+	ShapeMarkerData		*m_rootMarker;
+	ShapeStatic			*m_shapeUpper;
+    ShapeStatic           *m_shapeLower;
 	float			m_thighLen;
 	float			m_shinLen;
 	Entity			*m_parent;

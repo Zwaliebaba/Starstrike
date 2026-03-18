@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 #include "profiler.h"
 #include "GameApp.h"
@@ -17,8 +17,8 @@
 #include "soundsystem.h"
 #include "centipede.h"
 
-Shape* Centipede::s_shapeBody = nullptr;
-Shape* Centipede::s_shapeHead = nullptr;
+ShapeStatic* Centipede::s_shapeBody = nullptr;
+ShapeStatic* Centipede::s_shapeHead = nullptr;
 
 Centipede::Centipede()
   : Entity(),
@@ -32,8 +32,8 @@ Centipede::Centipede()
 
   if (!s_shapeBody)
   {
-    s_shapeBody = g_app->m_resource->GetShape("centipede.shp");
-    s_shapeHead = g_app->m_resource->GetShape("centipedehead.shp");
+    s_shapeBody = g_app->m_resource->GetShapeStatic("centipede.shp");
+    s_shapeHead = g_app->m_resource->GetShapeStatic("centipedehead.shp");
   }
 
   m_shape = s_shapeBody;
@@ -624,7 +624,7 @@ void Centipede::Render(float _predictionTime)
   if (maxHealth > 255)
     maxHealth = 255;
 
-  Shape* shape = m_shape;
+  ShapeStatic* shape = m_shape;
 
   if (!m_dead && m_linked)
   {

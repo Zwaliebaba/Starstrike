@@ -2,7 +2,7 @@
 #include "file_writer.h"
 #include "matrix34.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "math_utils.h"
 #include "hi_res_time.h"
@@ -18,7 +18,7 @@
 #include "controltower.h"
 #include "trunkport.h"
 
-Shape* ControlTower::s_dishShape = nullptr;
+ShapeStatic* ControlTower::s_dishShape = nullptr;
 
 ControlTower::ControlTower()
   : Building(),
@@ -29,9 +29,9 @@ ControlTower::ControlTower()
   m_radius = 4.0f;
   m_type = TypeControlTower;
 
-  Building::SetShape(g_app->m_resource->GetShape("controltower.shp"));
-  m_lightPos = m_shape->m_rootFragment->LookupMarker("MarkerLightPos");
-  m_dishPos = m_shape->m_rootFragment->LookupMarker("MarkerDishPos");
+  Building::SetShape(g_app->m_resource->GetShapeStatic("controltower.shp"));
+  m_lightPos = m_shape->GetMarkerData("MarkerLightPos");
+  m_dishPos = m_shape->GetMarkerData("MarkerDishPos");
 
   for (int i = 0; i < 3; ++i)
   {
@@ -39,14 +39,14 @@ ControlTower::ControlTower()
     char markerName[64];
 
     snprintf(markerName, sizeof(markerName), "MarkerReprogrammer%d", i);
-    m_reprogrammer[i] = m_shape->m_rootFragment->LookupMarker(markerName);
+    m_reprogrammer[i] = m_shape->GetMarkerData(markerName);
 
     snprintf(markerName, sizeof(markerName), "MarkerConsole%d", i);
-    m_console[i] = m_shape->m_rootFragment->LookupMarker(markerName);
+    m_console[i] = m_shape->GetMarkerData(markerName);
   }
 
   if (!s_dishShape)
-    s_dishShape = g_app->m_resource->GetShape("controltowerdish.shp");
+    s_dishShape = g_app->m_resource->GetShapeStatic("controltowerdish.shp");
 }
 
 void ControlTower::Initialise(Building* _template)
@@ -68,7 +68,7 @@ bool ControlTower::Advance()
     if (targetBuilding)
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
-      LegacyVector3 dishPos = m_dishPos->GetWorldMatrix(mat).pos;
+      LegacyVector3 dishPos = m_shape->GetMarkerWorldMatrix(m_dishPos, mat).pos;
       LegacyVector3 dishFront = (dishPos - targetBuilding->m_centerPos).Normalise();
       LegacyVector3 dishRight = dishFront ^ g_upVector;
       LegacyVector3 dishUp = dishRight ^ dishFront;
@@ -110,7 +110,7 @@ bool ControlTower::Advance()
     if (m_beingReprogrammed[i])
     {
       Matrix34 rootMat(m_front, g_upVector, m_pos);
-      Matrix34 worldMat = m_console[i]->GetWorldMatrix(rootMat);
+      Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_console[i], rootMat);
       LegacyVector3 particleVel = worldMat.pos - m_pos;
       particleVel += LegacyVector3(sfrand() * 10.0f, sfrand() * 5.0f, sfrand() * 10.0f);
       g_app->m_particleSystem->CreateParticle(worldMat.pos, particleVel, Particle::TypeBlueSpark);
@@ -127,7 +127,7 @@ int ControlTower::GetAvailablePosition(LegacyVector3& _pos, LegacyVector3& _fron
     if (!m_beingReprogrammed[i])
     {
       Matrix34 rootMat(m_front, g_upVector, m_pos);
-      Matrix34 worldMat = m_reprogrammer[i]->GetWorldMatrix(rootMat);
+      Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_reprogrammer[i], rootMat);
 
       _pos = worldMat.pos;
       _front = worldMat.f;
@@ -144,7 +144,7 @@ void ControlTower::GetConsolePosition(int _position, LegacyVector3& _pos)
   DEBUG_ASSERT(_position >= 0 && _position < 3);
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_console[_position]->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_console[_position], rootMat);
 
   _pos = worldMat.pos;
 }
@@ -288,7 +288,7 @@ void ControlTower::RenderAlphas(float _predictionTime)
   // Pre-compute some positions and shit
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_lightPos->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_lightPos, rootMat);
   LegacyVector3 lightPos = worldMat.pos;
 
   LegacyVector3 camR = g_app->m_camera->GetRight();
@@ -372,7 +372,7 @@ void ControlTower::RenderAlphas(float _predictionTime)
   if ((m_id.GetTeamId() != 255 && (lastSeqId % 10) / 2 == m_id.GetTeamId()) || m_beingReprogrammed[lastSeqId % 3] || g_app->m_editing)
   {
     Matrix34 rootMat(m_front, g_upVector, m_pos);
-    Matrix34 worldMat = m_lightPos->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_lightPos, rootMat);
     LegacyVector3 lightPos = worldMat.pos;
 
     float signalSize = m_ownership / 5.0f;

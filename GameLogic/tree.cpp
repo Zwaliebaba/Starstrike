@@ -3,7 +3,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "tree.h"
@@ -278,7 +278,7 @@ bool Tree::DoesSphereHit(const LegacyVector3& _pos, float _radius)
   return false;
 }
 
-bool Tree::DoesShapeHit(Shape* _shape, Matrix34 _transform)
+bool Tree::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform)
 {
   SpherePackage packageA(m_pos, 10.0f);
   if (_shape->SphereHit(&packageA, _transform))

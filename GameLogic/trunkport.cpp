@@ -3,7 +3,7 @@
 
 #include "file_writer.h"
 #include "text_stream_readers.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "hi_res_time.h"
 #include "text_renderer.h"
 #include "profiler.h"
@@ -30,10 +30,10 @@ TrunkPort::TrunkPort()
     m_heightMapSize(TRUNKPORT_HEIGHTMAP_MAXSIZE)
 {
     m_type = TypeTrunkPort;
-    SetShape( g_app->m_resource->GetShape( "trunkport.shp" ) );
+    SetShape( g_app->m_resource->GetShapeStatic( "trunkport.shp" ) );
 
-    m_destination1 = m_shape->m_rootFragment->LookupMarker( "MarkerDestination1" );
-    m_destination2 = m_shape->m_rootFragment->LookupMarker( "MarkerDestination2" );
+    m_destination1 = m_shape->GetMarkerData( "MarkerDestination1" );
+    m_destination2 = m_shape->GetMarkerData( "MarkerDestination2" );
 }
 
 
@@ -48,11 +48,11 @@ void TrunkPort::SetDetail( int _detail )
     m_heightMap = new LegacyVector3[ m_heightMapSize * m_heightMapSize ];
     memset( m_heightMap, 0, m_heightMapSize * m_heightMapSize * sizeof(LegacyVector3) );
 
-    ShapeMarker *marker = m_shape->m_rootFragment->LookupMarker( "MarkerSurface" );
+    ShapeMarkerData *marker = m_shape->GetMarkerData( "MarkerSurface" );
     DEBUG_ASSERT( marker );
 
     Matrix34 transform( m_front, g_upVector, m_pos );
-    LegacyVector3 worldPos = marker->GetWorldMatrix( transform ).pos;
+    LegacyVector3 worldPos = m_shape->GetMarkerWorldMatrix(marker, transform).pos;
 
     float size = 90.0f;
     LegacyVector3 up = g_upVector * size;
@@ -129,7 +129,7 @@ void TrunkPort::Render( float predictionTime )
 
     Matrix34 portMat( m_front, g_upVector, m_pos );
 
-    Matrix34 destMat = m_destination1->GetWorldMatrix(portMat);
+    Matrix34 destMat = m_shape->GetMarkerWorldMatrix(m_destination1, portMat);
     glColor4f( 0.9f, 0.8f, 0.8f, 1.0f );
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
@@ -141,7 +141,7 @@ void TrunkPort::Render( float predictionTime )
 
     g_gameFont.SetRenderShadow(false);
     glColor4f( 0.9f, 0.8f, 0.8f, 1.0f );
-    destMat = m_destination2->GetWorldMatrix(portMat);
+    destMat = m_shape->GetMarkerWorldMatrix(m_destination2, portMat);
     g_gameFont.DrawText3D( destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption );
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
@@ -170,11 +170,11 @@ void TrunkPort::RenderAlphas( float predictionTime )
 
     if( m_openTimer > 0.0f )
     {
-        ShapeMarker *marker = m_shape->m_rootFragment->LookupMarker( "MarkerSurface" );
+        ShapeMarkerData *marker = m_shape->GetMarkerData( "MarkerSurface" );
         DEBUG_ASSERT( marker );
 
         Matrix34 transform( m_front, g_upVector, m_pos );
-        LegacyVector3 markerPos = marker->GetWorldMatrix( transform ).pos;
+        LegacyVector3 markerPos = m_shape->GetMarkerWorldMatrix(marker, transform).pos;
         float maxDistance = 40.0f;
 
         float timeOpen = GetHighResTime() - m_openTimer;

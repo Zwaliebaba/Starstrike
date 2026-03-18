@@ -23,7 +23,7 @@
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "snow.h"
 #include "taskmanager.h"
 #include "taskmanager_interface.h"

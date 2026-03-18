@@ -5,8 +5,8 @@
 #include "building.h"
 
 
-class Shape;
-class ShapeFragment;
+class ShapeStatic;
+class ShapeFragmentData;
 class TextReader;
 
 #define LASERFENCE_RAISESPEED       0.3f
@@ -21,8 +21,8 @@ protected:
 
     bool            m_radiusSet;
 
-    ShapeMarker     *m_marker1;
-    ShapeMarker     *m_marker2;
+    ShapeMarkerData     *m_marker1;
+    ShapeMarkerData     *m_marker2;
 
 	bool			m_nextToggled;		// set to true when the fence has enabled/disabled the next fence in the line, to prevent constant enable calling
 
@@ -71,7 +71,7 @@ public:
     bool DoesSphereHit          (LegacyVector3 const &_pos, float _radius);
     bool DoesRayHit             (LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
                                  float _rayLen=1e10, LegacyVector3 *_pos=NULL, LegacyVector3 *_norm=NULL);
-    bool DoesShapeHit           (Shape *_shape, Matrix34 _transform);
+    bool DoesShapeHit           (ShapeStatic *_shape, Matrix34 _transform);
 
     void ListSoundEvents        (LList<const char*> *_list );
 

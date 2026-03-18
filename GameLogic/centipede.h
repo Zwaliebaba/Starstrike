@@ -9,7 +9,7 @@
 #define CENTIPEDE_NUMSPIRITSTOREGROW    4
 #define CENTIPEDE_MAXSIZE               20
 
-class Shape;
+class ShapeStatic;
 
 
 
@@ -29,8 +29,8 @@ protected:
     int             m_numSpiritsEaten;
     float           m_lastAdvance;
 
-    static Shape    *s_shapeBody;
-    static Shape    *s_shapeHead;
+    static ShapeStatic    *s_shapeBody;
+    static ShapeStatic    *s_shapeHead;
 
 protected:
     bool        SearchForRandomPosition();

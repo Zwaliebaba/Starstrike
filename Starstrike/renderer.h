@@ -4,8 +4,8 @@
 
 #define PIXEL_EFFECT_GRID_RES	16
 
-class Shape;
-class ShapeFragment;
+class ShapeStatic;
+class ShapeFragmentData;
 class LegacyVector3;
 class Matrix34;
 
@@ -77,8 +77,8 @@ class Renderer
     const double* GetTotalMatrix();
 
     void RasteriseSphere(const LegacyVector3& _pos, float _radius);
-    void MarkUsedCells(const ShapeFragment* _frag, const Matrix34& _transform);
-    void MarkUsedCells(const Shape* _shape, const Matrix34& _transform);
+    void MarkUsedCells(const ShapeFragmentData* _frag, const Matrix34& _transform);
+    void MarkUsedCells(const ShapeStatic* _shape, const Matrix34& _transform);
 
     bool IsFadeComplete() const;
     void StartFadeOut();

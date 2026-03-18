@@ -3,7 +3,7 @@
 #include "ogl_extensions.h"
 #include "profiler.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
@@ -32,18 +32,18 @@ RadarDish::RadarDish()
   m_front.Set(0, 0, 1);
   m_sendPeriod = RADARDISH_TRANSPORTPERIOD;
 
-  Shape* radarShape = g_app->m_resource->GetShapeCopy("radardish.shp", true);
-  SetShape(radarShape);
-
-  m_dish = m_shape->m_rootFragment->LookupFragment("Dish");
-  m_upperMount = m_shape->m_rootFragment->LookupFragment("UpperMount");
-  m_focusMarker = m_shape->m_rootFragment->LookupMarker("MarkerFocus");
+  ShapeStatic* master = g_app->m_resource->GetShapeStatic("radardish.shp");
+  SetShape(master);
+  m_shapeInstance = ShapeInstance(master);
+  m_dishIndex = master->GetFragmentIndex("Dish");
+  m_upperMountIndex = master->GetFragmentIndex("UpperMount");
+  m_focusMarker = m_shape->GetMarkerData("MarkerFocus");
 }
 
 RadarDish::~RadarDish()
 {
-  delete m_shape;
-  m_shape = nullptr;
+  // ShapeInstance is a value member — destroyed automatically.
+  // Building::m_shape is non-owning; Resource owns all masters.
 }
 
 void RadarDish::SetDetail(int _detail)
@@ -51,7 +51,7 @@ void RadarDish::SetDetail(int _detail)
   Teleport::SetDetail(_detail);
 
   Matrix34 rootMat(m_front, m_up, m_pos);
-  Matrix34 worldMat = m_entrance->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shapeInstance.GetMarkerWorldMatrix(m_entrance, rootMat);
   m_entrancePos = worldMat.pos;
   m_entranceFront = worldMat.f;
 }
@@ -87,7 +87,7 @@ bool RadarDish::Advance()
     return Building::Advance();
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shapeInstance.GetMarkerWorldMatrix(m_focusMarker, rootMat);
   LegacyVector3 dishPos = worldMat.pos;
   LegacyVector3 dishFront = worldMat.f;
 
@@ -103,18 +103,18 @@ bool RadarDish::Advance()
     LegacyVector3 rotationAxis = currentFront ^ targetFront;
     rotationAxis.y /= 4.0f;
     if (fabsf(rotationAxis.y) > M_PI / 3000.0f)
-      m_upperMount->m_angVel.y = signf(rotationAxis.y) * sqrtf(fabsf(rotationAxis.y));
+      m_shapeInstance.GetState(m_upperMountIndex).angVel.y = signf(rotationAxis.y) * sqrtf(fabsf(rotationAxis.y));
     else
     {
       m_horizontallyAligned = true;
-      m_upperMount->m_angVel.y = 0.0f;
+      m_shapeInstance.GetState(m_upperMountIndex).angVel.y = 0.0f;
     }
   }
 
   //
   // Rotate slowly to face our target (vert)
 
-  m_dish->m_angVel.Zero();
+  m_shapeInstance.GetState(m_dishIndex).angVel.Zero();
 
   if (m_horizontallyAligned && !m_verticallyAligned)
   {
@@ -128,22 +128,24 @@ bool RadarDish::Advance()
       targetFront.y = minAngle;
     targetFront.Normalise();
     float amount = worldMat.u * targetFront;
-    auto right = m_dish->m_transform.RightF3();
-    m_dish->m_angVel = LegacyVector3(right.x, right.y, right.z) * amount;
+    auto right = m_shapeInstance.GetState(m_dishIndex).transform.RightF3();
+    m_shapeInstance.GetState(m_dishIndex).angVel = LegacyVector3(right.x, right.y, right.z) * amount;
 
-    m_verticallyAligned = (m_dish->m_angVel.Mag() < 0.001f);
+    m_verticallyAligned = (m_shapeInstance.GetState(m_dishIndex).angVel.Mag() < 0.001f);
   }
 
-  m_upperMount->m_transform.RotateAround(DirectX::XMVectorSet(
-    m_upperMount->m_angVel.x * SERVER_ADVANCE_PERIOD,
-    m_upperMount->m_angVel.y * SERVER_ADVANCE_PERIOD,
-    m_upperMount->m_angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
-  m_dish->m_transform.RotateAround(DirectX::XMVectorSet(
-    m_dish->m_angVel.x * SERVER_ADVANCE_PERIOD,
-    m_dish->m_angVel.y * SERVER_ADVANCE_PERIOD,
-    m_dish->m_angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
+  FragmentState& upperState = m_shapeInstance.GetState(m_upperMountIndex);
+  upperState.transform.RotateAround(DirectX::XMVectorSet(
+    upperState.angVel.x * SERVER_ADVANCE_PERIOD,
+    upperState.angVel.y * SERVER_ADVANCE_PERIOD,
+    upperState.angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
+  FragmentState& dishState = m_shapeInstance.GetState(m_dishIndex);
+  dishState.transform.RotateAround(DirectX::XMVectorSet(
+    dishState.angVel.x * SERVER_ADVANCE_PERIOD,
+    dishState.angVel.y * SERVER_ADVANCE_PERIOD,
+    dishState.angVel.z * SERVER_ADVANCE_PERIOD, 0.0f));
 
-  if (m_movementSoundsPlaying && m_horizontallyAligned && m_dish->m_angVel.Mag() < 0.05f)
+  if (m_movementSoundsPlaying && m_horizontallyAligned && dishState.angVel.Mag() < 0.05f)
   {
     g_app->m_soundSystem->StopAllSounds(m_id, "RadarDish BeginRotation");
     g_app->m_soundSystem->TriggerBuildingEvent(this, "EndRotation");
@@ -226,7 +228,7 @@ bool RadarDish::Advance()
 LegacyVector3 RadarDish::GetDishPos([[maybe_unused]] float _predictionTime)
 {
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shapeInstance.GetMarkerWorldMatrix(m_focusMarker, rootMat);
   return worldMat.pos;
 }
 
@@ -244,7 +246,7 @@ LegacyVector3 RadarDish::GetDishFront(float _predictionTime)
   }
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shapeInstance.GetMarkerWorldMatrix(m_focusMarker, rootMat);
   return worldMat.f;
 }
 
@@ -262,7 +264,11 @@ void RadarDish::Aim(LegacyVector3 _worldPos)
   m_movementSoundsPlaying = true;
 }
 
-void RadarDish::Render(float _predictionTime) { Building::Render(_predictionTime); }
+void RadarDish::Render(float _predictionTime)
+{
+  Matrix34 mat(m_front, m_up, m_pos);
+  m_shapeInstance.Render(_predictionTime, mat);
+}
 
 void RadarDish::RenderAlphas(float _predictionTime)
 {
@@ -418,7 +424,7 @@ bool RadarDish::GetExit(LegacyVector3& _pos, LegacyVector3& _front)
   if (receiver)
   {
     Matrix34 rootMat(receiver->m_front, g_upVector, receiver->m_pos);
-    Matrix34 worldMat = receiver->m_entrance->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = receiver->m_shapeInstance.GetMarkerWorldMatrix(receiver->m_entrance, rootMat);
     _pos = worldMat.pos;
     _front = worldMat.f;
     return true;
@@ -498,5 +504,5 @@ bool RadarDish::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 
   SpherePackage sphere(_pos, _radius * 1.5f);
   Matrix34 transform(m_front, m_up, m_pos);
-  return m_shape->SphereHit(&sphere, transform);
+  return m_shapeInstance.SphereHit(&sphere, transform);
 }

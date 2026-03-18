@@ -12,7 +12,7 @@ public:
     int     m_segment;
 
 protected:
-    ShapeMarker *m_marker;
+    ShapeMarkerData *m_marker;
     LegacyVector3      m_vel;
 
 public:

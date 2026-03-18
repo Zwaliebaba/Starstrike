@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 
 #include "text_renderer.h"
@@ -23,9 +23,9 @@
 
 #include "souldestroyer.h"
 
-Shape *SoulDestroyer::s_shapeHead = NULL;
-Shape *SoulDestroyer::s_shapeTail = NULL;
-ShapeMarker *SoulDestroyer::s_tailMarker = NULL;
+ShapeStatic *SoulDestroyer::s_shapeHead = NULL;
+ShapeStatic *SoulDestroyer::s_shapeTail = NULL;
+ShapeMarkerData *SoulDestroyer::s_tailMarker = NULL;
 
 
 SoulDestroyer::SoulDestroyer()
@@ -37,10 +37,10 @@ SoulDestroyer::SoulDestroyer()
 
     if( !s_shapeTail || !s_shapeHead )
     {
-        s_shapeTail = g_app->m_resource->GetShape( "souldestroyertail.shp" );
-        s_shapeHead = g_app->m_resource->GetShape( "souldestroyerhead.shp" );
+        s_shapeTail = g_app->m_resource->GetShapeStatic( "souldestroyertail.shp" );
+        s_shapeHead = g_app->m_resource->GetShapeStatic( "souldestroyerhead.shp" );
 
-        s_tailMarker = s_shapeHead->m_rootFragment->LookupMarker( "MarkerTail" );
+        s_tailMarker = s_shapeHead->GetMarkerData( "MarkerTail" );
     }
 
     m_shape = s_shapeHead;
@@ -339,7 +339,7 @@ bool SoulDestroyer::SearchForRandomPosition()
 void SoulDestroyer::RecordHistoryPosition()
 {
     Matrix34 mat( m_front, m_up, m_pos );
-    LegacyVector3 tailPos = s_tailMarker->GetWorldMatrix(mat).pos;
+    LegacyVector3 tailPos = s_shapeHead->GetMarkerWorldMatrix(s_tailMarker, mat).pos;
     m_positionHistory.PutDataAtStart( tailPos );
 
     //int maxHistorys = 11;

@@ -5,7 +5,7 @@
 
 #include "resource.h"
 #include "math_utils.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 #include "hi_res_time.h"
 #include "profiler.h"

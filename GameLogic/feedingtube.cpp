@@ -9,7 +9,7 @@
 #include "ogl_extensions.h"
 #include "profiler.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 
 FeedingTube::FeedingTube()
@@ -20,8 +20,8 @@ FeedingTube::FeedingTube()
   m_type = TypeFeedingTube;
   //m_front.Set(0,0,1);
 
-  SetShape(g_app->m_resource->GetShape("feedingtube.shp"));
-  m_focusMarker = m_shape->m_rootFragment->LookupMarker("MarkerFocus");
+  SetShape(g_app->m_resource->GetShapeStatic("feedingtube.shp"));
+  m_focusMarker = m_shape->GetMarkerData("MarkerFocus");
 }
 
 // *** Initialise
@@ -35,7 +35,7 @@ void FeedingTube::Initialise(Building* _template)
 bool FeedingTube::Advance()
 {
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_focusMarker, rootMat);
   LegacyVector3 dishPos = worldMat.pos;
 
   auto ft = static_cast<FeedingTube*>(g_app->m_location->GetBuilding(m_receiverId));
@@ -50,7 +50,7 @@ bool FeedingTube::Advance()
 LegacyVector3 FeedingTube::GetDishPos(float _predictionTime)
 {
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_focusMarker, rootMat);
   return worldMat.pos;
 }
 
@@ -68,7 +68,7 @@ LegacyVector3 FeedingTube::GetDishFront(float _predictionTime)
   }
 
   Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_focusMarker->GetWorldMatrix(rootMat);
+  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_focusMarker, rootMat);
   return worldMat.f;
 }
 

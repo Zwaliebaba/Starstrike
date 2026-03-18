@@ -22,7 +22,7 @@ GodDish::GodDish()
     m_spawnSpam(false)
 {
   m_type = TypeGodDish;
-  SetShape(g_app->m_resource->GetShape("goddish.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("goddish.shp"));
 }
 
 void GodDish::Initialise(Building* _template) { Building::Initialise(_template); }

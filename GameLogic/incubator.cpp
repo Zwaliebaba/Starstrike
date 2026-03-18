@@ -8,7 +8,7 @@
 #include "math_utils.h"
 #include "particle_system.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 
 Incubator::Incubator()
@@ -20,15 +20,15 @@ Incubator::Incubator()
 {
   m_type = TypeIncubator;
 
-  SetShape(g_app->m_resource->GetShape("incubator.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("incubator.shp"));
 
-  m_spiritCenter = m_shape->m_rootFragment->LookupMarker("MarkerSpirits");
-  m_exit = m_shape->m_rootFragment->LookupMarker("MarkerExit");
-  m_dock = m_shape->m_rootFragment->LookupMarker("MarkerDock");
+  m_spiritCenter = m_shape->GetMarkerData("MarkerSpirits");
+  m_exit = m_shape->GetMarkerData("MarkerExit");
+  m_dock = m_shape->GetMarkerData("MarkerDock");
 
-  m_spiritEntrance[0] = m_shape->m_rootFragment->LookupMarker("MarkerSpiritIncoming0");
-  m_spiritEntrance[1] = m_shape->m_rootFragment->LookupMarker("MarkerSpiritIncoming1");
-  m_spiritEntrance[2] = m_shape->m_rootFragment->LookupMarker("MarkerSpiritIncoming2");
+  m_spiritEntrance[0] = m_shape->GetMarkerData("MarkerSpiritIncoming0");
+  m_spiritEntrance[1] = m_shape->GetMarkerData("MarkerSpiritIncoming1");
+  m_spiritEntrance[2] = m_shape->GetMarkerData("MarkerSpiritIncoming2");
 
   DEBUG_ASSERT(m_spiritCenter);
   DEBUG_ASSERT(m_exit);
@@ -47,7 +47,7 @@ void Incubator::Initialise(Building* _template)
   Building::Initialise(_template);
 
   Matrix34 mat(m_front, g_upVector, m_pos);
-  LegacyVector3 spiritCenter = m_spiritCenter->GetWorldMatrix(mat).pos;
+  LegacyVector3 spiritCenter = m_shape->GetMarkerWorldMatrix(m_spiritCenter, mat).pos;
 
   m_numStartingSpirits = static_cast<Incubator*>(_template)->m_numStartingSpirits;
 
@@ -119,7 +119,7 @@ bool Incubator::Advance()
 void Incubator::SpawnEntity()
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
-  Matrix34 exit = m_exit->GetWorldMatrix(mat);
+  Matrix34 exit = m_shape->GetMarkerWorldMatrix(m_exit, mat);
 
   //
   // Spawn the entity
@@ -168,7 +168,7 @@ void Incubator::SpawnEntity()
 void Incubator::AddSpirit(Spirit* _spirit)
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
-  LegacyVector3 spiritCenter = m_spiritCenter->GetWorldMatrix(mat).pos;
+  LegacyVector3 spiritCenter = m_shape->GetMarkerWorldMatrix(m_spiritCenter, mat).pos;
 
   Spirit* s = m_spirits.GetPointer();
   s->m_pos = spiritCenter + LegacyVector3(sfrand(20.0f), sfrand(20.0f), sfrand(20.0f));
@@ -187,7 +187,7 @@ void Incubator::AddSpirit(Spirit* _spirit)
 void Incubator::GetDockPoint(LegacyVector3& _pos, LegacyVector3& _front)
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
-  Matrix34 dock = m_dock->GetWorldMatrix(mat);
+  Matrix34 dock = m_shape->GetMarkerWorldMatrix(m_dock, mat);
   _pos = dock.pos;
   _pos = PushFromBuilding(_pos, 5.0f);
   _front = dock.f;
@@ -248,9 +248,9 @@ void Incubator::RenderAlphas(float _predictionTime)
 
   Matrix34 mat(m_front, g_upVector, m_pos);
   LegacyVector3 entrances[3];
-  entrances[0] = m_spiritEntrance[0]->GetWorldMatrix(mat).pos;
-  entrances[1] = m_spiritEntrance[1]->GetWorldMatrix(mat).pos;
-  entrances[2] = m_spiritEntrance[2]->GetWorldMatrix(mat).pos;
+  entrances[0] = m_shape->GetMarkerWorldMatrix(m_spiritEntrance[0], mat).pos;
+  entrances[1] = m_shape->GetMarkerWorldMatrix(m_spiritEntrance[1], mat).pos;
+  entrances[2] = m_shape->GetMarkerWorldMatrix(m_spiritEntrance[2], mat).pos;
 
   for (int i = 0; i < m_incoming.Size(); ++i)
   {

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "file_writer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "text_stream_readers.h"
@@ -37,10 +37,10 @@ Triffid::Triffid()
 {
   m_type = TypeTriffid;
 
-  SetShape(g_app->m_resource->GetShape("triffidhead.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("triffidhead.shp"));
 
-  m_launchPoint = m_shape->m_rootFragment->LookupMarker("MarkerLaunchPoint");
-  m_stem = m_shape->m_rootFragment->LookupMarker("MarkerTriffidStem");
+  m_launchPoint = m_shape->GetMarkerData("MarkerLaunchPoint");
+  m_stem = m_shape->GetMarkerData("MarkerTriffidStem");
 
   DEBUG_ASSERT(m_launchPoint);
   DEBUG_ASSERT(m_stem);
@@ -115,7 +115,7 @@ void Triffid::Render(float _predictionTime)
 
   //RenderArrow( m_pos, mat.pos, 1.0f, RGBAColour(100,0,0,255) );
 
-  LegacyVector3 stemPos = m_stem->GetWorldMatrix(mat).pos;
+  LegacyVector3 stemPos = m_shape->GetMarkerWorldMatrix(m_stem, mat).pos;
   LegacyVector3 midPoint = mat.pos + (stemPos - mat.pos).SetLength(10.0f);
   LegacyVector3 midPoint2 = midPoint - LegacyVector3(0, 20, 0);
   glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
@@ -150,8 +150,8 @@ void Triffid::Render(float _predictionTime)
 
   if (m_triggered && GetHighResTime() > m_timerSync - m_reloadTime * 0.25f)
   {
-    Matrix34 launchMat = m_launchPoint->GetWorldMatrix(mat);
-    Shape* eggShape = g_app->m_resource->GetShape("triffidegg.shp");
+    Matrix34 launchMat = m_shape->GetMarkerWorldMatrix(m_launchPoint, mat);
+    ShapeStatic* eggShape = g_app->m_resource->GetShapeStatic("triffidegg.shp");
     Matrix34 eggMat(launchMat.u, -launchMat.f, launchMat.pos);
     eggMat.f *= m_size;
     eggMat.u *= m_size;
@@ -174,7 +174,7 @@ void Triffid::RenderAlphas(float _predictionTime)
 
     Matrix34 headMat = GetHead();
     Matrix34 mat(m_front, g_upVector, headMat.pos);
-    Matrix34 launchMat = m_launchPoint->GetWorldMatrix(mat);
+    Matrix34 launchMat = m_shape->GetMarkerWorldMatrix(m_launchPoint, mat);
 
     LegacyVector3 point1 = launchMat.pos;
 
@@ -285,7 +285,7 @@ void Triffid::Launch()
   // Fire the egg
 
   Matrix34 mat = GetHead();
-  Matrix34 launchMat = m_launchPoint->GetWorldMatrix(mat);
+  Matrix34 launchMat = m_shape->GetMarkerWorldMatrix(m_launchPoint, mat);
   LegacyVector3 velocity = launchMat.f;
   velocity.SetLength(m_force * m_size * (1.0f + syncsfrand(0.2f)));
 
@@ -478,7 +478,7 @@ TriffidEgg::TriffidEgg()
   SetType(TypeTriffidEgg);
 
   m_up = g_upVector;
-  m_shape = g_app->m_resource->GetShape("triffidegg.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("triffidegg.shp");
 
   m_life = 20.0f + syncfrand(10.0f);
   m_timerSync = GetHighResTime() + m_life;

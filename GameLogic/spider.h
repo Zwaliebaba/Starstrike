@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entity.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 class Unit;
 class EntityLeg;
@@ -38,7 +38,7 @@ class Spider : public Entity
 
   protected:
     SpiderParameters m_parameters[3];
-    ShapeMarker* m_eggLay;
+    ShapeMarkerData* m_eggLay;
 
     EntityLeg* m_legs[SPIDER_NUM_LEGS];
     float m_nextLegMoveTime; // Actually just the next opportunity for a leg to move - there is no guarantee that a leg will move then

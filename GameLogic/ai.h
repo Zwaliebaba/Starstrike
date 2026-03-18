@@ -51,7 +51,7 @@ class AITarget : public Building
     float IsNearTo(int _aiTargetId); // returns distance or -1
 
     bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
-    bool DoesShapeHit(Shape* _shape, Matrix34 _transform) override;
+    bool DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) override;
 };
 
 // ============================================================================
@@ -87,6 +87,6 @@ class AISpawnPoint : public Building
     void SetBuildingLink(int _buildingId) override;
 
     bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
-    bool DoesShapeHit(Shape* _shape, Matrix34 _transform) override;
+    bool DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) override;
 };
 

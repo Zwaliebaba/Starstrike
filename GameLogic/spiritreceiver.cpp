@@ -4,7 +4,7 @@
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "preferences.h"
 #include "language_table.h"
@@ -37,12 +37,12 @@ LegacyVector3 ReceiverBuilding::GetSpiritLocation()
 {
   if (!m_spiritLocation)
   {
-    m_spiritLocation = m_shape->m_rootFragment->LookupMarker("MarkerSpiritLink");
+    m_spiritLocation = m_shape->GetMarkerData("MarkerSpiritLink");
     DEBUG_ASSERT(m_spiritLocation);
   }
 
   Matrix34 rootMat(m_front, m_up, m_pos);
-  Matrix34 worldPos = m_spiritLocation->GetWorldMatrix(rootMat);
+  Matrix34 worldPos = m_shape->GetMarkerWorldMatrix(m_spiritLocation, rootMat);
   return worldPos.pos;
 }
 
@@ -395,7 +395,7 @@ SpiritProcessor::SpiritProcessor()
     m_throughput(0.0f)
 {
   m_type = TypeSpiritProcessor;
-  SetShape(g_app->m_resource->GetShape("spiritprocessor.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("spiritprocessor.shp"));
 }
 
 void SpiritProcessor::Initialise(Building* _building)
@@ -527,7 +527,7 @@ ReceiverLink::ReceiverLink()
   : ReceiverBuilding()
 {
   m_type = TypeReceiverLink;
-  SetShape(g_app->m_resource->GetShape("receiverlink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("receiverlink.shp"));
 }
 
 bool ReceiverLink::Advance() { return ReceiverBuilding::Advance(); }
@@ -540,7 +540,7 @@ ReceiverSpiritSpawner::ReceiverSpiritSpawner()
   : ReceiverBuilding()
 {
   m_type = TypeReceiverSpiritSpawner;
-  SetShape(g_app->m_resource->GetShape("receiverlink.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("receiverlink.shp"));
 }
 
 bool ReceiverSpiritSpawner::Advance()
@@ -562,18 +562,18 @@ SpiritReceiver::SpiritReceiver()
     m_spiritLink(nullptr)
 {
   m_type = TypeSpiritReceiver;
-  SetShape(g_app->m_resource->GetShape("spiritreceiver.shp"));
-  m_headMarker = m_shape->m_rootFragment->LookupMarker("MarkerHead");
+  SetShape(g_app->m_resource->GetShapeStatic("spiritreceiver.shp"));
+  m_headMarker = m_shape->GetMarkerData("MarkerHead");
 
   for (int i = 0; i < SPIRITRECEIVER_NUMSTATUSMARKERS; ++i)
   {
     char name[64];
     snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name);
   }
 
-  m_headShape = g_app->m_resource->GetShape("spiritreceiverhead.shp");
-  m_spiritLink = m_headShape->m_rootFragment->LookupMarker("MarkerSpiritLink");
+  m_headShape = g_app->m_resource->GetShapeStatic("spiritreceiverhead.shp");
+  m_spiritLink = m_headShape->GetMarkerData("MarkerSpiritLink");
 }
 
 void SpiritReceiver::Initialise(Building* _template)
@@ -644,7 +644,7 @@ void SpiritReceiver::Render(float _predictionTime)
   ReceiverBuilding::Render(_predictionTime);
 
   Matrix34 mat(m_front, m_up, m_pos);
-  LegacyVector3 headPos = m_headMarker->GetWorldMatrix(mat).pos;
+  LegacyVector3 headPos = m_shape->GetMarkerWorldMatrix(m_headMarker, mat).pos;
   LegacyVector3 up = g_upVector;
   LegacyVector3 right(1, 0, 0);
   LegacyVector3 front = up ^ right;
@@ -655,12 +655,12 @@ void SpiritReceiver::Render(float _predictionTime)
 LegacyVector3 SpiritReceiver::GetSpiritLocation()
 {
   Matrix34 mat(m_front, m_up, m_pos);
-  LegacyVector3 headPos = m_headMarker->GetWorldMatrix(mat).pos;
+  LegacyVector3 headPos = m_shape->GetMarkerWorldMatrix(m_headMarker, mat).pos;
   LegacyVector3 up = g_upVector;
   LegacyVector3 right(1, 0, 0);
   LegacyVector3 front = up ^ right;
   Matrix34 headMat(front, up, headPos);
-  LegacyVector3 spiritLinkPos = m_spiritLink->GetWorldMatrix(headMat).pos;
+  LegacyVector3 spiritLinkPos = m_headShape->GetMarkerWorldMatrix(m_spiritLink, headMat).pos;
   return spiritLinkPos;
 }
 
@@ -676,7 +676,7 @@ void SpiritReceiver::RenderPorts()
   for (int i = 0; i < GetNumPorts(); ++i)
   {
     Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_statusMarkers[i]->GetWorldMatrix(rootMat);
+    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
 
     //
     // Render the status light

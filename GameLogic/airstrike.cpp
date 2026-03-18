@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "airstrike.h"
 #include "GameApp.h"
 #include "location.h"
@@ -152,8 +152,8 @@ SpaceInvader::SpaceInvader()
   : Entity(),
     m_armed(true)
 {
-  m_shape = g_app->m_resource->GetShape("spaceinvader.shp");
-  m_bombShape = g_app->m_resource->GetShape("throwable.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("spaceinvader.shp");
+  m_bombShape = g_app->m_resource->GetShapeStatic("throwable.shp");
 }
 
 bool SpaceInvader::Advance(Unit* _unit)

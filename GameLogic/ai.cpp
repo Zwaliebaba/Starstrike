@@ -302,7 +302,7 @@ AITarget::AITarget()
   memset(m_idleCount, 0, NUM_TEAMS * sizeof(int));
   memset(m_priority, 0, NUM_TEAMS * sizeof(float));
 
-  SetShape(g_app->m_resource->GetShape("aitarget.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("aitarget.shp"));
 
   m_teamCountTimer = syncfrand(2.0f);
 }
@@ -486,7 +486,7 @@ void AITarget::RenderAlphas(float _predictionTime) {}
 
 bool AITarget::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
 
-bool AITarget::DoesShapeHit(Shape* _shape, Matrix34 _transform) { return false; }
+bool AITarget::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
 
 // ============================================================================
 
@@ -677,4 +677,4 @@ void AISpawnPoint::Write(FileWriter* _out)
 
 bool AISpawnPoint::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
 
-bool AISpawnPoint::DoesShapeHit(Shape* _shape, Matrix34 _transform) { return false; }
+bool AISpawnPoint::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }

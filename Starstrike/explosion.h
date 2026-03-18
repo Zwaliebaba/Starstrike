@@ -2,7 +2,7 @@
 
 #include "matrix33.h"
 #include "rgb_colour.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 //*****************************************************************************
 // Class Tumbler
@@ -49,7 +49,7 @@ class Explosion
     float m_timeToDie;
 
   public:
-    Explosion(ShapeFragment* _frag, const Matrix34& _transform, float _fraction);
+    Explosion(const ShapeFragmentData* _frag, const FragmentState* _states, const Matrix34& _transform, float _fraction);
     ~Explosion() = default;
     Explosion(const Explosion&) = delete;
     Explosion& operator=(const Explosion&) = delete;
@@ -73,8 +73,8 @@ class ExplosionManager
     ExplosionManager();
     ~ExplosionManager();
 
-    void AddExplosion(ShapeFragment* _frag, const Matrix34& _transform, bool _recurse, float _fraction);
-    void AddExplosion(const Shape* _shape, const Matrix34& _transform, float _fraction = 1.0f);
+    void AddExplosion(const ShapeFragmentData* _frag, const FragmentState* _states, const Matrix34& _transform, bool _recurse, float _fraction);
+    void AddExplosion(const ShapeStatic* _shape, const Matrix34& _transform, float _fraction = 1.0f);
     void Reset();
 
     void Advance();

@@ -2,9 +2,9 @@
 
 #include "building.h"
 
-class Shape;
-class ShapeFragment;
-class ShapeMarker;
+class ShapeStatic;
+class ShapeFragmentData;
+class ShapeMarkerData;
 
 class FenceSwitch : public Building
 {
@@ -16,7 +16,7 @@ class FenceSwitch : public Building
 
     float m_timer; // no fences changes will be made until this timer counts to 0 for the first time
 
-    ShapeMarker* m_connectionLocation;
+    ShapeMarkerData* m_connectionLocation;
 
   public:
     char m_script[256];

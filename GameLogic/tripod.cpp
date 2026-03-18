@@ -2,7 +2,7 @@
 #include "math_utils.h"
 #include "profiler.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "vector2.h"
 #include "entity_leg.h"
 #include "tripod.h"
@@ -60,7 +60,7 @@ Tripod::Tripod()
     m_up(g_upVector),
     m_bodyVel(0, 0, 0)
 {
-  m_shape = g_app->m_resource->GetShape("tripod.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("tripod.shp");
   m_modeStartTime = 0.0f;
 
   // Initialise legs

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 
 
 #include "library.h"
@@ -14,7 +14,7 @@ Library::Library()
 :   Building()
 {
     m_type = Building::TypeLibrary;
-    SetShape( g_app->m_resource->GetShape( "library.shp" ) );
+    SetShape( g_app->m_resource->GetShapeStatic( "library.shp" ) );
 
     memset( m_scrollSpawned, 0, GlobalResearch::NumResearchItems * sizeof(bool) );
 }
@@ -29,11 +29,11 @@ bool Library::Advance()
         {
             char markerName[256];
             snprintf( markerName, sizeof(markerName), "MarkerResearch%02d", i+1 );
-            ShapeMarker *scrollMarker = m_shape->m_rootFragment->LookupMarker( markerName );
+            ShapeMarkerData *scrollMarker = m_shape->GetMarkerData( markerName );
             DEBUG_ASSERT( scrollMarker );
 
             Matrix34 rootMat(m_front, g_upVector, m_pos);
-            Matrix34 scrollPos = scrollMarker->GetWorldMatrix( rootMat );
+            Matrix34 scrollPos = m_shape->GetMarkerWorldMatrix(scrollMarker, rootMat);
 
             ResearchItem *item = new ResearchItem();
             item->m_researchType = i;

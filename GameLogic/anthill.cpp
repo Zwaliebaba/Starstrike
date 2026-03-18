@@ -30,7 +30,7 @@ AntHill::AntHill()
 {
   m_type = TypeAntHill;
 
-  SetShape(g_app->m_resource->GetShape("anthill.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("anthill.shp"));
 }
 
 void AntHill::Initialise(Building* _template)

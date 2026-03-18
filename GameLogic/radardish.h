@@ -4,14 +4,16 @@
 #define RADARDISH_TRANSPORTSPEED     50.0f                       // Speed of in-transit entities (m/s)
 
 #include "teleport.h"
+#include "ShapeInstance.h"
 
 
 class RadarDish : public Teleport
 {
 protected:
-	ShapeFragment *m_dish;
-	ShapeFragment *m_upperMount;
-	ShapeMarker	  *m_focusMarker;
+    ShapeInstance     m_shapeInstance;
+    int               m_dishIndex;
+    int               m_upperMountIndex;
+    ShapeMarkerData  *m_focusMarker;
 
     LegacyVector3     m_entrancePos;
     LegacyVector3     m_entranceFront;

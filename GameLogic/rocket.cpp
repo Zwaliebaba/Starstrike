@@ -3,7 +3,7 @@
 #include "file_writer.h"
 #include "text_stream_readers.h"
 #include "text_renderer.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "preferences.h"
 #include "language_table.h"
 #include "rocket.h"
@@ -22,7 +22,7 @@
 #include "taskmanager_interface.h"
 #include "soundsystem.h"
 
-Shape* FuelBuilding::s_fuelPipe = nullptr;
+ShapeStatic* FuelBuilding::s_fuelPipe = nullptr;
 
 FuelBuilding::FuelBuilding()
   : Building(),
@@ -32,7 +32,7 @@ FuelBuilding::FuelBuilding()
 {
   if (!s_fuelPipe)
   {
-    s_fuelPipe = g_app->m_resource->GetShape("fuelpipe.shp");
+    s_fuelPipe = g_app->m_resource->GetShapeStatic("fuelpipe.shp");
     DEBUG_ASSERT(s_fuelPipe);
   }
 }
@@ -48,12 +48,12 @@ LegacyVector3 FuelBuilding::GetFuelPosition()
 {
   if (!m_fuelMarker)
   {
-    m_fuelMarker = m_shape->m_rootFragment->LookupMarker("MarkerFuel");
+    m_fuelMarker = m_shape->GetMarkerData("MarkerFuel");
     DEBUG_ASSERT(m_fuelMarker);
   }
 
   Matrix34 mat(m_front, m_up, m_pos);
-  return m_fuelMarker->GetWorldMatrix(mat).pos;
+  return m_shape->GetMarkerWorldMatrix(m_fuelMarker, mat).pos;
 }
 
 void FuelBuilding::ProvideFuel(float _level)
@@ -246,10 +246,10 @@ FuelGenerator::FuelGenerator()
 {
   m_type = TypeFuelGenerator;
 
-  SetShape(g_app->m_resource->GetShape("fuelgenerator.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("fuelgenerator.shp"));
 
-  m_pump = g_app->m_resource->GetShape("fuelgeneratorpump.shp");
-  m_pumpTip = m_pump->m_rootFragment->LookupMarker("MarkerTip");
+  m_pump = g_app->m_resource->GetShapeStatic("fuelgeneratorpump.shp");
+  m_pumpTip = m_pump->GetMarkerData("MarkerTip");
 }
 
 void FuelGenerator::ProvideSurge() { m_surges++; }
@@ -294,7 +294,7 @@ bool FuelGenerator::Advance()
       pumpVel += g_upVector * frand(10);
 
       Matrix34 mat(m_front, g_upVector, pumpPos);
-      LegacyVector3 particlePos = m_pumpTip->GetWorldMatrix(mat).pos;
+      LegacyVector3 particlePos = m_pump->GetMarkerWorldMatrix(m_pumpTip, mat).pos;
       float size = 150.0f + frand(150.0f);
 
       g_app->m_particleSystem->CreateParticle(particlePos, pumpVel, Particle::TypeDarwinianFire, size);
@@ -369,7 +369,7 @@ FuelPipe::FuelPipe()
 {
   m_type = TypeFuelPipe;
 
-  SetShape(g_app->m_resource->GetShape("fuelpipebase.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("fuelpipebase.shp"));
 }
 
 bool FuelPipe::Advance()
@@ -402,9 +402,9 @@ FuelStation::FuelStation()
 {
   m_type = TypeFuelStation;
 
-  SetShape(g_app->m_resource->GetShape("fuelstation.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("fuelstation.shp"));
 
-  m_entrance = m_shape->m_rootFragment->LookupMarker("MarkerEntrance");
+  m_entrance = m_shape->GetMarkerData("MarkerEntrance");
 }
 
 bool FuelStation::IsLoading()
@@ -457,7 +457,7 @@ bool FuelStation::Advance()
 LegacyVector3 FuelStation::GetEntrance()
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
-  return m_entrance->GetWorldMatrix(mat).pos;
+  return m_shape->GetMarkerWorldMatrix(m_entrance, mat).pos;
 }
 
 bool FuelStation::BoardRocket(WorldObjectId _id)
@@ -661,16 +661,16 @@ EscapeRocket::EscapeRocket()
 {
   m_type = TypeEscapeRocket;
 
-  SetShape(g_app->m_resource->GetShape("rocket.shp"));
+  SetShape(g_app->m_resource->GetShapeStatic("rocket.shp"));
 
-  m_booster = m_shape->m_rootFragment->LookupMarker("MarkerBooster");
+  m_booster = m_shape->GetMarkerData("MarkerBooster");
   ASSERT_TEXT(m_booster, "MarkerBooster not found in rocket.shp");
 
   for (int i = 0; i < 3; ++i)
   {
     char name[256];
     snprintf(name, sizeof(name), "MarkerWindow0%d", i + 1);
-    m_window[i] = m_shape->m_rootFragment->LookupMarker(name);
+    m_window[i] = m_shape->GetMarkerData(name);
     ASSERT_TEXT(m_window[i], "%s not found", name);
   }
 }
@@ -976,7 +976,7 @@ void EscapeRocket::AdvanceExploding()
 
     int windowIndex = syncrand() % 3;
     Matrix34 mat(m_front, m_up, m_pos);
-    Matrix34 windowMat = m_window[windowIndex]->GetWorldMatrix(mat);
+    Matrix34 windowMat = m_shape->GetMarkerWorldMatrix(m_window[windowIndex], mat);
 
     LegacyVector3 vel = windowMat.f;
     float angle = syncsfrand(M_PI * 0.25f);
@@ -1001,7 +1001,7 @@ void EscapeRocket::AdvanceExploding()
   for (int i = 0; i < 3; ++i)
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    Matrix34 windowMat = m_window[i]->GetWorldMatrix(mat);
+    Matrix34 windowMat = m_shape->GetMarkerWorldMatrix(m_window[i], mat);
 
     LegacyVector3 vel = windowMat.f;
     float angle = syncsfrand(M_PI * 0.25f);
@@ -1145,7 +1145,7 @@ bool EscapeRocket::Advance()
   if (m_state == StateReady || m_state == StateCountdown || m_state == StateFlight)
   {
     Matrix34 mat(m_front, g_upVector, m_pos);
-    LegacyVector3 boosterPos = m_booster->GetWorldMatrix(mat).pos;
+    LegacyVector3 boosterPos = m_shape->GetMarkerWorldMatrix(m_booster, mat).pos;
 
     for (int i = 0; i < 15; ++i)
     {

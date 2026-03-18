@@ -9,9 +9,9 @@
 
 #include "globals.h"
 
-class Shape;
-class ShapeFragment;
-class ShapeMarker;
+class ShapeStatic;
+class ShapeFragmentData;
+class ShapeMarkerData;
 class TextReader;
 class BuildingPort;
 class FileWriter;
@@ -95,21 +95,21 @@ class Building : public WorldObject
 
     bool m_destroyed; // Building has been destroyed using the script command DestroyBuilding, remove it next Advance
 
-    Shape* m_shape;
-    LList<ShapeMarker*> m_lights; // Ownership lights
+    ShapeStatic* m_shape;
+    LList<ShapeMarkerData*> m_lights; // Ownership lights
     LList<BuildingPort*> m_ports; // Require Darwinians in them to operate
 
-    static Shape* s_controlPad;
-    static ShapeMarker* s_controlPadStatus;
+    static ShapeStatic* s_controlPad;
+    static ShapeMarkerData* s_controlPadStatus;
 
     Building();
 
     virtual void Initialise(Building* _template);
     bool Advance() override;
 
-    virtual void SetShape(Shape* _shape);
-    void SetShapeLights(ShapeFragment* _fragment); // Recursivly search for lights
-    void SetShapePorts(ShapeFragment* _fragment);
+    virtual void SetShape(ShapeStatic* _shape);
+    void SetShapeLights(const ShapeFragmentData* _fragment); // Recursivly search for lights
+    void SetShapePorts(const ShapeFragmentData* _fragment);
 
     virtual void SetDetail(int _detail);
 
@@ -143,7 +143,7 @@ class Building : public WorldObject
     virtual const char* GetObjectiveCounter();
 
     virtual bool DoesSphereHit(const LegacyVector3& _pos, float _radius);
-    virtual bool DoesShapeHit(Shape* _shape, Matrix34 _transform);
+    virtual bool DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform);
     virtual bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen = 1e10,
                             LegacyVector3* _pos = nullptr, LegacyVector3* _norm = nullptr); // pos/norm will not always be available
 
@@ -166,7 +166,7 @@ class Building : public WorldObject
 class BuildingPort
 {
   public:
-    ShapeMarker* m_marker;
+    ShapeMarkerData* m_marker;
     WorldObjectId m_occupant;
     Matrix34 m_mat;
     int m_counter[NUM_TEAMS];

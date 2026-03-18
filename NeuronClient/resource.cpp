@@ -1,11 +1,10 @@
 #include "pch.h"
 #include "binary_stream_readers.h"
 #include "bitmap.h"
-
 #include "filesys_utils.h"
 #include "file_writer.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_renderer.h"
 #include "text_stream_readers.h"
 #include "preferences.h"
@@ -152,34 +151,22 @@ void Resource::DeleteTexture(const char* _name)
   }
 }
 
-Shape* Resource::GetShape(const char* _name)
+ShapeStatic* Resource::GetShapeStatic(const char* _name)
 {
-  Shape* theShape = m_shapes.GetData(_name);
+  ShapeStatic* theShape = m_shapes.GetData(_name);
 
-  // If we haven't loaded the shape before, or _makeNew is true, then
-  // try to load it from the disk
+  // If we haven't loaded the shape before, try to load it from the disk
   if (!theShape)
   {
-    theShape = GetShapeCopy(_name, false);
+    hstring fullFilename = FileSys::GetHomeDirectory() + L"Shapes\\" + to_hstring(_name);
+
+    if (DoesFileExist(to_string(fullFilename).c_str()))
+      theShape = NEW ShapeStatic(to_string(fullFilename).c_str());
+
+    ASSERT_TEXT(theShape, "Couldn't create shape file {}", _name);
     m_shapes.PutData(_name, theShape);
   }
 
-  return theShape;
-}
-
-Shape* Resource::GetShapeCopy(const char* _name, bool _animating)
-{
-  Shape* theShape = nullptr;
-
-  if (!theShape)
-  {
-    hstring fullFilename = FileSys::GetHomeDirectory() + L"shapes\\" + to_hstring(_name);
-
-    if (DoesFileExist(to_string(fullFilename).c_str()))
-      theShape = NEW Shape(to_string(fullFilename).c_str(), _animating);
-  }
-
-  ASSERT_TEXT(theShape, "Couldn't create shape file {}", _name);
   return theShape;
 }
 

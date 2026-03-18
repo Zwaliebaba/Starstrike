@@ -2,7 +2,7 @@
 #include "file_writer.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "generichub.h"
 #include "controltower.h"
@@ -73,7 +73,7 @@ void DynamicBase::SetShapeName(char* _shapeName)
 
   if (strcmp(m_shapeName, "none") != 0)
   {
-    SetShape(g_app->m_resource->GetShape(m_shapeName));
+    SetShape(g_app->m_resource->GetShapeStatic(m_shapeName));
 
     Matrix34 mat(m_front, m_up, m_pos);
 
@@ -97,7 +97,7 @@ DynamicHub::DynamicHub()
     m_minActiveLinks(0)
 {
   m_type = TypeDynamicHub;
-  //SetShape( g_app->m_resource->GetShape( "generator.shp" ) );
+  //SetShape( g_app->m_resource->GetShapeStatic( "generator.shp" ) );
 }
 
 void DynamicHub::Initialise(Building* _template)
@@ -269,7 +269,7 @@ DynamicNode::DynamicNode()
     m_scoreSupplied(0)
 {
   m_type = TypeDynamicNode;
-  //SetShape( g_app->m_resource->GetShape( "solarpanel.shp" ) );
+  //SetShape( g_app->m_resource->GetShapeStatic( "solarpanel.shp" ) );
 }
 
 void DynamicNode::Initialise(Building* _template)

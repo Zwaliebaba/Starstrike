@@ -4,7 +4,7 @@
 
 #include "resource.h"
 #include "matrix34.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 
 #include "text_renderer.h"
@@ -34,14 +34,14 @@ SporeGenerator::SporeGenerator()
 {
     SetType( TypeSporeGenerator );
 
-    m_shape = g_app->m_resource->GetShape( "sporegenerator.shp" );
-    m_eggMarker = m_shape->m_rootFragment->LookupMarker( "MarkerEggs" );
+    m_shape = g_app->m_resource->GetShapeStatic( "sporegenerator.shp" );
+    m_eggMarker = m_shape->GetMarkerData( "MarkerEggs" );
 
     for( int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i )
     {
         char name[256];
         snprintf( name, sizeof(name), "MarkerTail0%d", i+1 );
-        m_tail[i] = m_shape->m_rootFragment->LookupMarker( name );
+        m_tail[i] = m_shape->GetMarkerData( name );
     }
 }
 
@@ -264,7 +264,7 @@ bool SporeGenerator::AdvanceEggLaying()
         {
             m_eggTimer = 2.0f + syncfrand(2.0f) - 1.0 * (float) g_app->m_difficultyLevel / 10.0f;
             Matrix34 mat( m_front, g_upVector, m_pos );
-            Matrix34 eggLayMat = m_eggMarker->GetWorldMatrix(mat);
+            Matrix34 eggLayMat = m_shape->GetMarkerWorldMatrix(m_eggMarker, mat);
             g_app->m_location->SpawnEntities( eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, m_vel, 0.0f );
             g_app->m_soundSystem->TriggerEntityEvent( this, "LayEgg" );
         }
@@ -354,7 +354,7 @@ void SporeGenerator::Render( float _predictionTime )
 
     for( int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i )
     {
-        LegacyVector3 prevTailPos = m_tail[i]->GetWorldMatrix(mat).pos;
+        LegacyVector3 prevTailPos = m_shape->GetMarkerWorldMatrix(m_tail[i], mat).pos;
         LegacyVector3 prevTailDir = ( prevTailPos - predictedPos );
         prevTailDir.HorizontalAndNormalise();
 
@@ -442,7 +442,7 @@ bool SporeGenerator::RenderPixelEffect( float _predictionTime )
 
     for( int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i )
     {
-        LegacyVector3 prevTailPos = m_tail[i]->GetWorldMatrix(mat).pos;
+        LegacyVector3 prevTailPos = m_shape->GetMarkerWorldMatrix(m_tail[i], mat).pos;
         LegacyVector3 prevTailDir = ( prevTailPos - predictedPos );
         prevTailDir.HorizontalAndNormalise();
 

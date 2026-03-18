@@ -52,7 +52,7 @@ class Tree : public Building
     void Damage(float _damage) override;
 
     bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
-    bool DoesShapeHit(Shape* _shape, Matrix34 _transform) override;
+    bool DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) override;
     bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen = 1e10, LegacyVector3* _pos = nullptr,
                     LegacyVector3* _norm = nullptr) override; // pos/norm will not always be available
 

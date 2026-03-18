@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "math_utils.h"
 #include "hi_res_time.h"
 #include "input.h"
@@ -33,10 +33,10 @@ Officer::Officer()
     m_state = StateIdle;
     m_orders = OrderNone;
 
-    m_shape = g_app->m_resource->GetShape( "darwinian.shp" );
+    m_shape = g_app->m_resource->GetShapeStatic( "darwinian.shp" );
     ASSERT_TEXT( m_shape, "Shape not found : officer.shp" );
 
-    m_flagMarker = m_shape->m_rootFragment->LookupMarker( "MarkerFlag" );
+    m_flagMarker = m_shape->GetMarkerData( "MarkerFlag" );
 
     m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
     m_radius = m_shape->CalculateRadius(g_identityMatrix34, m_centerPos);
@@ -208,7 +208,7 @@ void Officer::RenderFlag( float _predictionTime )
     LegacyVector3 entityRight(m_front ^ entityUp);
     LegacyVector3 entityFront = entityUp ^ entityRight;
     Matrix34 mat( entityFront, entityUp, m_pos + m_vel * _predictionTime );
-    LegacyVector3 flagPos = m_flagMarker->GetWorldMatrix(mat).pos;
+    LegacyVector3 flagPos = m_shape->GetMarkerWorldMatrix(m_flagMarker, mat).pos;
 
     int texId = -1;
     if      ( m_orders == OrderNone )                   texId = g_app->m_resource->GetTexture( "icons/banner_none.bmp" );

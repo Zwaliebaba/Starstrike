@@ -41,7 +41,7 @@
 #include "rocket.h"
 #include "safearea.h"
 #include "scripttrigger.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 #include "spam.h"
 #include "spawnpoint.h"
@@ -56,8 +56,8 @@
 #include "upgrade_port.h"
 #include "wall.h"
 
-Shape* Building::s_controlPad = nullptr;
-ShapeMarker* Building::s_controlPadStatus = nullptr;
+ShapeStatic* Building::s_controlPad = nullptr;
+ShapeMarkerData* Building::s_controlPadStatus = nullptr;
 static std::once_flag s_controlPadOnce;
 
 Building::Building()
@@ -71,10 +71,10 @@ Building::Building()
 {
   std::call_once(s_controlPadOnce, []()
   {
-    s_controlPad = g_app->m_resource->GetShape("controlpad.shp");
+    s_controlPad = g_app->m_resource->GetShapeStatic("controlpad.shp");
     DEBUG_ASSERT(s_controlPad);
 
-    s_controlPadStatus = s_controlPad->m_rootFragment->LookupMarker("MarkerStatus");
+    s_controlPadStatus = s_controlPad->GetMarkerData("MarkerStatus");
     DEBUG_ASSERT(s_controlPadStatus);
   });
 
@@ -145,9 +145,9 @@ bool Building::Advance()
   return false;
 }
 
-void Building::SetShape(Shape* _shape) { m_shape = _shape; }
+void Building::SetShape(ShapeStatic* _shape) { m_shape = _shape; }
 
-void Building::SetShapeLights(ShapeFragment* _fragment)
+void Building::SetShapeLights(const ShapeFragmentData* _fragment)
 {
   //
   // Enter all lights from this fragment
@@ -156,7 +156,7 @@ void Building::SetShapeLights(ShapeFragment* _fragment)
 
   for (i = 0; i < _fragment->m_childMarkers.Size(); ++i)
   {
-    ShapeMarker* marker = _fragment->m_childMarkers[i];
+    ShapeMarkerData* marker = _fragment->m_childMarkers.GetData(i);
     if (strstr(marker->m_name, "MarkerLight"))
       m_lights.PutData(marker);
   }
@@ -166,12 +166,12 @@ void Building::SetShapeLights(ShapeFragment* _fragment)
 
   for (i = 0; i < _fragment->m_childFragments.Size(); ++i)
   {
-    ShapeFragment* fragment = _fragment->m_childFragments[i];
+    ShapeFragmentData* fragment = _fragment->m_childFragments.GetData(i);
     SetShapeLights(fragment);
   }
 }
 
-void Building::SetShapePorts(ShapeFragment* _fragment)
+void Building::SetShapePorts(const ShapeFragmentData* _fragment)
 {
   //
   // Enter all ports from this fragment
@@ -182,12 +182,12 @@ void Building::SetShapePorts(ShapeFragment* _fragment)
 
   for (i = 0; i < _fragment->m_childMarkers.Size(); ++i)
   {
-    ShapeMarker* marker = _fragment->m_childMarkers[i];
+    ShapeMarkerData* marker = _fragment->m_childMarkers.GetData(i);
     if (strstr(marker->m_name, "MarkerPort"))
     {
       auto port = new BuildingPort();
       port->m_marker = marker;
-      port->m_mat = marker->GetWorldMatrix(buildingMat);
+      port->m_mat = m_shape->GetMarkerWorldMatrix(marker, buildingMat);
       port->m_mat.pos = PushFromBuilding(port->m_mat.pos, 5.0f);
       port->m_mat.pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(port->m_mat.pos.x, port->m_mat.pos.z);
 
@@ -203,7 +203,7 @@ void Building::SetShapePorts(ShapeFragment* _fragment)
 
   for (i = 0; i < _fragment->m_childFragments.Size(); ++i)
   {
-    ShapeFragment* fragment = _fragment->m_childFragments[i];
+    ShapeFragmentData* fragment = _fragment->m_childFragments.GetData(i);
     SetShapePorts(fragment);
   }
 }
@@ -280,9 +280,9 @@ void Building::RenderLights()
     {
       for (int i = 0; i < m_lights.Size(); ++i)
       {
-        ShapeMarker* marker = m_lights[i];
+        ShapeMarkerData* marker = m_lights[i];
         Matrix34 rootMat(m_front, m_up, m_pos);
-        Matrix34 worldMat = marker->GetWorldMatrix(rootMat);
+        Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(marker, rootMat);
         LegacyVector3 lightPos = worldMat.pos;
 
         float signalSize = 6.0f;
@@ -411,7 +411,7 @@ void Building::RenderPorts()
     LegacyVector3 camR = g_app->m_camera->GetRight() * size;
     LegacyVector3 camU = g_app->m_camera->GetUp() * size;
 
-    LegacyVector3 statusPos = s_controlPadStatus->GetWorldMatrix(mat).pos;
+    LegacyVector3 statusPos = s_controlPad->GetMarkerWorldMatrix(s_controlPadStatus, mat).pos;
 
     if (GetPortOccupant(i).IsValid())
       glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
@@ -491,7 +491,7 @@ bool Building::DoesSphereHit(const LegacyVector3& _pos, float _radius)
   return (distance <= _radius + m_radius);
 }
 
-bool Building::DoesShapeHit(Shape* _shape, Matrix34 _theTransform)
+bool Building::DoesShapeHit(ShapeStatic* _shape, Matrix34 _theTransform)
 {
   if (m_shape)
   {

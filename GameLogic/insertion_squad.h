@@ -68,10 +68,10 @@ public:
     float       m_secondaryTimer;
 
 protected:
-    ShapeMarker *m_laser;
-    ShapeMarker *m_brass;
-    ShapeMarker *m_eye1;
-    ShapeMarker *m_eye2;
+    ShapeMarkerData *m_laser;
+    ShapeMarkerData *m_brass;
+    ShapeMarkerData *m_eye1;
+    ShapeMarkerData *m_eye2;
 
 protected:
     WorldObjectId   m_enemyId;

@@ -11,8 +11,8 @@ class TrunkPort : public Building
 public:
     int m_targetLocationId;
 
-    ShapeMarker *m_destination1;
-    ShapeMarker *m_destination2;
+    ShapeMarkerData *m_destination1;
+    ShapeMarkerData *m_destination2;
 
     int     m_heightMapSize;
     LegacyVector3 *m_heightMap;

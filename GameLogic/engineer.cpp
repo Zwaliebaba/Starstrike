@@ -18,7 +18,7 @@
 #include "renderer.h"
 #include "researchitem.h"
 #include "resource.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "soundsystem.h"
 
 Engineer::Engineer()
@@ -32,7 +32,7 @@ Engineer::Engineer()
 {
   m_idleRotateRate = syncsfrand(0.5f);
 
-  m_shape = g_app->m_resource->GetShape("engineer.shp");
+  m_shape = g_app->m_resource->GetShapeStatic("engineer.shp");
 
   Matrix34 mat(LegacyVector3(0, 0, 1), g_upVector, g_zeroVector);
   m_centerPos = m_shape->CalculateCenter(mat);

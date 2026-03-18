@@ -13,8 +13,8 @@ class MineBuilding : public Building
 {
   protected:
     int m_trackLink;
-    ShapeMarker* m_trackMarker1;
-    ShapeMarker* m_trackMarker2;
+    ShapeMarkerData* m_trackMarker1;
+    ShapeMarkerData* m_trackMarker2;
 
     Matrix34 m_trackMatrix1;
     Matrix34 m_trackMatrix2;
@@ -24,13 +24,13 @@ class MineBuilding : public Building
     float m_previousMineSpeed;
     float m_wheelRotate;
 
-    static Shape* s_wheelShape;
-    static Shape* s_cartShape;
-    static ShapeMarker* s_cartMarker1;
-    static ShapeMarker* s_cartMarker2;
-    static ShapeMarker* s_cartContents[3];
-    static Shape* s_polygon1;
-    static Shape* s_primitive1;
+    static ShapeStatic* s_wheelShape;
+    static ShapeStatic* s_cartShape;
+    static ShapeMarkerData* s_cartMarker1;
+    static ShapeMarkerData* s_cartMarker2;
+    static ShapeMarkerData* s_cartContents[3];
+    static ShapeStatic* s_polygon1;
+    static ShapeStatic* s_primitive1;
 
     static float s_refineryPopulation;
     static float s_refineryRecalculateTimer;
@@ -150,10 +150,10 @@ class TrackEnd : public MineBuilding
 class Refinery : public MineBuilding
 {
   protected:
-    ShapeMarker* m_wheel1;
-    ShapeMarker* m_wheel2;
-    ShapeMarker* m_wheel3;
-    ShapeMarker* m_counter1;
+    ShapeMarkerData* m_wheel1;
+    ShapeMarkerData* m_wheel2;
+    ShapeMarkerData* m_wheel3;
+    ShapeMarkerData* m_counter1;
 
   public:
     Refinery();
@@ -173,8 +173,8 @@ class Refinery : public MineBuilding
 class Mine : public MineBuilding
 {
   protected:
-    ShapeMarker* m_wheel1;
-    ShapeMarker* m_wheel2;
+    ShapeMarkerData* m_wheel1;
+    ShapeMarkerData* m_wheel2;
 
   public:
     Mine();

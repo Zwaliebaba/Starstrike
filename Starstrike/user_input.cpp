@@ -5,7 +5,7 @@
 #include "targetcursor.h"
 #include "math_utils.h"
 #include "profiler.h"
-#include "shape.h"
+#include "ShapeStatic.h"
 #include "text_renderer.h"
 #include "preferences.h"
 #include "language_table.h"

@@ -13,11 +13,11 @@ public:
     float       m_ownership;                            // 100 = strongly owned, 5 = nearly lost, 0 = neutral
 
 protected:
-    static Shape    *s_dishShape;
-    ShapeMarker     *m_lightPos;
-    ShapeMarker     *m_reprogrammer[3];
-    ShapeMarker     *m_console[3];
-    ShapeMarker     *m_dishPos;
+    static ShapeStatic *s_dishShape;
+    ShapeMarkerData *m_lightPos;
+    ShapeMarkerData *m_reprogrammer[3];
+    ShapeMarkerData *m_console[3];
+    ShapeMarkerData *m_dishPos;
 
     Matrix34        m_dishMatrix;
 
