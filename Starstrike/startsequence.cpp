@@ -44,7 +44,7 @@ void StartSequence::RegisterCaption(char* _caption, float _x, float _y, float _s
 {
   auto caption = new StartSequenceCaption();
 
-  caption->m_caption = strdup(_caption);
+  caption->m_caption = _strdup(_caption);
   caption->m_x = _x;
   caption->m_y = _y;
   caption->m_size = _size;

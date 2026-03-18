@@ -88,7 +88,7 @@ void LangTable::ParseLanguageFile(char const *_filename)
 		char *key = in->GetNextToken();
 
 		LangPhrase *phrase = new LangPhrase;
-		phrase->m_key = strdup(key);
+		phrase->m_key = _strdup(key);
 
 		// Make sure the this key isn't already used
 		if(m_phrasesRaw.LookupTree(key))
@@ -110,7 +110,7 @@ void LangTable::ParseLanguageFile(char const *_filename)
             }
         }
 
-        phrase->m_string = strdup( aString );
+        phrase->m_string = _strdup( aString );
 
         int stringLength = strlen( phrase->m_string );
         if( phrase->m_string[stringLength-1] == '\n' )

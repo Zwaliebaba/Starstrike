@@ -278,7 +278,7 @@ int HashTable<T>::PutData(char const* _key, T const& _data)
 
 	unsigned int index = GetInsertPos(_key);
 	DEBUG_ASSERT(m_keys[index] == NULL);
-	m_keys[index] = strdup(_key);
+	m_keys[index] = _strdup(_key);
 	m_data[index] = _data;
 	m_slotsFree--;
 

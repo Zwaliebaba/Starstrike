@@ -122,8 +122,6 @@ class ShapeFragmentData
     // Geometry (loaded from disk, never modified)
     unsigned int m_numPositions;
     LegacyVector3* m_positions;
-    LegacyVector3* m_positionsInWS;
-    // Temp storage space used to cache World Space versions of all the vertex positions in the hit check routines
     unsigned int m_numNormals;
     LegacyVector3* m_normals;
     unsigned int m_numColours;

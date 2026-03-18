@@ -1108,8 +1108,8 @@ void SphereWorld::RenderIslands()
     if (loc->m_available || g_app->m_editing)
     {
       LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id);
-      char* islandName = strdup(g_app->m_globalWorld->GetLocationNameTranslated(loc->m_id));
-      strupr(islandName);
+      char* islandName = _strdup(g_app->m_globalWorld->GetLocationNameTranslated(loc->m_id));
+      _strupr(islandName);
 
       float size = 5.0f * sqrtf((g_app->m_camera->GetPos() - islandPos).Mag());
       size = 1000.0f;

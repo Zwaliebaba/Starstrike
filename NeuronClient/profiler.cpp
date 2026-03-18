@@ -31,7 +31,7 @@ ProfiledElement::ProfiledElement(char const *_name, ProfiledElement *_parent)
 	m_parent(_parent),
 	m_isExpanded(false)
 {
-    m_name = strdup(_name);
+    m_name = _strdup(_name);
 }
 
 

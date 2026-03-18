@@ -60,7 +60,7 @@ void EntityBlueprint::Initialise()
 		if (!theFile->TokenAvailable()) continue;
         ASSERT_TEXT(entityIndex < Entity::NumEntityTypes, "Too many entity blueprints defined");
 
-        m_names[entityIndex] = strdup(theFile->GetNextToken()); // Process-lifetime allocation — intentional [CI §2.3]
+        m_names[entityIndex] = _strdup(theFile->GetNextToken()); // Process-lifetime allocation — intentional [CI §2.3]
 		m_stats[entityIndex][0] = atof(theFile->GetNextToken());
         m_stats[entityIndex][1] = atof(theFile->GetNextToken());
         m_stats[entityIndex][2] = atof(theFile->GetNextToken());

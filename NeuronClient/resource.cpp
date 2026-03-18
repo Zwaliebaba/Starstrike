@@ -91,7 +91,7 @@ int Resource::GetTexture(const char* _name, bool _mipMapping, bool _masked)
   {
     char fullPath[512];
     snprintf(fullPath, sizeof(fullPath), "%s", _name);
-    strlwr(fullPath);
+    _strlwr(fullPath);
     BinaryReader* reader = GetBinaryReader(fullPath);
 
     if (reader)
@@ -132,7 +132,7 @@ bool Resource::DoesTextureExist(const char* _name)
   // If we still didn't find it, try to load it from a file on the disk
   char fullPath[512];
   snprintf(fullPath, sizeof(fullPath), "%s", _name);
-  strlwr(fullPath);
+  _strlwr(fullPath);
   BinaryReader* reader = GetBinaryReader(fullPath);
   if (reader)
     return true;
@@ -308,7 +308,7 @@ char* Resource::GenerateName()
 {
   int digits = log10f(m_nameSeed) + 1;
   auto name = new char[digits + 1];
-  itoa(m_nameSeed, name, 10);
+  _itoa(m_nameSeed, name, 10);
   m_nameSeed++;
 
   return name;

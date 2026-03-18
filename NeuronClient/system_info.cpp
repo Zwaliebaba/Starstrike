@@ -45,7 +45,7 @@ void SystemInfo::GetAudioDetails()
   {
     WAVEOUTCAPSA caps;
     waveOutGetDevCapsA(i, &caps, sizeof(WAVEOUTCAPSA));
-    m_audioInfo.m_deviceNames[i] = strdup(caps.szPname);
+    m_audioInfo.m_deviceNames[i] = _strdup(caps.szPname);
 
     int score = 0;
     if (caps.dwFormats & WAVE_FORMAT_1M08)

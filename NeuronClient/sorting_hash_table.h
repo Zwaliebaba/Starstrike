@@ -156,7 +156,7 @@ int SortingHashTable<T>::PutData(char const* _key, T const& _data)
 
 	unsigned int index = this->GetInsertPos(_key);
 	DEBUG_ASSERT(this->m_keys[index] == nullptr);
-	this->m_keys[index] = strdup(_key);
+	this->m_keys[index] = _strdup(_key);
 	this->m_data[index] = _data;
 	this->m_slotsFree--;
 

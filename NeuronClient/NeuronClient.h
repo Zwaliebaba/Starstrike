@@ -77,17 +77,7 @@ using namespace Neuron::Client;
 
 #define DARWINIA_VERSION_STRING DARWINIA_GAMETYPE "-" DARWINIA_VERSION
 
-#ifdef TARGET_MSVC
-
-// Visual studio 2005 insists that we use the underscored versions
-#define strupr _strupr
-#define strnicmp _strnicmp
-#define strlwr _strlwr
-#define strdup _strdup
-#define itoa _itoa
-
 #define HAVE_DSOUND
-#endif
 
 #include "opengl_directx.h"
 

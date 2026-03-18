@@ -16,12 +16,6 @@
 #include "language_table.h"
 #include "GameApp.h"
 
-#include "hi_res_time.h"
-
-#ifdef TARGET_MSVC
-	#define _snprintf _snprintf
-#endif
-
 #ifndef SEPULVEDA_MAX_PHRASE_LENGTH
 	#define SEPULVEDA_MAX_PHRASE_LENGTH	1024
 #endif
@@ -110,7 +104,7 @@ bool buildPhrase( char const *_key, char *_dest, CaptionParserMode &_mode ) {
 		char key[MAX_FINAL_KEY_LENGTH];
 		strncpy( key, _key, MAX_FINAL_KEY_LENGTH - 1 );
 		key[MAX_FINAL_KEY_LENGTH - 1] = '\0';
-		strlwr( key );
+		_strlwr( key );
 		if ( MOODYISLANGUAGEPHRASE( key, _mode.mood ) ) {
 			const char *definition = MOODYLANGUAGEPHRASE( key, _mode.mood );
 			if ( definition ) {
@@ -164,10 +158,10 @@ bool consumeIfMarker( char const *_baseString, char *_dest, CaptionParserMode &_
 
 	bool done = false;
 	char const * in = _baseString + _mode.inOffset;
-	if ( strnicmp( in, "[IFMODE ", 8 ) == 0 ) {
+	if ( _strnicmp( in, "[IFMODE ", 8 ) == 0 ) {
 		++_mode.ifdepth;
 		if ( _mode.writing ) {
-			if ( strnicmp( in + 8, "KEYBOARD]", 9 ) == 0 ) {
+			if ( _strnicmp( in + 8, "KEYBOARD]", 9 ) == 0 ) {
 				if ( _mode.mood != INPUT_MODE_KEYBOARD ) {
 					_mode.writing = false;
 					_mode.writingStopDepth = _mode.ifdepth;
@@ -180,7 +174,7 @@ bool consumeIfMarker( char const *_baseString, char *_dest, CaptionParserMode &_
 			done = true;
 		}
 	}
-	else if ( strnicmp( in, "[ELSE]", 6 ) == 0 ) {
+	else if ( _strnicmp( in, "[ELSE]", 6 ) == 0 ) {
 		if ( _mode.writing ) {
 			_mode.writing = false;
 			_mode.writingStopDepth = _mode.ifdepth;
@@ -189,7 +183,7 @@ bool consumeIfMarker( char const *_baseString, char *_dest, CaptionParserMode &_
 		_mode.inOffset += 5;
 		done = true;
 	}
-	else if ( strnicmp( in, "[ENDIF]", 7 ) == 0 ) {
+	else if ( _strnicmp( in, "[ENDIF]", 7 ) == 0 ) {
 		if ( !_mode.writing && _mode.ifdepth == _mode.writingStopDepth )
 			_mode.writing = true;
 		--_mode.ifdepth;
@@ -208,7 +202,7 @@ bool consumeKeyMarker( char const *_baseString, char *_dest, CaptionParserMode &
 
 	char const *in = _baseString + _mode.inOffset;
 	bool done = false;
-	if ( strnicmp( in, "[KEY", 4 ) == 0 ) {
+	if ( _strnicmp( in, "[KEY", 4 ) == 0 ) {
 		int len = markerLength( in ) - 5;
 		if ( !_mode.writing && 0 < len && len < MAX_READ_KEY_LENGTH )
 			done = true;

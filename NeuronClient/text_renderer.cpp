@@ -36,7 +36,7 @@ TextRenderer g_editorFont;
 
 void TextRenderer::Initialise(char const *_filename)
 {
-	m_filename = strdup(_filename);
+	m_filename = _strdup(_filename);
 	BuildOpenGlState();
     m_renderShadow = false;
     m_renderOutline = false;

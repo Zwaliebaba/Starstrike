@@ -1,10 +1,6 @@
 #include "pch.h"
 #include "net_socket.h"
 
-#ifdef TARGET_MSVC
-#define fdopen _fdopen
-#endif
-
 NetSocket::NetSocket()
 {
 	m_sockfd = INVALID_SOCKET;
@@ -34,7 +30,7 @@ NetRetCode NetSocket::Flush()
 	NetRetCode ret = NetOk;
 	if (!m_stdiofd)
 	{
-		m_stdiofd = fdopen(m_sockfd, "w");
+		m_stdiofd = _fdopen(m_sockfd, "w");
 	}
 	if ((m_stdiofd ==(FILE *)0) || (fflush(m_stdiofd)))
 	{

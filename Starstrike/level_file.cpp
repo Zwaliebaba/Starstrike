@@ -222,7 +222,7 @@ void LevelFile::ParseCameraAnims(TextReader* _in)
 
       // Read mount name
       word = _in->GetNextToken();
-      node->m_mountName = strdup(word);
+      node->m_mountName = _strdup(word);
       if (_stricmp(node->m_mountName, MAGIC_MOUNT_NAME_START_POS))
       {
         ASSERT_TEXT(GetCameraMount(node->m_mountName), "Bad camera animation mount name in level file %s", m_missionFilename);

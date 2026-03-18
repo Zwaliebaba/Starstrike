@@ -68,7 +68,7 @@ void TextReader::CleanLine()
 		// Check if file is encrypted
 		if (m_fileEncrypted == -1)
 		{
-			if (strnicmp(m_line, "redshirt2", 9) == 0)
+			if (_strnicmp(m_line, "redshirt2", 9) == 0)
 			{
 				m_fileEncrypted = 1;
 				for (int i = 9; i < len; ++i)

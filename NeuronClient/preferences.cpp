@@ -34,7 +34,7 @@ PrefsItem::PrefsItem(char* _line)
     c++;
   }
   *c = '\0';
-  m_key = strdup(key);
+  m_key = _strdup(key);
 
   // Get value
   char* value = c + 1;
@@ -70,31 +70,31 @@ PrefsItem::PrefsItem(char* _line)
     if (m_type == TypeFloat)
       m_float = atof(value);
     else if (m_type == TypeString)
-      m_str = strdup(value);
+      m_str = _strdup(value);
     else
       m_int = atoi(value);
   }
   else
   {
     m_type = TypeString;
-    m_str = strdup(value);
+    m_str = _strdup(value);
   }
 }
 
 PrefsItem::PrefsItem(const char* _key, const char* _str)
   : m_type(TypeString)
 {
-  m_key = strdup(_key);
-  m_str = strdup(_str);
+  m_key = _strdup(_key);
+  m_str = _strdup(_str);
 }
 
 PrefsItem::PrefsItem(const char* _key, float _float)
   : m_type(TypeFloat),
-    m_float(_float) { m_key = strdup(_key); }
+    m_float(_float) { m_key = _strdup(_key); }
 
 PrefsItem::PrefsItem(const char* _key, int _int)
   : m_type(TypeInt),
-    m_int(_int) { m_key = strdup(_key); }
+    m_int(_int) { m_key = _strdup(_key); }
 
 PrefsItem::~PrefsItem()
 {
@@ -110,7 +110,7 @@ PrefsItem::~PrefsItem()
 
 PrefsManager::PrefsManager(const char* _filename)
 {
-  m_filename = strdup(_filename);
+  m_filename = _strdup(_filename);
 
   Load();
 
@@ -120,7 +120,7 @@ PrefsManager::PrefsManager(const char* _filename)
 
 PrefsManager::PrefsManager(const std::string& _filename)
 {
-  m_filename = strdup(_filename.c_str());
+  m_filename = _strdup(_filename.c_str());
 
   Load();
 
@@ -459,7 +459,7 @@ void PrefsManager::SetString(const char* _key, const char* _string)
   {
     PrefsItem* item = m_items.GetData(index);
     DEBUG_ASSERT(item->m_type == PrefsItem::TypeString);
-    char* newString = strdup(_string);
+    char* newString = _strdup(_string);
     free(item->m_str);
     // Note by Chris:
     // The incoming value of _string might also be item->m_str
@@ -511,7 +511,7 @@ void PrefsManager::AddLine(const char* _line, bool _overwrite)
 
   if (!IsLineEmpty(_line)) // Skip comment lines and blank lines
   {
-    char* localCopy = strdup(_line);
+    char* localCopy = _strdup(_line);
     char* c = strchr(localCopy, '\n');
     if (c)
       *c = '\0';
@@ -532,7 +532,7 @@ void PrefsManager::AddLine(const char* _line, bool _overwrite)
 
   if (saveLine)
   {
-    char* lineCopy = strdup(_line);
+    char* lineCopy = _strdup(_line);
     m_fileText.PutData(lineCopy);
   }
 }
@@ -551,7 +551,7 @@ void PrefsManager::AddLine(const char* _line, bool _overwrite)
 //    newString[i*2] = '\0';
 //
 //    PrefsItem *item = new PrefsItem();
-//    item->m_key = strdup(_key);
+//    item->m_key = _strdup(_key);
 //    item->m_str = newString;
 //    m_items.PutData(item->m_key, item);
 //}

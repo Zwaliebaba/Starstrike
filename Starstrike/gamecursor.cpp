@@ -588,7 +588,7 @@ MouseCursor::MouseCursor( char const *_filename )
 {
     char fullFilename[512];
 	snprintf( fullFilename, sizeof(fullFilename), "%s", _filename);
-	m_mainFilename = strdup(fullFilename);
+	m_mainFilename = _strdup(fullFilename);
 
     BinaryReader *binReader = g_app->m_resource->GetBinaryReader( m_mainFilename );
 	ASSERT_TEXT(binReader, "Failed to open mouse cursor resource %s", _filename);
@@ -598,7 +598,7 @@ MouseCursor::MouseCursor( char const *_filename )
 	g_app->m_resource->AddBitmap(m_mainFilename, bmp);
 
 	snprintf(fullFilename, sizeof(fullFilename), "shadow_%s", _filename);
-	m_shadowFilename = strdup(fullFilename);
+	m_shadowFilename = _strdup(fullFilename);
     bmp.ApplyBlurFilter( 10.0f );
 	g_app->m_resource->AddBitmap(m_shadowFilename, bmp);
 

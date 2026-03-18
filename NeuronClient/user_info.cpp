@@ -20,13 +20,13 @@ bool GetUserInfoData( char const *_userInfoFilename, char const **_username, cha
 
             ASSERT_TEXT( _stricmp( fileReader.GetNextToken(), "Username" ) == 0, "Failed to parse %s", _userInfoFilename );
 
-            s_username = strdup( fileReader.GetRestOfLine() );
+            s_username = _strdup( fileReader.GetRestOfLine() );
 
             fileReader.ReadLine();
 
             ASSERT_TEXT( _stricmp( fileReader.GetNextToken(), "Email" ) == 0, "Failed to parse %s", _userInfoFilename );
 
-            s_email = strdup( fileReader.GetRestOfLine() );
+            s_email = _strdup( fileReader.GetRestOfLine() );
         }
     }
 

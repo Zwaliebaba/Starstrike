@@ -10,10 +10,6 @@
 #include "GameApp.h"
 #include "renderer.h"
 
-#ifdef TARGET_MSVC
-#define HAVE_REFRESH_RATES
-#endif
-
 class ScreenResDropDownMenu : public DropDownMenu
 {
 #ifdef HAVE_REFRESH_RATES
@@ -173,12 +169,6 @@ void PrefsScreenWindow::Create()
 {
   DarwiniaWindow::Create();
 
-  /*int x = GetMenuSize(150);
-  int w = GetMenuSize(170);
-  int y = 30;
-  int h = GetMenuSize(30);
-int fontSize = GetMenuSize(13);*/
-
   int y = GetClientRectY1();
   int border = GetClientRectX1() + 10;
   int x = m_w * 0.5;
@@ -210,14 +200,6 @@ int fontSize = GetMenuSize(13);*/
   windowed->m_fontSize = fontSize;
   windowed->RegisterInt(&m_windowed);
 
-#ifdef HAVE_REFRESH_RATES
-  auto refresh = new FullscreenRequiredMenu();
-  refresh->SetShortProperties(LANGUAGEPHRASE("dialog_refreshrate"), x, y += h, buttonW, buttonH);
-  refresh->RegisterInt(&m_refreshRate);
-  refresh->m_fontSize = fontSize;
-  RegisterButton(refresh);
-#endif
-
   RegisterButton(windowed);
   RegisterButton(screenRes);
   screenRes->RegisterInt(&m_resId);
@@ -235,7 +217,6 @@ int fontSize = GetMenuSize(13);*/
   m_buttonOrder.PutData(windowed);
   if (windowed->GetSelectionValue() == 0)
   {
-    m_buttonOrder.PutData(refresh);
     m_buttonOrder.PutData(colourDepth);
   }
 

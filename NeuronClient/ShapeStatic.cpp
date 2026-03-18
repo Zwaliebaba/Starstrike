@@ -5,6 +5,11 @@
 #include "text_stream_readers.h"
 #include "resource.h"
 
+// Per-thread scratch buffer for world-space positions in accurate hit-tests.
+// Grows to the largest fragment encountered and stays allocated for reuse.
+// Safe across recursion: each level fully consumes the buffer before recurring.
+static thread_local std::vector<LegacyVector3> t_scratchWS;
+
 // ****************************************************************************
 // Class ShapeMarkerData
 // ****************************************************************************
@@ -17,8 +22,8 @@ ShapeMarkerData::ShapeMarkerData(const char* _name, const char* _parentName, int
     m_depth(_depth),
     m_parentIndices(nullptr)
 {
-  m_name = strdup(_name);
-  m_parentName = strdup(_parentName);
+  m_name = _strdup(_name);
+  m_parentName = _strdup(_parentName);
 
   // Remove spaces from m_name
   char* c = m_name;
@@ -48,7 +53,7 @@ ShapeMarkerData::ShapeMarkerData(const char* _name, const char* _parentName, int
 // *** Constructor
 ShapeMarkerData::ShapeMarkerData(TextReader* _in, const char* _name)
 {
-  m_name = strdup(_name);
+  m_name = _strdup(_name);
   m_parentName = nullptr;
   while (_in->ReadLine())
   {
@@ -59,7 +64,7 @@ ShapeMarkerData::ShapeMarkerData(TextReader* _in, const char* _name)
       if (_stricmp(firstWord, "ParentName") == 0)
       {
         char* secondWord = _in->GetNextToken();
-        m_parentName = strdup(secondWord);
+        m_parentName = _strdup(secondWord);
       }
       else if (_stricmp(firstWord, "Depth") == 0)
       {
@@ -97,9 +102,9 @@ ShapeMarkerData::ShapeMarkerData(TextReader* _in, const char* _name)
   m_parentIndices = new int[m_depth];
 
   if (!m_name)
-    m_name = strdup("unknown");
+    m_name = _strdup("unknown");
   if (!m_parentName)
-    m_parentName = strdup("unknown");
+    m_parentName = _strdup("unknown");
 }
 
 ShapeMarkerData::~ShapeMarkerData()
@@ -145,7 +150,6 @@ Transform3D ShapeMarkerData::GetWorldTransform(const FragmentState* _states, con
 ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
   : m_numPositions(0),
     m_positions(nullptr),
-    m_positionsInWS(nullptr),
     m_numNormals(0),
     m_normals(nullptr),
     m_numColours(0),
@@ -168,7 +172,7 @@ ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
   DEBUG_ASSERT(_name);
-  m_name = strdup(_name);
+  m_name = _strdup(_name);
 
   while (_in->ReadLine())
   {
@@ -179,7 +183,7 @@ ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
     char* secondWord = _in->GetNextToken();
 
     if (_stricmp(firstWord, "ParentName") == 0)
-      m_parentName = strdup(secondWord);
+      m_parentName = _strdup(secondWord);
     else if (_stricmp(firstWord, "front") == 0)
     {
       m_baseTransform.m._31 = static_cast<float>(atof(secondWord));
@@ -235,13 +239,11 @@ ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
   m_baseTransform.Orthonormalize();
 
   if (!m_name)
-    m_name = strdup("unknown");
+    m_name = _strdup("unknown");
   if (!m_parentName)
-    m_parentName = strdup("unknown");
+    m_parentName = _strdup("unknown");
 
   GenerateNormals();
-
-  m_positionsInWS = new LegacyVector3[m_numVertices];
 }
 
 // This constructor is used when you want to build a shape from scratch yourself,
@@ -249,7 +251,6 @@ ShapeFragmentData::ShapeFragmentData(TextReader* _in, const char* _name)
 ShapeFragmentData::ShapeFragmentData(const char* _name, const char* _parentName)
   : m_numPositions(0),
     m_positions(nullptr),
-    m_positionsInWS(nullptr),
     m_numNormals(0),
     m_normals(nullptr),
     m_numColours(0),
@@ -269,8 +270,8 @@ ShapeFragmentData::ShapeFragmentData(const char* _name, const char* _parentName)
   m_triangles = new ShapeTriangle[m_maxTriangles];
 
   m_baseTransform = Neuron::Transform3D::Identity();
-  m_name = strdup(_name);
-  m_parentName = strdup(_parentName);
+  m_name = _strdup(_name);
+  m_parentName = _strdup(_parentName);
 
   // Remove spaces from m_name
   char* c = m_name;
@@ -300,7 +301,6 @@ ShapeFragmentData::ShapeFragmentData(const char* _name, const char* _parentName)
 ShapeFragmentData::~ShapeFragmentData()
 {
   SAFE_DELETE_ARRAY(m_positions);
-  SAFE_DELETE_ARRAY(m_positionsInWS);
   free(m_name);
   m_name = nullptr;
   free(m_parentName);
@@ -860,8 +860,11 @@ bool ShapeFragmentData::RayHit(const FragmentState* _states, RayPackage* _packag
       return true;
 
     // Compute World Space versions of all the vertices
-    for (int i = 0; i < m_numPositions; ++i)
-      m_positionsInWS[i] = m_positions[i] * totalMatrix;
+    if (t_scratchWS.size() < m_numPositions)
+      t_scratchWS.resize(m_numPositions);
+    LegacyVector3* positionsInWS = t_scratchWS.data();
+    for (unsigned int i = 0; i < m_numPositions; ++i)
+      positionsInWS[i] = m_positions[i] * totalMatrix;
 
     // Check each triangle in this fragment for intersection
     for (int j = 0; j < m_numTriangles; ++j)
@@ -869,8 +872,8 @@ bool ShapeFragmentData::RayHit(const FragmentState* _states, RayPackage* _packag
       VertexPosCol* v1 = &m_vertices[m_triangles[j].v1];
       VertexPosCol* v2 = &m_vertices[m_triangles[j].v2];
       VertexPosCol* v3 = &m_vertices[m_triangles[j].v3];
-      if (RayTriIntersection(_package->m_rayStart, _package->m_rayDir, m_positionsInWS[v1->m_posId], m_positionsInWS[v2->m_posId],
-                             m_positionsInWS[v3->m_posId]))
+      if (RayTriIntersection(_package->m_rayStart, _package->m_rayDir, positionsInWS[v1->m_posId], positionsInWS[v2->m_posId],
+                             positionsInWS[v3->m_posId]))
         return true;
     }
   }
@@ -903,8 +906,11 @@ bool ShapeFragmentData::SphereHit(const FragmentState* _states, SpherePackage* _
       return true;
 
     // Compute World Space versions of all the vertices
-    for (int i = 0; i < m_numPositions; ++i)
-      m_positionsInWS[i] = m_positions[i] * totalMatrix;
+    if (t_scratchWS.size() < m_numPositions)
+      t_scratchWS.resize(m_numPositions);
+    LegacyVector3* positionsInWS = t_scratchWS.data();
+    for (unsigned int i = 0; i < m_numPositions; ++i)
+      positionsInWS[i] = m_positions[i] * totalMatrix;
 
     // Check each triangle in this fragment for intersection
     for (int j = 0; j < m_numTriangles; ++j)
@@ -912,8 +918,8 @@ bool ShapeFragmentData::SphereHit(const FragmentState* _states, SpherePackage* _
       VertexPosCol* v1 = &m_vertices[m_triangles[j].v1];
       VertexPosCol* v2 = &m_vertices[m_triangles[j].v2];
       VertexPosCol* v3 = &m_vertices[m_triangles[j].v3];
-      if (SphereTriangleIntersection(_package->m_pos, _package->m_radius, m_positionsInWS[v1->m_posId], m_positionsInWS[v2->m_posId],
-                                     m_positionsInWS[v3->m_posId]))
+      if (SphereTriangleIntersection(_package->m_pos, _package->m_radius, positionsInWS[v1->m_posId], positionsInWS[v2->m_posId],
+                                     positionsInWS[v3->m_posId]))
         return true;
     }
   }
@@ -1032,7 +1038,7 @@ ShapeStatic::~ShapeStatic()
 
 void ShapeStatic::Load(TextReader* _in)
 {
-  m_name = strdup(_in->GetFilename());
+  m_name = _strdup(_in->GetFilename());
 
   constexpr int maxFrags = 100;
   constexpr int maxMarkers = 100;
