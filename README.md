@@ -1,84 +1,67 @@
 # Starstrike
 
-Starstrike is a Windows-native real-time strategy game built in C++ with Direct3D 12, WinUI 3, and Windows App SDK 1.8. It targets Windows 10+ (x64) and ships as an MSIX-packaged desktop application.
+A high-performance multiplayer space combat game built with DirectX 12 and modern C++.
+
+## Overview
+
+Starstrike is a real-time 3D space combat game designed to showcase DirectX 12 rendering capabilities and modern C++ architecture patterns. The game features fast-paced space battles with support for both single-player and multiplayer modes.
+
+## Project Status
+
+🚧 **In Development** - This project is currently in the initial planning and setup phase.
+
+## Key Features (Planned)
+
+- **DirectX 12 Rendering**: Utilizing DirectX 12 for high-performance graphics rendering
+- **Multiplayer Support**: Network architecture for competitive multiplayer gameplay
+- **Modern C++**: Built with C++17/20 features and best practices
+- **Cross-Platform Networking**: Platform-independent networking layer
+- **Modular Architecture**: Component-based design for maintainability and extensibility
+
+## Technology Stack
+
+- **Graphics API**: DirectX 12
+- **Language**: C++ (C++17 or later)
+- **Platform**: Windows 10/11
+- **Build System**: (To be determined - CMake or Visual Studio)
+- **Networking**: (To be determined)
 
 ## Documentation
 
-| Document | Description |
-|---|---|
-| [Architecture](docs/architecture.md) | Module structure, dependency graph, and subsystem design |
-| [Development Guide](docs/development-guide.md) | Prerequisites, build instructions, and development workflow |
-| [Contributing](docs/contributing.md) | Pull request process, code review standards, and PR guidelines |
-| [Coding Standards](.github/coding-standards.md) | Naming conventions, formatting, and language usage |
-| [Codebase Improvement Plan](CI.md) | Phased roadmap for modernising the codebase |
-| [Math Migration Plan](MathPlan.md) | Plan for migrating legacy math types to DirectXMath |
-| [Matrix Convention Plan](MatrixConv.md) | Plan for standardising matrix conventions across the engine |
+Comprehensive documentation is available in the `/docs` directory:
+
+- [Architecture Overview](docs/ARCHITECTURE.md) - System design and architectural patterns
+- [Build Instructions](docs/BUILD.md) - How to build and run the project
+- [API Documentation](docs/API.md) - Public API reference
+- [Contributing Guide](docs/CONTRIBUTING.md) - Guidelines for contributors
+
+## Getting Started
+
+Detailed build and setup instructions will be provided once the project structure is established.
 
 ## Project Structure
 
 ```
 Starstrike/
-├── Starstrike/       # Main application — WinUI 3, MSIX packaging, DirectX 12 renderer
-├── GameLogic/        # Game entities, buildings, AI, menus (static lib)
-├── NeuronClient/     # Rendering, input, audio, UI framework (static lib)
-├── NeuronCore/       # Modern C++ utilities, math, networking (static lib)
-├── NeuronServer/     # Network server (static lib)
-├── docs/             # Project documentation
-└── .github/          # Repository configuration and AI agent definitions
+├── docs/               # Documentation
+├── src/                # Source code (planned)
+│   ├── engine/        # Core engine systems
+│   ├── game/          # Game-specific logic
+│   ├── renderer/      # DirectX 12 rendering
+│   └── network/       # Networking layer
+├── assets/            # Game assets (planned)
+├── tests/             # Unit and integration tests (planned)
+└── third_party/       # External dependencies (planned)
 ```
 
-**Dependency graph:**
+## License
 
-```
-Starstrike ──► NeuronClient ──► NeuronCore
-          ──► GameLogic
-          ──► NeuronCore
-NeuronServer ──► NeuronCore
-```
+(To be determined)
 
-## Quick Start
+## Contact
 
-### Prerequisites
+For questions or contributions, please see [CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
-- Visual Studio 2022 (v17.x+) with the **Desktop development with C++** and **Windows App SDK** workloads
-- Windows SDK 10.0.22621 or later
-- NuGet package manager (bundled with Visual Studio)
+---
 
-### Build
-
-```powershell
-# Restore NuGet packages
-nuget restore Starstrike.slnx
-
-# Build (command line)
-msbuild Starstrike.slnx /p:Configuration=Release /p:Platform=x64
-
-# Or open in Visual Studio
-# File > Open > Project/Solution > Starstrike.slnx
-# Select x64 + Debug, then Build > Build Solution (Ctrl+Shift+B)
-```
-
-### Run
-
-Launch the `Starstrike` project from Visual Studio (F5) or run the built MSIX package.
-
-## Technology Stack
-
-| Component | Technology |
-|---|---|
-| Language | C++20 (Release), C++latest (Debug) |
-| Compiler | MSVC v145 (v143 fallback) |
-| Graphics API | Direct3D 12 |
-| UI Framework | WinUI 3 / Windows App SDK 1.8 |
-| Packaging | MSIX |
-| Build system | MSBuild / Visual Studio solution (.slnx) |
-| Dependencies | NuGet |
-
-## Key Subsystems
-
-- **Rendering** — Direct3D 12 pipeline with a legacy OpenGL compatibility shim (`NeuronClient/opengl_directx`)
-- **Game Logic** — Entity and building hierarchy with 18+ entity types and 57+ building types (`GameLogic`)
-- **Input** — Pluggable input driver stack with binding and filtering layers (`NeuronClient`)
-- **Audio** — 3D spatial audio with DirectSound backend (`NeuronClient`)
-- **Networking** — UDP client-server with sequence-ID delivery tracking (`NeuronCore`, `NeuronServer`)
-- **Math** — Transitioning from legacy `LegacyVector3`/`Matrix34` to DirectXMath-backed types (see [MathPlan.md](MathPlan.md))
+**Note**: This is an active development project. Documentation and structure are subject to change as the project evolves.
