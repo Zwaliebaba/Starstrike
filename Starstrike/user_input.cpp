@@ -1,16 +1,13 @@
 #include "pch.h"
 #include "eclipse.h"
-
 #include "input.h"
 #include "targetcursor.h"
 #include "math_utils.h"
 #include "profiler.h"
 #include "ShapeStatic.h"
 #include "text_renderer.h"
-#include "preferences.h"
 #include "language_table.h"
 #include "debugmenu.h"
-#include "clienttoserver.h"
 #include "GameApp.h"
 #include "camera.h"
 #include "global_world.h"
@@ -68,39 +65,10 @@ void UserInput::Advance()
 
   AdvanceMenus();
 
-  bool modsEnabled = g_prefsManager->GetInt("ModSystemEnabled", 0) != 0;
-
-  if (g_inputManager->controlEvent(ControlGamePause))
-    g_app->m_clientToServer->RequestPause();
-
-  //    if (g_keyDeltas[KEY_F2]) DebugKeyBindings::DebugCameraButton();
-#ifdef LOCATION_EDITOR
-  if (modsEnabled)
-  {
-    if (g_inputManager->controlEvent(ControlToggleEditor))
-      DebugKeyBindings::EditorButton();
-  }
-#endif
-  //
 #ifdef CHEATMENU_ENABLED
   if (g_inputManager->controlEvent(ControlToggleCheatMenu))
     DebugKeyBindings::CheatButton();
 #endif
-
-  //
-  //    if (g_keyDeltas[KEY_F5]) DebugKeyBindings::FPSButton();
-  //#ifdef PROFILER_ENABLED
-  //	if (g_keyDeltas[KEY_F10]) DebugKeyBindings::ProfileButton();
-  //#endif // PROFILER_ENABLED
-
-#ifdef SOUND_EDITOR
-  if (modsEnabled)
-  {
-    //        if (g_keyDeltas[KEY_F7]) DebugKeyBindings::SoundStatsButton();
-    //        if (g_keyDeltas[KEY_F11]) DebugKeyBindings::SoundEditorButton();
-    //        if (g_keyDeltas[KEY_F9]) DebugKeyBindings::SoundProfileButton();
-  }
-#endif // SOUND_EDITOR
 
   END_PROFILE(g_app->m_profiler, "Advance UserInput");
 }
@@ -110,37 +78,7 @@ void UserInput::Render()
 {
   START_PROFILE(g_app->m_profiler, "Render UserInput");
 
-  //
-  // Render 2D overlays
-  // Caller provides ortho matrix and 2D GL state (depth off, blend on, cull off).
-
-  //
-  // Eclipse
-
   EclRender();
-
-  //
-  // Render 3d mouse history
-
-  //    glEnable    ( GL_BLEND );
-  //    glEnable    ( GL_LINE_SMOOTH );
-  //    glDisable   ( GL_DEPTH_TEST );
-  //    glLineWidth ( 5.0f );
-  //    glBegin     ( GL_LINE_STRIP );
-
-  //    for( int i = 0; i < m_mousePosHistory.Size(); ++i )
-  //    {
-  //        float alpha = 1.0f - ((float) i / (float) m_mousePosHistory.Size());
-  //        alpha *= 0.5f;
-  //        glColor4f( 1.0f, 1.0f, 0.0f, alpha );
-  //        LegacyVector3 *thisPos = m_mousePosHistory[i];
-  //        glVertex3fv( thisPos->GetData() );
-  //    }
-
-  //    glEnd       ();
-  //    glEnable    ( GL_DEPTH_TEST );
-  //    glDisable   ( GL_LINE_SMOOTH );
-  //    glDisable   ( GL_BLEND );
 
   END_PROFILE(g_app->m_profiler, "Render UserInput");
 }
@@ -188,11 +126,9 @@ void UserInput::RecalcMousePos3d()
     float sphereRadius = g_app->m_globalWorld->GetSize() * 40.0f;
 
     float dist = (rayStart - sphereCenter).Mag();
-    //DEBUG_ASSERT(dist < sphereRadius);
 
     rayStart += rayDir * (sphereRadius * 4.0f);
     rayDir = -rayDir;
     landscapeHit = RaySphereIntersection(rayStart, rayDir, sphereCenter, sphereRadius, 1e10, &m_mousePos3d);
-    //DEBUG_ASSERT(landscapeHit);
   }
 }

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "entity.h"
@@ -7,91 +6,84 @@
 #define OFFICER_ATTACKRANGE     10.0f
 #define OFFICER_ABSORBRANGE     10.0f
 
-
 class Officer : public Entity
 {
-public:
+  public:
     enum
     {
-        StateIdle,
-        StateToWaypoint,
-        StateGivingOrders
+      StateIdle,
+      StateToWaypoint,
+      StateGivingOrders
     };
 
     enum
     {
-        OrderNone,
-        OrderGoto,
-        OrderFollow,
-        NumOrderTypes
+      OrderNone,
+      OrderGoto,
+      OrderFollow,
+      NumOrderTypes
     };
 
-    int         m_state;
-    LegacyVector3     m_wayPoint;
-    int         m_wayPointTeleportId;           // Id of teleport we wish to walk into
+    int m_state;
+    LegacyVector3 m_wayPoint;
+    int m_wayPointTeleportId; // Id of teleport we wish to walk into
 
-    int         m_shield;
-    bool        m_demoted;
-    bool        m_absorb;
-    float       m_absorbTimer;
+    int m_shield;
+    bool m_demoted;
+    bool m_absorb;
+    float m_absorbTimer;
 
-    int         m_orders;
-    LegacyVector3     m_orderPosition;                // Position in the world
-    int         m_ordersBuildingId;             // Id of target building eg Teleport
+    int m_orders;
+    LegacyVector3 m_orderPosition; // Position in the world
+    int m_ordersBuildingId; // Id of target building eg Teleport
 
-    ShapeMarkerData *m_flagMarker;
-    Flag        m_flag;
+    ShapeMarkerData* m_flagMarker;
+    Flag m_flag;
 
-protected:
-    bool AdvanceIdle                ();
-    bool AdvanceToWaypoint          ();
-    bool AdvanceGivingOrders        ();
-    bool AdvanceToTargetPosition    ();
+  protected:
+    bool AdvanceIdle();
+    bool AdvanceToWaypoint();
+    bool AdvanceGivingOrders();
+    bool AdvanceToTargetPosition();
 
-    bool SearchForRandomPosition    ();
+    bool SearchForRandomPosition();
 
     void Absorb();
 
-    void RenderFlag         ( float _predictionTime );
-    void RenderShield       ( float _predictionTime );
-    void RenderSpirit       ( LegacyVector3 const &_pos );
+    void RenderFlag(float _predictionTime);
+    void RenderShield(float _predictionTime);
+    void RenderSpirit(const LegacyVector3& _pos);
 
-public:
+  public:
     Officer();
-    ~Officer();
+    ~Officer() override;
 
-    void Begin              ();
-    void Render		        ( float _predictionTime );
-    bool RenderPixelEffect  ( float _predictionTime );
+    void Begin() override;
+    void Render(float _predictionTime) override;
 
-    bool Advance            ( Unit *_unit );
+    bool Advance(Unit* _unit) override;
 
-    void ChangeHealth   ( int amount );
+    void ChangeHealth(int amount) override;
 
-    void SetWaypoint    ( LegacyVector3 const &_wayPoint );
-    void SetOrders      ( LegacyVector3 const &_orders );
-    //void SetDirectOrders( LegacyVector3 const &_orders ); // orders while in direct control mode - removes Goto command
+    void SetWaypoint(const LegacyVector3& _wayPoint);
+    void SetOrders(const LegacyVector3& _orders);
 
-    void SetNextMode     ();
-    void SetPreviousMode ();
+    void SetNextMode();
+    void SetPreviousMode();
 
     void CancelOrderSounds();
-    void ListSoundEvents( LList<const char*> *_list );
 
-    static const char *GetOrderType( int _orderType );
+    static const char* GetOrderType(int _orderType);
 };
-
 
 class OfficerOrders : public WorldObject
 {
-public:
-    LegacyVector3     m_wayPoint;
-    float       m_arrivedTimer;
+  public:
+    LegacyVector3 m_wayPoint;
+    float m_arrivedTimer;
 
-public:
     OfficerOrders();
 
-    bool Advance();
-    void Render( float _time );
+    bool Advance() override;
+    void Render(float _time) override;
 };
-

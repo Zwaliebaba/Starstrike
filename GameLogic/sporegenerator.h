@@ -1,53 +1,47 @@
-
 #pragma once
 
 #include "entity.h"
 
 #define SPOREGENERATOR_NUMTAILS 4
 
-
 class SporeGenerator : public Entity
 {
-public:
-    float       m_retargetTimer;
-    float       m_eggTimer;
-    LegacyVector3     m_targetPos;
-    int         m_spiritId;
+  public:
+    float m_retargetTimer;
+    float m_eggTimer;
+    LegacyVector3 m_targetPos;
+    int m_spiritId;
 
-protected:
-    bool    SearchForRandomPos      ();
-    bool    SearchForSpirits        ();
+  protected:
+    bool SearchForRandomPos();
+    bool SearchForSpirits();
 
-    bool    AdvanceToTargetPosition ();
-    bool    AdvanceIdle             ();
-    bool    AdvanceEggLaying        ();
-    bool    AdvancePanic            ();
+    bool AdvanceToTargetPosition();
+    bool AdvanceIdle();
+    bool AdvanceEggLaying();
+    bool AdvancePanic();
 
-    void    RenderTail( LegacyVector3 const &_from, LegacyVector3 const &_to, float _size );
+    void RenderTail(const LegacyVector3& _from, const LegacyVector3& _to, float _size);
 
-protected:
-    ShapeMarkerData *m_eggMarker;
-    ShapeMarkerData *m_tail[SPOREGENERATOR_NUMTAILS];
+    ShapeMarkerData* m_eggMarker;
+    ShapeMarkerData* m_tail[SPOREGENERATOR_NUMTAILS];
 
     enum
     {
-        StateIdle,
-        StateEggLaying,
-        StatePanic
+      StateIdle,
+      StateEggLaying,
+      StatePanic
     };
+
     int m_state;
 
-public:
+  public:
     SporeGenerator();
 
-    void Begin          ();
-    bool Advance        ( Unit *_unit );
-    void ChangeHealth   ( int _amount );
+    void Begin() override;
+    bool Advance(Unit* _unit) override;
+    void ChangeHealth(int _amount) override;
 
-    bool IsInView           ();
-    void Render             ( float _predictionTime );
-    bool RenderPixelEffect  ( float _predictionTime );
-
-    void ListSoundEvents    ( LList<const char*> *_list );
+    bool IsInView() override;
+    void Render(float _predictionTime) override;
 };
-

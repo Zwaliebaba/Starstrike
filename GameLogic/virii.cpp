@@ -778,12 +778,6 @@ bool Virii::IsInView()
   return g_app->m_camera->SphereInViewFrustum(centerPos, radius);
 }
 
-void Virii::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-  _list->PutData("ChangeDirection");
-}
-
 void Virii::Render(float predictionTime, int teamId, int _detail)
 {
   predictionTime += SERVER_ADVANCE_PERIOD;

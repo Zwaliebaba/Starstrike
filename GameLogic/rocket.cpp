@@ -312,14 +312,6 @@ bool FuelGenerator::Advance()
   return FuelBuilding::Advance();
 }
 
-void FuelGenerator::ListSoundEvents(LList<const char*>* _list)
-{
-  FuelBuilding::ListSoundEvents(_list);
-
-  _list->PutData("PumpUp");
-  _list->PutData("PumpDown");
-}
-
 LegacyVector3 FuelGenerator::GetPumpPos()
 {
   LegacyVector3 pumpPos = m_pos;
@@ -385,13 +377,6 @@ bool FuelPipe::Advance()
     g_app->m_soundSystem->StopAllSounds(m_id, "FuelPipe PumpFuel");
 
   return FuelBuilding::Advance();
-}
-
-void FuelPipe::ListSoundEvents(LList<const char*>* _list)
-{
-  FuelBuilding::ListSoundEvents(_list);
-
-  _list->PutData("PumpFuel");
 }
 
 // ============================================================================
@@ -488,13 +473,6 @@ bool FuelStation::BoardRocket(WorldObjectId _id)
   }
 
   return false;
-}
-
-void FuelStation::ListSoundEvents(LList<const char*>* _list)
-{
-  FuelBuilding::ListSoundEvents(_list);
-
-  _list->PutData("LoadPassenger");
 }
 
 void FuelStation::Render(float _predictionTime) { Building::Render(_predictionTime); }
@@ -673,19 +651,6 @@ EscapeRocket::EscapeRocket()
     m_window[i] = m_shape->GetMarkerData(name);
     ASSERT_TEXT(m_window[i], "%s not found", name);
   }
-}
-
-void EscapeRocket::ListSoundEvents(LList<const char*>* _list)
-{
-  FuelBuilding::ListSoundEvents(_list);
-
-  _list->PutData("Refueling");
-  _list->PutData("Happy");
-  _list->PutData("Unhappy");
-  _list->PutData("Flight");
-  _list->PutData("Malfunction");
-  _list->PutData("Explode");
-  _list->PutData("EngineBurn");
 }
 
 void EscapeRocket::SetupSounds()

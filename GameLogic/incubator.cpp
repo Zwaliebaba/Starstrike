@@ -284,11 +284,3 @@ void Incubator::RenderAlphas(float _predictionTime)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
 }
-
-void Incubator::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("AddSpirit");
-  _list->PutData("SpawnEntity");
-}

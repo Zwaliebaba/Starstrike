@@ -212,25 +212,6 @@ bool SpaceInvader::Advance(Unit* _unit)
 
 void SpaceInvader::ChangeHealth(int _amount)
 {
-  // Space invaders are now INVINCIBLE
-
-  //    bool dead = m_dead;
-  //
-  //    Entity::ChangeHealth( _amount );
-  //
-  //    if( m_dead && !dead )
-  //    {
-  //        // We just died
-  //        Matrix34 transform( m_front, g_upVector, m_pos );
-  //        g_explosionManager.AddExplosion( m_shape, transform );
-  //    }
-}
-
-void SpaceInvader::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("DropGrenade");
 }
 
 void SpaceInvader::Render(float _predictionTime)

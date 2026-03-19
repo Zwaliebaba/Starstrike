@@ -339,13 +339,6 @@ bool MineBuilding::Advance()
   return Building::Advance();
 }
 
-void MineBuilding::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("CogTurn");
-}
-
 void MineBuilding::TriggerCart(MineCart* _cart, float _initValue)
 {
   _cart->m_progress = _initValue;

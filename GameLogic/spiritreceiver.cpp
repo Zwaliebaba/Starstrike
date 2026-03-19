@@ -60,13 +60,6 @@ bool ReceiverBuilding::IsInView()
   return Building::IsInView();
 }
 
-void ReceiverBuilding::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("TriggerSpirit");
-}
-
 void ReceiverBuilding::Render(float _predictionTime)
 {
   Matrix34 mat(m_front, m_up, m_pos);

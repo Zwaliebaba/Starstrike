@@ -844,12 +844,3 @@ const char* Building::GetTypeNameTranslated(int _type)
     return LANGUAGEPHRASE(stringId);
   return typeName;
 }
-
-void Building::ListSoundEvents(LList<const char*>* _list)
-{
-  _list->PutData("Create");
-  _list->PutData("Reprogramming"); // Remove me
-  _list->PutData("ReprogramComplete");
-  _list->PutData("ChangeTeam");
-  _list->PutData("Damage");
-}

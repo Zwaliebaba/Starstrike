@@ -72,6 +72,5 @@ public:
 	bool	Advance(); // Returns true if the foot was planted this frame
 	void	AdvanceSpiderPounce(float _fractionComplete);
 	void	Render(float _predictionTime, LegacyVector3 const &_predictedMovement);
-	bool	RenderPixelEffect(float _predictionTime, LegacyVector3 const &_predictedMovement);
 };
 

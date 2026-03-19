@@ -489,13 +489,6 @@ void Tree::GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iteration
   }
 }
 
-void Tree::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("Burn");
-}
-
 void Tree::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);

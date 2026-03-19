@@ -126,6 +126,8 @@ public:
       m_SamplerArray = nullptr;
     m_NumSamplers = NumStaticSamplers;
     m_NumInitializedStaticSamplers = 0;
+   m_signature = nullptr;
+   m_Finalized = false;
   }
 
   RootParameter& operator[](size_t EntryIndex)

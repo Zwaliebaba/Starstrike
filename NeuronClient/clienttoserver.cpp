@@ -357,13 +357,6 @@ void ClientToServer::SendSyncronisation(int _lastProcessedId, unsigned char _syn
   SendLetter(letter);
 }
 
-void ClientToServer::RequestPause()
-{
-  auto letter = new NetworkUpdate();
-  letter->SetType(NetworkUpdate::Pause);
-  SendLetter(letter);
-}
-
 void ClientToServer::RequestSelectUnit(unsigned char _teamId, int _unitId, int _entityId, int _buildingId)
 {
   auto letter = new NetworkUpdate();
@@ -447,10 +440,6 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
     {
     case NetworkUpdate::Alive:
       g_app->m_location->UpdateTeam(update->m_teamId, update->m_teamControls);
-      break;
-
-    case NetworkUpdate::Pause:
-      g_app->m_paused = !g_app->m_paused;
       break;
 
     case NetworkUpdate::SelectUnit:

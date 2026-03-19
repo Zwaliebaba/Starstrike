@@ -81,6 +81,7 @@ void TreeRenderer::Shutdown()
 {
   m_gpuBuffers.clear();
   m_pendingUploads.clear();
+ m_pso.Destroy();
   m_textureLoaded = false;
   DebugTrace("TreeRenderer shut down\n");
 }

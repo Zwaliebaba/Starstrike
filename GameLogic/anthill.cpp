@@ -378,24 +378,6 @@ void AntHill::Render(float _predictionTime)
 
   glDisable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-#ifdef DEBUG_RENDER_ENABLED
-  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,140,0), 20, "Health %d", m_health );
-  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,120,0), 20, "%d Ants Inside", m_numAntsInside );
-  //g_editorFont.DrawText3DCenter( m_pos + LegacyVector3(0,100,0), 20, "%d Spirits Inside", m_numSpiritsInside );
-  //    for( int i = 0; i < m_objectives.Size(); ++i )
-  //    {
-  //        AntObjective *objective = m_objectives[i];
-  //        RenderSphere( objective->m_pos, 5.0f );
-  //    }
-#endif
-}
-
-void AntHill::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("Explode");
 }
 
 void AntHill::Read(TextReader* _in, bool _dynamic)

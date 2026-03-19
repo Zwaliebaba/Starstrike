@@ -693,33 +693,4 @@ void Spider::Render(float _predictionTime)
   g_app->m_renderer->UnsetObjectLighting();
 }
 
-bool Spider::RenderPixelEffect(float _predictionTime)
-{
-  Render(_predictionTime);
-
-  LegacyVector3 predictedMovement = _predictionTime * m_vel;
-  LegacyVector3 predictedPos = m_pos + predictedMovement;
-  LegacyVector3 up = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
-  LegacyVector3 right = m_up ^ m_front;
-  LegacyVector3 front = right ^ up;
-
-  Matrix34 mat(front, up, predictedPos);
-  g_app->m_renderer->MarkUsedCells(m_shape, mat);
-
-  for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
-    m_legs[i]->RenderPixelEffect(_predictionTime, predictedMovement);
-
-  return true;
-}
-
 bool Spider::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
-
-void Spider::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("Pounce");
-  _list->PutData("PounceLand");
-  _list->PutData("FootFall");
-  _list->PutData("LayEgg");
-}

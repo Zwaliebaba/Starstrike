@@ -447,14 +447,6 @@ bool GunTurret::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& 
   return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, norm);
 }
 
-void GunTurret::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("TargetSighted");
-  _list->PutData("FireShell");
-}
-
 GunTurretTarget::GunTurretTarget(int _buildingId)
   : WorldObject(),
     m_buildingId(_buildingId) { m_type = EffectGunTurretTarget; }

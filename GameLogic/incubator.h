@@ -54,7 +54,5 @@ public:
     void Write  ( FileWriter *_out );
 
     void GetDockPoint( LegacyVector3 &_pos, LegacyVector3 &_front );
-
-    void ListSoundEvents( LList<const char*> *_list );
 };
 

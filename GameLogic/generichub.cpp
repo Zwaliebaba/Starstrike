@@ -36,13 +36,6 @@ void DynamicBase::Render(float _predictionTime)
 
 bool DynamicBase::Advance() { return Building::Advance(); }
 
-void DynamicBase::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("TriggerSurge");
-}
-
 void DynamicBase::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);
@@ -113,13 +106,6 @@ void DynamicHub::ReprogramComplete()
 {
   m_reprogrammed = true;
   g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
-}
-
-void DynamicHub::ListSoundEvents(LList<const char*>* _list)
-{
-  DynamicBase::ListSoundEvents(_list);
-
-  _list->PutData("Enable");
 }
 
 bool DynamicHub::Advance()
@@ -366,13 +352,6 @@ void DynamicNode::Render(float _predictionTime)
 }
 
 void DynamicNode::RenderAlphas(float _predictionTime) { DynamicBase::RenderAlphas(_predictionTime); }
-
-void DynamicNode::ListSoundEvents(LList<const char*>* _list)
-{
-  DynamicBase::ListSoundEvents(_list);
-
-  _list->PutData("Operate");
-}
 
 void DynamicNode::ReprogramComplete()
 {

@@ -73,8 +73,6 @@ public:
                                  float _rayLen=1e10, LegacyVector3 *_pos=NULL, LegacyVector3 *_norm=NULL);
     bool DoesShapeHit           (ShapeStatic *_shape, Matrix34 _transform);
 
-    void ListSoundEvents        (LList<const char*> *_list );
-
     LegacyVector3 GetTopPosition();
 };
 

@@ -33,7 +33,6 @@ public:
         ToggleLaserFence,                   // A laser fence is toggled
         RunProgram,                         // A player wishes to run a program
         TargetProgram,                      // A player targets a running program
-        Pause,
         Syncronise                          // Performs a check to make sure we're in sync
     };
 

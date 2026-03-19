@@ -2,12 +2,8 @@
 
 #include "fast_darray.h"
 #include "llist.h"
-#include "text_stream_readers.h"
 #include "LegacyVector3.h"
-
 #include "sound_instance.h"
-#include "sound_parameter.h"
-
 #include "worldobject.h"
 
 class Entity;
@@ -58,7 +54,6 @@ class SoundSourceBlueprint
 
     static int GetSoundSoundType(const char* _name);
     static const char* GetSoundSourceName(int _type);
-    static void ListSoundEvents(int _type, LList<const char*>* _list);
 };
 
 //*****************************************************************************
@@ -200,4 +195,3 @@ class SoundSystem
 
     SoundInstance* GetSoundInstance(SoundInstanceId id);
 };
-

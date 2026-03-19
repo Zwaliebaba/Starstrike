@@ -23,7 +23,6 @@
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
-#include "ShapeStatic.h"
 #include "snow.h"
 #include "taskmanager.h"
 #include "taskmanager_interface.h"
@@ -1859,18 +1858,6 @@ void Location::SetupFog()
   glFogfv(GL_FOG_COLOR, fogCol);
   glFogi(GL_FOG_MODE, GL_LINEAR);
   glDisable(GL_FOG);
-}
-
-void Location::WaterReflect()
-{
-  for (int i = 0; i < m_lights.Size(); i++)
-  {
-    Light* light = m_lights.GetData(i);
-    //light->m_front[0] = -light->m_front[0];
-    //light->m_front[1] = -light->m_front[1];
-    //light->m_front[2] = -light->m_front[2];
-    //light->m_front[3] = -light->m_front[3];
-  }
 }
 
 void Location::SetupLights()

@@ -413,8 +413,6 @@ void ControlTower::RenderAlphas(float _predictionTime)
   }
 }
 
-void ControlTower::ListSoundEvents(LList<const char*>* _list) { Building::ListSoundEvents(_list); }
-
 void ControlTower::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);

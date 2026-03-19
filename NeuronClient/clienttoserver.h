@@ -63,7 +63,5 @@ public:
 
     void SendSyncronisation     ( int _lastProcessedId, unsigned char _sync );
     void SendIAmAlive           ( unsigned char _teamId, TeamControls const &_teamControls );
-
-    void RequestPause();
 };
 

@@ -9,68 +9,61 @@
 #define GUNTURRET_NUMBARRELS        4
 #define GUNTURRET_OWNERSHIPTIMER    1.0f
 
-
 class GunTurret : public Building
 {
-protected:
-    ShapeStatic     *m_turret;
-    ShapeStatic     *m_barrel;
-    ShapeMarkerData *m_barrelMount;
-    ShapeMarkerData *m_barrelEnd[GUNTURRET_NUMBARRELS];
-    ShapeMarkerData *m_statusMarkers[GUNTURRET_NUMSTATUSMARKERS];
+  protected:
+    ShapeStatic* m_turret;
+    ShapeStatic* m_barrel;
+    ShapeMarkerData* m_barrelMount;
+    ShapeMarkerData* m_barrelEnd[GUNTURRET_NUMBARRELS];
+    ShapeMarkerData* m_statusMarkers[GUNTURRET_NUMSTATUSMARKERS];
 
-    LegacyVector3         m_turretFront;
-    LegacyVector3         m_barrelUp;
+    LegacyVector3 m_turretFront;
+    LegacyVector3 m_barrelUp;
 
-    bool            m_aiTargetCreated;
+    bool m_aiTargetCreated;
 
-    LegacyVector3         m_target;
-    WorldObjectId   m_targetId;
-    float           m_fireTimer;
-    int             m_nextBarrel;
-    float           m_retargetTimer;
-    bool            m_targetCreated;
+    LegacyVector3 m_target;
+    WorldObjectId m_targetId;
+    float m_fireTimer;
+    int m_nextBarrel;
+    float m_retargetTimer;
+    bool m_targetCreated;
 
-    float           m_health;
-    float           m_ownershipTimer;
+    float m_health;
+    float m_ownershipTimer;
 
-protected:
     void PrimaryFire();
     bool SearchForTargets();
     void SearchForRandomPos();
     void RecalculateOwnership();
 
-public:
+  public:
     GunTurret();
 
-    void Initialise     ( Building *_template );
-    void SetDetail      ( int _detail );
+    void Initialise(Building* _template) override;
+    void SetDetail(int _detail) override;
 
-    void ExplodeBody    ();
-    void Damage         ( float _damage );
-    bool Advance        ();
+    void ExplodeBody();
+    void Damage(float _damage) override;
+    bool Advance() override;
 
-    LegacyVector3 GetTarget   ();
+    LegacyVector3 GetTarget();
 
-    bool IsInView       ();
-    void Render         ( float _predictionTime );
-    void RenderPorts    ();
+    bool IsInView() override;
+    void Render(float _predictionTime) override;
+    void RenderPorts() override;
 
-    bool DoesRayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir,
-                    float _rayLen, LegacyVector3 *_pos, LegacyVector3 *norm );
-
-    void ListSoundEvents( LList<const char*> *_list );
+    bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
+                    LegacyVector3* norm) override;
 };
-
 
 class GunTurretTarget : public WorldObject
 {
-public:
+  public:
     int m_buildingId;
 
-public:
-    GunTurretTarget ( int _buildingId );
-    bool Advance    ();
-    void Render     ( float _time );
+    GunTurretTarget(int _buildingId);
+    bool Advance() override;
+    void Render(float _time) override;
 };
-

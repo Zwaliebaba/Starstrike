@@ -280,14 +280,6 @@ void ResearchItem::RenderAlphas(float _predictionTime)
   glDepthMask(true);
 }
 
-bool ResearchItem::RenderPixelEffect(float _predictionTime)
-{
-  //	Matrix34 mat(m_front, m_up, m_pos);
-  //	m_shape->Render(0.0f, mat);
-  //	g_app->m_renderer->MarkUsedCells(m_shape, mat);
-  return false;
-}
-
 void ResearchItem::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);
@@ -304,13 +296,6 @@ void ResearchItem::Write(FileWriter* _out)
 
   _out->printf("%s ", GlobalResearch::GetTypeName(m_researchType));
   _out->printf("%6d", m_level);
-}
-
-void ResearchItem::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("AquireResearch");
 }
 
 bool ResearchItem::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }

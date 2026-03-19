@@ -180,13 +180,6 @@ void PowerBuilding::TriggerSurge(float _initValue)
   g_app->m_soundSystem->TriggerBuildingEvent(this, "TriggerSurge");
 }
 
-void PowerBuilding::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("TriggerSurge");
-}
-
 void PowerBuilding::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);
@@ -241,13 +234,6 @@ void Generator::ReprogramComplete()
 {
   m_enabled = true;
   g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
-}
-
-void Generator::ListSoundEvents(LList<const char*>* _list)
-{
-  PowerBuilding::ListSoundEvents(_list);
-
-  _list->PutData("Enable");
 }
 
 bool Generator::Advance()
@@ -607,11 +593,4 @@ void SolarPanel::RenderAlphas(float _predictionTime)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
   }
-}
-
-void SolarPanel::ListSoundEvents(LList<const char*>* _list)
-{
-  PowerBuilding::ListSoundEvents(_list);
-
-  _list->PutData("Operate");
 }

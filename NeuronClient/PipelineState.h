@@ -17,6 +17,11 @@ public:
   virtual ~PSO() = default;
 
   /**
+   * @brief Explicitly release the underlying pipeline state object.
+   */
+  void Destroy() { m_PSO = nullptr; }
+
+  /**
    * @brief Construct with a name.
    */
   PSO(const wchar_t* Name)

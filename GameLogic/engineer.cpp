@@ -1060,13 +1060,6 @@ void Engineer::Render(float predictionTime)
   }
 }
 
-bool Engineer::RenderPixelEffect(float predictionTime)
-{
-  RenderShape(predictionTime);
-
-  return true;
-}
-
 char* Engineer::GetCurrentAction()
 {
   switch (m_state)
@@ -1094,13 +1087,4 @@ char* Engineer::GetCurrentAction()
   }
 
   return LANGUAGEPHRASE("engineer_idle");
-}
-
-void Engineer::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("BeginReprogramming");
-  _list->PutData("EndReprogramming");
-  _list->PutData("ReprogrammingComplete");
 }

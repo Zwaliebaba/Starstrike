@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "building.h"
@@ -6,49 +5,44 @@
 class SpiritProcessor;
 class UnprocessedSpirit;
 
-
 // ****************************************************************************
 // Class ReceiverBuilding
 // ****************************************************************************
 
 class ReceiverBuilding : public Building
 {
-protected:
-    int             m_spiritLink;
-    ShapeMarkerData *m_spiritLocation;
+  protected:
+    int m_spiritLink;
+    ShapeMarkerData* m_spiritLocation;
 
-    LList           <float> m_spirits;
+    LList<float> m_spirits;
 
-public:
+  public:
     ReceiverBuilding();
 
-    void Initialise     ( Building *_template );
-    bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
+    void Initialise(Building* _template) override;
+    bool Advance() override;
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    bool            IsInView            ();
-    virtual LegacyVector3 GetSpiritLocation   ();
-    virtual void    TriggerSpirit       ( float _initValue );
+    bool IsInView() override;
+    virtual LegacyVector3 GetSpiritLocation();
+    virtual void TriggerSpirit(float _initValue);
 
-    void ListSoundEvents( LList<const char*> *_list );
-
-    static SpiritProcessor *GetSpiritProcessor();
+    static SpiritProcessor* GetSpiritProcessor();
 
     static void BeginRenderUnprocessedSpirits();
-    static void RenderUnprocessedSpirit( LegacyVector3 const &_pos, float _life=1.0f ); // gl friendly
-	static void RenderUnprocessedSpirit_basic( LegacyVector3 const &_pos, float _life=1.0f ); // dx friendly
-	static void RenderUnprocessedSpirit_detail( LegacyVector3 const &_pos, float _life=1.0f ); // dx friendly
+    static void RenderUnprocessedSpirit(const LegacyVector3& _pos, float _life = 1.0f); // gl friendly
+    static void RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, float _life = 1.0f); // dx friendly
+    static void RenderUnprocessedSpirit_detail(const LegacyVector3& _pos, float _life = 1.0f); // dx friendly
     static void EndRenderUnprocessedSpirits();
 
-    void Read   ( TextReader *_in, bool _dynamic );
-    void Write  ( FileWriter *_out );
+    void Read(TextReader* _in, bool _dynamic) override;
+    void Write(FileWriter* _out) override;
 
-    int  GetBuildingLink();
-    void SetBuildingLink( int _buildingId );
+    int GetBuildingLink() override;
+    void SetBuildingLink(int _buildingId) override;
 };
-
-
 
 // ****************************************************************************
 // Class SpiritProcessor
@@ -56,30 +50,27 @@ public:
 
 class SpiritProcessor : public ReceiverBuilding
 {
-protected:
-    float   m_timerSync;
-    int     m_numThisSecond;
-    float   m_spawnSync;
-    float   m_throughput;
+  protected:
+    float m_timerSync;
+    int m_numThisSecond;
+    float m_spawnSync;
+    float m_throughput;
 
-public:
-    LList   <UnprocessedSpirit *> m_floatingSpirits;
+  public:
+    LList<UnprocessedSpirit*> m_floatingSpirits;
 
-public:
     SpiritProcessor();
 
-    void TriggerSpirit ( float _initValue );
+    void TriggerSpirit(float _initValue) override;
 
-    const char* GetObjectiveCounter();
+    const char* GetObjectiveCounter() override;
 
-    void Initialise( Building *_building );
-    bool Advance();
-    bool IsInView();
-    void Render( float _predictionTime );
-    void RenderAlphas( float _predictionTime );
+    void Initialise(Building* _building) override;
+    bool Advance() override;
+    bool IsInView() override;
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 };
-
-
 
 // ****************************************************************************
 // Class ReceiverLink
@@ -87,11 +78,10 @@ public:
 
 class ReceiverLink : public ReceiverBuilding
 {
-public:
+  public:
     ReceiverLink();
-    bool Advance();
+    bool Advance() override;
 };
-
 
 // ****************************************************************************
 // Class ReceiverSpiritSpawner
@@ -99,11 +89,10 @@ public:
 
 class ReceiverSpiritSpawner : public ReceiverBuilding
 {
-public:
+  public:
     ReceiverSpiritSpawner();
-    bool Advance();
+    bool Advance() override;
 };
-
 
 // ****************************************************************************
 // Class SpiritReceiver
@@ -113,25 +102,23 @@ public:
 
 class SpiritReceiver : public ReceiverBuilding
 {
-protected:
-    ShapeMarkerData *m_headMarker;
-    ShapeStatic       *m_headShape;
-    ShapeMarkerData *m_spiritLink;
-    ShapeMarkerData *m_statusMarkers[SPIRITRECEIVER_NUMSTATUSMARKERS];
+  protected:
+    ShapeMarkerData* m_headMarker;
+    ShapeStatic* m_headShape;
+    ShapeMarkerData* m_spiritLink;
+    ShapeMarkerData* m_statusMarkers[SPIRITRECEIVER_NUMSTATUSMARKERS];
 
-public:
+  public:
     SpiritReceiver();
 
-    LegacyVector3 GetSpiritLocation();
+    LegacyVector3 GetSpiritLocation() override;
 
-    void Initialise     ( Building *_template );
-    bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderPorts    ();
-    void RenderAlphas   ( float _predictionTime );
-
+    void Initialise(Building* _template) override;
+    bool Advance() override;
+    void Render(float _predictionTime) override;
+    void RenderPorts() override;
+    void RenderAlphas(float _predictionTime) override;
 };
-
 
 // ****************************************************************************
 // Class UnprocessedSpirit
@@ -139,27 +126,27 @@ public:
 
 class UnprocessedSpirit : public WorldObject
 {
-protected:
-    float       m_timeSync;
-    float       m_positionOffset;                       // Used to make them float around a bit
-    float       m_xaxisRate;
-    float       m_yaxisRate;
-    float       m_zaxisRate;
+  protected:
+    float m_timeSync;
+    float m_positionOffset; // Used to make them float around a bit
+    float m_xaxisRate;
+    float m_yaxisRate;
+    float m_zaxisRate;
 
-public:
-    LegacyVector3     m_hover;
+  public:
+    LegacyVector3 m_hover;
+
     enum
     {
-        StateUnprocessedFalling,
-        StateUnprocessedFloating,
-        StateUnprocessedDeath
+      StateUnprocessedFalling,
+      StateUnprocessedFloating,
+      StateUnprocessedDeath
     };
-    int         m_state;
 
-public:
+    int m_state;
+
     UnprocessedSpirit();
 
-    bool Advance();
-    float GetLife();                        // Returns 0.0f-1.0f (0.0f=dead, 1.0f=alive)
+    bool Advance() override;
+    float GetLife(); // Returns 0.0f-1.0f (0.0f=dead, 1.0f=alive)
 };
-

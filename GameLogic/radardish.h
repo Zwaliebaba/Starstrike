@@ -6,60 +6,56 @@
 #include "teleport.h"
 #include "ShapeInstance.h"
 
-
 class RadarDish : public Teleport
 {
-protected:
-    ShapeInstance     m_shapeInstance;
-    int               m_dishIndex;
-    int               m_upperMountIndex;
-    ShapeMarkerData  *m_focusMarker;
+  protected:
+    ShapeInstance m_shapeInstance;
+    int m_dishIndex;
+    int m_upperMountIndex;
+    ShapeMarkerData* m_focusMarker;
 
-    LegacyVector3     m_entrancePos;
-    LegacyVector3     m_entranceFront;
+    LegacyVector3 m_entrancePos;
+    LegacyVector3 m_entranceFront;
 
-    LegacyVector3     m_target;
-    int         m_receiverId;
-    float       m_range;
-    float       m_signal;
+    LegacyVector3 m_target;
+    int m_receiverId;
+    float m_range;
+    float m_signal;
 
-    bool        m_newlyCreated;
+    bool m_newlyCreated;
 
-    bool        m_horizontallyAligned;
-    bool        m_verticallyAligned;
-    bool        m_movementSoundsPlaying;
+    bool m_horizontallyAligned;
+    bool m_verticallyAligned;
+    bool m_movementSoundsPlaying;
 
-    LegacyVector3     GetDishPos      ( float _predictionTime );      // Returns the position of the transmission point
-    LegacyVector3     GetDishFront    ( float _predictionTime );      // Returns the front vector of the dish
+    LegacyVector3 GetDishPos(float _predictionTime); // Returns the position of the transmission point
+    LegacyVector3 GetDishFront(float _predictionTime); // Returns the front vector of the dish
 
-    void RenderSignal   ( float _predictionTime, float _radius, float _alpha );
+    void RenderSignal(float _predictionTime, float _radius, float _alpha);
 
-public:
+  public:
     RadarDish();
-	~RadarDish();
+    ~RadarDish() override;
 
-    void SetDetail      ( int _detail );
+    void SetDetail(int _detail) override;
 
-    bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
+    bool Advance() override;
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    void Aim            ( LegacyVector3 _worldPos );
+    void Aim(LegacyVector3 _worldPos);
 
-    bool    Connected       ();
-    bool    ReadyToSend     ();
+    bool Connected() override;
+    bool ReadyToSend() override;
 
-    int     GetConnectedDishId();
+    int GetConnectedDishId();
 
-    LegacyVector3 GetStartPoint   ();
-    LegacyVector3 GetEndPoint     ();
-    bool    GetEntrance     ( LegacyVector3 &_pos, LegacyVector3 &_front );
-    bool    GetExit         ( LegacyVector3 &_pos, LegacyVector3 &_front );
+    LegacyVector3 GetStartPoint() override;
+    LegacyVector3 GetEndPoint() override;
+    bool GetEntrance(LegacyVector3& _pos, LegacyVector3& _front) override;
+    bool GetExit(LegacyVector3& _pos, LegacyVector3& _front) override;
 
-    bool    DoesSphereHit   (LegacyVector3 const &_pos, float _radius);
+    bool DoesSphereHit(const LegacyVector3& _pos, float _radius) override;
 
-    bool    UpdateEntityInTransit( Entity *_entity );
-
-    void    ListSoundEvents ( LList<const char*> *_list );
+    bool UpdateEntityInTransit(Entity* _entity) override;
 };
-

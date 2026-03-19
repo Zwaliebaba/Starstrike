@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "building.h"
@@ -6,38 +5,33 @@
 #define SPAM_RELOADTIME             60.0f
 #define SPAM_DAMAGE                 100.0f
 
-
 class Spam : public Building
 {
-protected:
-    float   m_timer;
-    float   m_damage;
+  protected:
+    float m_timer;
+    float m_damage;
 
-    bool    m_research;
-    bool    m_onGround;
-    bool    m_activated;
+    bool m_research;
+    bool m_onGround;
+    bool m_activated;
 
-public:
+  public:
     Spam();
 
-    void Initialise( Building *_template );
-    void SetDetail( int _detail );
-    void Damage( float _damage );
-	void Destroy( float _intensity );
+    void Initialise(Building* _template) override;
+    void SetDetail(int _detail) override;
+    void Damage(float _damage) override;
+    void Destroy(float _intensity) override;
 
-    void Render( float _predictionTime );
-    void RenderAlphas( float _predictionTime );
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    bool Advance();
-
-    void ListSoundEvents( LList<const char*> *_list );
+    bool Advance() override;
 
     void SetAsResearch();
     void SendFromHeaven();
     void SpawnInfection();
 };
-
-
 
 // ****************************************************************************
 //  Class SpamInfection
@@ -50,24 +44,23 @@ public:
 
 class SpamInfection : public WorldObject
 {
-protected:
+  protected:
     enum
     {
-        StateIdle,
-        StateAttackingEntity,
-        StateAttackingSpirit
+      StateIdle,
+      StateAttackingEntity,
+      StateAttackingSpirit
     };
 
-    int             m_state;
-    float           m_retargetTimer;
-    WorldObjectId   m_targetId;
-    int             m_spiritId;
-    LegacyVector3         m_targetPos;
-    float           m_life;
+    int m_state;
+    float m_retargetTimer;
+    WorldObjectId m_targetId;
+    int m_spiritId;
+    LegacyVector3 m_targetPos;
+    float m_life;
 
-    LList           <LegacyVector3> m_positionHistory;
+    LList<LegacyVector3> m_positionHistory;
 
-protected:
     void AdvanceIdle();
     void AdvanceAttackingEntity();
     void AdvanceAttackingSpirit();
@@ -77,13 +70,11 @@ protected:
     bool SearchForRandomPosition();
     bool SearchForSpirits();
 
-public:
-     int m_parentId;                     // id of Spam that spawned me
+  public:
+    int m_parentId; // id of Spam that spawned me
 
-public:
     SpamInfection();
 
-    bool Advance	();
-    void Render	    ( float _time );
+    bool Advance() override;
+    void Render(float _time) override;
 };
-

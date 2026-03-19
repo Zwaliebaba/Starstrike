@@ -1,11 +1,8 @@
 #pragma once
 
-
 #include "unit.h"
 
-
 #define GAP_BETWEEN_MEN	10.0f
-
 
 //*****************************************************************************
 // Class HistoricWayPoint
@@ -15,87 +12,80 @@
 
 class HistoricWayPoint
 {
-public:
-	LegacyVector3				m_pos;
-	unsigned int		m_id;
-	static unsigned int	s_lastId;
+  public:
+    LegacyVector3 m_pos;
+    unsigned int m_id;
+    static unsigned int s_lastId;
 
-	HistoricWayPoint(LegacyVector3 const &_pos)
-	:	m_pos(_pos)
-	{
-		s_lastId++;
-		m_id = s_lastId;
-	}
+    HistoricWayPoint(const LegacyVector3& _pos)
+      : m_pos(_pos)
+    {
+      s_lastId++;
+      m_id = s_lastId;
+    }
 };
-
 
 //*****************************************************************************
 // Class InsertionSquad
 //*****************************************************************************
 
-class InsertionSquad: public Unit
+class InsertionSquad : public Unit
 {
-protected:
-    LList <HistoricWayPoint *>	m_positionHistory;          	// A list of all the places the user has clicked. Most recent first
+  protected:
+    LList<HistoricWayPoint*> m_positionHistory; // A list of all the places the user has clicked. Most recent first
 
-public:
-    int     m_weaponType;                                       // Indexes into GlobalResearch
-    int     m_controllerId;                                     // Task ID of controller if this squad is running one
-    int     m_teleportId;                                       // Id of teleport build we wish to enter, or -1
+  public:
+    int m_weaponType; // Indexes into GlobalResearch
+    int m_controllerId; // Task ID of controller if this squad is running one
+    int m_teleportId; // Id of teleport build we wish to enter, or -1
 
-public:
-    InsertionSquad				    (int teamId, int _unitId, int numEntities, LegacyVector3 const &_pos);
-	~InsertionSquad				    ();
+    InsertionSquad(int teamId, int _unitId, int numEntities, const LegacyVector3& _pos);
+    ~InsertionSquad() override;
 
-	virtual void    SetWayPoint	    (LegacyVector3 const &_pos);
-	LegacyVector3         GetTargetPos    (float _distFromPointMan);
-	Entity          *GetPointMan	();
-    void            SetWeaponType   ( int _weaponType );                    // Indexes into GlobalResearch
-    void            Attack          ( LegacyVector3 pos, bool withGrenade );
+    void SetWayPoint(const LegacyVector3& _pos) override;
+    LegacyVector3 GetTargetPos(float _distFromPointMan);
+    Entity* GetPointMan();
+    void SetWeaponType(int _weaponType); // Indexes into GlobalResearch
+    void Attack(LegacyVector3 pos, bool withGrenade) override;
 
-    void            DirectControl   ( TeamControls const& _teamControls ); // used when the squad is being directly controlled by the player using a control pad
+    void DirectControl(const TeamControls& _teamControls) override;
+    // used when the squad is being directly controlled by the player using a control pad
 };
-
 
 //*****************************************************************************
 // Class Squadie
 //*****************************************************************************
 
-class Squadie: public Entity
+class Squadie : public Entity
 {
-public:
-    bool        m_justFired;
-    float       m_secondaryTimer;
+  public:
+    bool m_justFired;
+    float m_secondaryTimer;
 
-protected:
-    ShapeMarkerData *m_laser;
-    ShapeMarkerData *m_brass;
-    ShapeMarkerData *m_eye1;
-    ShapeMarkerData *m_eye2;
+  protected:
+    ShapeMarkerData* m_laser;
+    ShapeMarkerData* m_brass;
+    ShapeMarkerData* m_eye1;
+    ShapeMarkerData* m_eye2;
 
-protected:
-    WorldObjectId   m_enemyId;
-    float           m_retargetTimer;
-    void            RunAI();               // Call this if the player isnt' controlling us
+    WorldObjectId m_enemyId;
+    float m_retargetTimer;
+    void RunAI(); // Call this if the player isnt' controlling us
 
-public:
+  public:
     Squadie();
 
-    void Begin                  ();
-    bool Advance                ( Unit *_unit );
-    void ChangeHealth           ( int _amount );
-    void Attack                 ( LegacyVector3 const &_pos );
+    void Begin() override;
+    bool Advance(Unit* _unit) override;
+    void ChangeHealth(int _amount) override;
+    void Attack(const LegacyVector3& _pos) override;
 
-    void Render                 ( float _predictionTime );
-    bool RenderPixelEffect      ( float _predictionTime );
+    void Render(float _predictionTime) override;
 
-    bool HasSecondaryWeapon     ();
-    void FireSecondaryWeapon    ( LegacyVector3 const &_pos );
+    bool HasSecondaryWeapon();
+    void FireSecondaryWeapon(const LegacyVector3& _pos);
 
-    void ListSoundEvents	    ( LList<const char*> *_list );
+    LegacyVector3 GetCameraFocusPoint() override;
 
-	LegacyVector3 GetCameraFocusPoint	();
-
-	LegacyVector3 GetSecondaryWeaponTarget();
+    LegacyVector3 GetSecondaryWeaponTarget();
 };
-

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "entity.h"
@@ -11,53 +10,46 @@
 
 class ShapeStatic;
 
-
-
 class Centipede : public Entity
 {
-protected:
-    float           m_size;
-    WorldObjectId   m_next;                         // Guy infront of me
-    WorldObjectId   m_prev;                         // Guy behind me
+  protected:
+    float m_size;
+    WorldObjectId m_next; // Guy infront of me
+    WorldObjectId m_prev; // Guy behind me
 
-    LegacyVector3         m_targetPos;
-    WorldObjectId   m_targetEntity;
+    LegacyVector3 m_targetPos;
+    WorldObjectId m_targetEntity;
 
-    LList<LegacyVector3>  m_positionHistory;
-    bool            m_linked;
-    float           m_panic;
-    int             m_numSpiritsEaten;
-    float           m_lastAdvance;
+    LList<LegacyVector3> m_positionHistory;
+    bool m_linked;
+    float m_panic;
+    int m_numSpiritsEaten;
+    float m_lastAdvance;
 
-    static ShapeStatic    *s_shapeBody;
-    static ShapeStatic    *s_shapeHead;
+    static ShapeStatic* s_shapeBody;
+    static ShapeStatic* s_shapeHead;
 
-protected:
-    bool        SearchForRandomPosition();
-    bool        SearchForTargetEnemy();
-    bool        SearchForSpirits();
-    bool        SearchForRetreatPosition();
+    bool SearchForRandomPosition();
+    bool SearchForTargetEnemy();
+    bool SearchForSpirits();
+    bool SearchForRetreatPosition();
 
-    bool        AdvanceToTargetPosition();
-    void        RecordHistoryPosition();
-    bool        GetTrailPosition( LegacyVector3 &_pos, LegacyVector3 &_vel, int _numSteps );
+    bool AdvanceToTargetPosition();
+    void RecordHistoryPosition();
+    bool GetTrailPosition(LegacyVector3& _pos, LegacyVector3& _vel, int _numSteps);
 
-    void        Panic( float _time );
-    void        EatSpirits();
+    void Panic(float _time);
+    void EatSpirits();
 
-public:
+  public:
     Centipede();
 
-    void Begin              ();
-    bool Advance            ( Unit *_unit );
-    void ChangeHealth       ( int _amount );
-    void Render             ( float _predictionTime );
-	bool RenderPixelEffect  ( float _predictionTime );
+    void Begin() override;
+    bool Advance(Unit* _unit) override;
+    void ChangeHealth(int _amount) override;
+    void Render(float _predictionTime) override;
 
-    bool IsInView           ();
+    bool IsInView() override;
 
-    void Attack             ( LegacyVector3 const &_pos );
-
-    void ListSoundEvents    ( LList<const char*> *_list );
+    void Attack(const LegacyVector3& _pos) override;
 };
-

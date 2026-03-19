@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "entity.h"
@@ -15,135 +14,130 @@
 
 class Darwinian : public Entity
 {
-public:
+  public:
     enum
     {
-        StateIdle,
-        StateApproachingPort,
-        StateOperatingPort,
-        StateApproachingArmour,
-        StateInsideArmour,
-        StateWorshipSpirit,
-        StateUnderControl,
-        StateFollowingOrders,
-        StateFollowingOfficer,
-        StateCombat,
-        StateCapturedByAnt,
-        StateBoardingRocket,
-        StateWatchingSpectacle,
-        StateAttackingBuilding,                        // Eg attacking rocket in demo2
-        StateOnFire
+      StateIdle,
+      StateApproachingPort,
+      StateOperatingPort,
+      StateApproachingArmour,
+      StateInsideArmour,
+      StateWorshipSpirit,
+      StateUnderControl,
+      StateFollowingOrders,
+      StateFollowingOfficer,
+      StateCombat,
+      StateCapturedByAnt,
+      StateBoardingRocket,
+      StateWatchingSpectacle,
+      StateAttackingBuilding,
+      // Eg attacking rocket in demo2
+      StateOnFire
     };
 
-    int         m_state;
-    bool        m_promoted;
-    LegacyVector3     m_wayPoint;
+    int m_state;
+    bool m_promoted;
+    LegacyVector3 m_wayPoint;
 
-protected:
-    float           m_retargetTimer;
-    WorldObjectId   m_threatId;
-    WorldObjectId   m_armourId;
-    WorldObjectId   m_officerId;
-    int             m_spiritId;
-    int             m_buildingId;
-    int             m_portId;
-    WorldObjectId   m_boxKiteId;
+  protected:
+    float m_retargetTimer;
+    WorldObjectId m_threatId;
+    WorldObjectId m_armourId;
+    WorldObjectId m_officerId;
+    int m_spiritId;
+    int m_buildingId;
+    int m_portId;
+    WorldObjectId m_boxKiteId;
 
-    float       m_threatRange;
-    bool        m_scared;
+    float m_threatRange;
+    bool m_scared;
 
-    int         m_controllerId;                         // Used only when Under
-    int         m_wayPointId;                           // Control
-    bool        m_teleportRequired;                     //
+    int m_controllerId; // Used only when Under
+    int m_wayPointId; // Control
+    bool m_teleportRequired; //
 
-    LegacyVector3     m_orders;                               // Used when receiving orders
-    int         m_ordersBuildingId;                     // from an officer
-    bool        m_ordersSet;                            //
+    LegacyVector3 m_orders; // Used when receiving orders
+    int m_ordersBuildingId; // from an officer
+    bool m_ordersSet; //
 
-    float       m_grenadeTimer;
-    float       m_officerTimer;
+    float m_grenadeTimer;
+    float m_officerTimer;
 
-    int         m_shadowBuildingId;         // This building causes us to cast a shadow
-    LegacyVector3     m_avoidObstruction;         // Used to nagivate around big obstructions, eg water
+    int m_shadowBuildingId; // This building causes us to cast a shadow
+    LegacyVector3 m_avoidObstruction; // Used to nagivate around big obstructions, eg water
 
-protected:
-    bool        SearchForNewTask();
+    bool SearchForNewTask();
 
-    bool        SearchForRandomPosition();
-    bool        SearchForThreats();
-    bool        SearchForSpirits();
-    bool        SearchForPorts();
-    bool        SearchForOfficers();
-    bool        SearchForArmour();
-    bool        BeginVictoryDance();
+    bool SearchForRandomPosition();
+    bool SearchForThreats();
+    bool SearchForSpirits();
+    bool SearchForPorts();
+    bool SearchForOfficers();
+    bool SearchForArmour();
+    bool BeginVictoryDance();
 
-    bool        AdvanceIdle             ();
-    bool        AdvanceApproachingPort  ();
-    bool        AdvanceOperatingPort    ();
-    bool        AdvanceApproachingArmour();
-    bool        AdvanceInsideArmour     ();
-    bool        AdvanceWorshipSpirit    ();
-    bool        AdvanceUnderControl     ();
-    bool        AdvanceFollowingOrders  ();
-    bool        AdvanceFollowingOfficer ();
-    bool        AdvanceCombat           ();
-    bool        AdvanceCapturedByAnt    ();
-    bool        AdvanceWatchingSpectacle();
-    bool        AdvanceBoardingRocket   ();
-    bool        AdvanceAttackingBuilding();
-    bool        AdvanceOnFire           ();
+    bool AdvanceIdle();
+    bool AdvanceApproachingPort();
+    bool AdvanceOperatingPort();
+    bool AdvanceApproachingArmour();
+    bool AdvanceInsideArmour();
+    bool AdvanceWorshipSpirit();
+    bool AdvanceUnderControl();
+    bool AdvanceFollowingOrders();
+    bool AdvanceFollowingOfficer();
+    bool AdvanceCombat();
+    bool AdvanceCapturedByAnt();
+    bool AdvanceWatchingSpectacle();
+    bool AdvanceBoardingRocket();
+    bool AdvanceAttackingBuilding();
+    bool AdvanceOnFire();
 
-    bool        AdvanceToTargetPosition();
+    bool AdvanceToTargetPosition();
 
-public:
+  public:
     Darwinian();
 
-    void Begin                  ();
-    bool Advance                ( Unit *_unit );
-    void ChangeHealth           ( int _amount );
-    bool IsInView               ();
-    void Render                 ( float _predictionTime, float _highDetail );
+    void Begin() override;
+    bool Advance(Unit* _unit) override;
+    void ChangeHealth(int _amount) override;
+    bool IsInView() override;
+    void Render(float _predictionTime, float _highDetail);
 
-    LegacyVector3 PushFromObstructions( LegacyVector3 const &pos, bool killem = true );
+    LegacyVector3 PushFromObstructions(const LegacyVector3& pos, bool killem = true) override;
 
-    void GiveOrders             ( LegacyVector3 const &_targetPos );
-    void TakeControl            ( int _controllerId );
-    void AntCapture             ( WorldObjectId _antId );
-    void WatchSpectacle         ( int _buildingId );
-    void CastShadow             ( int _buildingId );
-    void BoardRocket            ( int _buildingId );
-    void AttackBuilding         ( int _buildingId );
-    void SetFire                ();
-    bool IsOnFire               ();
-
-    void ListSoundEvents        ( LList<const char*> *_list );
+    void GiveOrders(const LegacyVector3& _targetPos);
+    void TakeControl(int _controllerId);
+    void AntCapture(WorldObjectId _antId);
+    void WatchSpectacle(int _buildingId);
+    void CastShadow(int _buildingId);
+    void BoardRocket(int _buildingId);
+    void AttackBuilding(int _buildingId);
+    void SetFire();
+    bool IsOnFire();
 };
-
-
 
 class BoxKite : public WorldObject
 {
-public:
-    ShapeStatic       *m_shape;
-    LegacyVector3     m_front;
-    LegacyVector3     m_up;
+  public:
+    ShapeStatic* m_shape;
+    LegacyVector3 m_front;
+    LegacyVector3 m_up;
 
     enum
     {
-        StateHeld,
-        StateReleased
+      StateHeld,
+      StateReleased
     };
-    int         m_state;
 
-    float       m_birthTime;
-    float       m_deathTime;
-    float       m_brightness;
-    float       m_size;
+    int m_state;
 
-public:
+    float m_birthTime;
+    float m_deathTime;
+    float m_brightness;
+    float m_size;
+
     BoxKite();
-    bool Advance    ();
-    void Release    ();
-    void Render     ( float _predictionTime );
+    bool Advance() override;
+    void Release();
+    void Render(float _predictionTime) override;
 };
-

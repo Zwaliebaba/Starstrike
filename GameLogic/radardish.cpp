@@ -484,16 +484,6 @@ bool RadarDish::UpdateEntityInTransit(Entity* _entity)
   return false;
 }
 
-void RadarDish::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("BeginRotation");
-  _list->PutData("EndRotation");
-  _list->PutData("ConnectionEstablished");
-  _list->PutData("ConnectionLost");
-}
-
 bool RadarDish::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 {
   // This method is overridden for Radar Dish in order to expand the number

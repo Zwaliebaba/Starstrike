@@ -540,14 +540,6 @@ bool LaserFence::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform)
   return DoesSphereHit(_transform.pos, _shape->m_rootFragment->m_radius);
 }
 
-void LaserFence::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("Spark");
-  _list->PutData("Electrocute");
-}
-
 LegacyVector3 LaserFence::GetTopPosition()
 {
   Matrix34 mat(m_front, g_upVector, m_pos);

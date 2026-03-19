@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "entity.h"
@@ -9,62 +8,58 @@ class ShapeStatic;
 
 #define ARMOUR_UNLOADPERIOD   0.1f
 
-
-class Armour: public Entity
+class Armour : public Entity
 {
-protected:
-    ShapeMarkerData     *m_markerEntrance;
-    ShapeMarkerData     *m_markerFlag;
-    LegacyVector3         m_up;
-    LegacyVector3         m_conversionPoint;
-    float           m_speed;
+  protected:
+    ShapeMarkerData* m_markerEntrance;
+    ShapeMarkerData* m_markerFlag;
+    LegacyVector3 m_up;
+    LegacyVector3 m_conversionPoint;
+    float m_speed;
 
     enum
     {
-        StateIdle,
-        StateUnloading,
-        StateLoading,
+      StateIdle,
+      StateUnloading,
+      StateLoading,
     };
-    int             m_numPassengers;
-    float           m_previousUnloadTimer;
-    float           m_newOrdersTimer;
 
-    Flag            m_flag;
-    Flag            m_deployFlag;
+    int m_numPassengers;
+    float m_previousUnloadTimer;
+    float m_newOrdersTimer;
 
-public:
-    LegacyVector3         m_wayPoint;
-    int             m_state;
+    Flag m_flag;
+    Flag m_deployFlag;
 
-public:
+  public:
+    LegacyVector3 m_wayPoint;
+    int m_state;
+
     Armour();
-    ~Armour();
+    ~Armour() override;
 
-    void Begin              ();
-    bool Advance            ( Unit *_unit );
-    void Render             ( float _predictionTime );
+    void Begin() override;
+    bool Advance(Unit* _unit) override;
+    void Render(float _predictionTime) override;
 
-    void ChangeHealth       ( int _amount );
+    void ChangeHealth(int _amount) override;
 
-    void SetOrders          ( LegacyVector3 const &_orders );
-    void SetWayPoint        ( LegacyVector3 const &_wayPoint );
-    void SetConversionPoint ( LegacyVector3 const &_conversionPoint );
-    void AdvanceToTargetPos ();
-    void DetectCollisions   ();
-    void ConvertToGunTurret ();
+    void SetOrders(const LegacyVector3& _orders);
+    void SetWayPoint(const LegacyVector3& _wayPoint);
+    void SetConversionPoint(const LegacyVector3& _conversionPoint);
+    void AdvanceToTargetPos();
+    void DetectCollisions();
+    void ConvertToGunTurret();
 
-    void SetDirectOrders    (); // orders while in direct control mode - removes gun turret mode
+    void SetDirectOrders(); // orders while in direct control mode - removes gun turret mode
 
-    bool IsLoading          ();
-    bool IsUnloading        ();
-    void ToggleLoading      ();
-    void AddPassenger       ();
-    void RemovePassenger    ();
+    bool IsLoading();
+    bool IsUnloading();
+    void ToggleLoading();
+    void AddPassenger();
+    void RemovePassenger();
 
     int Capacity();
 
-    void ListSoundEvents    ( LList<const char*> *_list );
-
-    void GetEntrance( LegacyVector3 &_exitPos, LegacyVector3 &_exitDir );
+    void GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir);
 };
-

@@ -147,8 +147,6 @@ class Building : public WorldObject
     virtual bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen = 1e10,
                             LegacyVector3* _pos = nullptr, LegacyVector3* _norm = nullptr); // pos/norm will not always be available
 
-    virtual void ListSoundEvents(LList<const char*>* _list);
-
     virtual void Read(TextReader* _in, bool _dynamic); // Use these to read/write additional building-specific
     virtual void Write(FileWriter* _out); // data to the level files
 

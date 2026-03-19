@@ -250,16 +250,6 @@ LegacyVector3 FeedingTube::GetStartPoint() { return GetDishPos(0.0f); }
 
 LegacyVector3 FeedingTube::GetEndPoint() { return GetDishPos(0.0f) + (GetDishFront(0.0f) * m_range); }
 
-void FeedingTube::ListSoundEvents(LList<const char*>* _list)
-{
-  Building::ListSoundEvents(_list);
-
-  _list->PutData("BeginRotation");
-  _list->PutData("EndRotation");
-  _list->PutData("ConnectionEstablished");
-  _list->PutData("ConnectionLost");
-}
-
 bool FeedingTube::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 {
   // This method is overridden for Radar Dish in order to expand the number

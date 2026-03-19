@@ -214,50 +214,5 @@ void EntityLeg::Render(float _predictionTime, const LegacyVector3& _predictedMov
     LegacyVector3 front(up ^ g_upVector);
     Matrix34 mat(front, up, kneePos);
     m_shapeUpper->Render(_predictionTime, mat);
-
-    //RenderArrow( rootPos, kneePos, 1.0f );
   }
-}
-
-bool EntityLeg::RenderPixelEffect(float _predictionTime, const LegacyVector3& _predictedMovement)
-{
-  LegacyVector3 predictedPos = m_parent->m_pos + _predictedMovement;
-  LegacyVector3 rootPos(_predictedMovement + GetLegRootPos());
-  LegacyVector3 footPos;
-
-  switch (m_foot.m_state)
-  {
-  case EntityFoot::OnGround:
-    footPos = m_foot.m_pos;
-    break;
-
-  case EntityFoot::Swinging:
-    {
-      float fractionComplete = RampUpAndDown(m_foot.m_leftGroundTimeStamp, m_legSwingDuration, g_gameTime);
-      footPos = GetIdealSwingingFootPos(fractionComplete);
-      break;
-    }
-
-  case EntityFoot::Pouncing:
-    footPos = m_foot.m_pos + _predictedMovement; // - m_foot.m_bodyToFoot;
-    break;
-  }
-
-  LegacyVector3 kneePos = CalcKneePos(footPos, rootPos, predictedPos);
-
-  {
-    LegacyVector3 up((kneePos - footPos).Normalise());
-    LegacyVector3 front(up ^ LegacyVector3(1, 0, 0).Normalise());
-    Matrix34 mat(front, up, footPos);
-    g_app->m_renderer->MarkUsedCells(m_shapeLower, mat);
-  }
-
-  {
-    LegacyVector3 up((rootPos - kneePos).Normalise());
-    LegacyVector3 front(up ^ LegacyVector3(1, 0, 0).Normalise());
-    Matrix34 mat(front, up, kneePos);
-    g_app->m_renderer->MarkUsedCells(m_shapeUpper, mat);
-  }
-
-  return true;
 }

@@ -405,88 +405,17 @@ void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)
   _exitDir = entranceMat.f;
 }
 
-void Armour::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("LoadDarwinian");
-  _list->PutData("UnloadDarwinian");
-}
-
-/*
-void Armour::SetMissileTarget( LegacyVector3 const &_startRay, LegacyVector3 const &_rayDir )
-{
-    //
-    // Look for enemy entities
-
-    WorldObjectId id = g_app->m_location->GetEntityId( _startRay, _rayDir, 1 );
-    Entity *entity = g_app->m_location->GetEntity( id );
-    if( entity )
-    {
-        m_missileTarget = entity->m_pos+entity->m_centerPos;
-        return;
-    }
-
-
-    //
-    // Hit against the landscape
-
-    LegacyVector3 landscapeHit;
-    bool hit = g_app->m_location->m_landscape.RayHit( _startRay, _rayDir, &landscapeHit );
-    if( hit )
-    {
-        m_missileTarget = landscapeHit;
-        return;
-    }
-}
-
-
-LegacyVector3 Armour::GetMissileTarget()
-{
-    return m_missileTarget;
-}
-
-
-void Armour::LaunchMissile()
-{
-    Missile *missile = new Missile();
-    missile->m_pos = m_pos + LegacyVector3(0,30,0);
-
-    LegacyVector3 front = (m_front + m_up).Normalise();
-    LegacyVector3 right = front ^ g_upVector;
-    LegacyVector3 up = (right ^ front).Normalise();
-    front = (up ^ right).Normalise();
-    missile->m_front = front;
-    missile->m_up = up;
-    missile->m_vel = front * 200.0f;
-    missile->m_tankId = m_id;
-    missile->m_target = m_missileTarget;
-    g_app->m_location->m_effects.PutData( missile );
-}*/
-
 void Armour::Render(float _predictionTime)
 {
   if (m_dead)
     return;
 
-  //#ifdef DEBUG_RENDER_ENABLED
-  //    glDisable( GL_DEPTH_TEST );
-  //    RenderArrow( m_pos+LegacyVector3(0,10,0), m_wayPoint, 1.0f, RGBAColour(255,255,255,155) );
-  //    if( m_attackTarget != g_zeroVector )
-  //    {
-  //        RenderArrow( m_pos+LegacyVector3(0,10,0), m_attackTarget, 1.0f, RGBAColour(255,50,50,255) );
-  //    }
-  //    glEnable( GL_DEPTH_TEST );
-  //#endif
-
   //
   // Work out our predicted position
 
   LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  //predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue( predictedPos.x, predictedPos.z );
-  //predictedPos.y = max( predictedPos.y, 0.0f );
   predictedPos.y += sinf(g_gameTime + m_id.GetUniqueId()) * 2;
-  LegacyVector3 predictedUp = m_up; //g_app->m_location->m_landscape.m_normalMap->GetValue( predictedPos.x, predictedPos.z );
+  LegacyVector3 predictedUp = m_up; 
   predictedUp.x += sinf((g_gameTime + m_id.GetUniqueId()) * 2) * 0.05f;
   predictedUp.z += cosf(g_gameTime + m_id.GetUniqueId()) * 0.05f;
 

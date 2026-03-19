@@ -84,9 +84,7 @@ class Spider : public Entity
     bool Advance(Unit* _unit) override;
     void ChangeHealth(int _amount) override;
     void Render(float _predictionTime) override;
-    bool RenderPixelEffect(float _predictionTime) override;
 
     bool IsInView() override;
-    void ListSoundEvents(LList<const char*>* _list) override;
 };
 

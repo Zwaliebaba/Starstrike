@@ -603,15 +603,6 @@ bool Centipede::AdvanceToTargetPosition()
   return (m_pos - m_targetPos).Mag() < 20.0f;
 }
 
-void Centipede::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("Panic");
-  _list->PutData("EnemySighted");
-  _list->PutData("Grow");
-}
-
 void Centipede::Render(float _predictionTime)
 {
   LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
@@ -652,28 +643,3 @@ void Centipede::Render(float _predictionTime)
 }
 
 bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
-
-bool Centipede::RenderPixelEffect(float _predictionTime)
-{
-  Render(_predictionTime);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
-
-  if (!m_dead && m_linked)
-  {
-    LegacyVector3 predictedFront = m_front;
-    LegacyVector3 predictedUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
-    LegacyVector3 predictedRight = predictedUp ^ predictedFront;
-    predictedFront = predictedRight ^ predictedUp;
-
-    Matrix34 mat(predictedFront, predictedUp, predictedPos);
-    mat.f *= m_size;
-    mat.u *= m_size;
-    mat.r *= m_size;
-
-    g_app->m_renderer->MarkUsedCells(m_shape, mat);
-  }
-
-  return true;
-}

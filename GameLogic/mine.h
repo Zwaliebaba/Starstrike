@@ -53,8 +53,6 @@ class MineBuilding : public Building
 
     virtual void TriggerCart(MineCart* _cart, float _initValue);
 
-    void ListSoundEvents(LList<const char*>* _list) override;
-
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
 

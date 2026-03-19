@@ -2317,19 +2317,6 @@ void Darwinian::Render(float _predictionTime, float _highDetail)
   }
 }
 
-void Darwinian::ListSoundEvents(LList<const char*>* _list)
-{
-  Entity::ListSoundEvents(_list);
-
-  _list->PutData("SeenThreatAttack");
-  _list->PutData("SeenThreatRunAway");
-  _list->PutData("TakenControl");
-  _list->PutData("EscapedControl");
-  _list->PutData("GivenOrders");
-  _list->PutData("VictoryJump");
-  _list->PutData("OnFire");
-}
-
 // ===========================================================================
 
 BoxKite::BoxKite()
