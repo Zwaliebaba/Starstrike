@@ -75,9 +75,11 @@ The project follows this standard documentation layout:
 Starstrike/
 ├── README.md                        # Project overview and quick start
 ├── docs/
-│   ├── architecture.md              # Module structure, subsystem design, dependency rules
+│   ├── architecture.md              # Module structure, subsystem design, dependency rules, ADRs
 │   ├── development-guide.md         # Setup, build, debugging, workflow
-│   └── contributing.md              # PR process, commit messages, review standards
+│   ├── contributing.md              # PR process, commit messages, review standards
+│   ├── gamelogic.md                 # Simulation–rendering decoupling plan (GameLogic → GameSim + GameRender)
+│   └── tree.md                      # TreeRenderer dependency reduction plan
 ├── .github/
 │   ├── agents.md                    # AI agent instructions and project summary
 │   ├── coding-standards.md          # This file
@@ -87,9 +89,10 @@ Starstrike/
 │       ├── planner.agent.md
 │       ├── SoftwareEngineer.agent.md
 │       └── RefactorCleaner.agent.md
-├── CI.md                            # Codebase improvement roadmap
-├── MathPlan.md                      # Math type migration plan
-└── MatrixConv.md                    # Matrix convention plan
+├── CI.md                            # Codebase improvement roadmap (index of all initiatives)
+├── MathPlan.md                      # Math type migration plan (LegacyVector3 → GameVector3 etc.)
+├── MatrixConv.md                    # Matrix convention standardisation plan
+└── Server.md                        # Server separation plan (headless StarstrikeServer.exe)
 ```
 
 ### Documentation Conventions
@@ -110,4 +113,6 @@ Starstrike/
 | New PR or review process | `docs/contributing.md` |
 | New coding convention | `.github/coding-standards.md` |
 | New or changed AI agent behaviour | `.github/agents.md` or `.github/agents/*.agent.md` |
-| New improvement phase | `CI.md` |
+| New improvement phase or initiative | `CI.md`, plus a dedicated plan document in `docs/` or the root |
+| Significant architectural decision | Add an ADR entry to `docs/architecture.md` |
+| Changes to shader files | Update `docs/development-guide.md` GPU Debugging section if the shader inventory changes |

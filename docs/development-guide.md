@@ -87,11 +87,17 @@ Starstrike/
 │   ├── pch.h/cpp
 │   └── ...
 ├── docs/                 # Project documentation
+│   ├── architecture.md   # Module structure, dependency graph, subsystem design
+│   ├── development-guide.md
+│   ├── contributing.md
+│   ├── gamelogic.md      # Simulation–rendering decoupling plan
+│   └── tree.md           # TreeRenderer dependency reduction plan
 ├── .github/              # Repo configuration and AI agent definitions
 ├── Starstrike.slnx       # Visual Studio solution
-├── CI.md                 # Codebase improvement roadmap
-├── MathPlan.md           # Math migration plan
-└── MatrixConv.md         # Matrix convention plan
+├── CI.md                 # Codebase improvement roadmap (index of all initiatives)
+├── MathPlan.md           # Math type migration plan
+├── MatrixConv.md         # Matrix convention standardisation plan
+└── Server.md             # Server separation plan (headless StarstrikeServer.exe)
 ```
 
 ## Adding New Files
@@ -131,7 +137,8 @@ Use `ASSERT_TEXT` and `DEBUG_ASSERT` — do not use the standard `assert()` macr
 
 - **PIX for Windows**: Attach to the Starstrike process to capture GPU frames.
 - **RenderDoc**: Supported for DX12 frame capture.
-- Shader source is in `NeuronClient/CompiledShaders/` as pre-compiled DXIL headers.
+- HLSL shader source lives in `NeuronClient/Shaders/` (`VertexShader.hlsl`, `PixelShader.hlsl`, `TreeVertexShader.hlsl`, `TreePixelShader.hlsl`, `PerFrameConstants.hlsli`).
+- Pre-compiled DXIL bytecode is checked in as C++ headers under `NeuronClient/CompiledShaders/`. Rebuild the `NeuronClient` project to regenerate them after shader edits.
 
 ## Testing
 

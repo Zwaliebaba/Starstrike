@@ -13,6 +13,9 @@ Starstrike is a Windows-native real-time strategy game built in C++ with Direct3
 | [Codebase Improvement Plan](CI.md) | Phased roadmap for modernising the codebase |
 | [Math Migration Plan](MathPlan.md) | Plan for migrating legacy math types to DirectXMath |
 | [Matrix Convention Plan](MatrixConv.md) | Plan for standardising matrix conventions across the engine |
+| [Server Separation Plan](Server.md) | Plan to produce a headless `StarstrikeServer.exe` for Windows Server Core |
+| [GameLogic Decoupling](docs/gamelogic.md) | Plan to split `GameLogic` into pure-simulation and render-companion libraries |
+| [TreeRenderer Decoupling](docs/tree.md) | Plan to decouple `tree_renderer.cpp` from the OpenGL translation layer |
 
 ## Project Structure
 

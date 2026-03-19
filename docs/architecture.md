@@ -143,6 +143,8 @@ All new cross-cutting utilities should be added to NeuronCore.
 
 Minimal static library providing the network server. Contains precompiled headers and the server project file. Implementation is in `NeuronServer.vcxproj`.
 
+**Current limitation:** The three server-related source files in `NeuronClient` (`server.cpp`, `servertoclient.cpp`, `preferences.cpp`) directly `#include "GameApp.h"`, which transitively pulls in the full rendering, audio, and input stack. This prevents `NeuronServer` from being linked into a standalone headless process. See [Server.md](../Server.md) for the `SERVER_BUILD` preprocessor guard fix and the accompanying `Dockerfile` for Windows Server Core container deployment.
+
 ## Rendering Pipeline
 
 ```
@@ -159,6 +161,14 @@ Legacy path (via OpenGL shim):
 ```
 
 New rendering features should target the DX12 path directly. Do not add new functionality to `ImRenderer`; use `SpriteBatch` for new textured-quad work.
+
+### TreeRenderer — Reference Implementation for Extracted Renderers
+
+`NeuronClient/tree_renderer.h/.cpp` is the first building type to have its rendering fully extracted from `GameLogic`. It owns a dedicated DirectX 12 PSO, per-tree GPU buffer management, and an inversion-of-control interface (`ITreeRenderBackend`) for GPU resource cleanup when simulation objects are destroyed. The call site in `Starstrike/location.cpp` dispatches to `TreeRenderer::Get().DrawTree(...)` directly.
+
+A follow-on plan ([docs/tree.md](../docs/tree.md)) decouples `TreeRenderer` from `d3d12_backend.h` and `opengl_directx.h` so that it can eventually move to a dedicated `GameRender` project.
+
+The broader simulation–rendering decoupling work (covering all 67 remaining `GameLogic` files) uses `TreeRenderer` as its reference implementation. See [docs/gamelogic.md](../docs/gamelogic.md).
 
 ## Networking Architecture
 
@@ -192,13 +202,45 @@ Use `winrt::com_ptr<T>` (not `Microsoft::WRL::ComPtr<T>`) for all COM object lif
 
 ## Known Technical Debt
 
-See [CI.md](../CI.md) for the full phased improvement plan. Key items:
+See [CI.md](../CI.md) for the full phased improvement plan and links to each detailed plan document. Key standing debt items:
 
 | Category | Count | Notes |
 |---|---|---|
-| Unsafe C string functions (`sprintf`, `strcpy`, etc.) | 75+ | Buffer-overflow risk |
-| Raw `new`/`delete` without RAII | 100+ | Target for `unique_ptr` migration |
-| Plain `enum` (should be `enum class`) | 9 | Type-safety gap |
-| `#ifndef` include guards (should be `#pragma once`) | 212+ | ODR risk from typos |
-| Commented-out code blocks | 30+ | Should be deleted |
-| Stale `#define` branches | 6 | Dead preprocessor paths |
+| Unsafe C string functions (`sprintf`, `strcpy`, etc.) | 75+ | Buffer-overflow risk; replace with `snprintf` / `std::format` in new or modified code |
+| Raw `new`/`delete` without RAII | 100+ | Target for `unique_ptr` migration, starting with `NeuronCore` and `Starstrike` |
+| Plain `enum` (should be `enum class`) | 9 | Type-safety gap; straightforward per-file fix |
+| `#ifndef` include guards (should be `#pragma once`) | 212+ | ODR risk from guard-name typos; mechanical replacement |
+| Commented-out code blocks | 30+ | Should be deleted; rely on git history |
+| Stale `#define` branches | 6 | Dead preprocessor paths; delete unreachable branches |
+
+Active modernisation initiatives (math migration, matrix convention, server separation, simulation–rendering decoupling) are tracked in [CI.md](../CI.md).
+
+---
+
+## Architecture Decision Records
+
+Significant design decisions made during the modernisation programme are recorded here for future reference.
+
+### ADR-001 — Row-major, row-vector matrix convention (2024)
+
+**Decision:** Standardise all matrix operations on the DirectX row-major, row-vector convention (`mul(v, M)` in HLSL). Do not introduce a column-vector convention or transpose shims.
+
+**Rationale:** The legacy `Matrix34` data layout (`r`, `u`, `f`, `pos` rows packed sequentially) is already byte-compatible with a DirectX row-major `XMFLOAT4X4` — no memory transposition is needed. `ConvertToOpenGLFormat` was performing a conceptual relabeling, not an actual data transformation. The DX12 HLSL shaders already use `row_major float4x4` and `mul(v, M)`. Standardising on this avoids a global transpose and lets native `XMMatrixMultiply` be used without wrapper gymnastics.
+
+**Consequence:** `Matrix33 * vec` applies the inverse rotation (used intentionally for world-to-local queries). `vec * Matrix33` applies the forward rotation. See [MatrixConv.md](../MatrixConv.md) for the full operator table and migration phases.
+
+### ADR-002 — Incremental extraction over ECS rewrite (2024)
+
+**Decision:** Decouple simulation from rendering using incremental per-type extraction (one PR per entity/building type) rather than a wholesale ECS rewrite.
+
+**Rationale:** A clean ECS rewrite would halt all other development for months and introduce significant regression risk across 77 files. Incremental extraction keeps the game shippable at every step. `TreeRenderer` proves the approach works. The `BuildingRenderer`/`EntityRenderer` base-class + registry pattern provides a uniform dispatch mechanism that scales to 40+ types without per-type `if/else` chains.
+
+**Consequence:** A transition period where old virtual-dispatch rendering and new registry rendering coexist. The fallback `else` path in `BuildingRenderRegistry` / `EntityRenderRegistry` handles unmigrated types transparently.
+
+### ADR-003 — `winrt::com_ptr<T>` over `Microsoft::WRL::ComPtr<T>` (project start)
+
+**Decision:** Use `winrt::com_ptr<T>` for all COM object lifetime management throughout the codebase.
+
+**Rationale:** The project uses C++/WinRT for WinUI 3. Mixing `WRL::ComPtr` and `winrt::com_ptr` in the same codebase creates friction at API boundaries and inconsistent usage patterns. `winrt::com_ptr` integrates naturally with the WinUI 3 programming model.
+
+**API surface:** `.get()` (not `.Get()`), `= nullptr` (not `.Reset()`), `IID_GRAPHICS_PPV_ARGS(ptr)` (not `IID_PPV_ARGS(&ptr)`).
