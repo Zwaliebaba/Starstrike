@@ -8,8 +8,10 @@
 
 class ArmyAnt : public Entity
 {
-protected:
+public:
     float       m_scale;
+
+protected:
     ShapeStatic       *m_shapes[3];
     ShapeMarkerData *m_carryMarker;
 

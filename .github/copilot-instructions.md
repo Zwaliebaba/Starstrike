@@ -110,4 +110,5 @@ When context files don't provide specific guidance:
 - Legacy code (NeuronClient, GameLogic) uses raw pointers and C-style strings; keep those patterns when editing those areas.
 - NeuronCore favors modern C++ (e.g., `std::string_view`, `std::format`, `constexpr`, `[[nodiscard]]`, `noexcept`).
 - Rendering: `ImRenderer` is legacy and should not be extended. New textured-quad rendering should target `SpriteBatch`.
+- Game object renderer companions (EntityRenderer, BuildingRenderer, and their registries/implementations like ArmyAntRenderer, TreeBuildingRenderer, ShadowRenderer) should be placed in the GameRender project, not NeuronClient.
 - Build and verify after changes using the existing solution and configurations.

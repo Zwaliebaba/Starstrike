@@ -5,7 +5,6 @@
 #include "math_utils.h"
 #include "soundsystem.h"
 #include "GameApp.h"
-#include "renderer.h"
 #include "location.h"
 #include "unit.h"
 #include "explosion.h"
@@ -523,21 +522,6 @@ void ArmyAnt::GetCarryMarker(LegacyVector3& _pos, LegacyVector3& _vel)
 
 void ArmyAnt::Render(float _predictionTime)
 {
-  if (m_dead)
-    return;
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  LegacyVector3 predictedUp = g_upVector;
-
-  g_app->m_renderer->SetObjectLighting();
-  glDisable(GL_TEXTURE_2D);
-
-  Matrix34 mat(m_front, predictedUp, predictedPos);
-  mat.u *= m_scale;
-  mat.f *= m_scale;
-  mat.r *= m_scale;
-
-  m_shape->Render(_predictionTime, mat);
-
-  g_app->m_renderer->UnsetObjectLighting();
+  // Rendering moved to ArmyAntRenderer companion (NeuronClient).
+  // Kept as empty override for legacy fallback safety.
 }

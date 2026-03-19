@@ -6,7 +6,7 @@
 class Tree : public Building
 {
   protected:
-    void RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf);
+    void CalcBranchRadius(LegacyVector3 _from, LegacyVector3 _to, int _iterations);
     void GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf, TreeMeshData& _mesh);
 
     LegacyVector3 m_hitcheckCenter;
@@ -21,11 +21,12 @@ class Tree : public Building
       TreeMeshData m_branchMesh;
       TreeMeshData m_leafMesh;
       bool m_meshDirty = true;
+      int m_meshVersion = 0;
 
       unsigned char m_leafColourArray[4];
       unsigned char m_branchColourArray[4];
 
-      float GetActualHeight(float _predictionTime);
+      float GetActualHeight(float _predictionTime) const;
 
     float m_height;
     float m_budsize;

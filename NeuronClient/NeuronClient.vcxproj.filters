@@ -265,6 +265,13 @@
     <ClInclude Include="FrameListener.h" />
     <ClInclude Include="UploadRingBuffer.h" />
     <ClInclude Include="ShapeInstance.h" />
+    <ClInclude Include="EntityRenderRegistry.h" />
+    <ClInclude Include="BuildingRenderRegistry.h" />
+    <ClInclude Include="BuildingRenderer.h" />
+    <ClInclude Include="EntityRenderer.h" />
+    <ClInclude Include="ShadowRenderer.h" />
+    <ClInclude Include="TreeBuildingRenderer.h" />
+    <ClInclude Include="ArmyAntRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -484,6 +491,11 @@
     <ClCompile Include="tree_renderer.cpp" />
     <ClCompile Include="UploadRingBuffer.cpp" />
     <ClCompile Include="ShapeInstance.cpp" />
+    <ClCompile Include="EntityRenderRegistry.cpp" />
+    <ClCompile Include="BuildingRenderRegistry.cpp" />
+    <ClCompile Include="ShadowRenderer.cpp" />
+    <ClCompile Include="TreeBuildingRenderer.cpp" />
+    <ClCompile Include="ArmyAntRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

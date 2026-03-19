@@ -47,7 +47,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAMELOGIC_HAS_RENDERER;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -67,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAMELOGIC_HAS_RENDERER;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -105,6 +105,7 @@
     <ClInclude Include="factory.h" />
     <ClInclude Include="feedingtube.h" />
     <ClInclude Include="flag.h" />
+    <ClInclude Include="GameLogicPlatform.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="generichub.h" />
     <ClInclude Include="goddish.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="profilewindow.h" />
     <ClInclude Include="radardish.h" />
     <ClInclude Include="reallyquit_window.h" />
+    <ClInclude Include="render_backend_interface.h" />
     <ClInclude Include="researchitem.h" />
     <ClInclude Include="rocket.h" />
     <ClInclude Include="safearea.h" />

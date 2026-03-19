@@ -232,6 +232,8 @@
     </ClInclude>
     <ClInclude Include="tree_mesh_data.h" />
     <ClInclude Include="tree_render_interface.h" />
+    <ClInclude Include="GameLogicPlatform.h" />
+    <ClInclude Include="render_backend_interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

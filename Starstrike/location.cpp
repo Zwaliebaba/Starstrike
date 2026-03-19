@@ -29,6 +29,9 @@
 #include "team.h"
 #include "tree.h"
 #include "tree_renderer.h"
+#include "BuildingRenderRegistry.h"
+#include "BuildingRenderer.h"
+#include "TreeBuildingRenderer.h"
 #include "unit.h"
 #include "water.h"
 #include "weapons.h"
@@ -1063,11 +1066,6 @@ void Location::RenderBuildingAlphas()
   //
   // Render those sorted buildings in reverse depth order
 
-  // Ensure tree texture is loaded once before the loop.
-  static int s_treeTextureId = -1;
-  if (s_treeTextureId == -1)
-    s_treeTextureId = g_app->m_resource->GetTexture("textures/laser.bmp");
-
   for (int i = s_nextSortedBuilding - 1; i >= 0; i--)
   {
     int buildingIndex = s_sortedBuildings[i].m_buildingIndex;
@@ -1079,11 +1077,12 @@ void Location::RenderBuildingAlphas()
                        ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
                        : timeSinceAdvance;
 
-    if (building->m_type == Building::TypeTree)
+    BuildingRenderer* renderer = g_buildingRenderRegistry.Get(building->m_type);
+    if (renderer)
     {
-      auto* tree = static_cast<Tree*>(building);
-      bool skipLeaves = (Location::ChristmasModEnabled() == 1);
-      TreeRenderer::Get().DrawTree(tree, predTime, s_treeTextureId, skipLeaves);
+      BuildingRenderContext ctx;
+      ctx.predictionTime = predTime;
+      renderer->RenderAlphas(*building, ctx);
     }
     else
     {

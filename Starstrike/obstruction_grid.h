@@ -1,33 +1,28 @@
-
 #pragma once
 
-#include "2d_array.h"
+#include "llist.h"
 #include "2d_surface_map.h"
-
 
 class ObstructionGridCell
 {
-public:
+  public:
     LList<int> m_buildings;
 };
 
-
-
 class ObstructionGrid
 {
-protected:
-    SurfaceMap2D <ObstructionGridCell> m_cells;
+  protected:
+    SurfaceMap2D<ObstructionGridCell> m_cells;
 
-    void CalculateBuildingArea( int _buildingId );              // This cannot be called once on its own
-                                                                // It must be called as part of a complete recalc
+    void CalculateBuildingArea(int _buildingId); // This cannot be called once on its own
+    // It must be called as part of a complete recalc
 
-public:
-    ObstructionGrid( float _cellSizeX, float _cellSizeZ );
+  public:
+    ObstructionGrid(float _cellSizeX, float _cellSizeZ);
 
     void CalculateAll();
 
-    LList<int> *GetBuildings( float _locationX, float _locationZ );
+    LList<int>* GetBuildings(float _locationX, float _locationZ);
 
     void Render();
 };
-

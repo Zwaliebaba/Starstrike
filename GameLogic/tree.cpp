@@ -8,6 +8,7 @@
 #include "preferences.h"
 #include "tree.h"
 #include "tree_render_interface.h"
+#include "render_backend_interface.h"
 #include "soundsystem.h"
 #include "GameApp.h"
 #include "globals.h"
@@ -15,6 +16,7 @@
 #include "location.h"
 
 ITreeRenderBackend* g_treeRenderBackend = nullptr;
+IRenderBackend* g_renderBackend = nullptr;
 
 Tree::Tree()
   : Building(),
@@ -75,6 +77,16 @@ void Tree::SetDetail(int _detail)
 
 bool Tree::Advance()
 {
+  // Ensure mesh is generated before the renderer sees this tree.
+  // Previously done in TreeRenderer::EnsureUploaded(); moved here so
+  // the renderer is a pure consumer and can receive const Tree&.
+  if (m_meshDirty)
+  {
+    Generate();
+    m_meshDirty = false;
+    ++m_meshVersion;
+  }
+
   m_fireDamage -= SERVER_ADVANCE_PERIOD;
   if (m_fireDamage < 0.0f)
     m_fireDamage = 0.0f;
@@ -166,7 +178,7 @@ bool Tree::Advance()
   return false;
 }
 
-float Tree::GetActualHeight(float _predictionTime)
+float Tree::GetActualHeight(float _predictionTime) const
 {
   float predictedOnFire = m_onFire;
   if (predictedOnFire != 0.0f)
@@ -225,7 +237,7 @@ void Tree::Generate()
   // Compute hit-check center from accumulated leaf positions
   m_hitcheckCenter /= static_cast<float>(m_numLeafs);
   // Compute hit-check radius (radius-only pass, no mesh output)
-  RenderBranch(g_zeroVector, g_upVector, m_iterations, true, false, false);
+  CalcBranchRadius(g_zeroVector, g_upVector, m_iterations);
   m_hitcheckRadius *= 0.8f;
 
   m_meshDirty = true;
@@ -308,7 +320,11 @@ bool Tree::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayD
   return false;
 }
 
-void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations, bool _calcRadius, bool _renderBranch, bool _renderLeaf)
+// Radius-only recursive walk: same branching logic as GenerateBranch but
+// emits no geometry.  Only computes m_hitcheckRadius (max leaf distance
+// from m_hitcheckCenter).  Called once per Generate() after the mesh passes
+// have accumulated m_hitcheckCenter.
+void Tree::CalcBranchRadius(LegacyVector3 _from, LegacyVector3 _to, int _iterations)
 {
   if (_iterations == 0)
     return;
@@ -316,65 +332,18 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
 
   if (_iterations == 0)
   {
-    if (_calcRadius)
-    {
-      float distToCenter = (_to - m_hitcheckCenter).Mag();
-      if (distToCenter > m_hitcheckRadius)
-        m_hitcheckRadius = distToCenter;
-    }
-    else if (_renderLeaf)
-    {
-      m_hitcheckCenter += _to;
-      m_numLeafs++;
-    }
+    float distToCenter = (_to - m_hitcheckCenter).Mag();
+    if (distToCenter > m_hitcheckRadius)
+      m_hitcheckRadius = distToCenter;
   }
-
-  /*
-  Make the tree seem more alive animation
-  _to += LegacyVector3(sinf(g_gameTime*(7-_iterations))*0.005f * _iterations,
-                 sinf(g_gameTime) * 0.01f,
-                 sinf(g_gameTime * (7-_iterations))*0.005f * _iterations );
-  */
 
   LegacyVector3 rightAngleA = ((_to - _from) ^ _to).Normalise();
   LegacyVector3 rightAngleB = (rightAngleA ^ (_to - _from)).Normalise();
 
   LegacyVector3 thisBranch = (_to - _from);
-
   float thickness = thisBranch.Mag();
 
-  float budsize = 0.1f;
-
-  if (_iterations == 0)
-    budsize *= m_budsize;
-
-  LegacyVector3 camRightA = rightAngleA * thickness * budsize;
-  LegacyVector3 camRightB = rightAngleB * thickness * budsize;
-
-  if ((_iterations == 0 && _renderLeaf) || (_iterations != 0 && _renderBranch))
-  {
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3fv((_from - camRightA).GetData());
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3fv((_from + camRightA).GetData());
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3fv((_to + camRightA).GetData());
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3fv((_to - camRightA).GetData());
-
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3fv((_from - camRightB).GetData());
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3fv((_from + camRightB).GetData());
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3fv((_to + camRightB).GetData());
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3fv((_to - camRightB).GetData());
-  }
-
-  int numBranches = 4;
-
-  for (int i = 0; i < numBranches; ++i)
+  for (int i = 0; i < 4; ++i)
   {
     LegacyVector3 thisRightAngle;
     if (i == 0)
@@ -389,12 +358,12 @@ void Tree::RenderBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
     float distance = 0.3f + frand(0.6f);
     LegacyVector3 thisFrom = _from + thisBranch * distance;
     LegacyVector3 thisTo = thisFrom + thisRightAngle * thickness * 0.4f * m_pushOut + thisBranch * (1.0f - distance) * m_pushUp;
-    RenderBranch(thisFrom, thisTo, _iterations, _calcRadius, _renderBranch, _renderLeaf);
+    CalcBranchRadius(thisFrom, thisTo, _iterations);
   }
 }
 
-// Mesh-filling overload: same recursive logic as RenderBranch, but emits TreeVertex
-// data into a TreeMeshData buffer instead of calling GL.  GL_QUADS (4-vert) are
+// Mesh-filling overload: same recursive branching logic as CalcBranchRadius, but
+// emits TreeVertex data into a TreeMeshData buffer.  GL_QUADS (4-vert) are
 // converted to triangle pairs (6-vert) during emission.
 void Tree::GenerateBranch(LegacyVector3 _from, LegacyVector3 _to, int _iterations,
                           bool _calcRadius, bool _renderBranch, bool _renderLeaf,

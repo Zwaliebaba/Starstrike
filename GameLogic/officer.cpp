@@ -95,7 +95,6 @@ void Officer::ChangeHealth(int amount)
 
 void Officer::Render(float _predictionTime)
 {
-  RenderPixelEffect(_predictionTime);
   RenderShield(_predictionTime);
 
   if (m_enabled)

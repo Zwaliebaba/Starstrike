@@ -1,8 +1,7 @@
-
 #pragma once
 
 #include "fast_darray.h"
-
+#include "text_stream_readers.h"
 #include "building.h"
 #include "spirit.h"
 
@@ -12,47 +11,44 @@ class ShapeMarkerData;
 
 struct IncubatorIncoming
 {
-    LegacyVector3 m_pos;
-    int     m_entrance;
-    float   m_alpha;
+  LegacyVector3 m_pos;
+  int m_entrance;
+  float m_alpha;
 };
 
-
-class Incubator: public Building
+class Incubator : public Building
 {
-protected:
-    FastDArray      <Spirit> m_spirits;
-    ShapeMarkerData     *m_spiritCenter;
-    ShapeMarkerData     *m_exit;
-    ShapeMarkerData     *m_dock;
-    ShapeMarkerData     *m_spiritEntrance[3];
+  protected:
+    FastDArray<Spirit> m_spirits;
+    ShapeMarkerData* m_spiritCenter;
+    ShapeMarkerData* m_exit;
+    ShapeMarkerData* m_dock;
+    ShapeMarkerData* m_spiritEntrance[3];
 
-    int             m_troopType;
-    float           m_timer;
+    int m_troopType;
+    float m_timer;
 
-    LList           <IncubatorIncoming *> m_incoming;
+    LList<IncubatorIncoming*> m_incoming;
 
-public:
-    int             m_numStartingSpirits;
+  public:
+    int m_numStartingSpirits;
 
-public:
     Incubator();
-    ~Incubator();
+    ~Incubator() override;
 
-    void Initialise ( Building *_template );
+    void Initialise(Building* _template) override;
 
-    bool Advance    ();
+    bool Advance() override;
     void SpawnEntity();
-    void AddSpirit  ( Spirit *_spirit );
+    void AddSpirit(Spirit* _spirit);
 
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
+    void Render(float _predictionTime) override;
+    void RenderAlphas(float _predictionTime) override;
 
-    int  NumSpiritsInside();
+    int NumSpiritsInside();
 
-    void Read   ( TextReader *_in, bool _dynamic );
-    void Write  ( FileWriter *_out );
+    void Read(TextReader* _in, bool _dynamic) override;
+    void Write(FileWriter* _out) override;
 
-    void GetDockPoint( LegacyVector3 &_pos, LegacyVector3 &_front );
+    void GetDockPoint(LegacyVector3& _pos, LegacyVector3& _front);
 };
-

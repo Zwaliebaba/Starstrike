@@ -87,23 +87,20 @@ void TreeRenderer::Shutdown()
 }
 
 // ---------------------------------------------------------------------------
-// EnsureUploaded — lazy-generates mesh and uploads to GPU
+// EnsureUploaded — uploads mesh data to GPU when version changes
 // ---------------------------------------------------------------------------
 
-void TreeRenderer::EnsureUploaded(Tree* _tree)
+void TreeRenderer::EnsureUploaded(const Tree& _tree)
 {
-  int uid = _tree->m_id.GetUniqueId();
+  int uid = _tree.m_id.GetUniqueId();
 
-  // If already uploaded and mesh is clean, nothing to do.
-  if (!_tree->m_meshDirty && m_gpuBuffers.contains(uid))
-    return;
+  // Check if already uploaded at the current mesh version.
+  auto existing = m_gpuBuffers.find(uid);
+  if (existing != m_gpuBuffers.end() && existing->second.meshVersion == _tree.m_meshVersion)
+    return; // GPU buffer is current, nothing to do.
 
-  // Safety net: if meshes are empty, generate now.
-  if (_tree->m_branchMesh.vertices.empty() && _tree->m_leafMesh.vertices.empty())
-    _tree->Generate();
-
-  const auto& branchVerts = _tree->m_branchMesh.vertices;
-  const auto& leafVerts = _tree->m_leafMesh.vertices;
+  const auto& branchVerts = _tree.m_branchMesh.vertices;
+  const auto& leafVerts = _tree.m_leafMesh.vertices;
 
   UINT branchCount = static_cast<UINT>(branchVerts.size());
   UINT leafCount = static_cast<UINT>(leafVerts.size());
@@ -169,18 +166,18 @@ void TreeRenderer::EnsureUploaded(Tree* _tree)
   gpu.leafVertexCount = leafCount;
 
   m_gpuBuffers[uid] = std::move(gpu);
-  _tree->m_meshDirty = false;
+  m_gpuBuffers[uid].meshVersion = _tree.m_meshVersion;
 }
 
 // ---------------------------------------------------------------------------
 // DrawTree — renders a single tree with dedicated PSO
 // ---------------------------------------------------------------------------
 
-void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _textureGLId, bool _skipLeaves)
+void TreeRenderer::DrawTree(const Tree& _tree, float _predictionTime, unsigned int _textureGLId, bool _skipLeaves)
 {
   EnsureUploaded(_tree);
 
-  int uid = _tree->m_id.GetUniqueId();
+  int uid = _tree.m_id.GetUniqueId();
   auto it = m_gpuBuffers.find(uid);
   if (it == m_gpuBuffers.end())
     return; // Nothing to draw
@@ -195,10 +192,10 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
   }
 
   // --- Build world × view matrix ---
-  float actualHeight = _tree->GetActualHeight(_predictionTime);
+  float actualHeight = _tree.GetActualHeight(_predictionTime);
 
   LegacyVector3 up(0.0f, 1.0f, 0.0f);
-  Matrix34 mat(_tree->m_front, up, _tree->m_pos);
+  Matrix34 mat(_tree.m_front, up, _tree.m_pos);
   XMFLOAT4X4 worldFloat = mat.ToXMFLOAT4X4();
   XMMATRIX world = XMLoadFloat4x4(&worldFloat);
 
@@ -235,8 +232,8 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
   dc.FogEnabled = OpenGLD3D::GetFogState().enabled ? 1u : 0u;
 
   // --- Draw branches ---
-  dc.MatDiffuse = XMFLOAT4(_tree->m_branchColourArray[0] / 255.0f, _tree->m_branchColourArray[1] / 255.0f,
-                           _tree->m_branchColourArray[2] / 255.0f, _tree->m_branchColourArray[3] / 255.0f);
+  dc.MatDiffuse = XMFLOAT4(_tree.m_branchColourArray[0] / 255.0f, _tree.m_branchColourArray[1] / 255.0f,
+                           _tree.m_branchColourArray[2] / 255.0f, _tree.m_branchColourArray[3] / 255.0f);
 
   auto cbAlloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
   memcpy(cbAlloc.cpuPtr, &dc, sizeof(dc));
@@ -246,8 +243,8 @@ void TreeRenderer::DrawTree(Tree* _tree, float _predictionTime, unsigned int _te
   // --- Draw leaves (skipped when Christmas mod is enabled) ---
   if (gpu.leafVertexCount > 0 && !_skipLeaves)
   {
-    dc.MatDiffuse = XMFLOAT4(_tree->m_leafColourArray[0] / 255.0f, _tree->m_leafColourArray[1] / 255.0f,
-                             _tree->m_leafColourArray[2] / 255.0f, _tree->m_leafColourArray[3] / 255.0f);
+    dc.MatDiffuse = XMFLOAT4(_tree.m_leafColourArray[0] / 255.0f, _tree.m_leafColourArray[1] / 255.0f,
+                             _tree.m_leafColourArray[2] / 255.0f, _tree.m_leafColourArray[3] / 255.0f);
 
     auto cbAlloc2 = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
     memcpy(cbAlloc2.cpuPtr, &dc, sizeof(dc));

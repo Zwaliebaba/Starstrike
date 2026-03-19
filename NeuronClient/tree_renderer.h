@@ -15,6 +15,7 @@ struct TreeGPUData
   UINT branchVertexCount = 0;
   UINT leafVertexStart = 0;
   UINT leafVertexCount = 0;
+  int meshVersion = -1;
 };
 
 // --- Tree renderer (singleton) ---
@@ -30,7 +31,7 @@ class TreeRenderer final : public ITreeRenderBackend
     void Init();
     void Shutdown();
 
-    void DrawTree(Tree* _tree, float _predictionTime, unsigned int _textureGLId, bool _skipLeaves = false);
+    void DrawTree(const Tree& _tree, float _predictionTime, unsigned int _textureGLId, bool _skipLeaves = false);
 
     // ITreeRenderBackend
     void ReleaseTree(int _uniqueId) override;
@@ -39,7 +40,7 @@ class TreeRenderer final : public ITreeRenderBackend
     TreeRenderer() = default;
     ~TreeRenderer() override = default;
 
-    void EnsureUploaded(Tree* _tree);
+    void EnsureUploaded(const Tree& _tree);
 
     GraphicsPSO m_pso{L"Tree PSO"};
 
