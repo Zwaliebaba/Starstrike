@@ -1,204 +1,328 @@
-# Architecture
+# Starstrike Architecture
 
-Starstrike is structured as a Visual Studio solution containing one executable project and four static library projects. Each library owns a clearly-scoped set of responsibilities with no circular dependencies.
+## Overview
 
-## Module Overview
+Starstrike is architected as a modern, modular game engine with a focus on high-performance rendering using DirectX 12 and scalable multiplayer networking. The architecture follows industry-standard patterns for game engines while maintaining flexibility for rapid iteration.
 
-| Module | Type | Responsibility |
-|---|---|---|
-| `Starstrike` | Executable (MSIX) | Application entry point, main game loop, DirectX 12 renderer, camera, particle system, level management |
-| `GameLogic` | Static lib | Game entities, buildings, AI, scripting, menus, input-field UI |
-| `NeuronClient` | Static lib | Legacy rendering shim (OpenGL → DX12), input driver stack, 3D audio, legacy UI framework, math types |
-| `NeuronCore` | Static lib | Modern C++ utilities: DirectXMath wrappers, binary I/O, file system, networking, threading, timers |
-| `NeuronServer` | Static lib | Network server implementation |
+## Architectural Principles
 
-## Dependency Graph
+1. **Separation of Concerns**: Clear boundaries between engine systems, rendering, game logic, and networking
+2. **Data-Oriented Design**: Performance-critical systems use cache-friendly data layouts
+3. **Modern C++ Practices**: RAII, smart pointers, move semantics, and compile-time polymorphism where appropriate
+4. **Platform Abstraction**: Core systems abstract platform-specific implementations
+5. **Deterministic Networking**: Game state synchronization designed for fairness and consistency
 
-```
-Starstrike
- ├── NeuronClient ──► NeuronCore
- │                ──► GameLogic
- ├── GameLogic    (no upstream deps)
- ├── NeuronCore   (no upstream deps)
- └── (implicitly) NeuronServer ──► NeuronCore
-```
+## System Architecture
 
-Rules enforced by the solution:
-- `GameLogic` must not import `NeuronClient` or `Starstrike`.
-- `NeuronCore` must not import any other project.
-- `NeuronServer` must not import `GameLogic` or `NeuronClient`.
-
-## Starstrike (Main Application)
-
-**Key files:**
-
-| File | Purpose |
-|---|---|
-| `WinMain.cpp` | Win32/WinUI 3 entry point |
-| `main.h/cpp` | Game initialisation and main loop tick |
-| `GameApp.h/cpp` | Application class: window management, state machine |
-| `renderer.h/cpp` | Direct3D 12 render coordinator |
-| `camera.h/cpp` | 3D camera control |
-| `location.h/cpp` | Level/location simulation |
-| `global_world.h/cpp` | Persistent world state across locations |
-| `entity_grid.h/cpp` | Spatial grid for entity queries |
-| `particle_system.h/cpp` | Particle effects |
-| `landscape.h/cpp` | Terrain data and rendering |
-| `water.h/cpp` | Water simulation |
-| `unit.h/cpp` | Unit wrapper |
-| `routing_system.h/cpp` | Unit pathfinding |
-| `script.h/cpp` | Gameplay scripting |
-| `taskmanager.h/cpp` | Task/objective UI |
-| `user_input.h/cpp` | Top-level input handling |
-
-**Tick order:**
-```
-Input → GameApp::Advance() → Location::Advance() → EntityGrid → Entities/Buildings → Renderer
-```
-
-## GameLogic
-
-**Responsibilities:** All game-play rules, entity behaviour, building logic, AI, and in-game menu UI.
-
-### Entity Hierarchy
-
-`WorldObject` → `Entity` → (18+ concrete types)
-
-Selected entity types:
-`LaserTroop`, `Engineer`, `Virii`, `InsertionSquadie`, `Egg`, `SporeGenerator`, `Lander`, `Tripod`, `Centipede`, `SpaceInvader`, `Spider`, `Darwinian`, `Officer`, `ArmyAnt`, `Armour`, `SoulDestroyer`, `TriffidEgg`, `AI`
-
-### Building Hierarchy
-
-`WorldObject` → `Building` → (57+ concrete types)
-
-Selected building types:
-`Factory`, `Cave`, `RadarDish`, `ControlTower`, `GunTurret`, `Bridge`, `Generator`, `Incubator`, `AntHill`, `SpawnPoint`, `BlueprintStore`, `EscapeRocket`, and many more.
-
-Buildings are created through a factory function in `building.cpp` that dispatches on a type enum.
-
-### AI System
-
-`ai.h/cpp` manages autonomous agent behaviour. Individual unit types implement their own `Advance()` methods; the AI system provides coordination and task assignment.
-
-## NeuronClient
-
-**Responsibilities:** All legacy subsystems inherited from the original codebase — rendering shim, input stack, audio, math types, and the Eclipse UI framework.
-
-### OpenGL → DirectX 12 Shim
-
-`opengl_directx.cpp/h` translates legacy OpenGL draw calls (`glVertex3fv`, `glMultMatrixf`, etc.) into Direct3D 12 command-list submissions. This layer exists to avoid rewriting all legacy rendering code at once. New rendering work should target the DX12 API directly via `Starstrike/renderer.h`.
-
-### Input Stack
-
-The input system is layered:
+### High-Level Architecture
 
 ```
-Raw device events
-  → InputDriver (simple / conjoin / idle / alias / value / withdelta)
-  → InputFilter (debounce, axis scaling, dead zones)
-  → InputSpec (named binding)
-  → ControlBindings (action → binding map)
+┌─────────────────────────────────────────────────────────────┐
+│                     Game Application                         │
+│                     (Game-Specific Logic)                    │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────┴──────────────────────────────────────┐
+│                     Core Engine Layer                        │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │   Scene     │  │   Entity    │  │    Resource         │ │
+│  │  Manager    │  │  Component  │  │   Management        │ │
+│  │             │  │   System    │  │                     │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────┴──────────────────────────────────────┐
+│                   Platform Services                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │  Renderer   │  │  Network    │  │      Input          │ │
+│  │  (DX12)     │  │   Layer     │  │    System           │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Audio
+## Core Modules
 
-`soundsystem.cpp/h` manages all audio playback. `sound_library_3d.cpp/h` provides 3D spatial audio with a DirectSound backend. `sound_parameter.cpp/h` and `sound_filter.cpp/h` handle dynamic audio parameters and DSP filters.
+### 1. Renderer Module (DirectX 12)
 
-### Legacy Math Types
+The renderer is built on DirectX 12 and implements modern rendering techniques.
 
-| Type | Description |
-|---|---|
-| `LegacyVector3` | 3-component float vector (`x`, `y`, `z`) |
-| `Matrix33` | 3×3 rotation/scale matrix |
-| `Matrix34` | 4×3 affine transform (right, up, forward, position rows) |
-| `Vector2` | 2D float vector |
+**Key Components:**
+- **Command Queue Manager**: Manages graphics, compute, and copy command queues
+- **Descriptor Heap Manager**: Efficient descriptor allocation and management
+- **Resource Manager**: Texture, buffer, and shader resource lifecycle management
+- **PSO Cache**: Pipeline State Object caching for optimal performance
+- **Frame Graph**: Dependency-based rendering pipeline for automatic synchronization
 
-These types are being migrated to DirectXMath-backed equivalents. See [MathPlan.md](../MathPlan.md).
+**Ownership Model:**
+- GPU resources managed via `ComPtr<>` (Microsoft COM smart pointer)
+- CPU-side resources use standard smart pointers (`std::unique_ptr`, `std::shared_ptr`)
+- Explicit resource barriers for state transitions
 
-### Eclipse UI Framework
+**Threading Model:**
+- Multi-threaded command list recording
+- Per-frame command allocator pools
+- Lock-free descriptor allocation using atomic operations
 
-`eclipse.cpp/h`, `eclbutton.h/cpp`, `eclwindow.h/cpp` implement the legacy windowed UI system used by in-game panels and menus. No new UI should be added to this framework; new UI should use WinUI 3.
+**Performance Considerations:**
+- Bindless resource access where supported
+- Persistent descriptor heaps
+- Upload heap pooling to reduce allocation overhead
+- Asynchronous resource uploads via copy queue
 
-## NeuronCore
+### 2. Entity Component System (ECS)
 
-**Responsibilities:** Modern, platform-independent utilities written to C++20 standards.
+A data-oriented ECS for game object management.
 
-| File | Purpose |
-|---|---|
-| `GameMath.h` | DirectXMath wrappers in the `Neuron::Math` namespace |
-| `MathCommon.h` | Bit utilities, constants |
-| `DataWriter.h` / `DataReader.h` | Binary serialisation |
-| `FileSys.h` | File system operations (ANSI/Wide variants) |
-| `Debug.h` | `Neuron::DebugTrace`, `Neuron::Fatal`, assertions |
-| `ASyncLoader.h` | Asynchronous resource loading (pending refactor to condition variable) |
-| `net_lib.h/cpp` | Platform-independent network interface |
-| `net_socket.h/cpp` | Socket abstraction |
-| `TimerCore.h` | High-precision timer (`QueryPerformanceCounter`) |
-| `Hash.h` | Hash utilities |
-| `WndProcManager.h/cpp` | Window-message routing |
+**Design:**
+- Entities are lightweight IDs (64-bit handles)
+- Components stored in contiguous memory (struct-of-arrays)
+- Systems operate on component archetypes for cache efficiency
 
-All new cross-cutting utilities should be added to NeuronCore.
+**Key Systems:**
+- Transform System: Hierarchical transforms with dirty flag propagation
+- Physics System: Collision detection and response
+- Render System: Culling and draw call generation
+- Network Replication System: State synchronization
 
-## NeuronServer
+**Component Lifecycle:**
+- Components are Plain Old Data (POD) types when possible
+- No virtual functions in components
+- RAII wrappers for resource-owning components
 
-Minimal static library providing the network server. Contains precompiled headers and the server project file. Implementation is in `NeuronServer.vcxproj`.
+### 3. Networking Architecture
 
-## Rendering Pipeline
+Multi-user networking for competitive multiplayer gameplay.
 
+**Architecture Pattern:**
+- **Client-Server Model**: Authoritative server for game state
+- **Client-Side Prediction**: Responsive controls with server reconciliation
+- **Server Reconciliation**: Handles client prediction mismatches
+- **Entity Interpolation**: Smooth visual representation of network entities
+
+**Network Protocol:**
+- UDP-based with custom reliability layer
+- Delta compression for bandwidth efficiency
+- Priority-based packet scheduling
+- Lag compensation for hit detection
+
+**Synchronization:**
+- Tick-based simulation (e.g., 60Hz server update rate)
+- Snapshot interpolation for remote entities
+- Command buffering and replay for reconciliation
+- Deterministic physics simulation
+
+**Threading:**
+- Dedicated network thread for packet I/O
+- Lock-free queues for thread communication
+- Minimal locking in main game thread
+
+**Security Considerations:**
+- Input validation on server
+- Cheat detection for impossible moves
+- Rate limiting to prevent DoS attacks
+- Encrypted connections (to be implemented)
+
+### 4. Resource Management
+
+Unified resource management system for assets.
+
+**Features:**
+- Asynchronous resource loading
+- Reference-counted resources with automatic unloading
+- Hot-reloading support for rapid iteration
+- Resource dependency tracking
+
+**Resource Types:**
+- Meshes (vertex and index buffers)
+- Textures (2D, cube maps, arrays)
+- Shaders (vertex, pixel, compute)
+- Materials (shader + texture bindings)
+- Audio (sound effects, music)
+
+### 5. Memory Management
+
+**Strategies:**
+- **Stack Allocators**: For per-frame temporary allocations
+- **Pool Allocators**: For fixed-size objects (entities, particles)
+- **GPU Upload Heaps**: Ring buffer for dynamic GPU uploads
+- **Custom Allocators**: Profiled and optimized per subsystem
+
+**Tools:**
+- Memory tracking for leak detection (debug builds)
+- Allocation profiling hooks
+- GPU memory budget management
+
+### 6. Input System
+
+**Features:**
+- Multi-device support (keyboard, mouse, gamepad)
+- Input action mapping (configurable key bindings)
+- Input buffering for network synchronization
+- Dead zone and sensitivity configuration
+
+## Threading Model
+
+**Main Threads:**
+1. **Main Thread**: Game logic, ECS updates, high-level rendering commands
+2. **Render Thread**: Command list recording, PSO management
+3. **Network Thread**: Socket I/O, packet processing
+4. **Resource Thread**: Asynchronous asset loading and decompression
+
+**Synchronization:**
+- Lock-free queues between threads where possible
+- Minimal mutex usage, prefer atomic operations
+- Double/triple buffering for render data
+- Fence-based GPU synchronization
+
+## Build System
+
+(To be determined - CMake recommended for cross-IDE support)
+
+**Planned Structure:**
+- Separate static libraries per module
+- Unit tests integrated with build
+- Automated shader compilation
+- Asset pipeline integration
+
+## Platform Abstraction
+
+**Abstracted Interfaces:**
+- Window creation and event handling
+- File I/O and path handling
+- Network sockets (Windows Sockets with potential cross-platform layer)
+- Threading primitives
+
+**Platform-Specific Code:**
+- DirectX 12 renderer (Windows-only)
+- Windows-specific optimizations (IOCP for networking)
+
+## Performance Considerations
+
+**CPU:**
+- Cache-friendly data layouts
+- Minimize virtual function calls in hot paths
+- Compile-time polymorphism via templates where appropriate
+- SIMD intrinsics for math operations
+
+**GPU:**
+- Minimize state changes and PSO switches
+- Batch draw calls by material and mesh
+- GPU-driven rendering where supported (ExecuteIndirect)
+- Async compute for post-processing
+
+**Memory:**
+- Minimize allocations in per-frame code
+- Reuse command allocators and descriptor heaps
+- Pool frequently allocated objects
+
+## Code Organization
+
+**Namespace Structure:**
+```cpp
+namespace Starstrike {
+    namespace Engine {
+        // Core engine systems
+    }
+    namespace Renderer {
+        namespace DX12 {
+            // DirectX 12 implementation
+        }
+    }
+    namespace Network {
+        // Networking layer
+    }
+    namespace Game {
+        // Game-specific code
+    }
+}
 ```
-Game state
-  → Starstrike/renderer.h (DX12 coordinator)
-      → Direct3D 12 command lists
-      → Compiled HLSL shaders (NeuronClient/CompiledShaders/*.h)
-      → GPU resources (GpuBuffer, GpuResource, PipelineState, RootSignature)
-      → SpriteBatch (2D/UI quads)
 
-Legacy path (via OpenGL shim):
-  → NeuronClient/opengl_directx.cpp
-      → Translates gl* calls → DX12 command list
-```
+**Header Organization:**
+- Public API headers: `include/starstrike/`
+- Private implementation: `src/`
+- Platform-specific: `src/platform/`
 
-New rendering features should target the DX12 path directly. Do not add new functionality to `ImRenderer`; use `SpriteBatch` for new textured-quad work.
+## API Boundaries
 
-## Networking Architecture
+**Public API:**
+- Core engine interfaces
+- Entity/component creation
+- Resource loading
+- Input querying
 
-The network layer uses a UDP client-server model:
+**Private Implementation:**
+- DirectX 12 details
+- Network protocol internals
+- Memory allocators
+- Platform-specific code
 
-```
-NeuronClient/clienttoserver.h  ──► NeuronCore/net_socket.h ──► OS sockets
-NeuronClient/servertoclient.h  ──► NeuronCore/net_socket_listener.h
+**ABI Considerations:**
+- C++17/20 features used throughout (no C API layer planned)
+- Static linking recommended for deployment
+- No plugin system initially (may be added later)
 
-NeuronServer ──► NeuronCore/net_lib.h
-```
+## Compile-Time vs Runtime Polymorphism
 
-Network updates are serialised via `NeuronClient/networkupdate.h` and identified by sequence IDs.
+**Compile-Time (Templates):**
+- Math library (vectors, matrices)
+- Allocator policies
+- Component system type dispatch
 
-## Key Architectural Patterns
+**Runtime (Virtual Functions):**
+- High-level game states
+- UI systems
+- Platform abstraction interfaces
 
-### Factory Pattern (Buildings)
-`Building::Create(int type)` in `building.cpp` returns a `Building*` to the appropriate subclass. The type enum has 57+ values. New building types must register an entry in this factory.
+## Error Handling
 
-### Spatial Query (EntityGrid)
-`EntityGrid` in `Starstrike/entity_grid.h` partitions entities into a 2D grid for efficient radius queries. All per-frame proximity checks go through this grid, not raw entity iteration.
+**Strategy:**
+- Exceptions for initialization failures
+- Error codes/return values for runtime operations
+- Assertions for programming errors (debug builds)
+- Logging system for diagnostics
 
-### Precompiled Headers
-Every project uses `pch.h` / `pch.cpp`. All `.cpp` files must include `pch.h` as the first `#include`. When adding new translation units, configure PCH usage in the `.vcxproj` (`Use` for `.cpp`, `Create` for `pch.cpp`).
+**Graphics Errors:**
+- DirectX Debug Layer in debug builds
+- GPU validation (PIX, RenderDoc)
+- Graceful degradation where possible
 
-### COM Smart Pointers
-Use `winrt::com_ptr<T>` (not `Microsoft::WRL::ComPtr<T>`) for all COM object lifetime management:
-- `.get()` to obtain the raw pointer (not `.Get()`)
-- `= nullptr` to release (not `.Reset()`)
-- `IID_GRAPHICS_PPV_ARGS(ptr)` when the target is a `com_ptr` (not `IID_PPV_ARGS(&ptr)`)
+## Testing Strategy
 
-## Known Technical Debt
+**Planned Tests:**
+- Unit tests for core systems (entity system, math library)
+- Integration tests for subsystem interactions
+- Networking simulation tests (packet loss, latency)
+- Rendering validation tests (reference images)
 
-See [CI.md](../CI.md) for the full phased improvement plan. Key items:
+## Security Considerations
 
-| Category | Count | Notes |
-|---|---|---|
-| Unsafe C string functions (`sprintf`, `strcpy`, etc.) | 75+ | Buffer-overflow risk |
-| Raw `new`/`delete` without RAII | 100+ | Target for `unique_ptr` migration |
-| Plain `enum` (should be `enum class`) | 9 | Type-safety gap |
-| `#ifndef` include guards (should be `#pragma once`) | 212+ | ODR risk from typos |
-| Commented-out code blocks | 30+ | Should be deleted |
-| Stale `#define` branches | 6 | Dead preprocessor paths |
+**Client Security:**
+- Input sanitization
+- Bounds checking on all network data
+- Memory safety via RAII and smart pointers
+
+**Server Security:**
+- Rate limiting per client
+- Input validation and sanity checks
+- Anti-cheat heuristics
+- DoS prevention
+
+## Open Questions / Future Considerations
+
+- **Build System**: CMake vs Visual Studio solution
+- **Scripting**: Potential integration of Lua or similar for gameplay
+- **Audio System**: Choice of audio middleware (FMOD, Wwise, or custom)
+- **Physics Engine**: Custom vs third-party (PhysX, Bullet)
+- **Platform Support**: Future Linux/Vulkan port?
+- **Profiling**: Integration with external profilers (Tracy, Superluminal, PIX)
+
+## References
+
+- DirectX 12 Best Practices: Microsoft DX12 Programming Guide
+- Network Architecture: "Networked Physics" by Glenn Fiedler
+- ECS Design: "Data-Oriented Design" by Richard Fabian
+- Game Engine Architecture: "Game Engine Architecture" by Jason Gregory
+
+---
+
+**Document Status**: Initial architectural design - subject to revision as implementation progresses.

@@ -1,10 +1,46 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="GameRender.cpp" />
+    <ClCompile Include="EntityRenderRegistry.cpp" />
+    <ClCompile Include="BuildingRenderRegistry.cpp" />
+    <ClCompile Include="ShadowRenderer.cpp" />
+    <ClCompile Include="TreeBuildingRenderer.cpp" />
+    <ClCompile Include="ArmyAntRenderer.cpp" />
+    <ClCompile Include="EggRenderer.cpp" />
+    <ClCompile Include="OfficerRenderer.cpp" />
+    <ClCompile Include="TriffidEggRenderer.cpp" />
+    <ClCompile Include="EngineerRenderer.cpp" />
+    <ClCompile Include="ArmourRenderer.cpp" />
+    <ClCompile Include="TripodRenderer.cpp" />
+    <ClCompile Include="CentipedeRenderer.cpp" />
+    <ClCompile Include="SpiderRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="GameRender.h" />
+    <ClInclude Include="EntityRenderer.h" />
+    <ClInclude Include="BuildingRenderer.h" />
+    <ClInclude Include="EntityRenderRegistry.h" />
+    <ClInclude Include="BuildingRenderRegistry.h" />
+    <ClInclude Include="ShadowRenderer.h" />
+    <ClInclude Include="TreeBuildingRenderer.h" />
+    <ClInclude Include="ArmyAntRenderer.h" />
+    <ClInclude Include="EggRenderer.h" />
+    <ClInclude Include="OfficerRenderer.h" />
+    <ClInclude Include="TriffidEggRenderer.h" />
+    <ClInclude Include="EngineerRenderer.h" />
+    <ClInclude Include="ArmourRenderer.h" />
+    <ClInclude Include="TripodRenderer.h" />
+    <ClInclude Include="CentipedeRenderer.h" />
+    <ClInclude Include="SpiderRenderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter" />
   </ItemGroup>
 </Project>

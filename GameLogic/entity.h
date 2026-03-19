@@ -1,10 +1,10 @@
 #pragma once
 
 #include "worldobject.h"
+#include "ShapeStatic.h"
 
 class Unit;
 class InsertionSquad;
-class ShapeStatic;
 class TeamControls;
 
 // ****************************************************************************

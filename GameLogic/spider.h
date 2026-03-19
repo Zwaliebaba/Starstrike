@@ -23,8 +23,12 @@ class SpiderParameters
 // Class Spider
 //*****************************************************************************
 
+class SpiderRenderer;
+
 class Spider : public Entity
 {
+  friend class SpiderRenderer;
+
   public:
     enum
     {

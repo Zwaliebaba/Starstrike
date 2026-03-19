@@ -8,8 +8,12 @@ class ShapeStatic;
 
 #define ARMOUR_UNLOADPERIOD   0.1f
 
+class ArmourRenderer;
+
 class Armour : public Entity
 {
+  friend class ArmourRenderer;
+
   protected:
     ShapeMarkerData* m_markerEntrance;
     ShapeMarkerData* m_markerFlag;

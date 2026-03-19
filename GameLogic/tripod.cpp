@@ -548,28 +548,6 @@ bool Tripod::Advance(Unit* _unit)
 
 void Tripod::Render(float _predictionTime)
 {
-  glDisable(GL_TEXTURE_2D);
-
-  g_app->m_renderer->SetObjectLighting();
-
-  //
-  // Render body
-
-  LegacyVector3 predictedMovement = _predictionTime * m_vel;
-  LegacyVector3 predictedPos = m_pos + predictedMovement;
-  //	predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z) +
-  //					 m_targetHoverHeight;
-
-  Matrix34 mat(m_front, m_up, predictedPos);
-  m_shape->Render(_predictionTime, mat);
-
-  //
-  // Render Legs
-
-  for (int i = 0; i < 3; ++i)
-    m_legs[i]->Render(_predictionTime, predictedMovement);
-
-  //	m_s->Render();
-
-  g_app->m_renderer->UnsetObjectLighting();
+    // Rendering moved to TripodRenderer companion (GameRender).
+    // Kept as empty override for legacy fallback safety.
 }

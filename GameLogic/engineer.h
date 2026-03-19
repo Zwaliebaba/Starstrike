@@ -7,8 +7,12 @@
 #define ENGINEER_RETARGETTIMER          1.0f                    // Re-search area for viable targets every x seconds
 #define ENGINEER_SEARCHRANGE            200.0f                  // Range around which to search for viable targets
 
+class EngineerRenderer;
+
 class Engineer : public Entity
 {
+  friend class EngineerRenderer;
+
   public:
     enum
     {

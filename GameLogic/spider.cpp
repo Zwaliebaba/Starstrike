@@ -640,57 +640,8 @@ bool Spider::Advance(Unit* _unit)
 
 void Spider::Render(float _predictionTime)
 {
-  if (m_dead)
-    return;
-
-  glDisable(GL_TEXTURE_2D);
-
-  //RenderArrow(m_pos, m_targetPos, 1.0f);
-
-  if (m_state == StateAttack)
-  {
-    //RenderArrow(m_pos, m_pounceTarget, 1.0f, RGBAColour(255,0,0) );
-  }
-
-  g_app->m_renderer->SetObjectLighting();
-
-  //
-  // Render body
-
-  LegacyVector3 predictedMovement = _predictionTime * m_vel;
-  LegacyVector3 predictedPos = m_pos + predictedMovement;
-  //	predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z) +
-  //					 m_targetHoverHeight;
-
-  LegacyVector3 up = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
-  LegacyVector3 right = m_up ^ m_front;
-  LegacyVector3 front = right ^ up;
-
-  Matrix34 mat(front, up, predictedPos);
-
-  if (m_renderDamaged)
-  {
-    float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-    if (frand() > 0.5f)
-      mat.r *= (1.0f + sinf(timeIndex) * 0.5f);
-    else
-      mat.u *= (1.0f + sinf(timeIndex) * 0.5f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-  }
-
-  m_shape->Render(_predictionTime, mat);
-
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  //
-  // Render Legs
-
-  for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
-    m_legs[i]->Render(_predictionTime, predictedMovement);
-
-  g_app->m_renderer->UnsetObjectLighting();
+    // Rendering moved to SpiderRenderer companion (GameRender).
+    // Kept as empty override for legacy fallback safety.
 }
 
 bool Spider::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

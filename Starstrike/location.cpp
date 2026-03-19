@@ -968,10 +968,23 @@ void Location::RenderBuildings()
       if (building->IsInView())
       {
         START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
-        if (i > m_buildings.GetLastUpdated())
-          building->Render(timeSinceAdvance + SERVER_ADVANCE_PERIOD);
+
+        float predTime = (i > m_buildings.GetLastUpdated())
+                           ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
+                           : timeSinceAdvance;
+
+        BuildingRenderer* renderer = g_buildingRenderRegistry.Get(building->m_type);
+        if (renderer)
+        {
+          BuildingRenderContext ctx;
+          ctx.predictionTime = predTime;
+          renderer->Render(*building, ctx);
+        }
         else
-          building->Render(timeSinceAdvance);
+        {
+          building->Render(predTime);
+        }
+
         END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
       }
     }
@@ -1045,10 +1058,21 @@ void Location::RenderBuildingAlphas()
         {
           START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
 
-          if (i > m_buildings.GetLastUpdated())
-            building->RenderAlphas(timeSinceAdvance + SERVER_ADVANCE_PERIOD);
+          float predTime = (i > m_buildings.GetLastUpdated())
+                             ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
+                             : timeSinceAdvance;
+
+          BuildingRenderer* bldgRenderer = g_buildingRenderRegistry.Get(building->m_type);
+          if (bldgRenderer)
+          {
+            BuildingRenderContext ctx;
+            ctx.predictionTime = predTime;
+            bldgRenderer->RenderAlphas(*building, ctx);
+          }
           else
-            building->RenderAlphas(timeSinceAdvance);
+          {
+            building->RenderAlphas(predTime);
+          }
 
           END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
         }

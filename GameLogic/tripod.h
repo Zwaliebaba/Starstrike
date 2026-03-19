@@ -30,8 +30,12 @@ public:
 // Class Tripod
 //*****************************************************************************
 
+class TripodRenderer;
+
 class Tripod: public Entity
 {
+	friend class TripodRenderer;
+
 public:
 	enum
 	{

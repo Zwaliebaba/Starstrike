@@ -348,10 +348,15 @@ The server build of `GameLogic` (or future `GameSim`) omits this define.
 
 ### Renderer Placement Strategy
 
-During Phase 2, new render companions are placed in **`NeuronClient/`** —
-matching the existing `TreeRenderer` placement.  This avoids creating a new
-project mid-transition and keeps the build graph simple.  All companions are
-moved to `GameRender/` in Phase 5 when the project is created.
+New render companions are placed in **`GameRender/`** from the start.
+`GameRender` is a static library that depends on `NeuronClient` (for the GL
+translation layer, `ShapeStatic`, `TreeRenderer`, etc.) and `GameLogic`
+(for entity/building types).  `Starstrike` links `GameRender` and calls
+`InitGameRenderers()` at startup to register all companions.
+
+> `TreeRenderer` (the DX12 pipeline) remains in `NeuronClient/` because it
+> is low-level GPU infrastructure.  `TreeBuildingRenderer` (the thin adapter
+> that wraps it behind `BuildingRenderer`) lives in `GameRender/`.
 
 ### Pre-Step: Extract `ShadowRenderer`
 

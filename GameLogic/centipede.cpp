@@ -605,41 +605,8 @@ bool Centipede::AdvanceToTargetPosition()
 
 void Centipede::Render(float _predictionTime)
 {
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
-
-  float maxHealth = EntityBlueprint::GetStat(TypeCentipede, StatHealth);
-  maxHealth *= m_size * 2;
-  if (maxHealth < 0)
-    maxHealth = 0;
-  if (maxHealth > 255)
-    maxHealth = 255;
-
-  ShapeStatic* shape = m_shape;
-
-  if (!m_dead && m_linked)
-  {
-    glDisable(GL_TEXTURE_2D);
-    //RenderSphere( m_targetPos, 5.0f );
-
-    LegacyVector3 predictedFront = m_front;
-    LegacyVector3 predictedUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
-    LegacyVector3 predictedRight = predictedUp ^ predictedFront;
-    predictedFront = predictedRight ^ predictedUp;
-    predictedFront.Normalise();
-
-    Matrix34 mat(predictedFront, predictedUp, predictedPos);
-
-    mat.f *= m_size;
-    mat.u *= m_size;
-    mat.r *= m_size;
-
-    g_app->m_renderer->SetObjectLighting();
-    shape->Render(_predictionTime, mat);
-    g_app->m_renderer->UnsetObjectLighting();
-
-    glDisable(GL_NORMALIZE);
-  }
+    // Rendering moved to CentipedeRenderer companion (GameRender).
+    // Kept as empty override for legacy fallback safety.
 }
 
 bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

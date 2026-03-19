@@ -95,127 +95,23 @@ void Officer::ChangeHealth(int amount)
 
 void Officer::Render(float _predictionTime)
 {
-  RenderShield(_predictionTime);
-
-  if (m_enabled)
-    RenderFlag(_predictionTime);
+  // Rendering moved to OfficerRenderer companion (GameRender).
+  // Kept as empty override for legacy fallback safety.
 }
 
 void Officer::RenderSpirit(const LegacyVector3& _pos)
 {
-  LegacyVector3 pos = _pos;
-
-  int innerAlpha = 255;
-  int outerAlpha = 40;
-  int glowAlpha = 20;
-
-  float spiritInnerSize = 0.5f;
-  float spiritOuterSize = 1.5f;
-  float spiritGlowSize = 10;
-
-  float size = spiritInnerSize;
-  glColor4ub(100, 250, 100, innerAlpha);
-
-  glDisable(GL_TEXTURE_2D);
-
-  glBegin(GL_QUADS);
-  glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
-  glEnd();
-
-  size = spiritOuterSize;
-  glColor4ub(100, 250, 100, outerAlpha);
-
-  glBegin(GL_QUADS);
-  glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
-  glEnd();
-
-  size = spiritGlowSize;
-  glColor4ub(100, 250, 100, glowAlpha);
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
-  glEnd();
-  glDisable(GL_TEXTURE_2D);
+  // Rendering moved to OfficerRenderer companion (GameRender).
 }
 
 void Officer::RenderShield(float _predictionTime)
 {
-  float timeIndex = g_gameTime + m_id.GetUniqueId() * 20;
-
-  glDisable(GL_CULL_FACE);
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  predictedPos.y += 10.0f;
-
-  for (int i = 0; i < m_shield; ++i)
-  {
-    LegacyVector3 spiritPos = predictedPos;
-    spiritPos.x += sinf(timeIndex * 1.8f + i * 2.0f) * 10.0f;
-    spiritPos.y += cosf(timeIndex * 2.1f + i * 1.2f) * 6.0f;
-    spiritPos.z += sinf(timeIndex * 2.4f + i * 1.4f) * 10.0f;
-
-    RenderSpirit(spiritPos);
-  }
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_BLEND);
-  glDepthMask(true);
-  glEnable(GL_CULL_FACE);
+  // Rendering moved to OfficerRenderer companion (GameRender).
 }
 
 void Officer::RenderFlag(float _predictionTime)
 {
-  float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-  float size = 20.0f;
-
-  LegacyVector3 up = g_upVector;
-  LegacyVector3 front = m_front * -1;
-  front.y = 0;
-  front.Normalise();
-
-  if (m_orders != OrderNone)
-    up.RotateAround(front * sinf(timeIndex * 2) * 0.3f);
-
-  LegacyVector3 entityUp = g_upVector;
-  LegacyVector3 entityRight(m_front ^ entityUp);
-  LegacyVector3 entityFront = entityUp ^ entityRight;
-  Matrix34 mat(entityFront, entityUp, m_pos + m_vel * _predictionTime);
-  LegacyVector3 flagPos = m_shape->GetMarkerWorldMatrix(m_flagMarker, mat).pos;
-
-  int texId = -1;
-  if (m_orders == OrderNone)
-    texId = g_app->m_resource->GetTexture("icons/banner_none.bmp");
-  else if (m_orders == OrderGoto)
-    texId = g_app->m_resource->GetTexture("icons/banner_goto.bmp");
-  else if (m_orders == OrderFollow && !m_absorb)
-    texId = g_app->m_resource->GetTexture("icons/banner_follow.bmp");
-  else
-    if (m_orders == OrderFollow && m_absorb)
-      texId = g_app->m_resource->GetTexture("icons/banner_absorb.bmp");
-
-  m_flag.SetTexture(texId);
-  m_flag.SetPosition(flagPos);
-  m_flag.SetOrientation(front, up);
-  m_flag.SetSize(size);
-  m_flag.Render();
+  // Rendering moved to OfficerRenderer companion (GameRender).
 }
 
 bool Officer::AdvanceIdle()

@@ -45,6 +45,7 @@
 #include "user_input.h"
 #include "water.h"
 #include "window_manager.h"
+#include "GameRender.h"
 
 #define TARGET_FRAME_RATE_INCREMENT 0.25f
 
@@ -539,6 +540,8 @@ void Initialise()
   EntityBlueprint::Initialise();
 
   g_app->m_renderer->SetOpenGLState();
+
+  InitGameRenderers();
 }
 
 void Finalise()

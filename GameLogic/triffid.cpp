@@ -635,44 +635,6 @@ bool TriffidEgg::Advance(Unit* _unit)
 
 void TriffidEgg::Render(float _predictionTime)
 {
-  if (m_dead)
-    return;
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-
-  LegacyVector3 direction = m_vel;
-  LegacyVector3 right = (g_upVector ^ direction).Normalise();
-  LegacyVector3 up = m_up;
-  up.RotateAround(right * _predictionTime * m_force * m_force * 30.0f);
-  LegacyVector3 front = right ^ up;
-  up.Normalise();
-  front.Normalise();
-
-  //
-  // Make our size pulsate a little
-  float age = (m_timerSync - GetHighResTime()) / m_life;
-  age = max(age, 0.0f);
-  age = min(age, 1.0f);
-  float size = m_size + fabs(sinf(g_gameTime * 2.0f)) * (1.0f - age) * 0.4f;
-
-  predictedPos.y -= size;
-  Matrix34 transform(front, up, predictedPos);
-  transform.f *= size;
-  transform.u *= size;
-  transform.r *= size;
-
-  glEnable(GL_NORMALIZE);
-  g_app->m_renderer->SetObjectLighting();
-  m_shape->Render(_predictionTime, transform);
-  g_app->m_renderer->UnsetObjectLighting();
-  glDisable(GL_NORMALIZE);
-
-  g_app->m_renderer->MarkUsedCells(m_shape, transform);
-
-  //
-  // Render our shadow
-
-  BeginRenderShadow();
-  RenderShadow(predictedPos, size * 10.0f);
-  EndRenderShadow();
+  // Rendering moved to TriffidEggRenderer companion (GameRender).
+  // Kept as empty override for legacy fallback safety.
 }

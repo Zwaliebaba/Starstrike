@@ -1,137 +1,413 @@
-# Contributing
+# Contributing to Starstrike
 
-This document describes the process for contributing code changes to Starstrike.
+Thank you for your interest in contributing to Starstrike! This document provides guidelines and instructions for contributing to the project.
 
-## Workflow
+## Code of Conduct
 
-1. Create a feature branch from `main`:
-   ```powershell
-   git checkout main
-   git pull origin main
-   git checkout -b feature/short-description
+This project adheres to a code of conduct that all contributors are expected to follow. Please be respectful, inclusive, and professional in all interactions.
+
+## Getting Started
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Starstrike.git
+   cd Starstrike
    ```
-2. Make your changes following the [Coding Standards](.github/../.github/coding-standards.md).
-3. Build and validate locally (see [Development Guide](development-guide.md)).
-4. Commit with a clear message (see [Commit Messages](#commit-messages) below).
-5. Push and open a pull request.
+3. **Add upstream remote**:
+   ```bash
+   git remote add upstream https://github.com/Zwaliebaba/Starstrike.git
+   ```
+4. **Create a feature branch**:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-## Pull Request Guidelines
+## Development Workflow
 
-### Title Format
+### 1. Before You Start
 
-```
-[component] Brief description of change
-```
+- Check existing issues and pull requests to avoid duplicate work
+- For major changes, open an issue first to discuss your proposal
+- Ensure you understand the project architecture (see [ARCHITECTURE.md](ARCHITECTURE.md))
 
-Examples:
-- `[renderer] Fix shadow mapping artefacts on terrain`
-- `[gamelogic] Add turret cooldown after overheat`
-- `[neuroncore] Replace busy-wait in ASyncLoader with condition variable`
-- `[docs] Update architecture diagram`
+### 2. Making Changes
 
-Valid component values: `renderer`, `gamelogic`, `neuronclient`, `neuroncore`, `neuronserver`, `input`, `audio`, `networking`, `ui`, `build`, `docs`.
+**Coding Standards:**
 
-### Required Checks
+- Follow modern C++ best practices (C++17/20)
+- Use RAII for resource management
+- Prefer `std::unique_ptr`/`std::shared_ptr` over raw pointers
+- Use `const` and `constexpr` where appropriate
+- Avoid unnecessary allocations in performance-critical code
+- Write self-documenting code; add comments for complex logic
 
-Every pull request must pass:
+**Code Style:**
 
-- [ ] **Debug x64 build** — `msbuild Starstrike.slnx /p:Configuration=Debug /p:Platform=x64`
-- [ ] **Release x64 build** — `msbuild Starstrike.slnx /p:Configuration=Release /p:Platform=x64`
-- [ ] Manual gameplay validation (launch the game and exercise the affected feature)
+```cpp
+// Namespace usage
+namespace Starstrike::Engine {
 
-### PR Description
+// Class naming: PascalCase
+class EntityManager {
+public:
+    // Public methods: PascalCase
+    Entity CreateEntity();
+    void DestroyEntity(Entity entity);
+    
+    // Getters/Setters: Get/Set prefix
+    World* GetWorld() const { return m_world.get(); }
+    
+private:
+    // Private members: m_ prefix, camelCase
+    std::unique_ptr<World> m_world;
+    std::vector<Entity> m_entities;
+    
+    // Private methods: camelCase
+    void updateSystems(float deltaTime);
+};
 
-Include the following sections in your PR description:
+// Constants: UPPER_SNAKE_CASE
+constexpr uint32_t MAX_ENTITIES = 10000;
 
-```markdown
-## Summary
-- What changed and why
+// Enums: PascalCase for enum, PascalCase for values
+enum class ComponentType {
+    Transform,
+    MeshRenderer,
+    Rigidbody
+};
 
-## Testing
-- Steps to validate the change manually
-- Any regression risks and how they were checked
-
-## Notes (optional)
-- Performance impact, known limitations, follow-up work
-```
-
-For changes that affect gameplay or rendering, include a brief description of the visual or mechanical impact.
-
-## Commit Messages
-
-Use the imperative mood, keep the subject line under 72 characters, and reference the affected component:
-
-```
-[component] Short description of what the commit does
-
-Optional body explaining the motivation and any non-obvious
-implementation details. Wrap lines at 72 characters.
-```
-
-Examples:
-```
-[neuroncore] Replace busy-wait in ASyncLoader with condition variable
-
-The previous implementation spun the CPU at 100% while waiting for
-assets to load. Replacing with std::condition_variable reduces CPU
-usage and improves responsiveness during level transitions.
-```
-
-```
-[gamelogic] Fix null deref in Building::Create for unknown type
-
-Building::Create returned an uninitialised pointer when given an
-unrecognised type enum value. Added a nullptr guard and a fatal-
-error log call to catch unregistered types early.
+} // namespace Starstrike::Engine
 ```
 
-## Code Review Standards
+**Formatting:**
+- Indentation: 4 spaces (no tabs)
+- Braces: Allman style (braces on new line)
+- Line length: Aim for 100 characters, hard limit at 120
+- File encoding: UTF-8
 
-Reviewers will check:
+### 3. Writing Tests
 
-1. **Correctness** — Does the change do what it claims? Are edge cases handled?
-2. **Standards** — Does the code follow [Coding Standards](.github/../.github/coding-standards.md)?
-3. **Safety** — No new unsafe string operations (`sprintf`, `strcpy`, `strcat`). Prefer safe alternatives or document why unsafe usage is unavoidable.
-4. **Memory** — New allocations in NeuronCore use smart pointers. Legacy code in GameLogic/NeuronClient may use raw pointers if consistent with surrounding code.
-5. **Build impact** — Changes to widely-included headers are justified and minimised.
-6. **Documentation** — New public APIs, subsystems, or non-obvious behaviour are documented.
-7. **No regressions** — Existing gameplay and rendering remain unaffected.
+All new features and bug fixes should include tests:
 
-## Documentation Requirements
+- **Unit tests** for individual components/functions
+- **Integration tests** for system interactions
+- **Regression tests** for bug fixes
 
-When your change introduces or modifies a public API, subsystem, or architectural pattern:
+Example test structure:
+```cpp
+#include <gtest/gtest.h>
+#include <starstrike/Engine.h>
 
-- Update or add documentation in `docs/` if the change affects architecture, the development workflow, or the contribution process.
-- Update `.github/coding-standards.md` if a new convention is established.
-- Add inline comments for non-obvious logic.
-- For significant architectural decisions, consider adding an ADR entry (see [Architecture Decision Records](architecture.md#architecture-decision-records) format in `docs/architecture.md`).
+TEST(EntityManagerTest, CreateEntity) {
+    Starstrike::Engine::World world;
+    auto entity = world.CreateEntity();
+    EXPECT_TRUE(entity.IsValid());
+}
 
-## Adding New Subsystems
+TEST(EntityManagerTest, DestroyEntity) {
+    Starstrike::Engine::World world;
+    auto entity = world.CreateEntity();
+    world.DestroyEntity(entity);
+    EXPECT_FALSE(world.HasEntity(entity));
+}
+```
 
-If your change adds a new subsystem or library:
+### 4. Building and Testing
 
-1. Determine which existing project it belongs to, or propose a new project with justification.
-2. Follow the dependency rules:
-   - `GameLogic` must not depend on `NeuronClient` or `Starstrike`.
-   - `NeuronCore` must not depend on any other project in this solution.
-   - `NeuronServer` must not depend on `GameLogic` or `NeuronClient`.
-3. Create paired `.h`/`.cpp` files with `PascalCase` names.
-4. Configure precompiled header usage in the `.vcxproj`.
-5. Update `docs/architecture.md` to describe the new subsystem.
+Before submitting your changes:
 
-## Style Checklist
+```bash
+# Build in Debug mode
+cmake --build build --config Debug
 
-Before opening a PR, verify:
+# Run tests
+ctest --test-dir build -C Debug
 
-- [ ] File names are `PascalCase.cpp` / `PascalCase.h`
-- [ ] Classes and methods use `PascalCase`
-- [ ] Member variables use `m_camelCase`
-- [ ] Global pointers use `g_` prefix
-- [ ] Constants use `UPPER_SNAKE_CASE`
-- [ ] Header uses `#pragma once` (not `#ifndef` guard)
-- [ ] New `.cpp` includes `pch.h` as the first line
-- [ ] No new includes already covered by `pch.h`
-- [ ] Assertions use `ASSERT_TEXT` / `DEBUG_ASSERT` (not `assert`)
-- [ ] Debug logging uses `Neuron::DebugTrace` (not `printf` or `OutputDebugString` directly)
-- [ ] COM objects use `winrt::com_ptr<T>` (not `Microsoft::WRL::ComPtr<T>`)
-- [ ] New NeuronCore code uses C++20 idioms (`constexpr`, `[[nodiscard]]`, `std::format`, etc.)
+# Build in Release mode
+cmake --build build --config Release
+
+# Run tests again
+ctest --test-dir build -C Release
+```
+
+Ensure all tests pass and there are no compiler warnings.
+
+### 5. Committing Changes
+
+**Commit Message Format:**
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no logic change)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `perf`: Performance improvements
+- `chore`: Build system, dependencies, etc.
+
+**Examples:**
+
+```
+feat(renderer): Add skybox rendering support
+
+Implements cubemap rendering for skybox backgrounds.
+Uses pre-filtered environment maps for reflections.
+
+Closes #123
+```
+
+```
+fix(network): Fix packet deserialization bug
+
+Corrects byte order issues when reading int64 values
+from network packets on big-endian systems.
+
+Fixes #456
+```
+
+**Commit Guidelines:**
+- Keep commits focused and atomic
+- Write clear, descriptive commit messages
+- Reference issue numbers when applicable
+- Sign-off your commits if required by project policy
+
+### 6. Submitting a Pull Request
+
+1. **Update your fork**:
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
+
+2. **Push to your fork**:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+3. **Create Pull Request** on GitHub with:
+   - Clear title describing the change
+   - Detailed description of what and why
+   - Reference to related issues
+   - Screenshots/videos for visual changes
+
+4. **PR Checklist**:
+   - [ ] Code follows project style guidelines
+   - [ ] All tests pass
+   - [ ] New tests added for new features
+   - [ ] Documentation updated (if applicable)
+   - [ ] No compiler warnings
+   - [ ] Commit messages follow guidelines
+   - [ ] Branch is up-to-date with main
+
+### 7. Code Review Process
+
+- Maintainers will review your PR
+- Address feedback and requested changes
+- Keep the PR updated with main branch
+- Once approved, your PR will be merged
+
+## Areas for Contribution
+
+### High Priority
+
+- Core engine systems implementation
+- DirectX 12 renderer implementation
+- Networking layer implementation
+- Input system
+- Resource management
+- Math library optimizations
+
+### Medium Priority
+
+- Unit tests and integration tests
+- Documentation improvements
+- Example projects
+- Build system improvements
+- Performance profiling tools
+
+### Low Priority (Nice to Have)
+
+- Editor tools
+- Asset pipeline tools
+- Additional platform support
+- Third-party integrations
+
+## Reporting Bugs
+
+When reporting bugs, please include:
+
+1. **Description**: Clear description of the issue
+2. **Steps to Reproduce**: Minimal steps to reproduce the bug
+3. **Expected Behavior**: What you expected to happen
+4. **Actual Behavior**: What actually happened
+5. **Environment**:
+   - OS version
+   - GPU model and driver version
+   - Build configuration (Debug/Release)
+   - Commit hash or version
+6. **Logs**: Relevant error messages or logs
+7. **Screenshots**: If applicable
+
+Use the GitHub issue template when available.
+
+## Suggesting Enhancements
+
+For feature requests:
+
+1. **Check existing issues** to avoid duplicates
+2. **Describe the feature** clearly
+3. **Explain the use case** and benefits
+4. **Provide examples** of similar implementations (if any)
+5. **Consider implications**: Performance, API changes, compatibility
+
+## Performance Considerations
+
+When contributing performance-critical code:
+
+- Profile before and after changes
+- Document performance characteristics
+- Consider cache-friendliness
+- Minimize allocations in hot paths
+- Use appropriate data structures
+- Consider multi-threading implications
+
+## Documentation
+
+Documentation improvements are always welcome:
+
+- Fix typos and unclear explanations
+- Add missing API documentation
+- Provide usage examples
+- Update outdated information
+- Improve code comments
+
+## Platform-Specific Contributions
+
+Currently targeting Windows/DirectX 12. When contributing:
+
+- Use platform abstractions where appropriate
+- Document platform-specific behavior
+- Consider future cross-platform support
+- Test on different Windows versions if possible
+
+## Security
+
+If you discover a security vulnerability:
+
+- **Do NOT** open a public issue
+- Email the maintainers directly (contact info to be provided)
+- Provide detailed information about the vulnerability
+- Allow time for a fix before public disclosure
+
+## Legal
+
+By contributing, you agree that:
+
+- Your contributions are your original work
+- You have the right to submit the contributions
+- Your contributions may be distributed under the project's license
+- You grant the project maintainers a perpetual, worldwide, non-exclusive license to use your contributions
+
+## Getting Help
+
+- **Documentation**: Check [docs/](../docs/) directory
+- **Issues**: Search existing issues or create a new one
+- **Discussions**: Use GitHub Discussions for questions
+- **Discord**: (To be set up - for real-time chat)
+
+## Recognition
+
+Contributors will be recognized in:
+- CONTRIBUTORS.md file
+- Release notes
+- Project documentation
+
+Significant contributions may result in commit access to the repository.
+
+## Style Guides
+
+### C++ Style Guide
+
+Follow the C++ Core Guidelines with these specifics:
+
+**Headers:**
+```cpp
+// myheader.h
+#pragma once
+
+#include <standard_library_headers>
+
+#include "project_headers.h"
+#include "third_party/library.h"
+
+namespace Starstrike::Module {
+
+class MyClass {
+    // ... 
+};
+
+} // namespace Starstrike::Module
+```
+
+**Source Files:**
+```cpp
+// myclass.cpp
+#include "myheader.h"
+
+#include <standard_library_headers>
+
+#include "other_project_headers.h"
+
+namespace Starstrike::Module {
+
+void MyClass::MyMethod() {
+    // Implementation
+}
+
+} // namespace Starstrike::Module
+```
+
+### Documentation Style
+
+Use Doxygen-style comments for public APIs:
+
+```cpp
+/**
+ * @brief Creates a new entity in the world.
+ * 
+ * Entities are lightweight handles to game objects. Components can be
+ * attached to entities to give them behavior and data.
+ * 
+ * @return A valid entity handle
+ * @throws std::bad_alloc if entity pool is exhausted
+ * 
+ * @see DestroyEntity
+ * @see AddComponent
+ */
+Entity CreateEntity();
+```
+
+## Resources
+
+- [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+- [DirectX 12 Documentation](https://docs.microsoft.com/en-us/windows/win32/direct3d12/)
+- [Game Programming Patterns](https://gameprogrammingpatterns.com/)
+- [DirectX 12 Best Practices](https://developer.nvidia.com/dx12-dos-and-donts)
+
+## License
+
+(License information to be determined)
+
+---
+
+Thank you for contributing to Starstrike! Your efforts help make this project better for everyone.

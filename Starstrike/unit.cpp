@@ -22,6 +22,8 @@
 
 #include "worldobject.h"
 #include "lasertrooper.h"
+#include "EntityRenderRegistry.h"
+#include "EntityRenderer.h"
 
 Unit::Unit(int troopType, int teamId, int unitId, int numEntities, LegacyVector3 const &_pos)
 :   m_troopType(troopType),
@@ -131,14 +133,25 @@ bool Unit::IsInView()
 void Unit::Render( float _predictionTime )
 {
 	// Render all the entities that are up-to-date with server advances
-    int lastUpdated = m_entities.GetLastUpdated();
-    for (int i = 0; i <= lastUpdated; i++)
+	int lastUpdated = m_entities.GetLastUpdated();
+	for (int i = 0; i <= lastUpdated; i++)
 	{
-        if (m_entities.ValidIndex(i))
-        {
-            Entity *entity = m_entities[i];
-            entity->Render( _predictionTime );
-        }
+		if (m_entities.ValidIndex(i))
+		{
+			Entity *entity = m_entities[i];
+			EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
+			if (renderer)
+			{
+				EntityRenderContext ctx;
+				ctx.predictionTime = _predictionTime;
+				ctx.highDetailFactor = 1.0f;
+				renderer->Render(*entity, ctx);
+			}
+			else
+			{
+				entity->Render( _predictionTime );
+			}
+		}
 	}
 
 	// Render all the entities that are one step out-of-date with server advances
@@ -146,14 +159,25 @@ void Unit::Render( float _predictionTime )
 	_predictionTime += SERVER_ADVANCE_PERIOD;
 	for (int i = lastUpdated + 1; i < size; i++)
 	{
-        if (m_entities.ValidIndex(i))
-        {
-            Entity *entity = m_entities[i];
-            entity->Render(_predictionTime);
-        }
+		if (m_entities.ValidIndex(i))
+		{
+			Entity *entity = m_entities[i];
+			EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
+			if (renderer)
+			{
+				EntityRenderContext ctx;
+				ctx.predictionTime = _predictionTime;
+				ctx.highDetailFactor = 1.0f;
+				renderer->Render(*entity, ctx);
+			}
+			else
+			{
+				entity->Render(_predictionTime);
+			}
+		}
 	}
 
-    glEnable        ( GL_CULL_FACE );
+	glEnable        ( GL_CULL_FACE );
 }
 
 bool Unit::Advance( int _slice )

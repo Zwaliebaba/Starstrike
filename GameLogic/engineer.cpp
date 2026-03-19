@@ -938,126 +938,13 @@ bool Engineer::AdvanceToResearchItem()
 
 void Engineer::RenderShape(float predictionTime)
 {
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-  if (m_onGround)
-  {
-    predictedPos.y = max(g_app->m_location->m_landscape.m_heightMap->GetValue( predictedPos.x, predictedPos.z ), 0.0f /*sea level*/) +
-      m_hoverHeight;
-  }
-
-  LegacyVector3 entityUp = g_upVector;
-  LegacyVector3 entityFront = m_front;
-  entityFront.y *= 0.5f;
-  entityFront.Normalise();
-  LegacyVector3 entityRight = entityFront ^ entityUp;
-  entityUp = entityRight ^ entityFront;
-
-  g_app->m_renderer->SetObjectLighting();
-
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_COLOR_MATERIAL);
-  glDisable(GL_BLEND);
-
-  if (entityFront.y > 0.5f)
-    entityFront.Set(1, 0, 0);
-  Matrix34 mat(entityFront, entityUp, predictedPos);
-  m_shape->Render(predictionTime, mat);
-
-  glEnable(GL_BLEND);
-  glDisable(GL_COLOR_MATERIAL);
-  glEnable(GL_TEXTURE_2D);
-  g_app->m_renderer->UnsetObjectLighting();
-  glEnable(GL_CULL_FACE);
-
-  g_app->m_renderer->MarkUsedCells(m_shape, mat);
+    // Rendering moved to EngineerRenderer companion (GameRender).
 }
 
 void Engineer::Render(float predictionTime)
 {
-  //
-  // Work out our predicted position and orientation
-
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-  if (m_onGround)
-  {
-    predictedPos.y = max(g_app->m_location->m_landscape.m_heightMap->GetValue( predictedPos.x, predictedPos.z ), 0.0f /*sea level*/) +
-      m_hoverHeight;
-  }
-
-  if (!m_dead)
-  {
-    RenderShape(predictionTime);
-
-    BeginRenderShadow();
-    RenderShadow(predictedPos, 10.0f);
-    EndRenderShadow();
-  }
-
-  //
-  // If we are reprogramming, draw some control lasers
-
-  if (m_state == StateReprogramming || m_state == StateOperatingBridge || m_state == StateResearching)
-  {
-    LegacyVector3 fromPos = m_pos;
-    LegacyVector3 toPos;
-
-    Building* building = g_app->m_location->GetBuilding(m_buildingId);
-    if (building)
-    {
-      if (building->m_type == Building::TypeControlTower)
-      {
-        auto tower = static_cast<ControlTower*>(building);
-        tower->GetConsolePosition(m_positionId, toPos);
-      }
-      else if (building->m_type == Building::TypeBridge)
-      {
-        LegacyVector3 front;
-        auto bridge = static_cast<Bridge*>(building);
-        bridge->GetAvailablePosition(toPos, front);
-      }
-      else if (building->m_type == Building::TypeResearchItem)
-      {
-        auto item = static_cast<ResearchItem*>(building);
-        LegacyVector3 end1, end2;
-        item->GetEndPositions(end1, end2);
-        float time = g_gameTime + m_id.GetIndex();
-        toPos = end1;
-        toPos += (end2 - end1) / 2.0f;
-        toPos += (end2 - end1) * sinf(time) * 0.5f;
-      }
-
-      LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-      LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
-      LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
-
-      rightAngle *= 0.5f;
-
-      glColor4f(0.2f, 0.4f, 1.0f, fabs(sinf(g_gameTime * 3.0f)));
-
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-      glDepthMask(false);
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-
-      glBegin(GL_QUADS);
-      glTexCoord2i(0, 0);
-      glVertex3fv((fromPos - rightAngle).GetData());
-      glTexCoord2i(0, 1);
-      glVertex3fv((fromPos + rightAngle).GetData());
-      glTexCoord2i(1, 1);
-      glVertex3fv((toPos + rightAngle).GetData());
-      glTexCoord2i(1, 0);
-      glVertex3fv((toPos - rightAngle).GetData());
-      glEnd();
-
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glDisable(GL_TEXTURE_2D);
-      glDepthMask(true);
-      glDisable(GL_BLEND);
-    }
-  }
+    // Rendering moved to EngineerRenderer companion (GameRender).
+    // Kept as empty override for legacy fallback safety.
 }
 
 char* Engineer::GetCurrentAction()

@@ -10,8 +10,12 @@
 
 class ShapeStatic;
 
+class CentipedeRenderer;
+
 class Centipede : public Entity
 {
+  friend class CentipedeRenderer;
+
   protected:
     float m_size;
     WorldObjectId m_next; // Guy infront of me

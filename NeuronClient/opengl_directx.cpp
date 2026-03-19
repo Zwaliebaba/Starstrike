@@ -8,8 +8,6 @@
 #include "UploadRingBuffer.h"
 #include "matrix34.h"
 #include "tree_renderer.h"
-#include "BuildingRenderRegistry.h"
-#include "TreeBuildingRenderer.h"
 
 using namespace OpenGLD3D;
 

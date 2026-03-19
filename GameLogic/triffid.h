@@ -64,8 +64,12 @@ class Triffid : public Building
 
 #define TRIFFIDEGG_BOUNCEFRICTION 0.65f
 
+class TriffidEggRenderer;
+
 class TriffidEgg : public Entity
 {
+  friend class TriffidEggRenderer;
+
   protected:
     LegacyVector3 m_up;
     float m_force;

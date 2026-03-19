@@ -18,6 +18,8 @@
 #include "renderer.h"
 #include "team.h"
 #include "unit.h"
+#include "EntityRenderRegistry.h"
+#include "EntityRenderer.h"
 #include "user_input.h"
 #include "gamecursor.h"
 #include "taskmanager.h"
@@ -544,7 +546,18 @@ void Team::RenderOthers(float _predictionTime)
       if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->IsInView())
       {
         START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
-        entity->Render(_predictionTime);
+        EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
+        if (renderer)
+        {
+          EntityRenderContext ctx;
+          ctx.predictionTime = _predictionTime;
+          ctx.highDetailFactor = 1.0f;
+          renderer->Render(*entity, ctx);
+        }
+        else
+        {
+          entity->Render(_predictionTime);
+        }
         END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }
@@ -560,7 +573,18 @@ void Team::RenderOthers(float _predictionTime)
       if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->IsInView())
       {
         START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
-        entity->Render(_predictionTime);
+        EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
+        if (renderer)
+        {
+          EntityRenderContext ctx;
+          ctx.predictionTime = _predictionTime;
+          ctx.highDetailFactor = 1.0f;
+          renderer->Render(*entity, ctx);
+        }
+        else
+        {
+          entity->Render(_predictionTime);
+        }
         END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }
