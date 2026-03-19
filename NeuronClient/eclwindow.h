@@ -1,0 +1,75 @@
+
+/*
+        A Window object.
+        Essentially a container for Eclipse buttons.
+
+        All co-ordinates are RELATIVE to the window
+
+  */
+
+
+#pragma once
+
+#define SIZE_ECLWINDOW_NAME     256
+#define SIZE_ECLWINDOW_TITLE    256
+
+#include "llist.h"
+
+class EclButton;
+
+
+class EclWindow
+{
+    // TODO [CI §2.2]: Rule-of-Five — has dtor but no copy/move ops
+
+public:
+
+    int         m_x;
+    int         m_y;
+    int         m_w;
+    int         m_h;
+
+    char        m_name  [SIZE_ECLWINDOW_NAME];
+    char        m_title [SIZE_ECLWINDOW_TITLE];
+
+    bool        m_movable;
+    bool        m_resizable;
+    bool        m_dirty;
+
+    LList       <EclButton *> m_buttons;
+
+public:
+
+    char        m_currentTextEdit[SIZE_ECLWINDOW_NAME];
+
+public:
+
+    EclWindow                       ( const char *_name );
+    virtual ~EclWindow  ();
+
+    void SetName                    ( const char *_name );
+    void SetTitle                   ( const char *_title );
+    void SetPosition                ( int _x, int _y );
+    void SetSize                    ( int _w, int _h );
+    void SetMovable                 ( bool _movable );
+	void MakeAllOnScreen			();
+
+    void RegisterButton             ( EclButton *button );
+    void RemoveButton               ( const char *_name );
+
+    void BeginTextEdit              ( const char *_name );
+    void EndTextEdit                ();
+
+    virtual EclButton   *GetButton  ( const char *_name );
+    virtual EclButton   *GetButton  ( int _x, int _y );                             
+
+    virtual void Create ();
+    virtual void Remove ();
+    virtual void Update ();
+    virtual void Render ( bool hasFocus );
+
+    virtual void Keypress   ( int keyCode, bool shift, bool ctrl, bool alt );
+    virtual void MouseEvent ( bool lmb, bool rmb, bool up, bool down );
+
+};
+

@@ -1,0 +1,37 @@
+#pragma once
+
+#ifdef PROFILER_ENABLED
+
+
+#include "darwinia_window.h"
+
+
+class ProfiledElement;
+
+
+//*****************************************************************************
+// Class ProfileWindow
+//*****************************************************************************
+
+class ProfileWindow : public DarwiniaWindow
+{
+protected:
+	int		m_yPos;
+
+	void RenderElementProfile(ProfiledElement *_pe, unsigned int _indent);
+
+
+public:
+	bool	m_totalPerSecond;
+
+	ProfileWindow( const char *name );
+    ~ProfileWindow();
+
+    void Render( bool hasFocus );
+	void Create();
+	void Remove();
+};
+
+
+#endif // PROFILER_ENABLED
+

@@ -1,0 +1,186 @@
+#include "pch.h"
+#include "file_writer.h"
+#include "text_stream_readers.h"
+#include "language_table.h"
+#include "scripttrigger.h"
+#include "GameApp.h"
+#include "globals.h"
+#include "location.h"
+#include "entity_grid.h"
+#include "script.h"
+#include "team.h"
+#include "camera.h"
+
+ScriptTrigger::ScriptTrigger()
+  : Building(),
+    m_range(100.0f),
+    m_entityType(SCRIPTRIGGER_RUNNEVER),
+    m_linkId(-1),
+    m_triggered(0),
+    m_timer(0.0f)
+{
+  m_type = TypeScriptTrigger;
+
+  snprintf(m_scriptFilename, sizeof(m_scriptFilename), "NewScript");
+}
+
+void ScriptTrigger::Initialise(Building* _template)
+{
+  Building::Initialise(_template);
+
+  auto trigger = static_cast<ScriptTrigger*>(_template);
+  strncpy(m_scriptFilename, trigger->m_scriptFilename, sizeof(m_scriptFilename));
+  m_scriptFilename[sizeof(m_scriptFilename) - 1] = '\0';
+  m_range = trigger->m_range;
+  m_entityType = trigger->m_entityType;
+  m_linkId = trigger->m_linkId;
+}
+
+void ScriptTrigger::Trigger()
+{
+  if (strstr(m_scriptFilename, ".txt"))
+  {
+    // Run a script, speficied by filename
+    g_app->m_script->RunScript(m_scriptFilename);
+    m_triggered = -1;
+  }
+  else
+    m_triggered = 1;
+}
+
+bool ScriptTrigger::Advance()
+{
+  if (m_entityType != SCRIPTRIGGER_RUNNEVER)
+  {
+    if (m_triggered == -1)
+    {
+      // Our script has been run, we are done
+      return true;
+    }
+    if (m_triggered <= 0) {
+      bool alreadyRunningScript = g_app->m_script->IsRunningScript() || !g_app->m_camera->IsInteractive();
+
+      if (!alreadyRunningScript)
+      {
+        // We haven't been triggered yet
+        m_timer -= SERVER_ADVANCE_PERIOD;
+
+        if (m_timer <= 0.0f)
+        {
+          m_timer = 1.0f;
+
+          if (m_entityType == SCRIPTRIGGER_RUNALWAYS)
+            Trigger();
+          else if (m_entityType == SCRIPTRIGGER_RUNCAMENTER)
+          {
+            float camDistance = (g_app->m_camera->GetPos() - m_pos).Mag();
+            LegacyVector3 camVel = g_app->m_camera->GetVel();
+            bool camInteractive = g_app->m_camera->IsInteractive();
+
+            if (camDistance <= m_range && camVel.Mag() < 5.0f && camInteractive)
+              Trigger();
+          }
+          else if (m_entityType == SCRIPTRIGGER_RUNCAMVIEW)
+          {
+            float camDistance = (g_app->m_camera->GetPos() - m_pos).Mag();
+            LegacyVector3 camVel = g_app->m_camera->GetVel();
+            bool camInteractive = g_app->m_camera->IsInteractive();
+            bool inView = RaySphereIntersection(g_app->m_camera->GetPos(), g_app->m_camera->GetFront(), m_pos, m_range);
+
+            if (camDistance <= (m_range + 300.0f) && camVel.Mag() < 5.0f && camInteractive && inView)
+              Trigger();
+
+            if (camDistance <= m_range && camVel.Mag() < 5.0f && camInteractive)
+              Trigger();
+          }
+          else
+          {
+            int numFound;
+            int numCorrectTypeFound = 0;
+            WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, m_range, &numFound);
+            for (int i = 0; i < numFound; ++i)
+            {
+              WorldObjectId id = ids[i];
+              if (id.IsValid() && id.GetTeamId() == m_id.GetTeamId())
+              {
+                Entity* entity = g_app->m_location->GetEntity(id);
+                if (entity && entity->m_type == m_entityType)
+                {
+                  ++numCorrectTypeFound;
+                  break;
+                }
+              }
+            }
+
+            if (numCorrectTypeFound > 0)
+              Trigger();
+          }
+        }
+      }
+    }
+  }
+
+  return Building::Advance();
+}
+
+void ScriptTrigger::RenderAlphas(float predictionTime)
+{
+};
+
+bool ScriptTrigger::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+
+bool ScriptTrigger::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+
+bool ScriptTrigger::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
+                               LegacyVector3* _norm)
+{
+  if (g_app->m_editing)
+    return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, _norm);
+  return false;
+}
+
+int ScriptTrigger::GetBuildingLink() { return m_linkId; }
+
+void ScriptTrigger::SetBuildingLink(int _buildingId) { m_linkId = _buildingId; }
+
+void ScriptTrigger::Read(TextReader* _in, bool _dynamic)
+{
+  Building::Read(_in, _dynamic);
+
+  m_linkId = atoi(_in->GetNextToken());
+  m_range = atof(_in->GetNextToken());
+
+  strncpy(m_scriptFilename, _in->GetNextToken(), sizeof(m_scriptFilename));
+  m_scriptFilename[sizeof(m_scriptFilename) - 1] = '\0';
+
+  char* entityType = _in->GetNextToken();
+  if (_stricmp(entityType, "always") == 0)
+    m_entityType = SCRIPTRIGGER_RUNALWAYS;
+  else if (_stricmp(entityType, "never") == 0)
+    m_entityType = SCRIPTRIGGER_RUNNEVER;
+  else if (_stricmp(entityType, "camenter") == 0)
+    m_entityType = SCRIPTRIGGER_RUNCAMENTER;
+  else if (_stricmp(entityType, "camview") == 0)
+    m_entityType = SCRIPTRIGGER_RUNCAMVIEW;
+  else
+    m_entityType = Entity::GetTypeId(entityType);
+}
+
+void ScriptTrigger::Write(FileWriter* _out)
+{
+  Building::Write(_out);
+
+  char entityType[64];
+  if (m_entityType == SCRIPTRIGGER_RUNALWAYS)
+    snprintf(entityType, sizeof(entityType), "always");
+  else if (m_entityType == SCRIPTRIGGER_RUNNEVER)
+    snprintf(entityType, sizeof(entityType), "never");
+  else if (m_entityType == SCRIPTRIGGER_RUNCAMENTER)
+    snprintf(entityType, sizeof(entityType), "camenter");
+  else if (m_entityType == SCRIPTRIGGER_RUNCAMVIEW)
+    snprintf(entityType, sizeof(entityType), "camview");
+  else
+    snprintf(entityType, sizeof(entityType), "%s", Entity::GetTypeName(m_entityType));
+
+  _out->printf("%-6d %-6.2f %s %s", m_linkId, m_range, m_scriptFilename, entityType);
+}

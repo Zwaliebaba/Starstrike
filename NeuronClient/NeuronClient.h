@@ -1,0 +1,89 @@
+#pragma once
+
+#include "NeuronCore.h"
+
+// Undefine GetCurrentTime macro to prevent
+// conflict with Storyboard::GetCurrentTime
+#undef GetCurrentTime
+
+#include <winrt/Windows.Devices.Enumeration.h>
+#include <winrt/Windows.Devices.Input.h>
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Input.Core.h>
+#include <winrt/Windows.UI.Popups.h>
+
+using namespace winrt;
+
+#include "DirectXHelper.h"
+#include "GraphicsCore.h"
+#include "PixProfiler.h"
+#include "Strings.h"
+
+#include "GameMain.h"
+
+namespace Neuron::Client
+{
+    class ClientEngine
+    {
+    public:
+        static void Startup(const wchar_t* _gameName, HINSTANCE _hInstance, int nCmdShow);
+        static void StartGame(const com_ptr<GameMain>& _gameMain);
+        static void Shutdown();
+
+        static void Run();
+
+        static HINSTANCE Instance() {
+            return m_instance;
+        }
+        static HWND Window() {
+            return m_hwnd;
+        }
+        static Windows::Foundation::Size OutputSize() {
+            return m_outputSize;
+        }
+        static Windows::Foundation::Point OutputTopLeft();
+
+    protected:
+        inline static HINSTANCE m_instance;
+        inline static HWND m_hwnd;
+        inline static Windows::Foundation::Size m_outputSize;
+        inline static com_ptr<GameMain> m_main;
+
+        inline static bool sm_resourcesLoaded = { false };
+    };
+
+} // namespace Neuron::Client
+
+using namespace Neuron::Client;
+
+#pragma comment(lib, "Gdi32.lib")
+#pragma comment(lib, "Shell32.lib")
+
+#ifndef INCLUDED_UNIVERSAL_INCLUDE_H
+#define INCLUDED_UNIVERSAL_INCLUDE_H
+
+#define DARWINIA_VERSION "1.5.11"
+#define DARWINIA_EXE_VERSION 1,5,11,0
+#define STR_DARWINIA_EXE_VERSION "1, 5, 11, 0\0"
+
+#define TARGET_DEBUG
+#define DARWINIA_GAMETYPE "debug"
+
+#ifdef _DEBUG
+#define CHEATMENU_ENABLED
+#endif
+
+#define DEBUG_RENDER_ENABLED
+
+#define DARWINIA_VERSION_STRING DARWINIA_GAMETYPE "-" DARWINIA_VERSION
+
+#define HAVE_DSOUND
+
+#include "opengl_directx.h"
+
+#define SAFE_FREE(x) {free(x);x=nullptr;}
+#define SAFE_DELETE(x) {delete x;x=nullptr;}
+#define SAFE_DELETE_ARRAY(x) {delete[] x;x=nullptr;}
+#define SAFE_RELEASE(x) {if(x){(x)->Release();x=nullptr;}}
+
+#endif

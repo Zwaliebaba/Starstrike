@@ -1,0 +1,41 @@
+
+#pragma once
+
+
+class StartSequenceCaption;
+
+
+class StartSequence
+{
+protected:
+    float m_startTime;
+    LList<StartSequenceCaption *> m_captions;
+
+    void RegisterCaption( char *_caption, float _x, float _y, float _size,
+                          float _startTime, float _endTime );
+
+public:
+    StartSequence();
+    ~StartSequence();
+
+    bool Advance();
+    void Render2D();
+    void Render3D();
+};
+
+
+
+class StartSequenceCaption
+{
+public:
+    ~StartSequenceCaption() { free(m_caption); }
+
+    char *m_caption;
+    float m_x;
+    float m_y;
+    float m_size;
+    float m_startTime;
+    float m_endTime;
+
+};
+
