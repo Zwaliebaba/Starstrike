@@ -31,6 +31,8 @@ class ViriiUnit : public Unit
 
 class Virii : public Entity
 {
+    friend class ViriiRenderer;
+
   public:
     enum
     {

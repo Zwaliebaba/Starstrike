@@ -14,6 +14,8 @@
 
 class Darwinian : public Entity
 {
+    friend class DarwinianRenderer;
+
   public:
     enum
     {

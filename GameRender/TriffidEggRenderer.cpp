@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "TriffidEggRenderer.h"
 #include "ShadowRenderer.h"
 #include "triffid.h"
@@ -45,8 +44,6 @@ void TriffidEggRenderer::Render(const Entity& _entity, const EntityRenderContext
     egg.m_shape->Render(_ctx.predictionTime, transform);
     g_app->m_renderer->UnsetObjectLighting();
     glDisable(GL_NORMALIZE);
-
-    g_app->m_renderer->MarkUsedCells(egg.m_shape, transform);
 
     //
     // Render our shadow

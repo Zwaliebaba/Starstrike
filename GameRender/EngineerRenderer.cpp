@@ -48,8 +48,6 @@ void EngineerRenderer::RenderShape(const Engineer& _engineer, float _predictionT
     glEnable(GL_TEXTURE_2D);
     g_app->m_renderer->UnsetObjectLighting();
     glEnable(GL_CULL_FACE);
-
-    g_app->m_renderer->MarkUsedCells(_engineer.m_shape, mat);
 }
 
 void EngineerRenderer::RenderLaser(const Engineer& _engineer, float _predictionTime)

@@ -157,9 +157,12 @@
   <ItemGroup>
     <ClInclude Include="ArmourRenderer.h" />
     <ClInclude Include="CentipedeRenderer.h" />
+    <ClInclude Include="DarwinianRenderer.h" />
     <ClInclude Include="EggRenderer.h" />
     <ClInclude Include="EngineerRenderer.h" />
     <ClInclude Include="GameRender.h" />
+    <ClInclude Include="LanderRenderer.h" />
+    <ClInclude Include="LaserTrooperRenderer.h" />
     <ClInclude Include="OfficerRenderer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="EntityRenderer.h" />
@@ -167,22 +170,28 @@
     <ClInclude Include="EntityRenderRegistry.h" />
     <ClInclude Include="BuildingRenderRegistry.h" />
     <ClInclude Include="ShadowRenderer.h" />
+    <ClInclude Include="SoulDestroyerRenderer.h" />
     <ClInclude Include="SpiderRenderer.h" />
     <ClInclude Include="TreeBuildingRenderer.h" />
     <ClInclude Include="ArmyAntRenderer.h" />
     <ClInclude Include="TriffidEggRenderer.h" />
     <ClInclude Include="TripodRenderer.h" />
+    <ClInclude Include="ViriiRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArmourRenderer.cpp" />
     <ClCompile Include="CentipedeRenderer.cpp" />
+    <ClCompile Include="DarwinianRenderer.cpp" />
     <ClCompile Include="EggRenderer.cpp" />
     <ClCompile Include="EngineerRenderer.cpp" />
     <ClCompile Include="GameRender.cpp" />
     <ClCompile Include="EntityRenderRegistry.cpp" />
     <ClCompile Include="BuildingRenderRegistry.cpp" />
+    <ClCompile Include="LanderRenderer.cpp" />
+    <ClCompile Include="LaserTrooperRenderer.cpp" />
     <ClCompile Include="OfficerRenderer.cpp" />
     <ClCompile Include="ShadowRenderer.cpp" />
+    <ClCompile Include="SoulDestroyerRenderer.cpp" />
     <ClCompile Include="SpiderRenderer.cpp" />
     <ClCompile Include="TreeBuildingRenderer.cpp" />
     <ClCompile Include="ArmyAntRenderer.cpp" />
@@ -194,6 +203,7 @@
     </ClCompile>
     <ClCompile Include="TriffidEggRenderer.cpp" />
     <ClCompile Include="TripodRenderer.cpp" />
+    <ClCompile Include="ViriiRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

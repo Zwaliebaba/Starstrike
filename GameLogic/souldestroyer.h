@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.h"
+#include "fast_darray.h"
 
 #define SOULDESTROYER_MINSEARCHRANGE       200.0f
 #define SOULDESTROYER_MAXSEARCHRANGE       300.0f
@@ -11,6 +12,8 @@ class ShapeStatic;
 
 class SoulDestroyer : public Entity
 {
+    friend class SoulDestroyerRenderer;
+
   protected:
     LegacyVector3 m_targetPos;
     LegacyVector3 m_up;
@@ -36,7 +39,6 @@ class SoulDestroyer : public Entity
     bool GetTrailPosition(LegacyVector3& _pos, LegacyVector3& _vel);
 
     void RenderShapes(float _predictionTime);
-    void RenderShapesForPixelEffect(float _predictionTime);
     void RenderSpirit(const LegacyVector3& _pos, float _alpha);
 
     void Panic(float _time);

@@ -33,8 +33,8 @@ Renderer::Renderer()
     m_tileIndex(0),
     m_fadedness(0.0f),
     m_fadeRate(0.0f),
-    m_fadeDelay(0.0f),
-    m_pixelSize(256) {}
+    m_fadeDelay(0.0f)
+{}
 
 void Renderer::Initialise()
 {
@@ -42,13 +42,7 @@ void Renderer::Initialise()
   m_screenH = static_cast<int>(ClientEngine::OutputSize().Height);
 
   InitialiseOGLExtensions();
-
-  BuildOpenGlState();
 }
-
-void Renderer::Restart() { BuildOpenGlState(); }
-
-void Renderer::BuildOpenGlState() { glGenTextures(1, &m_pixelEffectTexId); }
 
 void Renderer::RenderFlatTexture()
 {
@@ -763,65 +757,3 @@ void Renderer::Get2DScreenPos(const LegacyVector3& v, LegacyVector3* _out)
 }
 
 const double* Renderer::GetTotalMatrix() { return m_totalMatrix; }
-
-void Renderer::RasteriseSphere(const LegacyVector3& _pos, float _radius)
-{
-  const float screenToGridFactor = static_cast<float>(PIXEL_EFFECT_GRID_RES) / static_cast<float>(m_screenW);
-  Camera* cam = g_app->m_camera;
-  LegacyVector3 center;
-  LegacyVector3 topLeft;
-  LegacyVector3 bottomRight;
-  const LegacyVector3 camUpRight = (cam->GetRight() + cam->GetUp()) * _radius;
-  Get2DScreenPos(_pos, &center);
-  Get2DScreenPos(_pos + camUpRight, &topLeft);
-  Get2DScreenPos(_pos - camUpRight, &bottomRight);
-
-  int x1 = floorf(topLeft.x * screenToGridFactor);
-  int x2 = ceilf(bottomRight.x * screenToGridFactor);
-  int y1 = floorf(bottomRight.y * screenToGridFactor);
-  int y2 = ceilf(topLeft.y * screenToGridFactor);
-
-  clamp(x1, 0, PIXEL_EFFECT_GRID_RES);
-  clamp(x2, 0, PIXEL_EFFECT_GRID_RES);
-  clamp(y1, 0, PIXEL_EFFECT_GRID_RES);
-  clamp(y2, 0, PIXEL_EFFECT_GRID_RES);
-
-  const float nearestZ = center.z - _radius;
-
-  for (int y = y1; y < y2; ++y)
-  {
-    for (int x = x1; x < x2; ++x)
-    {
-      if (nearestZ < m_pixelEffectGrid[x][y])
-        m_pixelEffectGrid[x][y] = nearestZ;
-    }
-  }
-}
-
-void Renderer::MarkUsedCells(const ShapeFragmentData* _frag, const Matrix34& _transform)
-{
-#if USE_PIXEL_EFFECT_GRID_OPTIMISATION
-  Matrix34 total(Matrix34(_frag->m_baseTransform) * _transform); LegacyVector3 worldPos = _frag->m_center * total;
-
-  // Return early if this shape fragment isn't on the screen
-  {
-    if (!g_app->m_camera->SphereInViewFrustum(worldPos, _frag->m_radius))
-      return;
-  } if (_frag->m_radius > 0.0f)
-    RasteriseSphere(worldPos, _frag->m_radius);
-
-  // Recurse into all child fragments
-  int numChildren = _frag->m_childFragments.Size(); for (int i = 0; i < numChildren; ++i)
-  {
-    const ShapeFragmentData* child = _frag->m_childFragments.GetData(i);
-    MarkUsedCells(child, total);
-  }
-#endif // USE_PIXEL_EFFECT_GRID_OPTIMISATION
-}
-
-void Renderer::MarkUsedCells(const ShapeStatic* _shape, const Matrix34& _transform)
-{
-  START_PROFILE(g_app->m_profiler, "MarkUsedCells");
-  MarkUsedCells(_shape->m_rootFragment, _transform);
-  END_PROFILE(g_app->m_profiler, "MarkUsedCells");
-}

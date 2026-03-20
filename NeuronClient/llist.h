@@ -54,7 +54,8 @@ public:
 	void		PutDataAtIndex	( const T &newdata, int index );
 
     inline T	GetData			( int index ) const;	// slow unless sequential
-    inline T   *GetPointer		( int index );			// slow unless sequential
+	inline T   *GetPointer		( int index );			// slow unless sequential
+	inline const T *GetPointer	( int index ) const;	// slow unless sequential (const)
 	void		RemoveData		( int index );			// slow
     int			FindData		( const T &data );		// -1 means 'not found'
 
@@ -66,6 +67,7 @@ public:
 	void        EmptyAndDeleteArray();                  // As above, but with delete[]
 
     inline T operator [] (int index);
+    inline T operator [] (int index) const;
 };
 
 
@@ -353,7 +355,58 @@ T* LList<T>::GetPointer(int index)
 
 
 template <class T>
+const T* LList<T>::GetPointer(int index) const
+{
+    if (!ValidIndex(index)) return NULL;
+
+    if (m_previous && m_previousIndex != -1 && index == m_previousIndex + 1)
+    {
+        m_previous = m_previous->m_next;
+        m_previousIndex++;
+
+        if (m_previous == NULL) return NULL;
+        else return &(m_previous->m_data);
+    }
+    else if (m_previous && m_previousIndex != -1 && index == m_previousIndex)
+    {
+        return &(m_previous->m_data);
+    }
+    else
+    {
+        LListItem <T>* current = m_first;
+
+        for (int i = 0; i < index; ++i)
+        {
+            if (current == NULL) return NULL;
+
+            current = current->m_next;
+        }
+
+        m_previous = current;
+
+        if (current == NULL)
+        {
+            m_previousIndex = -1;
+            return NULL;
+        }
+        else
+        {
+            m_previousIndex = index;
+            return &(current->m_data);
+        }
+    }
+}
+
+
+template <class T>
 T LList<T>::operator [] (int index)
+{
+    return GetData(index);
+}
+
+
+template <class T>
+T LList<T>::operator [] (int index) const
 {
     return GetData(index);
 }

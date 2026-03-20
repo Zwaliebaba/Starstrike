@@ -657,11 +657,9 @@ dialog_cpuusageunknown                 Utilisation ORDI inconnue
 
 dialog_graphicsoptions                 Options graphiques
 dialog_landscapedetail                 Terres
-dialog_waterdetail                     Eau
 dialog_skydetail                       Ciel
 dialog_buildingdetail                  Constructions
 dialog_entitydetail                    Entités
-dialog_pixeleffect                     Effet de pixel
 
 dialog_screenoptions                   Options d'affichage
 dialog_refreshrate                     Taux

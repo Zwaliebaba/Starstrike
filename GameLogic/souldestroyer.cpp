@@ -13,7 +13,6 @@
 #include "location.h"
 #include "team.h"
 #include "main.h"
-#include "renderer.h"
 #include "soundsystem.h"
 #include "souldestroyer.h"
 
@@ -381,210 +380,17 @@ bool SoulDestroyer::AdvanceToTargetPosition()
 
 void SoulDestroyer::RenderShapes(float _predictionTime)
 {
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  LegacyVector3 predictedFront = m_front;
-  LegacyVector3 predictedUp = m_up;
-  LegacyVector3 predictedRight = predictedUp ^ predictedFront;
-  predictedFront = predictedRight ^ predictedUp;
-  predictedFront.Normalise();
-  predictedUp.Normalise();
-  Matrix34 mat(predictedFront, predictedUp, predictedPos);
-
-  glEnable(GL_NORMALIZE);
-  glDisable(GL_TEXTURE_2D);
-
-  g_app->m_renderer->SetObjectLighting();
-
-  s_shapeHead->Render(_predictionTime, mat);
-
-  for (int i = 1; i < m_positionHistory.Size(); i += 1)
-  {
-    LegacyVector3 pos1 = *m_positionHistory.GetPointer(i);
-    LegacyVector3 pos2 = *m_positionHistory.GetPointer(i - 1);
-
-    LegacyVector3 pos = pos1 + (pos2 - pos1);
-    LegacyVector3 front = (pos2 - pos1).Normalise();
-    LegacyVector3 right = front ^ g_upVector;
-    LegacyVector3 up = right ^ front;
-    LegacyVector3 vel = (pos2 - pos1) / SERVER_ADVANCE_PERIOD;
-    pos += vel * _predictionTime;
-
-    float scale = 1.0f - (static_cast<float>(i) / static_cast<float>(m_positionHistory.Size()));
-    scale *= 1.5f;
-    if (i == m_positionHistory.Size() - 1)
-      scale = 0.8f;
-    scale = max(scale, 0.5f);
-
-    Matrix34 tailMat(front, up, pos);
-    tailMat.u *= scale;
-    tailMat.r *= scale;
-    tailMat.f *= scale;
-
-    s_shapeTail->Render(_predictionTime, tailMat);
-  }
-
-  g_app->m_renderer->UnsetObjectLighting();
-
-  glDisable(GL_NORMALIZE);
-}
-
-void SoulDestroyer::RenderShapesForPixelEffect(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  LegacyVector3 predictedFront = m_front;
-  LegacyVector3 predictedUp = m_up;
-  LegacyVector3 predictedRight = predictedUp ^ predictedFront;
-  predictedFront = predictedRight ^ predictedUp;
-  Matrix34 mat(predictedFront, predictedUp, predictedPos);
-
-  g_app->m_renderer->MarkUsedCells(s_shapeHead, mat);
-
-  for (int i = 1; i < m_positionHistory.Size(); i += 1)
-  {
-    LegacyVector3 pos1 = *m_positionHistory.GetPointer(i);
-    LegacyVector3 pos2 = *m_positionHistory.GetPointer(i - 1);
-
-    LegacyVector3 pos = pos1 + (pos2 - pos1);
-    LegacyVector3 front = (pos2 - pos1).Normalise();
-    LegacyVector3 right = front ^ g_upVector;
-    LegacyVector3 up = right ^ front;
-    LegacyVector3 vel = (pos2 - pos1) / SERVER_ADVANCE_PERIOD;
-    pos += vel * _predictionTime;
-
-    float scale = 1.0f - (static_cast<float>(i) / static_cast<float>(m_positionHistory.Size()));
-    scale *= 1.5f;
-    if (i == m_positionHistory.Size() - 1)
-      scale = 0.8f;
-    scale = max(scale, 0.5f);
-
-    Matrix34 tailMat(front, up, pos);
-    tailMat.u *= scale;
-    tailMat.r *= scale;
-    tailMat.f *= scale;
-
-    g_app->m_renderer->MarkUsedCells(s_shapeTail, tailMat);
-  }
+  // Rendering moved to SoulDestroyerRenderer (GameRender project)
 }
 
 void SoulDestroyer::Render(float _predictionTime)
 {
-  _predictionTime -= SERVER_ADVANCE_PERIOD;
-
-  if (!m_dead)
-  {
-    glDisable(GL_TEXTURE_2D);
-
-    LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-    LegacyVector3 predictedFront = m_front;
-    LegacyVector3 predictedUp = m_up;
-    LegacyVector3 predictedRight = predictedUp ^ predictedFront;
-    predictedFront = predictedRight ^ predictedUp;
-    Matrix34 mat(predictedFront, predictedUp, predictedPos);
-
-    //        RenderSphere( m_targetPos, 5.0f );
-    //        RenderSphere( predictedPos, 300.0f );
-    //        RenderArrow( m_pos, m_pos+predictedFront * 200.0f, 3.0f, RGBAColour(0,255,0) );
-    //        RenderArrow( m_pos, m_pos+predictedUp * 100.0f, 2.0f, RGBAColour(255,0,0) );
-    //        RenderArrow( m_pos, m_pos+predictedRight * 100.0f, 2.0f, RGBAColour(0,0,255) );
-
-    RenderShapes(_predictionTime);
-
-    //
-    // Render shadows
-
-    BeginRenderShadow();
-    RenderShadow(predictedPos, 50.0f);
-
-    for (int i = 1; i < m_positionHistory.Size(); i += 1)
-    {
-      LegacyVector3 pos1 = *m_positionHistory.GetPointer(i);
-      LegacyVector3 pos2 = *m_positionHistory.GetPointer(i - 1);
-
-      LegacyVector3 pos = pos1 + (pos2 - pos1);
-      LegacyVector3 vel = (pos2 - pos1) / SERVER_ADVANCE_PERIOD;
-      pos += vel * _predictionTime;
-
-      float scale = 1.0f - (static_cast<float>(i) / static_cast<float>(m_positionHistory.Size()));
-      scale *= 1.5f;
-      if (i == m_positionHistory.Size() - 1)
-        scale = 0.8f;
-      scale = max(scale, 0.5f);
-
-      RenderShadow(pos, scale * 20.0f);
-    }
-
-    EndRenderShadow();
-
-    //
-    // Render our spirits
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glEnable(GL_BLEND);
-    glDepthMask(false);
-
-    float timeNow = GetHighResTime();
-    for (int i = 0; i < m_spirits.Size(); ++i)
-    {
-      if (m_spirits.ValidIndex(i))
-      {
-        float birthTime = m_spirits[i];
-        if (timeNow >= birthTime + 60.0f)
-          m_spirits.MarkNotUsed(i);
-        else
-        {
-          float alpha = 1.0f - (timeNow - m_spirits[i]) / 60.0f;
-          alpha = min(alpha, 1.0f);
-          alpha = max(alpha, 0.0f);
-          LegacyVector3 pos = m_pos + m_spiritPosition[i];
-          pos += m_vel * _predictionTime;
-          RenderSpirit(pos, alpha);
-        }
-      }
-    }
-
-    glDepthMask(true);
-    glDisable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-
-    //glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-    //g_editorFont.DrawText3DCenter( predictedPos+LegacyVector3(0,50,0), 20, "%2.2f", m_panic );
-  }
+  // Rendering moved to SoulDestroyerRenderer (GameRender project)
 }
 
 void SoulDestroyer::RenderSpirit(const LegacyVector3& _pos, float _alpha)
 {
-  LegacyVector3 pos = _pos;
-
-  int innerAlpha = 200 * _alpha;
-  int outerAlpha = 100 * _alpha;
-  int spiritInnerSize = 4 * _alpha;
-  int spiritOuterSize = 12 * _alpha;
-
-  RGBAColour colour(100, 50, 50);
-  float distToParticle = (g_app->m_camera->GetPos() - pos).Mag();
-
-  float size = spiritInnerSize / sqrtf(sqrtf(distToParticle));
-  glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
-
-  glBegin(GL_QUADS);
-  glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
-  glEnd();
-
-  size = spiritOuterSize / sqrtf(sqrtf(distToParticle));
-  glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
-  glBegin(GL_QUADS);
-  glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
-  glEnd();
+  // Rendering moved to SoulDestroyerRenderer (GameRender project)
 }
 
 void SoulDestroyer::SetWaypoint(const LegacyVector3 _waypoint) { m_targetPos = _waypoint; }

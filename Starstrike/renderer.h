@@ -29,10 +29,6 @@ class Renderer
     float m_fadeRate; // +ve means fading out, -ve means fading in
     float m_fadeDelay; // Amount of time left to wait before starting fade
 
-    unsigned int m_pixelEffectTexId;
-    float m_pixelEffectGrid[PIXEL_EFFECT_GRID_RES][PIXEL_EFFECT_GRID_RES]; // -1.0 means cell not used
-    int m_pixelSize;
-
     int GetGLStateInt(int pname) const;
     float GetGLStateFloat(int pname) const;
 
@@ -40,7 +36,7 @@ class Renderer
     void RenderLogo();
 
     void RenderFadeOut();
-   void RenderHUD();
+    void RenderHUD();
     void RenderFrame(bool withFlip = true);
     void RenderPaused();
 
@@ -48,12 +44,9 @@ class Renderer
     Renderer();
 
     void Initialise();
-    void Restart();
 
     void Render();
     void FPSMeterAdvance();
-
-    void BuildOpenGlState();
 
     float GetNearPlane() const;
     float GetFarPlane() const;
@@ -76,13 +69,8 @@ class Renderer
     void Get2DScreenPos(const LegacyVector3& _in, LegacyVector3* _out);
     const double* GetTotalMatrix();
 
-    void RasteriseSphere(const LegacyVector3& _pos, float _radius);
-    void MarkUsedCells(const ShapeFragmentData* _frag, const Matrix34& _transform);
-    void MarkUsedCells(const ShapeStatic* _shape, const Matrix34& _transform);
-
     bool IsFadeComplete() const;
     void StartFadeOut();
     void StartFadeIn(float _delay);
     void AdvanceFade();
 };
-

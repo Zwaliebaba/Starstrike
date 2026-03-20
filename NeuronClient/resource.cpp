@@ -296,9 +296,6 @@ void Resource::RegenerateOpenGlState()
   g_editorFont.BuildOpenGlState();
   g_gameFont.BuildOpenGlState();
 
-  // Tell the renderer (for the pixel effect texture)
-  g_app->m_renderer->BuildOpenGlState();
-
   // Tell the location
   if (g_app->m_location)
     g_app->m_location->RegenerateOpenGlState();

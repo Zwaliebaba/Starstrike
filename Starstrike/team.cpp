@@ -424,9 +424,8 @@ void Team::RenderVirii(float _predictionTime)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glDepthMask(false);
   glDisable(GL_CULL_FACE);
-  glBegin(GL_QUADS);
 
-  int entityDetail = g_prefsManager->GetInt("RenderEntityDetail");
+  EntityRenderer* renderer = g_entityRenderRegistry.Get(Entity::TypeVirii);
 
   for (int i = 0; i <= m_others.Size(); i++)
   {
@@ -435,35 +434,24 @@ void Team::RenderVirii(float _predictionTime)
       Entity* entity = m_others.GetData(i);
       if (entity->m_type == Entity::TypeVirii)
       {
-        auto virii = static_cast<Virii*>(entity);
-        if (virii->IsInView())
+        if (entity->IsInView())
         {
-          float rangeToCam = (virii->m_pos - g_app->m_camera->GetPos()).Mag();
-          int viriiDetail = 1;
-          if (entityDetail == 1 && rangeToCam > 1000.0f)
-            viriiDetail = 2;
-          else if (entityDetail == 2 && rangeToCam > 1000.0f)
-            viriiDetail = 3;
-          else if (entityDetail == 2 && rangeToCam > 500.0f)
-            viriiDetail = 2;
-          else if (entityDetail == 3 && rangeToCam > 1000.0f)
-            viriiDetail = 4;
-          else if (entityDetail == 3 && rangeToCam > 600.0f)
-            viriiDetail = 3;
-          else
-            if (entityDetail == 3 && rangeToCam > 300.0f)
-              viriiDetail = 2;
+          EntityRenderContext ctx;
+          ctx.predictionTime = (i <= lastUpdated) ? _predictionTime : _predictionTime + SERVER_ADVANCE_PERIOD;
+          ctx.highDetailFactor = 1.0f;
 
-          if (i <= lastUpdated)
-            virii->Render(_predictionTime, m_teamId, viriiDetail);
+          if (renderer)
+            renderer->Render(*entity, ctx);
           else
-            virii->Render(_predictionTime + SERVER_ADVANCE_PERIOD, m_teamId, viriiDetail);
+          {
+            auto virii = static_cast<Virii*>(entity);
+            virii->Render(ctx.predictionTime, m_teamId, 1);
+          }
         }
       }
     }
   }
 
-  glEnd();
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
   glEnable(GL_CULL_FACE);
@@ -503,6 +491,8 @@ void Team::RenderDarwinians(float _predictionTime)
 
   highDetailDistanceSqd *= highDetailDistanceSqd;
 
+  EntityRenderer* renderer = g_entityRenderRegistry.Get(Entity::TypeDarwinian);
+
   for (int i = 0; i <= m_others.Size(); i++)
   {
     if (m_others.ValidIndex(i))
@@ -510,18 +500,21 @@ void Team::RenderDarwinians(float _predictionTime)
       Entity* entity = m_others.GetData(i);
       if (entity->m_type == Entity::TypeDarwinian)
       {
-        auto darwinian = static_cast<Darwinian*>(entity);
-        if (darwinian->IsInView())
+        if (entity->IsInView())
         {
-          float camDistSqd = (darwinian->m_pos - g_app->m_camera->GetPos()).MagSquared();
+          float camDistSqd = (entity->m_pos - g_app->m_camera->GetPos()).MagSquared();
           float highDetail = 1.0f - (camDistSqd / highDetailDistanceSqd);
           highDetail = max(highDetail, 0.0f);
           highDetail = min(highDetail, 1.0f);
 
-          if (i <= lastUpdated)
-            darwinian->Render(_predictionTime, highDetail);
+          EntityRenderContext ctx;
+          ctx.predictionTime = (i <= lastUpdated) ? _predictionTime : _predictionTime + SERVER_ADVANCE_PERIOD;
+          ctx.highDetailFactor = highDetail;
+
+          if (renderer)
+            renderer->Render(*entity, ctx);
           else
-            darwinian->Render(_predictionTime + SERVER_ADVANCE_PERIOD, highDetail);
+            static_cast<Darwinian*>(entity)->Render(ctx.predictionTime, highDetail);
         }
       }
     }

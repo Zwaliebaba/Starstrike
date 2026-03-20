@@ -1,24 +1,18 @@
-
 #pragma once
 
 #include "darwinia_window.h"
 
-
 class PrefsGraphicsWindow : public DarwiniaWindow
 {
-public:
-    int     m_landscapeDetail;
-    int     m_waterDetail;
-    int     m_cloudDetail;
-    int     m_buildingDetail;
-    int     m_entityDetail;
-    int     m_pixelEffectRange;
+  public:
+    int m_landscapeDetail;
+    int m_cloudDetail;
+    int m_buildingDetail;
+    int m_entityDetail;
 
-public:
     PrefsGraphicsWindow();
-    ~PrefsGraphicsWindow();
+    ~PrefsGraphicsWindow() override;
 
-    void Create();
-    void Render( bool _hasFocus );
+    void Create() override;
+    void Render(bool _hasFocus) override;
 };
-

@@ -14,6 +14,172 @@ representation logic.  After this work:
 
 ---
 
+## Implementation Status (Updated)
+
+This section tracks what has been completed, what is in progress, and what
+remains.  Updated by codebase audit.
+
+### Phase 0 — Preparation
+
+| Task | Status | Notes |
+|------|--------|-------|
+| 0.1 — Audit every `Render` method | ✅ Done | Documented in tables below |
+| 0.2 — Audit `ShapeMarker*` usage | ✅ Done | Documented in tables below |
+| 0.3 — Audit side-effect calls | ✅ Done | Documented in tables below |
+| 0.4 — Clean `Tree::RenderBranch()` → `CalcBranchRadius()` | ✅ Done | `tree.h` declares `CalcBranchRadius()`; `tree.cpp:327` has the pure-math implementation.  `GenerateBranch()` retained for mesh-filling (no GL). |
+
+### Phase 1 — Break the PCH Dependency
+
+| Task | Status | Notes |
+|------|--------|-------|
+| 1.1 — Create `GameLogicPlatform.h` | ✅ Done | Forward-declares `ShapeStatic`, `ShapeFragmentData`, `ShapeMarkerData`; `#if GAMELOGIC_HAS_RENDERER` includes `NeuronClient.h` |
+| 1.2 — Change `GameLogic/pch.h` | ✅ Done | Now includes `GameLogicPlatform.h` only |
+| 1.3 — `GAMELOGIC_HAS_RENDERER` define | ✅ Done | Present in both Debug and Release x64 configurations in `GameLogic.vcxproj` |
+
+### Phase 2 — Extract Rendering into Companion Classes
+
+#### Pre-Steps
+
+| Task | Status | Notes |
+|------|--------|-------|
+| `ShadowRenderer` extraction | ✅ Done | `GameRender/ShadowRenderer.h/.cpp` — full GL implementation extracted from `Entity::BeginRenderShadow`/`RenderShadow`/`EndRenderShadow` |
+| `EntityRenderer` base class | ✅ Done | `GameRender/EntityRenderer.h` — `Render(const Entity&, ctx)` + `RenderAlphas` |
+| `BuildingRenderer` base class | ✅ Done | `GameRender/BuildingRenderer.h` — includes `RenderLights`/`RenderPorts` virtuals |
+| `EntityRenderRegistry` | ✅ Done | `GameRender/EntityRenderRegistry.h/.cpp` — type-indexed table, `g_entityRenderRegistry` global |
+| `BuildingRenderRegistry` | ✅ Done | `GameRender/BuildingRenderRegistry.h/.cpp` — type-indexed table, `g_buildingRenderRegistry` global |
+| `IRenderBackend` generalized interface | ✅ Done | `GameLogic/render_backend_interface.h` — `ReleaseEntity(int)` / `ReleaseBuilding(int)` |
+| `TreeBuildingRenderer` adapter | ✅ Done | `GameRender/TreeBuildingRenderer.h/.cpp` — `static_cast<const Tree&>` delegates to `TreeRenderer` |
+| `Tree::Advance()` owns `Generate()` | ✅ Done | `tree.cpp:83-88` — `Generate()` + `m_meshDirty = false` + `++m_meshVersion` in `Advance()` |
+| `TreeRenderer::DrawTree()` takes `const Tree&` | ✅ Done | `tree_renderer.cpp:176` — `const Tree&` signature |
+| `InitGameRenderers()` call site | ✅ Done | `Starstrike/main.cpp:544` calls `InitGameRenderers()` at startup |
+| `location.cpp` — registry dispatch for buildings | ✅ Done | `RenderBuildings()` (line 976) and `RenderBuildingAlphas()` (lines 1065, 1104) use `g_buildingRenderRegistry.Get()` with fallback |
+| `team.cpp` — registry dispatch for entities | ✅ Done | `RenderVirii()` (line 428), `RenderDarwinians()` (line 494), `RenderOthers()` (lines 542, 569) use `g_entityRenderRegistry.Get()` with fallback |
+| `unit.cpp` — registry dispatch for entities | ✅ Done | `Unit::Render()` (lines 142, 165) uses `g_entityRenderRegistry.Get()` with fallback |
+
+> **Deviation from plan:** The plan called for companions to be placed in
+> `NeuronClient/` during Phase 2 then moved to `GameRender/` in Phase 5.
+> Instead, `GameRender/` was created early and all companions were placed
+> there from the start.  This is strictly better — it avoids a future
+> file-move step.  The plan's Phase 5.2 (`GameRender.vcxproj` creation) is
+> effectively complete.
+
+#### Wave 1 — Trivial Entities (just `Shape::Render`)
+
+| Entity | Renderer | Registered | Old `Render()` Removed |
+|--------|----------|------------|------------------------|
+| `ArmyAnt` | ✅ `GameRender/ArmyAntRenderer` | ✅ `TypeArmyAnt` | ❌ `armyant.cpp:523` still has `ArmyAnt::Render()` |
+| `Egg` | ✅ `GameRender/EggRenderer` | ✅ `TypeEgg` | ❌ `egg.cpp:32` still has `Egg::Render()` |
+| `Officer` | ✅ `GameRender/OfficerRenderer` | ✅ `TypeOfficer` | ❌ `officer.cpp:96` still has `Officer::Render()` |
+| `TriffidEgg` | ✅ `GameRender/TriffidEggRenderer` | ✅ `TypeTriffidEgg` | ❌ `triffid.cpp:636` still has `TriffidEgg::Render()` |
+
+#### Wave 2 — Medium Entities (shape + GL state)
+
+| Entity | Renderer | Registered | Old `Render()` Removed |
+|--------|----------|------------|------------------------|
+| `Engineer` | ✅ `GameRender/EngineerRenderer` | ✅ `TypeEngineer` | ❌ Still in `engineer.cpp` |
+| `Armour` | ✅ `GameRender/ArmourRenderer` | ✅ `TypeArmour` | ❌ Still in `armour.cpp` |
+| `Lander` | ✅ `GameRender/LanderRenderer` | ✅ `TypeLander` | ❌ Still in `lander.cpp` |
+| `Tripod` | ✅ `GameRender/TripodRenderer` | ✅ `TypeTripod` | ❌ Still in `tripod.cpp:549` |
+| `Centipede` | ✅ `GameRender/CentipedeRenderer` | ✅ `TypeCentipede` | ❌ Still in `centipede.cpp` |
+| `Spider` | ✅ `GameRender/SpiderRenderer` | ✅ `TypeSpider` | ❌ Still in `spider.cpp:641` |
+
+#### Wave 3 — Complex Entities (custom geometry / special signatures)
+
+| Entity | Renderer | Registered | Old `Render()` Removed |
+|--------|----------|------------|------------------------|
+| `Darwinian` | ✅ `GameRender/DarwinianRenderer` | ✅ `TypeDarwinian` | ❌ `darwinian.cpp:1935` still has `Darwinian::Render()` |
+| `Virii` | ✅ `GameRender/ViriiRenderer` | ✅ `TypeVirii` | ❌ `virii.cpp:708` still has `Virii::Render()` |
+| `SoulDestroyer` | ✅ `GameRender/SoulDestroyerRenderer` | ✅ `TypeSoulDestroyer` | ❌ `souldestroyer.cpp:386` still has `SoulDestroyer::Render()` |
+| `LaserTrooper` | ✅ `GameRender/LaserTrooperRenderer` | ✅ `TypeLaserTroop` | ❌ Still in `lasertrooper.cpp` |
+
+#### Wave 4 — Buildings
+
+| Building | Renderer | Registered | Old `Render()` Removed |
+|----------|----------|------------|------------------------|
+| `Tree` | ✅ `TreeBuildingRenderer` adapter | ✅ `TypeTree` | N/A (Tree never had a standard `Building::Render` override) |
+| All other buildings (~20 types) | ❌ **Not started** | ❌ | ❌ |
+
+Building types with `Render()`/`RenderAlphas()` overrides still in `GameLogic`:
+`Building` (base), `Cave`, `Factory`, `SpawnPoint`, `MasterSpawnPoint`,
+`SpawnPopulationLock`, `Teleport`, `RadarDish`, `LaserFence`, `GodDish`,
+`Incubator`, `Mine`, `Triffid`, `SpiritReceiver`, `SpiritProcessor`,
+`ReceiverBuilding`, `SpiritStore`, `Generator`/`PylonEnd`/`SolarPanel`,
+`FeedingTube`, `Spam`, `Rocket`/`FuelBuilding`/`FuelGenerator`/`FuelStation`/`EscapeRocket`,
+`StaticShape`, `TrunkPort`, `Wall`, `FenceSwitch`, `Snow`, `ScriptTrigger`,
+`ResearchItem`, `SporeGenerator`, `Flag`.
+
+#### Wave 5 — UI / Debug Windows
+
+| Status | Notes |
+|--------|-------|
+| ❌ Not started | `cheat_window`, `darwinia_window`, `debugmenu`, `network_window`, `prefs_*_window`, `profilewindow`, `reallyquit_window`, `userprofile_window` still in `GameLogic/` |
+
+### Phase 2 — Remaining Gaps (Legacy Code Not Yet Cleaned)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `ITreeRenderBackend` still exists as separate interface | ⚠️ Not migrated | `GameLogic/tree_render_interface.h` still has `ITreeRenderBackend` + `g_treeRenderBackend` global; not yet consolidated into `IRenderBackend` |
+| `Entity::BeginRenderShadow`/`RenderShadow`/`EndRenderShadow` still in `entity.h` | ⚠️ Legacy remains | Lines 103–105 of `entity.h` — static methods still declared; `ShadowRenderer` in `GameRender/` is the replacement but old methods not deleted |
+| Old `Render()` bodies in entity `.cpp` files | ✅ Cleaned | All 14 migrated entity types now have empty stub `Render()` bodies; full GL code deleted. Declarations remain in `.h` for Phase 4. |
+| `Shape* m_shape` and `Shape* m_shapes[]` still on entities | ⚠️ Still coupled | `entity.h:66` still has `ShapeStatic* m_shape`; entity constructors still load shapes via `g_app->m_resource->GetShape()` |
+| `building.h` still has all render virtuals | ⚠️ Still coupled | `Render()`, `RenderAlphas()`, `RenderLights()`, `RenderPorts()` still declared (lines 118–121); `ShapeStatic* m_shape` on line 98 |
+| `worldobject.h` still has `virtual void Render(float)` | ⚠️ Still coupled | Line 88 — base-class virtual remains |
+
+### Phase 3 — SimEventQueue
+
+| Status | Notes |
+|--------|-------|
+| ❌ Not started | No `SimEvent`, `SimEventQueue`, or event-related files exist. `Tree::Advance()` still calls `g_app->m_particleSystem->CreateParticle()` and `g_app->m_soundSystem->...` directly (tree.cpp:109, 116, etc.) |
+
+### Phase 4 — Remove `Render()` from Base Classes
+
+| Status | Notes |
+|--------|-------|
+| ❌ Not started | Blocked by: Wave 4 buildings not migrated, old `Render()` bodies not deleted |
+
+### Phase 5 — Create `GameSim` and `GameRender` Projects
+
+| Task | Status | Notes |
+|------|--------|-------|
+| 5.1 — `GameSim.vcxproj` | ❌ Not started | `GameLogic` still the sole simulation project |
+| 5.2 — `GameRender.vcxproj` | ✅ Done (early) | Created with all companions from the start; static library, pch includes `NeuronClient.h`, includes `NeuronCore/NeuronClient/GameLogic/Starstrike` |
+| 5.3 — Update link deps | ⚠️ Partial | `Starstrike` links `GameRender`; `NeuronServer` does not yet link `GameSim` (doesn't exist) |
+| 5.4 — Delete `GameLogic/` | ❌ Not started | Still in solution |
+
+### Phase 6 — Presentation State Separation
+
+| Status | Notes |
+|--------|-------|
+| ⚠️ Partially achieved | New companions receive `const Entity&` / `const Building&` — correct layering. But `ArmyAntRenderer` reads `ant.m_shape->Render()` (the renderer reads `Shape*` from the simulation object, not from its own state). True const separation requires moving `Shape*` ownership to renderers. |
+
+### Phase 7 — Headless Bot Client
+
+| Status | Notes |
+|--------|-------|
+| ❌ Not started | Requires Phase 5 (`GameSim`) |
+
+---
+
+### Summary: What's Next
+
+The highest-impact remaining work items, in recommended order:
+
+1. ~~**Create `LanderRenderer` and `LaserTrooperRenderer`**~~ ✅ Done —
+   Waves 2 and 3 entity renderers are now complete (15 of 15 entity types).
+2. **Wave 4 — Building renderers** — ~20 building types still dispatch via
+   the fallback `building->Render(predTime)` path.  Each is an independent
+   PR following the established `BuildingRenderer` pattern.
+3. ~~**Delete old `Render()` bodies**~~ ✅ Done — all 14 migrated entity
+   `.cpp` files now have empty stubs; full GL code removed.
+4. **Migrate `ITreeRenderBackend` → `IRenderBackend`** — consolidate the
+   tree-specific cleanup global into the generalized interface.
+5. **Phase 3 — `SimEventQueue`** — can start with `Tree::Advance()` as pilot
+   while building migration proceeds in parallel.
+6. **Phase 4 — Remove base-class `Render()`** — after all types are migrated.
+7. **Phase 5.1 — `GameSim` project split** — after Phase 4.
+
+---
+
 ## Current State Analysis
 
 ### The Coupling
@@ -98,22 +264,26 @@ establishes patterns that subsequent migrations should follow.
 
 3. **Renderer lives in `NeuronClient/` during transition.**
    `TreeRenderer` was placed in `NeuronClient/`, not a separate `GameRender`
-   project.  During Phase 2, new render companions should follow this
+   project.  ~~During Phase 2, new render companions should follow this
    placement to minimize churn.  The `GameRender` project is created later
-   in Phase 5 and all companions are moved then.
+   in Phase 5 and all companions are moved then.~~
+   **UPDATE:** `GameRender/` was created early; all new companions were
+   placed there from the start.  `TreeRenderer` (the DX12 pipeline) remains
+   in `NeuronClient/`; `TreeBuildingRenderer` (the adapter) lives in
+   `GameRender/`.
 
 ### Gaps That Remain for Tree
 
-| Gap | Resolution |
-|-----|------------|
-| `Tree::Advance()` calls `g_app->m_particleSystem->CreateParticle(...)` and `g_app->m_soundSystem->...` directly | Migrate to `SimEventQueue` in Phase 3 (Tree is the pilot) |
-| `Tree::RenderBranch()` contains dead GL code paths (`glTexCoord2f`, `glVertex3fv`) | Clean up in Phase 0.4 — split into pure-math `CalcBranchRadius()` and delete unreachable GL paths |
-| `Tree` inherits `Building::m_shape` (never used, always `nullptr`) | Resolved when Phase 4 removes `m_shape` from `Building` base class |
-| Call-site uses manual `if` type check instead of registry dispatch | Replace with `BuildingRenderRegistry` in Phase 2 pre-step |
-| `TreeRenderer` has no `BuildingRenderer` base class — cannot be stored in registry | Wrap in thin `TreeBuildingRenderer : BuildingRenderer` adapter in Phase 2 pre-step |
-| `TreeRenderer::DrawTree()` takes concrete `Tree*`, not `const Building&` | Adapter performs `static_cast` internally; `DrawTree` signature changes to `const Tree&` |
-| `TreeRenderer::EnsureUploaded()` mutates `Tree` (`m_meshDirty = false`, calls `Generate()`) | Move `Generate()` call to `Tree::Advance()`; renderer becomes a pure consumer (Phase 2 pre-step) |
-| `ITreeRenderBackend` is tree-specific; one per type doesn't scale | Migrate to generalized `IRenderBackend::ReleaseBuilding(int)` in Phase 2 pre-step |
+| Gap | Status | Resolution |
+|-----|--------|------------|
+| `Tree::Advance()` calls `g_app->m_particleSystem->CreateParticle(...)` and `g_app->m_soundSystem->...` directly | ❌ Open | Migrate to `SimEventQueue` in Phase 3 (Tree is the pilot) |
+| `Tree::RenderBranch()` contains dead GL code paths (`glTexCoord2f`, `glVertex3fv`) | ✅ Done | Renamed to `CalcBranchRadius()`; GL paths deleted |
+| `Tree` inherits `Building::m_shape` (never used, always `nullptr`) | ❌ Open | Resolved when Phase 4 removes `m_shape` from `Building` base class |
+| Call-site uses manual `if` type check instead of registry dispatch | ✅ Done | `BuildingRenderRegistry` in `location.cpp` with fallback |
+| `TreeRenderer` has no `BuildingRenderer` base class — cannot be stored in registry | ✅ Done | `TreeBuildingRenderer : BuildingRenderer` adapter in `GameRender/` |
+| `TreeRenderer::DrawTree()` takes concrete `Tree*`, not `const Building&` | ✅ Done | `DrawTree` takes `const Tree&`; adapter `static_cast`s from `const Building&` |
+| `TreeRenderer::EnsureUploaded()` mutates `Tree` (`m_meshDirty = false`, calls `Generate()`) | ✅ Done | `Generate()` now in `Tree::Advance()`; renderer uses `m_meshVersion` for GPU-side staleness |
+| `ITreeRenderBackend` is tree-specific; one per type doesn't scale | ⚠️ Partial | `IRenderBackend` generalized interface created (`render_backend_interface.h`); `ITreeRenderBackend` not yet migrated to it |
 
 ### Architectural Assessment: Why TreeRenderer Should Not Be Replicated Verbatim
 
@@ -348,6 +518,8 @@ The server build of `GameLogic` (or future `GameSim`) omits this define.
 
 ### Renderer Placement Strategy
 
+> **STATUS: ✅ Implemented as described.**
+
 New render companions are placed in **`GameRender/`** from the start.
 `GameRender` is a static library that depends on `NeuronClient` (for the GL
 translation layer, `ShapeStatic`, `TreeRenderer`, etc.) and `GameLogic`
@@ -360,14 +532,21 @@ translation layer, `ShapeStatic`, `TreeRenderer`, etc.) and `GameLogic`
 
 ### Pre-Step: Extract `ShadowRenderer`
 
+> **STATUS: ✅ Done.** `GameRender/ShadowRenderer.h/.cpp` — placed directly
+> in `GameRender/` (not `NeuronClient/` as originally planned).
+
 `Entity::BeginRenderShadow()` / `RenderShadow()` / `EndRenderShadow()`
 (`entity.cpp:496+`) are static methods containing GL calls used by many
 entity `Render()` overrides across Waves 1–3.  Extract these into
-`NeuronClient/ShadowRenderer.h/.cpp` **before** Wave 1 so that all entity
+`GameRender/ShadowRenderer.h/.cpp` **before** Wave 1 so that all entity
 render companions can call `ShadowRenderer::Begin()` / `Render()` /
 `End()` instead of `Entity::BeginRenderShadow()`.
 
 ### Pre-Step: Introduce `BuildingRenderRegistry` (with `Tree` as first entry)
+
+> **STATUS: ✅ Done.** `GameRender/BuildingRenderRegistry.h/.cpp` +
+> `location.cpp` uses registry dispatch with fallback for all building
+> render passes.
 
 `Starstrike/location.cpp:1082` already does manual type dispatch for Tree:
 
@@ -395,6 +574,10 @@ This prevents the dispatch site from accumulating per-type `if` branches as
 more buildings are migrated.
 
 ### Pre-Step: Adapt `TreeRenderer` to `BuildingRenderer` Interface
+
+> **STATUS: ✅ Done.** All four sub-tasks completed: `Generate()` in
+> `Tree::Advance()`, `TreeBuildingRenderer` adapter in `GameRender/`,
+> registered in `BuildingRenderRegistry`, `DrawTree` takes `const Tree&`.
 
 `TreeRenderer` predates the `BuildingRenderer` base class and uses a
 concrete `Tree*` interface.  Before `BuildingRenderRegistry` can include
@@ -457,6 +640,10 @@ Tree, two changes are needed:
 
 ### Pre-Step: Generalize `ITreeRenderBackend` as a Destruction-Cleanup Pattern
 
+> **STATUS: ⚠️ Partial.** `IRenderBackend` interface created
+> (`render_backend_interface.h`).  `ITreeRenderBackend` still exists
+> separately in `tree_render_interface.h` and has not been migrated.
+
 `Tree::~Tree()` calls `g_treeRenderBackend->ReleaseTree(uniqueId)` to
 notify the renderer when a simulation object is destroyed.  Any future
 entity/building type whose render companion owns per-instance GPU resources
@@ -497,21 +684,21 @@ GameLogic/armyant.h    → class ArmyAnt : Entity { Advance(); Render(); }
 GameLogic/armyant.cpp  → #includes GL headers, implements both
 ```
 
-**After** (two classes, Phase 2 placement):
+**After** (two classes, actual placement):
 ```
 GameLogic/armyant.h              → class ArmyAnt : Entity { Advance(); }
 GameLogic/armyant.cpp            → pure simulation, no GL
 
-NeuronClient/ArmyAntRenderer.h   → class ArmyAntRenderer : EntityRenderer { Render(); }
-NeuronClient/ArmyAntRenderer.cpp → GL calls, Shape::Render, lighting
+GameRender/ArmyAntRenderer.h    → class ArmyAntRenderer : EntityRenderer { Render(); }
+GameRender/ArmyAntRenderer.cpp  → GL calls, Shape::Render, lighting
 ```
-
-> In Phase 5 the `NeuronClient/*Renderer.*` files move to `GameRender/`.
 
 ### `EntityRenderer` base class
 
+> **STATUS: ✅ Done.** `GameRender/EntityRenderer.h`
+
 ```cpp
-// NeuronClient/EntityRenderer.h  (moves to GameRender/ in Phase 5)
+// GameRender/EntityRenderer.h
 #pragma once
 
 struct EntityRenderContext
@@ -537,8 +724,10 @@ public:
 
 ### `BuildingRenderer` base class
 
+> **STATUS: ✅ Done.** `GameRender/BuildingRenderer.h`
+
 ```cpp
-// NeuronClient/BuildingRenderer.h  (moves to GameRender/ in Phase 5)
+// GameRender/BuildingRenderer.h
 #pragma once
 
 struct BuildingRenderContext
@@ -566,11 +755,13 @@ never affect simulation state.
 
 ### `EntityRenderRegistry`
 
+> **STATUS: ✅ Done.** `GameRender/EntityRenderRegistry.h/.cpp`
+
 Type-indexed table of render companions replaces polymorphic
 `Entity::Render()` dispatch:
 
 ```cpp
-// NeuronClient/EntityRenderRegistry.h  (moves to GameRender/ in Phase 5)
+// GameRender/EntityRenderRegistry.h
 #pragma once
 
 #include "entity.h"
@@ -593,6 +784,11 @@ slots.
 
 ### Call-site change (`Team::Render` family)
 
+> **STATUS: ✅ Done.** `team.cpp` (`RenderVirii`, `RenderDarwinians`,
+> `RenderOthers`), `unit.cpp` (`Unit::Render`), and `location.cpp`
+> (`RenderBuildings`, `RenderBuildingAlphas`) all use registry dispatch
+> with fallback to legacy `entity->Render()` / `building->Render()`.
+
 ```diff
 - entity->Render(_predictionTime);
 + EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
@@ -602,42 +798,38 @@ slots.
 
 Same pattern for `BuildingRenderer` / `BuildingRenderRegistry`.
 
-**Darwinian special case:** `Team::Render()` currently has a separate
-rendering loop for Darwinians that computes `highDetail` from camera
-distance and calls `darwinian->Render(_predictionTime, highDetail)`.
-After migration, this loop uses the same `EntityRenderRegistry::Get()`
-dispatch with `EntityRenderContext.highDetailFactor` pre-computed by the
-caller.  The separate Darwinian loop can then be unified into
-`RenderOthers()`.
+**Darwinian special case:** `Team::RenderDarwinians()` still has its own
+loop (computes `highDetail` from camera distance), but now routes through
+`EntityRenderRegistry` with `EntityRenderContext.highDetailFactor`.  The
+fallback path uses `static_cast<Darwinian*>(entity)->Render()`.  Unifying
+into `RenderOthers()` is optional cleanup — not blocking.
 
 ### Migration Order
 
 Each entity type is a self-contained PR:
 
-**Wave 1 — Trivial** (just `Shape::Render`):
+**Wave 1 — Trivial** (just `Shape::Render`): ✅ All companions created
 - `ArmyAnt`, `Egg`, `Officer`, `TriffidEgg`
 
-**Wave 2 — Medium** (shape + GL state):
+**Wave 2 — Medium** (shape + GL state): ✅ All companions created
 - `Engineer`, `Armour`, `Lander`, `Tripod`, `Centipede`, `Spider`
 
-**Wave 3 — Complex** (custom geometry / special signatures):
+**Wave 3 — Complex** (custom geometry / special signatures): ✅ All companions created
 - `Darwinian` (LOD render), `Virii` (particle rendering),
-  `SoulDestroyer` (multi-segment), `LaserTrooper`
+  `SoulDestroyer` (multi-segment), `LaserTrooper` (billboard quads)
 
-**Wave 4 — Buildings**:
-- Same pattern with `BuildingRenderer` / `BuildingRenderRegistry`
-- `Tree` is already migrated — `TreeBuildingRenderer` adapter created in
-  Phase 2 pre-step; remaining buildings follow the standard companion pattern
-- Include `RenderLights()` / `RenderPorts()` in each `BuildingRenderer`
+**Wave 4 — Buildings**: ⚠️ Only Tree done
+- ✅ `Tree` — `TreeBuildingRenderer` adapter
+- ❌ Remaining ~20 building types not started
 
-**Wave 5 — UI / debug windows**:
+**Wave 5 — UI / debug windows**: ❌ Not started
 - Already client-only; move to render companions without logic changes
 
 ### Per-Entity Migration Checklist
 
 For each entity type:
 
-- [ ] Create `NeuronClient/<Type>Renderer.h/.cpp`
+- [ ] Create `GameRender/<Type>Renderer.h/.cpp`
 - [ ] Move `Render()` body (and `RenderAlphas()` if present) to the renderer
 - [ ] Move `Shape*` fields and asset loading to the renderer
 - [ ] Replace `ShapeMarker*` simulation usage with data-driven offsets
@@ -646,6 +838,7 @@ For each entity type:
       `ITreeRenderBackend` pattern)
 - [ ] Register the renderer in `EntityRenderRegistry` init
 - [ ] Remove GL includes from the simulation `.cpp`
+- [ ] Delete the old `Render()` body from the simulation `.cpp`
 - [ ] Verify `Advance()` has no remaining rendering dependencies
 - [ ] Build and test in all configurations
 
@@ -653,7 +846,7 @@ For each entity type:
 
 For each building type:
 
-- [ ] Create `NeuronClient/<Type>BuildingRenderer.h/.cpp`
+- [ ] Create `GameRender/<Type>BuildingRenderer.h/.cpp`
 - [ ] Move `Render()`, `RenderAlphas()`, `RenderLights()`, and
       `RenderPorts()` bodies to the renderer
 - [ ] Move `Shape*` fields and asset loading to the renderer
@@ -668,6 +861,8 @@ For each building type:
 ---
 
 ## Phase 3 — Introduce `SimEventQueue` for Side Effects
+
+> **STATUS: ❌ Not started.**  No `SimEvent` / `SimEventQueue` files exist.
 
 Simulation code currently calls rendering/audio systems directly during
 `Advance()` and `ChangeHealth()`.  Replace these with a deferred event
@@ -783,6 +978,10 @@ Server ignores or logs for replay.
 
 ## Phase 4 — Remove `Render()` from Base Classes
 
+> **STATUS: ❌ Not started.**  Blocked by: Wave 2 missing `Lander`, Wave 3
+> missing `LaserTrooper`, Wave 4 buildings (~20 types) not migrated, and old
+> `Render()` bodies still present in all 12 migrated entity `.cpp` files.
+
 Once **all** entity and building types have render companions registered:
 
 1. Remove `virtual void Render(float)` from `WorldObject`.
@@ -802,7 +1001,14 @@ Once **all** entity and building types have render companions registered:
 
 ## Phase 5 — Create `GameSim` and `GameRender` Projects
 
+> **STATUS: ⚠️ Partial.**  5.2 (`GameRender.vcxproj`) completed early.
+> 5.1 (`GameSim`), 5.3 (link deps), and 5.4 (delete `GameLogic`) not
+> started — blocked by Phases 2–4.
+
 ### 5.1 — `GameSim/GameSim.vcxproj` (static library)
+
+> **STATUS: ❌ Not started.**  `GameLogic` is still the sole simulation
+> project.
 
 - Move all simulation `.cpp/.h` from `GameLogic/` into `GameSim/`.
 - `pch.h` includes `NeuronCore.h` only.
@@ -812,16 +1018,25 @@ Once **all** entity and building types have render companions registered:
 
 ### 5.2 — `GameRender/GameRender.vcxproj` (static library)
 
-- Move all `*Renderer.cpp/.h` files from `NeuronClient/` into `GameRender/`.
-  This includes `TreeRenderer`, `ShadowRenderer`, all entity/building
-  companions, and the registries.
+> **STATUS: ✅ Done (created early).**  All companions placed in
+> `GameRender/` from the start.  `pch.h` includes `NeuronClient.h`;
+> additional include dirs cover `NeuronCore`, `NeuronClient`, `GameLogic`,
+> `Starstrike`.  `TreeRenderer` (the DX12 pipeline) remains in
+> `NeuronClient/`.
+
+- ~~Move all `*Renderer.cpp/.h` files from `NeuronClient/` into `GameRender/`.~~
+  Companions were placed directly in `GameRender/` — no move needed.
 - Contains `EntityRenderRegistry`, `BuildingRenderRegistry`.
-- Contains `SimEventQueue` drain/dispatch logic.
+- Contains `SimEventQueue` drain/dispatch logic (future — not yet created).
 - `pch.h` includes `NeuronClient.h`.
 - Additional include directories: `$(SolutionDir)NeuronCore`,
-  `$(SolutionDir)NeuronClient`, `$(SolutionDir)GameSim`.
+  `$(SolutionDir)NeuronClient`, `$(SolutionDir)GameLogic`,
+  `$(SolutionDir)Starstrike`.
 
 ### 5.3 — Update link dependencies
+
+> **STATUS: ⚠️ Partial.**  `Starstrike` links `GameRender`.  `NeuronServer`
+> does not yet link `GameSim` (project doesn't exist).
 
 | Project | Links |
 |---------|-------|
@@ -831,11 +1046,19 @@ Once **all** entity and building types have render companions registered:
 
 ### 5.4 — Delete `GameLogic/` project
 
+> **STATUS: ❌ Not started.**
+
 Once all files are migrated, remove `GameLogic.vcxproj` from the solution.
 
 ---
 
 ## Phase 6 — Separate Simulation State from Presentation State
+
+> **STATUS: ⚠️ Partially achieved.**  New companions receive `const Entity&`
+> / `const Building&` — correct layering.  However, renderers still read
+> `Shape*` from simulation objects (e.g. `ant.m_shape->Render()`), so true
+> const separation requires moving `Shape*` ownership to renderers (Phase 4
+> prerequisite).
 
 ### 6.1 — Const access for renderers
 
@@ -869,6 +1092,8 @@ simulation at a different rate than the client framerate.
 ---
 
 ## Phase 7 — Headless Bot Client
+
+> **STATUS: ❌ Not started.**  Requires Phase 5 (`GameSim` project).
 
 With `GameSim` fully decoupled:
 
@@ -920,39 +1145,42 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 
 ## File Change Summary (All Phases)
 
-| Phase | File | Action |
-|-------|------|--------|
-| 0 | `GameLogic/tree.cpp` | Rename `RenderBranch()` → `CalcBranchRadius()`; delete dead GL paths |
-| 0 | `GameLogic/tree.h` | Update method declaration |
-| 1 | `GameLogic/GameLogicPlatform.h` | **New** — conditional include shim |
-| 1 | `GameLogic/pch.h` | Replace `NeuronClient.h` with `GameLogicPlatform.h` |
-| 1 | `GameLogic/GameLogic.vcxproj` | Add `GAMELOGIC_HAS_RENDERER` define |
-| 2 (pre) | `NeuronClient/ShadowRenderer.h/.cpp` | **New** — extracted from `Entity::BeginRenderShadow` etc. |
-| 2 (pre) | `NeuronClient/BuildingRenderRegistry.h/.cpp` | **New** — type-indexed dispatch; Tree registered first |
-| 2 (pre) | `NeuronClient/EntityRenderRegistry.h/.cpp` | **New** — type-indexed dispatch table |
-| 2 (pre) | `NeuronClient/EntityRenderer.h` | **New** — base renderer interface |
-| 2 (pre) | `NeuronClient/BuildingRenderer.h` | **New** — base building renderer interface (incl. `RenderLights`/`RenderPorts`) |
-| 2 (pre) | `GameLogic/render_backend_interface.h` | **New** — generalized `IRenderBackend` for GPU cleanup on destruction |
-| 2 (pre) | `NeuronClient/TreeBuildingRenderer.h/.cpp` | **New** — thin adapter: `TreeBuildingRenderer : BuildingRenderer`, delegates to `TreeRenderer` |
-| 2 (pre) | `GameLogic/tree.cpp` | Move `Generate()` + `m_meshDirty = false` from `TreeRenderer::EnsureUploaded()` into `Tree::Advance()` |
-| 2 (pre) | `NeuronClient/tree_renderer.cpp` | Remove `_tree->Generate()` / `m_meshDirty = false` from `EnsureUploaded()`; change `DrawTree` to take `const Tree&` |
-| 2 (pre) | `Starstrike/location.cpp` | Replace `if (TypeTree)` dispatch with `BuildingRenderRegistry` + fallback |
-| 2 | `NeuronClient/<Type>Renderer.h/.cpp` | **New** — one per entity/building type (~40 files) |
-| 2 | `Starstrike/team.cpp` | Switch from `entity->Render()` to registry dispatch |
-| 3 | `GameLogic/SimEvents.h` | **New** — event types (moves to `GameSim/` in Phase 5) |
-| 3 | `GameLogic/SimEventQueue.h/.cpp` | **New** — deferred side-effect queue (moves to `GameSim/` in Phase 5) |
-| 3 | `GameLogic/tree.cpp` (pilot) | Replace particle/sound calls with event queue pushes |
-| 3 | All entity `.cpp` with `g_explosionManager`, `m_particleSystem`, etc. | Replace with event queue pushes |
-| 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` |
-| 4 | `GameLogic/entity.h` | Remove `virtual Render()`, `Shape* m_shape`, shadow statics |
-| 4 | `GameLogic/entity.cpp` | Remove `BeginRenderShadow` / `RenderShadow` / `EndRenderShadow` |
-| 4 | `GameLogic/building.h` | Remove `virtual Render()` / `RenderAlphas()` / `RenderLights()` / `RenderPorts()`, `Shape* m_shape` |
-| 5 | `GameSim/GameSim.vcxproj` | **New** — pure simulation static lib |
-| 5 | `GameRender/GameRender.vcxproj` | **New** — render companion static lib (all companions move here from `NeuronClient/`) |
-| 5 | `Starstrike/Starstrike.vcxproj` | Update link deps |
-| 5 | `NeuronServer/NeuronServer.vcxproj` | Add `GameSim` link |
-| 5 | `GameLogic/GameLogic.vcxproj` | **Deleted** |
-| 7 | `BotClient/BotClient.vcxproj` | **New** — headless executable |
+| Phase | File | Action | Status |
+|-------|------|--------|--------|
+| 0 | `GameLogic/tree.cpp` | Rename `RenderBranch()` → `CalcBranchRadius()`; delete dead GL paths | ✅ |
+| 0 | `GameLogic/tree.h` | Update method declaration | ✅ |
+| 1 | `GameLogic/GameLogicPlatform.h` | **New** — conditional include shim | ✅ |
+| 1 | `GameLogic/pch.h` | Replace `NeuronClient.h` with `GameLogicPlatform.h` | ✅ |
+| 1 | `GameLogic/GameLogic.vcxproj` | Add `GAMELOGIC_HAS_RENDERER` define | ✅ |
+| 2 (pre) | `GameRender/ShadowRenderer.h/.cpp` | **New** — extracted from `Entity::BeginRenderShadow` etc. | ✅ |
+| 2 (pre) | `GameRender/BuildingRenderRegistry.h/.cpp` | **New** — type-indexed dispatch; Tree registered first | ✅ |
+| 2 (pre) | `GameRender/EntityRenderRegistry.h/.cpp` | **New** — type-indexed dispatch table | ✅ |
+| 2 (pre) | `GameRender/EntityRenderer.h` | **New** — base renderer interface | ✅ |
+| 2 (pre) | `GameRender/BuildingRenderer.h` | **New** — base building renderer interface (incl. `RenderLights`/`RenderPorts`) | ✅ |
+| 2 (pre) | `GameLogic/render_backend_interface.h` | **New** — generalized `IRenderBackend` for GPU cleanup on destruction | ✅ |
+| 2 (pre) | `GameRender/TreeBuildingRenderer.h/.cpp` | **New** — thin adapter: `TreeBuildingRenderer : BuildingRenderer`, delegates to `TreeRenderer` | ✅ |
+| 2 (pre) | `GameLogic/tree.cpp` | Move `Generate()` + `m_meshDirty = false` from `TreeRenderer::EnsureUploaded()` into `Tree::Advance()` | ✅ |
+| 2 (pre) | `NeuronClient/tree_renderer.cpp` | Remove `_tree->Generate()` / `m_meshDirty = false` from `EnsureUploaded()`; change `DrawTree` to take `const Tree&` | ✅ |
+| 2 (pre) | `Starstrike/location.cpp` | Replace `if (TypeTree)` dispatch with `BuildingRenderRegistry` + fallback | ✅ |
+| 2 | `GameRender/<Type>Renderer.h/.cpp` | **New** — one per entity/building type (~40 files) | ⚠️ 15 of ~40 (all entities done; buildings remain) |
+| 2 | `Starstrike/team.cpp` | Switch from `entity->Render()` to registry dispatch | ✅ |
+| 2 | `Starstrike/unit.cpp` | Switch from `entity->Render()` to registry dispatch | ✅ |
+| 2 | `Starstrike/location.cpp` | Switch from `building->Render()` to registry dispatch | ✅ |
+| 2 | `GameLogic/*.cpp` (migrated entities) | Delete old `Render()` bodies | ✅ All 14 entity types stubbed |
+| 3 | `GameLogic/SimEvents.h` | **New** — event types (moves to `GameSim/` in Phase 5) | ❌ |
+| 3 | `GameLogic/SimEventQueue.h/.cpp` | **New** — deferred side-effect queue (moves to `GameSim/` in Phase 5) | ❌ |
+| 3 | `GameLogic/tree.cpp` (pilot) | Replace particle/sound calls with event queue pushes | ❌ |
+| 3 | All entity `.cpp` with `g_explosionManager`, `m_particleSystem`, etc. | Replace with event queue pushes | ❌ |
+| 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` | ❌ |
+| 4 | `GameLogic/entity.h` | Remove `virtual Render()`, `Shape* m_shape`, shadow statics | ❌ |
+| 4 | `GameLogic/entity.cpp` | Remove `BeginRenderShadow` / `RenderShadow` / `EndRenderShadow` | ❌ |
+| 4 | `GameLogic/building.h` | Remove `virtual Render()` / `RenderAlphas()` / `RenderLights()` / `RenderPorts()`, `Shape* m_shape` | ❌ |
+| 5 | `GameSim/GameSim.vcxproj` | **New** — pure simulation static lib | ❌ |
+| 5 | `GameRender/GameRender.vcxproj` | **New** — render companion static lib | ✅ (early) |
+| 5 | `Starstrike/Starstrike.vcxproj` | Update link deps | ⚠️ Partial |
+| 5 | `NeuronServer/NeuronServer.vcxproj` | Add `GameSim` link | ❌ |
+| 5 | `GameLogic/GameLogic.vcxproj` | **Deleted** | ❌ |
+| 7 | `BotClient/BotClient.vcxproj` | **New** — headless executable | ❌ |
 
 ---
 
@@ -991,32 +1219,36 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 
 ## Estimated Timeline
 
-| Phase | Effort | Risk | Prerequisite |
-|-------|--------|------|--------------|
-| 0 — Audit + `RenderBranch` cleanup | 1–2 days | None | — |
-| 1 — PCH split | 1 day | Low | Phase 0 |
-| 2 pre — `ShadowRenderer` + registries + `IRenderBackend` | 2–3 days | Low | Phase 1 |
-| 2 — Trivial entities (Wave 1) | 1 week | Low | Phase 2 pre |
-| 2 — Medium entities (Wave 2) | 1–2 weeks | Medium | Wave 1 |
-| 2 — Complex entities (Wave 3, incl. Darwinian unification) | 1–2 weeks | Medium | Wave 2 |
-| 2 — Buildings (Wave 4, Tree already done) | 1–2 weeks | Medium | Wave 1 |
-| 2 — UI/debug (Wave 5) | 2–3 days | Low | Wave 1 |
-| 3 — SimEventQueue (Tree pilot first, then remaining types) | 1 week | Medium | Phase 2 in progress |
-| 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete |
-| 5 — Project split (create GameSim + GameRender, move files) | 1–2 days | Low | Phase 4 |
-| 6 — Presentation state separation | 1 week | Low | Phase 5 |
-| 7 — Bot client | 1–2 days | Low | Phase 5 |
+| Phase | Effort | Risk | Prerequisite | Status |
+|-------|--------|------|--------------|--------|
+| 0 — Audit + `RenderBranch` cleanup | 1–2 days | None | — | ✅ Done |
+| 1 — PCH split | 1 day | Low | Phase 0 | ✅ Done |
+| 2 pre — `ShadowRenderer` + registries + `IRenderBackend` | 2–3 days | Low | Phase 1 | ✅ Done |
+| 2 — Trivial entities (Wave 1) | 1 week | Low | Phase 2 pre | ✅ Done |
+| 2 — Medium entities (Wave 2) | 1–2 weeks | Medium | Wave 1 | ✅ Done |
+| 2 — Complex entities (Wave 3, incl. Darwinian unification) | 1–2 weeks | Medium | Wave 2 | ✅ Done |
+| 2 — Buildings (Wave 4, Tree already done) | 1–2 weeks | Medium | Wave 1 | ⚠️ 1/~21 (Tree only) |
+| 2 — UI/debug (Wave 5) | 2–3 days | Low | Wave 1 | ❌ Not started |
+| 3 — SimEventQueue (Tree pilot first, then remaining types) | 1 week | Medium | Phase 2 in progress | ❌ Not started |
+| 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete | ❌ Blocked |
+| 5 — Project split (create GameSim + GameRender, move files) | 1–2 days | Low | Phase 4 | ⚠️ 5.2 done early |
+| 6 — Presentation state separation | 1 week | Low | Phase 5 | ⚠️ Partial |
+| 7 — Bot client | 1–2 days | Low | Phase 5 | ❌ Not started |
 
 Phase 1 alone is enough to start server-side simulation experiments
 immediately.  Phases 2–4 can run in parallel with other feature work.
 
-### Recommended Execution Order
+### Recommended Execution Order (Updated)
 
-1. **Phase 0**: Audit + clean `RenderBranch` (0.4) + expand marker audit (0.2)
-2. **Phase 1**: PCH split
-3. **Phase 2 pre**: `ShadowRenderer`, `BuildingRenderRegistry` (Tree as
-   first entry), `EntityRenderRegistry`, `IRenderBackend`
-4. **Phase 2 Wave 1**: Trivial entity companions (in `NeuronClient/`)
-5. **Phase 3 pilot**: `Tree::Advance()` side-effects → `SimEventQueue`
-6. **Phase 2 Waves 2–5** and remaining **Phase 3** migration in parallel
-7. **Phase 4–7** sequentially once Phase 2 + 3 are complete
+1. ~~**Phase 0**: Audit + clean `RenderBranch` (0.4) + expand marker audit (0.2)~~ ✅
+2. ~~**Phase 1**: PCH split~~ ✅
+3. ~~**Phase 2 pre**: `ShadowRenderer`, `BuildingRenderRegistry` (Tree as
+   first entry), `EntityRenderRegistry`, `IRenderBackend`~~ ✅
+4. ~~**Phase 2 Wave 1**: Trivial entity companions (in `GameRender/`)~~ ✅
+5. ~~**Create `LanderRenderer` and `LaserTrooperRenderer`** — complete Waves 2/3~~ ✅
+6. **Wave 4 — Building renderers** — ~20 building types, independent PRs
+7. ~~**Delete old `Render()` bodies** from migrated entity `.cpp` files~~ ✅
+8. **Migrate `ITreeRenderBackend` → `IRenderBackend`** — consolidate globals
+9. **Phase 3 pilot**: `Tree::Advance()` side-effects → `SimEventQueue`
+10. **Phase 2 Wave 5** (UI/debug) and remaining **Phase 3** in parallel
+11. **Phase 4–7** sequentially once Phase 2 + 3 are complete

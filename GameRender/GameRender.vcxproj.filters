@@ -16,6 +16,11 @@
     <ClCompile Include="TripodRenderer.cpp" />
     <ClCompile Include="CentipedeRenderer.cpp" />
     <ClCompile Include="SpiderRenderer.cpp" />
+    <ClCompile Include="SoulDestroyerRenderer.cpp" />
+    <ClCompile Include="DarwinianRenderer.cpp" />
+    <ClCompile Include="ViriiRenderer.cpp" />
+    <ClCompile Include="LanderRenderer.cpp" />
+    <ClCompile Include="LaserTrooperRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -35,6 +40,11 @@
     <ClInclude Include="TripodRenderer.h" />
     <ClInclude Include="CentipedeRenderer.h" />
     <ClInclude Include="SpiderRenderer.h" />
+    <ClInclude Include="SoulDestroyerRenderer.h" />
+    <ClInclude Include="DarwinianRenderer.h" />
+    <ClInclude Include="ViriiRenderer.h" />
+    <ClInclude Include="LanderRenderer.h" />
+    <ClInclude Include="LaserTrooperRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

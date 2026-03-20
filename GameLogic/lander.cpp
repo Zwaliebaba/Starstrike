@@ -103,46 +103,5 @@ bool Lander::AdvanceLanded()
 
 void Lander::Render(float predictionTime, int teamId)
 {
-  //
-  // Work out our predicted position and orientation
-
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-
-  LegacyVector3 entityUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
-  LegacyVector3 entityFront = m_front;
-  entityFront.Normalise();
-  LegacyVector3 entityRight = entityFront ^ entityUp;
-  entityUp = entityRight ^ entityFront;
-
-  if (!m_dead)
-  {
-    RGBAColour colour = g_app->m_location->m_teams[teamId].m_colour;
-
-    if (m_reloading > 0.0f)
-    {
-      colour.r = (colour.r == 255 ? 255 : 100);
-      colour.g = (colour.g == 255 ? 255 : 100);
-      colour.b = (colour.b == 255 ? 255 : 100);
-    }
-    glColor3ubv(colour.GetData());
-
-    //
-    // 3d Shape
-
-    g_app->m_renderer->SetObjectLighting();
-
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_COLOR_MATERIAL);
-    glDisable(GL_BLEND);
-
-    Matrix34 mat(entityFront, entityUp, predictedPos);
-    m_shape->Render(predictionTime, mat);
-
-    glEnable(GL_BLEND);
-    glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_TEXTURE_2D);
-    g_app->m_renderer->UnsetObjectLighting();
-    glEnable(GL_CULL_FACE);
-  }
+  // Rendering moved to LanderRenderer companion (GameRender).
 }

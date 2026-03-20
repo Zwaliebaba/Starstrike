@@ -657,11 +657,9 @@ dialog_cpuusageunknown                 CPU-Nutzung unbekannt
 
 dialog_graphicsoptions                 Grafikoptionen
 dialog_landscapedetail                 Landschaft
-dialog_waterdetail                     Gewässer
 dialog_skydetail                       Himmel
 dialog_buildingdetail                  Bauliche Details
 dialog_entitydetail                    Einheitsdetails
-dialog_pixeleffect                     Pixeleffekt
 
 dialog_screenoptions                   Bildschirmoptionen
 dialog_refreshrate                     Erneuerungsrate
