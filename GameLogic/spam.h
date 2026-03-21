@@ -7,6 +7,7 @@
 
 class Spam : public Building
 {
+    friend class SpamBuildingRenderer;
   protected:
     float m_timer;
     float m_damage;

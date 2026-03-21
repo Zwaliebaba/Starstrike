@@ -4,6 +4,7 @@
 
 class ResearchItem : public Building
 {
+    friend class ResearchItemBuildingRenderer;
   protected:
     float m_reprogrammed;
     ShapeMarkerData* m_end1;

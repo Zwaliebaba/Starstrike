@@ -564,7 +564,7 @@ bool Direct3DInit()
     return false;
 
   TreeRenderer::Get().Init();
-  g_treeRenderBackend = &TreeRenderer::Get();
+  g_renderBackend = &TreeRenderer::Get();
 
   InitialiseData();
   auto outputSize = Graphics::Core::Get().GetOutputSize();
@@ -605,7 +605,7 @@ void Direct3DShutdown()
   s_drawArraysScratchSize = 0;
 
   TreeRenderer::Get().Shutdown();
-  g_treeRenderBackend = nullptr;
+  g_renderBackend = nullptr;
 
   g_glState.Shutdown();
 }

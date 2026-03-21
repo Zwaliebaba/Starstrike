@@ -6,6 +6,7 @@
 
 class BlueprintBuilding : public Building
 {
+    friend class BlueprintBuildingRenderer;
 public:
     int     m_buildingLink;
     float   m_infected;

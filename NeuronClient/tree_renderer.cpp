@@ -254,7 +254,7 @@ void TreeRenderer::DrawTree(const Tree& _tree, float _predictionTime, unsigned i
 }
 
 // ---------------------------------------------------------------------------
-// ReleaseTree — ITreeRenderBackend implementation
+// ReleaseBuilding — IRenderBackend implementation
 // ---------------------------------------------------------------------------
 
-void TreeRenderer::ReleaseTree(int _uniqueId) { m_gpuBuffers.erase(_uniqueId); }
+void TreeRenderer::ReleaseBuilding(int _uniqueId) { m_gpuBuffers.erase(_uniqueId); }

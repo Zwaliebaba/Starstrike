@@ -4,6 +4,7 @@
 
 class Triffid : public Building
 {
+    friend class TriffidBuildingRenderer;
   protected:
     ShapeMarkerData* m_launchPoint;
     ShapeMarkerData* m_stem;

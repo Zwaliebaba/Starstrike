@@ -25,6 +25,8 @@ public:
 
 class SpawnBuilding : public Building
 {
+    friend class SpawnBuildingRenderer;
+
 protected:
     LList       <SpawnBuildingLink *> m_links;
     ShapeMarkerData *m_spiritLink;

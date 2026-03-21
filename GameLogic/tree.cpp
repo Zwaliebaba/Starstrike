@@ -7,7 +7,6 @@
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "tree.h"
-#include "tree_render_interface.h"
 #include "render_backend_interface.h"
 #include "soundsystem.h"
 #include "GameApp.h"
@@ -15,7 +14,6 @@
 #include "particle_system.h"
 #include "location.h"
 
-ITreeRenderBackend* g_treeRenderBackend = nullptr;
 IRenderBackend* g_renderBackend = nullptr;
 
 Tree::Tree()
@@ -35,8 +33,8 @@ Tree::Tree()
 
 Tree::~Tree()
 {
-  if (g_treeRenderBackend)
-    g_treeRenderBackend->ReleaseTree(m_id.GetUniqueId());
+  if (g_renderBackend)
+    g_renderBackend->ReleaseBuilding(m_id.GetUniqueId());
 }
 
 void Tree::Initialise(Building* _template)

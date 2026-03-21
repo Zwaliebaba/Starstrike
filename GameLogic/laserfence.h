@@ -14,6 +14,7 @@ class TextReader;
 
 class LaserFence : public Building
 {
+    friend class LaserFenceBuildingRenderer;
 protected:
     float           m_status;                       // 0=down, 1=up
     int             m_nextLaserFenceId;

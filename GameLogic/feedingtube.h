@@ -4,6 +4,7 @@
 
 class FeedingTube : public Building
 {
+    friend class FeedingTubeBuildingRenderer;
   protected:
     ShapeMarkerData* m_focusMarker;
 

@@ -1,0 +1,97 @@
+#include "pch.h"
+
+#include "FuelBuildingRenderer.h"
+#include "rocket.h"
+#include "main.h"
+#include "camera.h"
+#include "renderer.h"
+#include "resource.h"
+#include "preferences.h"
+#include "ShapeStatic.h"
+#include "GameApp.h"
+#include "location.h"
+
+void FuelBuildingRenderer::Render(const Building& _building, const BuildingRenderContext& _ctx)
+{
+    DefaultBuildingRenderer::Render(_building, _ctx);
+
+    auto& fuel = static_cast<const FuelBuilding&>(_building);
+    FuelBuilding* fuelBuilding = const_cast<FuelBuilding&>(fuel).GetLinkedBuilding();
+    if (fuelBuilding)
+    {
+        LegacyVector3 ourPipePos = const_cast<FuelBuilding&>(fuel).GetFuelPosition();
+        LegacyVector3 theirPipePos = fuelBuilding->GetFuelPosition();
+
+        LegacyVector3 pipeVector = (theirPipePos - ourPipePos).Normalise();
+        LegacyVector3 right = pipeVector ^ g_upVector;
+        LegacyVector3 up = pipeVector ^ right;
+
+        ourPipePos += pipeVector * 10;
+
+        Matrix34 pipeMat(up, pipeVector, ourPipePos);
+        DEBUG_ASSERT(FuelBuilding::s_fuelPipe);
+        FuelBuilding::s_fuelPipe->Render(_ctx.predictionTime, pipeMat);
+    }
+}
+
+void FuelBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+{
+    DefaultBuildingRenderer::RenderAlphas(_building, _ctx);
+
+    auto& fuel = static_cast<const FuelBuilding&>(_building);
+
+    if (fuel.m_currentLevel > 0.0f)
+    {
+        FuelBuilding* fuelBuilding = const_cast<FuelBuilding&>(fuel).GetLinkedBuilding();
+        if (fuelBuilding)
+        {
+            LegacyVector3 startPos = const_cast<FuelBuilding&>(fuel).GetFuelPosition();
+            LegacyVector3 endPos = fuelBuilding->GetFuelPosition();
+
+            LegacyVector3 midPos = (startPos + endPos) / 2.0f;
+            LegacyVector3 rightAngle = (g_app->m_camera->GetPos() - midPos) ^ (startPos - endPos);
+            rightAngle.SetLength(25.0f);
+
+            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/fuel.bmp"));
+            glEnable(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            glDepthMask(false);
+
+            float tx = g_gameTime * -0.5f;
+            float tw = 1.0f;
+
+            glColor4f(1.0f, 0.4f, 0.1f, 0.4f * fuel.m_currentLevel);
+
+            float nearPlaneStart = g_app->m_renderer->GetNearPlane();
+            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_app->m_renderer->GetFarPlane());
+
+            int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail");
+            float maxLoops = 4 - buildingDetail;
+            maxLoops = max(maxLoops, 1);
+            maxLoops = min(maxLoops, 3);
+
+            for (int i = 0; i < maxLoops; ++i)
+            {
+                glBegin(GL_QUADS);
+                glTexCoord2f(tx, 0);
+                glVertex3fv((startPos - rightAngle).GetData());
+                glTexCoord2f(tx, 1);
+                glVertex3fv((startPos + rightAngle).GetData());
+                glTexCoord2f(tx + tw, 1);
+                glVertex3fv((endPos + rightAngle).GetData());
+                glTexCoord2f(tx + tw, 0);
+                glVertex3fv((endPos - rightAngle).GetData());
+                glEnd();
+                rightAngle *= 0.7f;
+            }
+
+            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
+
+            glEnable(GL_DEPTH_TEST);
+            glDisable(GL_TEXTURE_2D);
+        }
+    }
+}

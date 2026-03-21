@@ -11,6 +11,9 @@ class MineCart;
 
 class MineBuilding : public Building
 {
+    friend class MineBuildingRenderer;
+    friend class RefineryBuildingRenderer;
+    friend class MineShaftBuildingRenderer;
   protected:
     int m_trackLink;
     ShapeMarkerData* m_trackMarker1;
@@ -147,6 +150,7 @@ class TrackEnd : public MineBuilding
 
 class Refinery : public MineBuilding
 {
+    friend class RefineryBuildingRenderer;
   protected:
     ShapeMarkerData* m_wheel1;
     ShapeMarkerData* m_wheel2;
@@ -170,6 +174,7 @@ class Refinery : public MineBuilding
 
 class Mine : public MineBuilding
 {
+    friend class MineShaftBuildingRenderer;
   protected:
     ShapeMarkerData* m_wheel1;
     ShapeMarkerData* m_wheel2;

@@ -6,6 +6,8 @@
 
 class Wall : public Building
 {
+  friend class WallBuildingRenderer;
+
 protected:
     float m_damage;
     float m_fallSpeed;

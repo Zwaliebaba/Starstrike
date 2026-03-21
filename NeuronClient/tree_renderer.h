@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PipelineState.h"
-#include "tree_render_interface.h"
+#include "render_backend_interface.h"
 
 struct TreeMeshData;
 class Tree;
@@ -21,9 +21,9 @@ struct TreeGPUData
 // --- Tree renderer (singleton) ---
 // Owns the dedicated DX12 PSO and per-tree GPU vertex buffers.  Uses the
 // shared root signature from OpenGLTranslationState.
-// Implements ITreeRenderBackend so Tree::~Tree() can release GPU resources
+// Implements IRenderBackend so Tree::~Tree() can release GPU resources
 // without depending on DX12 headers.
-class TreeRenderer final : public ITreeRenderBackend
+class TreeRenderer final : public IRenderBackend
 {
   public:
     static TreeRenderer& Get();
@@ -33,8 +33,8 @@ class TreeRenderer final : public ITreeRenderBackend
 
     void DrawTree(const Tree& _tree, float _predictionTime, unsigned int _textureGLId, bool _skipLeaves = false);
 
-    // ITreeRenderBackend
-    void ReleaseTree(int _uniqueId) override;
+    // IRenderBackend — releases per-tree GPU buffers when a Tree is destroyed.
+    void ReleaseBuilding(int _uniqueId) override;
 
   private:
     TreeRenderer() = default;

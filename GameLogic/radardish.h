@@ -8,6 +8,8 @@
 
 class RadarDish : public Teleport
 {
+    friend class RadarDishBuildingRenderer;
+
   protected:
     ShapeInstance m_shapeInstance;
     int m_dishIndex;

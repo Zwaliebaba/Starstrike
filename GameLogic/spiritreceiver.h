@@ -11,6 +11,8 @@ class UnprocessedSpirit;
 
 class ReceiverBuilding : public Building
 {
+    friend class ReceiverBuildingRenderer;
+
   protected:
     int m_spiritLink;
     ShapeMarkerData* m_spiritLocation;
@@ -102,6 +104,8 @@ class ReceiverSpiritSpawner : public ReceiverBuilding
 
 class SpiritReceiver : public ReceiverBuilding
 {
+    friend class SpiritReceiverBuildingRenderer;
+
   protected:
     ShapeMarkerData* m_headMarker;
     ShapeStatic* m_headShape;

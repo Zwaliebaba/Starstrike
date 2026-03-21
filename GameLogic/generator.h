@@ -10,6 +10,8 @@ class FileWriter;
 
 class PowerBuilding : public Building
 {
+    friend class PowerBuildingRenderer;
+
   protected:
     int m_powerLink;
     ShapeMarkerData* m_powerLocation;
@@ -41,6 +43,8 @@ class PowerBuilding : public Building
 
 class Generator : public PowerBuilding
 {
+    friend class GeneratorBuildingRenderer;
+
   protected:
     ShapeMarkerData* m_counter;
 
@@ -114,6 +118,8 @@ class PylonEnd : public PowerBuilding
 
 class SolarPanel : public PowerBuilding
 {
+    friend class SolarPanelBuildingRenderer;
+
   protected:
     ShapeMarkerData* m_glowMarker[SOLARPANEL_NUMGLOWS];
     ShapeMarkerData* m_statusMarkers[SOLARPANEL_NUMSTATUSMARKERS];

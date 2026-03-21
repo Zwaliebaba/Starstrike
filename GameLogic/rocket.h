@@ -4,6 +4,8 @@
 
 class FuelBuilding : public Building
 {
+    friend class FuelBuildingRenderer;
+
   protected:
     ShapeMarkerData* m_fuelMarker;
     static ShapeStatic* s_fuelPipe;
@@ -41,6 +43,8 @@ class FuelBuilding : public Building
 
 class FuelGenerator : public FuelBuilding
 {
+    friend class FuelGeneratorBuildingRenderer;
+
   protected:
     ShapeStatic* m_pump;
     ShapeMarkerData* m_pumpTip;
@@ -99,6 +103,8 @@ class FuelStation : public FuelBuilding
 
 class EscapeRocket : public FuelBuilding
 {
+    friend class EscapeRocketBuildingRenderer;
+
   protected:
     ShapeMarkerData* m_booster;
     ShapeMarkerData* m_window[3];

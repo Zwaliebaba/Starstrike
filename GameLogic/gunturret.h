@@ -11,6 +11,8 @@
 
 class GunTurret : public Building
 {
+    friend class GunTurretBuildingRenderer;
+
   protected:
     ShapeStatic* m_turret;
     ShapeStatic* m_barrel;

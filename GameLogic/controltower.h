@@ -6,6 +6,8 @@ class FileWriter;
 
 class ControlTower : public Building
 {
+    friend class ControlTowerBuildingRenderer;
+
   public:
     float m_ownership; // 100 = strongly owned, 5 = nearly lost, 0 = neutral
 

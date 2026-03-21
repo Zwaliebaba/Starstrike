@@ -13,6 +13,8 @@
 
 class ConstructionYard : public Building
 {
+    friend class ConstructionYardBuildingRenderer;
+
 protected:
     ShapeStatic     *m_rung;
     ShapeStatic     *m_primitive;
@@ -54,6 +56,8 @@ public:
 
 class DisplayScreen : public Building
 {
+    friend class DisplayScreenBuildingRenderer;
+
 protected:
     ShapeStatic       *m_armour;
     ShapeMarkerData *m_rays[DISPLAYSCREEN_NUMRAYS];

@@ -8,6 +8,7 @@ class ShapeMarkerData;
 
 class FenceSwitch : public Building
 {
+    friend class FenceSwitchBuildingRenderer;
   protected:
     int m_linkedBuildingId;
     int m_linkedBuildingId2; // optional second link for fence toggling
