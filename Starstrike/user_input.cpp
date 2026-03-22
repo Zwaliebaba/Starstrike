@@ -14,22 +14,22 @@
 #include "location.h"
 #include "renderer.h"
 #include "user_input.h"
+#include "keydefs.h"
 
 // *** Constructor
 UserInput::UserInput()
   : m_removeTopLevelMenu(false)
 {
-  const int screenH = g_app->m_renderer->ScreenH();
-  const int screenW = g_app->m_renderer->ScreenW();
-
   EclInitialise(g_app->m_renderer->ScreenW(), g_app->m_renderer->ScreenH());
 }
+
+extern signed char g_keyDeltas[KEY_MAX];
 
 // *** AdvanceMenus
 void UserInput::AdvanceMenus()
 {
-  //	if ( g_keyDeltas[KEY_F1] )
-  //		DebugKeyBindings::DebugMenu();
+  	if ( g_keyDeltas[KEY_F1] )
+  		DebugKeyBindings::DebugMenu();
 
   InputManager* im = g_inputManager;
   int mouseX = g_target->X();
@@ -124,8 +124,6 @@ void UserInput::RecalcMousePos3d()
     sphereCenter.z = g_app->m_globalWorld->GetSize() * 0.5f;
 
     float sphereRadius = g_app->m_globalWorld->GetSize() * 40.0f;
-
-    float dist = (rayStart - sphereCenter).Mag();
 
     rayStart += rayDir * (sphereRadius * 4.0f);
     rayDir = -rayDir;
