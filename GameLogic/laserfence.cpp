@@ -7,7 +7,7 @@
 #include "text_stream_readers.h"
 #include "preferences.h"
 #include "main.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "obstruction_grid.h"
 #include "team.h"

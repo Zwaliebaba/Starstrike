@@ -9,7 +9,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 
 #include "building.h"

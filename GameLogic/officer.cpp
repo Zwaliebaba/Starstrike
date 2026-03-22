@@ -6,7 +6,7 @@
 #include "input.h"
 #include "officer.h"
 #include "teleport.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "team.h"
 #include "main.h"

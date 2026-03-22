@@ -4,7 +4,7 @@
 #include "hi_res_time.h"
 #include "language_table.h"
 #include "safearea.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "team.h"
 #include "entity_grid.h"

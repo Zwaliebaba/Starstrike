@@ -6,7 +6,7 @@
 
 
 
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"

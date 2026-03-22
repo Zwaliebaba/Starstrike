@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "egg.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"

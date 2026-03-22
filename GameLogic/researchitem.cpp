@@ -3,7 +3,7 @@
 #include "GameSimEventQueue.h"
 #include "camera.h"
 #include "file_writer.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "global_world.h"
 #include "globals.h"
 #include "location.h"

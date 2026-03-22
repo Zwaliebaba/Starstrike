@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "upgrade_port.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "global_world.h"
 
 UpgradePort::UpgradePort()

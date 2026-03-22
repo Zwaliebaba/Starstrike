@@ -6,7 +6,7 @@
 #include "text_stream_readers.h"
 #include "generichub.h"
 #include "controltower.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "global_world.h"
 #include "GameSimEventQueue.h"

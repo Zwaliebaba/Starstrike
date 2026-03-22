@@ -6,7 +6,7 @@
 #include "library.h"
 #include "researchitem.h"
 
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 
 

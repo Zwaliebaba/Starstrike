@@ -4,7 +4,7 @@
 #include "preferences.h"
 #include "spam.h"
 #include "GameSimEventQueue.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "globals.h"
 #include "entity_grid.h"

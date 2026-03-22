@@ -10,7 +10,7 @@
 #include "constructionyard.h"
 #include "controltower.h"
 #include "rocket.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"

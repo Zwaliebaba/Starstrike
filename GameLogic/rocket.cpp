@@ -7,7 +7,7 @@
 #include "language_table.h"
 #include "rocket.h"
 #include "darwinian.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "camera.h"
 #include "team.h"

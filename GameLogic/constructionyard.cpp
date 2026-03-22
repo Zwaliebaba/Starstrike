@@ -6,7 +6,7 @@
 #include "constructionyard.h"
 #include "researchitem.h"
 #include "armour.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "main.h"
 #include "global_world.h"
 #include "location.h"

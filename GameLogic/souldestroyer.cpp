@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "math_utils.h"
 #include "hi_res_time.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "GameSimEventQueue.h"

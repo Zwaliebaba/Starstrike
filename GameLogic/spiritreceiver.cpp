@@ -6,7 +6,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "spiritreceiver.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "language_table.h"
 #include "location.h"
 #include "resource.h"

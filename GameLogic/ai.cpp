@@ -4,7 +4,7 @@
 #include "resource.h"
 #include "text_stream_readers.h"
 #include "hi_res_time.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "team.h"
 #include "location.h"
 #include "entity_grid.h"

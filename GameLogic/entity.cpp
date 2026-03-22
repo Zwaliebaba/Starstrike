@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "entity.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "ai.h"
 #include "airstrike.h"
 #include "armour.h"

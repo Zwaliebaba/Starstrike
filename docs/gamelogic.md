@@ -2,14 +2,14 @@
 
 ## Goal
 
-Split the `GameLogic` static library into a **pure-simulation** library
-(`GameSim`) that compiles without any GPU, rendering, or windowing headers,
-and a **render-companion** library (`GameRender`) that holds all visual
-representation logic.  After this work:
+Clean the `GameLogic` static library into a **pure-simulation** library
+that compiles without any GPU, rendering, or windowing headers, and
+maintain the separate **render-companion** library (`GameRender`) that
+holds all visual representation logic.  After this work:
 
-- `NeuronServer` can link `GameSim` directly and run authoritative game state.
-- A headless bot client can link `GameSim` without `NeuronClient`.
-- The existing `Starstrike` executable links both `GameSim` + `GameRender`
+- `NeuronServer` can link `GameLogic` directly and run authoritative game state.
+- A headless bot client can link `GameLogic` without `NeuronClient`.
+- The existing `Starstrike` executable links both `GameLogic` + `GameRender`
   and behaves identically to today.
 
 ---
@@ -32,9 +32,9 @@ remains.  Updated by codebase audit.
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 1.1 — Create `GameLogicPlatform.h` | ✅ Done | Forward-declares `ShapeStatic`, `ShapeFragmentData`, `ShapeMarkerData`; `#if GAMELOGIC_HAS_RENDERER` includes `NeuronClient.h` |
-| 1.2 — Change `GameLogic/pch.h` | ✅ Done | Now includes `GameLogicPlatform.h` only |
-| 1.3 — `GAMELOGIC_HAS_RENDERER` define | ✅ Done | Present in both Debug and Release x64 configurations in `GameLogic.vcxproj` |
+| 1.1 — Create `GameLogicPlatform.h` | ✅ Done | Forward-declared `ShapeStatic`, `ShapeFragmentData`, `ShapeMarkerData`; `#if GAMELOGIC_HAS_RENDERER` included `NeuronClient.h`.  **Later deleted in Phase 5.1** — `pch.h` now includes `NeuronCore.h` directly + forward declarations. |
+| 1.2 — Change `GameLogic/pch.h` | ✅ Done | Originally changed to include `GameLogicPlatform.h`.  **Phase 5.1 update:** now includes `NeuronCore.h` directly + forward declarations for `ShapeStatic`, `ShapeFragmentData`, `ShapeMarkerData`. |
+| 1.3 — `GAMELOGIC_HAS_RENDERER` define | ✅ Done | Originally added to both Debug and Release x64 configurations.  **Removed in Phase 5.1** — no longer needed after `GameApp.h` → `GameAppSim.h` migration. |
 
 ### Phase 2 — Extract Rendering into Companion Classes
 
@@ -162,11 +162,11 @@ remains.  Updated by codebase audit.
 - `WorldObjectRenderRegistry` provides the same registry-with-fallback
   pattern used by entities and buildings.
 
-**Remaining blocker for `GAMELOGIC_HAS_RENDERER` removal:** The macro
-cannot be deleted yet because 59 `GameLogic` `.cpp` files include
-`GameApp.h`, which inherits from `GameMain` (defined in
-`NeuronClient/GameMain.h`).  This dependency is resolved in Phase 5.1
-when `GameSim` is created with its own PCH (`NeuronCore.h` only).
+**`GAMELOGIC_HAS_RENDERER` removal: ✅ Done (Phase 5.1).**  The macro
+was removed after extracting `GameAppSim` base class from `GameApp`,
+which broke the `GameApp.h` → `GameMain` → `NeuronClient.h` dependency
+chain.  59 `GameLogic` `.cpp` files now include `GameAppSim.h` (which
+requires only `NeuronCore.h`).  `GameLogicPlatform.h` was also deleted.
 
 ### Phase 2 — Remaining Gaps (Legacy Code Not Yet Cleaned)
 
@@ -192,14 +192,13 @@ when `GameSim` is created with its own PCH (`NeuronCore.h` only).
 |--------|-------|
 | ✅ Done | All render declarations/bodies removed from all subclass `.h`/`.cpp` files (entities, buildings, and WorldObject subclasses).  `Building` virtuals (`Render`/`RenderAlphas`/`RenderLights`/`RenderPorts`) removed.  `Entity::Render` override removed.  `WorldObject::Render(float)` virtual removed (unblocked by Wave 6).  Entity shadow statics removed.  Dead building render helpers removed from 7 files.  All stale rendering includes removed from `GameLogic` simulation files — no `renderer.h`, `text_renderer.h`, `3d_sprite.h`, `ogl_extensions.h`, or `particle_system.h` includes remain.  Dead declarations (`Virii::Render`, `SporeGenerator::RenderTail`) and dead commented-out render code (`virii.cpp` 130-line `RenderLowDetail`/`RenderGlow` block) cleaned up.  `Shape* m_shape` on `Entity`/`Building` deferred to Phase 6. |
 
-### Phase 5 — Create `GameSim` and `GameRender` Projects
+### Phase 5 — Clean `GameLogic` for Headless Use + `GameRender` Project
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 5.1 — `GameSim.vcxproj` | ❌ Not started | `GameLogic` still the sole simulation project.  **Prerequisite verified:** `GameLogic` compiles without `GAMELOGIC_HAS_RENDERER` (headless compilation proven). |
+| 5.1 — Headless-clean `GameLogic` | ✅ Done | `GameLogic` cleaned in-place — no separate `GameSim` project needed.  `GameAppSim` base class extracted; `GAMELOGIC_HAS_RENDERER` removed; `GameLogicPlatform.h` deleted; `pch.h` includes `NeuronCore.h` only.  Headless compilation proven. |
 | 5.2 — `GameRender.vcxproj` | ✅ Done (early) | Created with all companions from the start; static library, pch includes `NeuronClient.h`, includes `NeuronCore/NeuronClient/GameLogic/Starstrike` |
-| 5.3 — Update link deps | ⚠️ Partial | `Starstrike` links `GameRender`; `NeuronServer` does not yet link `GameSim` (doesn't exist) |
-| 5.4 — Delete `GameLogic/` | ❌ Not started | Still in solution |
+| 5.3 — Update link deps | ✅ Done | `Starstrike` links `GameRender` + `GameLogic`.  `NeuronServer` links `NeuronCore` + `GameLogic`.  `AdditionalIncludeDirectories` added to both Debug and Release configs (also fixed pre-existing bug: Release was missing include dirs entirely).  `ProjectReference` to `GameLogic.vcxproj` added. |
 
 ### Phase 6 — Presentation State Separation
 
@@ -211,7 +210,7 @@ when `GameSim` is created with its own PCH (`NeuronCore.h` only).
 
 | Status | Notes |
 |--------|-------|
-| ❌ Not started | Requires Phase 5 (`GameSim`) |
+| ❌ Not started | Phase 5.3 prerequisite now met.  Requires `Shape*` ownership moved to renderers (Phase 6) for entity constructors to work headless. |
 
 ---
 
@@ -257,12 +256,18 @@ The highest-impact remaining work items, in recommended order:
    removed from `worldobject.h`.  No `#if GAMELOGIC_HAS_RENDERER` guards
    remain in GameLogic source files.  Dead declarations
    (`Virii::Render`, `SporeGenerator::RenderTail`) and dead commented-out
-   code cleaned up.  `GAMELOGIC_HAS_RENDERER` removal blocked by
-   `GameApp.h` → `GameMain` dependency (Phase 5 scope).
-10. **Phase 5.1 — `GameSim` project split** — next major milestone.
-    `GAMELOGIC_HAS_RENDERER` removal and `GameLogicPlatform.h` deletion
-    happen as part of this step (blocked by `GameApp.h` → `GameMain`
-    dependency, not by Wave 6).
+   code cleaned up.  ~~`GAMELOGIC_HAS_RENDERER` removal blocked by
+   `GameApp.h` → `GameMain` dependency (Phase 5 scope).~~ Resolved in
+   Phase 5.1.
+10. ~~**Phase 5.1 — Headless-clean `GameLogic`**~~ ✅ Done —
+    `GameAppSim` base class extracted from `GameApp` (breaks the
+    `GameApp.h` → `GameMain` → `NeuronClient.h` dependency chain);
+    59 GameLogic `.cpp` files switched from `GameApp.h` to `GameAppSim.h`;
+    `GAMELOGIC_HAS_RENDERER` removed from `GameLogic.vcxproj`;
+    `GameLogicPlatform.h` deleted; `pch.h` simplified to `NeuronCore.h`
+    + forward declarations; `rgb_colour.h/.cpp` moved from NeuronClient
+    to NeuronCore.  **GameLogic IS the simulation library** — no separate
+    `GameSim` project needed.  Headless compilation proven.
 
 ---
 
@@ -287,23 +292,30 @@ directly.
 
 ### Why It Blocks Server-Owned State
 
-1. **`NeuronServer` cannot link `GameLogic`.**
-   `GameLogic/pch.h` → `NeuronClient.h` → `opengl_directx.h` → D3D12
-   device headers.  A headless server has no GPU.
+1. ~~**`NeuronServer` cannot link `GameLogic`.**~~
+   ~~`GameLogic/pch.h` → `NeuronClient.h` → `opengl_directx.h` → D3D12
+   device headers.  A headless server has no GPU.~~
+   **✅ Resolved (Phase 5.1):** `pch.h` now includes `NeuronCore.h` only.
+   `GameAppSim.h` replaces `GameApp.h` in all 59 `.cpp` files.
 2. **Entity constructors load rendering assets.**
    e.g. `ArmyAnt::ArmyAnt()` calls `g_app->m_resource->GetShape("armyant.shp")`.
    A headless process has no resource/shape system.
-3. **Simulation and rendering share mutable state.**
-   `Advance()` and `Render()` both read/write `m_shape`, `m_front`,
+   *(Phase 6 scope — `Shape*` ownership moves to renderers.)*
+3. ~~**Simulation and rendering share mutable state.**~~
+   ~~`Advance()` and `Render()` both read/write `m_shape`, `m_front`,
    `m_pos`, `m_scale` with no separation of simulation state from
-   presentation state.
-4. **Side-effects in simulation call rendering APIs.**
-   `ArmyAnt::ChangeHealth()` calls `g_explosionManager.AddExplosion(m_shape, transform)`
+   presentation state.~~
+   **✅ Resolved (Phase 4):** All `Render()` methods removed from simulation
+   classes.  Renderers receive `const` references.
+4. ~~**Side-effects in simulation call rendering APIs.**~~
+   ~~`ArmyAnt::ChangeHealth()` calls `g_explosionManager.AddExplosion(m_shape, transform)`
    and `g_app->m_particleSystem->CreateParticle(...)` — both require GPU
-   state.
+   state.~~
+   **✅ Resolved (Phase 3):** All such calls migrated to `SimEventQueue`.
 
 ### PCH Dependency Chain
 
+**Original** (before Phase 1):
 ```
 GameLogic/pch.h
   └─ NeuronClient.h
@@ -315,7 +327,15 @@ GameLogic/pch.h
        └─ opengl_directx.h        ← GL translation layer / GPU
 ```
 
-Only `NeuronCore.h` is needed for pure simulation.
+**Current** (after Phase 5.1):
+```
+GameLogic/pch.h
+  └─ NeuronCore.h                 ← only dependency
+  + forward declarations for ShapeStatic, ShapeFragmentData, ShapeMarkerData
+```
+
+Only `NeuronCore.h` is needed for pure simulation.  `GameAppSim.h` (included
+by individual `.cpp` files, not the PCH) also requires only `NeuronCore.h`.
 
 ---
 
@@ -333,7 +353,7 @@ establishes patterns that subsequent migrations should follow.
 | Mesh generation | Moved to `TreeMeshData` / `GenerateBranch()` — CPU-side, no GL.  Mesh is uploaded lazily in `EnsureUploaded()`. |
 | GPU cleanup on destruction | `IRenderBackend` interface (`GameLogic/render_backend_interface.h`) + global `g_renderBackend`.  `Tree::~Tree()` calls `g_renderBackend->ReleaseBuilding(uniqueId)`.  ~~Previously `ITreeRenderBackend` / `g_treeRenderBackend` — migrated and deleted.~~ |
 | Call-site dispatch | `Starstrike/location.cpp:1082` — manual `if (building->m_type == Building::TypeTree)` dispatch to `TreeRenderer::Get().DrawTree(...)` |
-| Simulation file | `GameLogic/tree.cpp` — ~~still includes `soundsystem.h`, `particle_system.h`~~ removed after Phase 3; side-effects migrated to `GameSimEvent` / `g_simEventQueue`; still includes `GameApp.h` for `g_app->m_location` (fire spread) |
+| Simulation file | `GameLogic/tree.cpp` — ~~still includes `soundsystem.h`, `particle_system.h`~~ removed after Phase 3; side-effects migrated to `GameSimEvent` / `g_simEventQueue`; includes `GameAppSim.h` for `g_app->m_location` (fire spread) |
 
 ### Patterns to Adopt from TreeRenderer
 
@@ -458,31 +478,31 @@ Only the calling convention and ownership boundary change.
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    GameSim (new lib)                 │
+│                  GameLogic (cleaned)                 │
 │  Pure simulation: Entity, Building, AI, weapons,    │
 │  pathfinding, economy, spirit logic.                │
-│  NO GL, NO D3D12, NO Shape*, NO Renderer*.          │
+│  NO GL, NO D3D12, NO Renderer*.                     │
 │  pch.h includes NeuronCore.h only.                  │
 │  Compiles for server AND client.                    │
 └──────────────┬──────────────────────┬───────────────┘
                │                      │
     ┌──────────▼──────────┐  ┌────────▼────────────┐
-    │   NeuronServer      │  │  GameRender (new)    │
+    │   NeuronServer      │  │  GameRender          │
     │   (headless)        │  │  Render logic for    │
     │   Links: NeuronCore │  │  entities, buildings │
-    │         + GameSim   │  │  Links: NeuronClient │
-    │                     │  │        + GameSim     │
+    │        + GameLogic  │  │  Links: NeuronClient │
+    │                     │  │       + GameLogic    │
     └─────────────────────┘  └────────┬────────────┘
                                       │
                              ┌────────▼────────────┐
                              │   Starstrike (exe)   │
                              │   Links: NeuronClient│
-                             │        + GameSim     │
-                             │        + GameRender  │
+                             │       + GameLogic    │
+                             │       + GameRender   │
                              └─────────────────────┘
 ```
 
-A **headless bot client** links `NeuronCore` + `GameSim` only (no
+A **headless bot client** links `NeuronCore` + `GameLogic` only (no
 `GameRender`, no `NeuronClient`).
 
 ---
@@ -557,12 +577,15 @@ behavioral change.
 ## Phase 1 — Break the PCH Dependency
 
 Highest-value, lowest-risk change.  Makes `GameLogic` compilable without GPU
-headers behind a preprocessor guard.
+headers.  Originally used a preprocessor guard (`GAMELOGIC_HAS_RENDERER`);
+this was later removed in Phase 5.1 after `GameAppSim` extraction.
 
 ### 1.1 — Create `GameLogic/GameLogicPlatform.h`
 
+> **Deleted in Phase 5.1.**  Original content shown for historical reference.
+
 ```cpp
-// GameLogic/GameLogicPlatform.h
+// GameLogic/GameLogicPlatform.h  [DELETED]
 #pragma once
 
 #include "NeuronCore.h"
@@ -585,9 +608,13 @@ class Renderer;
 
 ### 1.2 — Change `GameLogic/pch.h`
 
-```diff
-- #include "NeuronClient.h"
-+ #include "GameLogicPlatform.h"
+**Final state** (after Phase 5.1):
+```cpp
+#pragma once
+#include "NeuronCore.h"
+class ShapeStatic;
+struct ShapeFragmentData;
+struct ShapeMarkerData;
 ```
 
 ### 1.3 — Add preprocessor define to `GameLogic.vcxproj`
@@ -596,7 +623,9 @@ Add `GAMELOGIC_HAS_RENDERER` to the preprocessor definitions for both
 Debug and Release configurations.  This preserves current behavior — nothing
 breaks.
 
-The server build of `GameLogic` (or future `GameSim`) omits this define.
+~~The server build of `GameLogic` (or future `GameSim`) omits this define.~~
+**UPDATE (Phase 5.1):** This define has been removed entirely.  `GameLogic`
+now compiles without it after `GameAppSim` extraction.
 
 ---
 
@@ -940,10 +969,10 @@ For each remaining `WorldObject` subclass with a `Render()` override:
 Once all WorldObject subclass renderers are extracted:
 
 - [x] Remove `virtual void Render(float)` from `WorldObject`
-- [ ] Delete `GAMELOGIC_HAS_RENDERER` from all `.vcxproj` files
-      (blocked by `GameApp.h` → `GameMain` dependency — Phase 5 scope)
-- [ ] Delete `GameLogicPlatform.h` (replaced by direct `NeuronCore.h`
-      include in `GameSim/pch.h` — Phase 5 scope)
+- [x] Delete `GAMELOGIC_HAS_RENDERER` from all `.vcxproj` files
+      (**Done** — removed in Phase 5.1 after `GameAppSim` extraction)
+- [x] Delete `GameLogicPlatform.h` (**Done** — `pch.h` now includes
+      `NeuronCore.h` directly + forward declarations)
 
 ### Per-Entity Migration Checklist
 
@@ -1104,22 +1133,69 @@ All WorldObject subclass renderers extracted (Wave 6).
 
 ---
 
-## Phase 5 — Create `GameSim` and `GameRender` Projects
+## Phase 5 — Clean `GameLogic` for Headless Use + `GameRender` Project
 
-> **STATUS: ⚠️ Partial.**  5.2 (`GameRender.vcxproj`) completed early.
-> 5.1 (`GameSim`), 5.3 (link deps), and 5.4 (delete `GameLogic`) not
-> started — blocked by Phases 2–4.
+> **STATUS: ✅ Complete.**  5.1 (`GameLogic` headless cleanup)
+> done via in-place refactoring — no separate `GameSim` project needed.
+> 5.2 (`GameRender.vcxproj`) completed early.  5.3 (link deps) done.
+> 5.4 is N/A.
 
-### 5.1 — `GameSim/GameSim.vcxproj` (static library)
+### 5.1 — Headless-clean `GameLogic` (in-place)
 
-> **STATUS: ❌ Not started.**  `GameLogic` is still the sole simulation
-> project.
+> **STATUS: ✅ Done.**  `GameLogic` is now the pure-simulation library.
+> Headless compilation proven.
 
-- Move all simulation `.cpp/.h` from `GameLogic/` into `GameSim/`.
-- `pch.h` includes `NeuronCore.h` only.
-- Additional include directories: `$(SolutionDir)NeuronCore`.
-- **No** `NeuronClient` dependency.
-- **No** `GAMELOGIC_HAS_RENDERER` define.
+**Original plan** called for creating a separate `GameSim.vcxproj` and
+moving all simulation files there.  After completing Phases 1–4 and Wave 6,
+`GameLogic` was already clean enough to serve as the simulation library
+directly.  Creating a separate project would have been unnecessary churn.
+
+**What was done instead:**
+
+1. **Extracted `GameAppSim` base class** (`GameLogic/GameAppSim.h`):
+   - Contains ALL data members from `GameApp` (with default member
+     initializers), the `GameMode` enum, virtual lifecycle methods with
+     empty defaults, and static utility methods.
+   - Requires only `NeuronCore.h` + `rgb_colour.h` — no `NeuronClient`
+     dependency.
+   - Declares `extern GameAppSim* g_app;`.
+
+2. **Refactored `GameApp`** (`Starstrike/GameApp.h`):
+   - Now `class GameApp : public GameAppSim, public GameMain` — only
+     framework overrides and lifecycle method overrides, no data members.
+   - `Starstrike/GameApp.cpp`: `GameAppSim* g_app = nullptr;` (was
+     `GameApp*`); member initializer list removed (DMIs handle it);
+     3 static methods qualified as `GameAppSim::`.
+
+3. **Migrated 59 GameLogic `.cpp` files**: `#include "GameApp.h"` →
+   `#include "GameAppSim.h"`.
+
+4. **Moved `rgb_colour.h/.cpp`** from `NeuronClient` to `NeuronCore`
+   (pure data type, zero rendering dependencies).
+
+5. **Removed `GAMELOGIC_HAS_RENDERER`** from `GameLogic.vcxproj` (both
+   Debug and Release configurations).
+
+6. **Deleted `GameLogicPlatform.h`** and simplified `GameLogic/pch.h` to:
+   ```cpp
+   #pragma once
+   #include "NeuronCore.h"
+   class ShapeStatic;
+   struct ShapeFragmentData;
+   struct ShapeMarkerData;
+   ```
+
+7. **Updated `Starstrike/main.cpp`**: 4 call sites use
+   `static_cast<GameApp*>(g_app)->IsActive()`/`IsSuspended()` (these are
+   `GameMain` methods, not simulation concepts).
+
+**Remaining include dependencies** (utility headers, not GPU):
+GameLogic `.cpp` files still include NeuronClient utility headers
+(51× `resource.h`, 44× `ShapeStatic.h`, 44× `math_utils.h`,
+25× `text_stream_readers.h`, 25× `file_writer.h`, etc.) and Starstrike
+infrastructure headers (35× `team.h`, 20× `main.h`, 11× `unit.h`, etc.).
+None of these are GPU/rendering headers.  Full removal is Phase 6 scope
+(moving `Shape*` ownership to renderers).
 
 ### 5.2 — `GameRender/GameRender.vcxproj` (static library)
 
@@ -1140,34 +1216,21 @@ All WorldObject subclass renderers extracted (Wave 6).
 
 ### 5.3 — Update link dependencies
 
-> **STATUS: ⚠️ Partial.**  `Starstrike` links `GameRender`.  `NeuronServer`
-> does not yet link `GameSim` (project doesn't exist).
+> **STATUS: ✅ Done.**  `Starstrike` links `GameRender` + `GameLogic`.
+> `NeuronServer` links `NeuronCore` + `GameLogic`.
 
-| Project | Links |
-|---------|-------|
-| `Starstrike` | `NeuronClient`, `NeuronCore`, `GameSim`, `GameRender` |
-| `NeuronServer` | `NeuronCore`, `GameSim` |
-| `BotClient` (future) | `NeuronCore`, `GameSim` |
+| Project | Links | Status |
+|---------|-------|--------|
+| `Starstrike` | `NeuronClient`, `NeuronCore`, `GameLogic`, `GameRender` | ✅ |
+| `NeuronServer` | `NeuronCore`, `GameLogic` | ✅ |
+| `BotClient` (future) | `NeuronCore`, `GameLogic` | ❌ Not yet created |
 
 ### 5.4 — Delete `GameLogic/` project
 
-> **STATUS: ❌ Not started.**
-
-**Prerequisite:** Wave 6 (WorldObject subclass renderers) is ✅ complete.
-All render companions exist in `GameRender/`, all `Render()` bodies and
-declarations removed from `GameLogic`, `WorldObject::Render(float)` virtual
-deleted.  No `#if defined(GAMELOGIC_HAS_RENDERER)` guards remain in
-`GameLogic` source files.
-
-**Remaining blocker:** `GAMELOGIC_HAS_RENDERER` and `GameLogicPlatform.h`
-cannot be deleted yet because 59 `GameLogic` `.cpp` files include
-`GameApp.h`, which inherits from `GameMain` (defined in
-`NeuronClient/GameMain.h`).  Without `GAMELOGIC_HAS_RENDERER`, the PCH
-does not include `NeuronClient.h`, and `GameMain` is undefined.  This is
-resolved when `GameSim` is created (Phase 5.1) with its own PCH
-(`NeuronCore.h` only) and the `GameApp.h` dependency is eliminated.
-
-Once all files are migrated, remove `GameLogic.vcxproj` from the solution.
+> **STATUS: N/A.**  `GameLogic` IS the simulation library — no separate
+> `GameSim` project was created, so there is nothing to delete.  The original
+> plan assumed a rename/move to `GameSim/`; the in-place cleanup approach
+> (Phase 5.1) made this unnecessary.
 
 ---
 
@@ -1212,12 +1275,13 @@ simulation at a different rate than the client framerate.
 
 ## Phase 7 — Headless Bot Client
 
-> **STATUS: ❌ Not started.**  Requires Phase 5 (`GameSim` project).
+> **STATUS: ❌ Not started.**  Requires Phase 5.3 (`NeuronServer` links
+> `GameLogic`).
 
-With `GameSim` fully decoupled:
+With `GameLogic` fully decoupled:
 
 1. Create `BotClient/BotClient.vcxproj` (executable).
-2. Links: `NeuronCore` + `GameSim` + networking.
+2. Links: `NeuronCore` + `GameLogic` + networking.
 3. No `NeuronClient`, no `GameRender`, no window, no GPU.
 4. Runs `Location::Advance()` in a loop, sends commands via network.
 5. All entity constructors work because `Shape*` has moved to renderers.
@@ -1247,15 +1311,23 @@ The simulation does not need the shape.  The fix:
 ## Handling `g_app` — The God Global
 
 `g_app` reaches everything: renderer, camera, resource loader, location,
-sound, particles.  A full split of `g_app` is out of scope for this plan,
-but the boundary is:
+sound, particles.  **Phase 5.1 partially addressed this** by extracting
+`GameAppSim` as a base class containing only simulation-relevant data
+members.  `g_app` is now typed as `GameAppSim*` (not `GameApp*`), which
+prevents simulation code from accidentally accessing `GameMain` (DX12/WinRT)
+members at compile time.
+
+The boundary is:
 
 - **Simulation code** may access `g_app->m_location`, `g_app->m_globalWorld`,
-  `g_app->m_clientToServer`, and similar simulation-state members.
+  `g_app->m_clientToServer`, and similar simulation-state members (all on
+  `GameAppSim`).
 - **Simulation code must NOT access** `g_app->m_renderer`, `g_app->m_camera`,
   `g_app->m_resource` (shape/texture loading), `g_app->m_particleSystem`,
   `g_app->m_soundSystem`.  These calls move to render companions or the
   `SimEventQueue`.
+- **Client code** that needs `GameMain` methods (e.g. `IsActive()`,
+  `IsSuspended()`) uses `static_cast<GameApp*>(g_app)`.
 
 A future phase can split `g_app` into `g_sim` (simulation globals) and
 `g_client` (rendering/audio globals).
@@ -1291,8 +1363,8 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 2 | `NeuronClient/opengl_directx.cpp` | Changed `g_treeRenderBackend` → `g_renderBackend` init/shutdown | ✅ |
 | 3 | `NeuronCore/SimEventQueue.h` | **New** — generic `SimEventQueue<TEvent, Capacity>` template (reusable across projects) | ✅ |
 | 3 | `NeuronCore/Overloaded.h` | **New** — aggregate template for `std::visit` lambda dispatch | ✅ |
-| 3 | `GameLogic/GameSimEvent.h` | **New** — `std::variant`-based event struct with 6 alternatives + `Visit()` + factories + `SimParticle`/`SimSoundSource` constants; `sizeof <= 88` enforced by `static_assert` (moves to `GameSim/` in Phase 5) | ✅ |
-| 3 | `GameLogic/GameSimEventQueue.h/.cpp` | **New** — typedef `SimEventQueue<GameSimEvent, 1024>` + `g_simEventQueue` global (moves to `GameSim/` in Phase 5) | ✅ |
+| 3 | `GameLogic/GameSimEvent.h` | **New** — `std::variant`-based event struct with 6 alternatives + `Visit()` + factories + `SimParticle`/`SimSoundSource` constants; `sizeof <= 88` enforced by `static_assert` | ✅ |
+| 3 | `GameLogic/GameSimEventQueue.h/.cpp` | **New** — typedef `SimEventQueue<GameSimEvent, 1024>` + `g_simEventQueue` global | ✅ |
 | 3 | All entity/building `.cpp` with `g_explosionManager`, `m_particleSystem`, `m_soundSystem` | Replace with `g_simEventQueue.Push(SimEvent::Make*(...))` calls; remove stale includes | ✅ |
 | 3 | `Starstrike/main.cpp` | Add `DrainSimEvents()` with `std::visit` + `Overloaded` after `Location::Advance()` | ✅ |
 | 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` | ✅ |
@@ -1313,13 +1385,24 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 2 W6 | `GameLogic/virii.h` | Dead `Render()` declaration removed | ✅ |
 | 2 W6 | `GameLogic/virii.cpp` | Dead 130-line commented-out `RenderLowDetail`/`RenderGlow` block removed | ✅ |
 | 2 W6 | `GameLogic/sporegenerator.h` | Dead `RenderTail()` declaration removed | ✅ |
-| 5 post | All `.vcxproj` files | Remove `GAMELOGIC_HAS_RENDERER` define (blocked by `GameApp.h` → `GameMain` dependency — Phase 5 scope) | ❌ |
-| 5 post | `GameLogic/GameLogicPlatform.h` | **Deleted** — replaced by `NeuronCore.h` in `GameSim/pch.h` | ❌ |
-| 5 | `GameSim/GameSim.vcxproj` | **New** — pure simulation static lib | ❌ |
+| 5.1 | `GameLogic/GameAppSim.h` | **New** — simulation-side base class for `GameApp`; all data members with DMIs, `GameMode` enum, virtual lifecycle methods, static utilities, `extern GameAppSim* g_app;` | ✅ |
+| 5.1 | `Starstrike/GameApp.h` | Rewritten — `class GameApp : public GameAppSim, public GameMain`; only framework overrides, no data members | ✅ |
+| 5.1 | `Starstrike/GameApp.cpp` | `GameAppSim* g_app = nullptr;`; member init list removed; 3 static methods `GameAppSim::` qualifier | ✅ |
+| 5.1 | `Starstrike/main.cpp` | 4 call sites changed to `static_cast<GameApp*>(g_app)->IsActive()`/`IsSuspended()` | ✅ |
+| 5.1 | 59 `GameLogic/*.cpp` files | `#include "GameApp.h"` → `#include "GameAppSim.h"` | ✅ |
+| 5.1 | `NeuronCore/rgb_colour.h/.cpp` | **Moved** from `NeuronClient` — pure data type, zero rendering deps | ✅ |
+| 5.1 | `NeuronCore/NeuronCore.vcxproj` | Added `rgb_colour.h/.cpp` entries | ✅ |
+| 5.1 | `NeuronClient/NeuronClient.vcxproj` | Removed `rgb_colour.h/.cpp` entries | ✅ |
+| 5.1 | `GameLogic/GameLogic.vcxproj` | `GAMELOGIC_HAS_RENDERER` removed (Debug + Release); `GameAppSim.h` added to `ClInclude` | ✅ |
+| 5.1 | `GameLogic/GameLogicPlatform.h` | **Deleted** — replaced by direct `NeuronCore.h` include in `pch.h` | ✅ |
+| 5.1 | `GameLogic/pch.h` | Simplified to `#include "NeuronCore.h"` + 3 forward declarations (`ShapeStatic`, `ShapeFragmentData`, `ShapeMarkerData`) | ✅ |
+| 5 post | All `.vcxproj` files | ~~Remove `GAMELOGIC_HAS_RENDERER` define~~ | ✅ Done in 5.1 |
+| 5 post | `GameLogic/GameLogicPlatform.h` | ~~**Deleted**~~ | ✅ Done in 5.1 |
+| 5 | ~~`GameSim/GameSim.vcxproj`~~ | ~~**New** — pure simulation static lib~~ | N/A — `GameLogic` cleaned in-place |
 | 5 | `GameRender/GameRender.vcxproj` | **New** — render companion static lib | ✅ (early) |
-| 5 | `Starstrike/Starstrike.vcxproj` | Update link deps | ⚠️ Partial |
-| 5 | `NeuronServer/NeuronServer.vcxproj` | Add `GameSim` link | ❌ |
-| 5 | `GameLogic/GameLogic.vcxproj` | **Deleted** | ❌ |
+| 5 | `Starstrike/Starstrike.vcxproj` | Update link deps | ✅ |
+| 5.3 | `NeuronServer/NeuronServer.vcxproj` | Add `GameLogic` `ProjectReference` + `AdditionalIncludeDirectories` (Debug + Release) | ✅ |
+| 5 | ~~`GameLogic/GameLogic.vcxproj`~~ | ~~**Deleted**~~ | N/A — `GameLogic` stays |
 | 7 | `BotClient/BotClient.vcxproj` | **New** — headless executable | ❌ |
 
 ---
@@ -1341,7 +1424,7 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | `TreeRenderer::EnsureUploaded()` mutates `Tree` (writes `m_meshDirty`, calls `Generate()`) | Move `Generate()` to `Tree::Advance()` in Phase 2 pre-step; renderer becomes pure consumer before any new companions are written |
 | `TreeRenderer` has no `BuildingRenderer` base, concrete `Tree*` coupling | `TreeBuildingRenderer` thin adapter wraps existing DX12 pipeline; no rewrite needed |
 | Replicating TreeRenderer verbatim for 40 types creates 40 `if/else if` branches and 40 per-type cleanup interfaces | Standardized `BuildingRenderer`/`EntityRenderer` base + registry dispatch; single `IRenderBackend` for cleanup |
-| `#if GAMELOGIC_HAS_RENDERER` guards in 5 WorldObject subclass files become permanent technical debt if not resolved | ✅ Resolved — Wave 6 extracted all `Render()` bodies into `GameRender/` companions; no guards remain in GameLogic source files.  Macro itself persists until Phase 5.1 (`GameSim` project split) due to `GameApp.h` → `GameMain` dependency. |
+| `#if GAMELOGIC_HAS_RENDERER` guards in 5 WorldObject subclass files become permanent technical debt if not resolved | ✅ Resolved — Wave 6 extracted all `Render()` bodies into `GameRender/` companions; no guards remain in GameLogic source files.  Macro removed in Phase 5.1 after `GameAppSim` extraction broke the `GameApp.h` → `GameMain` dependency. |
 
 ---
 
@@ -1354,7 +1437,7 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 - **`WorldObjectId`** — pure data, no rendering dependency.
 - **`TreeMeshData`, `TreeVertex`** — pure CPU-side data buffers used by
   `Tree` (simulation) and consumed by `TreeRenderer` (rendering).  These
-  are GPU-free and belong in `GameSim`.
+  are GPU-free and belong in `GameLogic`.
 
 ---
 
@@ -1373,9 +1456,9 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 3 — SimEventQueue (all entity/building types) | 1 week | Medium | Phase 2 in progress | ✅ Done |
 | 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete | ✅ Done |
 | 2 W6 — WorldObject subclass renderers (Flag, Snow, BoxKite, SpaceInvader, weapons) | 3–5 days | Low | Phase 4 | ✅ Done |
-| 5 — Project split (create GameSim + GameRender, move files) | 1–2 days | Low | Phase 4 + Wave 6 | ⚠️ 5.2 done early |
+| 5 — GameLogic headless cleanup + GameRender project | 1–2 days | Low | Phase 4 + Wave 6 | ✅ Done (5.1 + 5.2 + 5.3) |
 | 6 — Presentation state separation | 1 week | Low | Phase 5 | ⚠️ Partial |
-| 7 — Bot client | 1–2 days | Low | Phase 5 | ❌ Not started |
+| 7 — Bot client | 1–2 days | Low | Phase 6 | ❌ Not started |
 
 Phase 1 alone is enough to start server-side simulation experiments
 immediately.  Phases 2–4 can run in parallel with other feature work.
@@ -1418,7 +1501,17 @@ immediately.  Phases 2–4 can run in parallel with other feature work.
     dead declarations (`Virii::Render`, `SporeGenerator::RenderTail`) and
     dead commented-out render code cleaned up.  `GAMELOGIC_HAS_RENDERER`
     removal blocked by `GameApp.h` → `GameMain` dependency (Phase 5).
-14. **Phase 5.1 — `GameSim` project split** — next major milestone.
-    Resolves `GameApp.h` → `GameMain` dependency; enables
-    `GAMELOGIC_HAS_RENDERER` and `GameLogicPlatform.h` deletion.
-15. **Phases 5.3–7** sequentially.
+14. ~~**Phase 5.1 — Headless-clean `GameLogic`**~~ ✅ Done —
+    `GameAppSim` base class extracted from `GameApp`; 59 `.cpp` files
+    switched to `GameAppSim.h`; `GAMELOGIC_HAS_RENDERER` removed;
+    `GameLogicPlatform.h` deleted; `pch.h` simplified; `rgb_colour.h/.cpp`
+    moved to NeuronCore.  **GameLogic IS the simulation library** — no
+    separate `GameSim` project needed.  Headless compilation proven.
+15. ~~**Phase 5.3** — `NeuronServer` links `GameLogic`.~~ ✅ Done —
+    `NeuronServer.vcxproj` updated: `ProjectReference` to `GameLogic`,
+    `AdditionalIncludeDirectories` added to both Debug and Release
+    configs (also fixed pre-existing bug: Release config was missing
+    include dirs entirely).
+16. **Phase 6** — Presentation state separation (`Shape*` ownership to
+    renderers).
+17. **Phase 7** — Headless bot client.

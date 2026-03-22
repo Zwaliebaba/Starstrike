@@ -5,7 +5,7 @@
 #include "file_writer.h"
 #include "language_table.h"
 #include "blueprintstore.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "camera.h"
 #include "main.h"

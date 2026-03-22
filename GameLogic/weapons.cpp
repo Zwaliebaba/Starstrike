@@ -9,7 +9,7 @@
 #include "insertion_squad.h"
 #include "airstrike.h"
 #include "darwinian.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "location.h"

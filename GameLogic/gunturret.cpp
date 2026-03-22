@@ -4,7 +4,7 @@
 #include "math_utils.h"
 #include "input.h"
 #include "globals.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "team.h"
 #include "entity_grid.h"

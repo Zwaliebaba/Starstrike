@@ -2,7 +2,7 @@
 #include "hi_res_time.h"
 #include "snow.h"
 #include "globals.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 
 // ****************************************************************************

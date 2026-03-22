@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "clienttoserver.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"

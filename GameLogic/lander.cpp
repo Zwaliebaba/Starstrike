@@ -2,7 +2,7 @@
 #include "resource.h"
 #include "math_utils.h"
 #include "ShapeStatic.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
 #include "team.h"

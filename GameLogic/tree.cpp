@@ -9,7 +9,7 @@
 #include "tree.h"
 #include "render_backend_interface.h"
 #include "GameSimEventQueue.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "globals.h"
 #include "location.h"
 

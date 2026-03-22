@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "darwinian.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "ai.h"
 #include "armour.h"
 #include "armyant.h"

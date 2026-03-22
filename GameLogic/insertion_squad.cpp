@@ -6,7 +6,7 @@
 #include "ShapeStatic.h"
 #include "input.h"
 #include "input_types.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"

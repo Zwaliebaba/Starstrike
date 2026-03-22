@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "wall.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
 

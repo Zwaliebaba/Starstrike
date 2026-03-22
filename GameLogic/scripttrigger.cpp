@@ -3,7 +3,7 @@
 #include "text_stream_readers.h"
 #include "language_table.h"
 #include "scripttrigger.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "globals.h"
 #include "location.h"
 #include "entity_grid.h"

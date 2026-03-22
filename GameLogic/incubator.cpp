@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "incubator.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "file_writer.h"
 #include "globals.h"

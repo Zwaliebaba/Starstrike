@@ -8,7 +8,7 @@
 #include "language_table.h"
 #include "trunkport.h"
 #include "GameSimEventQueue.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "global_world.h"
 #include "main.h"

@@ -239,12 +239,12 @@ bool LocationGameLoop()
   while (!g_app->m_requestQuit)
   {
     // Yield CPU when the window is suspended or inactive.
-    if (g_app->IsSuspended())
+    if (static_cast<GameApp*>(g_app)->IsSuspended())
     {
       WaitMessage();
       continue;
     }
-    if (!g_app->IsActive())
+    if (!static_cast<GameApp*>(g_app)->IsActive())
     {
       // Still pump messages but throttle to ~10 FPS.
       Sleep(100);
@@ -502,12 +502,12 @@ bool GlobalWorldGameLoop()
       break;
 
     // Yield CPU when the window is suspended or inactive.
-    if (g_app->IsSuspended())
+    if (static_cast<GameApp*>(g_app)->IsSuspended())
     {
       WaitMessage();
       continue;
     }
-    if (!g_app->IsActive())
+    if (!static_cast<GameApp*>(g_app)->IsActive())
     {
       Sleep(100);
     }

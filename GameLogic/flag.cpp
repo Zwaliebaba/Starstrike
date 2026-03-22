@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "flag.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "main.h"
 
 Flag::Flag()

@@ -10,7 +10,7 @@
 #include "sporegenerator.h"
 
 #include "GameSimEventQueue.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "main.h"
 #include "camera.h"

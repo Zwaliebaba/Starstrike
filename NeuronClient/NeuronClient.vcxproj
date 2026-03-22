@@ -181,7 +181,6 @@
     <ClInclude Include="render_utils.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceStateTracker.h" />
-    <ClInclude Include="rgb_colour.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerManager.h" />
     <ClInclude Include="sample_cache.h" />
@@ -285,7 +284,6 @@
     <ClCompile Include="render_utils.cpp" />
     <ClCompile Include="resource.cpp" />
     <ClCompile Include="ResourceStateTracker.cpp" />
-    <ClCompile Include="rgb_colour.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SamplerManager.cpp" />
     <ClCompile Include="sample_cache.cpp" />

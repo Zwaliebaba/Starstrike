@@ -7,7 +7,7 @@
 #include "math_utils.h"
 
 
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "globals.h"

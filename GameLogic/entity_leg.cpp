@@ -5,7 +5,7 @@
 #include "ShapeStatic.h"
 #include "entity.h"
 #include "entity_leg.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "location.h"
 #include "main.h"
 

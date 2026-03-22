@@ -27,39 +27,11 @@
 #include "gamecursor_2d.h"
 #include "level_file.h"
 
-GameApp* g_app = nullptr;
+GameAppSim* g_app = nullptr;
 
 #define GAMEDATAFILE "game.txt"
 
 GameApp::GameApp()
-  : m_userInput(nullptr),
-    m_resource(nullptr),
-    m_soundSystem(nullptr),
-    m_particleSystem(nullptr),
-    m_langTable(nullptr),
-    m_profiler(nullptr),
-    m_globalWorld(nullptr),
-    m_location(nullptr),
-    m_locationId(-1),
-    m_camera(nullptr),
-    m_server(nullptr),
-    m_clientToServer(nullptr),
-    m_renderer(nullptr),
-    m_locationInput(nullptr),
-    m_taskManager(nullptr),
-    m_script(nullptr),
-    m_startSequence(nullptr),
-    m_negativeRenderer(false),
-    m_difficultyLevel(0),
-    m_largeMenus(false),
-    m_paused(false),
-    m_editing(false),
-    m_requestedLocationId(-1),
-    m_requestToggleEditing(false),
-    m_requestQuit(false),
-    m_levelReset(false),
-    m_atMainMenu(false),
-    m_gameMode(GameModeNone)
 {
   g_app = this;
 
@@ -238,12 +210,12 @@ void GameApp::SetProfileName(const char* _profileName)
   }
 }
 
-const char* GameApp::GetProfileDirectory()
+const char* GameAppSim::GetProfileDirectory()
 {
   return "";
 }
 
-const char* GameApp::GetPreferencesPath()
+const char* GameAppSim::GetPreferencesPath()
 {
   // good leak #1
   static char* path = nullptr;
@@ -259,7 +231,7 @@ const char* GameApp::GetPreferencesPath()
   return path;
 }
 
-const char* GameApp::GetScreenshotDirectory()
+const char* GameAppSim::GetScreenshotDirectory()
 {
   return "";
 }

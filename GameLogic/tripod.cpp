@@ -6,7 +6,7 @@
 #include "vector2.h"
 #include "entity_leg.h"
 #include "tripod.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "entity_grid.h"
 #include "GameSimEventQueue.h"
 #include "location.h"

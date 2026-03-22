@@ -8,7 +8,7 @@
 #include "hi_res_time.h"
 #include "clienttoserver.h"
 #include "GameSimEventQueue.h"
-#include "GameApp.h"
+#include "GameAppSim.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"
