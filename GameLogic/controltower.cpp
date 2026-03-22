@@ -7,7 +7,7 @@
 #include "math_utils.h"
 #include "hi_res_time.h"
 #include "clienttoserver.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "camera.h"
 #include "location.h"
@@ -184,7 +184,7 @@ bool ControlTower::Reprogram(int _teamId)
 
         if (m_ownership == 100.0f)
         {
-          g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ReprogramComplete"));
+          g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ReprogramComplete"));
           //g_app->m_sepulveda
           targetBuilding->ReprogramComplete();
           SetTeamId(_teamId);

@@ -3,7 +3,7 @@
 #include "matrix34.h"
 #include "ShapeStatic.h"
 #include "math_utils.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "unit.h"
@@ -275,7 +275,7 @@ bool ArmyAnt::AdvanceAttackEnemy()
     {
       g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)), SimParticle::TypeMuzzleFlash));
     }
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
   }
 
   return false;

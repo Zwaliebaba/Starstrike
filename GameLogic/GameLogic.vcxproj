@@ -103,6 +103,8 @@
     <ClInclude Include="feedingtube.h" />
     <ClInclude Include="flag.h" />
     <ClInclude Include="GameLogicPlatform.h" />
+    <ClInclude Include="GameSimEvent.h" />
+    <ClInclude Include="GameSimEventQueue.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="generichub.h" />
     <ClInclude Include="goddish.h" />
@@ -124,8 +126,6 @@
     <ClInclude Include="rocket.h" />
     <ClInclude Include="safearea.h" />
     <ClInclude Include="scripttrigger.h" />
-    <ClInclude Include="SimEvent.h" />
-    <ClInclude Include="SimEventQueue.h" />
     <ClInclude Include="snow.h" />
     <ClInclude Include="souldestroyer.h" />
     <ClInclude Include="spam.h" />
@@ -170,6 +170,7 @@
     <ClCompile Include="factory.cpp" />
     <ClCompile Include="feedingtube.cpp" />
     <ClCompile Include="flag.cpp" />
+    <ClCompile Include="GameSimEventQueue.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="generichub.cpp" />
     <ClCompile Include="goddish.cpp" />
@@ -192,7 +193,6 @@
     <ClCompile Include="rocket.cpp" />
     <ClCompile Include="safearea.cpp" />
     <ClCompile Include="scripttrigger.cpp" />
-    <ClCompile Include="SimEventQueue.cpp" />
     <ClCompile Include="snow.cpp" />
     <ClCompile Include="souldestroyer.cpp" />
     <ClCompile Include="spam.cpp" />

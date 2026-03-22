@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include "MathCommon.h"
 #include "Transform3D.h"
+#include "GameVector3.h"
+#include "GameMatrix.h"
 
 using namespace DirectX;
 

@@ -6,7 +6,7 @@
 #include "globals.h"
 #include "location.h"
 #include "math_utils.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "resource.h"
 #include "ShapeStatic.h"
 
@@ -161,7 +161,7 @@ void Incubator::SpawnEntity()
   //
   // Sound effect
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "SpawnEntity"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "SpawnEntity"));
 }
 
 void Incubator::AddSpirit(Spirit* _spirit)
@@ -180,7 +180,7 @@ void Incubator::AddSpirit(Spirit* _spirit)
   ii->m_alpha = 1.0f;
   m_incoming.PutData(ii);
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "AddSpirit"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "AddSpirit"));
 }
 
 void Incubator::GetDockPoint(LegacyVector3& _pos, LegacyVector3& _front)

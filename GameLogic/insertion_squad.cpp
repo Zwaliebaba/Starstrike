@@ -16,8 +16,7 @@
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "main.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "global_world.h"
 #include "insertion_squad.h"
 #include "teleport.h"
@@ -320,13 +319,13 @@ void Squadie::ChangeHealth(int _amount)
   if (!m_dead)
   {
     if (_amount < 0)
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LoseHealth"));
 
     if (m_stats[StatHealth] + _amount <= 0)
     {
       m_stats[StatHealth] = 100;
       m_dead = true;
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Die"));
     }
     else if (m_stats[StatHealth] + _amount > 255)
       m_stats[StatHealth] = 255;
@@ -350,7 +349,7 @@ bool Squadie::Advance(Unit* _theUnit)
     if (m_secondaryTimer <= 0.0f)
     {
       // Secondary weapon is reloaded
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "WeaponReturns"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "WeaponReturns"));
     }
   }
 
@@ -518,8 +517,8 @@ void Squadie::Attack(const LegacyVector3& _pos)
     //
     //
     m_reloading = m_stats[StatRate];
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "FireLaser"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "FireLaser"));
   }
 }
 
@@ -538,25 +537,25 @@ void Squadie::FireSecondaryWeapon(const LegacyVector3& _pos)
     switch (squad->m_weaponType)
     {
     case GlobalResearch::TypeGrenade:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowGrenade"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowGrenade"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeAirStrike:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowAirStrike"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowAirStrike"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableAirstrikeMarker, m_id.GetTeamId());
       m_secondaryTimer = 20.0f;
       break;
 
     case GlobalResearch::TypeController:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowController"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowController"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableControllerGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeRocket:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "FireRocket"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "FireRocket"));
       g_app->m_location->FireRocket(laserPos, _pos, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;

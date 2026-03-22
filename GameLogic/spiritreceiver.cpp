@@ -14,7 +14,7 @@
 #include "camera.h"
 #include "global_world.h"
 #include "renderer.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 // ****************************************************************************
 // Class ReceiverBuilding
@@ -84,7 +84,7 @@ bool ReceiverBuilding::Advance()
 void ReceiverBuilding::TriggerSpirit(float _initValue)
 {
   m_spirits.PutDataAtStart(_initValue);
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TriggerSpirit"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "TriggerSpirit"));
 }
 
 void ReceiverBuilding::Read(TextReader* _in, bool _dynamic)

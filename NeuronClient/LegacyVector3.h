@@ -1,209 +1,173 @@
 #pragma once
 
-
 #include "math_utils.h"
 #include "vector2.h"
 
 class LegacyVector3;
 
-extern LegacyVector3 const g_upVector;
-extern LegacyVector3 const g_zeroVector;
-
+extern const LegacyVector3 g_upVector;
+extern const LegacyVector3 g_zeroVector;
 
 class LegacyVector3
 {
-private:
-	bool Compare(LegacyVector3 const &b) const
-	{
-		return ( NearlyEquals(x, b.x) &&
-				 NearlyEquals(y, b.y) &&
-				 NearlyEquals(z, b.z) );
-	}
+  bool Compare(const LegacyVector3& b) const { return (NearlyEquals(x, b.x) && NearlyEquals(y, b.y) && NearlyEquals(z, b.z)); }
 
-public:
-	float x, y, z;
+  public:
+    float x, y, z;
 
-	// *** Constructors ***
-	LegacyVector3()
-	:	x(0.0f), y(0.0f), z(0.0f)
-	{
-	}
+    // *** Constructors ***
+    LegacyVector3()
+      : x(0.0f),
+        y(0.0f),
+        z(0.0f) {}
 
-	LegacyVector3(float _x, float _y, float _z)
-	:	x(_x), y(_y), z(_z)
-	{
-	}
+    LegacyVector3(float _x, float _y, float _z)
+      : x(_x),
+        y(_y),
+        z(_z) {}
 
-	LegacyVector3(Vector2 const &_b)
-	:	x(_b.x), y(0.0f), z(_b.y)
-	{
-	}
+    LegacyVector3(const Vector2& _b)
+      : x(_b.x),
+        y(0.0f),
+        z(_b.y) {}
 
-	void Zero()
-	{
-		x = y = z = 0.0f;
-	}
+    LegacyVector3(const XMVECTOR& _b) { XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(this), _b); }
 
-	void Set(float _x, float _y, float _z)
-	{
-		x = _x;
-		y = _y;
-		z = _z;
-	}
+    // Conversion bridge: GameVector3 ↔ LegacyVector3 (MathPlan Phase 2)
+    LegacyVector3(const Neuron::Math::GameVector3& _v) : x(_v.x), y(_v.y), z(_v.z) {}
+    operator Neuron::Math::GameVector3() const { return Neuron::Math::GameVector3(x, y, z); }
 
-	LegacyVector3 operator ^ (LegacyVector3 const &b) const
-	{
-		return LegacyVector3(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
-	}
+    void Zero() { x = y = z = 0.0f; }
 
-	float operator * (LegacyVector3 const &b) const
-	{
-		return x*b.x + y*b.y + z*b.z;
-	}
+    void Set(float _x, float _y, float _z)
+    {
+      x = _x;
+      y = _y;
+      z = _z;
+    }
 
-	LegacyVector3 operator - () const
-	{
-		return LegacyVector3(-x, -y, -z);
-	}
+    operator XMVECTOR() const { return XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(this)); }
 
-	LegacyVector3 operator + (LegacyVector3 const &b) const
-	{
-		return LegacyVector3(x + b.x, y + b.y, z + b.z);
-	}
+    LegacyVector3 operator ^(const LegacyVector3& b) const
+    {
+      return LegacyVector3(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
+    }
 
-	LegacyVector3 operator - (LegacyVector3 const &b) const
-	{
-		return LegacyVector3(x - b.x, y - b.y, z - b.z);
-	}
+    float operator *(const LegacyVector3& b) const { return x * b.x + y * b.y + z * b.z; }
 
-	LegacyVector3 operator * (float const b) const
-	{
-		return LegacyVector3(x * b, y * b, z * b);
-	}
+    LegacyVector3 operator -() const { return LegacyVector3(-x, -y, -z); }
 
-	LegacyVector3 operator / (float const b) const
-	{
-		float multiplier = 1.0f / b;
-		return LegacyVector3(x * multiplier, y * multiplier, z * multiplier);
-	}
+    LegacyVector3 operator +(const LegacyVector3& b) const { return LegacyVector3(x + b.x, y + b.y, z + b.z); }
 
-	LegacyVector3 const &operator = (LegacyVector3 const &b)
-	{
-		x = b.x;
-		y = b.y;
-		z = b.z;
-		return *this;
-	}
+    LegacyVector3 operator -(const LegacyVector3& b) const { return LegacyVector3(x - b.x, y - b.y, z - b.z); }
 
-	LegacyVector3 const &operator *= (float const b)
-	{
-		x *= b;
-		y *= b;
-		z *= b;
-		return *this;
-	}
+    LegacyVector3 operator *(const float b) const { return LegacyVector3(x * b, y * b, z * b); }
 
-	LegacyVector3 const &operator /= (float const b)
-	{
-		float multiplier = 1.0f / b;
-		x *= multiplier;
-		y *= multiplier;
-		z *= multiplier;
-		return *this;
-	}
+    LegacyVector3 operator /(const float b) const
+    {
+      float multiplier = 1.0f / b;
+      return LegacyVector3(x * multiplier, y * multiplier, z * multiplier);
+    }
 
-	LegacyVector3 const &operator += (LegacyVector3 const &b)
-	{
-		x += b.x;
-		y += b.y;
-		z += b.z;
-		return *this;
-	}
+    const LegacyVector3& operator =(const LegacyVector3& b)
+    {
+      x = b.x;
+      y = b.y;
+      z = b.z;
+      return *this;
+    }
 
-	LegacyVector3 const &operator -= (LegacyVector3 const &b)
-	{
-		x -= b.x;
-		y -= b.y;
-		z -= b.z;
-		return *this;
-	}
+    const LegacyVector3& operator *=(const float b)
+    {
+      x *= b;
+      y *= b;
+      z *= b;
+      return *this;
+    }
 
-	LegacyVector3 const &Normalise()
-	{
-		float lenSqrd = x*x + y*y + z*z;
-		if (lenSqrd > 0.0f)
-		{
-			float invLen = 1.0f / sqrtf(lenSqrd);
-			x *= invLen;
-			y *= invLen;
-			z *= invLen;
-		}
-		else
-		{
-			x = y = 0.0f;
-			z = 1.0f;
-		}
+    const LegacyVector3& operator /=(const float b)
+    {
+      float multiplier = 1.0f / b;
+      x *= multiplier;
+      y *= multiplier;
+      z *= multiplier;
+      return *this;
+    }
 
-		return *this;
-	}
+    const LegacyVector3& operator +=(const LegacyVector3& b)
+    {
+      x += b.x;
+      y += b.y;
+      z += b.z;
+      return *this;
+    }
 
-	LegacyVector3 const &SetLength(float _len)
-	{
-		float mag = Mag();
-		if (NearlyEquals(mag, 0.0f))
-		{
-			x = _len;
-			return *this;
-		}
+    const LegacyVector3& operator -=(const LegacyVector3& b)
+    {
+      x -= b.x;
+      y -= b.y;
+      z -= b.z;
+      return *this;
+    }
 
-		float scaler = _len / Mag();
-		*this *= scaler;
-		return *this;
-	}
+    const LegacyVector3& Normalise()
+    {
+      float lenSqrd = x * x + y * y + z * z;
+      if (lenSqrd > 0.0f)
+      {
+        float invLen = 1.0f / sqrtf(lenSqrd);
+        x *= invLen;
+        y *= invLen;
+        z *= invLen;
+      }
+      else
+      {
+        x = y = 0.0f;
+        z = 1.0f;
+      }
 
+      return *this;
+    }
 
-	bool operator == (LegacyVector3 const &b) const;		// Uses FLT_EPSILON
-	bool operator != (LegacyVector3 const &b) const;		// Uses FLT_EPSILON
+    const LegacyVector3& SetLength(float _len)
+    {
+      float mag = Mag();
+      if (NearlyEquals(mag, 0.0f))
+      {
+        x = _len;
+        return *this;
+      }
 
-	void	RotateAroundX	(float _angle);
-	void	RotateAroundY	(float _angle);
-	void	RotateAroundZ	(float _angle);
-	void	FastRotateAround(LegacyVector3 const &_norm, float _angle);
-	void	RotateAround	(LegacyVector3 const &_norm);
+      float scaler = _len / Mag();
+      *this *= scaler;
+      return *this;
+    }
 
-	float Mag() const
-	{
-		return sqrtf(x * x + y * y + z * z);
-	}
+    bool operator ==(const LegacyVector3& b) const; // Uses FLT_EPSILON
+    bool operator !=(const LegacyVector3& b) const; // Uses FLT_EPSILON
 
-	float MagSquared() const
-	{
-		return x * x + y * y + z * z;
-	}
+    void RotateAroundX(float _angle);
+    void RotateAroundY(float _angle);
+    void RotateAroundZ(float _angle);
+    void FastRotateAround(const LegacyVector3& _norm, float _angle);
+    void RotateAround(const LegacyVector3& _norm);
 
-	void HorizontalAndNormalise()
-	{
-		y = 0.0f;
-		float invLength = 1.0f / sqrtf(x * x + z * z);
-		x *= invLength;
-		z *= invLength;
-	}
+    float Mag() const { return sqrtf(x * x + y * y + z * z); }
 
-	float *GetData()
-	{
-		return &x;
-	}
+    float MagSquared() const { return x * x + y * y + z * z; }
 
-	float const *GetDataConst() const
-	{
-		return &x;
-	}
+    void HorizontalAndNormalise()
+    {
+      y = 0.0f;
+      float invLength = 1.0f / sqrtf(x * x + z * z);
+      x *= invLength;
+      z *= invLength;
+    }
+
+    float* GetData() { return &x; }
+
+    const float* GetDataConst() const { return &x; }
 };
 
-
 // Operator * between float and LegacyVector3
-inline LegacyVector3 operator * (	float _scale, LegacyVector3 const &_v )
-{
-	return _v * _scale;
-}
-
+inline LegacyVector3 operator *(float _scale, const LegacyVector3& _v) { return _v * _scale; }

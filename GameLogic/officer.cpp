@@ -10,8 +10,7 @@
 #include "location.h"
 #include "team.h"
 #include "main.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "camera.h"
 #include "obstruction_grid.h"
 #include "entity_grid.h"
@@ -420,7 +419,7 @@ void Officer::SetOrders(const LegacyVector3& _orders)
         }
 
         CancelOrderSounds();
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderGoto"));
       }
     }
     else
@@ -474,16 +473,16 @@ void Officer::SetOrders(const LegacyVector3& _orders)
         switch (m_orders)
         {
         case OrderNone:
-          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
+          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderNone"));
           break;
         case OrderGoto:
-          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
+          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderGoto"));
           break;
         case OrderFollow:
           if (m_absorb)
-            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
+            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderAbsorb"));
           else
-            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
+            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderFollow"));
           break;
         }
 
@@ -546,16 +545,16 @@ void Officer::SetNextMode()
     switch (m_orders)
     {
     case OrderNone:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderNone"));
       break;
     case OrderGoto:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderGoto"));
       break;
     case OrderFollow:
       if (m_absorb)
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderAbsorb"));
       else
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderFollow"));
       break;
     }
 
@@ -616,16 +615,16 @@ void Officer::SetPreviousMode()
     switch (m_orders)
     {
     case OrderNone:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderNone"));
       break;
     case OrderGoto:
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderGoto"));
       break;
     case OrderFollow:
       if (m_absorb)
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderAbsorb"));
       else
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SetOrderFollow"));
       break;
     }
 

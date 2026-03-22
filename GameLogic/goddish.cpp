@@ -12,7 +12,7 @@
 #include "team.h"
 #include "camera.h"
 #include "main.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 GodDish::GodDish()
   : Building(),
@@ -69,7 +69,7 @@ void GodDish::Activate()
     }
   }
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ConnectToGod"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ConnectToGod"));
 }
 
 void GodDish::DeActivate()
@@ -77,7 +77,7 @@ void GodDish::DeActivate()
   m_activated = false;
 
   g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "DisconnectFromGod"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "DisconnectFromGod"));
 }
 
 void GodDish::SpawnSpam(bool _isResearch)

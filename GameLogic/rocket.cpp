@@ -13,8 +13,7 @@
 #include "camera.h"
 #include "team.h"
 #include "main.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "global_world.h"
 #include "script.h"
 #include "entity_grid.h"
@@ -219,9 +218,9 @@ bool FuelGenerator::Advance()
   // Play sounds
 
   if (previousPumpPos >= 0.1f && m_previousPumpPos < 0.1f)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpUp"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "PumpUp"));
   else if (previousPumpPos <= 0.9f && m_previousPumpPos > 0.9f)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpDown"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "PumpDown"));
 
   return FuelBuilding::Advance();
 }
@@ -261,7 +260,7 @@ bool FuelPipe::Advance()
 
   if (m_currentLevel > 0.2f && !m_pumpSoundActive)
   {
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpFuel"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "PumpFuel"));
     m_pumpSoundActive = true;
   }
   else if (m_currentLevel <= 0.2f && m_pumpSoundActive)
@@ -360,7 +359,7 @@ bool FuelStation::BoardRocket(WorldObjectId _id)
         g_simEventQueue.Push(SimEvent::MakeParticle(entityPos, vel, SimParticle::TypeControlFlash));
       }
 
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "LoadPassenger"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "LoadPassenger"));
     }
 
     return result;
@@ -454,7 +453,7 @@ void EscapeRocket::SetupSounds()
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
 
     if (requiredSoundName)
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, requiredSoundName));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, requiredSoundName));
 
     m_activeSoundName = requiredSoundName;
 
@@ -469,7 +468,7 @@ void EscapeRocket::SetupSounds()
 
   if (wantEngine && !m_engineSoundActive)
   {
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "EngineBurn"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "EngineBurn"));
     m_engineSoundActive = true;
   }
   else if (!wantEngine && m_engineSoundActive)
@@ -808,7 +807,7 @@ void EscapeRocket::Damage(float _damage)
     if (m_damage > 100.0f)
     {
       m_state = StateExploding;
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
     }
   }
 }

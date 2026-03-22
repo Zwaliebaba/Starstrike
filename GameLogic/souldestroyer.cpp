@@ -8,7 +8,7 @@
 #include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "globals.h"
 #include "location.h"
 #include "team.h"
@@ -95,7 +95,7 @@ void SoulDestroyer::ChangeHealth(int _amount)
         tailMat.r *= scale;
         tailMat.f *= scale;
 
-        { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = tailMat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
+        g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, tailMat, 1.0f));
       }
     }
   }
@@ -164,7 +164,7 @@ void SoulDestroyer::Attack(const LegacyVector3& _pos)
     float distance = pushVector.Mag();
     if (distance < SOULDESTROYER_DAMAGERANGE)
     {
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
 
       pushVector.SetLength(SOULDESTROYER_DAMAGERANGE - distance);
 
@@ -212,7 +212,7 @@ void SoulDestroyer::Attack(const LegacyVector3& _pos)
 void SoulDestroyer::Panic(float _time)
 {
   if (m_panic <= 0.0f)
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Panic"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Panic"));
 
   m_panic = max(_time, m_panic);
 }
@@ -269,7 +269,7 @@ bool SoulDestroyer::SearchForTargetEnemy()
   if (targetId.IsValid())
   {
     m_targetEntity = targetId;
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "EnemySighted"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EnemySighted"));
     return true;
   }
   m_targetEntity.SetInvalid();

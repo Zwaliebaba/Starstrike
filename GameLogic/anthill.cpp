@@ -7,7 +7,7 @@
 #include "GameApp.h"
 #include "location.h"
 #include "entity_grid.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "team.h"
 #include "main.h"
 #include "anthill.h"
@@ -55,7 +55,7 @@ void AntHill::Damage(float _damage)
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
       g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f - static_cast<float>(m_health) / 100.0f));
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Damage"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Damage"));
     }
 
     if (m_health <= 0)
@@ -78,7 +78,7 @@ void AntHill::Damage(float _damage)
         g_app->m_location->SpawnSpirit(pos, vel, m_id.GetTeamId(), WorldObjectId());
       }
 
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
       m_health = 0;
     }
   }

@@ -15,7 +15,7 @@
 #include "location.h"
 #include "main.h"
 #include "renderer.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "mine.h"
 #include "constructionyard.h"
 #include "trunkport.h"
@@ -208,7 +208,7 @@ bool MineBuilding::Advance()
 {
   float mineSpeed = RefinerySpeed();
   if (m_previousMineSpeed <= 0.1f && mineSpeed > 0.1f)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "CogTurn"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "CogTurn"));
   m_previousMineSpeed = mineSpeed;
 
   if (mineSpeed > 0.0f)

@@ -143,7 +143,7 @@ remains.  Updated by codebase audit.
 
 | Status | Notes |
 |--------|-------|
-| ✅ Complete | `SimEvent.h`, `SimEventQueue.h/.cpp` created in `GameLogic/`.  All simulation-side `g_app->m_particleSystem`, `g_app->m_soundSystem`, and `g_explosionManager` calls across all entity and building `.cpp` files migrated to `g_simEventQueue.Push()` with factory methods (`MakeParticle`, `MakeExplosion`, `MakeSoundStop`, `MakeSoundEntity`, `MakeSoundBuilding`, `MakeSoundOther`).  `DrainSimEvents()` in `Starstrike/main.cpp` processes events after `Location::Advance()`.  Stale `#include` directives for `soundsystem.h`, `particle_system.h`, and `explosion.h` removed from all migrated files.  Only `prefs_sound_window.cpp` (Phase 2 Wave 5 — UI window) and `weapons.cpp` (2 calls in `Render()` bodies — rendering-side) retain rendering-system includes.  `SimEvent::MakeSoundStop` supports optional `eventName` parameter for selective sound stopping.  `FuelPipe` and `EscapeRocket` use sim-side tracking booleans (`m_pumpSoundActive`, `m_activeSoundName`, `m_engineSoundActive`) to replace `NumInstances` queries against the sound system. |
+| ✅ Complete | **Architecture:** generic `SimEventQueue<TEvent, Capacity>` template in `NeuronCore/SimEventQueue.h`; game-specific `GameSimEvent` (`std::variant` with 6 alternatives) in `GameLogic/GameSimEvent.h`; typedef + global in `GameLogic/GameSimEventQueue.h/.cpp`; `NeuronCore/Overloaded.h` provides `std::visit` lambda helper.  `DrainSimEvents()` in `Starstrike/main.cpp` uses `std::visit` + `Overloaded` lambdas (no `switch`/`case`).  All simulation-side `g_app->m_particleSystem`, `g_app->m_soundSystem`, and `g_explosionManager` calls migrated to `g_simEventQueue.Push()` with factory methods (`MakeParticle`, `MakeExplosion`, `MakeSoundStop`, `MakeSoundEntity`, `MakeSoundBuilding`, `MakeSoundOther`).  Stale `#include` directives removed.  Only `prefs_sound_window.cpp` (Wave 5 UI) and `weapons.cpp` (rendering-side) retain rendering-system includes.  `sizeof(GameSimEvent) <= 88` enforced by `static_assert`.  Vector/matrix fields use `Neuron::Math::GameVector3` / `Neuron::Math::GameMatrix` (not legacy types).  See `docs/SimEvent.md` for full implementation details including the 3-phase migration history (split/relocate → DirectXMath migration → `std::variant` conversion). |
 
 ### Phase 4 — Remove `Render()` from Base Classes
 
@@ -187,14 +187,16 @@ The highest-impact remaining work items, in recommended order:
 4. ~~**Migrate `ITreeRenderBackend` → `IRenderBackend`**~~ ✅ Done —
    `tree_render_interface.h` deleted; `TreeRenderer` inherits
    `IRenderBackend`; single `g_renderBackend` global.
-5. ~~**Phase 3 — `SimEventQueue` pilot**~~ ✅ Done — `SimEvent.h`,
-   `SimEventQueue.h/.cpp` created; `Tree::Advance()` / `Damage()` fully
-   migrated; `DrainSimEvents()` in `main.cpp`.
+5. ~~**Phase 3 — `SimEventQueue` pilot**~~ ✅ Done — `GameSimEvent.h`,
+   `GameSimEventQueue.h/.cpp`, `NeuronCore/SimEventQueue.h` created;
+   `Tree::Advance()` / `Damage()` fully migrated; `DrainSimEvents()` in
+   `main.cpp`.
 6. ~~**Phase 3 — remaining entity/building types**~~ ✅ Done — all
    simulation-side `g_explosionManager`, `m_particleSystem`,
-   `m_soundSystem` calls migrated to `SimEventQueue`.  Stale includes
-   removed.  Only `prefs_sound_window.cpp` (Wave 5) and `weapons.cpp`
-   `Render()` bodies retain rendering-system includes.
+   `m_soundSystem` calls migrated.  Stale includes removed.
+   `std::variant`-based `GameSimEvent` with 6 alternatives;
+   `DrainSimEvents()` uses `std::visit` + `Overloaded` lambdas.
+   See `docs/SimEvent.md` for full details.
 7. ~~**Phase 2 Wave 5 — UI/debug windows**~~ ✅ Done — all 17 UI/debug
    window file pairs moved to `GameRender/`; `OTHER_*` macros extracted
    to `GameLogic/prefs_keys.h`.
@@ -274,7 +276,7 @@ establishes patterns that subsequent migrations should follow.
 | Mesh generation | Moved to `TreeMeshData` / `GenerateBranch()` — CPU-side, no GL.  Mesh is uploaded lazily in `EnsureUploaded()`. |
 | GPU cleanup on destruction | `IRenderBackend` interface (`GameLogic/render_backend_interface.h`) + global `g_renderBackend`.  `Tree::~Tree()` calls `g_renderBackend->ReleaseBuilding(uniqueId)`.  ~~Previously `ITreeRenderBackend` / `g_treeRenderBackend` — migrated and deleted.~~ |
 | Call-site dispatch | `Starstrike/location.cpp:1082` — manual `if (building->m_type == Building::TypeTree)` dispatch to `TreeRenderer::Get().DrawTree(...)` |
-| Simulation file | `GameLogic/tree.cpp` — ~~still includes `soundsystem.h`, `particle_system.h`~~ removed after Phase 3 pilot; still includes `GameApp.h` for `g_app->m_location` (fire spread) |
+| Simulation file | `GameLogic/tree.cpp` — ~~still includes `soundsystem.h`, `particle_system.h`~~ removed after Phase 3; side-effects migrated to `GameSimEvent` / `g_simEventQueue`; still includes `GameApp.h` for `g_app->m_location` (fire spread) |
 
 ### Patterns to Adopt from TreeRenderer
 
@@ -891,96 +893,77 @@ For each building type:
 
 ## Phase 3 — Introduce `SimEventQueue` for Side Effects
 
-> **STATUS: ⚠️ Pilot complete (Tree).**  `GameLogic/SimEvent.h` and
-> `GameLogic/SimEventQueue.h/.cpp` created.  `Tree::Advance()` and
-> `Tree::Damage()` fully migrated — all particle/sound side-effect calls
-> replaced with `g_simEventQueue.Push()`.  `DrainSimEvents()` in
-> `Starstrike/main.cpp:108` processes events after each
-> `Location::Advance()` slice.  `tree.cpp` no longer includes
-> `soundsystem.h` or `particle_system.h`.  Remaining entity/building
-> types not yet migrated.
+> **STATUS: ✅ Complete.**  Generic `SimEventQueue<TEvent, Capacity>`
+> template in `NeuronCore/SimEventQueue.h`; game-specific `GameSimEvent`
+> (`std::variant` with 6 alternatives: `ParticleSpawn`, `Explosion`,
+> `SoundStop`, `SoundEntityEvent`, `SoundBuildingEvent`,
+> `SoundOtherEvent`) in `GameLogic/GameSimEvent.h`; typedef + global in
+> `GameLogic/GameSimEventQueue.h/.cpp`.  `DrainSimEvents()` in
+> `Starstrike/main.cpp` uses `std::visit` + `Overloaded` lambdas
+> (`NeuronCore/Overloaded.h`).  All simulation-side particle, sound, and
+> explosion calls across all entity/building `.cpp` files migrated to
+> `g_simEventQueue.Push()` with factory methods.  Stale includes removed.
+> `sizeof(GameSimEvent) <= 88` enforced by `static_assert`.  Vector/matrix
+> fields use `Neuron::Math::GameVector3` / `Neuron::Math::GameMatrix`.
+> See `docs/SimEvent.md` for the full 3-phase implementation history.
 
-Simulation code currently calls rendering/audio systems directly during
-`Advance()` and `ChangeHealth()`.  Replace these with a deferred event
-queue that the client drains after simulation and the server discards.
+Simulation code called rendering/audio systems directly during
+`Advance()` and `ChangeHealth()`.  These have been replaced with a deferred
+event queue that the client drains after simulation and the server discards.
 
-### Pilot: `Tree::Advance()`
+> **Full implementation details** are in `docs/SimEvent.md`, which documents
+> the 3-phase migration: Phase 1 (split & relocate), Phase 2 (DirectXMath
+> migration), Phase 3 (`std::variant` conversion).
 
-`Tree::Advance()` is the ideal first candidate — it is self-contained and
-exercises all three event types:
+### Architecture
 
-| Call site | Current code | Event type |
-|-----------|-------------|------------|
-| `tree.cpp:97` | `g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeFire, fireSize)` | `ParticleSpawn` |
-| `tree.cpp:104` | `g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeExplosionDebris)` | `ParticleSpawn` |
-| `tree.cpp:140` | `g_app->m_soundSystem->StopAllSounds(m_id, "Tree Burn")` | `SoundTrigger` |
-| `tree.cpp:141` | `g_app->m_soundSystem->TriggerBuildingEvent(this, "Create")` | `SoundTrigger` |
-| `tree.cpp:161` | `g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeLeaf, ...)` | `ParticleSpawn` |
-| `tree.cpp:260–261` (`Damage`) | `g_app->m_soundSystem->StopAllSounds(...)` / `TriggerBuildingEvent(...)` | `SoundTrigger` |
+| Component | File | Purpose |
+|-----------|------|---------|
+| Generic queue template | `NeuronCore/SimEventQueue.h` | `SimEventQueue<TEvent, Capacity>` — fixed-capacity flat array, no per-frame allocations |
+| Game event type | `GameLogic/GameSimEvent.h` | `std::variant`-based tagged union with 6 alternatives + `Visit()` helper + factory methods |
+| Typedef + global | `GameLogic/GameSimEventQueue.h/.cpp` | `using GameSimEventQueue = SimEventQueue<GameSimEvent, 1024>; extern GameSimEventQueue g_simEventQueue;` |
+| Visitor helper | `NeuronCore/Overloaded.h` | Aggregate template for `std::visit` lambda dispatch |
+| Client drain | `Starstrike/main.cpp` | `DrainSimEvents()` — `std::visit` + `Overloaded` lambdas after `Location::Advance()` |
 
-Migrate Tree first, verify the pattern works end-to-end, then apply to the
-remaining entity/building types.
-
-### `SimEvent` struct
-
-```cpp
-// GameSim/SimEvents.h
-#pragma once
-
-#include "LegacyVector3.h"
-
-struct SimEvent
-{
-    enum Type
-    {
-        Explosion,
-        ParticleSpawn,
-        SoundTrigger,
-    };
-
-    Type          type;
-    LegacyVector3 pos;
-    LegacyVector3 vel;
-    int           entityType;    // Renderer uses this to pick shape
-    float         scale;
-    int           soundEventId;  // For SoundTrigger events
-};
-```
-
-### `SimEventQueue`
+### `GameSimEvent` variant alternatives
 
 ```cpp
-// GameSim/SimEventQueue.h
-#pragma once
-
-#include "SimEvents.h"
-
-class SimEventQueue
+struct GameSimEvent
 {
-public:
-    void Push(const SimEvent& _event);
-    int  Count() const;
-    const SimEvent& Get(int _index) const;
-    void Clear();
+    struct ParticleSpawn   { GameVector3 pos, vel; int particleType; float particleSize; RGBAColour particleColour; };
+    struct Explosion       { const ShapeStatic* shape; GameMatrix transform; float fraction; };
+    struct SoundStop       { WorldObjectId objectId; const char* eventName; };   // nullptr = stop all
+    struct SoundEntityEvent   { WorldObjectId objectId; const char* eventName; };
+    struct SoundBuildingEvent { WorldObjectId objectId; const char* eventName; };
+    struct SoundOtherEvent    { GameVector3 pos; WorldObjectId objectId; int soundSourceType; const char* eventName; };
 
-private:
-    // Fixed-size ring buffer — no per-frame allocations.
-    static constexpr int MAX_EVENTS = 1024;
-    SimEvent m_events[MAX_EVENTS];
-    int      m_count = 0;
+    using Variant = std::variant<ParticleSpawn, Explosion, SoundStop,
+                                 SoundEntityEvent, SoundBuildingEvent, SoundOtherEvent>;
+    Variant data;
+
+    template<typename Visitor> decltype(auto) Visit(Visitor&& _vis) const;
+
+    // Factory helpers
+    [[nodiscard]] static GameSimEvent MakeParticle(...);
+    [[nodiscard]] static GameSimEvent MakeExplosion(...);
+    [[nodiscard]] static GameSimEvent MakeSoundStop(...);
+    [[nodiscard]] static GameSimEvent MakeSoundEntity(...);
+    [[nodiscard]] static GameSimEvent MakeSoundBuilding(...);
+    [[nodiscard]] static GameSimEvent MakeSoundOther(...);
 };
+static_assert(sizeof(GameSimEvent) <= 88);
+using SimEvent = GameSimEvent; // back-compat alias
 ```
+
+Vector/matrix fields use `Neuron::Math::GameVector3` /
+`Neuron::Math::GameMatrix` (not legacy types).  Implicit conversions in
+`LegacyVector3` and `Matrix34` allow seamless interop at call sites.
 
 ### Replacement example — `ArmyAnt::ChangeHealth()`
 
 ```diff
-- g_explosionManager.AddExplosion(m_shape, transform);
-+ SimEvent evt;
-+ evt.type       = SimEvent::Explosion;
-+ evt.pos        = m_pos;
-+ evt.entityType = m_type;
-+ evt.scale      = m_scale;
-+ g_simEventQueue.Push(evt);
+- g_explosionManager.AddExplosion(m_shape, transform, fraction);
++ g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, fraction));
 ```
 
 ### Client drain loop (in `Starstrike` main loop, after `Location::Advance`)
@@ -988,22 +971,18 @@ private:
 ```cpp
 for (int i = 0; i < g_simEventQueue.Count(); ++i)
 {
-    const SimEvent& evt = g_simEventQueue.Get(i);
-    switch (evt.type)
-    {
-    case SimEvent::Explosion:
-        // Look up shape from entity type via render registry
-        g_explosionManager.AddExplosion(GetShapeForType(evt.entityType),
-                                        BuildTransform(evt));
-        break;
-    case SimEvent::ParticleSpawn:
-        g_app->m_particleSystem->CreateParticle(evt.pos, evt.vel,
-                                                 Particle::TypeMuzzleFlash);
-        break;
-    case SimEvent::SoundTrigger:
-        // dispatch to sound system
-        break;
-    }
+    g_simEventQueue.Get(i).Visit(Overloaded{
+        [](const GameSimEvent::ParticleSpawn& e) {
+            g_app->m_particleSystem->CreateParticle(e.pos, e.vel, e.particleType, e.particleSize);
+        },
+        [](const GameSimEvent::Explosion& e) {
+            g_explosionManager.AddExplosion(e.shape, e.transform, e.fraction);
+        },
+        [](const GameSimEvent::SoundStop& e)          { /* sound system dispatch */ },
+        [](const GameSimEvent::SoundEntityEvent& e)   { /* sound system dispatch */ },
+        [](const GameSimEvent::SoundBuildingEvent& e)  { /* sound system dispatch */ },
+        [](const GameSimEvent::SoundOtherEvent& e)     { /* sound system dispatch */ },
+    });
 }
 g_simEventQueue.Clear();
 ```
@@ -1014,10 +993,13 @@ Server ignores or logs for replay.
 
 ## Phase 4 — Remove `Render()` from Base Classes
 
-> **STATUS: ❌ Not started.**  All entity and building types now have
-> render companions registered (Waves 1–4 complete).  Remaining
-> prerequisites: Phase 3 (`SimEventQueue`) to decouple side-effect calls,
-> and cleaning old `Render()` bodies from building `.cpp` files.
+> **STATUS: ⚠️ In progress.**  All entity and building types have render
+> companions registered (Waves 1–4 complete).  Phase 3 (`SimEventQueue`)
+> is complete — all side-effect calls decoupled.  Building render
+> declarations/bodies fully removed from all subclass `.h`/`.cpp` files.
+> `Building` virtuals removed.  `Entity::Render` override removed.
+> `WorldObject::Render` intentionally kept (used by non-entity/building
+> subclasses).  `Shape* m_shape` deferred to Phase 6.
 
 Once **all** entity and building types have render companions registered:
 
@@ -1064,7 +1046,7 @@ Once **all** entity and building types have render companions registered:
 - ~~Move all `*Renderer.cpp/.h` files from `NeuronClient/` into `GameRender/`.~~
   Companions were placed directly in `GameRender/` — no move needed.
 - Contains `EntityRenderRegistry`, `BuildingRenderRegistry`.
-- Contains `SimEventQueue` drain/dispatch logic (future — not yet created).
+- `DrainSimEvents()` consumer logic lives in `Starstrike/main.cpp` (not `GameRender`).
 - `pch.h` includes `NeuronClient.h`.
 - Additional include directories: `$(SolutionDir)NeuronCore`,
   `$(SolutionDir)NeuronClient`, `$(SolutionDir)GameLogic`,
@@ -1207,11 +1189,12 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 2 | `GameLogic/tree_render_interface.h` | **Deleted** — `ITreeRenderBackend` consolidated into `IRenderBackend` | ✅ |
 | 2 | `NeuronClient/tree_renderer.h/.cpp` | Changed `ITreeRenderBackend` → `IRenderBackend`; `ReleaseTree` → `ReleaseBuilding` | ✅ |
 | 2 | `NeuronClient/opengl_directx.cpp` | Changed `g_treeRenderBackend` → `g_renderBackend` init/shutdown | ✅ |
-| 3 | `GameLogic/SimEvent.h` | **New** — event struct + `SimParticle` type constants (moves to `GameSim/` in Phase 5) | ✅ |
-| 3 | `GameLogic/SimEventQueue.h/.cpp` | **New** — deferred side-effect queue + `g_simEventQueue` global (moves to `GameSim/` in Phase 5) | ✅ |
-| 3 | `GameLogic/tree.cpp` (pilot) | Replace particle/sound calls with event queue pushes; remove `soundsystem.h` and `particle_system.h` includes | ✅ |
-| 3 | `Starstrike/main.cpp` | Add `DrainSimEvents()` after `Location::Advance()`; add `SimEventQueue.h` include | ✅ |
-| 3 | All entity/building `.cpp` with `g_explosionManager`, `m_particleSystem`, `m_soundSystem` | Replace with event queue pushes; remove stale includes | ✅ |
+| 3 | `NeuronCore/SimEventQueue.h` | **New** — generic `SimEventQueue<TEvent, Capacity>` template (reusable across projects) | ✅ |
+| 3 | `NeuronCore/Overloaded.h` | **New** — aggregate template for `std::visit` lambda dispatch | ✅ |
+| 3 | `GameLogic/GameSimEvent.h` | **New** — `std::variant`-based event struct with 6 alternatives + `Visit()` + factories + `SimParticle`/`SimSoundSource` constants; `sizeof <= 88` enforced by `static_assert` (moves to `GameSim/` in Phase 5) | ✅ |
+| 3 | `GameLogic/GameSimEventQueue.h/.cpp` | **New** — typedef `SimEventQueue<GameSimEvent, 1024>` + `g_simEventQueue` global (moves to `GameSim/` in Phase 5) | ✅ |
+| 3 | All entity/building `.cpp` with `g_explosionManager`, `m_particleSystem`, `m_soundSystem` | Replace with `g_simEventQueue.Push(SimEvent::Make*(...))` calls; remove stale includes | ✅ |
+| 3 | `Starstrike/main.cpp` | Add `DrainSimEvents()` with `std::visit` + `Overloaded` after `Location::Advance()` | ✅ |
 | 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` | ❌ |
 | 4 | `GameLogic/entity.h` | Remove `virtual Render()`, `Shape* m_shape`, shadow statics | ❌ |
 | 4 | `GameLogic/entity.cpp` | Remove `BeginRenderShadow` / `RenderShadow` / `EndRenderShadow` | ❌ |
@@ -1292,12 +1275,15 @@ immediately.  Phases 2–4 can run in parallel with other feature work.
 8. ~~**Migrate `ITreeRenderBackend` → `IRenderBackend`**~~ ✅ —
    `tree_render_interface.h` deleted; single `g_renderBackend` global
 9. ~~**Phase 3 pilot**: `Tree::Advance()` side-effects → `SimEventQueue`~~ ✅ —
-   `SimEvent.h`, `SimEventQueue.h/.cpp` created; Tree fully migrated;
-   `DrainSimEvents()` in `main.cpp`; `tree.cpp` no longer includes
-   `soundsystem.h` / `particle_system.h`
-10. ~~**Phase 3 — remaining entity/building types**~~ ✅ — all
-    simulation-side `g_explosionManager`, `m_particleSystem`,
-    `m_soundSystem` calls migrated; stale includes removed
+   `GameSimEvent.h`, `GameSimEventQueue.h/.cpp`,
+   `NeuronCore/SimEventQueue.h` created; Tree fully migrated;
+   `DrainSimEvents()` in `main.cpp`
+10. ~~**Phase 3 — remaining entity/building types + variant conversion**~~ ✅ — all
+    simulation-side calls migrated; `std::variant`-based `GameSimEvent`
+    with 6 alternatives; `DrainSimEvents()` uses `std::visit` +
+    `Overloaded` (`NeuronCore/Overloaded.h`); `sizeof(GameSimEvent) <= 88`;
+    vector/matrix fields use `GameVector3`/`GameMatrix`.
+    See `docs/SimEvent.md` for full 3-phase history
 11. ~~**Phase 2 Wave 5** (UI/debug windows) — move to `GameRender`~~ ✅ —
     all 17 UI/debug window file pairs moved; `OTHER_*` macros extracted
     to `GameLogic/prefs_keys.h`

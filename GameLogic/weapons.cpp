@@ -20,8 +20,7 @@
 #include "unit.h"
 #include "global_world.h"
 #include "taskmanager.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 // ****************************************************************************
 //  Class ThrowableWeapon

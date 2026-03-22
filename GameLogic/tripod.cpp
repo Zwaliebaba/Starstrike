@@ -8,7 +8,7 @@
 #include "tripod.h"
 #include "GameApp.h"
 #include "entity_grid.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "location.h"
 #include "main.h"
 #include "renderer.h"
@@ -539,7 +539,7 @@ bool Tripod::Advance(Unit* _unit)
   if (m_pos.y < g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z))
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = mat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
     return true;
   }
 

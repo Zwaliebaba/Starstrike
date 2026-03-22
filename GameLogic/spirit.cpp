@@ -14,7 +14,7 @@
 #include "team.h"
 #include "global_world.h"
 
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 #include "spirit.h"
 #include "virii.h"
@@ -101,7 +101,7 @@ bool Spirit::Advance()
                 if( m_timeSync <= 0.0f )
                 {
                     m_state = StateDeath;
-                    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "BeginAscent"; g_simEventQueue.Push(evt); }
+                    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "BeginAscent"));
                     m_timeSync = 180.0f;
                     AddToGlobalWorld();
                 }
@@ -234,7 +234,7 @@ void Spirit::AddToGlobalWorld()
 void Spirit::CollectorArrives()
 {
     m_state = StateAttached;
-    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "PickedUp"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PickedUp"));
 }
 
 void Spirit::CollectorDrops()
@@ -244,7 +244,7 @@ void Spirit::CollectorDrops()
     m_state = StateFloating;
     m_pushFromBuildings = true;
 //    Begin();
-    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "Dropped"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Dropped"));
 }
 
 void Spirit::InEgg()
@@ -252,7 +252,7 @@ void Spirit::InEgg()
     m_state = StateInEgg;
     m_vel.Zero();
     m_hover.Zero();
-    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "PlacedInEgg"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PlacedInEgg"));
 }
 
 void Spirit::EggDestroyed()
@@ -261,7 +261,7 @@ void Spirit::EggDestroyed()
     m_hover.Zero();
     m_state = StateFloating;
 //    Begin();
-    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "EggDestroyed"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "EggDestroyed"));
 }
 
 void Spirit::Render( float predictionTime )

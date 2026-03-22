@@ -5,7 +5,7 @@
 #include "ShapeStatic.h"
 
 
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"

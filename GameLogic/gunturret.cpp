@@ -14,7 +14,7 @@
 #include "global_world.h"
 #include "level_file.h"
 #include "gunturret.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 GunTurret::GunTurret()
   : Building(),
@@ -106,7 +106,7 @@ bool GunTurret::SearchForTargets()
   Entity* entity = g_app->m_location->GetEntity(m_targetId);
 
   if (entity && m_targetId != previousTarget)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TargetSighted"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "TargetSighted"));
 
   return (m_targetId.IsValid());
 }
@@ -185,7 +185,7 @@ void GunTurret::PrimaryFire()
   }
 
   if (fired)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "FireShell"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "FireShell"));
 }
 
 bool GunTurret::Advance()

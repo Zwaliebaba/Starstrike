@@ -7,7 +7,7 @@
 #include "input.h"
 #include "armour.h"
 #include "gunturret.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
@@ -73,7 +73,7 @@ void Armour::ChangeHealth(int _amount)
   if (!m_dead)
   {
     if (_amount < 0)
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LoseHealth"));
 
     int oldHealth = m_stats[StatHealth];
     int newHealth = oldHealth + _amount;
@@ -94,7 +94,7 @@ void Armour::ChangeHealth(int _amount)
     if (newHealth == 0)
     {
       m_dead = true;
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Die"));
     }
   }
 }
@@ -384,7 +384,7 @@ void Armour::AddPassenger()
 {
   ++m_numPassengers;
 
-  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoadDarwinian"));
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LoadDarwinian"));
 }
 
 void Armour::RemovePassenger()
@@ -392,7 +392,7 @@ void Armour::RemovePassenger()
   --m_numPassengers;
   m_previousUnloadTimer = GetHighResTime();
 
-  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "UnloadDarwinian"));
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "UnloadDarwinian"));
 }
 
 void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)

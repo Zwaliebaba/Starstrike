@@ -11,7 +11,7 @@
 
 #include "sporegenerator.h"
 
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "main.h"
@@ -253,7 +253,7 @@ bool SporeGenerator::AdvanceEggLaying()
       Matrix34 mat(m_front, g_upVector, m_pos);
       Matrix34 eggLayMat = m_shape->GetMarkerWorldMatrix(m_eggMarker, mat);
       g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, m_vel, 0.0f);
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "LayEgg"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LayEgg"));
     }
   }
 

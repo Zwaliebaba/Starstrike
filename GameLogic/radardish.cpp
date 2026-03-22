@@ -10,7 +10,7 @@
 #include "globals.h"
 #include "location.h"
 #include "main.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "team.h"
 #include "global_world.h"
 #include "unit.h"
@@ -147,7 +147,7 @@ bool RadarDish::Advance()
   if (m_movementSoundsPlaying && m_horizontallyAligned && dishState.angVel.Mag() < 0.05f)
   {
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "EndRotation"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "EndRotation"));
     m_movementSoundsPlaying = false;
   }
 
@@ -204,8 +204,8 @@ bool RadarDish::Advance()
     m_range = 0.0f;
     m_signal = 0.0f;
     m_receiverId = -1;
-    { SimEvent evt = {}; evt.type = SimEvent::SoundStop; evt.objectId = m_id; evt.eventName = "RadarDish ConnectionEstablished"; g_simEventQueue.Push(evt); }
-    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "ConnectionLost"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "RadarDish ConnectionEstablished"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ConnectionLost"));
 
     GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
     if (gb)
@@ -214,7 +214,7 @@ bool RadarDish::Advance()
 
   if (!previouslyAligned && found)
   {
-    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "ConnectionEstablished"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ConnectionEstablished"));
 
     GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
     if (gb)
@@ -257,9 +257,9 @@ void RadarDish::Aim(LegacyVector3 _worldPos)
   m_verticallyAligned = false;
 
   if (m_movementSoundsPlaying)
-    { SimEvent evt = {}; evt.type = SimEvent::SoundStop; evt.objectId = m_id; evt.eventName = "RadarDish BeginRotation"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "RadarDish BeginRotation"));
 
-  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "BeginRotation"; g_simEventQueue.Push(evt); }
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "BeginRotation"));
   m_movementSoundsPlaying = true;
 }
 
@@ -457,7 +457,7 @@ bool RadarDish::UpdateEntityInTransit(Entity* _entity)
 
     g_app->m_location->m_entityGrid->AddObject(id, _entity->m_pos.x, _entity->m_pos.z, _entity->m_radius);
 
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = _entity->m_id; evt.objectType = _entity->m_type; evt.pos = _entity->m_pos; evt.vel = _entity->m_vel; evt.eventName = "ExitTeleport"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(_entity->m_id, "ExitTeleport"));
     return true;
   }
 

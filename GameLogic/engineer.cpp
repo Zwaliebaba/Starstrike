@@ -10,8 +10,7 @@
 #include "language_table.h"
 #include "location.h"
 #include "main.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "math_utils.h"
 #include "matrix34.h"
 #include "obstruction_grid.h"
@@ -228,13 +227,13 @@ void Engineer::ChangeHealth(int amount)
     int healthBandBefore = static_cast<int>(m_stats[StatHealth] / 50.0f);
 
     if (amount < 0)
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LoseHealth"));
 
     if (m_stats[StatHealth] + amount < 0)
     {
       m_stats[StatHealth] = 0;
       m_dead = true;
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Die"));
     }
     else if (m_stats[StatHealth] + amount > 255)
       m_stats[StatHealth] = 255;
@@ -323,7 +322,7 @@ bool Engineer::Advance(Unit* _unit)
       {
         ct->EndReprogram(m_positionId);
         g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EndReprogramming"));
       }
     }
 
@@ -331,7 +330,7 @@ bool Engineer::Advance(Unit* _unit)
     if (m_state == StateResearching)
     {
       g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EndReprogramming"));
     }
 
     // If I was operating a bridge, stop now
@@ -391,7 +390,7 @@ bool Engineer::Advance(Unit* _unit)
     ct->EndReprogram(m_positionId);
     m_positionId = -1;
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EndReprogramming"));
   }
 
   if (building && building->m_type == Building::TypeBridge && m_state != StateOperatingBridge)
@@ -669,7 +668,7 @@ bool Engineer::AdvanceToControlTower()
     {
       m_positionId = positionId;
       ct->BeginReprogram(m_positionId);
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "BeginReprogramming"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "BeginReprogramming"));
       m_state = StateReprogramming;
     }
   }
@@ -702,7 +701,7 @@ bool Engineer::AdvanceResearching()
   if (amIDone)
   {
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ReprogrammingComplete"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ReprogrammingComplete"));
     m_buildingId = -1;
     m_state = StateIdle;
     return false;
@@ -752,7 +751,7 @@ bool Engineer::AdvanceReprogramming()
   if (!building)
   {
     m_state = StateIdle;
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EndReprogramming"));
     return false;
   }
 
@@ -764,7 +763,7 @@ bool Engineer::AdvanceReprogramming()
     if (finished)
     {
       g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ReprogrammingComplete"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ReprogrammingComplete"));
       ct->EndReprogram(m_positionId);
       m_buildingId = -1;
       m_positionId = -1;
@@ -927,7 +926,7 @@ bool Engineer::AdvanceToResearchItem()
   bool arrived = AdvanceToTargetPos();
   if (arrived)
   {
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "BeginReprogramming"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "BeginReprogramming"));
     m_state = StateResearching;
   }
 

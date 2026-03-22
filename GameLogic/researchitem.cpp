@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "researchitem.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "camera.h"
 #include "file_writer.h"
 #include "GameApp.h"
@@ -82,7 +82,7 @@ bool ResearchItem::Advance()
     g_app->m_globalWorld->m_research->AddResearch(m_researchType);
     g_app->m_globalWorld->m_research->m_researchLevel[m_researchType] = m_level;
 
-    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "AquireResearch"; g_simEventQueue.Push(evt); }
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "AquireResearch"));
 
     if (existingLevel == 0)
       g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearch, m_researchType, 4.0f);

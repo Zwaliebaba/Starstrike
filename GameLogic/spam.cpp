@@ -3,7 +3,7 @@
 #include "math_utils.h"
 #include "preferences.h"
 #include "spam.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "globals.h"
@@ -70,7 +70,7 @@ void Spam::Damage(float _damage)
     GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
     if (gb)
       gb->m_online = true;
-    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "Explode"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
   }
 }
 
@@ -100,7 +100,7 @@ void Spam::SpawnInfection()
     infection->m_id.GenerateUniqueId();
   }
 
-  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Attack"));
 }
 
 bool Spam::Advance()
@@ -178,7 +178,7 @@ bool Spam::Advance()
   }
 
   if (m_research)
-    { SimEvent evt = {}; evt.type = SimEvent::SoundStop; evt.objectId = m_id; evt.eventName = "Spam Create"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "Spam Create"));
 
   return Building::Advance();
 }
@@ -194,7 +194,7 @@ void Spam::SetAsResearch()
   m_research = true;
   m_activated = false;
 
-  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "CreateResearch"; g_simEventQueue.Push(evt); }
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "CreateResearch"));
 }
 
 // ============================================================================
@@ -357,7 +357,7 @@ void SpamInfection::AdvanceAttackingEntity()
       LegacyVector3 vel(sfrand(15.0f), frand(15.0f), sfrand(15.0f));
       float size = i * 30;
       LegacyVector3 pos = m_pos + LegacyVector3(0, 50, 0);
-      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = m_pos; evt.vel = vel; evt.particleType = SimParticle::TypeFire; evt.particleSize = size; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeFire, size));
     }
 
     m_life += 1.0f;
@@ -401,7 +401,7 @@ void SpamInfection::AdvanceAttackingSpirit()
       LegacyVector3 vel(sfrand(15.0f), frand(15.0f), sfrand(15.0f));
       float size = i * 30;
       LegacyVector3 pos = m_pos + LegacyVector3(0, 50, 0);
-      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = m_pos; evt.vel = vel; evt.particleType = SimParticle::TypeFire; evt.particleSize = size; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeFire, size));
     }
 
     m_life += 1.0f;

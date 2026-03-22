@@ -7,7 +7,7 @@
 #include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "globals.h"
 #include "location.h"
 #include "team.h"
@@ -131,7 +131,7 @@ void Centipede::ChangeHealth(int _amount)
 void Centipede::Panic(float _time)
 {
   if (m_panic <= 0.0f)
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Panic"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Panic"));
 
   m_panic = max(_time, m_panic);
 
@@ -292,7 +292,7 @@ void Centipede::Attack(const LegacyVector3& _pos)
     float distance = pushVector.Mag();
     if (distance < m_radius)
     {
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
 
       pushVector.SetLength(m_radius - distance);
 
@@ -394,7 +394,7 @@ void Centipede::EatSpirits()
       centipede->Begin();
 
       g_app->m_location->m_entityGrid->AddObject(centipede->m_id, centipede->m_pos.x, centipede->m_pos.z, centipede->m_radius);
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Grow"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Grow"));
 
       tail = centipede;
       m_numSpiritsEaten -= CENTIPEDE_NUMSPIRITSTOREGROW;
@@ -452,7 +452,7 @@ bool Centipede::SearchForTargetEnemy()
   if (targetId.IsValid())
   {
     m_targetEntity = targetId;
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EnemySighted"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EnemySighted"));
     return true;
   }
   m_targetEntity.SetInvalid();

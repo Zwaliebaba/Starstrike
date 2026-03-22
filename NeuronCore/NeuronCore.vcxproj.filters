@@ -91,6 +91,10 @@
     <ClInclude Include="Transform3D.h">
       <Filter>GameMath</Filter>
     </ClInclude>
+    <ClInclude Include="SimEventQueue.h" />
+    <ClInclude Include="GameVector3.h" />
+    <ClInclude Include="GameMatrix.h" />
+    <ClInclude Include="Overloaded.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

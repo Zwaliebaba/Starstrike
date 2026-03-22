@@ -15,7 +15,7 @@
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "main.h"
 
 // ****************************************************************************
@@ -87,7 +87,7 @@ void PowerBuilding::TriggerSurge(float _initValue)
 {
   m_surges.PutDataAtStart(_initValue);
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TriggerSurge"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "TriggerSurge"));
 }
 
 void PowerBuilding::Read(TextReader* _in, bool _dynamic)
@@ -143,7 +143,7 @@ const char* Generator::GetObjectiveCounter()
 void Generator::ReprogramComplete()
 {
   m_enabled = true;
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Enable"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Enable"));
 }
 
 bool Generator::Advance()
@@ -356,7 +356,7 @@ bool SolarPanel::Advance()
   if (fractionOccupied > 0.6f)
   {
     if (!m_operating)
-      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Operate"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Operate"));
     m_operating = true;
   }
 

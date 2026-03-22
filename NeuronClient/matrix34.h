@@ -67,6 +67,24 @@ public:
 	{
 	}
 
+    // Conversion bridge: GameMatrix ↔ Matrix34 (MathPlan Phase 2)
+	Matrix34(const Neuron::Math::GameMatrix& _m)
+	:	r(_m.m._11, _m.m._12, _m.m._13),
+		u(_m.m._21, _m.m._22, _m.m._23),
+		f(_m.m._31, _m.m._32, _m.m._33),
+		pos(_m.m._41, _m.m._42, _m.m._43)
+	{
+	}
+
+	operator Neuron::Math::GameMatrix() const
+	{
+		return Neuron::Math::GameMatrix(DirectX::XMFLOAT4X4(
+			r.x,   r.y,   r.z,   0.0f,
+			u.x,   u.y,   u.z,   0.0f,
+			f.x,   f.y,   f.z,   0.0f,
+			pos.x, pos.y, pos.z, 1.0f));
+	}
+
 	void OrientRU( LegacyVector3 const & _r, LegacyVector3 const & _u );
 	void OrientRF( LegacyVector3 const & _r, LegacyVector3 const & _f );
 	void OrientUF( LegacyVector3 const & _u, LegacyVector3 const & _f );

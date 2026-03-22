@@ -517,9 +517,9 @@ Files (representative, not exhaustive):
 
 ## Success Criteria
 
-- [ ] `GameVector3` (pure storage) and `GameMatrix` (pure storage) types defined in NeuronCore with DirectXMath backing.
-- [ ] All math operations consolidated as `Neuron::Math` free functions in `GameMath.h` — no math methods on storage types.
-- [ ] No `GameMatrix33` type — both `Matrix33` and `Matrix34` replaced by single `GameMatrix` (4×4).
+- [x] `GameVector3` (pure storage) and `GameMatrix` (pure storage) types defined in NeuronCore with DirectXMath backing.
+- [x] All math operations consolidated as `Neuron::Math` free functions in `GameMath.h` — no math methods on storage types.
+- [x] No `GameMatrix33` type — both `Matrix33` and `Matrix34` replaced by single `GameMatrix` (4×4).
 - [ ] All `LegacyVector3`, `Matrix33`, `Matrix34` member variables in core types (`WorldObject`, `Building`, `Camera`) migrated to new types.
 - [ ] All `.cpp` files in GameLogic, NeuronClient, and Starstrike use new types exclusively with load→compute→store pattern.
 - [ ] Legacy headers (`LegacyVector3.h`, `matrix33.h`, `matrix34.h`) and implementations deleted.
@@ -541,3 +541,34 @@ Files (representative, not exhaustive):
 | Phase 6 | Varies (profile-driven) | Ongoing | Low |
 
 **Total estimated effort**: 2–3 weeks for a single developer, assuming no other priorities. Phase 4 is the long tail and can be parallelized or done opportunistically when touching files for other reasons. Phase 6 is reduced in scope because the pure-storage approach means Phase 4 migration naturally operates in XMVECTOR/XMMATRIX registers.
+
+---
+
+## Status
+
+| Phase | Status | Notes |
+|---|---|---|
+| Phase 1 | ✅ Complete | `GameVector3.h`, `GameMatrix.h` created in NeuronCore. `GameMath.h` extended with convenience overloads (`Length`, `LengthSquare`, `Dotf`, `Cross`, `Normalize`, `SetLength`, `TransformPoint`, `TransformVector`, `GetOrientation`). Build passes. |
+| Phase 2 | ✅ Complete | Implicit conversion operators added to `LegacyVector3` (↔ `GameVector3`), `Matrix34` (↔ `GameMatrix`), `Matrix33` (↔ `GameMatrix`). Build passes. Conversion bridge validated end-to-end via `SimEvent.md` Phase 2 (`GameSimEvent` fields migrated to new types; all ~38 producer call sites compile via implicit conversions). |
+| Phase 3 | Not started | Migrate `WorldObject`, `Building`, `Camera` header fields. |
+| Phase 4 | Not started | File-by-file `.cpp` migration. |
+| Phase 5 | Not started | Remove legacy types. |
+| Phase 6 | Not started | Optimization pass. |
+
+### Remaining Phase 1 verification items
+
+- [ ] Unit tests for `GameVector3` (construction, Load/Store round-trip, GetData, field access)
+- [ ] Unit tests for `GameMatrix` (construction, Identity, row accessors, Load/Store round-trip)
+- [ ] Unit tests for convenience overloads (Length, Dotf, Cross, Normalize, SetLength)
+- [ ] Unit tests for `TransformPoint` / `TransformVector` matching legacy `Matrix34 * LegacyVector3`
+
+### Remaining Phase 2 verification items
+
+- [ ] Unit tests for round-trip conversion `LegacyVector3 → GameVector3 → LegacyVector3`
+- [ ] Unit tests for round-trip conversion `Matrix34 → GameMatrix → Matrix34`
+- [ ] Unit tests for round-trip conversion `Matrix33 → GameMatrix → Matrix33`
+- [ ] In-game verification: game runs identically with no visual or behavioral regressions
+
+### Date
+
+2025-07-18

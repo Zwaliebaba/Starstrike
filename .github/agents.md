@@ -72,6 +72,21 @@ NeuronServer ──► NeuronCore
 - Include a short summary of gameplay/graphics impact when applicable.
 - Full guidelines in [docs/contributing.md](../docs/contributing.md).
 
+## DirectXMath / Vector Conventions
+
+- **Parameter passing**: Always pass 3D vectors as `FXMVECTOR` (not `const GameVector3&` or `const XMFLOAT3&`) in function parameters and use the `XM_CALLCONV` calling convention. This keeps vectors in SIMD registers and avoids unnecessary load/store round-trips.
+  ```cpp
+  // Correct — vector stays in registers
+  [[nodiscard]] float XM_CALLCONV Distance(FXMVECTOR _a, FXMVECTOR _b);
+
+  // Incorrect — forces store-to-memory then reload
+  [[nodiscard]] float Distance(const GameVector3& _a, const GameVector3& _b);
+  ```
+- **Storage types** (`GameVector3`, `GameMatrix`) are for struct members, serialization, and long-lived state. Load into `XMVECTOR` / `XMMATRIX` for computation; store the result back.
+- Follow the DirectXMath parameter-position rules for `FXMVECTOR` / `GXMVECTOR` / `HXMVECTOR` / `CXMVECTOR` ordering (see [DirectXMath calling conventions](https://learn.microsoft.com/en-us/windows/win32/dxmath/pg-xnamath-internals#calling-conventions)).
+- All new math utility functions go in `Neuron::Math` (`NeuronCore/GameMath.h`) — do not add math methods to storage types.
+- See [MathPlan.md](../MathPlan.md) for the migration roadmap from legacy types.
+
 ## Additional Notes
 
 - Avoid adding includes already covered by `pch.h`.

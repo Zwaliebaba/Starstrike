@@ -9,7 +9,7 @@
 #include "GameApp.h"
 #include "location.h"
 #include "global_world.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 // ****************************************************************************
 // Class DynamicBase
@@ -98,7 +98,7 @@ void DynamicHub::Initialise(Building* _template)
 void DynamicHub::ReprogramComplete()
 {
   m_reprogrammed = true;
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Enable"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Enable"));
 }
 
 bool DynamicHub::Advance()

@@ -68,6 +68,7 @@ When context files don't provide specific guidance:
   - Use `= nullptr` instead of `.Reset()` to release a COM object.
   - Use `IID_GRAPHICS_PPV_ARGS(ptr)` (defined in `DirectXHelper.h`) instead of `IID_PPV_ARGS(&ptr)` when the target is a `com_ptr`.
   - `IID_PPV_ARGS` is only correct with raw pointers (`T**`) or `.put()` / `.Put()` return values.
+- **DirectXMath vector passing**: Always pass 3D vectors as function parameters using `FXMVECTOR` (not `const GameVector3&` or `const XMFLOAT3&`) with the `XM_CALLCONV` calling convention to keep values in SIMD registers. Use `GameVector3`/`GameMatrix` only for storage (struct members, serialization). Follow DirectXMath parameter-position rules for `FXMVECTOR`/`GXMVECTOR`/`HXMVECTOR`/`CXMVECTOR`. All new math functions go in `Neuron::Math` (`NeuronCore/GameMath.h`).
 
 ## Documentation Requirements
 

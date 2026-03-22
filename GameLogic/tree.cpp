@@ -8,7 +8,7 @@
 #include "preferences.h"
 #include "tree.h"
 #include "render_backend_interface.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "globals.h"
 #include "location.h"
@@ -110,13 +110,7 @@ bool Tree::Advance()
     {
       LegacyVector3 fireSpawn = m_pos + LegacyVector3(0, actualHeight, 0);
       fireSpawn += LegacyVector3(sfrand(actualHeight * 0.75f), sfrand(actualHeight * 0.75f), sfrand(actualHeight * 0.75f));
-      SimEvent evt = {};
-      evt.type = SimEvent::ParticleSpawn;
-      evt.pos = fireSpawn;
-      evt.vel = g_zeroVector;
-      evt.particleType = SimParticle::TypeExplosionDebris;
-      evt.particleSize = -1.0f;
-      g_simEventQueue.Push(evt);
+      g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, g_zeroVector, SimParticle::TypeExplosionDebris));
     }
 
     //
@@ -152,19 +146,8 @@ bool Tree::Advance()
   {
     if (m_burnSoundPlaying)
     {
-      SimEvent stopEvt = {};
-      stopEvt.type = SimEvent::SoundStop;
-      stopEvt.objectId = m_id;
-      stopEvt.eventName = "Tree Burn";
-      g_simEventQueue.Push(stopEvt);
-
-      SimEvent trigEvt = {};
-      trigEvt.type = SimEvent::SoundBuildingEvent;
-      trigEvt.objectId = m_id;
-      trigEvt.objectType = m_type;
-      trigEvt.pos = m_pos;
-      trigEvt.eventName = "Create";
-      g_simEventQueue.Push(trigEvt);
+      g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "Tree Burn"));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Create"));
 
       m_burnSoundPlaying = false;
     }
@@ -185,14 +168,8 @@ bool Tree::Advance()
       float actualHeight = GetActualHeight(0.0f);
       LegacyVector3 fireSpawn = m_pos + LegacyVector3(0, actualHeight, 0);
       fireSpawn += LegacyVector3(sfrand(actualHeight * 1.0f), sfrand(actualHeight * 0.25f), sfrand(actualHeight * 1.0f));
-      SimEvent evt = {};
-      evt.type = SimEvent::ParticleSpawn;
-      evt.pos = fireSpawn;
-      evt.vel = g_zeroVector;
-      evt.particleType = SimParticle::TypeLeaf;
-      evt.particleSize = -1.0f;
-      evt.particleColour = RGBAColour(m_leafColourArray[0], m_leafColourArray[1], m_leafColourArray[2]);
-      g_simEventQueue.Push(evt);
+      g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, g_zeroVector, SimParticle::TypeLeaf, -1.0f,
+        RGBAColour(m_leafColourArray[0], m_leafColourArray[1], m_leafColourArray[2])));
     }
   }
 
@@ -290,19 +267,8 @@ void Tree::Damage(float _damage)
 
       if (!m_burnSoundPlaying)
       {
-        SimEvent stopEvt = {};
-        stopEvt.type = SimEvent::SoundStop;
-        stopEvt.objectId = m_id;
-        stopEvt.eventName = "Tree Create";
-        g_simEventQueue.Push(stopEvt);
-
-        SimEvent trigEvt = {};
-        trigEvt.type = SimEvent::SoundBuildingEvent;
-        trigEvt.objectId = m_id;
-        trigEvt.objectType = m_type;
-        trigEvt.pos = m_pos;
-        trigEvt.eventName = "Burn";
-        g_simEventQueue.Push(trigEvt);
+        g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "Tree Create"));
+        g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Burn"));
 
         m_burnSoundPlaying = true;
       }

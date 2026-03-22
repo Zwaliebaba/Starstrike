@@ -10,7 +10,7 @@
 #include "entity_grid.h"
 #include "renderer.h"
 #include "team.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "virii.h"
 #include "egg.h"
 
@@ -331,7 +331,7 @@ bool Virii::AdvanceAttacking()
     {
       g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)), SimParticle::TypeMuzzleFlash));
     }
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
     SearchForEnemies();
   }
 
@@ -601,7 +601,7 @@ bool Virii::SearchForIdleDirection()
     m_wayPoint = nextPos;
     m_state = StateIdle;
     RecordHistoryPosition(true);
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "ChangeDirection"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ChangeDirection"));
     END_PROFILE(g_app->m_profiler, "SearchForIdleDir");
     return true;
   }
@@ -623,7 +623,7 @@ bool Virii::SearchForIdleDirection()
       m_wayPoint = nextPos;
       m_state = StateIdle;
       RecordHistoryPosition(true);
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "ChangeDirection"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ChangeDirection"));
       END_PROFILE(g_app->m_profiler, "SearchForIdleDir");
       return true;
     }

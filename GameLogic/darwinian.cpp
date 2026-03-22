@@ -13,8 +13,7 @@
 #include "level_file.h"
 #include "location.h"
 #include "main.h"
-#include "SimEvent.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "math_utils.h"
 #include "obstruction_grid.h"
 #include "officer.h"
@@ -779,7 +778,7 @@ bool Darwinian::AdvanceUnderControl()
       g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash));
     }
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EscapedControl"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "EscapedControl"));
     return false;
   }
 
@@ -1263,7 +1262,7 @@ bool Darwinian::SearchForOfficers()
         m_wayPoint = PushFromObstructions(m_wayPoint, false);
         m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
 
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "GivenOrders"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "GivenOrders"));
 
         m_state = StateFollowingOrders;
         END_PROFILE(g_app->m_profiler, "SearchOfficers");
@@ -1350,7 +1349,7 @@ void Darwinian::GiveOrders(const LegacyVector3& _targetPos)
   m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
   m_wayPoint = PushFromObstructions(m_wayPoint);
 
-  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "GivenOrders"));
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "GivenOrders"));
 
   m_state = StateFollowingOrders;
 }
@@ -1459,7 +1458,7 @@ bool Darwinian::SearchForThreats()
     m_scared = true;
     if (m_threatId != threatId)
     {
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatRunAway"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SeenThreatRunAway"));
       m_threatId = threatId;
     }
     END_PROFILE(g_app->m_profiler, "SearchThreats");
@@ -1549,9 +1548,9 @@ bool Darwinian::SearchForThreats()
     if (m_threatId != threatId)
     {
       if (m_scared)
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatRunAway"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SeenThreatRunAway"));
       else
-        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatAttack"));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "SeenThreatAttack"));
       m_threatId = threatId;
     }
 
@@ -1664,7 +1663,7 @@ bool Darwinian::BeginVictoryDance()
       // jump!
       m_vel.y += 15.0f + syncfrand(15.0f);
       m_onGround = false;
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "VictoryJump"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "VictoryJump"));
       return true;
     }
   }
@@ -1882,7 +1881,7 @@ void Darwinian::TakeControl(int _controllerId)
       g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash));
     }
 
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "TakenControl"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "TakenControl"));
   }
 }
 
@@ -1917,7 +1916,7 @@ bool Darwinian::AdvanceOnFire()
   }
 
   if (syncrand() % 50 == 0)
-    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "OnFire"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "OnFire"));
 
   if (!m_dead && syncfrand(10) < 2 && m_onGround)
     ChangeHealth(-2);

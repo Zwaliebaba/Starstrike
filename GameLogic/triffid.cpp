@@ -8,7 +8,7 @@
 #include "text_renderer.h"
 #include "profiler.h"
 #include "language_table.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "triffid.h"
 #include "GameApp.h"
 #include "renderer.h"
@@ -116,7 +116,7 @@ void Triffid::Damage(float _damage)
   m_damage += _damage;
 
   if (m_damage <= 0.0f && !dead)
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Burn"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Burn"));
 }
 
 void Triffid::Launch()
@@ -156,7 +156,7 @@ void Triffid::Launch()
     triffidEgg->m_roamRange = m_triggerRadius;
   }
 
-  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "LaunchEgg"; g_simEventQueue.Push(evt); }
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "LaunchEgg"));
 }
 
 void Triffid::Initialise(Building* _template)
@@ -196,18 +196,18 @@ bool Triffid::Advance()
     LegacyVector3 fireSpawn = headMat.pos;
     fireSpawn += LegacyVector3(sfrand(10.0f * m_size), sfrand(10.0f * m_size), sfrand(10.0f * m_size));
     float fireSize = 100.0f + sfrand(100.0f * m_size);
-    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeFire; evt.particleSize = fireSize; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, g_zeroVector, SimParticle::TypeFire, fireSize));
 
     fireSpawn = m_pos + LegacyVector3(sfrand(10.0f * m_size), sfrand(10.0f * m_size), sfrand(10.0f * m_size));
-    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeFire; evt.particleSize = fireSize; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, g_zeroVector, SimParticle::TypeFire, fireSize));
 
     if (frand(100.0f) < 10.0f)
-      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeExplosionDebris; evt.particleSize = -1.0f; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, g_zeroVector, SimParticle::TypeExplosionDebris));
 
     m_size -= 0.006f;
     if (m_size <= 0.3f)
     {
-      { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = headMat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, headMat, 1.0f));
       return true;
     }
     m_timerSync -= 0.5f;
@@ -345,7 +345,7 @@ void TriffidEgg::ChangeHealth(int _amount)
     transform.f *= m_size;
     transform.u *= m_size;
     transform.r *= m_size;
-    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = transform; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
   }
 }
 
@@ -461,7 +461,7 @@ bool TriffidEgg::Advance(Unit* _unit)
     if (m_pos.y < landHeight + 3.0f)
       m_pos.y = landHeight + 3.0f;
     if (m_force > 0.1f)
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Bounce"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Bounce"));
   }
 
   // Self right ourselves
@@ -481,9 +481,9 @@ bool TriffidEgg::Advance(Unit* _unit)
   if (GetHighResTime() > m_timerSync)
   {
     Matrix34 transform(m_front, m_up, m_pos);
-    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = transform; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
     Spawn();
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "BurstOpen"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "BurstOpen"));
     return true;
   }
 

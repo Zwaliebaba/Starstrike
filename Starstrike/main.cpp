@@ -46,7 +46,7 @@
 #include "water.h"
 #include "window_manager.h"
 #include "GameRender.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 #define TARGET_FRAME_RATE_INCREMENT 0.25f
 
@@ -109,52 +109,45 @@ static void DrainSimEvents()
 {
   for (int i = 0; i < g_simEventQueue.Count(); ++i)
   {
-    const SimEvent& evt = g_simEventQueue.Get(i);
-    switch (evt.type)
-    {
-    case SimEvent::ParticleSpawn:
-      g_app->m_particleSystem->CreateParticle(
-        evt.pos, evt.vel, evt.particleType,
-        evt.particleSize, evt.particleColour);
-      break;
-
-    case SimEvent::Explosion:
-      if (evt.shape)
-        g_explosionManager.AddExplosion(evt.shape, evt.transform, evt.fraction);
-      break;
-
-    case SimEvent::SoundStop:
-      g_app->m_soundSystem->StopAllSounds(evt.objectId, evt.eventName);
-      break;
-
-    case SimEvent::SoundEntityEvent:
-    {
-      Entity* entity = g_app->m_location->GetEntity(evt.objectId);
-      if (entity)
-        g_app->m_soundSystem->TriggerEntityEvent(entity, evt.eventName);
-      break;
-    }
-
-    case SimEvent::SoundBuildingEvent:
-    {
-      Building* building = g_app->m_location->GetBuilding(evt.objectId.GetUniqueId());
-      if (building)
-        g_app->m_soundSystem->TriggerBuildingEvent(building, evt.eventName);
-      break;
-    }
-
-    case SimEvent::SoundOtherEvent:
-    {
-      // TriggerOtherEvent only reads _other->m_pos and _other->m_id.
-      // Spirits are WorldObjects, not Entities, so we build a lightweight
-      // temporary rather than looking up via GetEntity().
-      WorldObject tmp;
-      tmp.m_pos = evt.pos;
-      tmp.m_id = evt.objectId;
-      g_app->m_soundSystem->TriggerOtherEvent(&tmp, evt.eventName, evt.soundSourceType);
-      break;
-    }
-    }
+    g_simEventQueue.Get(i).Visit(Overloaded{
+      [](const SimEvent::ParticleSpawn& e)
+      {
+        g_app->m_particleSystem->CreateParticle(
+          e.pos, e.vel, e.particleType,
+          e.particleSize, e.particleColour);
+      },
+      [](const SimEvent::Explosion& e)
+      {
+        if (e.shape)
+          g_explosionManager.AddExplosion(e.shape, e.transform, e.fraction);
+      },
+      [](const SimEvent::SoundStop& e)
+      {
+        g_app->m_soundSystem->StopAllSounds(e.objectId, e.eventName);
+      },
+      [](const SimEvent::SoundEntityEvent& e)
+      {
+        Entity* entity = g_app->m_location->GetEntity(e.objectId);
+        if (entity)
+          g_app->m_soundSystem->TriggerEntityEvent(entity, e.eventName);
+      },
+      [](const SimEvent::SoundBuildingEvent& e)
+      {
+        Building* building = g_app->m_location->GetBuilding(e.objectId.GetUniqueId());
+        if (building)
+          g_app->m_soundSystem->TriggerBuildingEvent(building, e.eventName);
+      },
+      [](const SimEvent::SoundOtherEvent& e)
+      {
+        // TriggerOtherEvent only reads _other->m_pos and _other->m_id.
+        // Spirits are WorldObjects, not Entities, so we build a lightweight
+        // temporary rather than looking up via GetEntity().
+        WorldObject tmp;
+        tmp.m_pos = e.pos;
+        tmp.m_id = e.objectId;
+        g_app->m_soundSystem->TriggerOtherEvent(&tmp, e.eventName, e.soundSourceType);
+      },
+    });
   }
   g_simEventQueue.Clear();
 }
@@ -684,7 +677,7 @@ bool EnterLocation()
   float minX = -borderSize;
   float maxX = g_app->m_location->m_landscape.GetWorldSizeX() + borderSize;
   g_app->m_camera->SetBounds(minX, maxX, minX, maxX);
-  g_app->m_camera->SetTarget(LegacyVector3(maxX, 1000, maxX), LegacyVector3(-1, -0.7, -1)); // Incase start doesn't exist
+  g_app->m_camera->SetTarget(LegacyVector3(maxX, 1000, maxX), LegacyVector3(-1.0f, -0.7f, -1.0f)); // Incase start doesn't exist
   g_app->m_camera->SetTarget("start");
   g_app->m_camera->CutToTarget();
   g_app->m_camera->RequestMode(Camera::ModeFreeMovement);

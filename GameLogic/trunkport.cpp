@@ -8,7 +8,7 @@
 #include "profiler.h"
 #include "language_table.h"
 #include "trunkport.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "global_world.h"
@@ -81,7 +81,7 @@ bool TrunkPort::Advance()
   if (gb && gb->m_online && m_openTimer == 0.0f)
   {
     m_openTimer = GetHighResTime();
-    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PowerUp"));
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "PowerUp"));
   }
 
   return Building::Advance();

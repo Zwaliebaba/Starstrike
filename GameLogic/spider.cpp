@@ -4,7 +4,7 @@
 #include "camera.h"
 #include "entity_grid.h"
 #include "entity_leg.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "location.h"
 #include "main.h"
 #include "math_utils.h"
@@ -162,7 +162,7 @@ void Spider::StompFoot(const LegacyVector3& _pos)
   {
     LegacyVector3 vel(syncsfrand(20.0f), 5.0f + syncfrand(5.0f), syncsfrand(20.0f));
 
-    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = _pos; evt.vel = vel; evt.particleType = SimParticle::TypeMuzzleFlash; evt.particleSize = 10.0f; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeParticle(_pos, vel, SimParticle::TypeMuzzleFlash, 10.0f));
   }
 
   //
@@ -239,7 +239,7 @@ void Spider::UpdateLegs()
     //		}
 
     if (footPlanted)
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "FootFall"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "FootFall"));
   }
 
   m_delayBetweenLifts = m_parameters[stage].m_delayBetweenLifts;
@@ -420,8 +420,8 @@ bool Spider::AdvanceAttack()
         m_legs[i]->m_foot.m_targetPos = m_legs[i]->m_foot.m_pos + forwards;
       }
 
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
-      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Pounce"; g_simEventQueue.Push(evt); }
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Attack"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Pounce"));
     }
   }
 
@@ -445,7 +445,7 @@ bool Spider::AdvancePouncing()
     for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
       m_legs[i]->m_foot.m_state = EntityFoot::OnGround;
 
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "PounceLand"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "PounceLand"));
 
     // Squash people
     float squashRange = 40.0f;
@@ -585,7 +585,7 @@ bool Spider::AdvanceEggLaying()
 
     g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, g_zeroVector, 0.0f);
 
-    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "LayEgg"; g_simEventQueue.Push(evt); }
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LayEgg"));
 
     m_spiritId = -1;
     m_state = StateIdle;

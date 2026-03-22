@@ -89,6 +89,8 @@
     <ClInclude Include="DeviceNotify.h" />
     <ClInclude Include="FileSys.h" />
     <ClInclude Include="GameMath.h" />
+    <ClInclude Include="GameMatrix.h" />
+    <ClInclude Include="GameVector3.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="MathCommon.h" />
     <ClInclude Include="net_lib.h" />
@@ -100,7 +102,9 @@
     <ClInclude Include="net_udp_packet.h" />
     <ClInclude Include="NeuronCore.h" />
     <ClInclude Include="NeuronHelper.h" />
+    <ClInclude Include="Overloaded.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SimEventQueue.h" />
     <ClInclude Include="TimerCore.h" />
     <ClInclude Include="Transform3D.h" />
     <ClInclude Include="WndProcManager.h" />

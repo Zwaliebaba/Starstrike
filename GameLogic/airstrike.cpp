@@ -6,7 +6,7 @@
 #include "location.h"
 #include "renderer.h"
 #include "camera.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 
 AirstrikeUnit::AirstrikeUnit(int teamId, int unitId, int numEntities, const LegacyVector3& _pos)
   : Unit(Entity::TypeSpaceInvader, teamId, unitId, numEntities, _pos),
@@ -193,7 +193,7 @@ bool SpaceInvader::Advance(Unit* _unit)
       int index = g_app->m_location->m_effects.PutData(weapon);
       weapon->m_id.Set(m_id.GetTeamId(), UNIT_EFFECTS, index, -1);
       weapon->m_id.GenerateUniqueId();
-      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "DropGrenade"));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "DropGrenade"));
       m_armed = false;
     }
   }

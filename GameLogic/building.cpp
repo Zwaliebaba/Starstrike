@@ -12,7 +12,7 @@
 #include "controltower.h"
 #include "darwinian.h"
 #include "entity_grid.h"
-#include "SimEventQueue.h"
+#include "GameSimEventQueue.h"
 #include "factory.h"
 #include "feedingtube.h"
 #include "file_writer.h"
@@ -111,7 +111,7 @@ void Building::Initialise(Building* _template)
   if (gb)
     m_id.SetTeamId(gb->m_teamId);
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Create"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Create"));
 }
 
 void Building::SetDetail(int _detail)
@@ -210,7 +210,7 @@ void Building::Reprogram(float _complete) {}
 
 void Building::ReprogramComplete()
 {
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ReprogramComplete"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ReprogramComplete"));
 
   GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
   if (gb)
@@ -227,7 +227,7 @@ void Building::SetTeamId(int _teamId)
   if (gb)
     gb->m_teamId = _teamId;
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ChangeTeam"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ChangeTeam"));
 }
 
 LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius)
@@ -302,7 +302,7 @@ void Building::EvaluatePorts()
   }
 }
 
-void Building::Damage(float _damage) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Damage")); }
+void Building::Damage(float _damage) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Damage")); }
 
 void Building::Destroy(float _intensity)
 {
@@ -313,7 +313,7 @@ void Building::Destroy(float _intensity)
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
   g_app->m_location->Bang(m_pos, _intensity, _intensity / 4.0f);
 
-  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
 
   for (int i = 0; i < static_cast<int>(_intensity / 4.0f); ++i)
   {
