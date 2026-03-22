@@ -81,8 +81,6 @@ class Virii : public Entity
     bool AdvanceDead();
 
     bool IsInView() override;
-
-    void Render(float predictionTime, int teamId, int _detail);
 };
 
 //*****************************************************************************

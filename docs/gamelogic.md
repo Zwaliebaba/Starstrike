@@ -129,44 +129,44 @@ remains.  Updated by codebase audit.
 
 #### Wave 6 — Remaining WorldObject Subclass Renderers
 
-> **STATUS: ❌ Not started.**  These 5 source files contain `Render()`
-> methods for `WorldObject` subclasses that are neither `Entity` nor
-> `Building`.  Their rendering code is currently guarded with
-> `#if defined(GAMELOGIC_HAS_RENDERER)` as temporary scaffolding.
-> Before Phase 5.4 deletes `GameLogic`, these `Render()` bodies must be
-> extracted into proper render companions in `GameRender/`, matching the
-> pattern established in Waves 1–4.  This also enables removal of
-> `WorldObject::Render(float)` virtual and the `GAMELOGIC_HAS_RENDERER`
-> macro itself.
+> **STATUS: ✅ Done.**  All 5 source files have render companions in
+> `GameRender/`.  `WorldObjectRenderer` base class and
+> `WorldObjectRenderRegistry` provide type-indexed dispatch (matching the
+> entity/building registry pattern).  All renderers registered in
+> `InitGameRenderers()`.  Call sites updated (`Location::RenderWeapons()`
+> uses `g_worldObjectRenderRegistry`; lasers use
+> `WeaponRenderer::RenderLaser()`; flags use `FlagRenderer::Render()`).
+> `WorldObject::Render(float)` virtual removed from `worldobject.h`.
+> No `#if defined(GAMELOGIC_HAS_RENDERER)` guards remain in any
+> `GameLogic` `.cpp`/`.h` files.  No rendering includes remain in the 5
+> source files.  Dead declarations (`Virii::Render`, `SporeGenerator::RenderTail`)
+> and dead commented-out render code (`virii.cpp` `RenderLowDetail`/`RenderGlow`)
+> cleaned up.
 
-| Source File | WorldObject Subclass(es) | Planned Renderer(s) | Status |
-|-------------|-------------------------|---------------------|--------|
-| `flag.cpp` | `Flag` | `FlagRenderer` | ❌ |
-| `snow.cpp` | `Snow` | `SnowRenderer` | ❌ |
-| `airstrike.cpp` | `SpaceInvader` | `SpaceInvaderRenderer` | ❌ |
-| `darwinian.cpp` | `BoxKite` | `BoxKiteRenderer` | ❌ |
-| `weapons.cpp` | `ThrowableWeapon`, `Rocket`, `Laser`, `Shockwave`, `MuzzleFlash`, `Missile`, `TurretShell` | `WeaponRenderer` (single class with type dispatch, or one per weapon — TBD) | ❌ |
+| Source File | WorldObject Subclass(es) | Renderer | Status |
+|-------------|-------------------------|----------|--------|
+| `flag.cpp` | `Flag` | `GameRender/FlagRenderer` (static methods `Render`/`RenderText`) | ✅ |
+| `snow.cpp` | `Snow` | `GameRender/SnowRenderer` (`WorldObjectRenderer` subclass) | ✅ |
+| `airstrike.cpp` | `SpaceInvader` | `GameRender/SpaceInvaderRenderer` (`EntityRenderer` subclass) | ✅ |
+| `darwinian.cpp` | `BoxKite` | `GameRender/BoxKiteRenderer` (`WorldObjectRenderer` subclass) | ✅ |
+| `weapons.cpp` | `ThrowableWeapon`, `Rocket`, `Laser`, `Shockwave`, `MuzzleFlash`, `Missile`, `TurretShell` | `GameRender/WeaponRenderer` (single `WorldObjectRenderer` with internal type dispatch + static `RenderLaser()`) | ✅ |
 
-**Notes:**
-- `Flag::Render()` uses `text_renderer.h` for label display.  The companion
-  will need `TextRenderer` access (already available in `GameRender/`).
-- `Snow::Render()` uses `3d_sprite.h` for billboard particles.
-- `SpaceInvader::Render()` uses `renderer.h` + a debug `#ifdef` path.
-- `BoxKite::Render()` uses `renderer.h` for procedural geometry.
-- `weapons.cpp` contains 7 `Render()` functions sharing `renderer.h` and
-  `particle_system.h`.  A single `WeaponRenderer` with internal dispatch
-  may be cleaner than 7 separate companion classes.
-- Once all companions are created, the `#if defined(GAMELOGIC_HAS_RENDERER)`
-  guards in these 5 files become dead code and are deleted.
-- `WorldObject::Render(float)` virtual can then be removed from
-  `worldobject.h` (currently deferred from Phase 4).
+**Implementation notes:**
+- `FlagRenderer` uses static methods rather than inheriting `WorldObjectRenderer`
+  because `Flag` is a standalone class (not a `WorldObject` subclass).
+- `SpaceInvaderRenderer` inherits `EntityRenderer` (not `WorldObjectRenderer`)
+  because `SpaceInvader` is an `Entity` subclass.
+- `WeaponRenderer` uses a single class with internal type dispatch — chosen
+  over 7 separate classes because the 7 weapon types share `renderer.h` and
+  `particle_system.h` patterns.
+- `WorldObjectRenderRegistry` provides the same registry-with-fallback
+  pattern used by entities and buildings.
 
-**Dispatch mechanism:** These `WorldObject` subclasses do not use
-`EntityRenderRegistry` or `BuildingRenderRegistry`.  They are rendered by
-dedicated loops (e.g. `Location::RenderWeapons()`, `Location::RenderFlags()`).
-The same registry-with-fallback pattern can be applied, or the call sites
-can be updated to call the companion directly since there is typically only
-one type per loop.
+**Remaining blocker for `GAMELOGIC_HAS_RENDERER` removal:** The macro
+cannot be deleted yet because 59 `GameLogic` `.cpp` files include
+`GameApp.h`, which inherits from `GameMain` (defined in
+`NeuronClient/GameMain.h`).  This dependency is resolved in Phase 5.1
+when `GameSim` is created with its own PCH (`NeuronCore.h` only).
 
 ### Phase 2 — Remaining Gaps (Legacy Code Not Yet Cleaned)
 
@@ -178,7 +178,7 @@ one type per loop.
 | Old `Render()` bodies in building `.cpp` files | ✅ Cleaned | All building subclass `Render()`/`RenderAlphas()` bodies removed from `.cpp` files.  Declarations removed from `.h` files. |
 | `Shape* m_shape` and `Shape* m_shapes[]` still on entities | ⚠️ Still coupled | `entity.h:66` still has `ShapeStatic* m_shape`; entity constructors still load shapes via `g_app->m_resource->GetShape()` |
 | `building.h` render virtuals removed | ✅ Done | `Render()`, `RenderAlphas()`, `RenderLights()`, `RenderPorts()` removed from `building.h` and `building.cpp`.  All subclass overrides also removed.  `ShapeStatic* m_shape` still on line 98 — deferred to Phase 6. |
-| `worldobject.h` still has `virtual void Render(float)` | ⚠️ Intentionally kept | Line 88 — base-class virtual remains; required by non-entity/building WorldObject subclasses (`Zombie`, `Spirit`, `Snow`, `SpamInfection`, `Flag`, `GunTurretTarget`, `SpaceInvader`, 7 weapon types).  **Removed after Wave 6** creates companions for all remaining `Render()` overrides. |
+| `worldobject.h` `virtual void Render(float)` removed | ✅ Done | Wave 6 created companions for all remaining `WorldObject` subclass `Render()` overrides.  `WorldObject::Render(float)` virtual deleted from `worldobject.h`.  No `Render()` declarations remain on any `WorldObject` subclass in `GameLogic`. |
 
 ### Phase 3 — SimEventQueue
 
@@ -190,7 +190,7 @@ one type per loop.
 
 | Status | Notes |
 |--------|-------|
-| ✅ Done (except deferred items) | All entity and building render declarations/bodies removed from subclass `.h`/`.cpp` files.  `Building` virtuals (`Render`/`RenderAlphas`/`RenderLights`/`RenderPorts`) removed from `building.h`/`building.cpp`.  `Entity::Render` override removed from `entity.h`.  Entity shadow statics (`BeginRenderShadow`/`RenderShadow`/`EndRenderShadow`) removed from `entity.h`/`entity.cpp`.  Dead building render helpers removed from 7 files (`feedingtube`, `mine`, `radardish`, `spawnpoint`, `spiritreceiver`, `switch`, `teleport`).  Stale rendering includes removed: 16× `renderer.h`, 8× `text_renderer.h`, 1× `ogl_extensions.h`.  Only 5 `.cpp` files retain live rendering includes — all are `WorldObject` subclasses with intentionally-kept `Render()`: `airstrike.cpp` (`renderer.h` — `SpaceInvader`), `darwinian.cpp` (`renderer.h` — `BoxKite`), `weapons.cpp` (`renderer.h` + `particle_system.h` — 7 weapon types), `flag.cpp` (`text_renderer.h` — `Flag`), `snow.cpp` (`3d_sprite.h` — `Snow`).  **Deferred to Wave 6:** these 5 files get proper render companions in `GameRender/`; `WorldObject::Render` virtual removed; `#if GAMELOGIC_HAS_RENDERER` guards deleted.  `Shape* m_shape` on `Entity`/`Building` deferred to Phase 6. |
+| ✅ Done | All render declarations/bodies removed from all subclass `.h`/`.cpp` files (entities, buildings, and WorldObject subclasses).  `Building` virtuals (`Render`/`RenderAlphas`/`RenderLights`/`RenderPorts`) removed.  `Entity::Render` override removed.  `WorldObject::Render(float)` virtual removed (unblocked by Wave 6).  Entity shadow statics removed.  Dead building render helpers removed from 7 files.  All stale rendering includes removed from `GameLogic` simulation files — no `renderer.h`, `text_renderer.h`, `3d_sprite.h`, `ogl_extensions.h`, or `particle_system.h` includes remain.  Dead declarations (`Virii::Render`, `SporeGenerator::RenderTail`) and dead commented-out render code (`virii.cpp` 130-line `RenderLowDetail`/`RenderGlow` block) cleaned up.  `Shape* m_shape` on `Entity`/`Building` deferred to Phase 6. |
 
 ### Phase 5 — Create `GameSim` and `GameRender` Projects
 
@@ -249,15 +249,20 @@ The highest-impact remaining work items, in recommended order:
    subclasses with `Render()`: `SpaceInvader`, `BoxKite`, 7 weapons,
    `Flag`, `Snow`).  `WorldObject::Render` intentionally kept.
    `Shape* m_shape` deferred to Phase 6.
-9. **Phase 2 Wave 6 — WorldObject subclass renderers** — create render
-   companions in `GameRender/` for `Flag`, `Snow`, `BoxKite`,
-   `SpaceInvader`, and 7 weapon types (`ThrowableWeapon`, `Rocket`,
-   `Laser`, `Shockwave`, `MuzzleFlash`, `Missile`, `TurretShell`).  This
-   removes the `#if defined(GAMELOGIC_HAS_RENDERER)` guards from the 5
-   source files, enables removing `WorldObject::Render(float)` virtual,
-   and deletes the `GAMELOGIC_HAS_RENDERER` macro entirely.  Prerequisite
-   for Phase 5.4 (delete `GameLogic`).
+9. ~~**Phase 2 Wave 6 — WorldObject subclass renderers**~~ ✅ Done —
+   `FlagRenderer`, `SnowRenderer`, `BoxKiteRenderer`,
+   `SpaceInvaderRenderer`, `WeaponRenderer` all in `GameRender/`;
+   `WorldObjectRenderer` base + `WorldObjectRenderRegistry` for dispatch;
+   all registered in `InitGameRenderers()`.  `WorldObject::Render(float)`
+   removed from `worldobject.h`.  No `#if GAMELOGIC_HAS_RENDERER` guards
+   remain in GameLogic source files.  Dead declarations
+   (`Virii::Render`, `SporeGenerator::RenderTail`) and dead commented-out
+   code cleaned up.  `GAMELOGIC_HAS_RENDERER` removal blocked by
+   `GameApp.h` → `GameMain` dependency (Phase 5 scope).
 10. **Phase 5.1 — `GameSim` project split** — next major milestone.
+    `GAMELOGIC_HAS_RENDERER` removal and `GameLogicPlatform.h` deletion
+    happen as part of this step (blocked by `GameApp.h` → `GameMain`
+    dependency, not by Wave 6).
 
 ---
 
@@ -908,36 +913,37 @@ Each entity type is a self-contained PR:
 **Wave 5 — UI / debug windows**: ✅ Complete
 - All 17 UI/debug window file pairs moved from `GameLogic/` to `GameRender/`
 
-**Wave 6 — Remaining WorldObject subclasses** (not `Entity` / `Building`):
-- `Flag`, `Snow`, `BoxKite`, `SpaceInvader`, `ThrowableWeapon`, `Rocket`,
-  `Laser`, `Shockwave`, `MuzzleFlash`, `Missile`, `TurretShell`
-
-These are the final `Render()` overrides remaining in `GameLogic` source
-files.  They are currently behind `#if defined(GAMELOGIC_HAS_RENDERER)`
-guards.  Extracting them into `GameRender/` companions enables removing
-`WorldObject::Render(float)` and the macro itself.
+**Wave 6 — Remaining WorldObject subclasses** (not `Entity` / `Building`): ✅ Complete
+- `Flag` → `FlagRenderer`, `Snow` → `SnowRenderer`, `BoxKite` →
+  `BoxKiteRenderer`, `SpaceInvader` → `SpaceInvaderRenderer`,
+  7 weapon types → `WeaponRenderer` (single class with internal dispatch)
+- `WorldObjectRenderer` base class + `WorldObjectRenderRegistry` for
+  type-indexed dispatch
+- `WorldObject::Render(float)` removed from `worldobject.h`
+- No `#if GAMELOGIC_HAS_RENDERER` guards remain in GameLogic source files
 
 ### Per-WorldObject Migration Checklist
 
 For each remaining `WorldObject` subclass with a `Render()` override:
 
-- [ ] Create `GameRender/<Type>Renderer.h/.cpp` (or a combined
+- [x] Create `GameRender/<Type>Renderer.h/.cpp` (or a combined
       `WeaponRenderer` for the 7 weapon types)
-- [ ] Move `Render()` body from the `#if defined(GAMELOGIC_HAS_RENDERER)`
+- [x] Move `Render()` body from the `#if defined(GAMELOGIC_HAS_RENDERER)`
       block to the companion
-- [ ] Move rendering-only `#include` directives to the companion
-- [ ] Update the call site (e.g. `Location::RenderWeapons()`) to call
+- [x] Move rendering-only `#include` directives to the companion
+- [x] Update the call site (e.g. `Location::RenderWeapons()`) to call
       the companion instead of `worldObject->Render(predTime)`
-- [ ] Remove the `#if` / `#endif` guards from the simulation `.cpp`
-- [ ] Delete `Render()` declaration from the class header
-- [ ] Build and test in all configurations
+- [x] Remove the `#if` / `#endif` guards from the simulation `.cpp`
+- [x] Delete `Render()` declaration from the class header
+- [x] Build and test in all configurations
 
 Once all WorldObject subclass renderers are extracted:
 
-- [ ] Remove `virtual void Render(float)` from `WorldObject`
+- [x] Remove `virtual void Render(float)` from `WorldObject`
 - [ ] Delete `GAMELOGIC_HAS_RENDERER` from all `.vcxproj` files
+      (blocked by `GameApp.h` → `GameMain` dependency — Phase 5 scope)
 - [ ] Delete `GameLogicPlatform.h` (replaced by direct `NeuronCore.h`
-      include in `GameSim/pch.h`)
+      include in `GameSim/pch.h` — Phase 5 scope)
 
 ### Per-Entity Migration Checklist
 
@@ -1076,28 +1082,25 @@ Server ignores or logs for replay.
 
 ## Phase 4 — Remove `Render()` from Base Classes
 
-> **STATUS: ⚠️ In progress.**  All entity and building types have render
-> companions registered (Waves 1–4 complete).  Phase 3 (`SimEventQueue`)
-> is complete — all side-effect calls decoupled.  Building render
-> declarations/bodies fully removed from all subclass `.h`/`.cpp` files.
-> `Building` virtuals removed.  `Entity::Render` override removed.
-> `WorldObject::Render` intentionally kept (used by non-entity/building
-> subclasses).  `Shape* m_shape` deferred to Phase 6.
+> **STATUS: ✅ Done.**  All entity, building, and WorldObject subclass
+> render declarations/bodies removed.  `WorldObject::Render(float)` virtual
+> removed.  `Building` virtuals removed.  `Entity::Render` override removed.
+> Entity shadow statics removed.  Dead render helpers, stale includes, and
+> dead declarations cleaned up.  `Shape* m_shape` deferred to Phase 6.
 
-Once **all** entity and building types have render companions registered:
+All entity and building types have render companions registered (Waves 1–4).
+All WorldObject subclass renderers extracted (Wave 6).
 
-1. Remove `virtual void Render(float)` from `WorldObject`.
-2. Remove `virtual void Render(float)` from `Entity`.
-3. Remove `virtual void Render(float)` / `RenderAlphas(float)` /
-   `RenderLights()` / `RenderPorts()` from `Building`.
-4. Remove `Shape* m_shape` from `Entity` and `Building`.
-5. Remove `Shape* m_shapes[]` from entity subclasses (e.g. `ArmyAnt`).
-6. Remove `ShapeMarkerData* m_carryMarker` and similar from entity
-   subclasses (replaced by data-driven offsets in Phase 2).
-7. Remove static shadow helpers (`BeginRenderShadow` etc.) from `Entity`
-   (replaced by `ShadowRenderer` in Phase 2 pre-step).
-8. Remove `#include "renderer.h"` / `#include "shape.h"` from all
-   simulation files.
+1. ~~Remove `virtual void Render(float)` from `WorldObject`.~~ ✅
+2. ~~Remove `virtual void Render(float)` from `Entity`.~~ ✅
+3. ~~Remove `virtual void Render(float)` / `RenderAlphas(float)` /
+   `RenderLights()` / `RenderPorts()` from `Building`.~~ ✅
+4. Remove `Shape* m_shape` from `Entity` and `Building`. — deferred to Phase 6
+5. Remove `Shape* m_shapes[]` from entity subclasses. — deferred to Phase 6
+6. Remove `ShapeMarkerData* m_carryMarker` and similar. — deferred to Phase 6
+7. ~~Remove static shadow helpers (`BeginRenderShadow` etc.) from `Entity`.~~ ✅
+8. ~~Remove `#include "renderer.h"` / `#include "shape.h"` from all
+   simulation files.~~ ✅
 
 ---
 
@@ -1150,13 +1153,19 @@ Once **all** entity and building types have render companions registered:
 
 > **STATUS: ❌ Not started.**
 
-**Prerequisite:** Wave 6 (WorldObject subclass renderers) must be complete
-before this step.  The 5 files currently guarded with
-`#if defined(GAMELOGIC_HAS_RENDERER)` (`flag.cpp`, `snow.cpp`,
-`airstrike.cpp`, `darwinian.cpp`, `weapons.cpp`) must have their `Render()`
-bodies extracted to `GameRender/` companions.  The guards and
-`GAMELOGIC_HAS_RENDERER` define are then deleted — `GameSim` compiles
-without the macro and without rendering code.
+**Prerequisite:** Wave 6 (WorldObject subclass renderers) is ✅ complete.
+All render companions exist in `GameRender/`, all `Render()` bodies and
+declarations removed from `GameLogic`, `WorldObject::Render(float)` virtual
+deleted.  No `#if defined(GAMELOGIC_HAS_RENDERER)` guards remain in
+`GameLogic` source files.
+
+**Remaining blocker:** `GAMELOGIC_HAS_RENDERER` and `GameLogicPlatform.h`
+cannot be deleted yet because 59 `GameLogic` `.cpp` files include
+`GameApp.h`, which inherits from `GameMain` (defined in
+`NeuronClient/GameMain.h`).  Without `GAMELOGIC_HAS_RENDERER`, the PCH
+does not include `NeuronClient.h`, and `GameMain` is undefined.  This is
+resolved when `GameSim` is created (Phase 5.1) with its own PCH
+(`NeuronCore.h` only) and the `GameApp.h` dependency is eliminated.
 
 Once all files are migrated, remove `GameLogic.vcxproj` from the solution.
 
@@ -1286,20 +1295,25 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 3 | `GameLogic/GameSimEventQueue.h/.cpp` | **New** — typedef `SimEventQueue<GameSimEvent, 1024>` + `g_simEventQueue` global (moves to `GameSim/` in Phase 5) | ✅ |
 | 3 | All entity/building `.cpp` with `g_explosionManager`, `m_particleSystem`, `m_soundSystem` | Replace with `g_simEventQueue.Push(SimEvent::Make*(...))` calls; remove stale includes | ✅ |
 | 3 | `Starstrike/main.cpp` | Add `DrainSimEvents()` with `std::visit` + `Overloaded` after `Location::Advance()` | ✅ |
-| 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` | ⚠️ Deferred (still needed by non-entity/building subclasses) |
+| 4 | `GameLogic/worldobject.h` | Remove `virtual Render()` | ✅ |
 | 4 | `GameLogic/entity.h` | Remove `virtual Render()`, `Shape* m_shape`, shadow statics | ✅ `Render` override + shadow statics removed; `Shape* m_shape` deferred to Phase 6 |
 | 4 | `GameLogic/entity.cpp` | Remove `BeginRenderShadow` / `RenderShadow` / `EndRenderShadow` | ✅ |
 | 4 | `GameLogic/building.h` | Remove `virtual Render()` / `RenderAlphas()` / `RenderLights()` / `RenderPorts()`, `Shape* m_shape` | ✅ Virtuals removed; `Shape* m_shape` deferred to Phase 6 |
 | 4 | 25 `GameLogic/*.cpp` files | Remove stale rendering includes (`renderer.h` ×16, `text_renderer.h` ×8, `ogl_extensions.h` ×1) | ✅ |
 | 4 | 7 building `.cpp` files | Remove dead render helper bodies (`RenderSignal`, `RenderSpirit`, etc.) | ✅ |
-| 2 W6 | `GameRender/FlagRenderer.h/.cpp` | **New** — companion for `Flag::Render()` + `RenderText()` | ❌ |
-| 2 W6 | `GameRender/SnowRenderer.h/.cpp` | **New** — companion for `Snow::Render()` | ❌ |
-| 2 W6 | `GameRender/SpaceInvaderRenderer.h/.cpp` | **New** — companion for `SpaceInvader::Render()` | ❌ |
-| 2 W6 | `GameRender/BoxKiteRenderer.h/.cpp` | **New** — companion for `BoxKite::Render()` | ❌ |
-| 2 W6 | `GameRender/WeaponRenderer.h/.cpp` | **New** — companion for 7 weapon `Render()` functions | ❌ |
-| 2 W6 | `GameLogic/flag.cpp`, `snow.cpp`, `airstrike.cpp`, `darwinian.cpp`, `weapons.cpp` | Remove `#if GAMELOGIC_HAS_RENDERER` guards + `Render()` bodies + stale rendering includes | ❌ |
-| 2 W6 | `GameLogic/worldobject.h` | Remove `virtual void Render(float)` (unblocked by Wave 6) | ❌ |
-| 5 post | All `.vcxproj` files | Remove `GAMELOGIC_HAS_RENDERER` define | ❌ |
+| 2 W6 | `GameRender/FlagRenderer.h/.cpp` | **New** — companion for `Flag::Render()` + `RenderText()` | ✅ |
+| 2 W6 | `GameRender/SnowRenderer.h/.cpp` | **New** — companion for `Snow::Render()` | ✅ |
+| 2 W6 | `GameRender/SpaceInvaderRenderer.h/.cpp` | **New** — companion for `SpaceInvader::Render()` | ✅ |
+| 2 W6 | `GameRender/BoxKiteRenderer.h/.cpp` | **New** — companion for `BoxKite::Render()` | ✅ |
+| 2 W6 | `GameRender/WeaponRenderer.h/.cpp` | **New** — companion for 7 weapon `Render()` functions | ✅ |
+| 2 W6 | `GameRender/WorldObjectRenderer.h` | **New** — base renderer interface for WorldObject subclasses | ✅ |
+| 2 W6 | `GameRender/WorldObjectRenderRegistry.h/.cpp` | **New** — type-indexed dispatch for WorldObject effect renderers | ✅ |
+| 2 W6 | `GameLogic/flag.cpp`, `snow.cpp`, `airstrike.cpp`, `darwinian.cpp`, `weapons.cpp` | `Render()` bodies + rendering includes removed; no `#if GAMELOGIC_HAS_RENDERER` guards remain | ✅ |
+| 2 W6 | `GameLogic/worldobject.h` | `virtual void Render(float)` removed | ✅ |
+| 2 W6 | `GameLogic/virii.h` | Dead `Render()` declaration removed | ✅ |
+| 2 W6 | `GameLogic/virii.cpp` | Dead 130-line commented-out `RenderLowDetail`/`RenderGlow` block removed | ✅ |
+| 2 W6 | `GameLogic/sporegenerator.h` | Dead `RenderTail()` declaration removed | ✅ |
+| 5 post | All `.vcxproj` files | Remove `GAMELOGIC_HAS_RENDERER` define (blocked by `GameApp.h` → `GameMain` dependency — Phase 5 scope) | ❌ |
 | 5 post | `GameLogic/GameLogicPlatform.h` | **Deleted** — replaced by `NeuronCore.h` in `GameSim/pch.h` | ❌ |
 | 5 | `GameSim/GameSim.vcxproj` | **New** — pure simulation static lib | ❌ |
 | 5 | `GameRender/GameRender.vcxproj` | **New** — render companion static lib | ✅ (early) |
@@ -1327,7 +1341,7 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | `TreeRenderer::EnsureUploaded()` mutates `Tree` (writes `m_meshDirty`, calls `Generate()`) | Move `Generate()` to `Tree::Advance()` in Phase 2 pre-step; renderer becomes pure consumer before any new companions are written |
 | `TreeRenderer` has no `BuildingRenderer` base, concrete `Tree*` coupling | `TreeBuildingRenderer` thin adapter wraps existing DX12 pipeline; no rewrite needed |
 | Replicating TreeRenderer verbatim for 40 types creates 40 `if/else if` branches and 40 per-type cleanup interfaces | Standardized `BuildingRenderer`/`EntityRenderer` base + registry dispatch; single `IRenderBackend` for cleanup |
-| `#if GAMELOGIC_HAS_RENDERER` guards in 5 WorldObject subclass files become permanent technical debt if not resolved | Wave 6 extracts all guarded `Render()` bodies into `GameRender/` companions before Phase 5.4 deletes `GameLogic`; guards and macro are deleted |
+| `#if GAMELOGIC_HAS_RENDERER` guards in 5 WorldObject subclass files become permanent technical debt if not resolved | ✅ Resolved — Wave 6 extracted all `Render()` bodies into `GameRender/` companions; no guards remain in GameLogic source files.  Macro itself persists until Phase 5.1 (`GameSim` project split) due to `GameApp.h` → `GameMain` dependency. |
 
 ---
 
@@ -1357,8 +1371,8 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 2 — Buildings (Wave 4) | 1–2 weeks | Medium | Wave 1 | ✅ Done (57/57 types registered) |
 | 2 — UI/debug (Wave 5) | 2–3 days | Low | Wave 1 | ✅ Done |
 | 3 — SimEventQueue (all entity/building types) | 1 week | Medium | Phase 2 in progress | ✅ Done |
-| 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete | ✅ Done (deferred: `WorldObject::Render`, `Shape* m_shape`) |
-| 2 W6 — WorldObject subclass renderers (Flag, Snow, BoxKite, SpaceInvader, weapons) | 3–5 days | Low | Phase 4 | ❌ Not started |
+| 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete | ✅ Done |
+| 2 W6 — WorldObject subclass renderers (Flag, Snow, BoxKite, SpaceInvader, weapons) | 3–5 days | Low | Phase 4 | ✅ Done |
 | 5 — Project split (create GameSim + GameRender, move files) | 1–2 days | Low | Phase 4 + Wave 6 | ⚠️ 5.2 done early |
 | 6 — Presentation state separation | 1 week | Low | Phase 5 | ⚠️ Partial |
 | 7 — Bot client | 1–2 days | Low | Phase 5 | ❌ Not started |
@@ -1396,12 +1410,15 @@ immediately.  Phases 2–4 can run in parallel with other feature work.
     and 25 stale rendering includes removed.  `WorldObject::Render` kept
     (5 files with live `Render()` for non-entity/building subclasses).
     `Shape* m_shape` deferred to Phase 6.
-13. **Phase 2 Wave 6 — WorldObject subclass renderers** — create
+13. ~~**Phase 2 Wave 6 — WorldObject subclass renderers**~~ ✅ Done —
     `FlagRenderer`, `SnowRenderer`, `BoxKiteRenderer`,
-    `SpaceInvaderRenderer`, and `WeaponRenderer` (7 weapon types) in
-    `GameRender/`.  Remove `#if GAMELOGIC_HAS_RENDERER` guards from the 5
-    source files.  Remove `WorldObject::Render(float)` virtual.  Delete
-    `GAMELOGIC_HAS_RENDERER` from all `.vcxproj` files and
-    `GameLogicPlatform.h`.
+    `SpaceInvaderRenderer`, `WeaponRenderer` all in `GameRender/`;
+    `WorldObjectRenderer` base + `WorldObjectRenderRegistry`;
+    `WorldObject::Render(float)` removed from `worldobject.h`;
+    dead declarations (`Virii::Render`, `SporeGenerator::RenderTail`) and
+    dead commented-out render code cleaned up.  `GAMELOGIC_HAS_RENDERER`
+    removal blocked by `GameApp.h` → `GameMain` dependency (Phase 5).
 14. **Phase 5.1 — `GameSim` project split** — next major milestone.
+    Resolves `GameApp.h` → `GameMain` dependency; enables
+    `GAMELOGIC_HAS_RENDERER` and `GameLogicPlatform.h` deletion.
 15. **Phases 5.3–7** sequentially.

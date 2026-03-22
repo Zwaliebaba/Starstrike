@@ -23,8 +23,6 @@ class SporeGenerator : public Entity
     bool AdvanceEggLaying();
     bool AdvancePanic();
 
-    void RenderTail(const LegacyVector3& _from, const LegacyVector3& _to, float _size);
-
     ShapeMarkerData* m_eggMarker;
     ShapeMarkerData* m_tail[SPOREGENERATOR_NUMTAILS];
 
