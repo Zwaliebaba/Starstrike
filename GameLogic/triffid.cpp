@@ -8,15 +8,13 @@
 #include "text_renderer.h"
 #include "profiler.h"
 #include "language_table.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "triffid.h"
 #include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
-#include "explosion.h"
 #include "team.h"
 #include "main.h"
-#include "particle_system.h"
 #include "entity_grid.h"
 
 Triffid::Triffid()
@@ -109,147 +107,6 @@ bool Triffid::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _r
   return m_shape->RayHit(&ray, mat, true);
 }
 
-void Triffid::Render(float _predictionTime)
-{
-  Matrix34 mat = GetHead();
-
-  //RenderArrow( m_pos, mat.pos, 1.0f, RGBAColour(100,0,0,255) );
-
-  LegacyVector3 stemPos = m_shape->GetMarkerWorldMatrix(m_stem, mat).pos;
-  LegacyVector3 midPoint = mat.pos + (stemPos - mat.pos).SetLength(10.0f);
-  LegacyVector3 midPoint2 = midPoint - LegacyVector3(0, 20, 0);
-  glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
-  glDisable(GL_TEXTURE_2D);
-  glBegin(GL_LINES);
-  glVertex3fv(mat.pos.GetData());
-  glVertex3fv(midPoint.GetData());
-  glVertex3fv(midPoint.GetData());
-  glVertex3fv(m_pos.GetData());
-  glEnd();
-
-  //
-  // If we are damaged, flicked in and out based on our health
-
-  if (m_renderDamaged && !g_app->m_editing && m_damage > 0.0f)
-  {
-    float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-    float thefrand = frand();
-    if (thefrand > 0.7f)
-      mat.f *= (1.0f - sinf(timeIndex) * 0.5f);
-    else if (thefrand > 0.4f)
-      mat.u *= (1.0f - sinf(timeIndex) * 0.2f);
-    else
-      mat.r *= (1.0f - sinf(timeIndex) * 0.5f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-  }
-
-  glEnable(GL_NORMALIZE);
-
-  m_shape->Render(_predictionTime, mat);
-
-  if (m_triggered && GetHighResTime() > m_timerSync - m_reloadTime * 0.25f)
-  {
-    Matrix34 launchMat = m_shape->GetMarkerWorldMatrix(m_launchPoint, mat);
-    ShapeStatic* eggShape = g_app->m_resource->GetShapeStatic("triffidegg.shp");
-    Matrix34 eggMat(launchMat.u, -launchMat.f, launchMat.pos);
-    eggMat.f *= m_size;
-    eggMat.u *= m_size;
-    eggMat.r *= m_size;
-    eggShape->Render(_predictionTime, eggMat);
-  }
-
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  glDisable(GL_NORMALIZE);
-}
-
-void Triffid::RenderAlphas(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    
-
-    Matrix34 headMat = GetHead();
-    Matrix34 mat(m_front, g_upVector, headMat.pos);
-    Matrix34 launchMat = m_shape->GetMarkerWorldMatrix(m_launchPoint, mat);
-
-    LegacyVector3 point1 = launchMat.pos;
-
-    LegacyVector3 angle = launchMat.f;
-    angle.HorizontalAndNormalise();
-    angle.RotateAroundY(m_variance * 0.5f);
-    LegacyVector3 right = angle ^ g_upVector;
-    angle.RotateAround(right * m_pitch * 0.5f);
-    LegacyVector3 point2 = point1 + angle * m_force * 3.0f;
-
-    angle = launchMat.f;
-    angle.HorizontalAndNormalise();
-    angle.RotateAroundY(m_variance * -0.5f);
-    right = angle ^ g_upVector;
-    angle.RotateAround(right * m_pitch * 0.5f);
-    LegacyVector3 point3 = point1 + angle * m_force * 3.0f;
-
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv(point1.GetData());
-    glVertex3fv(point2.GetData());
-    glVertex3fv(point3.GetData());
-    glEnd();
-
-    //
-    // Create a fake egg and plot its course
-    // Render our trigger location
-
-#ifdef LOCATION_EDITOR
-    if (g_app->m_locationEditor->m_mode == LocationEditor::ModeBuilding && g_app->m_locationEditor->m_selectionId == m_id.GetUniqueId())
-    {
-      LegacyVector3 velocity = headMat.f;
-      velocity.SetLength(m_force * m_size);
-      TriffidEgg egg;
-      egg.m_pos = headMat.pos;
-      egg.m_vel = velocity;
-      egg.m_front = headMat.f;
-
-      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-      glLineWidth(2.0f);
-      glBegin(GL_LINES);
-      while (true)
-      {
-        glVertex3fv(egg.m_pos.GetData());
-        egg.Advance(NULL);
-        glVertex3fv(egg.m_pos.GetData());
-
-        if (egg.m_vel.Mag() < 20.0f)
-          break;
-      }
-      glEnd();
-
-      if (m_useTrigger)
-      {
-        LegacyVector3 triggerPos = m_pos + m_triggerLocation;
-        int numSteps = 20;
-        glBegin(GL_LINE_LOOP);
-        
-        glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-        for (int i = 0; i < numSteps; ++i)
-        {
-          float angle = 2.0f * M_PI * (float)i / (float)numSteps;
-          LegacyVector3 thisPos = triggerPos + LegacyVector3(sinf(angle) * m_triggerRadius, 0.0f, cosf(angle) * m_triggerRadius);
-          thisPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(thisPos.x, thisPos.z);
-          thisPos.y += 10.0f;
-          glVertex3fv(thisPos.GetData());
-        }
-        glEnd();
-
-        g_editorFont.DrawText3DCenter(triggerPos + LegacyVector3(0, 50, 0), 10.0f, "UseTrigger: %d", m_useTrigger);
-      }
-    }
-#endif
-  }
-}
-
 void Triffid::Damage(float _damage)
 {
   Building::Damage(_damage);
@@ -259,7 +116,7 @@ void Triffid::Damage(float _damage)
   m_damage += _damage;
 
   if (m_damage <= 0.0f && !dead)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "Burn");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Burn"));
 }
 
 void Triffid::Launch()
@@ -299,7 +156,7 @@ void Triffid::Launch()
     triffidEgg->m_roamRange = m_triggerRadius;
   }
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "LaunchEgg");
+  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "LaunchEgg"; g_simEventQueue.Push(evt); }
 }
 
 void Triffid::Initialise(Building* _template)
@@ -339,18 +196,18 @@ bool Triffid::Advance()
     LegacyVector3 fireSpawn = headMat.pos;
     fireSpawn += LegacyVector3(sfrand(10.0f * m_size), sfrand(10.0f * m_size), sfrand(10.0f * m_size));
     float fireSize = 100.0f + sfrand(100.0f * m_size);
-    g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeFire, fireSize);
+    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeFire; evt.particleSize = fireSize; g_simEventQueue.Push(evt); }
 
     fireSpawn = m_pos + LegacyVector3(sfrand(10.0f * m_size), sfrand(10.0f * m_size), sfrand(10.0f * m_size));
-    g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeFire, fireSize);
+    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeFire; evt.particleSize = fireSize; g_simEventQueue.Push(evt); }
 
     if (frand(100.0f) < 10.0f)
-      g_app->m_particleSystem->CreateParticle(fireSpawn, g_zeroVector, Particle::TypeExplosionDebris);
+      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = fireSpawn; evt.vel = g_zeroVector; evt.particleType = SimParticle::TypeExplosionDebris; evt.particleSize = -1.0f; g_simEventQueue.Push(evt); }
 
     m_size -= 0.006f;
     if (m_size <= 0.3f)
     {
-      g_explosionManager.AddExplosion(m_shape, headMat);
+      { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = headMat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
       return true;
     }
     m_timerSync -= 0.5f;
@@ -488,7 +345,7 @@ void TriffidEgg::ChangeHealth(int _amount)
     transform.f *= m_size;
     transform.u *= m_size;
     transform.r *= m_size;
-    g_explosionManager.AddExplosion(m_shape, transform);
+    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = transform; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
   }
 }
 
@@ -604,7 +461,7 @@ bool TriffidEgg::Advance(Unit* _unit)
     if (m_pos.y < landHeight + 3.0f)
       m_pos.y = landHeight + 3.0f;
     if (m_force > 0.1f)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Bounce");
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Bounce"; g_simEventQueue.Push(evt); }
   }
 
   // Self right ourselves
@@ -624,17 +481,11 @@ bool TriffidEgg::Advance(Unit* _unit)
   if (GetHighResTime() > m_timerSync)
   {
     Matrix34 transform(m_front, m_up, m_pos);
-    g_explosionManager.AddExplosion(m_shape, transform);
+    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = transform; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
     Spawn();
-    g_app->m_soundSystem->TriggerEntityEvent(this, "BurstOpen");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "BurstOpen"; g_simEventQueue.Push(evt); }
     return true;
   }
 
   return Entity::Advance(_unit);
-}
-
-void TriffidEgg::Render(float _predictionTime)
-{
-  // Rendering moved to TriffidEggRenderer companion (GameRender).
-  // Kept as empty override for legacy fallback safety.
 }

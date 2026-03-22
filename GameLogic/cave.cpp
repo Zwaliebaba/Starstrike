@@ -5,7 +5,7 @@
 #include "ShapeStatic.h"
 
 
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"
@@ -80,7 +80,7 @@ void Cave::Damage( float _damage )
     if( _damage > 80.0f )
     {
         Matrix34 mat( m_front, g_upVector, m_pos );
-        g_explosionManager.AddExplosion( m_shape, mat );
+        g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
         m_dead = true;
     }
 }

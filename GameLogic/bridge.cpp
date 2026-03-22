@@ -47,54 +47,6 @@ void Bridge::SetBridgeType(int _type)
   DEBUG_ASSERT(m_signal);
 }
 
-void Bridge::Render(float predictionTime)
-{
-  //
-  // Render our shape
-
-  Matrix34 mat(m_front, g_upVector, m_pos);
-  m_shape->Render(predictionTime, mat);
-}
-
-void Bridge::RenderAlphas(float predictionTime)
-{
-  //
-  // Render our signal
-
-  if (m_nextBridgeId != -1)
-  {
-    Building* building = g_app->m_location->GetBuilding(m_nextBridgeId);
-    if (building && building->m_type == TypeBridge)
-    {
-      auto bridge = static_cast<Bridge*>(building);
-      if (m_status > 0.0f && bridge->m_status > 0.0f)
-      {
-        LegacyVector3 ourPos = GetStartPoint();
-        LegacyVector3 theirPos = bridge->GetStartPoint();
-
-        if (m_id.GetTeamId() == 255)
-          glColor4f(0.5f, 0.5f, 0.5f, m_status / 100.0f);
-        else
-        {
-          RGBAColour col = g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-          glColor4ub(col.r, col.g, col.b, static_cast<unsigned char>(255.0f * m_status / 100.0f));
-        }
-
-        glEnable(GL_BLEND);
-        glEnable(GL_LINE_SMOOTH);
-        glBegin(GL_LINES);
-        glVertex3fv(ourPos.GetData());
-        glVertex3fv(theirPos.GetData());
-        glEnd();
-        glDisable(GL_LINE_SMOOTH);
-        glDisable(GL_BLEND);
-      }
-    }
-  }
-
-  Teleport::RenderAlphas(predictionTime);
-}
-
 bool Bridge::Advance()
 {
   if (m_status < 0.0f)

@@ -110,21 +110,6 @@ bool StaticShape::DoesShapeHit(ShapeStatic* _shape, Matrix34 _theTransform)
   return _shape->SphereHit(&package, _theTransform, true);
 }
 
-void StaticShape::Render(float _predictionTime)
-{
-  if (m_shape)
-  {
-    Matrix34 mat(m_front, m_up, m_pos);
-    mat.u *= m_scale;
-    mat.r *= m_scale;
-    mat.f *= m_scale;
-
-    glEnable(GL_NORMALIZE);
-    m_shape->Render(_predictionTime, mat);
-    glDisable(GL_NORMALIZE);
-  }
-}
-
 bool StaticShape::Advance() { return Building::Advance(); }
 
 void StaticShape::Read(TextReader* _in, bool _dynamic)

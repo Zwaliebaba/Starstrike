@@ -47,10 +47,3 @@ bool Wall::Advance()
 }
 
 void Wall::Damage(float _damage) { m_damage -= _damage; }
-
-void Wall::Render(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos - LegacyVector3(0, m_fallSpeed, 0) * _predictionTime;
-  Matrix34 mat(m_front, g_upVector, predictedPos);
-  m_shape->Render(_predictionTime, mat);
-}

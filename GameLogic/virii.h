@@ -22,7 +22,6 @@ class ViriiUnit : public Unit
     ViriiUnit(int teamId, int unitId, int numEntities, const LegacyVector3& _pos);
 
     bool Advance(int _slice) override;
-    void Render(float _predictionTime) override;
 };
 
 //*****************************************************************************

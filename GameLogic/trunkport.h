@@ -21,8 +21,6 @@ class TrunkPort : public Building
     void Initialise(Building* _template) override;
     void SetDetail(int _detail) override;
     bool Advance() override;
-    void Render(float predictionTime) override;
-    void RenderAlphas(float predictionTime) override;
 
     bool PerformDepthSort(LegacyVector3& _centerPos) override;
 

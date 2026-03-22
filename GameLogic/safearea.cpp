@@ -73,10 +73,6 @@ bool SafeArea::Advance()
   return false;
 }
 
-void SafeArea::Render(float predictionTime)
-{
-}
-
 bool SafeArea::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
 
 bool SafeArea::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }

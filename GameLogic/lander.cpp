@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "GameApp.h"
 #include "location.h"
-#include "particle_system.h"
+#include "SimEventQueue.h"
 #include "renderer.h"
 #include "team.h"
 #include "unit.h"
@@ -59,7 +59,7 @@ bool Lander::Advance(Unit* _unit)
   return false;
 }
 
-void Lander::ChangeHealth(int amount) { g_app->m_particleSystem->CreateParticle(m_pos, g_zeroVector, Particle::TypeMuzzleFlash); }
+void Lander::ChangeHealth(int amount) { g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash)); }
 
 bool Lander::AdvanceSailing()
 {
@@ -99,9 +99,4 @@ bool Lander::AdvanceLanded()
   }
 
   return false;
-}
-
-void Lander::Render(float predictionTime, int teamId)
-{
-  // Rendering moved to LanderRenderer companion (GameRender).
 }

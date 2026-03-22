@@ -20,7 +20,6 @@ public:
     void SetStringId    ( const char *_stringId );
 
     bool Advance();
-    void Render( float _predictionTime );
 
     bool DoesSphereHit          (LegacyVector3 const &_pos, float _radius);
     bool DoesShapeHit           (ShapeStatic *_shape, Matrix34 _transform);

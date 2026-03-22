@@ -4,16 +4,14 @@
 #include "camera.h"
 #include "entity_grid.h"
 #include "entity_leg.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "location.h"
 #include "main.h"
 #include "math_utils.h"
-#include "particle_system.h"
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
 #include "ShapeStatic.h"
-#include "soundsystem.h"
 
 #define FOOT_MOVE_THRESHOLD	        5.0f	// Lower means feet are lifted when less distant from their ideal pos, and thus smaller steps are taken
 
@@ -122,7 +120,7 @@ void Spider::ChangeHealth(int _amount)
     fractionDead = max(fractionDead, 0.0f);
     fractionDead = min(fractionDead, 1.0f);
     Matrix34 transform(m_front, m_up, m_pos);
-    g_explosionManager.AddExplosion(m_shape, transform, fractionDead);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, fractionDead));
   }
 }
 
@@ -164,7 +162,7 @@ void Spider::StompFoot(const LegacyVector3& _pos)
   {
     LegacyVector3 vel(syncsfrand(20.0f), 5.0f + syncfrand(5.0f), syncsfrand(20.0f));
 
-    g_app->m_particleSystem->CreateParticle(_pos, vel, Particle::TypeMuzzleFlash, 10.0f);
+    { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = _pos; evt.vel = vel; evt.particleType = SimParticle::TypeMuzzleFlash; evt.particleSize = 10.0f; g_simEventQueue.Push(evt); }
   }
 
   //
@@ -241,13 +239,13 @@ void Spider::UpdateLegs()
     //		}
 
     if (footPlanted)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "FootFall");
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "FootFall"; g_simEventQueue.Push(evt); }
   }
 
   m_delayBetweenLifts = m_parameters[stage].m_delayBetweenLifts;
 }
 
-// Tests that the line from m_pos to _dest doesn't go above a certain height
+// Tests that the line
 float Spider::IsPathOK(const LegacyVector3& _dest)
 {
   LegacyVector3 toDest(_dest - m_pos);
@@ -422,8 +420,8 @@ bool Spider::AdvanceAttack()
         m_legs[i]->m_foot.m_targetPos = m_legs[i]->m_foot.m_pos + forwards;
       }
 
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Pounce");
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Pounce"; g_simEventQueue.Push(evt); }
     }
   }
 
@@ -447,7 +445,7 @@ bool Spider::AdvancePouncing()
     for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
       m_legs[i]->m_foot.m_state = EntityFoot::OnGround;
 
-    g_app->m_soundSystem->TriggerEntityEvent(this, "PounceLand");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "PounceLand"; g_simEventQueue.Push(evt); }
 
     // Squash people
     float squashRange = 40.0f;
@@ -587,7 +585,7 @@ bool Spider::AdvanceEggLaying()
 
     g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, g_zeroVector, 0.0f);
 
-    g_app->m_soundSystem->TriggerEntityEvent(this, "LayEgg");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "LayEgg"; g_simEventQueue.Push(evt); }
 
     m_spiritId = -1;
     m_state = StateIdle;
@@ -636,12 +634,6 @@ bool Spider::Advance(Unit* _unit)
   }
 
   return Entity::Advance(_unit);
-}
-
-void Spider::Render(float _predictionTime)
-{
-    // Rendering moved to SpiderRenderer companion (GameRender).
-    // Kept as empty override for legacy fallback safety.
 }
 
 bool Spider::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

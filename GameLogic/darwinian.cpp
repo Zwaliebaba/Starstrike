@@ -13,17 +13,17 @@
 #include "level_file.h"
 #include "location.h"
 #include "main.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 #include "math_utils.h"
 #include "obstruction_grid.h"
 #include "officer.h"
-#include "particle_system.h"
 #include "profiler.h"
 #include "renderer.h"
 #include "resource.h"
 #include "rocket.h"
 #include "routing_system.h"
 #include "ShapeStatic.h"
-#include "soundsystem.h"
 #include "taskmanager.h"
 #include "team.h"
 #include "teleport.h"
@@ -461,7 +461,7 @@ bool Darwinian::AdvanceCombat()
   {
     m_state = StateIdle;
     m_retargetTimer = 0.0;
-    g_app->m_soundSystem->StopAllSounds(m_id, "Darwinian SeenThreat");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
     END_PROFILE(g_app->m_profiler, "AdvanceCombat");
     return false;
   }
@@ -477,7 +477,7 @@ bool Darwinian::AdvanceCombat()
     {
       m_state = StateIdle;
       m_retargetTimer = 0.0;
-      g_app->m_soundSystem->StopAllSounds(m_id, "Darwinian SeenThreat");
+      g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
       END_PROFILE(g_app->m_profiler, "AdvanceCombat");
       return false;
     }
@@ -776,10 +776,10 @@ bool Darwinian::AdvanceUnderControl()
     for (int i = 0; i < numFlashes; ++i)
     {
       LegacyVector3 vel(sfrand(5.0f), frand(15.0f), sfrand(5.0f));
-      g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeControlFlash);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash));
     }
-    g_app->m_soundSystem->StopAllSounds(m_id, "Darwinian TakenControl");
-    g_app->m_soundSystem->TriggerEntityEvent(this, "EscapedControl");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EscapedControl"));
     return false;
   }
 
@@ -1263,7 +1263,7 @@ bool Darwinian::SearchForOfficers()
         m_wayPoint = PushFromObstructions(m_wayPoint, false);
         m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
 
-        g_app->m_soundSystem->TriggerEntityEvent(this, "GivenOrders");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "GivenOrders"));
 
         m_state = StateFollowingOrders;
         END_PROFILE(g_app->m_profiler, "SearchOfficers");
@@ -1350,7 +1350,7 @@ void Darwinian::GiveOrders(const LegacyVector3& _targetPos)
   m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
   m_wayPoint = PushFromObstructions(m_wayPoint);
 
-  g_app->m_soundSystem->TriggerEntityEvent(this, "GivenOrders");
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "GivenOrders"));
 
   m_state = StateFollowingOrders;
 }
@@ -1459,7 +1459,7 @@ bool Darwinian::SearchForThreats()
     m_scared = true;
     if (m_threatId != threatId)
     {
-      g_app->m_soundSystem->TriggerEntityEvent(this, "SeenThreatRunAway");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatRunAway"));
       m_threatId = threatId;
     }
     END_PROFILE(g_app->m_profiler, "SearchThreats");
@@ -1549,9 +1549,9 @@ bool Darwinian::SearchForThreats()
     if (m_threatId != threatId)
     {
       if (m_scared)
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SeenThreatRunAway");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatRunAway"));
       else
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SeenThreatAttack");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SeenThreatAttack"));
       m_threatId = threatId;
     }
 
@@ -1567,7 +1567,7 @@ bool Darwinian::SearchForThreats()
   }
   // There are no nearby threats
   m_threatId.SetInvalid();
-  g_app->m_soundSystem->StopAllSounds(m_id, "Darwinian SeenThreat");
+  g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
 
   END_PROFILE(g_app->m_profiler, "SearchThreats");
   return false;
@@ -1664,7 +1664,7 @@ bool Darwinian::BeginVictoryDance()
       // jump!
       m_vel.y += 15.0f + syncfrand(15.0f);
       m_onGround = false;
-      g_app->m_soundSystem->TriggerEntityEvent(this, "VictoryJump");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "VictoryJump"));
       return true;
     }
   }
@@ -1879,10 +1879,10 @@ void Darwinian::TakeControl(int _controllerId)
     for (int i = 0; i < numFlashes; ++i)
     {
       LegacyVector3 vel(sfrand(5.0f), frand(15.0f), sfrand(5.0f));
-      g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeControlFlash);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash));
     }
 
-    g_app->m_soundSystem->TriggerEntityEvent(this, "TakenControl");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "TakenControl"));
   }
 }
 
@@ -1910,14 +1910,14 @@ bool Darwinian::AdvanceOnFire()
     //fireSpawn -= m_vel * 0.1f;
     float fireSize = 20 + syncfrand(30.0f);
     LegacyVector3 fireVel = m_vel * 0.3f + g_upVector * (3 + syncfrand(3));
-    int particleType = Particle::TypeDarwinianFire;
+    int particleType = SimParticle::TypeDarwinianFire;
     if (i > 4)
-      particleType = Particle::TypeMissileTrail;
-    g_app->m_particleSystem->CreateParticle(fireSpawn, fireVel, particleType, fireSize);
+      particleType = SimParticle::TypeMissileTrail;
+    g_simEventQueue.Push(SimEvent::MakeParticle(fireSpawn, fireVel, particleType, fireSize));
   }
 
   if (syncrand() % 50 == 0)
-    g_app->m_soundSystem->TriggerEntityEvent(this, "OnFire");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "OnFire"));
 
   if (!m_dead && syncfrand(10) < 2 && m_onGround)
     ChangeHealth(-2);
@@ -1931,11 +1931,6 @@ bool Darwinian::AdvanceOnFire()
 void Darwinian::SetFire() { m_state = StateOnFire; }
 
 bool Darwinian::IsOnFire() { return (m_state == StateOnFire); }
-
-void Darwinian::Render(float _predictionTime, float _highDetail)
-{
-  // Rendering moved to DarwinianRenderer (GameRender project)
-}
 
 // ===========================================================================
 

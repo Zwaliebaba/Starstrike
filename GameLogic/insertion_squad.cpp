@@ -8,18 +8,17 @@
 #include "input_types.h"
 #include "GameApp.h"
 #include "camera.h"
-#include "explosion.h"
 #include "location.h"
 #include "renderer.h"
 #include "team.h"
 #include "taskmanager.h"
 #include "routing_system.h"
-#include "particle_system.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "main.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 #include "global_world.h"
-#include "soundsystem.h"
 #include "insertion_squad.h"
 #include "teleport.h"
 
@@ -321,13 +320,13 @@ void Squadie::ChangeHealth(int _amount)
   if (!m_dead)
   {
     if (_amount < 0)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "LoseHealth");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
 
     if (m_stats[StatHealth] + _amount <= 0)
     {
       m_stats[StatHealth] = 100;
       m_dead = true;
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Die");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
     }
     else if (m_stats[StatHealth] + _amount > 255)
       m_stats[StatHealth] = 255;
@@ -338,7 +337,7 @@ void Squadie::ChangeHealth(int _amount)
   if (!dead && m_dead)
   {
     Matrix34 transform(m_front, g_upVector, m_pos);
-    g_explosionManager.AddExplosion(m_shape, transform);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
   }
 }
 
@@ -351,7 +350,7 @@ bool Squadie::Advance(Unit* _theUnit)
     if (m_secondaryTimer <= 0.0f)
     {
       // Secondary weapon is reloaded
-      g_app->m_soundSystem->TriggerEntityEvent(this, "WeaponReturns");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "WeaponReturns"));
     }
   }
 
@@ -467,65 +466,6 @@ bool Squadie::Advance(Unit* _theUnit)
   return manDead;
 }
 
-void Squadie::Render(float _predictionTime)
-{
-  if (!m_enabled)
-    return;
-
-  //
-  // Work out our predicted position and orientation
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  if (m_onGround)
-    predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
-
-  float size = 0.5f;
-
-  LegacyVector3 entityUp = g_upVector; //g_app->m_location->m_landscape.m_normalMap->GetValue( predictedPos.x, predictedPos.z );
-  LegacyVector3 entityFront = m_front;
-  entityFront.Normalise();
-  LegacyVector3 entityRight = entityFront ^ entityUp;
-  entityUp = entityRight ^ entityFront;
-
-  if (!m_dead)
-  {
-    //
-    // 3d Shape
-
-    g_app->m_renderer->SetObjectLighting();
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_COLOR_MATERIAL);
-    glDisable(GL_BLEND);
-
-    Matrix34 mat(entityFront, entityUp, predictedPos);
-
-    //
-    // If we are damaged, flicked in and out based on our health
-
-    if (m_renderDamaged)
-    {
-      float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-      float thefrand = frand();
-      if (thefrand > 0.7f)
-        mat.f *= (1.0f - sinf(timeIndex) * 0.5f);
-      else if (thefrand > 0.4f)
-        mat.u *= (1.0f - sinf(timeIndex) * 0.2f);
-      else
-        mat.r *= (1.0f - sinf(timeIndex) * 0.5f);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_ONE, GL_ONE);
-    }
-
-    m_shape->Render(_predictionTime, mat);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_TEXTURE_2D);
-    g_app->m_renderer->UnsetObjectLighting();
-  }
-}
-
 void Squadie::RunAI()
 {
   //
@@ -573,13 +513,13 @@ void Squadie::Attack(const LegacyVector3& _pos)
     Matrix34 brass = m_shape->GetMarkerWorldMatrix(m_brass, mat);
     LegacyVector3 particleVel = brass.f * (5.0f + syncfrand(10.0f));
     particleVel += LegacyVector3(syncsfrand(5.0f), syncsfrand(5.0f), syncsfrand(5.0f));
-    g_app->m_particleSystem->CreateParticle(brass.pos, particleVel, Particle::TypeBrass);
+    g_simEventQueue.Push(SimEvent::MakeParticle(brass.pos, particleVel, SimParticle::TypeBrass));
 
     //
     //
     m_reloading = m_stats[StatRate];
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
-    g_app->m_soundSystem->TriggerEntityEvent(this, "FireLaser");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "FireLaser"));
   }
 }
 
@@ -598,25 +538,25 @@ void Squadie::FireSecondaryWeapon(const LegacyVector3& _pos)
     switch (squad->m_weaponType)
     {
     case GlobalResearch::TypeGrenade:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "ThrowGrenade");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowGrenade"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeAirStrike:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "ThrowAirStrike");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowAirStrike"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableAirstrikeMarker, m_id.GetTeamId());
       m_secondaryTimer = 20.0f;
       break;
 
     case GlobalResearch::TypeController:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "ThrowController");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ThrowController"));
       g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableControllerGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeRocket:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "FireRocket");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "FireRocket"));
       g_app->m_location->FireRocket(laserPos, _pos, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;

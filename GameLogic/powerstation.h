@@ -19,7 +19,6 @@ public:
 	void Initialise		(Building *_template);
 
     bool Advance		();
-    void Render			(float predictionTime);
 
     int  GetBuildingLink();
     void SetBuildingLink(int _buildingId);

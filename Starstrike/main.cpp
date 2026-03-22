@@ -46,6 +46,7 @@
 #include "water.h"
 #include "window_manager.h"
 #include "GameRender.h"
+#include "SimEventQueue.h"
 
 #define TARGET_FRAME_RATE_INCREMENT 0.25f
 
@@ -97,6 +98,65 @@ void UpdateTargetFrameRate(int _currentSlice)
     g_targetFrameRate = 2.0f;
   else if (g_targetFrameRate > 85.0f)
     g_targetFrameRate = 85.0f;
+}
+
+// ---------------------------------------------------------------------------
+// DrainSimEvents — process deferred side-effects from simulation.
+// Called after Location::Advance(), before ParticleSystem::Advance().
+// ---------------------------------------------------------------------------
+
+static void DrainSimEvents()
+{
+  for (int i = 0; i < g_simEventQueue.Count(); ++i)
+  {
+    const SimEvent& evt = g_simEventQueue.Get(i);
+    switch (evt.type)
+    {
+    case SimEvent::ParticleSpawn:
+      g_app->m_particleSystem->CreateParticle(
+        evt.pos, evt.vel, evt.particleType,
+        evt.particleSize, evt.particleColour);
+      break;
+
+    case SimEvent::Explosion:
+      if (evt.shape)
+        g_explosionManager.AddExplosion(evt.shape, evt.transform, evt.fraction);
+      break;
+
+    case SimEvent::SoundStop:
+      g_app->m_soundSystem->StopAllSounds(evt.objectId, evt.eventName);
+      break;
+
+    case SimEvent::SoundEntityEvent:
+    {
+      Entity* entity = g_app->m_location->GetEntity(evt.objectId);
+      if (entity)
+        g_app->m_soundSystem->TriggerEntityEvent(entity, evt.eventName);
+      break;
+    }
+
+    case SimEvent::SoundBuildingEvent:
+    {
+      Building* building = g_app->m_location->GetBuilding(evt.objectId.GetUniqueId());
+      if (building)
+        g_app->m_soundSystem->TriggerBuildingEvent(building, evt.eventName);
+      break;
+    }
+
+    case SimEvent::SoundOtherEvent:
+    {
+      // TriggerOtherEvent only reads _other->m_pos and _other->m_id.
+      // Spirits are WorldObjects, not Entities, so we build a lightweight
+      // temporary rather than looking up via GetEntity().
+      WorldObject tmp;
+      tmp.m_pos = evt.pos;
+      tmp.m_id = evt.objectId;
+      g_app->m_soundSystem->TriggerOtherEvent(&tmp, evt.eventName, evt.soundSourceType);
+      break;
+    }
+    }
+  }
+  g_simEventQueue.Clear();
 }
 
 int GetNumSlicesToAdvance()
@@ -362,6 +422,7 @@ bool LocationGameLoop()
         if (g_sliceNum != -1)
         {
           g_app->m_location->Advance(g_sliceNum);
+          DrainSimEvents();
           g_app->m_particleSystem->Advance(g_sliceNum);
 
           if (g_sliceNum < NUM_SLICES_PER_FRAME - 1)

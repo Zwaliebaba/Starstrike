@@ -21,8 +21,6 @@ class ResearchItem : public Building
     void SetDetail(int _detail) override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     bool NeedsReprogram();
     bool Reprogram();

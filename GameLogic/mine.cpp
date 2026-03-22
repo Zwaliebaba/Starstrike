@@ -14,9 +14,8 @@
 #include "global_world.h"
 #include "location.h"
 #include "main.h"
-#include "particle_system.h"
 #include "renderer.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "mine.h"
 #include "constructionyard.h"
 #include "trunkport.h"
@@ -95,102 +94,6 @@ bool MineBuilding::IsInView()
   }
 
   return Building::IsInView();
-}
-
-void MineBuilding::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  LegacyVector3 camPos = g_app->m_camera->GetPos();
-  LegacyVector3 camFront = g_app->m_camera->GetFront();
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-
-  if (m_trackLink != -1)
-  {
-    Building* trackLink = g_app->m_location->GetBuilding(m_trackLink);
-    if (trackLink)
-    {
-      int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-
-      auto mineBuilding = static_cast<MineBuilding*>(trackLink);
-
-      LegacyVector3 ourPos1 = GetTrackMarker1();
-      LegacyVector3 theirPos1 = mineBuilding->GetTrackMarker1();
-
-      LegacyVector3 ourPos2 = GetTrackMarker2();
-      LegacyVector3 theirPos2 = mineBuilding->GetTrackMarker2();
-
-      glColor4f(0.85f, 0.4f, 0.4f, 1.0f);
-
-      float size = 2.0f;
-      if (buildingDetail > 1)
-        size = 1.0f;
-
-      LegacyVector3 camToOurPos1 = g_app->m_camera->GetPos() - ourPos1;
-      LegacyVector3 lineOurPos1 = camToOurPos1 ^ (ourPos1 - theirPos1);
-      lineOurPos1.SetLength(size);
-
-      LegacyVector3 camToTheirPos1 = g_app->m_camera->GetPos() - theirPos1;
-      LegacyVector3 lineTheirPos1 = camToTheirPos1 ^ (ourPos1 - theirPos1);
-      lineTheirPos1.SetLength(size);
-
-      glDisable(GL_CULL_FACE);
-
-      if (buildingDetail == 1)
-      {
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-        glEnable(GL_BLEND);
-      }
-
-      glDepthMask(false);
-
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.1, 0);
-      glVertex3fv((ourPos1 - lineOurPos1).GetData());
-      glTexCoord2f(0.1, 1);
-      glVertex3fv((ourPos1 + lineOurPos1).GetData());
-      glTexCoord2f(0.9, 1);
-      glVertex3fv((theirPos1 + lineTheirPos1).GetData());
-      glTexCoord2f(0.9, 0);
-      glVertex3fv((theirPos1 - lineTheirPos1).GetData());
-      glEnd();
-
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.1, 0);
-      glVertex3fv((ourPos2 - lineOurPos1).GetData());
-      glTexCoord2f(0.1, 1);
-      glVertex3fv((ourPos2 + lineOurPos1).GetData());
-      glTexCoord2f(0.9, 1);
-      glVertex3fv((theirPos2 + lineTheirPos1).GetData());
-      glTexCoord2f(0.9, 0);
-      glVertex3fv((theirPos2 - lineTheirPos1).GetData());
-      glEnd();
-
-      glDepthMask(true);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-      glDisable(GL_TEXTURE_2D);
-      glEnable(GL_CULL_FACE);
-    }
-  }
-}
-
-void MineBuilding::Render(float _predictionTime)
-{
-  _predictionTime -= 0.1f;
-
-  for (int i = 0; i < m_carts.Size(); ++i)
-  {
-    MineCart* thisCart = m_carts[i];
-    RenderCart(thisCart, _predictionTime);
-  }
-
-  Building::Render(_predictionTime);
 }
 
 void MineBuilding::RenderCart(MineCart* _cart, float _predictionTime)
@@ -305,7 +208,7 @@ bool MineBuilding::Advance()
 {
   float mineSpeed = RefinerySpeed();
   if (m_previousMineSpeed <= 0.1f && mineSpeed > 0.1f)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "CogTurn");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "CogTurn"));
   m_previousMineSpeed = mineSpeed;
 
   if (mineSpeed > 0.0f)
@@ -505,8 +408,6 @@ void TrackJunction::Initialise(Building* _template)
     m_trackLinks.PutData(trackLink);
   }
 }
-
-void TrackJunction::Render(float _predictionTime) { Building::Render(_predictionTime); }
 
 void TrackJunction::TriggerCart(MineCart* _cart, float _initValue)
 {
@@ -786,57 +687,6 @@ void Refinery::TriggerCart(MineCart* _cart, float _initValue)
   MineBuilding::TriggerCart(_cart, _initValue);
 }
 
-void Refinery::Render(float _predictionTime)
-{
-  MineBuilding::Render(_predictionTime);
-
-  //
-  // Render wheels
-
-  Matrix34 refineryMat(m_front, g_upVector, m_pos);
-  Matrix34 wheel1Mat = m_shape->GetMarkerWorldMatrix(m_wheel1, refineryMat);
-  Matrix34 wheel2Mat = m_shape->GetMarkerWorldMatrix(m_wheel2, refineryMat);
-  Matrix34 wheel3Mat = m_shape->GetMarkerWorldMatrix(m_wheel3, refineryMat);
-
-  float refinerySpeed = RefinerySpeed();
-  float predictedWheelRotate = m_wheelRotate - 3.0f * refinerySpeed * _predictionTime;
-
-  wheel1Mat.RotateAroundF(predictedWheelRotate);
-  wheel2Mat.RotateAroundF(predictedWheelRotate * -1.0f);
-  wheel3Mat.RotateAroundF(predictedWheelRotate);
-
-  wheel1Mat.r *= 1.3f;
-  wheel1Mat.u *= 1.3f;
-  wheel1Mat.f *= 1.3f;
-
-  wheel2Mat.r *= 0.8f;
-  wheel2Mat.u *= 0.8f;
-
-  wheel3Mat.r *= 1.6f;
-  wheel3Mat.u *= 1.6f;
-  wheel3Mat.f *= 1.6f;
-
-  s_wheelShape->Render(_predictionTime, wheel1Mat);
-  s_wheelShape->Render(_predictionTime, wheel2Mat);
-  s_wheelShape->Render(_predictionTime, wheel3Mat);
-
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
-  int numRefined = 0;
-  if (gb)
-    numRefined = gb->m_link;
-
-  Matrix34 counterMat = m_shape->GetMarkerWorldMatrix(m_counter1, refineryMat);
-  glColor4f(0.6f, 0.8f, 0.9f, 1.0f);
-  g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined);
-  counterMat.pos += counterMat.f * 0.1f;
-  counterMat.pos += (counterMat.f ^ counterMat.u) * 0.2f;
-  counterMat.pos += counterMat.u * 0.2f;
-  g_gameFont.SetRenderShadow(true);
-  glColor4f(0.6f, 0.8f, 0.9f, 0.0f);
-  g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 10.0f, "%d", numRefined);
-  g_gameFont.SetRenderShadow(false);
-}
-
 // ****************************************************************************
 // Class Mine
 // ****************************************************************************
@@ -851,33 +701,6 @@ Mine::Mine()
 
   m_wheel1 = m_shape->GetMarkerData("MarkerWheel01");
   m_wheel2 = m_shape->GetMarkerData("MarkerWheel02");
-}
-
-void Mine::Render(float _predictionTime)
-{
-  MineBuilding::Render(_predictionTime);
-
-  //
-  // Render wheels
-
-  Matrix34 mineMat(m_front, g_upVector, m_pos);
-  Matrix34 wheel1Mat = m_shape->GetMarkerWorldMatrix(m_wheel1, mineMat);
-  Matrix34 wheel2Mat = m_shape->GetMarkerWorldMatrix(m_wheel2, mineMat);
-
-  float refinerySpeed = RefinerySpeed();
-  float predictedWheelRotate = m_wheelRotate - 3.0f * refinerySpeed * _predictionTime;
-
-  wheel1Mat.RotateAroundF(predictedWheelRotate * -1.0f);
-  wheel2Mat.RotateAroundF(predictedWheelRotate);
-
-  wheel1Mat.r *= 0.5f;
-  wheel1Mat.u *= 0.5f;
-
-  wheel2Mat.r *= 0.9f;
-  wheel2Mat.u *= 0.9f;
-
-  s_wheelShape->Render(_predictionTime, wheel1Mat);
-  s_wheelShape->Render(_predictionTime, wheel2Mat);
 }
 
 void Mine::TriggerCart(MineCart* _cart, float _initValue)

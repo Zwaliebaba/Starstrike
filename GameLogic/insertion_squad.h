@@ -80,8 +80,6 @@ class Squadie : public Entity
     void ChangeHealth(int _amount) override;
     void Attack(const LegacyVector3& _pos) override;
 
-    void Render(float _predictionTime) override;
-
     bool HasSecondaryWeapon();
     void FireSecondaryWeapon(const LegacyVector3& _pos);
 

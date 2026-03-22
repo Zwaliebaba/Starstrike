@@ -23,8 +23,6 @@ class PowerBuilding : public Building
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     bool IsInView() override;
     LegacyVector3 GetPowerLocation();
@@ -64,7 +62,6 @@ class Generator : public PowerBuilding
     const char* GetObjectiveCounter() override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
 };
 
 // ****************************************************************************
@@ -106,7 +103,6 @@ class PylonEnd : public PowerBuilding
     PylonEnd();
 
     void TriggerSurge(float _initValue) override;
-    void RenderAlphas(float _predictionTime) override;
 };
 
 // ****************************************************************************
@@ -131,8 +127,4 @@ class SolarPanel : public PowerBuilding
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-
-    void Render(float _predictionTime) override;
-    void RenderPorts() override;
-    void RenderAlphas(float _predictionTime) override;
 };

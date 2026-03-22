@@ -103,7 +103,6 @@ class Darwinian : public Entity
     bool Advance(Unit* _unit) override;
     void ChangeHealth(int _amount) override;
     bool IsInView() override;
-    void Render(float _predictionTime, float _highDetail);
 
     LegacyVector3 PushFromObstructions(const LegacyVector3& pos, bool killem = true) override;
 

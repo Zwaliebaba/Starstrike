@@ -45,8 +45,6 @@ class Triffid : public Building
     void Initialise(Building* _template) override;
     bool Advance() override;
     void Launch();
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     void Damage(float _damage) override;
 
@@ -88,5 +86,4 @@ class TriffidEgg : public Entity
     void ChangeHealth(int _amount) override;
     void Spawn();
     bool Advance(Unit* _unit) override;
-    void Render(float _predictionTime) override;
 };

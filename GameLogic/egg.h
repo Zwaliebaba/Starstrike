@@ -26,7 +26,6 @@ public:
 
     void ChangeHealth   ( int amount );
 
-    void Render         ( float predictionTime );
     bool Advance        ( Unit *_unit );
     void Fertilise      ( int spiritId );
 };

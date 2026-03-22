@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "resource.h"
-#include "soundsystem.h"
 #include "egg.h"
 #include "GameApp.h"
 #include "camera.h"
@@ -27,12 +26,6 @@ void Egg::ChangeHealth(int amount)
     else
       m_stats[StatHealth] += amount;
   }
-}
-
-void Egg::Render(float predictionTime)
-{
-  // Rendering moved to EggRenderer companion (GameRender).
-  // Kept as empty override for legacy fallback safety.
 }
 
 bool Egg::Advance(Unit* _unit)

@@ -354,6 +354,8 @@ void Team::Render()
     if (m_units.ValidIndex(i))
     {
       Unit* unit = m_units[i];
+     if (unit->m_troopType == Entity::TypeVirii)
+       continue;  // Rendered in RenderVirii() with Virii-specific GL state
       if (unit->IsInView())
       {
         START_PROFILE(g_app->m_profiler, Entity::GetTypeName( unit->m_troopType ));
@@ -404,7 +406,18 @@ void Team::Render()
 
 void Team::RenderVirii(float _predictionTime)
 {
-  if (m_others.Size() == 0)
+  // Check if there are any Virii to render (in m_others or in ViriiUnits)
+  bool hasViriiUnits = false;
+  for (int i = 0; i < m_units.Size(); ++i)
+  {
+    if (m_units.ValidIndex(i) && m_units[i]->m_troopType == Entity::TypeVirii)
+    {
+      hasViriiUnits = true;
+      break;
+    }
+  }
+
+  if (m_others.Size() == 0 && !hasViriiUnits)
     return;
 
   int lastUpdated = m_others.GetLastUpdated();
@@ -440,14 +453,23 @@ void Team::RenderVirii(float _predictionTime)
           ctx.predictionTime = (i <= lastUpdated) ? _predictionTime : _predictionTime + SERVER_ADVANCE_PERIOD;
           ctx.highDetailFactor = 1.0f;
 
-          if (renderer)
-            renderer->Render(*entity, ctx);
-          else
-          {
-            auto virii = static_cast<Virii*>(entity);
-            virii->Render(ctx.predictionTime, m_teamId, 1);
-          }
+          DEBUG_ASSERT(renderer);
+          renderer->Render(*entity, ctx);
         }
+      }
+    }
+  }
+
+  // Render Virii that are in ViriiUnits (they need the same GL state)
+  for (int i = 0; i < m_units.Size(); ++i)
+  {
+    if (m_units.ValidIndex(i))
+    {
+      Unit* unit = m_units[i];
+      if (unit->m_troopType == Entity::TypeVirii && unit->IsInView())
+      {
+        unit->Render(_predictionTime);
+        glDisable(GL_CULL_FACE);  // Unit::Render re-enables; keep disabled for Virii batch
       }
     }
   }
@@ -511,10 +533,8 @@ void Team::RenderDarwinians(float _predictionTime)
           ctx.predictionTime = (i <= lastUpdated) ? _predictionTime : _predictionTime + SERVER_ADVANCE_PERIOD;
           ctx.highDetailFactor = highDetail;
 
-          if (renderer)
-            renderer->Render(*entity, ctx);
-          else
-            static_cast<Darwinian*>(entity)->Render(ctx.predictionTime, highDetail);
+          DEBUG_ASSERT(renderer);
+          renderer->Render(*entity, ctx);
         }
       }
     }
@@ -540,17 +560,11 @@ void Team::RenderOthers(float _predictionTime)
       {
         START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
         EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
-        if (renderer)
-        {
-          EntityRenderContext ctx;
-          ctx.predictionTime = _predictionTime;
-          ctx.highDetailFactor = 1.0f;
-          renderer->Render(*entity, ctx);
-        }
-        else
-        {
-          entity->Render(_predictionTime);
-        }
+        DEBUG_ASSERT(renderer);
+        EntityRenderContext ctx;
+        ctx.predictionTime = _predictionTime;
+        ctx.highDetailFactor = 1.0f;
+        renderer->Render(*entity, ctx);
         END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }
@@ -567,17 +581,11 @@ void Team::RenderOthers(float _predictionTime)
       {
         START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
         EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
-        if (renderer)
-        {
-          EntityRenderContext ctx;
-          ctx.predictionTime = _predictionTime;
-          ctx.highDetailFactor = 1.0f;
-          renderer->Render(*entity, ctx);
-        }
-        else
-        {
-          entity->Render(_predictionTime);
-        }
+        DEBUG_ASSERT(renderer);
+        EntityRenderContext ctx;
+        ctx.predictionTime = _predictionTime;
+        ctx.highDetailFactor = 1.0f;
+        renderer->Render(*entity, ctx);
         END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }

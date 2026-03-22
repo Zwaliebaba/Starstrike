@@ -60,6 +60,8 @@
 #include "ViriiRenderer.h"
 #include "LanderRenderer.h"
 #include "LaserTrooperRenderer.h"
+#include "SquadieRenderer.h"
+#include "SporeGeneratorRenderer.h"
 #include "building.h"
 #include "entity.h"
 
@@ -120,6 +122,8 @@ static DarwinianRenderer     s_darwinianRenderer;
 static ViriiRenderer         s_viriiRenderer;
 static LanderRenderer        s_landerRenderer;
 static LaserTrooperRenderer  s_laserTrooperRenderer;
+static SquadieRenderer              s_squadieRenderer;
+static SporeGeneratorRenderer       s_sporeGeneratorRenderer;
 
 void InitGameRenderers()
 {
@@ -195,4 +199,6 @@ void InitGameRenderers()
     g_entityRenderRegistry.Register(Entity::TypeVirii,          &s_viriiRenderer);
     g_entityRenderRegistry.Register(Entity::TypeLander,         &s_landerRenderer);
     g_entityRenderRegistry.Register(Entity::TypeLaserTroop,     &s_laserTrooperRenderer);
+    g_entityRenderRegistry.Register(Entity::TypeInsertionSquadie, &s_squadieRenderer);
+    g_entityRenderRegistry.Register(Entity::TypeSporeGenerator,   &s_sporeGeneratorRenderer);
 }

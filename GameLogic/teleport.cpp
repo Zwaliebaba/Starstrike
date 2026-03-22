@@ -115,41 +115,6 @@ bool Teleport::IsInView()
 }
 
 
-void Teleport::RenderAlphas ( float predictionTime )
-{
-//    LegacyVector3 pos, front;
-//    GetEntrance( pos, front );
-//    RenderSphere( pos, 3.0f, RGBAColour(255,0,0) );
-//    RenderSphere( pos, 15.0f, RGBAColour(255,0,0) );
-
-    //RenderHitCheck();
-
-    glEnable        ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-    glDisable       ( GL_CULL_FACE );
-    glDepthMask     ( false );
-
-    for( int i = 0; i < m_inTransit.Size(); ++i )
-    {
-        WorldObjectId *id = m_inTransit.GetPointer(i);
-        WorldObject *obj = g_app->m_location->GetEntity( *id );
-        if( obj )
-        {
-            Entity *ent = (Entity *) obj;
-            LegacyVector3 pos = obj->m_pos + obj->m_vel * predictionTime;
-            RenderSpirit( pos, ent->m_id.GetTeamId() );
-        }
-    }
-
-    glDepthMask     ( true );
-    glEnable        ( GL_CULL_FACE );
-    glDisable       ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-    Building::RenderAlphas( predictionTime );
-}
-
-
 void Teleport::RenderSpirit( LegacyVector3 const &_pos, int _teamId )
 {
     LegacyVector3 pos = _pos;

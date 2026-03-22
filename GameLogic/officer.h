@@ -50,17 +50,11 @@ class Officer : public Entity
 
     void Absorb();
 
-    void RenderFlag(float _predictionTime);
-    void RenderShield(float _predictionTime);
-    void RenderSpirit(const LegacyVector3& _pos);
-
   public:
     Officer();
     ~Officer() override;
 
     void Begin() override;
-    void Render(float _predictionTime) override;
-
     bool Advance(Unit* _unit) override;
 
     void ChangeHealth(int amount) override;

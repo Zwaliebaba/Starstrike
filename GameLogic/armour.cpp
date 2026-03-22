@@ -7,13 +7,11 @@
 #include "input.h"
 #include "armour.h"
 #include "gunturret.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "GameApp.h"
 #include "renderer.h"
 #include "location.h"
 #include "main.h"
-#include "particle_system.h"
-#include "explosion.h"
 #include "camera.h"
 #include "global_world.h"
 #include "obstruction_grid.h"
@@ -75,7 +73,7 @@ void Armour::ChangeHealth(int _amount)
   if (!m_dead)
   {
     if (_amount < 0)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "LoseHealth");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
 
     int oldHealth = m_stats[StatHealth];
     int newHealth = oldHealth + _amount;
@@ -90,13 +88,13 @@ void Armour::ChangeHealth(int _amount)
     {
       float fractionDead = 1.0f - static_cast<float>(newHealth) / EntityBlueprint::GetStat(TypeArmour, StatHealth);
       Matrix34 bodyMat(m_front, m_up, m_pos);
-      g_explosionManager.AddExplosion(m_shape, bodyMat, fractionDead);
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, bodyMat, fractionDead));
     }
 
     if (newHealth == 0)
     {
       m_dead = true;
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Die");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
     }
   }
 }
@@ -119,7 +117,7 @@ void Armour::ConvertToGunTurret()
   //
   // Explode some polys, to cover the ropey change
   Matrix34 bodyMat(m_front, m_up, m_pos);
-  g_explosionManager.AddExplosion(m_shape, bodyMat);
+  g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, bodyMat, 1.0f));
   turret->ExplodeBody();
 }
 
@@ -253,7 +251,7 @@ bool Armour::Advance(Unit* _unit)
     LegacyVector3 pos = m_pos + vel * 2;
     pos.y += 3.0f;
     float size = 50.0f + (syncrand() % 50);
-    g_app->m_particleSystem->CreateParticle(pos, vel, Particle::TypeMissileTrail, size);
+    g_simEventQueue.Push(SimEvent::MakeParticle(pos, vel, SimParticle::TypeMissileTrail, size));
   }
 
   //
@@ -386,7 +384,7 @@ void Armour::AddPassenger()
 {
   ++m_numPassengers;
 
-  g_app->m_soundSystem->TriggerEntityEvent(this, "LoadDarwinian");
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoadDarwinian"));
 }
 
 void Armour::RemovePassenger()
@@ -394,7 +392,7 @@ void Armour::RemovePassenger()
   --m_numPassengers;
   m_previousUnloadTimer = GetHighResTime();
 
-  g_app->m_soundSystem->TriggerEntityEvent(this, "UnloadDarwinian");
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "UnloadDarwinian"));
 }
 
 void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)
@@ -403,10 +401,4 @@ void Armour::GetEntrance(LegacyVector3& _exitPos, LegacyVector3& _exitDir)
   Matrix34 entranceMat = m_shape->GetMarkerWorldMatrix(m_markerEntrance, mat);
   _exitPos = entranceMat.pos;
   _exitDir = entranceMat.f;
-}
-
-void Armour::Render(float _predictionTime)
-{
-    // Rendering moved to ArmourRenderer companion (GameRender).
-    // Kept as empty override for legacy fallback safety.
 }

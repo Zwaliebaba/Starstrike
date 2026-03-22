@@ -42,9 +42,6 @@ class Incubator : public Building
     void SpawnEntity();
     void AddSpirit(Spirit* _spirit);
 
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
-
     int NumSpiritsInside();
 
     void Read(TextReader* _in, bool _dynamic) override;

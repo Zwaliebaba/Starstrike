@@ -31,8 +31,6 @@ public:
     void Initialise     ( Building *_template );
     void SetBridgeType  ( int _type );
 
-    void Render         ( float predictionTime );
-    void RenderAlphas   ( float predictionTime );
     bool Advance        ();
 
     bool GetAvailablePosition   ( LegacyVector3 &_pos, LegacyVector3 &_front );                     // Finds place for engineer

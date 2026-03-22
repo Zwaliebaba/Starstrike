@@ -42,32 +42,6 @@ void Factory::Initialise(Building* _template)
   m_spiritStore.Initialise(m_initialCapacity, 200, spiritStorePos, 5.0f, 10.0f, 5.0f);
 }
 
-void Factory::Render(float predictionTime)
-{
-  Building::Render(predictionTime);
-
-  //
-  // If we are creating render an effect at the source point
-
-  if (m_state == StateCreating)
-  {
-    LegacyVector3 pos(m_pos + LegacyVector3(2.0f, 20.0f, 20.0f));
-
-    glBegin(GL_LINE_LOOP);
-    glVertex3fv((pos + LegacyVector3(-5, -5, 0)).GetData());
-    glVertex3fv((pos + LegacyVector3(-5, +5, 0)).GetData());
-    glVertex3fv((pos + LegacyVector3(+5, +5, 0)).GetData());
-    glVertex3fv((pos + LegacyVector3(+5, -5, 0)).GetData());
-    glEnd();
-  }
-}
-
-void Factory::RenderAlphas(float predictionTime)
-{
-  if (!g_app->m_editing)
-    m_spiritStore.Render(predictionTime);
-}
-
 void Factory::RequestUnit(unsigned char _troopType, int _numToCreate)
 {
   m_troopType = _troopType;

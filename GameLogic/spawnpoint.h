@@ -44,8 +44,6 @@ public:
     virtual void    TriggerSpirit   ( SpawnBuildingSpirit *_spirit );
 
     bool            IsInView        ();
-    void            Render          ( float _predictionTime );
-    void            RenderAlphas    ( float _predictionTime );
     void            RenderSpirit    ( LegacyVector3 const &_pos );
 
     LegacyVector3         GetSpiritLink   ();
@@ -79,8 +77,6 @@ public:
     MasterSpawnPoint();
 
     bool Advance();
-    void Render       ( float _predictionTime );
-    void RenderAlphas ( float _predictionTime );
 
     void RequestSpirit( int _targetBuildingId );
 
@@ -115,11 +111,7 @@ public:
 
     void            TriggerSpirit( SpawnBuildingSpirit *_spirit );
 
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
-    void RenderPorts    ();
-
-};
+    };
 
 
 // ============================================================================
@@ -143,9 +135,6 @@ public:
 
     void    Initialise      ( Building *_template );
     bool    Advance         ();
-    void    Render          ( float _predictionTime );
-    void    RenderAlphas    ( float _predictionTime );
-
     void Read   ( TextReader *_in, bool _dynamic );
     void Write  ( FileWriter *_out );
 

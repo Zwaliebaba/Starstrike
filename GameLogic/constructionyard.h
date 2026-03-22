@@ -36,9 +36,6 @@ public:
 
     bool Advance();
 
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
-
     Matrix34 GetRungMatrix1();
     Matrix34 GetRungMatrix2();
 
@@ -64,8 +61,6 @@ protected:
 
 public:
     DisplayScreen();
-
-    void RenderAlphas       ( float _predictionTime );
 
 };
 

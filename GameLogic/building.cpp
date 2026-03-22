@@ -12,7 +12,7 @@
 #include "controltower.h"
 #include "darwinian.h"
 #include "entity_grid.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "factory.h"
 #include "feedingtube.h"
 #include "file_writer.h"
@@ -30,7 +30,6 @@
 #include "matrix34.h"
 #include "mine.h"
 #include "obstruction_grid.h"
-#include "particle_system.h"
 #include "powerstation.h"
 #include "preferences.h"
 #include "profiler.h"
@@ -42,7 +41,6 @@
 #include "safearea.h"
 #include "scripttrigger.h"
 #include "ShapeStatic.h"
-#include "soundsystem.h"
 #include "spam.h"
 #include "spawnpoint.h"
 #include "spiritreceiver.h"
@@ -113,7 +111,7 @@ void Building::Initialise(Building* _template)
   if (gb)
     m_id.SetTeamId(gb->m_teamId);
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Create");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Create"));
 }
 
 void Building::SetDetail(int _detail)
@@ -212,7 +210,7 @@ void Building::Reprogram(float _complete) {}
 
 void Building::ReprogramComplete()
 {
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "ReprogramComplete");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ReprogramComplete"));
 
   GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
   if (gb)
@@ -229,7 +227,7 @@ void Building::SetTeamId(int _teamId)
   if (gb)
     gb->m_teamId = _teamId;
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "ChangeTeam");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ChangeTeam"));
 }
 
 LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius)
@@ -256,79 +254,6 @@ LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius
 bool Building::IsInView() { return (g_app->m_camera->SphereInViewFrustum(m_centerPos, m_radius)); }
 
 bool Building::PerformDepthSort(LegacyVector3& _centerPos) { return false; }
-
-void Building::Render(float predictionTime)
-{
-  if (m_shape)
-  {
-    Matrix34 mat(m_front, m_up, m_pos);
-    m_shape->Render(predictionTime, mat);
-  }
-}
-
-void Building::RenderAlphas(float predictionTime)
-{
-  RenderLights();
-  RenderPorts();
-}
-
-void Building::RenderLights()
-{
-  if (m_id.GetTeamId() != 255 && m_lights.Size() > 0)
-  {
-    if ((g_app->m_clientToServer->m_lastValidSequenceIdFromServer % 10) / 2 == m_id.GetTeamId() || g_app->m_editing)
-    {
-      for (int i = 0; i < m_lights.Size(); ++i)
-      {
-        ShapeMarkerData* marker = m_lights[i];
-        Matrix34 rootMat(m_front, m_up, m_pos);
-        Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(marker, rootMat);
-        LegacyVector3 lightPos = worldMat.pos;
-
-        float signalSize = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight();
-        LegacyVector3 camU = g_app->m_camera->GetUp();
-
-        if (m_id.GetTeamId() == 255)
-          glColor3f(0.5f, 0.5f, 0.5f);
-        else
-          glColor3ubv(g_app->m_location->m_teams[m_id.GetTeamId()].m_colour.GetData());
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glDisable(GL_CULL_FACE);
-        glDepthMask(false);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-        for (int i = 0; i < 10; ++i)
-        {
-          float size = signalSize * static_cast<float>(i) / 10.0f;
-          glBegin(GL_QUADS);
-          glTexCoord2f(0.0f, 0.0f);
-          glVertex3fv((lightPos - camR * size - camU * size).GetData());
-          glTexCoord2f(1.0f, 0.0f);
-          glVertex3fv((lightPos + camR * size - camU * size).GetData());
-          glTexCoord2f(1.0f, 1.0f);
-          glVertex3fv((lightPos + camR * size + camU * size).GetData());
-          glTexCoord2f(0.0f, 1.0f);
-          glVertex3fv((lightPos - camR * size + camU * size).GetData());
-          glEnd();
-        }
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_BLEND);
-
-        glDepthMask(true);
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_TEXTURE_2D);
-      }
-    }
-  }
-}
 
 void Building::EvaluatePorts()
 {
@@ -377,74 +302,7 @@ void Building::EvaluatePorts()
   }
 }
 
-void Building::RenderPorts()
-{
-  START_PROFILE(g_app->m_profiler, "RenderPorts");
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail");
-
-  for (int i = 0; i < GetNumPorts(); ++i)
-  {
-    LegacyVector3 portPos;
-    LegacyVector3 portFront;
-    GetPortPosition(i, portPos, portFront);
-
-    //
-    // Render the port shape
-
-    portPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(portPos.x, portPos.z) + 0.5f;
-    LegacyVector3 portUp = g_upVector;
-    Matrix34 mat(portFront, portUp, portPos);
-
-    if (buildingDetail < 3)
-    {
-      g_app->m_renderer->SetObjectLighting();
-      s_controlPad->Render(0.0f, mat);
-      g_app->m_renderer->UnsetObjectLighting();
-    }
-
-    //
-    // Render the status light
-
-    float size = 6.0f;
-
-    LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-    LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-    LegacyVector3 statusPos = s_controlPad->GetMarkerWorldMatrix(s_controlPadStatus, mat).pos;
-
-    if (GetPortOccupant(i).IsValid())
-      glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
-    else
-      glColor4f(1.0f, 0.3f, 0.3f, 1.0f);
-
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glDepthMask(false);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((statusPos - camR - camU).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((statusPos + camR - camU).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((statusPos + camR + camU).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((statusPos - camR + camU).GetData());
-    glEnd();
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-    glDepthMask(true);
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
-  }
-
-  END_PROFILE(g_app->m_profiler, "RenderPorts");
-}
-
-void Building::Damage(float _damage) { g_app->m_soundSystem->TriggerBuildingEvent(this, "Damage"); }
+void Building::Damage(float _damage) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Damage")); }
 
 void Building::Destroy(float _intensity)
 {
@@ -452,10 +310,10 @@ void Building::Destroy(float _intensity)
 
   Matrix34 mat(m_front, g_upVector, m_pos);
   for (int i = 0; i < 3; ++i)
-    g_explosionManager.AddExplosion(m_shape, mat);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
   g_app->m_location->Bang(m_pos, _intensity, _intensity / 4.0f);
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Explode");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
 
   for (int i = 0; i < static_cast<int>(_intensity / 4.0f); ++i)
   {
@@ -463,7 +321,7 @@ void Building::Destroy(float _intensity)
     vel.x += syncsfrand(100.0f);
     vel.y += syncsfrand(100.0f);
     vel.z += syncsfrand(100.0f);
-    g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeExplosionCore, 100.0f);
+    g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeExplosionCore, 100.0f));
   }
 }
 

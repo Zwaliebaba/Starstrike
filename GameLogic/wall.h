@@ -17,7 +17,6 @@ public:
 
     bool Advance    ();
     void Damage     ( float _damage );
-    void Render     ( float _predictionTime );
 
 };
 

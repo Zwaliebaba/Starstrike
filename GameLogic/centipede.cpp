@@ -7,14 +7,13 @@
 #include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "globals.h"
 #include "location.h"
 #include "team.h"
 #include "unit.h"
 #include "main.h"
 #include "renderer.h"
-#include "soundsystem.h"
 #include "centipede.h"
 
 ShapeStatic* Centipede::s_shapeBody = nullptr;
@@ -118,7 +117,7 @@ void Centipede::ChangeHealth(int _amount)
     transform.u *= m_size;
     transform.r *= m_size;
 
-    g_explosionManager.AddExplosion(m_shape, transform);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
 
     auto next = static_cast<Centipede*>(g_app->m_location->GetEntitySafe(m_next, TypeCentipede));
     if (next)
@@ -132,7 +131,7 @@ void Centipede::ChangeHealth(int _amount)
 void Centipede::Panic(float _time)
 {
   if (m_panic <= 0.0f)
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Panic");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Panic"));
 
   m_panic = max(_time, m_panic);
 
@@ -293,7 +292,7 @@ void Centipede::Attack(const LegacyVector3& _pos)
     float distance = pushVector.Mag();
     if (distance < m_radius)
     {
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
 
       pushVector.SetLength(m_radius - distance);
 
@@ -395,7 +394,7 @@ void Centipede::EatSpirits()
       centipede->Begin();
 
       g_app->m_location->m_entityGrid->AddObject(centipede->m_id, centipede->m_pos.x, centipede->m_pos.z, centipede->m_radius);
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Grow");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Grow"));
 
       tail = centipede;
       m_numSpiritsEaten -= CENTIPEDE_NUMSPIRITSTOREGROW;
@@ -453,7 +452,7 @@ bool Centipede::SearchForTargetEnemy()
   if (targetId.IsValid())
   {
     m_targetEntity = targetId;
-    g_app->m_soundSystem->TriggerEntityEvent(this, "EnemySighted");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EnemySighted"));
     return true;
   }
   m_targetEntity.SetInvalid();
@@ -601,12 +600,6 @@ bool Centipede::AdvanceToTargetPosition()
   }
 
   return (m_pos - m_targetPos).Mag() < 20.0f;
-}
-
-void Centipede::Render(float _predictionTime)
-{
-    // Rendering moved to CentipedeRenderer companion (GameRender).
-    // Kept as empty override for legacy fallback safety.
 }
 
 bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

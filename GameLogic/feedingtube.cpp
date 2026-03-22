@@ -100,22 +100,6 @@ LegacyVector3 FeedingTube::GetForwardsClippingDir(float _predictionTime, Feeding
   return combinedDirection.Normalise();
 }
 
-void FeedingTube::Render(float _predictionTime) { Building::Render(_predictionTime); }
-
-void FeedingTube::RenderAlphas(float _predictionTime)
-{
-  if (g_app->m_editing)
-    return;
-
-  if (m_receiverId != -1)
-  {
-    RenderSignal(_predictionTime, 10.0f, 0.4f);
-    RenderSignal(_predictionTime, 9.0f, 0.2f);
-    RenderSignal(_predictionTime, 8.0f, 0.2f);
-    RenderSignal(_predictionTime, 4.0f, 0.5f);
-  }
-}
-
 void FeedingTube::RenderSignal(float _predictionTime, float _radius, float _alpha)
 {
   START_PROFILE(g_app->m_profiler, "Signal");

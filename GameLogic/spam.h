@@ -24,9 +24,6 @@ class Spam : public Building
     void Damage(float _damage) override;
     void Destroy(float _intensity) override;
 
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
-
     bool Advance() override;
 
     void SetAsResearch();

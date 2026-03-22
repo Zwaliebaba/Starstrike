@@ -38,9 +38,6 @@ class SoulDestroyer : public Entity
     void RecordHistoryPosition();
     bool GetTrailPosition(LegacyVector3& _pos, LegacyVector3& _vel);
 
-    void RenderShapes(float _predictionTime);
-    void RenderSpirit(const LegacyVector3& _pos, float _alpha);
-
     void Panic(float _time);
 
   public:
@@ -49,7 +46,6 @@ class SoulDestroyer : public Entity
     void Begin() override;
     bool Advance(Unit* _unit) override;
     void ChangeHealth(int _amount) override;
-    void Render(float _predictionTime) override;
 
     void Attack(const LegacyVector3& _pos) override;
 

@@ -15,9 +15,6 @@ class GodDish : public Building
     void Initialise(Building* _template) override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
-
     bool IsInView() override;
 
     void Activate();

@@ -15,9 +15,8 @@
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"
-#include "particle_system.h"
+#include "SimEventQueue.h"
 #include "main.h"
-#include "soundsystem.h"
 
 // ****************************************************************************
 // Class PowerBuilding
@@ -62,95 +61,6 @@ bool PowerBuilding::IsInView()
   return Building::IsInView();
 }
 
-void PowerBuilding::Render(float _predictionTime)
-{
-  Matrix34 mat(m_front, m_up, m_pos);
-  m_shape->Render(_predictionTime, mat);
-}
-
-void PowerBuilding::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  Building* powerLink = g_app->m_location->GetBuilding(m_powerLink);
-  if (powerLink)
-  {
-    //
-    // Render the power line itself
-    auto powerBuilding = static_cast<PowerBuilding*>(powerLink);
-
-    LegacyVector3 ourPos = GetPowerLocation();
-    LegacyVector3 theirPos = powerBuilding->GetPowerLocation();
-
-    LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
-    LegacyVector3 ourPosRight = camToOurPos ^ (theirPos - ourPos);
-    ourPosRight.SetLength(2.0f);
-
-    LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
-    LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
-    theirPosRight.SetLength(2.0f);
-
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glDepthMask(false);
-    glColor4f(0.9f, 0.9f, 0.5f, 1.0f);
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.1f, 0);
-    glVertex3fv((ourPos - ourPosRight).GetData());
-    glTexCoord2f(0.1f, 1);
-    glVertex3fv((ourPos + ourPosRight).GetData());
-    glTexCoord2f(0.9f, 1);
-    glVertex3fv((theirPos + theirPosRight).GetData());
-    glTexCoord2f(0.9f, 0);
-    glVertex3fv((theirPos - theirPosRight).GetData());
-    glEnd();
-
-    //
-    // Render any surges
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-
-    float surgeSize = 25.0f;
-    glColor4f(0.5f, 0.5f, 1.0f, 1.0f);
-    LegacyVector3 camUp = g_app->m_camera->GetUp() * surgeSize;
-    LegacyVector3 camRight = g_app->m_camera->GetRight() * surgeSize;
-    glBegin(GL_QUADS);
-    for (int i = 0; i < m_surges.Size(); ++i)
-    {
-      float thisSurge = m_surges[i];
-      thisSurge += _predictionTime * 2;
-      if (thisSurge < 0.0f)
-        thisSurge = 0.0f;
-      if (thisSurge > 1.0f)
-        thisSurge = 1.0f;
-      LegacyVector3 thisSurgePos = ourPos + (theirPos - ourPos) * thisSurge;
-      glTexCoord2i(0, 0);
-      glVertex3fv((thisSurgePos - camUp - camRight).GetData());
-      glTexCoord2i(1, 0);
-      glVertex3fv((thisSurgePos - camUp + camRight).GetData());
-      glTexCoord2i(1, 1);
-      glVertex3fv((thisSurgePos + camUp + camRight).GetData());
-      glTexCoord2i(0, 1);
-      glVertex3fv((thisSurgePos + camUp - camRight).GetData());
-    }
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-    glDepthMask(true);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-  }
-}
-
 bool PowerBuilding::Advance()
 {
   for (int i = 0; i < m_surges.Size(); ++i)
@@ -177,7 +87,7 @@ void PowerBuilding::TriggerSurge(float _initValue)
 {
   m_surges.PutDataAtStart(_initValue);
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "TriggerSurge");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TriggerSurge"));
 }
 
 void PowerBuilding::Read(TextReader* _in, bool _dynamic)
@@ -233,7 +143,7 @@ const char* Generator::GetObjectiveCounter()
 void Generator::ReprogramComplete()
 {
   m_enabled = true;
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Enable"));
 }
 
 bool Generator::Advance()
@@ -285,29 +195,6 @@ bool Generator::Advance()
   }
 
   return PowerBuilding::Advance();
-}
-
-void Generator::Render(float _predictionTime)
-{
-  PowerBuilding::Render(_predictionTime);
-
-  //g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,215,0), 10.0f, "NumThisSecond : %d", m_numThisSecond );
-
-  //if( m_enabled ) g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,180,0), 10.0f, "Enabled" );
-  //g_gameFont.DrawText3DCenter( m_pos + LegacyVector3(0,170,0), 10.0f, "Output : %d Gq/s", int(m_throughput*10.0f) );
-
-  Matrix34 generatorMat(m_front, g_upVector, m_pos);
-  Matrix34 counterMat = m_shape->GetMarkerWorldMatrix(m_counter, generatorMat);
-
-  glColor4f(0.6f, 0.8f, 0.9f, 1.0f);
-  g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", static_cast<int>(m_throughput * 10.0f));
-  counterMat.pos += counterMat.f * 0.1f;
-  counterMat.pos += (counterMat.f ^ counterMat.u) * 0.2f;
-  counterMat.pos += counterMat.u * 0.2f;
-  g_gameFont.SetRenderShadow(true);
-  glColor4f(0.6f, 0.8f, 0.9f, 0.0f);
-  g_gameFont.DrawText3D(counterMat.pos, counterMat.f, counterMat.u, 7.0f, "%d", static_cast<int>(m_throughput * 10.0f));
-  g_gameFont.SetRenderShadow(false);
 }
 
 // ****************************************************************************
@@ -421,11 +308,6 @@ void PylonEnd::TriggerSurge(float _initValue)
   }
 }
 
-void PylonEnd::RenderAlphas(float _predictionTime)
-{
-  // Do nothing
-}
-
 // ****************************************************************************
 // Class SolarPanel
 // ****************************************************************************
@@ -474,123 +356,17 @@ bool SolarPanel::Advance()
   if (fractionOccupied > 0.6f)
   {
     if (!m_operating)
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "Operate");
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Operate"));
     m_operating = true;
   }
 
   if (fractionOccupied < 0.3f)
   {
     if (m_operating)
-      g_app->m_soundSystem->StopAllSounds(m_id, "SolarPanel Operate");
+      g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
     m_operating = false;
   }
 
   return PowerBuilding::Advance();
 }
 
-void SolarPanel::RenderPorts()
-{
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-  for (int i = 0; i < GetNumPorts(); ++i)
-  {
-    Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
-
-    //
-    // Render the status light
-
-    float size = 6.0f;
-
-    LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-    LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-    LegacyVector3 statusPos = worldMat.pos;
-
-    if (GetPortOccupant(i).IsValid())
-      glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
-    else
-      glColor4f(1.0f, 0.3f, 0.3f, 1.0f);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((statusPos - camR - camU).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((statusPos + camR - camU).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((statusPos + camR + camU).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((statusPos - camR + camU).GetData());
-    glEnd();
-  }
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_BLEND);
-  glDepthMask(true);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_CULL_FACE);
-}
-
-void SolarPanel::Render(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
-    LegacyVector3 right(1, 0, 0);
-    m_front = right ^ m_up;
-  }
-
-  glShadeModel(GL_SMOOTH);
-  PowerBuilding::Render(_predictionTime);
-  glShadeModel(GL_FLAT);
-}
-
-void SolarPanel::RenderAlphas(float _predictionTime)
-{
-  PowerBuilding::RenderAlphas(_predictionTime);
-
-  float fractionOccupied = static_cast<float>(GetNumPortsOccupied()) / static_cast<float>(GetNumPorts());
-
-  if (fractionOccupied > 0.0f)
-  {
-    Matrix34 mat(m_front, m_up, m_pos);
-    float glowWidth = 60.0f;
-    float glowHeight = 40.0f;
-    float alphaValue = fabs(sinf(g_gameTime)) * fractionOccupied;
-
-    glColor4f(0.2f, 0.4f, 0.9f, alphaValue);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
-    glDepthMask(false);
-    glDisable(GL_CULL_FACE);
-
-    for (int i = 0; i < SOLARPANEL_NUMGLOWS; ++i)
-    {
-      Matrix34 thisGlow = m_shape->GetMarkerWorldMatrix(m_glowMarker[i], mat);
-
-      glBegin(GL_QUADS);
-      glTexCoord2i(0, 0);
-      glVertex3fv((thisGlow.pos - thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData());
-      glTexCoord2i(0, 1);
-      glVertex3fv((thisGlow.pos + thisGlow.r * glowHeight + thisGlow.f * glowWidth).GetData());
-      glTexCoord2i(1, 1);
-      glVertex3fv((thisGlow.pos + thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData());
-      glTexCoord2i(1, 0);
-      glVertex3fv((thisGlow.pos - thisGlow.r * glowHeight - thisGlow.f * glowWidth).GetData());
-      glEnd();
-    }
-
-    glEnable(GL_CULL_FACE);
-    glDepthMask(true);
-    glDisable(GL_TEXTURE_2D);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-  }
-}

@@ -3,17 +3,15 @@
 #include "math_utils.h"
 #include "preferences.h"
 #include "spam.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "globals.h"
 #include "entity_grid.h"
 #include "team.h"
-#include "particle_system.h"
 #include "global_world.h"
 #include "main.h"
 #include "camera.h"
-#include "soundsystem.h"
 
 static inline float SpamReloadTime() { return SPAM_RELOADTIME - (SPAM_RELOADTIME / 2.0) * g_app->m_difficultyLevel / 10.0; }
 
@@ -63,7 +61,7 @@ void Spam::Damage(float _damage)
     percentDead = min(percentDead, 1.0f);
     percentDead = max(percentDead, 0.0f);
     Matrix34 mat(m_front, g_upVector, m_pos);
-    g_explosionManager.AddExplosion(m_shape, mat, percentDead);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, percentDead));
   }
 
   if (!dead && m_damage <= 0.0f)
@@ -72,7 +70,7 @@ void Spam::Damage(float _damage)
     GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
     if (gb)
       gb->m_online = true;
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "Explode");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "Explode"; g_simEventQueue.Push(evt); }
   }
 }
 
@@ -80,124 +78,6 @@ void Spam::Destroy(float _intensity)
 {
   Building::Destroy(_intensity);
   m_damage = 0.0f;
-}
-
-void Spam::Render(float _predictionTime)
-{
-  LegacyVector3 rotateAround = g_upVector;
-  rotateAround.RotateAroundX(g_gameTime * 1.0f);
-  rotateAround.RotateAroundZ(g_gameTime * 0.7f);
-  rotateAround.Normalise();
-
-  m_front.RotateAround(rotateAround * g_advanceTime);
-  m_up.RotateAround(rotateAround * g_advanceTime);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  Matrix34 mat(m_front, m_up, predictedPos);
-
-  m_shape->Render(0.0f, mat);
-}
-
-void Spam::RenderAlphas(float _predictionTime)
-{
-  //g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,100,0), 10.0f, "timer %d", (int) m_timer );
-  //g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,90,0), 10.0f, "Damage %d", (int) m_damage );
-
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
-
-  float timeIndex = g_gameTime + m_id.GetUniqueId() * 10.0f;
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-  int maxBlobs = 20;
-  if (buildingDetail == 2)
-    maxBlobs = 10;
-  if (buildingDetail == 3)
-    maxBlobs = 0;
-
-  float alpha = 1.0f;
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  LegacyVector3 centerToMpos = m_pos - m_centerPos;
-
-  for (int i = 0; i < maxBlobs; ++i)
-  {
-    LegacyVector3 pos = predictedPos + centerToMpos;
-    pos.x += sinf(timeIndex + i) * i * 0.3f;
-    pos.y += cosf(timeIndex + i) * sinf(i * 10) * 5;
-    pos.z += cosf(timeIndex + i) * i * 0.3f;
-
-    float size = 5.0f + sinf(timeIndex + i * 10) * 7.0f;
-    size = max(size, 2.0f);
-
-    //glColor4f( 0.6f, 0.2f, 0.1f, alpha);
-    glColor4f(0.9f, 0.2f, 0.2f, alpha);
-
-    if (m_research)
-      glColor4f(0.1f, 0.2f, 0.8f, alpha);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((pos - camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((pos + camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((pos + camRight * size - camUp * size).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((pos - camRight * size - camUp * size).GetData());
-    glEnd();
-  }
-
-  //
-  // Starbursts
-
-  alpha = 1.0f - m_timer / SpamReloadTime();
-  alpha *= 0.3f;
-
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-
-  int numStars = 10;
-  if (buildingDetail == 2)
-    numStars = 5;
-  if (buildingDetail == 3)
-    numStars = 2;
-
-  for (int i = 0; i < numStars; ++i)
-  {
-    LegacyVector3 pos = predictedPos + centerToMpos;
-    pos.x += sinf(timeIndex + i) * i * 0.3f;
-    pos.y += (cosf(timeIndex + i) * cosf(i * 10) * 2);
-    pos.z += cosf(timeIndex + i) * i * 0.3f;
-
-    float size = i * 10 * alpha;
-    if (i > numStars - 2)
-      size = i * 20 * alpha;
-
-    //glColor4f( 1.0f, 0.4f, 0.2f, alpha );
-    glColor4f(0.8f, 0.2f, 0.2f, alpha);
-
-    if (m_research)
-      glColor4f(0.1f, 0.2f, 0.8f, alpha);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((pos - camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((pos + camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((pos + camRight * size - camUp * size).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((pos - camRight * size - camUp * size).GetData());
-    glEnd();
-  }
-
-  glDisable(GL_TEXTURE_2D);
 }
 
 void Spam::SpawnInfection()
@@ -220,7 +100,7 @@ void Spam::SpawnInfection()
     infection->m_id.GenerateUniqueId();
   }
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Attack");
+  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
 }
 
 bool Spam::Advance()
@@ -298,7 +178,7 @@ bool Spam::Advance()
   }
 
   if (m_research)
-    g_app->m_soundSystem->StopAllSounds(m_id, "Spam Create");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundStop; evt.objectId = m_id; evt.eventName = "Spam Create"; g_simEventQueue.Push(evt); }
 
   return Building::Advance();
 }
@@ -314,7 +194,7 @@ void Spam::SetAsResearch()
   m_research = true;
   m_activated = false;
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "CreateResearch");
+  { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "CreateResearch"; g_simEventQueue.Push(evt); }
 }
 
 // ============================================================================
@@ -477,7 +357,7 @@ void SpamInfection::AdvanceAttackingEntity()
       LegacyVector3 vel(sfrand(15.0f), frand(15.0f), sfrand(15.0f));
       float size = i * 30;
       LegacyVector3 pos = m_pos + LegacyVector3(0, 50, 0);
-      g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeFire, size);
+      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = m_pos; evt.vel = vel; evt.particleType = SimParticle::TypeFire; evt.particleSize = size; g_simEventQueue.Push(evt); }
     }
 
     m_life += 1.0f;
@@ -521,7 +401,7 @@ void SpamInfection::AdvanceAttackingSpirit()
       LegacyVector3 vel(sfrand(15.0f), frand(15.0f), sfrand(15.0f));
       float size = i * 30;
       LegacyVector3 pos = m_pos + LegacyVector3(0, 50, 0);
-      g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeFire, size);
+      { SimEvent evt = {}; evt.type = SimEvent::ParticleSpawn; evt.pos = m_pos; evt.vel = vel; evt.particleType = SimParticle::TypeFire; evt.particleSize = size; g_simEventQueue.Push(evt); }
     }
 
     m_life += 1.0f;

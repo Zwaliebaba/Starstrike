@@ -19,7 +19,6 @@ public:
 
     void Initialise ( Building *_template );
     bool Advance    ();
-    void Render     ( float predictionTime );
 
     bool DoesSphereHit          (LegacyVector3 const &_pos, float _radius);
     bool DoesShapeHit           (ShapeStatic *_shape, Matrix34 _transform);

@@ -62,13 +62,6 @@ bool Powerstation::Advance()
 }
 
 
-// *** Render
-void Powerstation::Render( float predictionTime )
-{
-	Building::Render(predictionTime);
-}
-
-
 // *** GetBuildingLink
 int Powerstation::GetBuildingLink()
 {

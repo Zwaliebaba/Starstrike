@@ -78,8 +78,6 @@ class Entity : public WorldObject
 
     void SetType(unsigned char _type); // Loads default stats from blueprint
 
-    void Render(float predictionTime) override;
-
     virtual void Begin();
     virtual bool Advance(Unit* _unit);
     virtual bool AdvanceDead(Unit* _unit);

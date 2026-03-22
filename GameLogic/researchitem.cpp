@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "researchitem.h"
-#include "GameApp.h"
+#include "SimEventQueue.h"
 #include "camera.h"
-#include "explosion.h"
 #include "file_writer.h"
+#include "GameApp.h"
 #include "global_world.h"
 #include "globals.h"
 #include "location.h"
@@ -12,7 +12,6 @@
 #include "preferences.h"
 #include "resource.h"
 #include "ShapeStatic.h"
-#include "soundsystem.h"
 #include "taskmanager_interface.h"
 #include "text_renderer.h"
 #include "text_stream_readers.h"
@@ -76,14 +75,14 @@ bool ResearchItem::Advance()
   if (m_reprogrammed <= 0.0f)
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    g_explosionManager.AddExplosion(m_shape, mat, 1.0f);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
 
     int existingLevel = g_app->m_globalWorld->m_research->CurrentLevel(m_researchType);
 
     g_app->m_globalWorld->m_research->AddResearch(m_researchType);
     g_app->m_globalWorld->m_research->m_researchLevel[m_researchType] = m_level;
 
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "AquireResearch");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundBuildingEvent; evt.objectId = m_id; evt.objectType = m_type; evt.eventName = "AquireResearch"; g_simEventQueue.Push(evt); }
 
     if (existingLevel == 0)
       g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearch, m_researchType, 4.0f);
@@ -111,173 +110,6 @@ void ResearchItem::GetEndPositions(LegacyVector3& _end1, LegacyVector3& _end2)
 
   _end1 = m_shape->GetMarkerWorldMatrix(m_end1, mat).pos;
   _end2 = m_shape->GetMarkerWorldMatrix(m_end2, mat).pos;
-}
-
-void ResearchItem::Render(float _predictionTime)
-{
-  if (m_reprogrammed <= 0.0f)
-    return;
-
-  LegacyVector3 rotateAround = g_upVector;
-  rotateAround.RotateAroundX(g_gameTime * 1.0f);
-  rotateAround.RotateAroundZ(g_gameTime * 0.7f);
-  rotateAround.Normalise();
-
-  m_front.RotateAround(rotateAround * g_advanceTime);
-  m_up.RotateAround(rotateAround * g_advanceTime);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  Matrix34 mat(m_front, m_up, predictedPos);
-
-  m_shape->Render(0.0f, mat);
-
-  if (g_app->m_editing && m_researchType != -1)
-  {
-    g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 25, 0), 5, GlobalResearch::GetTypeName(m_researchType));
-    g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 20, 0), 5, "%2.2f", m_reprogrammed);
-  }
-}
-
-void ResearchItem::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
-
-  float timeIndex = g_gameTime + m_id.GetUniqueId() * 10.0f;
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-  int maxBlobs = 20;
-  if (buildingDetail == 2)
-    maxBlobs = 10;
-  if (buildingDetail == 3)
-    maxBlobs = 0;
-
-  float alpha = 1.0f;
-
-  for (int i = 0; i < maxBlobs; ++i)
-  {
-    LegacyVector3 pos = m_centerPos;
-    pos.x += sinf(timeIndex + i) * i * 0.3f;
-    pos.y += cosf(timeIndex + i) * sinf(i * 10) * 5;
-    pos.z += cosf(timeIndex + i) * i * 0.3f;
-
-    float size = 5.0f + sinf(timeIndex + i * 10) * 7.0f;
-    size = max(size, 2.0f);
-
-    //glColor4f( 0.6f, 0.2f, 0.1f, alpha);
-    glColor4f(0.1f, 0.2f, 0.8f, alpha);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((pos - camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((pos + camRight * size + camUp * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((pos + camRight * size - camUp * size).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((pos - camRight * size - camUp * size).GetData());
-    glEnd();
-  }
-
-  //
-  // Starbursts
-
-  alpha = 1.0f - m_reprogrammed / 100.0f;
-  alpha *= 0.3f;
-
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-
-  if (alpha > 0.0f)
-  {
-    int numStars = 10;
-    if (buildingDetail == 2)
-      numStars = 5;
-    if (buildingDetail == 3)
-      numStars = 2;
-
-    for (int i = 0; i < numStars; ++i)
-    {
-      LegacyVector3 pos = m_centerPos;
-      pos.x += sinf(timeIndex + i) * i * 0.3f;
-      pos.y += (cosf(timeIndex + i) * cosf(i * 10) * 2);
-      pos.z += cosf(timeIndex + i) * i * 0.3f;
-
-      float size = i * 10 * alpha;
-      if (i > numStars - 2)
-        size = i * 20 * alpha;
-
-      //glColor4f( 1.0f, 0.4f, 0.2f, alpha );
-      glColor4f(0.1f, 0.2f, 0.8f, alpha);
-
-      glBegin(GL_QUADS);
-      glTexCoord2i(0, 0);
-      glVertex3fv((pos - camRight * size + camUp * size).GetData());
-      glTexCoord2i(1, 0);
-      glVertex3fv((pos + camRight * size + camUp * size).GetData());
-      glTexCoord2i(1, 1);
-      glVertex3fv((pos + camRight * size - camUp * size).GetData());
-      glTexCoord2i(0, 1);
-      glVertex3fv((pos - camRight * size - camUp * size).GetData());
-      glEnd();
-    }
-  }
-
-  //
-  // Draw control line to heaven
-
-  alpha = 1.0f - m_reprogrammed / 100.0f;
-  alpha *= (0.5f + fabs(cosf(g_gameTime)) * 0.5f);
-
-  if (alpha > 0.0f)
-  {
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-    glDisable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
-
-    float w = 10.0f * alpha;
-
-    glBegin(GL_QUADS);
-    glColor4f(0.1f, 0.2f, 0.8f, alpha);
-    glTexCoord2i(0, 0);
-    glVertex3fv((m_pos + LegacyVector3(0, -50, 0) - camRight * w).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((m_pos + LegacyVector3(0, -50, 0) + camRight * w).GetData());
-
-    glColor4f(0.1f, 0.2f, 0.8f, 0.0f);
-    glTexCoord2i(1, 1);
-    glVertex3fv((m_pos + LegacyVector3(0, 1000, 0) + camRight * w).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((m_pos + LegacyVector3(0, 1000, 0) - camRight * w).GetData());
-    glEnd();
-
-    w *= 0.3f;
-
-    glBegin(GL_QUADS);
-    glColor4f(0.1f, 0.2f, 0.8f, alpha);
-    glTexCoord2i(0, 0);
-    glVertex3fv((m_pos + LegacyVector3(0, -50, 0) - camRight * w).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((m_pos + LegacyVector3(0, -50, 0) + camRight * w).GetData());
-
-    glColor4f(0.1f, 0.2f, 0.8f, 0.0f);
-    glTexCoord2i(1, 1);
-    glVertex3fv((m_pos + LegacyVector3(0, 1000, 0) + camRight * w).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((m_pos + LegacyVector3(0, 1000, 0) - camRight * w).GetData());
-    glEnd();
-  }
-
-  glShadeModel(GL_FLAT);
-  glDisable(GL_TEXTURE_2D);
-  glDepthMask(true);
 }
 
 void ResearchItem::Read(TextReader* _in, bool _dynamic)

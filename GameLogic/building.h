@@ -115,11 +115,6 @@ class Building : public WorldObject
 
     virtual bool IsInView();
 
-    void Render(float predictionTime) override;
-    virtual void RenderAlphas(float predictionTime);
-    virtual void RenderLights();
-    virtual void RenderPorts();
-
     virtual bool PerformDepthSort(LegacyVector3& _centerPos); // Return true if you plan to use transparencies
 
     virtual void SetTeamId(int _teamId);

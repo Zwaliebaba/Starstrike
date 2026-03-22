@@ -20,7 +20,6 @@ class DynamicBase : public Building
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-    void Render(float _predictionTime) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
@@ -60,7 +59,6 @@ class DynamicHub : public DynamicBase
     const char* GetObjectiveCounter() override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
 
     void ActivateLink();
     void DeactivateLink();
@@ -91,10 +89,6 @@ class DynamicNode : public DynamicBase
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-
-    void Render(float _predictionTime) override;
-    void RenderPorts() override;
-    void RenderAlphas(float _predictionTime) override;
 
     void ReprogramComplete() override;
 

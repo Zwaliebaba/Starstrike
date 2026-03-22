@@ -20,7 +20,8 @@
 #include "unit.h"
 #include "global_world.h"
 #include "taskmanager.h"
-#include "soundsystem.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 
 // ****************************************************************************
 //  Class ThrowableWeapon
@@ -54,11 +55,11 @@ void ThrowableWeapon::TriggerSoundEvent(const char* _event)
   case EffectThrowableGrenade:
   case EffectThrowableAirstrikeMarker:
   case EffectThrowableControllerGrenade:
-    g_app->m_soundSystem->TriggerOtherEvent(this, _event, SoundSourceBlueprint::TypeGrenade);
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeGrenade, _event));
     break;
 
   case EffectThrowableAirstrikeBomb:
-    g_app->m_soundSystem->TriggerOtherEvent(this, _event, SoundSourceBlueprint::TypeAirstrikeBomb);
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeAirstrikeBomb, _event));
     break;
   }
 }
@@ -71,7 +72,7 @@ bool ThrowableWeapon::Advance()
     vel.x += syncsfrand(5.0f);
     vel.y += syncsfrand(5.0f);
     vel.z += syncsfrand(5.0f);
-    g_app->m_particleSystem->CreateParticle(m_pos - m_vel * SERVER_ADVANCE_PERIOD, vel, Particle::TypeRocketTrail, 40.0f);
+    g_simEventQueue.Push(SimEvent::MakeParticle(m_pos - m_vel * SERVER_ADVANCE_PERIOD, vel, SimParticle::TypeRocketTrail, 40.0f));
   }
 
   if (m_force > 0.1f)
@@ -227,7 +228,7 @@ bool AirStrikeMarker::Advance()
   vel.x += syncsfrand(5.0f);
   vel.y += syncsfrand(5.0f);
   vel.z += syncsfrand(5.0f);
-  g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeFire, 100.0f);
+  g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeFire, 100.0f));
 
   //
   // If its time, summon the actual airstrike
@@ -280,13 +281,13 @@ bool ControllerGrenade::Advance()
 
   if (GetHighResTime() > m_birthTime + 3.0f)
   {
-    g_app->m_soundSystem->TriggerOtherEvent(this, "ExplodeController", SoundSourceBlueprint::TypeGrenade);
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeGrenade, "ExplodeController"));
 
     int numFlashes = 5 + darwiniaRandom() % 5;
     for (int i = 0; i < numFlashes; ++i)
     {
       LegacyVector3 vel(sfrand(15.0f), frand(35.0f), sfrand(15.0f));
-      g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeControlFlash, 100.0f);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash, 100.0f));
     }
 
     Task* currentTask = g_app->m_taskManager->GetCurrentTask();
@@ -335,7 +336,7 @@ Rocket::Rocket(LegacyVector3 _startPos, LegacyVector3 _targetPos)
   m_type = EffectRocket;
 }
 
-void Rocket::Initialise() { g_app->m_soundSystem->TriggerOtherEvent(this, "Create", SoundSourceBlueprint::TypeRocket); }
+void Rocket::Initialise() { g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Create")); }
 
 bool Rocket::Advance()
 {
@@ -356,7 +357,7 @@ bool Rocket::Advance()
     vel.x += syncsfrand(4.0f);
     vel.y += syncsfrand(4.0f);
     vel.z += syncsfrand(4.0f);
-    g_app->m_particleSystem->CreateParticle(m_pos - m_vel * SERVER_ADVANCE_PERIOD, vel, Particle::TypeFire);
+    g_simEventQueue.Push(SimEvent::MakeParticle(m_pos - m_vel * SERVER_ADVANCE_PERIOD, vel, SimParticle::TypeFire));
   }
 
   //
@@ -386,8 +387,8 @@ bool Rocket::Advance()
   if (GetHighResTime() > m_timer + maxLife)
   {
     g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
-    g_app->m_soundSystem->StopAllSounds(m_id, "Rocket Create");
-    g_app->m_soundSystem->TriggerOtherEvent(this, "Explode", SoundSourceBlueprint::TypeRocket);
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
     return true;
   }
 
@@ -397,7 +398,7 @@ bool Rocket::Advance()
   if (g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) >= m_pos.y)
   {
     g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
-    g_app->m_soundSystem->TriggerOtherEvent(this, "Explode", SoundSourceBlueprint::TypeRocket);
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
     return true;
   }
 
@@ -413,7 +414,7 @@ bool Rocket::Advance()
     if (building->DoesSphereHit(m_pos, 3.0f))
     {
       g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
-      g_app->m_soundSystem->TriggerOtherEvent(this, "Explode", SoundSourceBlueprint::TypeRocket);
+      g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
       return true;
     }
   }
@@ -469,7 +470,7 @@ void Laser::Initialise(float _lifeTime)
   m_harmless = false;
   m_bounced = false;
 
-  g_app->m_soundSystem->TriggerOtherEvent(this, "Create", SoundSourceBlueprint::TypeLaser);
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeLaser, "Create"));
 }
 
 bool Laser::Advance()
@@ -511,7 +512,7 @@ bool Laser::Advance()
     distanceRemaining.SetLength(distanceTotal - distanceTravelled);
 
     m_pos += distanceRemaining;
-    g_app->m_soundSystem->TriggerOtherEvent(this, "Richochet", SoundSourceBlueprint::TypeLaser);
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeLaser, "Richochet"));
 
     m_bounced = true;
   }
@@ -541,8 +542,8 @@ bool Laser::Advance()
         vel.x += sfrand(10.0f);
         vel.y += sfrand(10.0f);
         vel.z += sfrand(10.0f);
-        g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeRocketTrail);
-        g_app->m_soundSystem->TriggerOtherEvent(this, "HitBuilding", SoundSourceBlueprint::TypeLaser);
+        g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeRocketTrail));
+        g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeLaser, "HitBuilding"));
         return true;
       }
     }
@@ -566,8 +567,8 @@ bool Laser::Advance()
 
         if (PointSegDist2D(Vector2(entity->m_pos), Vector2(rayStart), Vector2(rayEnd)) < 10.0f)
         {
-          g_app->m_soundSystem->TriggerOtherEvent(this, "HitEntity", SoundSourceBlueprint::TypeLaser);
-          if (entity->m_type == Entity::TypeSpider || entity->m_type == Entity::TypeSporeGenerator || entity->m_type == Entity::TypeEngineer
+          g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeLaser, "HitEntity"));
+          if (entity->m_type == Entity::TypeSpider
             || entity->m_type == Entity::TypeTriffidEgg || entity->m_type == Entity::TypeSoulDestroyer || entity->m_type ==
             Entity::TypeArmour)
           {
@@ -957,8 +958,8 @@ bool Missile::Advance()
 
   Matrix34 mat(m_front, m_up, m_pos);
   LegacyVector3 boosterPos = m_shape->GetMarkerWorldMatrix(m_booster, mat).pos;
-  g_app->m_particleSystem->CreateParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 2.0f, vel, Particle::TypeMissileTrail, size);
-  g_app->m_particleSystem->CreateParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 1.5f, vel, Particle::TypeMissileTrail, size);
+  g_simEventQueue.Push(SimEvent::MakeParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 2.0f, vel, SimParticle::TypeMissileTrail, size));
+  g_simEventQueue.Push(SimEvent::MakeParticle(boosterPos - m_vel * SERVER_ADVANCE_PERIOD * 1.5f, vel, SimParticle::TypeMissileTrail, size));
 
   return false;
 }
@@ -1095,7 +1096,7 @@ bool TurretShell::Advance()
             vel.y += frand(10.0f);
             vel.z += sfrand(10.0f);
             float size = 25.0f + frand(25.0f);
-            g_app->m_particleSystem->CreateParticle(m_pos, vel, Particle::TypeRocketTrail, size);
+            g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeRocketTrail, size));
           }
           building->Damage(-2);
           return true;
@@ -1119,7 +1120,7 @@ bool TurretShell::Advance()
       vel.y += frand(10.0f);
       vel.z += sfrand(10.0f);
       float size = 25.0f + frand(25.0f);
-      g_app->m_particleSystem->CreateParticle(oldPos, vel, Particle::TypeRocketTrail, size);
+      g_simEventQueue.Push(SimEvent::MakeParticle(oldPos, vel, SimParticle::TypeRocketTrail, size));
     }
 
     return true;

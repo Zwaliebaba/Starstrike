@@ -13,9 +13,8 @@
 #include "main.h"
 #include "global_world.h"
 #include "level_file.h"
-#include "explosion.h"
 #include "gunturret.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 
 GunTurret::GunTurret()
   : Building(),
@@ -90,8 +89,8 @@ void GunTurret::ExplodeBody()
   LegacyVector3 barrelFront = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).f;
   Matrix34 barrelMat(barrelFront, m_up, barrelPos);
 
-  g_explosionManager.AddExplosion(m_turret, turretPos);
-  g_explosionManager.AddExplosion(m_barrel, barrelMat);
+  g_simEventQueue.Push(SimEvent::MakeExplosion(m_turret, turretPos, 1.0f));
+  g_simEventQueue.Push(SimEvent::MakeExplosion(m_barrel, barrelMat, 1.0f));
 }
 
 bool GunTurret::SearchForTargets()
@@ -107,7 +106,7 @@ bool GunTurret::SearchForTargets()
   Entity* entity = g_app->m_location->GetEntity(m_targetId);
 
   if (entity && m_targetId != previousTarget)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "TargetSighted");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TargetSighted"));
 
   return (m_targetId.IsValid());
 }
@@ -186,7 +185,7 @@ void GunTurret::PrimaryFire()
   }
 
   if (fired)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "FireShell");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "FireShell"));
 }
 
 bool GunTurret::Advance()
@@ -329,114 +328,6 @@ bool GunTurret::IsInView()
   if (underPlayerControl)
     return true;
   return Building::IsInView();
-}
-
-void GunTurret::Render(float _predictionTime)
-{
-  if (g_app->m_editing)
-    m_turretFront = m_front;
-
-  Matrix34 turretPos(m_turretFront, g_upVector, m_pos);
-  m_turret->Render(_predictionTime, turretPos);
-
-  LegacyVector3 barrelPos = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).pos;
-  LegacyVector3 barrelFront = m_turret->GetMarkerWorldMatrix(m_barrelMount, turretPos).f;
-  LegacyVector3 barrelRight = barrelFront ^ m_barrelUp;
-  barrelFront = m_barrelUp ^ barrelRight;
-  barrelFront.Normalise();
-  Matrix34 barrelMat(barrelFront, m_barrelUp, barrelPos);
-  m_barrel->Render(_predictionTime, barrelMat);
-
-  //RenderArrow( barrelPos, barrelPos + barrelFront * 1000.0f, 1.0f );
-
-  //
-  // Render targetting crosshair
-
-  /*
-      Team *team = g_app->m_location->GetMyTeam();
-      bool underPlayerControl = ( team && team->m_currentBuildingId == m_id.GetUniqueId() );
-  
-      if( underPlayerControl )
-      {
-          LegacyVector3 targetPos = barrelPos + LegacyVector3(0,10,0) + barrelFront.SetLength( 300.0f );
-          float size = 20.0f;
-          LegacyVector3 camUp = g_app->m_camera->GetUp();
-          LegacyVector3 camRight = g_app->m_camera->GetRight();
-          targetPos += camUp * 5.0f;
-  
-          glBindTexture( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "icons/mouse_missiletarget.bmp" ) );
-          glEnable( GL_TEXTURE_2D );
-          glDisable( GL_CULL_FACE );
-          glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-          glEnable( GL_BLEND );
-          glDepthMask( false );
-          glDisable( GL_DEPTH_TEST );
-  
-          glBegin( GL_QUADS );
-              glTexCoord2i(0,0);      glVertex3fv( (targetPos - camRight * size - camUp * size).GetData() );
-              glTexCoord2i(1,0);      glVertex3fv( (targetPos + camRight * size - camUp * size).GetData() );
-              glTexCoord2i(1,1);      glVertex3fv( (targetPos + camRight * size + camUp * size).GetData() );
-              glTexCoord2i(0,1);      glVertex3fv( (targetPos - camRight * size + camUp * size).GetData() );
-          glEnd();
-  
-          glEnable( GL_DEPTH_TEST );
-          glDepthMask( true );
-          glDisable( GL_BLEND );
-          glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-          glEnable( GL_CULL_FACE );
-          glDisable( GL_TEXTURE_2D );
-      }*/
-}
-
-void GunTurret::RenderPorts()
-{
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-  for (int i = 0; i < GetNumPorts(); ++i)
-  {
-    Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
-
-    //
-    // Render the status light
-
-    float size = 6.0f;
-    LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-    LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-    LegacyVector3 statusPos = worldMat.pos;
-
-    WorldObjectId occupantId = GetPortOccupant(i);
-    if (!occupantId.IsValid())
-      glColor4ub(150, 150, 150, 255);
-    else
-    {
-      RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
-      glColor4ubv(teamColour.GetData());
-    }
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((statusPos - camR - camU).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((statusPos + camR - camU).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((statusPos + camR + camU).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((statusPos - camR + camU).GetData());
-    glEnd();
-  }
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_BLEND);
-  glDepthMask(true);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_CULL_FACE);
 }
 
 bool GunTurret::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,

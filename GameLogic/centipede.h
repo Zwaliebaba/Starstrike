@@ -51,7 +51,6 @@ class Centipede : public Entity
     void Begin() override;
     bool Advance(Unit* _unit) override;
     void ChangeHealth(int _amount) override;
-    void Render(float _predictionTime) override;
 
     bool IsInView() override;
 

@@ -3,12 +3,10 @@
 #include "matrix34.h"
 #include "ShapeStatic.h"
 #include "math_utils.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "unit.h"
-#include "explosion.h"
-#include "particle_system.h"
 #include "entity_grid.h"
 #include "armyant.h"
 #include "anthill.h"
@@ -62,7 +60,7 @@ void ArmyAnt::ChangeHealth(int _amount)
     transform.f *= m_scale;
     transform.u *= m_scale;
     transform.r *= m_scale;
-    g_explosionManager.AddExplosion(m_shape, transform);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
 
     //
     // Drop any spirits we are carrying
@@ -275,10 +273,9 @@ bool ArmyAnt::AdvanceAttackEnemy()
     targetEntity->ChangeHealth(-1);
     for (int i = 0; i < 3; ++i)
     {
-      g_app->m_particleSystem->CreateParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)),
-                                              Particle::TypeMuzzleFlash);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)), SimParticle::TypeMuzzleFlash));
     }
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
   }
 
   return false;
@@ -518,10 +515,4 @@ void ArmyAnt::GetCarryMarker(LegacyVector3& _pos, LegacyVector3& _vel)
   Matrix34 mat(m_front, groundUp, m_pos);
   _pos = m_shape->GetMarkerWorldMatrix(m_carryMarker, mat).pos;
   _vel = m_vel;
-}
-
-void ArmyAnt::Render(float _predictionTime)
-{
-  // Rendering moved to ArmyAntRenderer companion (NeuronClient).
-  // Kept as empty override for legacy fallback safety.
 }

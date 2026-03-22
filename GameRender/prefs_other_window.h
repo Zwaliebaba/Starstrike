@@ -28,14 +28,5 @@ public:
     void ListAvailableLanguages();
 };
 
-// Defines useful to reference preferences from
-// other parts of the program.
-#define OTHER_HELPENABLED       "HelpEnabled"
-#define OTHER_CONTROLHELPENABLED "ControlHelpEnabled"
-#define OTHER_BOOTLOADER        "BootLoader"
-#define OTHER_CHRISTMASENABLED  "ChristmasEnabled"
-#define OTHER_LANGUAGE          "TextLanguage"
-#define OTHER_DIFFICULTY		"Difficulty"
-#define OTHER_LARGEMENUS		"LargeMenus"
-#define OTHER_AUTOMATICCAM      "AutomaticCamera"
+#include "prefs_keys.h"
 

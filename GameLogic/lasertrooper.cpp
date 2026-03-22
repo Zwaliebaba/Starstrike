@@ -72,8 +72,3 @@ void LaserTrooper::AdvanceVictoryDance()
     m_onGround = false;
   }
 }
-
-void LaserTrooper::Render(float predictionTime, int teamId)
-{
-  // Rendering moved to LaserTrooperRenderer companion (GameRender).
-}

@@ -29,7 +29,7 @@
 #include "routing_system.h"
 #include "ShapeStatic.h"
 #include "souldestroyer.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "spider.h"
 #include "sporegenerator.h"
 #include "text_stream_readers.h"
@@ -126,13 +126,13 @@ void Entity::ChangeHealth(int amount)
   if (!m_dead)
   {
     if (amount < 0)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "LoseHealth");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
 
     if (m_stats[StatHealth] + amount <= 0)
     {
       m_stats[StatHealth] = 100;
       m_dead = true;
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Die");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
       g_app->m_location->SpawnSpirit(m_pos, m_vel * 0.5f, m_id.GetTeamId(), m_id);
     }
     else if (m_stats[StatHealth] + amount > 255)
@@ -155,7 +155,7 @@ void Entity::Attack(const LegacyVector3& pos)
     m_reloading = m_stats[StatRate];
     m_justFired = true;
 
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
   }
 }
 
@@ -203,7 +203,7 @@ int Entity::EnterTeleports(int _requiredId)
       {
         WorldObjectId id(m_id);
         radarDish->EnterTeleport(id);
-        g_app->m_soundSystem->TriggerEntityEvent(this, "EnterTeleport");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EnterTeleport"));
         return buildingId;
       }
     }
@@ -218,7 +218,7 @@ int Entity::EnterTeleports(int _requiredId)
         {
           WorldObjectId id(m_id);
           bridge->EnterTeleport(id);
-          g_app->m_soundSystem->TriggerEntityEvent(this, "EnterTeleport");
+          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EnterTeleport"));
           return buildingId;
         }
       }
@@ -289,7 +289,7 @@ void Entity::AdvanceInWater(Unit* _unit)
 
 void Entity::Begin()
 {
-  g_app->m_soundSystem->TriggerEntityEvent(this, "Create");
+  g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Create"));
 
   if (m_shape)
   {
@@ -346,8 +346,6 @@ bool Entity::Advance(Unit* _unit)
 
   return false;
 }
-
-void Entity::Render(float predictionTime) {}
 
 bool Entity::IsInView() { return true; }
 

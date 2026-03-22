@@ -974,16 +974,10 @@ void Location::RenderBuildings()
                            : timeSinceAdvance;
 
         BuildingRenderer* renderer = g_buildingRenderRegistry.Get(building->m_type);
-        if (renderer)
-        {
-          BuildingRenderContext ctx;
-          ctx.predictionTime = predTime;
-          renderer->Render(*building, ctx);
-        }
-        else
-        {
-          building->Render(predTime);
-        }
+        DEBUG_ASSERT(renderer);
+        BuildingRenderContext ctx;
+        ctx.predictionTime = predTime;
+        renderer->Render(*building, ctx);
 
         END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
       }
@@ -1063,16 +1057,10 @@ void Location::RenderBuildingAlphas()
                              : timeSinceAdvance;
 
           BuildingRenderer* bldgRenderer = g_buildingRenderRegistry.Get(building->m_type);
-          if (bldgRenderer)
-          {
-            BuildingRenderContext ctx;
-            ctx.predictionTime = predTime;
-            bldgRenderer->RenderAlphas(*building, ctx);
-          }
-          else
-          {
-            building->RenderAlphas(predTime);
-          }
+          DEBUG_ASSERT(bldgRenderer);
+          BuildingRenderContext ctx;
+          ctx.predictionTime = predTime;
+          bldgRenderer->RenderAlphas(*building, ctx);
 
           END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
         }
@@ -1102,16 +1090,10 @@ void Location::RenderBuildingAlphas()
                        : timeSinceAdvance;
 
     BuildingRenderer* renderer = g_buildingRenderRegistry.Get(building->m_type);
-    if (renderer)
-    {
-      BuildingRenderContext ctx;
-      ctx.predictionTime = predTime;
-      renderer->RenderAlphas(*building, ctx);
-    }
-    else
-    {
-      building->RenderAlphas(predTime);
-    }
+    DEBUG_ASSERT(renderer);
+    BuildingRenderContext ctx;
+    ctx.predictionTime = predTime;
+    renderer->RenderAlphas(*building, ctx);
 
     END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
   }

@@ -26,8 +26,6 @@ class FeedingTube : public Building
     void Write(FileWriter* _out) override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     LegacyVector3 GetStartPoint();
     LegacyVector3 GetEndPoint();

@@ -4,7 +4,7 @@
 #include "preferences.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "prefs_other_window.h"
+#include "prefs_keys.h"
 
 PrefsManager* g_prefsManager = nullptr;
 

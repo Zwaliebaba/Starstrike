@@ -12,8 +12,7 @@
 #include "location.h"
 #include "obstruction_grid.h"
 #include "team.h"
-#include "particle_system.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "building.h"
 #include "laserfence.h"
 
@@ -77,10 +76,10 @@ void LaserFence::Spark()
     particleVel.SetLength(40.0f + frand(20.0f));
     particleVel += LegacyVector3(frand() * 20.0f, sfrand() * 20.0f, sfrand() * 20.0f);
     float size = 25.0f + frand(25.0f);
-    g_app->m_particleSystem->CreateParticle(sparkPos, particleVel, Particle::TypeSpark, size);
+    g_simEventQueue.Push(SimEvent::MakeParticle(sparkPos, particleVel, SimParticle::TypeSpark, size));
   }
 
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Spark");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Spark"));
 }
 
 bool LaserFence::Advance()
@@ -166,18 +165,6 @@ bool LaserFence::Advance()
   return Building::Advance();
 }
 
-void LaserFence::Render(float predictionTime)
-{
-  Matrix34 mat(m_front, g_upVector, m_pos);
-  mat.f *= m_scale;
-  mat.u *= m_scale;
-  mat.r *= m_scale;
-
-  glEnable(GL_NORMALIZE);
-  m_shape->Render(predictionTime, mat);
-  glDisable(GL_NORMALIZE);
-}
-
 float LaserFence::GetFenceFullHeight()
 {
   Matrix34 mat(m_front, g_upVector, m_pos);
@@ -213,157 +200,6 @@ bool LaserFence::PerformDepthSort(LegacyVector3& _centerPos)
 
   return false;
 }
-
-void LaserFence::RenderAlphas(float predictionTime)
-{
-  Building::RenderAlphas(predictionTime);
-
-  if (m_mode != ModeDisabled && m_mode != ModeNeverOn)
-  {
-    //
-    // Draw the laser fence connecting to the next laser fence
-
-    if (m_nextLaserFenceId != -1)
-    {
-      Building* nextFence = g_app->m_location->GetBuilding(m_nextLaserFenceId);
-      if (!nextFence || nextFence->m_type != TypeLaserFence)
-      {
-        m_nextLaserFenceId = -1;
-        return;
-      }
-      auto nextLaserFence = static_cast<LaserFence*>(nextFence);
-
-      int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-
-      glDisable(GL_CULL_FACE);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glDepthMask(false);
-
-      unsigned char alpha = 150;
-      if (m_id.GetTeamId() == 255)
-        glColor4ub(100, 100, 100, alpha);
-      else
-      {
-        RGBAColour* colour = &g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-        glColor4ub(colour->r, colour->g, colour->b, alpha);
-      }
-
-      float ourFenceMaxHeight = GetFenceFullHeight();
-      float theirFenceMaxHeight = nextLaserFence->GetFenceFullHeight();
-      float predictedStatus = m_status;
-      if (m_mode == ModeDisabling)
-        predictedStatus -= LASERFENCE_RAISESPEED * predictionTime;
-      if (m_mode == ModeEnabling)
-        predictedStatus += LASERFENCE_RAISESPEED * predictionTime;
-      if (g_app->m_editing)
-        predictedStatus = 1.0f;
-
-      float ourFenceHeight = ourFenceMaxHeight * predictedStatus;
-      float theirFenceHeight = theirFenceMaxHeight * predictedStatus;
-      float distance = (m_pos - nextFence->m_pos).Mag();
-      float dx = distance / (ourFenceMaxHeight * 2.0f);
-      float dz = ourFenceHeight / ourFenceMaxHeight;
-      float timeOff = g_gameTime / 15.0f;
-
-      if (buildingDetail < 3)
-      {
-        glEnable(GL_TEXTURE_2D);
-
-        gglActiveTextureARB(GL_TEXTURE0_ARB);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp"));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_REPLACE);
-        glEnable(GL_TEXTURE_2D);
-
-        gglActiveTextureARB(GL_TEXTURE1_ARB);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence2.bmp"));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
-        glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_MODULATE);
-        glEnable(GL_TEXTURE_2D);
-
-        glBegin(GL_QUADS);
-        gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, timeOff, 0.0f);
-        gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0, 0);
-        glVertex3fv((m_pos - LegacyVector3(0, ourFenceHeight / 3, 0)).GetData());
-
-        gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, timeOff, dz);
-        gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0, 1);
-        glVertex3fv((m_pos + LegacyVector3(0, ourFenceHeight, 0)).GetData());
-
-        gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, timeOff + dx, dz);
-        gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1, 1);
-        glVertex3fv((nextFence->m_pos + LegacyVector3(0, theirFenceHeight, 0)).GetData());
-
-        gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, timeOff + dx, 0.0f);
-        gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1, 0);
-        glVertex3fv((nextFence->m_pos - LegacyVector3(0, theirFenceHeight / 3, 0)).GetData());
-        glEnd();
-
-        gglActiveTextureARB(GL_TEXTURE1_ARB);
-        glDisable(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-        gglActiveTextureARB(GL_TEXTURE0_ARB);
-        glDisable(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-      }
-
-      //
-      // Blend another poly over the top for burn effect
-
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence2.bmp"));
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-      glBegin(GL_QUADS);
-      glTexCoord2f(0, 0);
-      glVertex3fv((m_pos - LegacyVector3(0, ourFenceHeight / 3, 0)).GetData());
-
-      glTexCoord2f(0, 1);
-      glVertex3fv((m_pos + LegacyVector3(0, ourFenceHeight, 0)).GetData());
-
-      glTexCoord2f(1, 1);
-      glVertex3fv((nextFence->m_pos + LegacyVector3(0, theirFenceHeight, 0)).GetData());
-
-      glTexCoord2f(1, 0);
-      glVertex3fv((nextFence->m_pos - LegacyVector3(0, theirFenceHeight / 3, 0)).GetData());
-      glEnd();
-
-      glDisable(GL_TEXTURE_2D);
-
-      //
-      // Gimme a line across the top
-      glEnable(GL_LINE_SMOOTH);
-
-      glBegin(GL_LINES);
-      glVertex3fv((m_pos + LegacyVector3(0, ourFenceHeight, 0)).GetData());
-      glVertex3fv((nextFence->m_pos + LegacyVector3(0, theirFenceHeight, 0)).GetData());
-      glEnd();
-
-      glDepthMask(true);
-      glDisable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glEnable(GL_CULL_FACE);
-      glDisable(GL_LINE_SMOOTH);
-    }
-  }
-}
-
-void LaserFence::RenderLights() {}
 
 void LaserFence::Enable()
 {
@@ -441,7 +277,7 @@ int LaserFence::GetBuildingLink() { return m_nextLaserFenceId; }
 
 void LaserFence::SetBuildingLink(int _buildingId) { m_nextLaserFenceId = _buildingId; }
 
-void LaserFence::Electrocute(const LegacyVector3& _pos) { g_app->m_soundSystem->TriggerBuildingEvent(this, "Electrocute"); }
+void LaserFence::Electrocute(const LegacyVector3& _pos) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Electrocute")); }
 
 bool LaserFence::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 {

@@ -8,7 +8,7 @@
 #include "tripod.h"
 #include "GameApp.h"
 #include "entity_grid.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "location.h"
 #include "main.h"
 #include "renderer.h"
@@ -108,7 +108,7 @@ void Tripod::ChangeHealth(int _amount)
     {
       // We just died
       Matrix34 transform(m_front, m_up, m_pos);
-      g_explosionManager.AddExplosion(m_shape, transform);
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
     }
   }
 }
@@ -539,15 +539,9 @@ bool Tripod::Advance(Unit* _unit)
   if (m_pos.y < g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z))
   {
     Matrix34 mat(m_front, m_up, m_pos);
-    g_explosionManager.AddExplosion(m_shape, mat);
+    { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = mat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
     return true;
   }
 
   return m_dead;
-}
-
-void Tripod::Render(float _predictionTime)
-{
-    // Rendering moved to TripodRenderer companion (GameRender).
-    // Kept as empty override for legacy fallback safety.
 }

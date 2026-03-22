@@ -13,9 +13,8 @@
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"
-#include "particle_system.h"
 #include "renderer.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 
 // ****************************************************************************
 // Class ReceiverBuilding
@@ -60,92 +59,6 @@ bool ReceiverBuilding::IsInView()
   return Building::IsInView();
 }
 
-void ReceiverBuilding::Render(float _predictionTime)
-{
-  Matrix34 mat(m_front, m_up, m_pos);
-  m_shape->Render(_predictionTime, mat);
-}
-
-void ReceiverBuilding::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  _predictionTime -= 0.1f;
-
-  Building* spiritLink = g_app->m_location->GetBuilding(m_spiritLink);
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-
-  if (spiritLink)
-  {
-    //
-    // Render the spirit line itself
-
-    auto receiverBuilding = static_cast<ReceiverBuilding*>(spiritLink);
-
-    LegacyVector3 ourPos = GetSpiritLocation();
-    LegacyVector3 theirPos = receiverBuilding->GetSpiritLocation();
-
-    LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
-    LegacyVector3 ourPosRight = camToOurPos ^ (theirPos - ourPos);
-
-    LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
-    LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
-
-    glDisable(GL_CULL_FACE);
-    glDepthMask(false);
-    glColor4f(0.9f, 0.9f, 0.5f, 1.0f);
-
-    float size = 0.5f;
-
-    if (buildingDetail == 1)
-    {
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-      size = 1.0f;
-    }
-
-    ourPosRight.SetLength(size);
-    theirPosRight.SetLength(size);
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.1f, 0);
-    glVertex3fv((ourPos - ourPosRight).GetData());
-    glTexCoord2f(0.1f, 1);
-    glVertex3fv((ourPos + ourPosRight).GetData());
-    glTexCoord2f(0.9f, 1);
-    glVertex3fv((theirPos + theirPosRight).GetData());
-    glTexCoord2f(0.9f, 0);
-    glVertex3fv((theirPos - theirPosRight).GetData());
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-
-    //
-    // Render any surges
-
-    BeginRenderUnprocessedSpirits();
-    for (int i = 0; i < m_spirits.Size(); ++i)
-    {
-      float thisSpirit = m_spirits[i];
-      thisSpirit += _predictionTime * 0.8f;
-      if (thisSpirit < 0.0f)
-        thisSpirit = 0.0f;
-      if (thisSpirit > 1.0f)
-        thisSpirit = 1.0f;
-      LegacyVector3 thisSpiritPos = ourPos + (theirPos - ourPos) * thisSpirit;
-      RenderUnprocessedSpirit(thisSpiritPos, 1.0f);
-    }
-    EndRenderUnprocessedSpirits();
-  }
-}
-
 bool ReceiverBuilding::Advance()
 {
   for (int i = 0; i < m_spirits.Size(); ++i)
@@ -171,7 +84,7 @@ bool ReceiverBuilding::Advance()
 void ReceiverBuilding::TriggerSpirit(float _initValue)
 {
   m_spirits.PutDataAtStart(_initValue);
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "TriggerSpirit");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "TriggerSpirit"));
 }
 
 void ReceiverBuilding::Read(TextReader* _in, bool _dynamic)
@@ -487,31 +400,6 @@ bool SpiritProcessor::Advance()
   return ReceiverBuilding::Advance();
 }
 
-void SpiritProcessor::Render(float _predictionTime) { ReceiverBuilding::Render(_predictionTime); }
-
-void SpiritProcessor::RenderAlphas(float _predictionTime)
-{
-  ReceiverBuilding::RenderAlphas(_predictionTime);
-
-  //
-  // Render all floating spirits
-
-  BeginRenderUnprocessedSpirits();
-
-  _predictionTime -= SERVER_ADVANCE_PERIOD;
-
-  for (int i = 0; i < m_floatingSpirits.Size(); ++i)
-  {
-    UnprocessedSpirit* spirit = m_floatingSpirits[i];
-    LegacyVector3 pos = spirit->m_pos;
-    pos += spirit->m_vel * _predictionTime;
-    pos += spirit->m_hover * _predictionTime;
-    float life = spirit->GetLife();
-    RenderUnprocessedSpirit(pos, life);
-  }
-  EndRenderUnprocessedSpirits();
-}
-
 // ****************************************************************************
 // Class ReceiverLink
 // ****************************************************************************
@@ -625,26 +513,6 @@ bool SpiritReceiver::Advance()
   return ReceiverBuilding::Advance();
 }
 
-void SpiritReceiver::Render(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
-    LegacyVector3 right(1, 0, 0);
-    m_front = right ^ m_up;
-  }
-
-  ReceiverBuilding::Render(_predictionTime);
-
-  Matrix34 mat(m_front, m_up, m_pos);
-  LegacyVector3 headPos = m_shape->GetMarkerWorldMatrix(m_headMarker, mat).pos;
-  LegacyVector3 up = g_upVector;
-  LegacyVector3 right(1, 0, 0);
-  LegacyVector3 front = up ^ right;
-  Matrix34 headMat(front, up, headPos);
-  m_headShape->Render(_predictionTime, headMat);
-}
-
 LegacyVector3 SpiritReceiver::GetSpiritLocation()
 {
   Matrix34 mat(m_front, m_up, m_pos);
@@ -655,62 +523,6 @@ LegacyVector3 SpiritReceiver::GetSpiritLocation()
   Matrix34 headMat(front, up, headPos);
   LegacyVector3 spiritLinkPos = m_headShape->GetMarkerWorldMatrix(m_spiritLink, headMat).pos;
   return spiritLinkPos;
-}
-
-void SpiritReceiver::RenderPorts()
-{
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-  glDepthMask(false);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-  for (int i = 0; i < GetNumPorts(); ++i)
-  {
-    Matrix34 rootMat(m_front, m_up, m_pos);
-    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_statusMarkers[i], rootMat);
-
-    //
-    // Render the status light
-
-    float size = 6.0f;
-    LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-    LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-    LegacyVector3 statusPos = worldMat.pos;
-
-    if (GetPortOccupant(i).IsValid())
-      glColor4f(0.3f, 1.0f, 0.3f, 1.0f);
-    else
-      glColor4f(1.0f, 0.3f, 0.3f, 1.0f);
-
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((statusPos - camR - camU).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((statusPos + camR - camU).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((statusPos + camR + camU).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((statusPos - camR + camU).GetData());
-    glEnd();
-  }
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_BLEND);
-  glDepthMask(true);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_CULL_FACE);
-}
-
-void SpiritReceiver::RenderAlphas(float _predictionTime)
-{
-  ReceiverBuilding::RenderAlphas(_predictionTime);
-
-  //RenderHitCheck();
-
-  float fractionOccupied = static_cast<float>(GetNumPortsOccupied()) / static_cast<float>(GetNumPorts());
 }
 
 // ****************************************************************************

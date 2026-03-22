@@ -2,57 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="cheat_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="darwinia_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="debugmenu.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="drop_down_menu.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="input_field.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="mainmenus.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="message_dialog.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="network_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="prefs_graphics_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="prefs_keybindings_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="prefs_other_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="prefs_screen_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="prefs_sound_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="profilewindow.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="reallyquit_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="scrollbar.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="userprofile_window.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="ai.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
@@ -233,60 +182,12 @@
     <ClInclude Include="tree_mesh_data.h" />
     <ClInclude Include="GameLogicPlatform.h" />
     <ClInclude Include="render_backend_interface.h" />
+    <ClInclude Include="SimEvent.h" />
+    <ClInclude Include="SimEventQueue.h" />
+    <ClInclude Include="prefs_keys.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="cheat_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="darwinia_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="debugmenu.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="drop_down_menu.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="input_field.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="mainmenus.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="message_dialog.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="network_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="prefs_graphics_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="prefs_keybindings_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="prefs_other_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="prefs_screen_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="prefs_sound_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="profilewindow.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="reallyquit_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="scrollbar.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="userprofile_window.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="ai.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
@@ -464,6 +365,7 @@
     <ClCompile Include="worldobject.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="SimEventQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interface">

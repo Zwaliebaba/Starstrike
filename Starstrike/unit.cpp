@@ -140,17 +140,11 @@ void Unit::Render( float _predictionTime )
 		{
 			Entity *entity = m_entities[i];
 			EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
-			if (renderer)
-			{
-				EntityRenderContext ctx;
-				ctx.predictionTime = _predictionTime;
-				ctx.highDetailFactor = 1.0f;
-				renderer->Render(*entity, ctx);
-			}
-			else
-			{
-				entity->Render( _predictionTime );
-			}
+			DEBUG_ASSERT(renderer);
+			EntityRenderContext ctx;
+			ctx.predictionTime = _predictionTime;
+			ctx.highDetailFactor = 1.0f;
+			renderer->Render(*entity, ctx);
 		}
 	}
 
@@ -163,17 +157,11 @@ void Unit::Render( float _predictionTime )
 		{
 			Entity *entity = m_entities[i];
 			EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
-			if (renderer)
-			{
-				EntityRenderContext ctx;
-				ctx.predictionTime = _predictionTime;
-				ctx.highDetailFactor = 1.0f;
-				renderer->Render(*entity, ctx);
-			}
-			else
-			{
-				entity->Render(_predictionTime);
-			}
+			DEBUG_ASSERT(renderer);
+			EntityRenderContext ctx;
+			ctx.predictionTime = _predictionTime;
+			ctx.highDetailFactor = 1.0f;
+			renderer->Render(*entity, ctx);
 		}
 	}
 

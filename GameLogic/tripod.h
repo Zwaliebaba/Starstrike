@@ -77,7 +77,6 @@ public:
 	~Tripod();
 
 	bool Advance(Unit *_unit);
-	void Render(float _predictionTime);
 	void Begin();
 };
 

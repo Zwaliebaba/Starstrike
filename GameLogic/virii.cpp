@@ -8,10 +8,9 @@
 #include "globals.h"
 #include "location.h"
 #include "entity_grid.h"
-#include "particle_system.h"
 #include "renderer.h"
 #include "team.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "virii.h"
 #include "egg.h"
 
@@ -27,13 +26,6 @@ bool ViriiUnit::Advance(int _slice)
   m_enemiesFound = g_app->m_location->m_entityGrid->AreEnemiesPresent(m_centerPos.x, m_centerPos.z, searchRadius, m_teamId);
 
   return Unit::Advance(_slice);
-}
-
-void ViriiUnit::Render(float _predictionTime)
-{
-  // Rendering moved to ViriiRenderer (GameRender project).
-  // Delegate to Unit::Render which uses EntityRenderRegistry dispatch.
-  Unit::Render(_predictionTime);
 }
 
 Virii::Virii()
@@ -337,10 +329,9 @@ bool Virii::AdvanceAttacking()
     entity->ChangeHealth(-20);
     for (int i = 0; i < 3; ++i)
     {
-      g_app->m_particleSystem->CreateParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)),
-                                              Particle::TypeMuzzleFlash);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, LegacyVector3(syncsfrand(15.0f), syncsfrand(15.0f) + 15.0f, syncsfrand(15.0f)), SimParticle::TypeMuzzleFlash));
     }
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Attack"));
     SearchForEnemies();
   }
 
@@ -610,7 +601,7 @@ bool Virii::SearchForIdleDirection()
     m_wayPoint = nextPos;
     m_state = StateIdle;
     RecordHistoryPosition(true);
-    g_app->m_soundSystem->TriggerEntityEvent(this, "ChangeDirection");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "ChangeDirection"; g_simEventQueue.Push(evt); }
     END_PROFILE(g_app->m_profiler, "SearchForIdleDir");
     return true;
   }
@@ -632,7 +623,7 @@ bool Virii::SearchForIdleDirection()
       m_wayPoint = nextPos;
       m_state = StateIdle;
       RecordHistoryPosition(true);
-      g_app->m_soundSystem->TriggerEntityEvent(this, "ChangeDirection");
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "ChangeDirection"; g_simEventQueue.Push(evt); }
       END_PROFILE(g_app->m_profiler, "SearchForIdleDir");
       return true;
     }
@@ -703,11 +694,6 @@ bool Virii::IsInView()
 
   float radius = sqrtf(radiusSqd);
   return g_app->m_camera->SphereInViewFrustum(centerPos, radius);
-}
-
-void Virii::Render(float predictionTime, int teamId, int _detail)
-{
-  // Rendering moved to ViriiRenderer (GameRender project)
 }
 
 /*

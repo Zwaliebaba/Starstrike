@@ -7,14 +7,13 @@
 #include "GameApp.h"
 #include "location.h"
 #include "entity_grid.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "team.h"
 #include "main.h"
 #include "anthill.h"
 #include "armyant.h"
 #include "darwinian.h"
 #include "spawnpoint.h"
-#include "soundsystem.h"
 
 AntHill::AntHill()
   : Building(),
@@ -55,14 +54,14 @@ void AntHill::Damage(float _damage)
     if (healthBandAfter != healthBandBefore)
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
-      g_explosionManager.AddExplosion(m_shape, mat, 1.0f - static_cast<float>(m_health) / 100.0f);
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "Damage");
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f - static_cast<float>(m_health) / 100.0f));
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Damage"));
     }
 
     if (m_health <= 0)
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
-      g_explosionManager.AddExplosion(m_shape, mat);
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
 
       int numSpirits = m_numAntsInside + m_numSpiritsInside;
       for (int i = 0; i < numSpirits; ++i)
@@ -79,7 +78,7 @@ void AntHill::Damage(float _damage)
         g_app->m_location->SpawnSpirit(pos, vel, m_id.GetTeamId(), WorldObjectId());
       }
 
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "Explode");
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
       m_health = 0;
     }
   }
@@ -351,33 +350,6 @@ bool AntHill::Advance()
   m_renderDamaged = (frand(0.75f) * (1.0f - fabs(sinf(timeIndex)) * 1.2f) > healthFraction);
 
   return (m_health <= 0);
-}
-
-void AntHill::Render(float _predictionTime)
-{
-  Matrix34 mat(m_front, m_up, m_pos);
-
-  //
-  // If we are damaged, flicked in and out based on our health
-
-  if (m_renderDamaged)
-  {
-    float timeIndex = g_gameTime + m_id.GetUniqueId() * 10;
-    float thefrand = frand();
-    if (thefrand > 0.7f)
-      mat.f *= (1.0f - sinf(timeIndex) * 0.7f);
-    else if (thefrand > 0.4f)
-      mat.u *= (1.0f - sinf(timeIndex) * 0.5f);
-    else
-      mat.r *= (1.0f - sinf(timeIndex) * 0.7f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-  }
-
-  m_shape->Render(_predictionTime, mat);
-
-  glDisable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void AntHill::Read(TextReader* _in, bool _dynamic)

@@ -53,8 +53,6 @@ class GunTurret : public Building
     LegacyVector3 GetTarget();
 
     bool IsInView() override;
-    void Render(float _predictionTime) override;
-    void RenderPorts() override;
 
     bool DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                     LegacyVector3* norm) override;

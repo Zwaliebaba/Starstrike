@@ -33,8 +33,6 @@ class ControlTower : public Building
     bool Advance() override;
 
     bool IsInView() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     int GetAvailablePosition(LegacyVector3& _pos, LegacyVector3& _front); // Finds place for reprogrammer
     void GetConsolePosition(int _position, LegacyVector3& _pos);

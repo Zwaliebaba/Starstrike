@@ -7,13 +7,12 @@
 #include "math_utils.h"
 #include "hi_res_time.h"
 #include "clienttoserver.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 #include "GameApp.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"
 #include "main.h"
-#include "particle_system.h"
 #include "global_world.h"
 #include "controltower.h"
 #include "trunkport.h"
@@ -113,7 +112,7 @@ bool ControlTower::Advance()
       Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_console[i], rootMat);
       LegacyVector3 particleVel = worldMat.pos - m_pos;
       particleVel += LegacyVector3(sfrand() * 10.0f, sfrand() * 5.0f, sfrand() * 10.0f);
-      g_app->m_particleSystem->CreateParticle(worldMat.pos, particleVel, Particle::TypeBlueSpark);
+      g_simEventQueue.Push(SimEvent::MakeParticle(worldMat.pos, particleVel, SimParticle::TypeBlueSpark));
     }
   }
 
@@ -185,8 +184,8 @@ bool ControlTower::Reprogram(int _teamId)
 
         if (m_ownership == 100.0f)
         {
-          g_app->m_soundSystem->TriggerBuildingEvent(this, "ReprogramComplete");
-          //g_app->m_sepulveda->Say("building_captured");
+          g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "ReprogramComplete"));
+          //g_app->m_sepulveda
           targetBuilding->ReprogramComplete();
           SetTeamId(_teamId);
           g_app->m_globalWorld->m_research->GiveResearchPoints(GLOBALRESEARCH_POINTS_CONTROLTOWER);
@@ -214,16 +213,6 @@ void ControlTower::EndReprogram(int _position)
   m_beingReprogrammed[_position] = false;
 }
 
-void ControlTower::Render(float _predictionTime)
-{
-  Building::Render(_predictionTime);
-
-  //
-  // Render our dish
-
-  s_dishShape->Render(_predictionTime, m_dishMatrix);
-}
-
 bool ControlTower::IsInView()
 {
   if (Building::IsInView())
@@ -235,182 +224,6 @@ bool ControlTower::IsInView()
   LegacyVector3 towerPos = m_pos;
   towerPos.y = g_app->m_camera->GetPos().y;
   return g_app->m_camera->PosInViewFrustum(towerPos);
-}
-
-void ControlTower::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  //
-  // Control lines will be bright when we are near a control tower
-  // And dim when we are not
-  // Recalculate our distance to the nearest control tower once per second
-
-  static int s_lastRecalculation = 0.0f;
-  static float s_distanceScale = 0.0f;
-  static float s_desiredDistanceScale = 0.0f;
-
-  if (static_cast<int>(GetHighResTime()) > s_lastRecalculation)
-  {
-    s_lastRecalculation = static_cast<int>(GetHighResTime());
-
-    float nearest = 99999.9f;
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
-    {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
-      {
-        Building* building = g_app->m_location->m_buildings[i];
-        if (building && building->m_type == TypeControlTower)
-        {
-          float camDist = (building->m_pos - g_app->m_camera->GetPos()).Mag();
-          if (camDist < nearest)
-            nearest = camDist;
-        }
-      }
-    }
-
-    if (nearest < 200.0f)
-      s_desiredDistanceScale = 1.0f;
-    else
-      s_desiredDistanceScale = 0.1f;
-  }
-
-  if (s_desiredDistanceScale > s_distanceScale)
-  {
-    s_distanceScale = (s_desiredDistanceScale * SERVER_ADVANCE_PERIOD * 0.1f) + (s_distanceScale * (1.0f - SERVER_ADVANCE_PERIOD * 0.1f));
-  }
-  else
-  {
-    s_distanceScale = (s_desiredDistanceScale * SERVER_ADVANCE_PERIOD * 0.03f) + (s_distanceScale * (1.0f - SERVER_ADVANCE_PERIOD * 0.03f));
-  }
-
-  //
-  // Pre-compute some positions and shit
-
-  Matrix34 rootMat(m_front, g_upVector, m_pos);
-  Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_lightPos, rootMat);
-  LegacyVector3 lightPos = worldMat.pos;
-
-  LegacyVector3 camR = g_app->m_camera->GetRight();
-  LegacyVector3 camU = g_app->m_camera->GetUp();
-
-  RGBAColour colour;
-  if (m_id.GetTeamId() == 255)
-    colour.Set(128, 128, 128, 255);
-  else
-    colour = g_app->m_location->m_teams[m_id.GetTeamId()].m_colour;
-
-  //
-  // Draw control line to heaven
-
-  if (!g_app->m_editing)
-  {
-    LegacyVector3 controlUp(0, 50.0f + (m_id.GetUniqueId() % 50), 0);
-
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glShadeModel(GL_SMOOTH);
-    glDepthMask(false);
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    float w = (lightPos - g_app->m_camera->GetPos()).Mag() * 0.002f;
-    w = max(0.5f, w);
-
-    for (int i = 0; i < 10; ++i)
-    {
-      LegacyVector3 thisUp1 = LegacyVector3(0, -20, 0) + controlUp * static_cast<float>(i);
-      LegacyVector3 thisUp2 = LegacyVector3(0, -20, 0) + controlUp * static_cast<float>(i + 1);
-
-      int alpha = 255 - 255 * static_cast<float>(i) / 10.0f;
-      int alpha2 = 255 - 255 * static_cast<float>(i + 1) / 10.0f;
-
-      alpha *= fabs(sinf(g_gameTime * 2 + static_cast<float>(i) / 5.0f));
-      alpha2 *= fabs(sinf(g_gameTime * 2 + static_cast<float>(i + 1) / 5.0f));
-
-      alpha *= s_distanceScale;
-      alpha2 *= s_distanceScale;
-
-      float y = static_cast<float>(i) / 10.0f;
-      float h = 1.0f / 10.0f;
-
-      glBegin(GL_QUADS);
-      glColor4ub(colour.r, colour.g, colour.b, alpha);
-
-      glTexCoord2f(y, 0);
-      glVertex3fv((lightPos - camR * w + thisUp1).GetData());
-      glTexCoord2f(y, 1);
-      glVertex3fv((lightPos + camR * w + thisUp1).GetData());
-
-      glColor4ub(colour.r, colour.g, colour.b, alpha2);
-
-      glTexCoord2f(y + h, 1);
-      glVertex3fv((lightPos + camR * w + thisUp2).GetData());
-      glTexCoord2f(y + h, 0);
-      glVertex3fv((lightPos - camR * w + thisUp2).GetData());
-      glEnd();
-    }
-
-    glDisable(GL_TEXTURE_2D);
-
-    glDepthMask(true);
-    glShadeModel(GL_FLAT);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-  }
-
-  //
-  // Draw our signal flash
-
-  int lastSeqId = g_app->m_clientToServer->m_lastValidSequenceIdFromServer;
-
-  if ((m_id.GetTeamId() != 255 && (lastSeqId % 10) / 2 == m_id.GetTeamId()) || m_beingReprogrammed[lastSeqId % 3] || g_app->m_editing)
-  {
-    Matrix34 rootMat(m_front, g_upVector, m_pos);
-    Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_lightPos, rootMat);
-    LegacyVector3 lightPos = worldMat.pos;
-
-    float signalSize = m_ownership / 5.0f;
-
-    glColor4ub(colour.r, colour.g, colour.b, 255);
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glDisable(GL_CULL_FACE);
-    glDepthMask(false);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-    for (int i = 0; i < 10; ++i)
-    {
-      float size = signalSize * static_cast<float>(i) / 10.0f;
-      glBegin(GL_QUADS);
-      glTexCoord2f(0.0f, 0.0f);
-      glVertex3fv((lightPos - camR * size - camU * size).GetData());
-      glTexCoord2f(1.0f, 0.0f);
-      glVertex3fv((lightPos + camR * size - camU * size).GetData());
-      glTexCoord2f(1.0f, 1.0f);
-      glVertex3fv((lightPos + camR * size + camU * size).GetData());
-      glTexCoord2f(0.0f, 1.0f);
-      glVertex3fv((lightPos - camR * size + camU * size).GetData());
-      glEnd();
-    }
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_BLEND);
-
-    glDepthMask(true);
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_TEXTURE_2D);
-  }
 }
 
 void ControlTower::Read(TextReader* _in, bool _dynamic)

@@ -205,25 +205,6 @@ bool FenceSwitch::Advance()
 }
 
 // *** Render
-void FenceSwitch::Render(float predictionTime) { Building::Render(predictionTime); }
-
-void FenceSwitch::RenderAlphas(float predictionTime)
-{
-  Building* building = g_app->m_location->GetBuilding(m_linkedBuildingId);
-  if (building && building->m_type == TypeLaserFence)
-  {
-    auto fence = static_cast<LaserFence*>(building);
-    RenderConnection(fence->GetTopPosition(), m_switchValue == m_linkedBuildingId);
-  }
-
-  building = g_app->m_location->GetBuilding(m_linkedBuildingId2);
-  if (building && building->m_type == TypeLaserFence)
-  {
-    auto fence = static_cast<LaserFence*>(building);
-    RenderConnection(fence->GetTopPosition(), m_switchValue == m_linkedBuildingId2);
-  }
-}
-
 void FenceSwitch::RenderConnection(LegacyVector3 _targetPos, bool _active)
 {
   LegacyVector3 ourPos = GetConnectionLocation();
@@ -336,64 +317,6 @@ void FenceSwitch::Switch()
     {
         g_app->m_script->RunScript( m_script );
     }*/
-  }
-}
-
-void FenceSwitch::RenderLights()
-{
-  if (m_id.GetTeamId() != 255 && m_lights.Size() > 0)
-  {
-    if ((g_app->m_clientToServer->m_lastValidSequenceIdFromServer % 10) / 2 == m_id.GetTeamId() || g_app->m_editing)
-    {
-      for (int i = 0; i < m_lights.Size(); ++i)
-      {
-        ShapeMarkerData* marker = m_lights[i];
-        Matrix34 rootMat(m_front, m_up, m_pos);
-        Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(marker, rootMat);
-        LegacyVector3 lightPos = worldMat.pos;
-
-        float signalSize = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight();
-        LegacyVector3 camU = g_app->m_camera->GetUp();
-
-        if (m_switchValue == m_linkedBuildingId)
-          glColor3f(0.0f, 1.0f, 0.0f);
-        else
-          glColor3f(1.0f, 0.0f, 0.0f);
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glDisable(GL_CULL_FACE);
-        glDepthMask(false);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-        for (int i = 0; i < 10; ++i)
-        {
-          float size = signalSize * static_cast<float>(i) / 10.0f;
-          glBegin(GL_QUADS);
-          glTexCoord2f(0.0f, 0.0f);
-          glVertex3fv((lightPos - camR * size - camU * size).GetData());
-          glTexCoord2f(1.0f, 0.0f);
-          glVertex3fv((lightPos + camR * size - camU * size).GetData());
-          glTexCoord2f(1.0f, 1.0f);
-          glVertex3fv((lightPos + camR * size + camU * size).GetData());
-          glTexCoord2f(0.0f, 1.0f);
-          glVertex3fv((lightPos - camR * size + camU * size).GetData());
-          glEnd();
-        }
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_BLEND);
-
-        glDepthMask(true);
-        glEnable(GL_CULL_FACE);
-        glDisable(GL_TEXTURE_2D);
-      }
-    }
   }
 }
 

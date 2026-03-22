@@ -131,77 +131,6 @@ void SpawnBuilding::RenderSpirit( LegacyVector3 const &_pos )
 }
 
 
-void SpawnBuilding::RenderAlphas( float _predictionTime )
-{
-    LegacyVector3 ourPos = GetSpiritLink();
-
-    int buildingDetail = g_prefsManager->GetInt( "RenderBuildingDetail", 1 );
-
-    for( int i = 0; i < m_links.Size(); ++i )
-    {
-        SpawnBuildingLink *link = m_links[i];
-        SpawnBuilding *building = (SpawnBuilding *) g_app->m_location->GetBuilding( link->m_targetBuildingId );
-        if( building )
-        {
-            LegacyVector3 theirPos = building->GetSpiritLink();
-
-            LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
-            LegacyVector3 ourPosRight = camToOurPos ^ ( theirPos - ourPos );
-
-            LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
-            LegacyVector3 theirPosRight = camToTheirPos ^ ( theirPos - ourPos );
-
-            glDisable   ( GL_CULL_FACE );
-            glDepthMask ( false );
-            glColor4f   ( 0.9f, 0.9f, 0.5f, 1.0f );
-
-            float size = 0.5f;
-
-            if( buildingDetail == 1 )
-            {
-                glEnable    ( GL_BLEND );
-                glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
-
-                glEnable        ( GL_TEXTURE_2D );
-                glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/laser.bmp" ) );
-                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-                glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-
-                size = 1.0f;
-            }
-
-            theirPosRight.SetLength( size );
-            ourPosRight.SetLength( size );
-
-            glBegin( GL_QUADS );
-                glTexCoord2f(0.1f, 0);      glVertex3fv( (ourPos - ourPosRight).GetData() );
-                glTexCoord2f(0.1f, 1);      glVertex3fv( (ourPos + ourPosRight).GetData() );
-                glTexCoord2f(0.9f, 1);      glVertex3fv( (theirPos + theirPosRight).GetData() );
-                glTexCoord2f(0.9f, 0);      glVertex3fv( (theirPos - theirPosRight).GetData() );
-            glEnd();
-
-            glDisable       ( GL_TEXTURE_2D );
-
-
-            //
-            // Render spirits in transit
-
-            for( int j = 0; j < link->m_spirits.Size(); ++j )
-            {
-                SpawnBuildingSpirit *spirit = link->m_spirits[j];
-                float predictedProgress = spirit->m_currentProgress + _predictionTime;
-                if( predictedProgress >= 0.0f && predictedProgress <= 1.0f )
-                {
-                    LegacyVector3 position = ourPos + ( theirPos - ourPos ) * predictedProgress;
-                    RenderSpirit( position );
-                }
-            }
-        }
-    }
-
-    Building::RenderAlphas( _predictionTime );
-}
-
 
 void SpawnBuilding::SetBuildingLink( int _buildingId )
 {
@@ -316,11 +245,6 @@ bool SpawnBuilding::Advance()
     return Building::Advance();
 }
 
-
-void SpawnBuilding::Render( float _predictionTime )
-{
-    Building::Render( _predictionTime );
-}
 
 
 void SpawnBuilding::Read( TextReader *_in, bool _dynamic )
@@ -446,22 +370,6 @@ bool MasterSpawnPoint::Advance()
 }
 
 
-void MasterSpawnPoint::Render( float _predictionTime )
-{
-    if( m_isGlobal || g_app->m_editing )
-    {
-        SpawnBuilding::Render( _predictionTime );
-    }
-}
-
-
-void MasterSpawnPoint::RenderAlphas ( float _predictionTime )
-{
-    if( m_isGlobal || g_app->m_editing )
-    {
-        SpawnBuilding::RenderAlphas( _predictionTime );
-    }
-}
 
 
 
@@ -670,115 +578,7 @@ bool SpawnPoint::Advance()
 }
 
 
-void SpawnPoint::Render( float _predictionTime )
-{
-    SpawnBuilding::Render( _predictionTime );
-}
 
-
-void SpawnPoint::RenderAlphas( float _predictionTime )
-{
-    SpawnBuilding::RenderAlphas( _predictionTime );
-
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
-
-    glDepthMask     ( false );
-    glEnable        ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-    glEnable        ( GL_TEXTURE_2D );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/cloudyglow.bmp" ) );
-
-    float timeIndex = g_gameTime + m_id.GetUniqueId() * 10.0f;
-
-    int buildingDetail = g_prefsManager->GetInt( "RenderBuildingDetail", 1 );
-    int maxBlobs = 20;
-    if( buildingDetail == 2 ) maxBlobs = 10;
-    if( buildingDetail == 3 ) maxBlobs = 0;
-
-    float alpha = GetNumPortsOccupied() / (float) GetNumPorts();
-
-    for( int i = 0; i < maxBlobs; ++i )
-    {
-        LegacyVector3 pos = m_centerPos;
-        pos += LegacyVector3(0,25,0);
-        pos.x += sinf(timeIndex+i) * i * 0.7f;
-        pos.y += cosf(timeIndex+i) * sinf(i*10) * 12;
-        pos.z += cosf(timeIndex+i) * i * 0.7f;
-
-        float size = 10.0f + sinf(timeIndex+i*10) * 10.0f;
-        size = max( size, 5.0f );
-
-        glColor4f( 0.6f, 0.2f, 0.1f, alpha);
-
-        glBegin( GL_QUADS );
-            glTexCoord2i(0,0);      glVertex3fv( (pos - camRight * size + camUp * size).GetData() );
-            glTexCoord2i(1,0);      glVertex3fv( (pos + camRight * size + camUp * size).GetData() );
-            glTexCoord2i(1,1);      glVertex3fv( (pos + camRight * size - camUp * size).GetData() );
-            glTexCoord2i(0,1);      glVertex3fv( (pos - camRight * size - camUp * size).GetData() );
-        glEnd();
-    }
-
-    glDisable       ( GL_TEXTURE_2D );
-    glDepthMask     ( true );
-}
-
-
-void SpawnPoint::RenderPorts()
-{
-    glDisable       ( GL_CULL_FACE );
-    glEnable        ( GL_TEXTURE_2D );
-    glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/starburst.bmp" ) );
-    glDepthMask     ( false );
-    glEnable        ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-    glBegin         ( GL_QUADS );
-
-    for( int i = 0; i < GetNumPorts(); ++i )
-    {
-        LegacyVector3 portPos;
-        LegacyVector3 portFront;
-        GetPortPosition( i, portPos, portFront );
-
-        LegacyVector3 portUp = g_upVector;
-        Matrix34 mat( portFront, portUp, portPos );
-
-        //
-        // Render the status light
-
-        float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
-
-        LegacyVector3 statusPos = s_controlPad->GetMarkerWorldMatrix(s_controlPadStatus, mat).pos;
-        statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
-        statusPos.y += 5.0f;
-
-        WorldObjectId occupantId = GetPortOccupant(i);
-        if( !occupantId.IsValid() )
-        {
-            glColor4ub( 150, 150, 150, 255 );
-        }
-        else
-        {
-            RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
-            glColor4ubv( teamColour.GetData() );
-        }
-
-        glTexCoord2i( 0, 0 );           glVertex3fv( (statusPos - camR - camU).GetData() );
-        glTexCoord2i( 1, 0 );           glVertex3fv( (statusPos + camR - camU).GetData() );
-        glTexCoord2i( 1, 1 );           glVertex3fv( (statusPos + camR + camU).GetData() );
-        glTexCoord2i( 0, 1 );           glVertex3fv( (statusPos - camR + camU).GetData() );
-    }
-
-    glEnd           ();
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glDisable       ( GL_BLEND );
-    glDepthMask     ( true );
-    glDisable       ( GL_TEXTURE_2D );
-    glEnable        ( GL_CULL_FACE );
-
-}
 
 
 // ============================================================================
@@ -876,14 +676,6 @@ bool SpawnPopulationLock::Advance()
 }
 
 
-void SpawnPopulationLock::Render( float _predictionTime )
-{
-}
-
-
-void SpawnPopulationLock::RenderAlphas( float _predictionTime )
-{
-}
 
 void SpawnPopulationLock::Read( TextReader *_in, bool _dynamic )
 {

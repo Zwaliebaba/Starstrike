@@ -13,14 +13,13 @@
 #include "camera.h"
 #include "team.h"
 #include "main.h"
-#include "particle_system.h"
-#include "explosion.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 #include "global_world.h"
 #include "script.h"
 #include "entity_grid.h"
 #include "renderer.h"
 #include "taskmanager_interface.h"
-#include "soundsystem.h"
 
 ShapeStatic* FuelBuilding::s_fuelPipe = nullptr;
 
@@ -110,91 +109,6 @@ bool FuelBuilding::IsInView()
   return Building::IsInView();
 }
 
-void FuelBuilding::Render(float _predictionTime)
-{
-  Building::Render(_predictionTime);
-
-  FuelBuilding* fuelBuilding = GetLinkedBuilding();
-  if (fuelBuilding)
-  {
-    LegacyVector3 ourPipePos = GetFuelPosition();
-    LegacyVector3 theirPipePos = fuelBuilding->GetFuelPosition();
-
-    LegacyVector3 pipeVector = (theirPipePos - ourPipePos).Normalise();
-    LegacyVector3 right = pipeVector ^ g_upVector;
-    LegacyVector3 up = pipeVector ^ right;
-
-    ourPipePos += pipeVector * 10;
-
-    Matrix34 pipeMat(up, pipeVector, ourPipePos);
-    DEBUG_ASSERT(s_fuelPipe);
-    s_fuelPipe->Render(_predictionTime, pipeMat);
-  }
-}
-
-void FuelBuilding::RenderAlphas(float _predictionTime)
-{
-  Building::RenderAlphas(_predictionTime);
-
-  if (m_currentLevel > 0.0f)
-  {
-    FuelBuilding* fuelBuilding = GetLinkedBuilding();
-    if (fuelBuilding)
-    {
-      LegacyVector3 startPos = GetFuelPosition();
-      LegacyVector3 endPos = fuelBuilding->GetFuelPosition();
-
-      LegacyVector3 midPos = (startPos + endPos) / 2.0f;
-      LegacyVector3 rightAngle = (g_app->m_camera->GetPos() - midPos) ^ (startPos - endPos);
-      rightAngle.SetLength(25.0f);
-
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/fuel.bmp"));
-      glEnable(GL_TEXTURE_2D);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-      glDepthMask(false);
-
-      float tx = g_gameTime * -0.5f;
-      float tw = 1.0f;
-
-      glColor4f(1.0f, 0.4f, 0.1f, 0.4f * m_currentLevel);
-
-      float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-      g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_app->m_renderer->GetFarPlane());
-
-      int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail");
-      float maxLoops = 4 - buildingDetail;
-      maxLoops = max(maxLoops, 1);
-      maxLoops = min(maxLoops, 3);
-
-      for (int i = 0; i < maxLoops; ++i)
-      {
-        glBegin(GL_QUADS);
-        glTexCoord2f(tx, 0);
-        glVertex3fv((startPos - rightAngle).GetData());
-        glTexCoord2f(tx, 1);
-        glVertex3fv((startPos + rightAngle).GetData());
-        glTexCoord2f(tx + tw, 1);
-        glVertex3fv((endPos + rightAngle).GetData());
-        glTexCoord2f(tx + tw, 0);
-        glVertex3fv((endPos - rightAngle).GetData());
-        glEnd();
-        rightAngle *= 0.7f;
-      }
-
-      g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
-
-      glEnable(GL_DEPTH_TEST);
-      glDisable(GL_TEXTURE_2D);
-    }
-  }
-
-  //    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,70,0), 5, "Fuel Pressure : %2.2f", m_currentLevel );
-}
-
 void FuelBuilding::Read(TextReader* _in, bool _dynamic)
 {
   Building::Read(_in, _dynamic);
@@ -230,7 +144,7 @@ void FuelBuilding::Destroy(float _intensity)
     ourPipePos += pipeVector * 10;
 
     Matrix34 pipeMat(up, pipeVector, ourPipePos);
-    g_explosionManager.AddExplosion(s_fuelPipe, pipeMat);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(s_fuelPipe, pipeMat, 1.0f));
   }
 }
 
@@ -297,7 +211,7 @@ bool FuelGenerator::Advance()
       LegacyVector3 particlePos = m_pump->GetMarkerWorldMatrix(m_pumpTip, mat).pos;
       float size = 150.0f + frand(150.0f);
 
-      g_app->m_particleSystem->CreateParticle(particlePos, pumpVel, Particle::TypeDarwinianFire, size);
+      g_simEventQueue.Push(SimEvent::MakeParticle(particlePos, pumpVel, SimParticle::TypeDarwinianFire, size));
     }
   }
 
@@ -305,9 +219,9 @@ bool FuelGenerator::Advance()
   // Play sounds
 
   if (previousPumpPos >= 0.1f && m_previousPumpPos < 0.1f)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "PumpUp");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpUp"));
   else if (previousPumpPos <= 0.9f && m_previousPumpPos > 0.9f)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "PumpDown");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpDown"));
 
   return FuelBuilding::Advance();
 }
@@ -321,30 +235,6 @@ LegacyVector3 FuelGenerator::GetPumpPos()
   pumpPos.y += fabs(cosf(m_pumpMovement)) * pumpHeight;
 
   return pumpPos;
-}
-
-void FuelGenerator::Render(float _predictionTime)
-{
-  FuelBuilding::Render(_predictionTime);
-
-  //
-  // Render the pump
-
-  float fuelVal = m_surges / 10.0f;
-  m_pumpMovement += g_advanceTime * fuelVal * 2;
-
-  LegacyVector3 pumpPos = GetPumpPos();
-  Matrix34 mat(m_front, g_upVector, pumpPos);
-
-  m_pump->Render(_predictionTime, mat);
-}
-
-void FuelGenerator::RenderAlphas(float _predictionTime)
-{
-  FuelBuilding::RenderAlphas(_predictionTime);
-
-  //    glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
-  //    g_editorFont.DrawText3DCenter( m_pos+LegacyVector3(0,90,0), 10, "Surges : %2.2f", m_surges );
 }
 
 const char* FuelGenerator::GetObjectiveCounter()
@@ -369,12 +259,16 @@ bool FuelPipe::Advance()
   //
   // Ensure our sound ambiences are playing
 
-  int numInstances = g_app->m_soundSystem->NumInstances(m_id, "FuelPipe PumpFuel");
-
-  if (m_currentLevel > 0.2f && numInstances == 0)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, "PumpFuel");
-  else if (m_currentLevel <= 0.2f && numInstances > 0)
-    g_app->m_soundSystem->StopAllSounds(m_id, "FuelPipe PumpFuel");
+  if (m_currentLevel > 0.2f && !m_pumpSoundActive)
+  {
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "PumpFuel"));
+    m_pumpSoundActive = true;
+  }
+  else if (m_currentLevel <= 0.2f && m_pumpSoundActive)
+  {
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "FuelPipe PumpFuel"));
+    m_pumpSoundActive = false;
+  }
 
   return FuelBuilding::Advance();
 }
@@ -463,156 +357,16 @@ bool FuelStation::BoardRocket(WorldObjectId _id)
       for (int i = 0; i < numFlashes; ++i)
       {
         LegacyVector3 vel(sfrand(15.0f), frand(35.0f), sfrand(15.0f));
-        g_app->m_particleSystem->CreateParticle(entityPos, vel, Particle::TypeControlFlash);
+        g_simEventQueue.Push(SimEvent::MakeParticle(entityPos, vel, SimParticle::TypeControlFlash));
       }
 
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "LoadPassenger");
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "LoadPassenger"));
     }
 
     return result;
   }
 
   return false;
-}
-
-void FuelStation::Render(float _predictionTime) { Building::Render(_predictionTime); }
-
-void FuelStation::RenderAlphas(float _predictionTime)
-{
-  // Prevent FuelBuilding::RenderAlphas from being called
-
-  //
-  // Render countdown
-
-  Building* building = g_app->m_location->GetBuilding(m_fuelLink);
-  if (building && building->m_type == TypeEscapeRocket)
-  {
-    auto rocket = static_cast<EscapeRocket*>(building);
-    if ((rocket->m_state == EscapeRocket::StateCountdown && rocket->m_countdown <= 10.0f) || rocket->m_state == EscapeRocket::StateFlight)
-    {
-      float screenSize = 60.0f;
-      LegacyVector3 screenFront = m_front;
-      //screenFront.RotateAroundY( 0.33f * M_PI );
-      LegacyVector3 screenRight = screenFront ^ g_upVector;
-      LegacyVector3 screenPos = m_pos + LegacyVector3(0, 150, 0);
-      screenPos -= screenRight * screenSize * 0.5f;
-      screenPos += screenFront * 30;
-      LegacyVector3 screenUp = g_upVector;
-
-      //
-      // Render lines for over effect
-
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glEnable(GL_TEXTURE_2D);
-      glEnable(GL_BLEND);
-      glDepthMask(false);
-      glShadeModel(GL_SMOOTH);
-      glDisable(GL_CULL_FACE);
-
-      float texX = 0.0f;
-      float texW = 3.0f;
-      float texY = g_gameTime * 0.01f;
-      float texH = 0.3f;
-
-      glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-      glBegin(GL_QUADS);
-      glVertex3fv(screenPos.GetData());
-      glVertex3fv((screenPos + screenRight * screenSize).GetData());
-      glVertex3fv((screenPos + screenRight * screenSize + screenUp * screenSize).GetData());
-      glVertex3fv((screenPos + screenUp * screenSize).GetData());
-      glEnd();
-
-      glColor4f(1.0f, 0.4f, 0.2f, 1.0f);
-
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-      for (int i = 0; i < 2; ++i)
-      {
-        glBegin(GL_QUADS);
-        glTexCoord2f(texX, texY);
-        glVertex3fv(screenPos.GetData());
-
-        glTexCoord2f(texX + texW, texY);
-        glVertex3fv((screenPos + screenRight * screenSize).GetData());
-
-        glTexCoord2f(texX + texW, texY + texH);
-        glVertex3fv((screenPos + screenRight * screenSize + screenUp * screenSize).GetData());
-
-        glTexCoord2f(texX, texY + texH);
-        glVertex3fv((screenPos + screenUp * screenSize).GetData());
-        glEnd();
-
-        texY *= 1.5f;
-        texH = 0.1f;
-      }
-
-      glDepthMask(false);
-
-      //
-      // Render countdown
-
-      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-      LegacyVector3 textPos = screenPos + screenRight * screenSize * 0.5f + screenUp * screenSize * 0.5f;
-
-      if (rocket->m_state == EscapeRocket::StateCountdown)
-      {
-        int countdown = static_cast<int>(rocket->m_countdown) + 1;
-        g_gameFont.DrawText3D(textPos, screenFront, g_upVector, 50, "%d", countdown);
-      }
-      else
-      {
-        if (fmod(g_gameTime, 2) < 1)
-          g_gameFont.DrawText3D(textPos, screenFront, g_upVector, 50, "0");
-      }
-
-      //
-      // Render projection effect
-
-      glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-
-      LegacyVector3 ourPos = m_pos + LegacyVector3(0, 90, 0);
-      LegacyVector3 theirPos = m_pos + LegacyVector3(0, 200, 0);
-      theirPos += screenFront * 30.0f;
-
-      LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
-      LegacyVector3 lineTheirPos = camToTheirPos ^ (ourPos - theirPos);
-      lineTheirPos.SetLength(m_radius * 0.5f);
-
-      for (int i = 0; i < 3; ++i)
-      {
-        LegacyVector3 pos = theirPos;
-        pos.x += sinf(g_gameTime + i) * 15;
-        pos.y += sinf(g_gameTime + i) * 15;
-        pos.z += cosf(g_gameTime + i) * 15;
-
-        float blue = 0.5f + fabs(sinf(g_gameTime * i)) * 0.5f;
-
-        glBegin(GL_QUADS);
-        glColor4f(1.0f, 0.4f, 0.2f, 0.4f);
-        glTexCoord2f(1, 0);
-        glVertex3fv((ourPos - lineTheirPos).GetData());
-        glTexCoord2f(1, 1);
-        glVertex3fv((ourPos + lineTheirPos).GetData());
-        glColor4f(1.0f, 0.4f, 0.2f, 0.2f);
-        glTexCoord2f(0, 1);
-        glVertex3fv((pos + lineTheirPos).GetData());
-        glTexCoord2f(0, 0);
-        glVertex3fv((pos - lineTheirPos).GetData());
-        glEnd();
-      }
-
-      glDepthMask(true);
-      glEnable(GL_DEPTH_TEST);
-      glDisable(GL_TEXTURE_2D);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      glDisable(GL_BLEND);
-      glShadeModel(GL_FLAT);
-    }
-  }
 }
 
 bool FuelStation::PerformDepthSort(LegacyVector3& _centerPos)
@@ -691,44 +445,37 @@ void EscapeRocket::SetupSounds()
     break;
   }
 
-  char fullName[256];
-  if (requiredSoundName)
-    snprintf(fullName, sizeof(fullName), "EscapeRocket %s", requiredSoundName);
-
   //
-  // If we're not set up right, kill all sounds first
+  // If the required sound changed, stop old and start new
 
-  int numInstances = requiredSoundName ? g_app->m_soundSystem->NumInstances(m_id, fullName) : 0;
-
-  if (!requiredSoundName || numInstances == 0)
+  if (requiredSoundName != m_activeSoundName)
   {
-    g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket Refueling");
-    g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket Happy");
-    g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket Unhappy");
-    g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket Malfunction");
-    g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket Flight");
+    // Stop all ambience sounds for this rocket
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+
+    if (requiredSoundName)
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, requiredSoundName));
+
+    m_activeSoundName = requiredSoundName;
+
+    // Engine sound was also stopped — re-arm so it re-triggers below if needed
+    m_engineSoundActive = false;
   }
-
-  //
-  // Spawn the correct sound
-
-  if (requiredSoundName && numInstances == 0)
-    g_app->m_soundSystem->TriggerBuildingEvent(this, requiredSoundName);
 
   //
   // If our engines are on then trigger the event
 
-  int numEngineInstances = g_app->m_soundSystem->NumInstances(m_id, "EscapeRocket EngineBurn");
+  bool wantEngine = (m_state == StateReady || m_state == StateCountdown || m_state == StateFlight);
 
-  if (m_state == StateReady || m_state == StateCountdown || m_state == StateFlight)
+  if (wantEngine && !m_engineSoundActive)
   {
-    if (numEngineInstances == 0)
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "EngineBurn");
+    g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "EngineBurn"));
+    m_engineSoundActive = true;
   }
-  else
+  else if (!wantEngine && m_engineSoundActive)
   {
-    if (numEngineInstances > 0)
-      g_app->m_soundSystem->StopAllSounds(m_id, "EscapeRocket EngineBurn");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id, "EscapeRocket EngineBurn"));
+    m_engineSoundActive = false;
   }
 }
 
@@ -957,7 +704,7 @@ void EscapeRocket::AdvanceExploding()
   if (m_fuel > 0.0f)
   {
     Matrix34 mat(m_front, g_upVector, m_pos);
-    g_explosionManager.AddExplosion(m_shape, mat, 0.001f);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 0.001f));
   }
 
   //
@@ -978,8 +725,8 @@ void EscapeRocket::AdvanceExploding()
     float smokeSize = fireSize;
 
     if (m_fuel > 0.0f)
-      g_app->m_particleSystem->CreateParticle(windowMat.pos, vel, Particle::TypeFire, fireSize);
-    g_app->m_particleSystem->CreateParticle(windowMat.pos, smokeVel, Particle::TypeMissileTrail, smokeSize);
+      g_simEventQueue.Push(SimEvent::MakeParticle(windowMat.pos, vel, SimParticle::TypeFire, fireSize));
+    g_simEventQueue.Push(SimEvent::MakeParticle(windowMat.pos, smokeVel, SimParticle::TypeMissileTrail, smokeSize));
   }
 
   if (m_damage <= 0.0f)
@@ -1061,7 +808,7 @@ void EscapeRocket::Damage(float _damage)
     if (m_damage > 100.0f)
     {
       m_state = StateExploding;
-      g_app->m_soundSystem->TriggerBuildingEvent(this, "Explode");
+      g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Explode"));
     }
   }
 }
@@ -1124,10 +871,10 @@ bool EscapeRocket::Advance()
       {
         vel.x *= 0.75f;
         vel.z *= 0.75f;
-        g_app->m_particleSystem->CreateParticle(pos, vel, Particle::TypeMissileTrail, size);
+        g_simEventQueue.Push(SimEvent::MakeParticle(pos, vel, SimParticle::TypeMissileTrail, size));
       }
       else
-        g_app->m_particleSystem->CreateParticle(pos, vel, Particle::TypeMissileFire, size);
+        g_simEventQueue.Push(SimEvent::MakeParticle(pos, vel, SimParticle::TypeMissileFire, size));
     }
   }
 
@@ -1142,124 +889,6 @@ bool EscapeRocket::SafeToLaunch()
   int numEnemies = g_app->m_location->m_entityGrid->GetNumEnemies(testPos.x, testPos.z, testRadius, 0);
 
   return (numEnemies < 2);
-}
-
-void EscapeRocket::Render(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-
-  Matrix34 mat(m_front, m_up, predictedPos);
-
-  m_shape->Render(0.0f, mat);
-}
-
-void EscapeRocket::RenderAlphas(float _predictionTime)
-{
-  FuelBuilding::RenderAlphas(_predictionTime);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-  //
-  // Render rocket glow
-  // Calculate alpha value
-
-  float alpha = m_fuel / 100.0f;
-  alpha = min(alpha, 1.0f);
-  alpha = max(alpha, 0.0f);
-
-  if (alpha > 0.0f)
-  {
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.75f;
-
-    glDepthMask(false);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    //glDisable       ( GL_DEPTH_TEST );
-
-    float timeIndex = g_gameTime * 2;
-
-    int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-    int maxBlobs = 50;
-    if (buildingDetail == 2)
-      maxBlobs = 20;
-    if (buildingDetail == 3)
-      maxBlobs = 10;
-
-    LegacyVector3 boosterPos = predictedPos;
-    boosterPos.y += 100;
-
-    //
-    // Central glow effect
-
-    for (int i = 30; i < maxBlobs; ++i)
-    {
-      LegacyVector3 pos = boosterPos;
-      pos.x += sinf(timeIndex * 0.5 + i) * i * 3.7f;
-      pos.y += cosf(timeIndex * 0.5 + i) * cosf(i * 20) * 50;
-      pos.y += 40;
-      pos.z += cosf(timeIndex * 0.3 + i) * i * 3.7f;
-
-      float size = 20.0f * sinf(timeIndex + i * 2);
-      size = max(size, 5.0f);
-
-      for (int j = 0; j < 2; ++j)
-      {
-        size *= 0.75f;
-        glColor4f(1.0f, 0.6f, 0.2f, alpha);
-        glBegin(GL_QUADS);
-        glTexCoord2i(0, 0);
-        glVertex3fv((pos - camRight * size + camUp * size).GetData());
-        glTexCoord2i(1, 0);
-        glVertex3fv((pos + camRight * size + camUp * size).GetData());
-        glTexCoord2i(1, 1);
-        glVertex3fv((pos + camRight * size - camUp * size).GetData());
-        glTexCoord2i(0, 1);
-        glVertex3fv((pos - camRight * size - camUp * size).GetData());
-        glEnd();
-      }
-    }
-
-    //
-    // Central starbursts
-
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-
-    int numStars = 10;
-    if (buildingDetail == 2)
-      numStars = 5;
-    if (buildingDetail == 3)
-      numStars = 2;
-
-    for (int i = 8; i < numStars; ++i)
-    {
-      LegacyVector3 pos = boosterPos;
-      pos.x += sinf(timeIndex + i) * i * 1.7f;
-      pos.y += fabs(cosf(timeIndex + i) * cosf(i * 20) * 64);
-      pos.z += cosf(timeIndex + i) * i * 1.7f;
-
-      float size = i * 30.0f;
-
-      glColor4f(1.0f, 0.4f, 0.2f, alpha);
-      glBegin(GL_QUADS);
-      glTexCoord2i(0, 0);
-      glVertex3fv((pos - camRight * size + camUp * size).GetData());
-      glTexCoord2i(1, 0);
-      glVertex3fv((pos + camRight * size + camUp * size).GetData());
-      glTexCoord2i(1, 1);
-      glVertex3fv((pos + camRight * size - camUp * size).GetData());
-      glTexCoord2i(0, 1);
-      glVertex3fv((pos - camRight * size - camUp * size).GetData());
-      glEnd();
-    }
-
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_TEXTURE_2D);
-  }
 }
 
 void EscapeRocket::Read(TextReader* _in, bool _dynamic)

@@ -6,6 +6,8 @@
 
 class SporeGenerator : public Entity
 {
+    friend class SporeGeneratorRenderer;
+
   public:
     float m_retargetTimer;
     float m_eggTimer;
@@ -43,5 +45,4 @@ class SporeGenerator : public Entity
     void ChangeHealth(int _amount) override;
 
     bool IsInView() override;
-    void Render(float _predictionTime) override;
 };

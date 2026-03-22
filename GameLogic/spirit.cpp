@@ -14,7 +14,7 @@
 #include "team.h"
 #include "global_world.h"
 
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 
 #include "spirit.h"
 #include "virii.h"
@@ -49,7 +49,7 @@ void Spirit::Begin()
     m_numNearbyEggs = 0;
     m_eggSearchTimer = 0.0f;
 
-    g_app->m_soundSystem->TriggerOtherEvent( this, "Create", SoundSourceBlueprint::TypeSpirit );
+    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Create"));
 }
 
 bool Spirit::Advance()
@@ -101,7 +101,7 @@ bool Spirit::Advance()
                 if( m_timeSync <= 0.0f )
                 {
                     m_state = StateDeath;
-                    g_app->m_soundSystem->TriggerOtherEvent( this, "BeginAscent", SoundSourceBlueprint::TypeSpirit );
+                    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "BeginAscent"; g_simEventQueue.Push(evt); }
                     m_timeSync = 180.0f;
                     AddToGlobalWorld();
                 }
@@ -234,7 +234,7 @@ void Spirit::AddToGlobalWorld()
 void Spirit::CollectorArrives()
 {
     m_state = StateAttached;
-    g_app->m_soundSystem->TriggerOtherEvent( this, "PickedUp", SoundSourceBlueprint::TypeSpirit );
+    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "PickedUp"; g_simEventQueue.Push(evt); }
 }
 
 void Spirit::CollectorDrops()
@@ -244,7 +244,7 @@ void Spirit::CollectorDrops()
     m_state = StateFloating;
     m_pushFromBuildings = true;
 //    Begin();
-    g_app->m_soundSystem->TriggerOtherEvent( this, "Dropped", SoundSourceBlueprint::TypeSpirit );
+    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "Dropped"; g_simEventQueue.Push(evt); }
 }
 
 void Spirit::InEgg()
@@ -252,7 +252,7 @@ void Spirit::InEgg()
     m_state = StateInEgg;
     m_vel.Zero();
     m_hover.Zero();
-    g_app->m_soundSystem->TriggerOtherEvent( this, "PlacedInEgg", SoundSourceBlueprint::TypeSpirit );
+    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "PlacedInEgg"; g_simEventQueue.Push(evt); }
 }
 
 void Spirit::EggDestroyed()
@@ -261,7 +261,7 @@ void Spirit::EggDestroyed()
     m_hover.Zero();
     m_state = StateFloating;
 //    Begin();
-    g_app->m_soundSystem->TriggerOtherEvent( this, "EggDestroyed", SoundSourceBlueprint::TypeSpirit );
+    { SimEvent evt = {}; evt.type = SimEvent::SoundOtherEvent; evt.pos = m_pos; evt.objectId = m_id; evt.soundSourceType = SimSoundSource::TypeSpirit; evt.eventName = "EggDestroyed"; g_simEventQueue.Push(evt); }
 }
 
 void Spirit::Render( float predictionTime )

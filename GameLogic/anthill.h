@@ -46,7 +46,6 @@ class AntHill : public Building
     void Initialise(Building* _template) override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
     void Damage(float _damage) override;
     void Destroy(float _intensity) override;
 

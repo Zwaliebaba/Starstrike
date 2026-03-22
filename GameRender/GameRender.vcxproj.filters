@@ -63,6 +63,25 @@
     <ClCompile Include="ConstructionYardBuildingRenderer.cpp" />
     <ClCompile Include="DisplayScreenBuildingRenderer.cpp" />
     <ClCompile Include="DynamicNodeBuildingRenderer.cpp" />
+    <ClCompile Include="cheat_window.cpp" />
+    <ClCompile Include="darwinia_window.cpp" />
+    <ClCompile Include="debugmenu.cpp" />
+    <ClCompile Include="drop_down_menu.cpp" />
+    <ClCompile Include="input_field.cpp" />
+    <ClCompile Include="mainmenus.cpp" />
+    <ClCompile Include="message_dialog.cpp" />
+    <ClCompile Include="network_window.cpp" />
+    <ClCompile Include="prefs_graphics_window.cpp" />
+    <ClCompile Include="prefs_keybindings_window.cpp" />
+    <ClCompile Include="prefs_other_window.cpp" />
+    <ClCompile Include="prefs_screen_window.cpp" />
+    <ClCompile Include="prefs_sound_window.cpp" />
+    <ClCompile Include="profilewindow.cpp" />
+    <ClCompile Include="reallyquit_window.cpp" />
+    <ClCompile Include="scrollbar.cpp" />
+    <ClCompile Include="userprofile_window.cpp" />
+    <ClCompile Include="SquadieRenderer.cpp" />
+    <ClCompile Include="SporeGeneratorRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -130,6 +149,25 @@
     <ClInclude Include="ConstructionYardBuildingRenderer.h" />
     <ClInclude Include="DisplayScreenBuildingRenderer.h" />
     <ClInclude Include="DynamicNodeBuildingRenderer.h" />
+    <ClInclude Include="cheat_window.h" />
+    <ClInclude Include="darwinia_window.h" />
+    <ClInclude Include="debugmenu.h" />
+    <ClInclude Include="drop_down_menu.h" />
+    <ClInclude Include="input_field.h" />
+    <ClInclude Include="mainmenus.h" />
+    <ClInclude Include="message_dialog.h" />
+    <ClInclude Include="network_window.h" />
+    <ClInclude Include="prefs_graphics_window.h" />
+    <ClInclude Include="prefs_keybindings_window.h" />
+    <ClInclude Include="prefs_other_window.h" />
+    <ClInclude Include="prefs_screen_window.h" />
+    <ClInclude Include="prefs_sound_window.h" />
+    <ClInclude Include="profilewindow.h" />
+    <ClInclude Include="reallyquit_window.h" />
+    <ClInclude Include="scrollbar.h" />
+    <ClInclude Include="userprofile_window.h" />
+    <ClInclude Include="SquadieRenderer.h" />
+    <ClInclude Include="SporeGeneratorRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

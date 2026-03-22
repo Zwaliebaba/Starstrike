@@ -10,13 +10,12 @@
 #include "location.h"
 #include "team.h"
 #include "main.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 #include "camera.h"
-#include "particle_system.h"
-#include "explosion.h"
 #include "obstruction_grid.h"
 #include "entity_grid.h"
 #include "global_world.h"
-#include "soundsystem.h"
 
 Officer::Officer()
   : Entity(),
@@ -89,29 +88,8 @@ void Officer::ChangeHealth(int amount)
   {
     // We just died
     Matrix34 transform(m_front, g_upVector, m_pos);
-    g_explosionManager.AddExplosion(m_shape, transform);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
   }
-}
-
-void Officer::Render(float _predictionTime)
-{
-  // Rendering moved to OfficerRenderer companion (GameRender).
-  // Kept as empty override for legacy fallback safety.
-}
-
-void Officer::RenderSpirit(const LegacyVector3& _pos)
-{
-  // Rendering moved to OfficerRenderer companion (GameRender).
-}
-
-void Officer::RenderShield(float _predictionTime)
-{
-  // Rendering moved to OfficerRenderer companion (GameRender).
-}
-
-void Officer::RenderFlag(float _predictionTime)
-{
-  // Rendering moved to OfficerRenderer companion (GameRender).
 }
 
 bool Officer::AdvanceIdle()
@@ -371,10 +349,7 @@ void Officer::SetWaypoint(const LegacyVector3& _wayPoint)
 
 void Officer::CancelOrderSounds()
 {
-  g_app->m_soundSystem->StopAllSounds(m_id, "Officer SetOrderNone");
-  g_app->m_soundSystem->StopAllSounds(m_id, "Officer SetOrderGoto");
-  g_app->m_soundSystem->StopAllSounds(m_id, "Officer SetOrderFollow");
-  g_app->m_soundSystem->StopAllSounds(m_id, "Officer SetOrderAbsorb");
+  g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
 }
 
 void Officer::SetOrders(const LegacyVector3& _orders)
@@ -437,15 +412,15 @@ void Officer::SetOrders(const LegacyVector3& _orders)
         {
           if (orders.m_arrivedTimer < 0.0f)
           {
-            g_app->m_particleSystem->CreateParticle(orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 50.0f);
-            g_app->m_particleSystem->CreateParticle(orders.m_pos, g_zeroVector, Particle::TypeMuzzleFlash, 40.0f);
+            g_simEventQueue.Push(SimEvent::MakeParticle(orders.m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash, 50.0f));
+            g_simEventQueue.Push(SimEvent::MakeParticle(orders.m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash, 40.0f));
           }
           if (orders.Advance())
             break;
         }
 
         CancelOrderSounds();
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderGoto");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
       }
     }
     else
@@ -499,16 +474,16 @@ void Officer::SetOrders(const LegacyVector3& _orders)
         switch (m_orders)
         {
         case OrderNone:
-          g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderNone");
+          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
           break;
         case OrderGoto:
-          g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderGoto");
+          g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
           break;
         case OrderFollow:
           if (m_absorb)
-            g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderAbsorb");
+            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
           else
-            g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderFollow");
+            g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
           break;
         }
 
@@ -571,16 +546,16 @@ void Officer::SetNextMode()
     switch (m_orders)
     {
     case OrderNone:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderNone");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
       break;
     case OrderGoto:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderGoto");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
       break;
     case OrderFollow:
       if (m_absorb)
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderAbsorb");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
       else
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderFollow");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
       break;
     }
 
@@ -641,16 +616,16 @@ void Officer::SetPreviousMode()
     switch (m_orders)
     {
     case OrderNone:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderNone");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderNone"));
       break;
     case OrderGoto:
-      g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderGoto");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderGoto"));
       break;
     case OrderFollow:
       if (m_absorb)
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderAbsorb");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderAbsorb"));
       else
-        g_app->m_soundSystem->TriggerEntityEvent(this, "SetOrderFollow");
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "SetOrderFollow"));
       break;
     }
 
@@ -702,7 +677,7 @@ bool OfficerOrders::Advance()
 
     m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
 
-    g_app->m_particleSystem->CreateParticle(oldPos, g_zeroVector, Particle::TypeMuzzleFlash, 30.0f);
+    g_simEventQueue.Push(SimEvent::MakeParticle(oldPos, g_zeroVector, SimParticle::TypeMuzzleFlash, 30.0f));
 
     if (m_vel.Mag() * SERVER_ADVANCE_PERIOD > distance)
       m_arrivedTimer = 0.0f;

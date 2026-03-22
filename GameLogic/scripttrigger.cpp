@@ -123,10 +123,6 @@ bool ScriptTrigger::Advance()
   return Building::Advance();
 }
 
-void ScriptTrigger::RenderAlphas(float predictionTime)
-{
-};
-
 bool ScriptTrigger::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
 
 bool ScriptTrigger::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }

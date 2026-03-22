@@ -46,9 +46,6 @@ public:
     void SetDetail ( int _detail );
 
     bool Advance        ();
-    void Render         ( float predictionTime );
-    void RenderAlphas   ( float predictionTime );
-    void RenderLights   ();
 
     bool PerformDepthSort   ( LegacyVector3 &_centerPos );
     bool IsInView           ();

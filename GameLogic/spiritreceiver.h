@@ -24,8 +24,6 @@ class ReceiverBuilding : public Building
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     bool IsInView() override;
     virtual LegacyVector3 GetSpiritLocation();
@@ -70,8 +68,6 @@ class SpiritProcessor : public ReceiverBuilding
     void Initialise(Building* _building) override;
     bool Advance() override;
     bool IsInView() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 };
 
 // ****************************************************************************
@@ -119,9 +115,6 @@ class SpiritReceiver : public ReceiverBuilding
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderPorts() override;
-    void RenderAlphas(float _predictionTime) override;
 };
 
 // ****************************************************************************

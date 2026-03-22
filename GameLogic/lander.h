@@ -24,7 +24,6 @@ public:
     bool AdvanceLanded  ();
 
     void ChangeHealth   ( int amount );
-    void Render         ( float _predictionTime, int _teamId );
 
 };
 

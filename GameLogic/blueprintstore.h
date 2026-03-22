@@ -22,8 +22,6 @@ public:
     void Initialise( Building *_template );
     bool Advance();
     bool IsInView();
-    void Render( float _predictionTime );
-    void RenderAlphas( float _predictionTime );
 
     virtual void SendBlueprint( int _segment, bool _infected );
 
@@ -53,8 +51,6 @@ public:
 
     void Initialise     ( Building *_template );
     bool Advance        ();
-    void Render         ( float _predictionTime );
-    void RenderAlphas   ( float _predictionTime );
     void SendBlueprint  ( int _segment, bool _infected );
 
     const char* GetObjectiveCounter();
@@ -76,8 +72,6 @@ public:
 
     void            RecalculateOwnership();
     bool            Advance();
-    void            Render( float _predictionTime );
-    void            RenderPorts();
 
     void            Read   ( TextReader *_in, bool _dynamic );
     void            Write  ( FileWriter *_out );
@@ -99,8 +93,6 @@ public:
     void SetDetail( int _detail );
 
     bool Advance();
-
-    void Render         ( float _predictionTime );
 
     void Read   ( TextReader *_in, bool _dynamic );
     void Write  ( FileWriter *_out );

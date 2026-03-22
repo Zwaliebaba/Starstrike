@@ -47,8 +47,6 @@ class MineBuilding : public Building
 
     bool IsInView() override;
 
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
     void RenderCart(MineCart* _cart, float _predictionTime);
 
     LegacyVector3 GetTrackMarker1();
@@ -99,7 +97,6 @@ class TrackJunction : public MineBuilding
 
     void Initialise(Building* _template) override;
 
-    void Render(float _predictionTime) override;
     void TriggerCart(MineCart* _cart, float _initValue) override;
 
     void SetBuildingLink(int _buildingId) override;
@@ -161,7 +158,6 @@ class Refinery : public MineBuilding
     Refinery();
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
 
     const char* GetObjectiveCounter() override;
 
@@ -181,8 +177,6 @@ class Mine : public MineBuilding
 
   public:
     Mine();
-
-    void Render(float _predictionTime) override;
 
     void TriggerCart(MineCart* _cart, float _initValue) override;
 };

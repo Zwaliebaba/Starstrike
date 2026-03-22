@@ -27,8 +27,6 @@ class FuelBuilding : public Building
     bool Advance() override;
 
     bool IsInView() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
@@ -61,8 +59,6 @@ class FuelGenerator : public FuelBuilding
     void ProvideSurge();
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     const char* GetObjectiveCounter() override;
 };
@@ -72,6 +68,8 @@ class FuelGenerator : public FuelBuilding
 class FuelPipe : public FuelBuilding
 {
   public:
+    bool m_pumpSoundActive = false;
+
     FuelPipe();
 
     bool Advance() override;
@@ -86,9 +84,6 @@ class FuelStation : public FuelBuilding
 
   public:
     FuelStation();
-
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     LegacyVector3 GetEntrance();
 
@@ -135,6 +130,8 @@ class EscapeRocket : public FuelBuilding
     float m_damage;
     int m_spawnBuildingId;
     bool m_spawnCompleted;
+    const char* m_activeSoundName = nullptr;
+    bool m_engineSoundActive = false;
 
   protected:
     void Refuel();
@@ -164,9 +161,6 @@ class EscapeRocket : public FuelBuilding
 
     bool IsSpectacle();
     bool IsInView() override;
-
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;

@@ -42,8 +42,6 @@ class RadarDish : public Teleport
     void SetDetail(int _detail) override;
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     void Aim(LegacyVector3 _worldPos);
 

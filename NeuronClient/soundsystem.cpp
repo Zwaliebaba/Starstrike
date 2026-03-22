@@ -851,7 +851,7 @@ void SoundSystem::TriggerDuplicateSound(SoundInstance* _instance)
 
 void SoundSystem::StopAllSounds(WorldObjectId _id, const char* _eventName)
 {
-  if (strstr(_eventName, "Music"))
+  if (_eventName && strstr(_eventName, "Music"))
   {
     if (m_music)
       m_music->BeginRelease(true);

@@ -8,12 +8,11 @@
 #include "GameApp.h"
 #include "camera.h"
 #include "entity_grid.h"
-#include "explosion.h"
+#include "SimEventQueue.h"
 #include "globals.h"
 #include "location.h"
 #include "team.h"
 #include "main.h"
-#include "soundsystem.h"
 #include "souldestroyer.h"
 
 ShapeStatic* SoulDestroyer::s_shapeHead = nullptr;
@@ -70,7 +69,7 @@ void SoulDestroyer::ChangeHealth(int _amount)
     Panic(2.0f + syncfrand(2.0f));
 
     Matrix34 transform(m_front, m_up, m_pos);
-    g_explosionManager.AddExplosion(m_shape, transform, fractionDead);
+    g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, fractionDead));
 
     if (m_dead)
     {
@@ -96,7 +95,7 @@ void SoulDestroyer::ChangeHealth(int _amount)
         tailMat.r *= scale;
         tailMat.f *= scale;
 
-        g_explosionManager.AddExplosion(m_shape, tailMat, 1.0f);
+        { SimEvent evt = {}; evt.type = SimEvent::Explosion; evt.shape = m_shape; evt.transform = tailMat; evt.fraction = 1.0f; g_simEventQueue.Push(evt); }
       }
     }
   }
@@ -165,7 +164,7 @@ void SoulDestroyer::Attack(const LegacyVector3& _pos)
     float distance = pushVector.Mag();
     if (distance < SOULDESTROYER_DAMAGERANGE)
     {
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Attack");
+      { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Attack"; g_simEventQueue.Push(evt); }
 
       pushVector.SetLength(SOULDESTROYER_DAMAGERANGE - distance);
 
@@ -213,7 +212,7 @@ void SoulDestroyer::Attack(const LegacyVector3& _pos)
 void SoulDestroyer::Panic(float _time)
 {
   if (m_panic <= 0.0f)
-    g_app->m_soundSystem->TriggerEntityEvent(this, "Panic");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "Panic"; g_simEventQueue.Push(evt); }
 
   m_panic = max(_time, m_panic);
 }
@@ -270,7 +269,7 @@ bool SoulDestroyer::SearchForTargetEnemy()
   if (targetId.IsValid())
   {
     m_targetEntity = targetId;
-    g_app->m_soundSystem->TriggerEntityEvent(this, "EnemySighted");
+    { SimEvent evt = {}; evt.type = SimEvent::SoundEntityEvent; evt.objectId = m_id; evt.objectType = m_type; evt.pos = m_pos; evt.vel = m_vel; evt.eventName = "EnemySighted"; g_simEventQueue.Push(evt); }
     return true;
   }
   m_targetEntity.SetInvalid();
@@ -376,21 +375,6 @@ bool SoulDestroyer::AdvanceToTargetPosition()
   m_up = right ^ m_front;
 
   return (m_pos - m_targetPos).Mag() < 40.0f;
-}
-
-void SoulDestroyer::RenderShapes(float _predictionTime)
-{
-  // Rendering moved to SoulDestroyerRenderer (GameRender project)
-}
-
-void SoulDestroyer::Render(float _predictionTime)
-{
-  // Rendering moved to SoulDestroyerRenderer (GameRender project)
-}
-
-void SoulDestroyer::RenderSpirit(const LegacyVector3& _pos, float _alpha)
-{
-  // Rendering moved to SoulDestroyerRenderer (GameRender project)
 }
 
 void SoulDestroyer::SetWaypoint(const LegacyVector3 _waypoint) { m_targetPos = _waypoint; }

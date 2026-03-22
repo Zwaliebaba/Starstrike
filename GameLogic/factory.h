@@ -38,9 +38,6 @@ public:
 
     void Initialise( Building *_template );
 
-    void Render         ( float predictionTime );
-    void RenderAlphas   ( float predictionTime );
-
     bool Advance();
     void AdvanceStateUnused();
     void AdvanceStateCreating();

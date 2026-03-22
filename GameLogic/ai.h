@@ -40,8 +40,6 @@ class AITarget : public Building
     AITarget();
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-    void RenderAlphas(float _predictionTime) override;
 
     void RecalculateNeighbours();
     void RecountTeams();
@@ -78,7 +76,6 @@ class AISpawnPoint : public Building
 
     void Initialise(Building* _template) override;
     bool Advance() override;
-    void RenderAlphas(float _predictionTime) override;
 
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;

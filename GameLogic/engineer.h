@@ -91,8 +91,5 @@ class Engineer : public Entity
     int GetMaxSpirits();
     void CollectSpirit(int _spiritId);
 
-    void Render(float predictionTime) override;
-    void RenderShape(float predictionTime);
-
     char* GetCurrentAction();
 };

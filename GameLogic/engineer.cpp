@@ -4,22 +4,21 @@
 #include "bridge.h"
 #include "camera.h"
 #include "controltower.h"
-#include "explosion.h"
 #include "global_world.h"
 #include "globals.h"
 #include "incubator.h"
 #include "language_table.h"
 #include "location.h"
 #include "main.h"
+#include "SimEvent.h"
+#include "SimEventQueue.h"
 #include "math_utils.h"
 #include "matrix34.h"
 #include "obstruction_grid.h"
-#include "particle_system.h"
 #include "renderer.h"
 #include "researchitem.h"
 #include "resource.h"
 #include "ShapeStatic.h"
-#include "soundsystem.h"
 
 Engineer::Engineer()
   : Entity(),
@@ -229,20 +228,20 @@ void Engineer::ChangeHealth(int amount)
     int healthBandBefore = static_cast<int>(m_stats[StatHealth] / 50.0f);
 
     if (amount < 0)
-      g_app->m_soundSystem->TriggerEntityEvent(this, "LoseHealth");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "LoseHealth"));
 
     if (m_stats[StatHealth] + amount < 0)
     {
       m_stats[StatHealth] = 0;
       m_dead = true;
-      g_app->m_soundSystem->TriggerEntityEvent(this, "Die");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "Die"));
     }
     else if (m_stats[StatHealth] + amount > 255)
       m_stats[StatHealth] = 255;
     else
     {
       m_stats[StatHealth] += amount;
-      g_app->m_particleSystem->CreateParticle(m_pos, g_zeroVector, Particle::TypeMuzzleFlash);
+      g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash));
     }
 
     int healthBandAfter = static_cast<int>(m_stats[StatHealth] / 50.0f);
@@ -254,7 +253,7 @@ void Engineer::ChangeHealth(int amount)
     if (fractionDead == 1.0f || healthBandAfter < healthBandBefore)
     {
       Matrix34 transform(m_front, g_upVector, m_pos);
-      g_explosionManager.AddExplosion(m_shape, transform, fractionDead);
+      g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, fractionDead));
     }
   }
 }
@@ -323,16 +322,16 @@ bool Engineer::Advance(Unit* _unit)
       if (ct)
       {
         ct->EndReprogram(m_positionId);
-        g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-        g_app->m_soundSystem->TriggerEntityEvent(this, "EndReprogramming");
+        g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+        g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
       }
     }
 
     // If I was researching something, stop now
     if (m_state == StateResearching)
     {
-      g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-      g_app->m_soundSystem->TriggerEntityEvent(this, "EndReprogramming");
+      g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
     }
 
     // If I was operating a bridge, stop now
@@ -391,8 +390,8 @@ bool Engineer::Advance(Unit* _unit)
     auto ct = static_cast<ControlTower*>(building);
     ct->EndReprogram(m_positionId);
     m_positionId = -1;
-    g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-    g_app->m_soundSystem->TriggerEntityEvent(this, "EndReprogramming");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
   }
 
   if (building && building->m_type == Building::TypeBridge && m_state != StateOperatingBridge)
@@ -405,8 +404,7 @@ bool Engineer::Advance(Unit* _unit)
   if (building && building->m_type == Building::TypeResearchItem && m_state != StateResearching)
   {
     // We've been moved away from researching a research item
-    g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-    //g_app->m_soundSystem->TriggerEntityEvent( this, "EndReprogramming" );
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
   }
 
   //
@@ -671,7 +669,7 @@ bool Engineer::AdvanceToControlTower()
     {
       m_positionId = positionId;
       ct->BeginReprogram(m_positionId);
-      g_app->m_soundSystem->TriggerEntityEvent(this, "BeginReprogramming");
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "BeginReprogramming"));
       m_state = StateReprogramming;
     }
   }
@@ -689,7 +687,7 @@ bool Engineer::AdvanceResearching()
   auto item = static_cast<ResearchItem*>(g_app->m_location->GetBuilding(m_buildingId));
   if (!item || item->m_type != Building::TypeResearchItem || !item->NeedsReprogram())
   {
-    g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
 
     m_buildingId = -1;
     m_state = StateIdle;
@@ -703,8 +701,8 @@ bool Engineer::AdvanceResearching()
 
   if (amIDone)
   {
-    g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-    g_app->m_soundSystem->TriggerEntityEvent(this, "ReprogrammingComplete");
+    g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ReprogrammingComplete"));
     m_buildingId = -1;
     m_state = StateIdle;
     return false;
@@ -724,7 +722,7 @@ bool Engineer::AdvanceResearching()
   {
     LegacyVector3 particleVel = m_pos - toPos;
     particleVel += LegacyVector3(sfrand() * 15.0f, frand() * 10.0f, sfrand() * 15.0f);
-    g_app->m_particleSystem->CreateParticle(toPos, particleVel, Particle::TypeBlueSpark);
+    g_simEventQueue.Push(SimEvent::MakeParticle(toPos, particleVel, SimParticle::TypeBlueSpark));
   }
 
   //
@@ -754,7 +752,7 @@ bool Engineer::AdvanceReprogramming()
   if (!building)
   {
     m_state = StateIdle;
-    g_app->m_soundSystem->TriggerEntityEvent(this, "EndReprogramming");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "EndReprogramming"));
     return false;
   }
 
@@ -765,8 +763,8 @@ bool Engineer::AdvanceReprogramming()
     bool finished = ct->Reprogram(m_id.GetTeamId());
     if (finished)
     {
-      g_app->m_soundSystem->StopAllSounds(m_id, "Engineer BeginReprogramming");
-      g_app->m_soundSystem->TriggerEntityEvent(this, "ReprogrammingComplete");
+      g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
+      g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "ReprogrammingComplete"));
       ct->EndReprogram(m_positionId);
       m_buildingId = -1;
       m_positionId = -1;
@@ -929,22 +927,11 @@ bool Engineer::AdvanceToResearchItem()
   bool arrived = AdvanceToTargetPos();
   if (arrived)
   {
-    g_app->m_soundSystem->TriggerEntityEvent(this, "BeginReprogramming");
+    g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, m_type, m_pos, m_vel, "BeginReprogramming"));
     m_state = StateResearching;
   }
 
   return false;
-}
-
-void Engineer::RenderShape(float predictionTime)
-{
-    // Rendering moved to EngineerRenderer companion (GameRender).
-}
-
-void Engineer::Render(float predictionTime)
-{
-    // Rendering moved to EngineerRenderer companion (GameRender).
-    // Kept as empty override for legacy fallback safety.
 }
 
 char* Engineer::GetCurrentAction()

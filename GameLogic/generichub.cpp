@@ -9,8 +9,7 @@
 #include "GameApp.h"
 #include "location.h"
 #include "global_world.h"
-#include "particle_system.h"
-#include "soundsystem.h"
+#include "SimEventQueue.h"
 
 // ****************************************************************************
 // Class DynamicBase
@@ -26,12 +25,6 @@ void DynamicBase::Initialise(Building* _template)
   Building::Initialise(_template);
   m_buildingLink = static_cast<DynamicBase*>(_template)->m_buildingLink;
   SetShapeName(static_cast<DynamicBase*>(_template)->m_shapeName);
-}
-
-void DynamicBase::Render(float _predictionTime)
-{
-  if (m_shape)
-    Building::Render(_predictionTime);
 }
 
 bool DynamicBase::Advance() { return Building::Advance(); }
@@ -105,7 +98,7 @@ void DynamicHub::Initialise(Building* _template)
 void DynamicHub::ReprogramComplete()
 {
   m_reprogrammed = true;
-  g_app->m_soundSystem->TriggerBuildingEvent(this, "Enable");
+  g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, m_type, "Enable"));
 }
 
 bool DynamicHub::Advance()
@@ -181,8 +174,6 @@ bool DynamicHub::Advance()
 
   return DynamicBase::Advance();
 }
-
-void DynamicHub::Render(float _predictionTime) { DynamicBase::Render(_predictionTime); }
 
 void DynamicHub::ActivateLink()
 {
@@ -334,24 +325,6 @@ bool DynamicNode::Advance()
   }
   return DynamicBase::Advance();
 }
-
-void DynamicNode::RenderPorts() { Building::RenderPorts(); }
-
-void DynamicNode::Render(float _predictionTime)
-{
-  if (g_app->m_editing)
-  {
-    m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
-    LegacyVector3 right(1, 0, 0);
-    m_front = right ^ m_up;
-  }
-
-  glShadeModel(GL_SMOOTH);
-  DynamicBase::Render(_predictionTime);
-  glShadeModel(GL_FLAT);
-}
-
-void DynamicNode::RenderAlphas(float _predictionTime) { DynamicBase::RenderAlphas(_predictionTime); }
 
 void DynamicNode::ReprogramComplete()
 {
