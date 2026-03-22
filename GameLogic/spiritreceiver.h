@@ -31,12 +31,6 @@ class ReceiverBuilding : public Building
 
     static SpiritProcessor* GetSpiritProcessor();
 
-    static void BeginRenderUnprocessedSpirits();
-    static void RenderUnprocessedSpirit(const LegacyVector3& _pos, float _life = 1.0f); // gl friendly
-    static void RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, float _life = 1.0f); // dx friendly
-    static void RenderUnprocessedSpirit_detail(const LegacyVector3& _pos, float _life = 1.0f); // dx friendly
-    static void EndRenderUnprocessedSpirits();
-
     void Read(TextReader* _in, bool _dynamic) override;
     void Write(FileWriter* _out) override;
 

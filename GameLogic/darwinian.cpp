@@ -18,7 +18,6 @@
 #include "obstruction_grid.h"
 #include "officer.h"
 #include "profiler.h"
-#include "renderer.h"
 #include "resource.h"
 #include "rocket.h"
 #include "routing_system.h"
@@ -1979,73 +1978,4 @@ void BoxKite::Release()
 {
   m_state = StateReleased;
   m_deathTime = GetHighResTime() + 180.0f;
-}
-
-void BoxKite::Render(float _predictionTime)
-{
-  glDisable(GL_BLEND);
-  glDepthMask(true);
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-
-  float scale = (GetHighResTime() - m_birthTime) / 10.0f;
-  if (scale > m_size)
-    scale = m_size;
-
-  if (m_deathTime != 0.0f && GetHighResTime() > m_deathTime - 20.0f)
-  {
-    float deathScale = (m_deathTime - GetHighResTime()) / 20.0f;
-    if (deathScale < 0.0f)
-      deathScale = 0.0f;
-    scale = deathScale * m_size;
-  }
-
-  g_app->m_renderer->SetObjectLighting();
-  Matrix34 mat(m_front, m_up, predictedPos);
-  mat.u *= scale;
-  mat.r *= scale;
-  mat.f *= scale;
-  m_shape->Render(_predictionTime, mat);
-  g_app->m_renderer->UnsetObjectLighting();
-
-  //
-  // Candle in the middle
-
-  glEnable(GL_BLEND);
-  glDepthMask(false);
-
-  LegacyVector3 camUp = g_app->m_camera->GetUp() * 3.0f * scale * m_brightness;
-  LegacyVector3 camRight = g_app->m_camera->GetRight() * 3.0f * scale * m_brightness;
-
-  glColor4f(1.0f, 0.75f, 0.2f, m_brightness);
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((predictedPos - camRight + camUp).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((predictedPos + camRight + camUp).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((predictedPos + camRight - camUp).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((predictedPos - camRight - camUp).GetData());
-  glEnd();
-
-  camUp *= 0.2f;
-  camRight *= 0.2f;
-
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((predictedPos - camRight + camUp).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((predictedPos + camRight + camUp).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((predictedPos + camRight - camUp).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((predictedPos - camRight - camUp).GetData());
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
 }

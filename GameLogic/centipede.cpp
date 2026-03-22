@@ -13,7 +13,6 @@
 #include "team.h"
 #include "unit.h"
 #include "main.h"
-#include "renderer.h"
 #include "centipede.h"
 
 ShapeStatic* Centipede::s_shapeBody = nullptr;

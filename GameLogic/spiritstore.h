@@ -24,7 +24,6 @@ public:
                       float _sizeX, float _sizeY, float _sizeZ );            // Capacity isn't enforced, just provide a "best guess"
 
     void Advance    ();
-    void Render     ( float _predictionTime );
 
     int  NumSpirits     ();
     void AddSpirit      ( Spirit *_spirit );

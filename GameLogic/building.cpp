@@ -34,7 +34,6 @@
 #include "preferences.h"
 #include "profiler.h"
 #include "radardish.h"
-#include "renderer.h"
 #include "researchitem.h"
 #include "resource.h"
 #include "rocket.h"

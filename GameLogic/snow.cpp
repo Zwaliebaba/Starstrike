@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "hi_res_time.h"
-#include "3d_sprite.h"
-#include "resource.h"
 #include "snow.h"
 #include "globals.h"
 #include "GameApp.h"
@@ -85,17 +83,4 @@ float Snow::GetLife()
   float life = timePassed / 10.0f;
   life = min(life, 1.0f);
   return life;
-}
-
-void Snow::Render(float _predictionTime)
-{
-  _predictionTime -= SERVER_ADVANCE_PERIOD;
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  predictedPos += m_hover * _predictionTime;
-
-  float size = 20.0f;
-
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0);
-  Render3DSprite(predictedPos, size, size, g_app->m_resource->GetTexture("textures/starburst.bmp"));
 }

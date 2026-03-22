@@ -4,8 +4,6 @@
 #include "file_writer.h"
 #include "resource.h"
 #include "math_utils.h"
-#include "text_renderer.h"
-#include "3d_sprite.h"
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "language_table.h"
@@ -14,7 +12,6 @@
 #include "global_world.h"
 #include "location.h"
 #include "main.h"
-#include "renderer.h"
 #include "GameSimEventQueue.h"
 #include "mine.h"
 #include "constructionyard.h"
@@ -94,114 +91,6 @@ bool MineBuilding::IsInView()
   }
 
   return Building::IsInView();
-}
-
-void MineBuilding::RenderCart(MineCart* _cart, float _predictionTime)
-{
-  //START_PROFILE(g_app->m_profiler, "Mine Cart");
-
-  if (m_trackLink != -1)
-  {
-    Building* trackLink = g_app->m_location->GetBuilding(m_trackLink);
-    if (!trackLink)
-      return;
-    auto mineBuilding = static_cast<MineBuilding*>(trackLink);
-
-    int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-
-    LegacyVector3 ourMarker1 = GetTrackMarker1();
-    LegacyVector3 ourMarker2 = GetTrackMarker2();
-    LegacyVector3 theirMarker1 = mineBuilding->GetTrackMarker1();
-    LegacyVector3 theirMarker2 = mineBuilding->GetTrackMarker2();
-
-    float mineSpeed = RefinerySpeed();
-
-    float predictedProgress = _cart->m_progress;
-    predictedProgress += _predictionTime * mineSpeed;
-    if (predictedProgress < 0.0f)
-      predictedProgress = 0.0f;
-    if (predictedProgress > 1.0f)
-      predictedProgress = 1.0f;
-
-    LegacyVector3 trackLeft = ourMarker1 + (theirMarker1 - ourMarker1) * predictedProgress;
-    LegacyVector3 trackRight = ourMarker2 + (theirMarker2 - ourMarker2) * predictedProgress;
-
-    LegacyVector3 cartPos = (trackLeft + trackRight) / 2.0f;
-    cartPos += LegacyVector3(0, -40, 0);
-
-    if (g_app->m_camera->PosInViewFrustum(cartPos))
-    {
-      LegacyVector3 cartFront = (trackLeft - trackRight) ^ g_upVector;
-      cartFront.y = 0.0f;
-      cartFront.Normalise();
-
-      //START_PROFILE(g_app->m_profiler, "RenderCartShape" );
-      Matrix34 transform(cartFront, g_upVector, cartPos);
-      s_cartShape->Render(0.0f, transform);
-      //END_PROFILE(g_app->m_profiler, "RenderCartShape" );
-
-      LegacyVector3 cartLinkLeft = s_cartShape->GetMarkerWorldMatrix(s_cartMarker1, transform).pos;
-      LegacyVector3 cartLinkRight = s_cartShape->GetMarkerWorldMatrix(s_cartMarker2, transform).pos;
-
-      //START_PROFILE(g_app->m_profiler, "RenderLines" );
-      LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.5f;
-      glBegin(GL_QUADS);
-      glVertex3fv((trackLeft - camRight).GetData());
-      glVertex3fv((trackLeft + camRight).GetData());
-      glVertex3fv((cartLinkLeft + camRight).GetData());
-      glVertex3fv((cartLinkLeft - camRight).GetData());
-
-      glVertex3fv((trackRight - camRight).GetData());
-      glVertex3fv((trackRight + camRight).GetData());
-      glVertex3fv((cartLinkRight + camRight).GetData());
-      glVertex3fv((cartLinkRight - camRight).GetData());
-      glEnd();
-      //END_PROFILE(g_app->m_profiler, "RenderLines" );
-
-      //START_PROFILE(g_app->m_profiler, "RenderPolygons" );
-      for (int i = 0; i < 3; ++i)
-      {
-        if (_cart->m_polygons[i])
-        {
-          Matrix34 polyMat = s_cartShape->GetMarkerWorldMatrix(s_cartContents[i], transform);
-          s_polygon1->Render(0.0f, polyMat);
-        }
-
-        if (_cart->m_primitives[i])
-        {
-          Matrix34 polyMat = s_cartShape->GetMarkerWorldMatrix(s_cartContents[i], transform);
-          s_primitive1->Render(0.0f, polyMat);
-
-          if (buildingDetail < 3)
-          {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-            glDepthMask(false);
-            //glDisable( GL_DEPTH_TEST );
-            glDisable(GL_LIGHTING);
-
-            glColor4f(1.0f, 0.7f, 0.0f, 0.75f);
-
-            float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.1f, g_app->m_renderer->GetFarPlane());
-
-            Render3DSprite(polyMat.pos - LegacyVector3(0, 25, 0), 50.0f, 50.0f, g_app->m_resource->GetTexture("textures/glow.bmp"));
-
-            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
-
-            glEnable(GL_LIGHTING);
-            glEnable(GL_DEPTH_TEST);
-            glDepthMask(true);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glDisable(GL_BLEND);
-          }
-        }
-      }
-      //END_PROFILE(g_app->m_profiler, "RenderPolygons" );
-    }
-  }
-
-  //END_PROFILE(g_app->m_profiler, "Mine Cart");
 }
 
 bool MineBuilding::Advance()

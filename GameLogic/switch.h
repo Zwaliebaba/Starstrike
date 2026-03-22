@@ -31,7 +31,6 @@ class FenceSwitch : public Building
     void SetDetail(int _detail) override;
 
     bool Advance() override;
-    void RenderConnection(LegacyVector3 _targetPos, bool _active);
 
     void Switch();
 

@@ -2,7 +2,6 @@
 #include "resource.h"
 #include "file_writer.h"
 #include "text_stream_readers.h"
-#include "text_renderer.h"
 #include "ShapeStatic.h"
 #include "preferences.h"
 #include "language_table.h"
@@ -17,7 +16,6 @@
 #include "global_world.h"
 #include "script.h"
 #include "entity_grid.h"
-#include "renderer.h"
 #include "taskmanager_interface.h"
 
 ShapeStatic* FuelBuilding::s_fuelPipe = nullptr;

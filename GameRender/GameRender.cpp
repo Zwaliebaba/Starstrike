@@ -62,6 +62,12 @@
 #include "LaserTrooperRenderer.h"
 #include "SquadieRenderer.h"
 #include "SporeGeneratorRenderer.h"
+#include "SpaceInvaderRenderer.h"
+#include "BoxKiteRenderer.h"
+#include "SnowRenderer.h"
+#include "WorldObjectRenderRegistry.h"
+#include "WeaponRenderer.h"
+#include "MiscEffectRenderer.h"
 #include "building.h"
 #include "entity.h"
 
@@ -124,6 +130,11 @@ static LanderRenderer        s_landerRenderer;
 static LaserTrooperRenderer  s_laserTrooperRenderer;
 static SquadieRenderer              s_squadieRenderer;
 static SporeGeneratorRenderer       s_sporeGeneratorRenderer;
+static SpaceInvaderRenderer          s_spaceInvaderRenderer;
+static SnowRenderer                  s_snowRenderer;
+static BoxKiteRenderer               s_boxKiteRenderer;
+static WeaponRenderer                s_weaponRenderer;
+static MiscEffectRenderer            s_miscEffectRenderer;
 
 void InitGameRenderers()
 {
@@ -201,4 +212,24 @@ void InitGameRenderers()
     g_entityRenderRegistry.Register(Entity::TypeLaserTroop,     &s_laserTrooperRenderer);
     g_entityRenderRegistry.Register(Entity::TypeInsertionSquadie, &s_squadieRenderer);
     g_entityRenderRegistry.Register(Entity::TypeSporeGenerator,   &s_sporeGeneratorRenderer);
+    g_entityRenderRegistry.Register(Entity::TypeSpaceInvader,      &s_spaceInvaderRenderer);
+
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectSnow, &s_snowRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectBoxKite, &s_boxKiteRenderer);
+
+    // Weapon effects
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectThrowableGrenade, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectThrowableAirstrikeMarker, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectThrowableAirstrikeBomb, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectThrowableControllerGrenade, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectRocket, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectShockwave, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectMuzzleFlash, &s_weaponRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectGunTurretShell, &s_weaponRenderer);
+
+    // Misc effects
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectGunTurretTarget, &s_miscEffectRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectSpamInfection, &s_miscEffectRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectOfficerOrders, &s_miscEffectRenderer);
+    g_worldObjectRenderRegistry.Register(WorldObject::EffectZombie, &s_miscEffectRenderer);
 }

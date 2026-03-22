@@ -8,7 +8,6 @@
 #include "globals.h"
 #include "location.h"
 #include "entity_grid.h"
-#include "renderer.h"
 #include "team.h"
 #include "GameSimEventQueue.h"
 #include "virii.h"

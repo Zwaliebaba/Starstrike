@@ -9,7 +9,6 @@
 #include "main.h"
 #include "math_utils.h"
 #include "profiler.h"
-#include "renderer.h"
 #include "resource.h"
 #include "ShapeStatic.h"
 

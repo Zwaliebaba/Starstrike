@@ -4,7 +4,6 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "ShapeStatic.h"
-#include "text_renderer.h"
 #include "text_stream_readers.h"
 #include "language_table.h"
 #include "generator.h"

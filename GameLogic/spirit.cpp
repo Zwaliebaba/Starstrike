@@ -264,67 +264,6 @@ void Spirit::EggDestroyed()
     g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "EggDestroyed"));
 }
 
-void Spirit::Render( float predictionTime )
-{
-    int innerAlpha = 255;
-    int outerAlpha = 100;
-    float spiritInnerSize = 1.0;
-    float spiritOuterSize = 3.0;
-
-    if( m_state == StateBirth )
-    {
-        float fractionBorn = 1.2f - (m_timeSync / 6.0f);
-        if( fractionBorn > 1.0f ) fractionBorn = 1.0f;
-        //innerAlpha *= fractionBorn;
-        //outerAlpha *= fractionBorn;
-        spiritInnerSize *= fractionBorn;
-        spiritOuterSize *= fractionBorn;
-    }
-
-    if( m_state == StateDeath )
-    {
-        float fractionAlive = m_timeSync / 180.0f;
-        innerAlpha *= fractionAlive;
-        outerAlpha *= fractionAlive;
-        spiritInnerSize *= fractionAlive;
-        spiritOuterSize *= fractionAlive;
-    }
-
-    RGBAColour colour;
-    if( m_teamId != 255 )
-    {
-        colour = g_app->m_location->m_teams[ m_teamId ].m_colour;
-    }
-    else
-    {
-        colour.Set( 255, 255, 255 );
-    }
-
-    predictionTime -= SERVER_ADVANCE_PERIOD;
-
-    LegacyVector3 predictedPos = m_pos + predictionTime * m_vel;
-    predictedPos += predictionTime * m_hover;
-
-    float size = spiritInnerSize;
-    glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
-
-    glBegin( GL_QUADS );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
-
-    size = spiritOuterSize;
-    glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
-    glBegin( GL_QUADS );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (predictedPos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (predictedPos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
-}
-
 int Spirit::NumNearbyEggs()
 {
     return m_numNearbyEggs;

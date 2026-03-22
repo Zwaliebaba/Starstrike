@@ -5,7 +5,7 @@
 #include "wall.h"
 #include "GameApp.h"
 #include "location.h"
-#include "particle_system.h"
+#include "GameSimEventQueue.h"
 
 Wall::Wall()
   : m_damage(0.0f),
@@ -38,7 +38,7 @@ bool Wall::Advance()
         particlePos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(particlePos.x, particlePos.z) + 10.0f;
         LegacyVector3 particleVel(sfrand(10.0f), frand(10.0f), sfrand(10.0f));
 
-        g_app->m_particleSystem->CreateParticle(particlePos, particleVel, Particle::TypeRocketTrail, 50.0f);
+        g_simEventQueue.Push(SimEvent::MakeParticle(particlePos, particleVel, SimParticle::TypeRocketTrail, 50.0f));
       }
     }
   }

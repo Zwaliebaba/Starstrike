@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "OfficerRenderer.h"
+#include "FlagRenderer.h"
 #include "officer.h"
 #include "ShapeStatic.h"
 #include "resource.h"
@@ -139,5 +140,5 @@ void OfficerRenderer::RenderFlag(const Officer& _officer, float _predictionTime)
     flag.SetPosition(flagPos);
     flag.SetOrientation(front, up);
     flag.SetSize(size);
-    flag.Render();
+    FlagRenderer::Render(flag);
 }

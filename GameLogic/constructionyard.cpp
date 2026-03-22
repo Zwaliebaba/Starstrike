@@ -11,7 +11,6 @@
 #include "global_world.h"
 #include "location.h"
 #include "camera.h"
-#include "renderer.h"
 #include "team.h"
 
 ConstructionYard::ConstructionYard()

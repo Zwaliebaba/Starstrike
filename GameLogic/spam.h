@@ -55,9 +55,6 @@ class SpamInfection : public WorldObject
     WorldObjectId m_targetId;
     int m_spiritId;
     LegacyVector3 m_targetPos;
-    float m_life;
-
-    LList<LegacyVector3> m_positionHistory;
 
     void AdvanceIdle();
     void AdvanceAttackingEntity();
@@ -69,10 +66,11 @@ class SpamInfection : public WorldObject
     bool SearchForSpirits();
 
   public:
+    float m_life;
+    LList<LegacyVector3> m_positionHistory;
     int m_parentId; // id of Spam that spawned me
 
     SpamInfection();
 
     bool Advance() override;
-    void Render(float _time) override;
 };

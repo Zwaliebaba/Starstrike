@@ -32,6 +32,10 @@
 #include "BuildingRenderRegistry.h"
 #include "BuildingRenderer.h"
 #include "TreeBuildingRenderer.h"
+#include "WorldObjectRenderer.h"
+#include "WorldObjectRenderRegistry.h"
+#include "WeaponRenderer.h"
+#include "SpiritRenderer.h"
 #include "unit.h"
 #include "water.h"
 #include "weapons.h"
@@ -829,11 +833,10 @@ void Location::RenderSpirits()
     if (m_spirits.ValidIndex(i))
     {
       Spirit* r = m_spirits.GetPointer(i);
-
-      if (i > m_spirits.GetLastUpdated())
-        r->Render(timeSinceAdvance + 0.1f);
-      else
-        r->Render(timeSinceAdvance);
+      float predTime = (i > m_spirits.GetLastUpdated())
+                         ? timeSinceAdvance + 0.1f
+                         : timeSinceAdvance;
+      SpiritRenderer::RenderSpirit(*r, predTime);
     }
   }
 
@@ -1140,11 +1143,16 @@ void Location::RenderWeapons()
     if (m_effects.ValidIndex(i))
     {
       WorldObject* w = m_effects[i];
+      float predTime = (i > m_effects.GetLastUpdated())
+                         ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
+                         : timeSinceAdvance;
 
-      if (i > m_effects.GetLastUpdated())
-        w->Render(timeSinceAdvance + SERVER_ADVANCE_PERIOD);
-      else
-        w->Render(timeSinceAdvance);
+      WorldObjectRenderer* renderer = g_worldObjectRenderRegistry.Get(w->m_type);
+      if (renderer)
+      {
+        WorldObjectRenderContext ctx{predTime};
+        renderer->Render(*w, ctx);
+      }
     }
   }
   glEnable(GL_CULL_FACE);
@@ -1165,11 +1173,10 @@ void Location::RenderWeapons()
     if (m_lasers.ValidIndex(i))
     {
       Laser* l = m_lasers.GetPointer(i);
-
-      if (i > m_lasers.GetLastUpdated())
-        l->Render(timeSinceAdvance + SERVER_ADVANCE_PERIOD);
-      else
-        l->Render(timeSinceAdvance);
+      float predTime = (i > m_lasers.GetLastUpdated())
+                         ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
+                         : timeSinceAdvance;
+      WeaponRenderer::RenderLaser(*l, predTime);
     }
   }
 

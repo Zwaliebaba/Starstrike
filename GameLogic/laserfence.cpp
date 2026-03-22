@@ -5,7 +5,6 @@
 #include "ShapeStatic.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "ogl_extensions.h"
 #include "preferences.h"
 #include "main.h"
 #include "GameApp.h"

@@ -44,7 +44,6 @@ public:
     virtual void    TriggerSpirit   ( SpawnBuildingSpirit *_spirit );
 
     bool            IsInView        ();
-    void            RenderSpirit    ( LegacyVector3 const &_pos );
 
     LegacyVector3         GetSpiritLink   ();
     void            SetBuildingLink ( int _buildingId );

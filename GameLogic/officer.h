@@ -79,5 +79,4 @@ class OfficerOrders : public WorldObject
     OfficerOrders();
 
     bool Advance() override;
-    void Render(float _time) override;
 };

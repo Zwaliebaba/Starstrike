@@ -355,8 +355,3 @@ bool GunTurretTarget::Advance()
 
   return false;
 }
-
-void GunTurretTarget::Render(float _time)
-{
-  //RenderSphere( m_pos, 10.0f );
-}

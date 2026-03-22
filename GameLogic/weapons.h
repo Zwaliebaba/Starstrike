@@ -12,7 +12,7 @@ class ShapeMarkerData;
 
 class ThrowableWeapon : public WorldObject
 {
-  protected:
+  public:
     ShapeStatic* m_shape;
     float m_birthTime;
     float m_force;
@@ -26,12 +26,10 @@ class ThrowableWeapon : public WorldObject
 
     void TriggerSoundEvent(const char* _event);
 
-  public:
     ThrowableWeapon(int _type, const LegacyVector3& _startPos, const LegacyVector3& _front, float _force);
 
     void Initialise();
     bool Advance() override;
-    void Render(float _predictionTime) override;
 
     static float GetMaxForce(int _researchLevel);
     static float GetApproxMaxRange(float _maxForce);
@@ -94,8 +92,7 @@ class Rocket : public WorldObject
 
     void Initialise();
     bool Advance() override;
-    void Render(float predictionTime) override;
-};
+  };
 
 // ****************************************************************************
 //  Class Laser
@@ -105,19 +102,15 @@ class Laser : public WorldObject
 {
   public:
     unsigned char m_fromTeamId;
-
-  protected:
     float m_life;
     bool m_harmless; // becomes true after hitting someone
     bool m_bounced;
 
-  public:
     Laser() {}
 
     void Initialise(float _lifeTime);
     bool Advance() override;
-    void Render(float predictionTime) override;
-};
+  };
 
 // ****************************************************************************
 //  Class TurretShell
@@ -125,15 +118,13 @@ class Laser : public WorldObject
 
 class TurretShell : public WorldObject
 {
-  protected:
+  public:
     float m_life;
 
-  public:
     TurretShell(float _life);
 
     bool Advance() override;
-    void Render(float predictionTime) override;
-};
+  };
 
 // ****************************************************************************
 //  Class Shockwave
@@ -150,8 +141,7 @@ class Shockwave : public WorldObject
     Shockwave(int _teamId, float _size);
 
     bool Advance() override;
-    void Render(float predictionTime) override;
-};
+  };
 
 // ****************************************************************************
 //  Class MuzzleFlash
@@ -168,8 +158,7 @@ class MuzzleFlash : public WorldObject
     MuzzleFlash(const LegacyVector3& _pos, const LegacyVector3& _front, float _size, float _life);
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
-};
+  };
 
 // ****************************************************************************
 //  Class Missile
@@ -177,14 +166,12 @@ class MuzzleFlash : public WorldObject
 
 class Missile : public WorldObject
 {
-  protected:
+  public:
     float m_life;
     LList<LegacyVector3> m_history;
     ShapeStatic* m_shape;
     ShapeMarkerData* m_booster;
     MuzzleFlash m_fire;
-
-  public:
     WorldObjectId m_tankId; // Who fired me
     LegacyVector3 m_front;
     LegacyVector3 m_up;
@@ -195,5 +182,4 @@ class Missile : public WorldObject
     bool Advance() override;
     bool AdvanceToTargetPosition(const LegacyVector3& _pos);
     void Explode();
-    void Render(float _predictionTime) override;
-};
+  };

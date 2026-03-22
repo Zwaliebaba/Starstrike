@@ -33,8 +33,6 @@ class RadarDish : public Teleport
     LegacyVector3 GetDishPos(float _predictionTime); // Returns the position of the transmission point
     LegacyVector3 GetDishFront(float _predictionTime); // Returns the front vector of the dish
 
-    void RenderSignal(float _predictionTime, float _radius, float _alpha);
-
   public:
     RadarDish();
     ~RadarDish() override;

@@ -2,7 +2,6 @@
 #include "file_writer.h"
 #include "math_utils.h"
 #include "resource.h"
-#include "text_renderer.h"
 #include "text_stream_readers.h"
 #include "hi_res_time.h"
 #include "GameApp.h"

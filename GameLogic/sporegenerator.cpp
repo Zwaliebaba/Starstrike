@@ -7,15 +7,12 @@
 #include "ShapeStatic.h"
 #include "math_utils.h"
 
-#include "text_renderer.h"
-
 #include "sporegenerator.h"
 
 #include "GameSimEventQueue.h"
 #include "GameApp.h"
 #include "location.h"
 #include "main.h"
-#include "renderer.h"
 #include "camera.h"
 
 #define SPOREGENERATOR_HOVERHEIGHT          100.0f

@@ -102,8 +102,6 @@ void WorldObject::BounceOffLandscape()
 
 bool WorldObject::Advance() { return false; }
 
-void WorldObject::Render(float _time) {}
-
 // ****************************************************************************
 //  Class Light
 // ****************************************************************************

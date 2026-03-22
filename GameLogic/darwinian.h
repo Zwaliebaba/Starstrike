@@ -140,5 +140,4 @@ class BoxKite : public WorldObject
     BoxKite();
     bool Advance() override;
     void Release();
-    void Render(float _predictionTime) override;
 };

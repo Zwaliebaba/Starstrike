@@ -10,12 +10,9 @@
 #include "airstrike.h"
 #include "darwinian.h"
 #include "GameApp.h"
-#include "camera.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "location.h"
-#include "particle_system.h"
-#include "renderer.h"
 #include "team.h"
 #include "unit.h"
 #include "global_world.h"
@@ -79,6 +76,13 @@ bool ThrowableWeapon::Advance()
     m_vel.y -= 9.8f;
     m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
+   // Spin rotation — deterministic at sim tick rate
+   LegacyVector3 right = m_up ^ m_front;
+   m_up.RotateAround(right * m_force * m_force * 0.15f);
+   m_front = right ^ m_up;
+   m_front.Normalise();
+   m_up.Normalise();
+
     float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     if (m_pos.y < landHeight + 1.0f)
     {
@@ -91,34 +95,7 @@ bool ThrowableWeapon::Advance()
     }
   }
 
-  return false;
-}
-
-void ThrowableWeapon::Render(float _predictionTime)
-{
-  _predictionTime -= SERVER_ADVANCE_PERIOD;
-
-  LegacyVector3 right = m_up ^ m_front;
-  m_up.RotateAround(right * m_force * m_force * 0.15f);
-  m_front = right ^ m_up;
-  m_front.Normalise();
-  m_up.Normalise();
-
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  Matrix34 transform(m_front, m_up, predictedPos);
-
-  g_app->m_renderer->SetObjectLighting();
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_COLOR_MATERIAL);
-  glDisable(GL_BLEND);
-
-  m_shape->Render(_predictionTime, transform);
-
-  glEnable(GL_BLEND);
-  glDisable(GL_COLOR_MATERIAL);
-  g_app->m_renderer->UnsetObjectLighting();
-
+  // Flash sound — once per second of real time
   int numFlashes = static_cast<int>(GetHighResTime() - m_birthTime);
   if (numFlashes > m_numFlashes)
   {
@@ -126,42 +103,7 @@ void ThrowableWeapon::Render(float _predictionTime)
     m_numFlashes = numFlashes;
   }
 
-  float flashAlpha = 1.0f - ((GetHighResTime() - m_birthTime) - numFlashes);
-  if (flashAlpha < 0.2f)
-  {
-    float distToThrowable = (g_app->m_camera->GetPos() - predictedPos).Mag();
-
-    float size = 1000.0f / sqrtf(distToThrowable);
-    glColor4ub(m_colour.r, m_colour.g, m_colour.b, 200);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glDisable(GL_CULL_FACE);
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
-    glEnd();
-    size *= 0.4f;
-    glColor4f(1.0f, 1.0f, 1.0f, 0.7f);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 1);
-    glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(0, 0);
-    glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
-  }
+  return false;
 }
 
 float ThrowableWeapon::GetMaxForce(int _researchLevel)
@@ -421,44 +363,6 @@ bool Rocket::Advance()
   return false;
 }
 
-void Rocket::Render(float predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-
-  LegacyVector3 front = m_vel;
-  front.Normalise();
-  LegacyVector3 right = front ^ g_upVector;
-  LegacyVector3 up = right ^ front;
-
-  Matrix34 transform(front, up, predictedPos);
-
-  g_app->m_renderer->SetObjectLighting();
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_COLOR_MATERIAL);
-  glDisable(GL_BLEND);
-
-  m_shape->Render(predictionTime, transform);
-
-  glEnable(GL_BLEND);
-  glDisable(GL_COLOR_MATERIAL);
-  g_app->m_renderer->UnsetObjectLighting();
-
-  for (int i = 0; i < 5; ++i)
-  {
-    LegacyVector3 vel(m_vel / -20.0f);
-    vel.x += sfrand(8.0f);
-    vel.y += sfrand(8.0f);
-    vel.z += sfrand(8.0f);
-    LegacyVector3 pos = predictedPos - m_vel * (0.05f + frand(0.05f));
-    pos.x += sfrand(8.0f);
-    pos.y += sfrand(8.0f);
-    pos.z += sfrand(8.0f);
-    float size = 50.0f + frand(50.0f);
-    g_app->m_particleSystem->CreateParticle(pos, vel, Particle::TypeMissileFire, size);
-  }
-}
-
 // ****************************************************************************
 //  Class Laser
 // ****************************************************************************
@@ -599,45 +503,6 @@ bool Laser::Advance()
   return false;
 }
 
-void Laser::Render(float predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-
-  //
-  // No richochet occurred recently
-  LegacyVector3 lengthVector = m_vel;
-  lengthVector.SetLength(10.0f);
-  LegacyVector3 fromPos = predictedPos;
-  LegacyVector3 toPos = predictedPos - lengthVector;
-
-  LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-  LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
-  float camDistSqd = camToMidPoint.MagSquared();
-  LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
-
-  rightAngle *= 0.8f;
-
-  const RGBAColour& colour = g_app->m_location->m_teams[m_fromTeamId].m_colour;
-  glColor4ub(colour.r, colour.g, colour.b, 255);
-
-  glBegin(GL_QUADS);
-  for (int i = 0; i < 5; ++i)
-  {
-    glTexCoord2i(0, 0);
-    glVertex3fv((fromPos - rightAngle).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((fromPos + rightAngle).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((toPos + rightAngle).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((toPos - rightAngle).GetData());
-  }
-  glEnd();
-
-  if (camDistSqd < 200.0f)
-    g_app->m_camera->CreateCameraShake(0.5f);
-}
-
 // ****************************************************************************
 // Class Shockwave
 // ****************************************************************************
@@ -699,111 +564,6 @@ bool Shockwave::Advance()
   return false;
 }
 
-void Shockwave::Render(float predictionTime)
-{
-  glShadeModel(GL_SMOOTH);
-  glDisable(GL_DEPTH_TEST);
-
-  glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-  int numSteps = 50.0f;
-  float predictedLife = m_life - predictionTime;
-  float radius = 35.0f + 40.0f * (m_size - predictedLife);
-  float alpha = 0.6f * predictedLife / m_size;
-
-  glBegin(GL_TRIANGLE_FAN);
-  glColor4f(1.0f, 1.0f, 0.0f, 0.0f);
-  glVertex3fv((m_pos + LegacyVector3(0, 5, 0)).GetData());
-  glColor4f(1.0f, 0.5f, 0.5f, alpha);
-
-  float angle = 0.0f;
-  for (int i = 0; i <= numSteps; ++i)
-  {
-    float xDiff = radius * sinf(angle);
-    float zDiff = radius * cosf(angle);
-    LegacyVector3 pos = m_pos + LegacyVector3(xDiff, 5, zDiff);
-    glVertex3fv(pos.GetData());
-    angle += 2.0f * M_PI / static_cast<float>(numSteps);
-  }
-
-  glEnd();
-
-  glShadeModel(GL_FLAT);
-  glEnable(GL_DEPTH_TEST);
-
-  //
-  // Render screen flash if we are new
-
-  if (m_size - predictedLife < 0.1f)
-  {
-    if (g_app->m_camera->PosInViewFrustum(m_pos))
-    {
-      float distance = (g_app->m_camera->GetPos() - m_pos).Mag();
-      float distanceFactor = 1.0f - (distance / 500.0f);
-      if (distanceFactor < 0.0f)
-        distanceFactor = 0.0f;
-
-      float alpha = 1.0f - (m_size - predictedLife) / 0.1f;
-      alpha *= distanceFactor;
-      glColor4f(1, 1, 1, alpha);
-      g_app->m_renderer->SetupMatricesFor2D();
-      int screenW = g_app->m_renderer->ScreenW();
-      int screenH = g_app->m_renderer->ScreenH();
-      glDisable(GL_CULL_FACE);
-      glBegin(GL_QUADS);
-      glVertex2i(0, 0);
-      glVertex2i(screenW, 0);
-      glVertex2i(screenW, screenH);
-      glVertex2i(0, screenH);
-      glEnd();
-      glEnable(GL_CULL_FACE);
-      g_app->m_renderer->SetupMatricesFor3D();
-
-      g_app->m_camera->CreateCameraShake(alpha);
-    }
-  }
-
-  //
-  // Render big blast
-
-  if (m_size - predictedLife < 1.0f)
-  {
-    float distToBang = (g_app->m_camera->GetPos() - m_pos).Mag();
-    LegacyVector3 predictedPos = m_pos;
-    float size = (m_size * 2000.0f) / sqrtf(distToBang);
-    float alpha = 1.0f - (m_size - predictedLife) / 1.0f;
-    glColor4f(1.0f, 0.4f, 0.4f, alpha);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glDisable(GL_CULL_FACE);
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
-    glEnd();
-
-    size *= 0.4f;
-    glColor4f(1.0f, 1.0f, 0.0f, alpha);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 1);
-    glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-    glTexCoord2i(0, 0);
-    glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
-  }
-}
-
 // ****************************************************************************
 // Class MuzzleFlash
 // ****************************************************************************
@@ -828,54 +588,6 @@ bool MuzzleFlash::Advance()
   m_life -= SERVER_ADVANCE_PERIOD * 10.0f;
 
   return false;
-}
-
-void MuzzleFlash::Render(float _predictionTime)
-{
-  float predictedLife = m_life - _predictionTime * 10.0f;
-  //float predictedLife = m_life;
-  LegacyVector3 predictedPos = m_pos + m_front * _predictionTime * 10.0f;
-  LegacyVector3 right = m_front ^ g_upVector;
-
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-
-  LegacyVector3 fromPos = predictedPos;
-  LegacyVector3 toPos = predictedPos + m_front * m_size;
-
-  LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-  LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
-  LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
-  LegacyVector3 toPosToFromPos = toPos - fromPos;
-
-  rightAngle *= m_size * 0.5f;
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/muzzleflash.bmp"));
-  glDepthMask(false);
-
-  float alpha = predictedLife;
-  alpha = min(1.0f, alpha);
-  alpha = max(0.0f, alpha);
-  glColor4f(1.0f, 1.0f, 1.0f, alpha);
-
-  glBegin(GL_QUADS);
-  for (int i = 0; i < 5; ++i)
-  {
-    rightAngle *= 0.8f;
-    toPosToFromPos *= 0.8f;
-    glTexCoord2i(0, 0);
-    glVertex3fv((fromPos - rightAngle).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((fromPos + rightAngle).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((fromPos + toPosToFromPos + rightAngle).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((fromPos + toPosToFromPos - rightAngle).GetData());
-  }
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
 }
 
 // ****************************************************************************
@@ -964,48 +676,6 @@ bool Missile::Advance()
 }
 
 void Missile::Explode() { g_app->m_location->Bang(m_pos, 20.0f, 100.0f); }
-
-void Missile::Render(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  Matrix34 mat(m_front, m_up, predictedPos);
-
-  glDisable(GL_BLEND);
-
-  g_app->m_renderer->SetObjectLighting();
-  glEnable(GL_CULL_FACE);
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_COLOR_MATERIAL);
-  glDisable(GL_BLEND);
-
-  m_shape->Render(_predictionTime, mat);
-  g_app->m_renderer->UnsetObjectLighting();
-
-  glEnable(GL_BLEND);
-  glDisable(GL_COLOR_MATERIAL);
-  glDisable(GL_CULL_FACE);
-
-  LegacyVector3 boosterPos = m_shape->GetMarkerWorldMatrix(m_booster, mat).pos;
-  m_fire.m_pos = boosterPos;
-  m_fire.m_vel = m_vel;
-  m_fire.m_size = 30.0f + frand(20.0f);
-  m_fire.m_front = -m_front;
-  m_fire.Render(_predictionTime);
-
-  for (int i = 0; i < 5; ++i)
-  {
-    LegacyVector3 vel(m_vel / -10.0f);
-    vel.x += sfrand(8.0f);
-    vel.y += sfrand(8.0f);
-    vel.z += sfrand(8.0f);
-    LegacyVector3 pos = predictedPos - m_vel * (0.1f + frand(0.1f));
-    pos.x += sfrand(8.0f);
-    pos.y += sfrand(8.0f);
-    pos.z += sfrand(8.0f);
-    float size = 200.0f + frand(200.0f);
-    g_app->m_particleSystem->CreateParticle(pos, vel, Particle::TypeMissileFire, size);
-  }
-}
 
 // ****************************************************************************
 // Class TurretShell
@@ -1128,27 +798,3 @@ bool TurretShell::Advance()
   return false;
 }
 
-void TurretShell::Render(float predictionTime)
-{
-  predictionTime += SERVER_ADVANCE_PERIOD;
-
-  //LegacyVector3 predictedVel = m_vel;
-  //predictedVel.y -= 30.0f * predictionTime;
-  //LegacyVector3 predictedPos = m_pos + predictedVel * predictionTime;
-  //RenderSphere( predictedPos, 1.0f );
-
-  LegacyVector3 predictedPos = m_pos + m_vel * predictionTime;
-  LegacyVector3 predictedFront = m_vel;
-  predictedFront.Normalise();
-  LegacyVector3 right = predictedFront ^ g_upVector;
-  LegacyVector3 up = right ^ predictedFront;
-  ShapeStatic* shape = g_app->m_resource->GetShapeStatic("turretshell.shp");
-
-  Matrix34 shellMat(predictedFront, up, predictedPos);
-
-  glDisable(GL_BLEND);
-  g_app->m_renderer->SetObjectLighting();
-  shape->Render(predictionTime, shellMat);
-  g_app->m_renderer->UnsetObjectLighting();
-  glEnable(GL_BLEND);
-}

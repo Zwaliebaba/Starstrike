@@ -3,17 +3,15 @@
 #include "file_writer.h"
 #include "hi_res_time.h"
 #include "math_utils.h"
-#include "resource.h"
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
-#include "preferences.h"
-#include "language_table.h"
 #include "spiritreceiver.h"
 #include "GameApp.h"
+#include "language_table.h"
 #include "location.h"
+#include "resource.h"
 #include "camera.h"
 #include "global_world.h"
-#include "renderer.h"
 #include "GameSimEventQueue.h"
 
 // ****************************************************************************
@@ -128,165 +126,6 @@ SpiritProcessor* ReceiverBuilding::GetSpiritProcessor()
   }
 
   return processor;
-}
-
-static float s_nearPlaneStart;
-
-void ReceiverBuilding::BeginRenderUnprocessedSpirits()
-{
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glDepthMask(false);
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-  if (buildingDetail == 1)
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
-
-  s_nearPlaneStart = g_app->m_renderer->GetNearPlane();
-  g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart * 1.1f, g_app->m_renderer->GetFarPlane());
-}
-
-void ReceiverBuilding::RenderUnprocessedSpirit(const LegacyVector3& _pos, float _life)
-{
-  LegacyVector3 position = _pos;
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-  float scale = 2.0f * _life;
-  float alphaValue = _life;
-
-  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 3 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 3 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 3 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 3 * scale).GetData());
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 3 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 3 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 3 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 3 * scale).GetData());
-  glEnd();
-
-  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 1 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 1 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 1 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 1 * scale).GetData());
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 1 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 1 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 1 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 1 * scale).GetData());
-  glEnd();
-
-  int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
-  if (buildingDetail == 1)
-  {
-    glEnable(GL_TEXTURE_2D);
-    glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
-    glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3fv((position + camUp * 30 * scale).GetData());
-    glTexCoord2i(1, 0);
-    glVertex3fv((position + camRight * 30 * scale).GetData());
-    glTexCoord2i(1, 1);
-    glVertex3fv((position - camUp * 30 * scale).GetData());
-    glTexCoord2i(0, 1);
-    glVertex3fv((position - camRight * 30 * scale).GetData());
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-  }
-}
-
-void ReceiverBuilding::RenderUnprocessedSpirit_basic(const LegacyVector3& _pos, float _life)
-{
-  LegacyVector3 position = _pos;
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-  float scale = 2.0f * _life;
-  float alphaValue = _life;
-
-  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 3 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 3 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 3 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 3 * scale).GetData());
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 3 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 3 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 3 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 3 * scale).GetData());
-
-  glColor4f(0.6f, 0.2f, 0.1f, alphaValue);
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 1 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 1 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 1 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 1 * scale).GetData());
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 1 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 1 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 1 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 1 * scale).GetData());
-}
-
-void ReceiverBuilding::RenderUnprocessedSpirit_detail(const LegacyVector3& _pos, float _life)
-{
-  LegacyVector3 position = _pos;
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-  float scale = 2.0f * _life;
-  float alphaValue = _life;
-
-  glColor4f(0.6f, 0.2f, 0.1f, alphaValue / 1.5f);
-  glTexCoord2i(0, 0);
-  glVertex3fv((position + camUp * 30 * scale).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((position + camRight * 30 * scale).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((position - camUp * 30 * scale).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((position - camRight * 30 * scale).GetData());
-}
-
-void ReceiverBuilding::EndRenderUnprocessedSpirits()
-{
-  g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart, g_app->m_renderer->GetFarPlane());
-
-  glDisable(GL_TEXTURE_2D);
-  glDepthMask(true);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_BLEND);
-  glEnable(GL_CULL_FACE);
 }
 
 // ****************************************************************************

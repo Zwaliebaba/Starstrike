@@ -204,47 +204,6 @@ bool FenceSwitch::Advance()
   return Building::Advance();
 }
 
-// *** Render
-void FenceSwitch::RenderConnection(LegacyVector3 _targetPos, bool _active)
-{
-  LegacyVector3 ourPos = GetConnectionLocation();
-  LegacyVector3 theirPos = _targetPos;
-
-  LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
-  LegacyVector3 ourPosRight = camToOurPos ^ (theirPos - ourPos);
-  ourPosRight.SetLength(2.0f);
-
-  LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
-  LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
-  theirPosRight.SetLength(2.0f);
-
-  glDisable(GL_CULL_FACE);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  glDepthMask(false);
-
-  if (_active)
-    glColor4f(0.9f, 0.9f, 0.5f, 1.0f);
-  else
-    glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
-
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.1f, 0);
-  glVertex3fv((ourPos - ourPosRight).GetData());
-  glTexCoord2f(0.1f, 1);
-  glVertex3fv((ourPos + ourPosRight).GetData());
-  glTexCoord2f(0.9f, 1);
-  glVertex3fv((theirPos + theirPosRight).GetData());
-  glTexCoord2f(0.9f, 0);
-  glVertex3fv((theirPos - theirPosRight).GetData());
-  glEnd();
-}
-
 // *** GetBuildingLink
 int FenceSwitch::GetBuildingLink() { return m_linkedBuildingId; }
 

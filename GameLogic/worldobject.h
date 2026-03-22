@@ -70,7 +70,8 @@ class WorldObject
       EffectShockwave,
       EffectMuzzleFlash,
       EffectOfficerOrders,
-      EffectZombie
+      EffectZombie,
+      NumEffectTypes
     };
 
     WorldObjectId m_id;
@@ -85,7 +86,6 @@ class WorldObject
     void BounceOffLandscape();
 
     virtual bool Advance();
-    virtual void Render(float _time);
 };
 
 // ****************************************************************************

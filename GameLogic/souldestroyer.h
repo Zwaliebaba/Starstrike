@@ -68,5 +68,4 @@ class Zombie : public WorldObject
     Zombie();
 
     bool Advance() override;
-    void Render(float _predictionTime) override;
 };

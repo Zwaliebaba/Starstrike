@@ -9,7 +9,6 @@
 #include "GameApp.h"
 #include "camera.h"
 #include "location.h"
-#include "renderer.h"
 #include "team.h"
 #include "taskmanager.h"
 #include "routing_system.h"

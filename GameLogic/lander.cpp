@@ -5,7 +5,6 @@
 #include "GameApp.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
-#include "renderer.h"
 #include "team.h"
 #include "unit.h"
 #include "lander.h"

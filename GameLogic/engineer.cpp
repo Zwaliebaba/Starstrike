@@ -14,7 +14,6 @@
 #include "math_utils.h"
 #include "matrix34.h"
 #include "obstruction_grid.h"
-#include "renderer.h"
 #include "researchitem.h"
 #include "resource.h"
 #include "ShapeStatic.h"

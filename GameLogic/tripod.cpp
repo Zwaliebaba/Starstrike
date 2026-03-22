@@ -11,7 +11,6 @@
 #include "GameSimEventQueue.h"
 #include "location.h"
 #include "main.h"
-#include "renderer.h"
 
 #define FOOT_MOVE_THRESHOLD	1.0f	// Lower means feet are lifted when less distant from their ideal pos, and thus smaller steps are taken
 #define IDEAL_LEG_SLOPE		0.2f

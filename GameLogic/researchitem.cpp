@@ -13,7 +13,6 @@
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "taskmanager_interface.h"
-#include "text_renderer.h"
 #include "text_stream_readers.h"
 
 ResearchItem::ResearchItem()

@@ -9,7 +9,6 @@
 #include "GameApp.h"
 #include "entity_grid.h"
 #include "location.h"
-#include "renderer.h"
 #include "team.h"
 #include "unit.h"
 

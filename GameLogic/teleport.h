@@ -22,8 +22,6 @@ class Teleport : public Building
 
     ShapeMarkerData* m_entrance;
 
-    void RenderSpirit(const LegacyVector3& _pos, int _teamId);
-
   public:
     LList<WorldObjectId> m_inTransit; // Entities on the move
 

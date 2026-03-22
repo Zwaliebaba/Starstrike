@@ -161,6 +161,7 @@
     <ClInclude Include="BlueprintConsoleBuildingRenderer.h" />
     <ClInclude Include="BlueprintRelayBuildingRenderer.h" />
     <ClInclude Include="BlueprintStoreBuildingRenderer.h" />
+    <ClInclude Include="BoxKiteRenderer.h" />
     <ClInclude Include="CentipedeRenderer.h" />
     <ClInclude Include="ConstructionYardBuildingRenderer.h" />
     <ClInclude Include="ControlTowerBuildingRenderer.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="EscapeRocketBuildingRenderer.h" />
     <ClInclude Include="FeedingTubeBuildingRenderer.h" />
     <ClInclude Include="FenceSwitchBuildingRenderer.h" />
+    <ClInclude Include="FlagRenderer.h" />
     <ClInclude Include="FuelBuildingRenderer.h" />
     <ClInclude Include="FuelGeneratorBuildingRenderer.h" />
     <ClInclude Include="FuelStationBuildingRenderer.h" />
@@ -186,6 +188,7 @@
     <ClInclude Include="MasterSpawnPointBuildingRenderer.h" />
     <ClInclude Include="MineBuildingRenderer.h" />
     <ClInclude Include="MineShaftBuildingRenderer.h" />
+    <ClInclude Include="MiscEffectRenderer.h" />
     <ClInclude Include="NullBuildingRenderer.h" />
     <ClInclude Include="OfficerRenderer.h" />
     <ClInclude Include="pch.h" />
@@ -201,14 +204,17 @@
     <ClInclude Include="ResearchItemBuildingRenderer.h" />
     <ClInclude Include="ScriptTriggerBuildingRenderer.h" />
     <ClInclude Include="ShadowRenderer.h" />
+    <ClInclude Include="SnowRenderer.h" />
     <ClInclude Include="SolarPanelBuildingRenderer.h" />
     <ClInclude Include="SoulDestroyerRenderer.h" />
+    <ClInclude Include="SpaceInvaderRenderer.h" />
     <ClInclude Include="SpamBuildingRenderer.h" />
     <ClInclude Include="SpawnBuildingRenderer.h" />
     <ClInclude Include="SpawnPointBuildingRenderer.h" />
     <ClInclude Include="SpiderRenderer.h" />
     <ClInclude Include="SpiritProcessorBuildingRenderer.h" />
     <ClInclude Include="SpiritReceiverBuildingRenderer.h" />
+    <ClInclude Include="SpiritRenderer.h" />
     <ClInclude Include="SporeGeneratorRenderer.h" />
     <ClInclude Include="SquadieRenderer.h" />
     <ClInclude Include="StaticShapeBuildingRenderer.h" />
@@ -239,6 +245,9 @@
     <ClInclude Include="reallyquit_window.h" />
     <ClInclude Include="scrollbar.h" />
     <ClInclude Include="userprofile_window.h" />
+    <ClInclude Include="WeaponRenderer.h" />
+    <ClInclude Include="WorldObjectRenderer.h" />
+    <ClInclude Include="WorldObjectRenderRegistry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AITargetBuildingRenderer.cpp" />
@@ -247,6 +256,7 @@
     <ClCompile Include="BlueprintConsoleBuildingRenderer.cpp" />
     <ClCompile Include="BlueprintRelayBuildingRenderer.cpp" />
     <ClCompile Include="BlueprintStoreBuildingRenderer.cpp" />
+    <ClCompile Include="BoxKiteRenderer.cpp" />
     <ClCompile Include="CentipedeRenderer.cpp" />
     <ClCompile Include="ConstructionYardBuildingRenderer.cpp" />
     <ClCompile Include="ControlTowerBuildingRenderer.cpp" />
@@ -259,6 +269,7 @@
     <ClCompile Include="EscapeRocketBuildingRenderer.cpp" />
     <ClCompile Include="FeedingTubeBuildingRenderer.cpp" />
     <ClCompile Include="FenceSwitchBuildingRenderer.cpp" />
+    <ClCompile Include="FlagRenderer.cpp" />
     <ClCompile Include="FuelBuildingRenderer.cpp" />
     <ClCompile Include="FuelGeneratorBuildingRenderer.cpp" />
     <ClCompile Include="FuelStationBuildingRenderer.cpp" />
@@ -274,6 +285,7 @@
     <ClCompile Include="MasterSpawnPointBuildingRenderer.cpp" />
     <ClCompile Include="MineBuildingRenderer.cpp" />
     <ClCompile Include="MineShaftBuildingRenderer.cpp" />
+    <ClCompile Include="MiscEffectRenderer.cpp" />
     <ClCompile Include="OfficerRenderer.cpp" />
     <ClCompile Include="PowerBuildingRenderer.cpp" />
     <ClCompile Include="PylonEndBuildingRenderer.cpp" />
@@ -283,14 +295,17 @@
     <ClCompile Include="ResearchItemBuildingRenderer.cpp" />
     <ClCompile Include="ScriptTriggerBuildingRenderer.cpp" />
     <ClCompile Include="ShadowRenderer.cpp" />
+    <ClCompile Include="SnowRenderer.cpp" />
     <ClCompile Include="SolarPanelBuildingRenderer.cpp" />
     <ClCompile Include="SoulDestroyerRenderer.cpp" />
+    <ClCompile Include="SpaceInvaderRenderer.cpp" />
     <ClCompile Include="SpamBuildingRenderer.cpp" />
     <ClCompile Include="SpawnBuildingRenderer.cpp" />
     <ClCompile Include="SpawnPointBuildingRenderer.cpp" />
     <ClCompile Include="SpiderRenderer.cpp" />
     <ClCompile Include="SpiritProcessorBuildingRenderer.cpp" />
     <ClCompile Include="SpiritReceiverBuildingRenderer.cpp" />
+    <ClCompile Include="SpiritRenderer.cpp" />
     <ClCompile Include="SporeGeneratorRenderer.cpp" />
     <ClCompile Include="SquadieRenderer.cpp" />
     <ClCompile Include="StaticShapeBuildingRenderer.cpp" />
@@ -327,6 +342,8 @@
     <ClCompile Include="reallyquit_window.cpp" />
     <ClCompile Include="scrollbar.cpp" />
     <ClCompile Include="userprofile_window.cpp" />
+    <ClCompile Include="WeaponRenderer.cpp" />
+    <ClCompile Include="WorldObjectRenderRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

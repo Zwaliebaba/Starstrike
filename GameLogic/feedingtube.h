@@ -16,8 +16,6 @@ class FeedingTube : public Building
     LegacyVector3 GetDishFront(float _predictionTime); // Returns the front vector of the dish
     LegacyVector3 GetForwardsClippingDir(float _predictionTime, FeedingTube* _sender); // Returns a good clipping direction for signal
 
-    void RenderSignal(float _predictionTime, float _radius, float _alpha);
-
   public:
     FeedingTube();
 

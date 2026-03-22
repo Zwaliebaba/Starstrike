@@ -9,7 +9,6 @@
 #include "gunturret.h"
 #include "GameSimEventQueue.h"
 #include "GameApp.h"
-#include "renderer.h"
 #include "location.h"
 #include "main.h"
 #include "camera.h"

@@ -12,13 +12,11 @@
 #include "entity_grid.h"
 #include "globals.h"
 #include "location.h"
-#include "renderer.h"
 #include "team.h"
 #include "unit.h"
 #include "taskmanager.h"
 #include "global_world.h"
 #include "routing_system.h"
-#include "particle_system.h"
 
 #include "teleport.h"
 #include "insertion_squad.h"
@@ -112,39 +110,6 @@ bool Teleport::IsInView()
     }
 
     return Building::IsInView();
-}
-
-
-void Teleport::RenderSpirit( LegacyVector3 const &_pos, int _teamId )
-{
-    LegacyVector3 pos = _pos;
-
-    int innerAlpha = 100;
-    int outerAlpha = 50;
-    int spiritInnerSize = 2;
-    int spiritOuterSize = 6;
-
-    RGBAColour colour;
-    if( _teamId >= 0 ) colour = g_app->m_location->m_teams[ _teamId ].m_colour;
-
-    float size = spiritInnerSize;
-    glColor4ub(colour.r, colour.g, colour.b, innerAlpha );
-
-    glBegin( GL_QUADS );
-        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
-
-    size = spiritOuterSize;
-    glColor4ub(colour.r, colour.g, colour.b, outerAlpha );
-    glBegin( GL_QUADS );
-        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
 }
 
 

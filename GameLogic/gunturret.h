@@ -65,5 +65,4 @@ class GunTurretTarget : public WorldObject
 
     GunTurretTarget(int _buildingId);
     bool Advance() override;
-    void Render(float _time) override;
 };

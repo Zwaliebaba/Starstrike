@@ -20,7 +20,6 @@ public:
     Snow();
 
     bool Advance();
-    void Render( float _predictionTime );
 
     float GetLife();                        // Returns 0.0f-1.0f (0.0f=dead, 1.0f=alive)
 };

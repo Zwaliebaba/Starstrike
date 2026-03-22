@@ -8,7 +8,7 @@
 
 class Flag
 {
-protected:
+public:
     LegacyVector3 m_flag[FLAG_RESOLUTION][FLAG_RESOLUTION];
 
     int     m_texId;
@@ -17,7 +17,6 @@ protected:
     LegacyVector3 m_up;
     float   m_size;
 
-public:
     Flag();
 
     void Initialise         ();
@@ -26,8 +25,5 @@ public:
     void SetPosition        ( LegacyVector3 const &_pos );
     void SetOrientation     ( LegacyVector3 const &_front, LegacyVector3 const &_up );
     void SetSize            ( float _size );
-
-    void Render();
-    void RenderText         ( int _posX, int _posY, char *_caption );
 };
 

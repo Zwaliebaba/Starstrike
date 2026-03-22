@@ -82,6 +82,14 @@
     <ClCompile Include="userprofile_window.cpp" />
     <ClCompile Include="SquadieRenderer.cpp" />
     <ClCompile Include="SporeGeneratorRenderer.cpp" />
+    <ClCompile Include="WorldObjectRenderRegistry.cpp" />
+    <ClCompile Include="SnowRenderer.cpp" />
+    <ClCompile Include="FlagRenderer.cpp" />
+    <ClCompile Include="SpaceInvaderRenderer.cpp" />
+    <ClCompile Include="BoxKiteRenderer.cpp" />
+    <ClCompile Include="WeaponRenderer.cpp" />
+    <ClCompile Include="MiscEffectRenderer.cpp" />
+    <ClCompile Include="SpiritRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -168,9 +176,15 @@
     <ClInclude Include="userprofile_window.h" />
     <ClInclude Include="SquadieRenderer.h" />
     <ClInclude Include="SporeGeneratorRenderer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="WorldObjectRenderer.h" />
+    <ClInclude Include="WorldObjectRenderRegistry.h" />
+    <ClInclude Include="SnowRenderer.h" />
+    <ClInclude Include="FlagRenderer.h" />
+    <ClInclude Include="SpaceInvaderRenderer.h" />
+    <ClInclude Include="BoxKiteRenderer.h" />
+    <ClInclude Include="WeaponRenderer.h" />
+    <ClInclude Include="MiscEffectRenderer.h" />
+    <ClInclude Include="SpiritRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natstepfilter">
@@ -184,5 +198,10 @@
     <Filter Include="Project Files">
       <UniqueIdentifier>{01240f28-bfdb-4d9a-87a2-48b172da1db4}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>Project Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "ArmourRenderer.h"
+#include "FlagRenderer.h"
 #include "armour.h"
 #include "ShapeStatic.h"
 #include "matrix34.h"
@@ -79,13 +80,13 @@ void ArmourRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
         break;
     }
 
-    flag.Render();
+    FlagRenderer::Render(flag);
 
     if (armour.m_numPassengers > 0)
     {
         char caption[16];
         snprintf(caption, sizeof(caption), "%d", armour.m_numPassengers);
-        flag.RenderText(2, 2, caption);
+        FlagRenderer::RenderText(flag, 2, 2, caption);
     }
 
     //
@@ -103,6 +104,6 @@ void ArmourRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
         deployFlag.SetOrientation(front, up);
         deployFlag.SetSize(30.0f);
         deployFlag.SetTexture(g_app->m_resource->GetTexture("icons/banner_deploy.bmp"));
-        deployFlag.Render();
+        FlagRenderer::Render(deployFlag);
     }
 }

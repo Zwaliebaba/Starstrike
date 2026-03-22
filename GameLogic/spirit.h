@@ -29,9 +29,6 @@ public:
     float           m_eggSearchTimer;                   // How often to re-search
 
 protected:
-    float       m_timeSync;
-
-    LegacyVector3     m_hover;
     float       m_positionOffset;                       // Used to make them float around a bit
     float       m_xaxisRate;
     float       m_yaxisRate;
@@ -40,13 +37,14 @@ protected:
     bool        m_pushFromBuildings;
 
 public:
+    float       m_timeSync;
+    LegacyVector3     m_hover;
 
     Spirit();
     ~Spirit();
 
     void Begin      ();
     bool Advance    ();
-    void Render     ( float predictionTime );
 
     void CollectorArrives   ();                             // A collector is above me and picks me up
     void CollectorDrops     ();                             // My collector has dropped me

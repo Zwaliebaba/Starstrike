@@ -89,20 +89,20 @@ class GameApp : public GameMain
       NumGameModes
     };
 
-    GameApp();
-    ~GameApp() override;
+GameApp();
+~GameApp() override;
 
-    void Startup() override {}
-    void Shutdown() override {}
-    void Update([[maybe_unused]] float _deltaT) override {}
-    void RenderScene() override {}
+void Startup() override {}
+void Shutdown() override {}
+void Update([[maybe_unused]] float _deltaT) override {}
+void RenderScene() override {}
 
-    // --- Lifecycle overrides ---
+// --- Lifecycle overrides ---
 
-    void OnActivated() override;
-    void OnDeactivated() override;
-    void OnSuspending() override;
-    void OnResuming() override;
+void OnActivated() override;
+void OnDeactivated() override;
+void OnSuspending() override;
+void OnResuming() override;
 
     void SetProfileName(const char* _profileName);
     bool LoadProfile();

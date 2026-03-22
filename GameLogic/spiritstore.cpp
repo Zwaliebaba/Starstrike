@@ -5,7 +5,6 @@
 #include "resource.h"
 
 #include "GameApp.h"
-#include "renderer.h"
 
 #include "spiritstore.h"
 
@@ -45,78 +44,7 @@ void SpiritStore::Advance()
             Spirit *s = m_spirits.GetPointer(i);
             s->Advance();
         }
-    }
-}
-
-void SpiritStore::Render( float _predictionTime )
-{
-	START_PROFILE(g_app->m_profiler, "Spirit Store");
-
-    glEnable        ( GL_BLEND );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE );
-    glDepthMask     ( false );
-    glDisable       ( GL_CULL_FACE );
-
-    glColor4f       ( 1.0f, 1.0f, 1.0f, 0.5f );
-
-    glEnable        (GL_TEXTURE_2D);
-    glBindTexture	(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false));
-	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-    glBegin(GL_QUADS);
-        glNormal3f(0,1,0);
-        glTexCoord2f( 0.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 1.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 1.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 0.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-
-        glNormal3f(0,0,-1);
-        glTexCoord2f( 0.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y - m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 1.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 1.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 0.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y - m_sizeY, m_pos.z - m_sizeZ);
-
-        glNormal3f(0,0,1);
-        glTexCoord2f( 0.0f, 0.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y - m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 1.0f, 0.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 1.0f, 1.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 0.0f, 1.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y - m_sizeY, m_pos.z + m_sizeZ);
-
-        glNormal3f(1,0,0);
-        glTexCoord2f( 0.0f, 0.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y - m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 1.0f, 0.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 1.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 0.0f, 1.0f );     glVertex3f(m_pos.x + m_sizeX, m_pos.y - m_sizeY, m_pos.z + m_sizeZ);
-
-        glNormal3f(-1,0,0);
-        glTexCoord2f( 0.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y - m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 1.0f, 0.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z + m_sizeZ);
-        glTexCoord2f( 1.0f, 1.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y + m_sizeY, m_pos.z - m_sizeZ);
-        glTexCoord2f( 0.0f, 1.0f );     glVertex3f(m_pos.x - m_sizeX, m_pos.y - m_sizeY, m_pos.z - m_sizeZ);
-    glEnd();
-
-    glDisable       ( GL_TEXTURE_2D );
-    glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-    glTexParameteri	( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-
-    for( int i = 0; i < m_spirits.Size(); ++i )
-    {
-        if( m_spirits.ValidIndex(i) )
-        {
-            Spirit *s = m_spirits.GetPointer(i);
-            s->Render( _predictionTime );
-        }
-    }
-
-    glDisable       ( GL_BLEND );
-    glEnable        ( GL_CULL_FACE );
-    glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    glDepthMask     ( true );
-
-	END_PROFILE(g_app->m_profiler, "Spirit Store");
+	}
 }
 
 

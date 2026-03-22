@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "file_writer.h"
+#include "profiler.h"
 #include "resource.h"
 #include "ShapeStatic.h"
 
-#include "text_renderer.h"
-#include "profiler.h"
 #include "math_utils.h"
 #include "text_stream_readers.h"
 #include "hi_res_time.h"
@@ -98,38 +97,6 @@ bool SpawnBuilding::IsInView()
     return g_app->m_camera->SphereInViewFrustum( m_visibilityMidpoint, m_visibilityRadius );
 
 }
-
-
-void SpawnBuilding::RenderSpirit( LegacyVector3 const &_pos )
-{
-    LegacyVector3 pos = _pos;
-
-    int innerAlpha = 255;
-    int outerAlpha = 150;
-    int spiritInnerSize = 2;
-    int spiritOuterSize = 6;
-
-    float size = spiritInnerSize;
-    glColor4ub(150, 50, 25, innerAlpha );
-
-    glBegin( GL_QUADS );
-        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
-
-    size = spiritOuterSize;
-    glColor4ub(150, 50, 25, outerAlpha );
-
-    glBegin( GL_QUADS );
-        glVertex3fv( (pos - g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetRight()*size).GetData() );
-        glVertex3fv( (pos + g_app->m_camera->GetUp()*size).GetData() );
-        glVertex3fv( (pos - g_app->m_camera->GetRight()*size).GetData() );
-    glEnd();
-}
-
 
 
 void SpawnBuilding::SetBuildingLink( int _buildingId )

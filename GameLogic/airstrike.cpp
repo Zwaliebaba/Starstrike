@@ -4,8 +4,6 @@
 #include "airstrike.h"
 #include "GameApp.h"
 #include "location.h"
-#include "renderer.h"
-#include "camera.h"
 #include "GameSimEventQueue.h"
 
 AirstrikeUnit::AirstrikeUnit(int teamId, int unitId, int numEntities, const LegacyVector3& _pos)
@@ -212,30 +210,4 @@ bool SpaceInvader::Advance(Unit* _unit)
 
 void SpaceInvader::ChangeHealth(int _amount)
 {
-}
-
-void SpaceInvader::Render(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  glDisable(GL_TEXTURE_2D);
-
-#ifdef DEBUG_RENDER_ENABLED
-  //RenderSphere( m_targetPos, 5.0f );
-#endif
-
-  g_app->m_renderer->SetObjectLighting();
-
-  Matrix34 mat(m_front, g_upVector, predictedPos);
-  mat.f *= 2.0f;
-  mat.u *= 2.0f;
-  mat.r *= 2.0f;
-  m_shape->Render(_predictionTime, mat);
-
-  if (m_armed)
-  {
-    mat = Matrix34(-g_upVector, m_front, predictedPos - g_upVector * 12.0f);
-    m_bombShape->Render(_predictionTime, mat);
-  }
-
-  g_app->m_renderer->UnsetObjectLighting();
 }

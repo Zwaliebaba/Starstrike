@@ -4,7 +4,6 @@
 #include "text_stream_readers.h"
 #include "ShapeStatic.h"
 #include "hi_res_time.h"
-#include "text_renderer.h"
 #include "profiler.h"
 #include "language_table.h"
 #include "trunkport.h"

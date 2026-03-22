@@ -98,10 +98,6 @@ class Entity : public WorldObject
 
     virtual void DirectControl(const TeamControls& _teamControls);
 
-    static void BeginRenderShadow();
-    static void RenderShadow(const LegacyVector3& _pos, float _size);
-    static void EndRenderShadow();
-
     static const char* GetTypeName(int _troopType);
     static int GetTypeId(const char* _typeName);
     static Entity* NewEntity(int _troopType);

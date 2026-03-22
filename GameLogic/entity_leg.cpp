@@ -8,7 +8,6 @@
 #include "GameApp.h"
 #include "location.h"
 #include "main.h"
-#include "renderer.h"
 
 EntityLeg::EntityLeg(int _legNum, Entity* _parent, const char* _shapeNameUpper, const char* _shapeNameLower, const char* _rootMarkerName)
   : m_legNum(_legNum),

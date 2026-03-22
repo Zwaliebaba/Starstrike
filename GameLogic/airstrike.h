@@ -36,15 +36,13 @@ class AirstrikeUnit : public Unit
 
 class SpaceInvader : public Entity
 {
-  protected:
+  public:
     LegacyVector3 m_targetPos;
     bool m_armed;
     ShapeStatic* m_bombShape;
 
-  public:
     SpaceInvader();
 
     bool Advance(Unit* _unit) override;
     void ChangeHealth(int _amount) override;
-    void Render(float _predictionTime) override;
 };

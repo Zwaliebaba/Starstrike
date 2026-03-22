@@ -47,8 +47,6 @@ class MineBuilding : public Building
 
     bool IsInView() override;
 
-    void RenderCart(MineCart* _cart, float _predictionTime);
-
     LegacyVector3 GetTrackMarker1();
     LegacyVector3 GetTrackMarker2();
 

@@ -3,7 +3,6 @@
 #include "matrix34.h"
 #include "ShapeStatic.h"
 #include "math_utils.h"
-#include "text_renderer.h"
 #include "hi_res_time.h"
 #include "GameApp.h"
 #include "camera.h"
@@ -428,61 +427,4 @@ bool Zombie::Advance()
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
   return false;
-}
-
-void Zombie::Render(float _predictionTime)
-{
-  LegacyVector3 predictedPos = m_pos + m_vel * _predictionTime;
-  predictedPos += m_hover * _predictionTime;
-
-  LegacyVector3 predictedFront = m_front;
-  LegacyVector3 predictedUp = m_up;
-  LegacyVector3 predictedRight = predictedFront ^ predictedUp;
-
-  float size = 5.0f;
-
-  float alpha = 1.0f - (m_life / 10.0f);
-  alpha = max(0.1f, alpha);
-  alpha = min(0.7f, alpha);
-
-  float outerAlpha = (0.7f - alpha) * 0.1f;
-
-  float timeRemaining = 600.0f - m_life;
-  if (timeRemaining < 100.0f)
-  {
-    alpha *= timeRemaining * 0.01f;
-    outerAlpha *= timeRemaining * 0.01f;
-  }
-
-  glDisable(GL_CULL_FACE);
-  glColor4f(0.9f, 0.9f, 1.0f, alpha);
-  glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/ghost.bmp"));
-
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((predictedPos - size * predictedRight - size * predictedUp).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((predictedPos + size * predictedRight - size * predictedUp).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((predictedPos + size * predictedRight + size * predictedUp).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((predictedPos - size * predictedRight + size * predictedUp).GetData());
-  glEnd();
-
-  size *= 2.0f;
-  glColor4f(0.9f, 0.9f, 1.0f, outerAlpha);
-  glBegin(GL_QUADS);
-  glTexCoord2i(0, 0);
-  glVertex3fv((predictedPos - size * predictedRight - size * predictedUp).GetData());
-  glTexCoord2i(1, 0);
-  glVertex3fv((predictedPos + size * predictedRight - size * predictedUp).GetData());
-  glTexCoord2i(1, 1);
-  glVertex3fv((predictedPos + size * predictedRight + size * predictedUp).GetData());
-  glTexCoord2i(0, 1);
-  glVertex3fv((predictedPos - size * predictedRight + size * predictedUp).GetData());
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_CULL_FACE);
 }
