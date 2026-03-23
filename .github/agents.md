@@ -22,8 +22,7 @@ NeuronServer ──► NeuronCore
 | [docs/contributing.md](../docs/contributing.md) | PR process, commit messages, review standards |
 | [coding-standards.md](coding-standards.md) | Naming, formatting, language conventions |
 | [CI.md](../CI.md) | Phased codebase improvement roadmap |
-| [MathPlan.md](../MathPlan.md) | Math type migration plan (LegacyVector3 → DirectXMath) |
-| [MatrixConv.md](../MatrixConv.md) | Matrix convention standardisation plan |
+| [MathMigration.md](../MathMigration.md) | Math type migration plan (LegacyVector3/Matrix34 → DirectXMath) |
 
 ## Setup Commands
 
@@ -74,18 +73,36 @@ NeuronServer ──► NeuronCore
 
 ## DirectXMath / Vector Conventions
 
-- **Parameter passing**: Always pass 3D vectors as `FXMVECTOR` (not `const GameVector3&` or `const XMFLOAT3&`) in function parameters and use the `XM_CALLCONV` calling convention. This keeps vectors in SIMD registers and avoids unnecessary load/store round-trips.
+All vector and matrix math must use SIMD register types (`XMVECTOR`, `XMMATRIX`) for
+computation. `XMFLOAT3` / `XMFLOAT4X4` are **storage only** — never perform
+arithmetic on them. The load→compute→store boundary must be explicit.
+
+| Context | Type | Reason |
+|---|---|---|
+| Struct/class members | `XMFLOAT3` / `XMFLOAT4X4` | Stable layout, serializable, no alignment requirement |
+| Function parameters (non-virtual) | `FXMVECTOR` + `XM_CALLCONV` | SIMD register passing |
+| Function parameters (virtual) | `const XMFLOAT3&` | Virtual dispatch cannot use `XM_CALLCONV` |
+| Function return values | `XMVECTOR` or `XMFLOAT3` | `XMVECTOR` if caller will continue computing; `XMFLOAT3` if storing |
+| Local temporaries in functions | `XMVECTOR` / `XMMATRIX` | **Always** — never `XMFLOAT3` for intermediate results |
+| Loop bodies | `XMVECTOR` / `XMMATRIX` | Hoist loads before loop, store after |
+| One-shot scalar queries | `XMFLOAT3` overload (e.g. `Length(XMFLOAT3)`) | Returns scalar — no vector kept in register |
+
+> **Anti-pattern — do NOT add `XMFLOAT3` arithmetic operators** (`operator+`,
+> `operator*`, etc.). They would hide a load→op→store per expression, defeating
+> the entire purpose of the SIMD boundary. All vector arithmetic stays in `XMVECTOR`.
+
+- **Parameter passing**: Always pass 3D vectors as `FXMVECTOR` (not `const XMFLOAT3&`) in non-virtual function parameters and use the `XM_CALLCONV` calling convention. This keeps vectors in SIMD registers and avoids unnecessary load/store round-trips.
   ```cpp
   // Correct — vector stays in registers
   [[nodiscard]] float XM_CALLCONV Distance(FXMVECTOR _a, FXMVECTOR _b);
 
   // Incorrect — forces store-to-memory then reload
-  [[nodiscard]] float Distance(const GameVector3& _a, const GameVector3& _b);
+  [[nodiscard]] float Distance(const XMFLOAT3& _a, const XMFLOAT3& _b);
   ```
-- **Storage types** (`GameVector3`, `GameMatrix`) are for struct members, serialization, and long-lived state. Load into `XMVECTOR` / `XMMATRIX` for computation; store the result back.
+- **Storage types** (`XMFLOAT3`, `XMFLOAT4X4`) are for struct members, serialization, and long-lived state. Load into `XMVECTOR` / `XMMATRIX` for computation; store the result back. Transitional types (`GameVector3`, `GameMatrix`, `Transform3D`) are being eliminated — see [MathMigration.md](../MathMigration.md).
 - Follow the DirectXMath parameter-position rules for `FXMVECTOR` / `GXMVECTOR` / `HXMVECTOR` / `CXMVECTOR` ordering (see [DirectXMath calling conventions](https://learn.microsoft.com/en-us/windows/win32/dxmath/pg-xnamath-internals#calling-conventions)).
 - All new math utility functions go in `Neuron::Math` (`NeuronCore/GameMath.h`) — do not add math methods to storage types.
-- See [MathPlan.md](../MathPlan.md) for the migration roadmap from legacy types.
+- See [MathMigration.md](../MathMigration.md) for the full migration roadmap from legacy types.
 
 ## Additional Notes
 
