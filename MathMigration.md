@@ -756,6 +756,11 @@ Same pattern as Phase 3.2. Change member type, update parse/write, remove legacy
 
 Migrate `GameMatrix`/`GameVector3` fields to raw DirectXMath. ~38 producer sites.
 
+After C.4 completes, verify that `DrainSimEvents()` in `Starstrike/main.cpp` no
+longer relies on implicit `GameVector3→LegacyVector3` / `GameMatrix→Matrix34`
+conversions (previously tracked as SimEvent.md Phase 2 Step 8 — resolved
+automatically once downstream APIs accept the new types).
+
 #### C.5 — GameLogic Matrix34 construction sites (~60 files)
 
 The bulk migration. Each file constructs `Matrix34(front, up, pos)` and passes to
