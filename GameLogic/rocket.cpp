@@ -38,7 +38,7 @@ void FuelBuilding::Initialise(Building* _template)
   m_fuelLink = static_cast<FuelBuilding*>(_template)->m_fuelLink;
 }
 
-LegacyVector3 FuelBuilding::GetFuelPosition()
+LegacyVector3 FuelBuilding::GetFuelPosition() const
 {
   if (!m_fuelMarker)
   {
@@ -61,7 +61,7 @@ void FuelBuilding::ProvideFuel(float _level)
   m_currentLevel = std::max(m_currentLevel, 0.0f);
 }
 
-FuelBuilding* FuelBuilding::GetLinkedBuilding()
+FuelBuilding* FuelBuilding::GetLinkedBuilding() const
 {
   Building* building = g_context->m_location->GetBuilding(m_fuelLink);
   if (building)

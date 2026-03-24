@@ -226,6 +226,30 @@ bool Darwinian::Advance(Unit* _unit)
     }
   }
 
+  //
+  // Invalidate shadow building if the spectacle has ended
+
+  if (m_shadowBuildingId != -1)
+  {
+    Building* shadowBuilding = g_context->m_location->GetBuilding(m_shadowBuildingId);
+    if (!shadowBuilding)
+    {
+      m_shadowBuildingId = -1;
+    }
+    else if (shadowBuilding->m_type == Building::TypeGodDish)
+    {
+      auto dish = static_cast<GodDish*>(shadowBuilding);
+      if (!dish->m_activated && dish->m_timer < 1.0f)
+        m_shadowBuildingId = -1;
+    }
+    else if (shadowBuilding->m_type == Building::TypeEscapeRocket)
+    {
+      auto rocket = static_cast<EscapeRocket*>(shadowBuilding);
+      if (!rocket->IsSpectacle())
+        m_shadowBuildingId = -1;
+    }
+  }
+
   if (m_boxKiteId.IsValid() && (m_state != StateWorshipSpirit || m_dead))
   {
     auto boxKite = static_cast<BoxKite*>(g_context->m_location->GetEffect(m_boxKiteId));

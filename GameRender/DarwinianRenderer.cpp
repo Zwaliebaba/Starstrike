@@ -4,7 +4,6 @@
 #include "darwinian.h"
 #include "entity.h"
 #include "goddish.h"
-#include "rocket.h"
 #include "camera.h"
 #include "location.h"
 #include "main.h"
@@ -170,9 +169,6 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
 
         if (_highDetail > 0.0f && d.m_shadowBuildingId != -1)
         {
-            // TODO Phase 6: eliminate mutation — m_shadowBuildingId write should move to Advance()
-            Darwinian& mutableD = const_cast<Darwinian&>(d);
-
             Building* building = g_context->m_location->GetBuilding(d.m_shadowBuildingId);
             if (building)
             {
@@ -180,15 +176,10 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
                 if (building->m_type == Building::TypeGodDish)
                 {
                     auto dish = static_cast<GodDish*>(building);
-                    if (!dish->m_activated && dish->m_timer < 1.0f)
-                        mutableD.m_shadowBuildingId = -1;
                     alpha = dish->m_timer * 0.1f;
                 }
                 else if (building->m_type == Building::TypeEscapeRocket)
                 {
-                    auto rocket = static_cast<EscapeRocket*>(building);
-                    if (!rocket->IsSpectacle())
-                        mutableD.m_shadowBuildingId = -1;
                     float distance = (building->m_pos - d.m_pos).Mag();
                     if (distance < 400.0f)
                         alpha = 1.0f;

@@ -29,7 +29,7 @@ class SpawnBuilding : public Building
 
 protected:
     LList       <SpawnBuildingLink *> m_links;
-    ShapeMarkerData *m_spiritLink;
+    mutable ShapeMarkerData *m_spiritLink;
 
     LegacyVector3     m_visibilityMidpoint;
     float       m_visibilityRadius;
@@ -45,7 +45,7 @@ public:
 
     bool            IsInView        ();
 
-    LegacyVector3         GetSpiritLink   ();
+    LegacyVector3         GetSpiritLink   () const;
     void            SetBuildingLink ( int _buildingId );
     void            ClearLinks      ();
 

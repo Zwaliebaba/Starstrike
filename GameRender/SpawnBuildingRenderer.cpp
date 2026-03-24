@@ -42,7 +42,7 @@ void SpawnBuildingRenderer::RenderAlphas(const Building& _building, const Buildi
 {
     const auto& spawn = static_cast<const SpawnBuilding&>(_building);
 
-    LegacyVector3 ourPos = const_cast<SpawnBuilding&>(spawn).GetSpiritLink();
+    LegacyVector3 ourPos = spawn.GetSpiritLink();
 
     int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
 

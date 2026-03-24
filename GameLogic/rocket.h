@@ -7,7 +7,7 @@ class FuelBuilding : public Building
     friend class FuelBuildingRenderer;
 
   protected:
-    ShapeMarkerData* m_fuelMarker;
+    mutable ShapeMarkerData* m_fuelMarker;
     static ShapeStatic* s_fuelPipe;
 
   public:
@@ -20,9 +20,9 @@ class FuelBuilding : public Building
 
     virtual void ProvideFuel(float _level);
 
-    LegacyVector3 GetFuelPosition();
+    LegacyVector3 GetFuelPosition() const;
 
-    FuelBuilding* GetLinkedBuilding();
+    FuelBuilding* GetLinkedBuilding() const;
 
     bool Advance() override;
 

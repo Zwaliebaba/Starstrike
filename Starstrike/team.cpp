@@ -551,11 +551,10 @@ void Team::RenderOthers(float _predictionTime)
     if (m_others.ValidIndex(i))
     {
       Entity* entity = m_others.GetData(i);
-      if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->IsInView())
+      if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->m_type != Entity::TypeAI && entity->IsInView())
       {
         START_PROFILE(g_context->m_profiler, Entity::GetTypeName( entity->m_type ));
         EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
-        DEBUG_ASSERT(renderer);
         EntityRenderContext ctx;
         ctx.predictionTime = _predictionTime;
         ctx.highDetailFactor = 1.0f;

@@ -90,6 +90,9 @@
     <ClCompile Include="WeaponRenderer.cpp" />
     <ClCompile Include="MiscEffectRenderer.cpp" />
     <ClCompile Include="SpiritRenderer.cpp" />
+    <ClCompile Include="InitBuildingRenderers.cpp" />
+    <ClCompile Include="InitEntityRenderers.cpp" />
+    <ClCompile Include="InitWorldObjectRenderers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -203,5 +206,7 @@
     <None Include="packages.config">
       <Filter>Project Files</Filter>
     </None>
+    <None Include="Render.md" />
+    <None Include="DX12Migration.md" />
   </ItemGroup>
 </Project>

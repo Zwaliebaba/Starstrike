@@ -14,10 +14,10 @@ void FuelBuildingRenderer::Render(const Building& _building, const BuildingRende
     DefaultBuildingRenderer::Render(_building, _ctx);
 
     auto& fuel = static_cast<const FuelBuilding&>(_building);
-    FuelBuilding* fuelBuilding = const_cast<FuelBuilding&>(fuel).GetLinkedBuilding();
+    FuelBuilding* fuelBuilding = fuel.GetLinkedBuilding();
     if (fuelBuilding)
     {
-        LegacyVector3 ourPipePos = const_cast<FuelBuilding&>(fuel).GetFuelPosition();
+        LegacyVector3 ourPipePos = fuel.GetFuelPosition();
         LegacyVector3 theirPipePos = fuelBuilding->GetFuelPosition();
 
         LegacyVector3 pipeVector = (theirPipePos - ourPipePos).Normalise();
@@ -40,10 +40,10 @@ void FuelBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
 
     if (fuel.m_currentLevel > 0.0f)
     {
-        FuelBuilding* fuelBuilding = const_cast<FuelBuilding&>(fuel).GetLinkedBuilding();
+        FuelBuilding* fuelBuilding = fuel.GetLinkedBuilding();
         if (fuelBuilding)
         {
-            LegacyVector3 startPos = const_cast<FuelBuilding&>(fuel).GetFuelPosition();
+            LegacyVector3 startPos = fuel.GetFuelPosition();
             LegacyVector3 endPos = fuelBuilding->GetFuelPosition();
 
             LegacyVector3 midPos = (startPos + endPos) / 2.0f;

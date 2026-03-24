@@ -279,6 +279,9 @@
     <ClCompile Include="GeneratorBuildingRenderer.cpp" />
     <ClCompile Include="GodDishBuildingRenderer.cpp" />
     <ClCompile Include="GunTurretBuildingRenderer.cpp" />
+    <ClCompile Include="InitBuildingRenderers.cpp" />
+    <ClCompile Include="InitEntityRenderers.cpp" />
+    <ClCompile Include="InitWorldObjectRenderers.cpp" />
     <ClCompile Include="LanderRenderer.cpp" />
     <ClCompile Include="LaserFenceBuildingRenderer.cpp" />
     <ClCompile Include="LaserTrooperRenderer.cpp" />
@@ -346,7 +349,9 @@
     <ClCompile Include="WorldObjectRenderRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DX12Migration.md" />
     <None Include="packages.config" />
+    <None Include="Render.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

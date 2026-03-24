@@ -126,7 +126,7 @@ LList<int>* SpawnBuilding::ExploreLinks()
   return result;
 }
 
-LegacyVector3 SpawnBuilding::GetSpiritLink()
+LegacyVector3 SpawnBuilding::GetSpiritLink() const
 {
   if (!m_spiritLink)
   {
