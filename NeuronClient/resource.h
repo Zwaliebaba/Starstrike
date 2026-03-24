@@ -6,7 +6,6 @@
 #pragma once
 
 #include "btree.h"
-#include "llist.h"
 #include "hash_table.h"
 
 class ShapeStatic;
@@ -14,7 +13,6 @@ class BitmapRGBA;
 class TextReader;
 class BinaryReader;
 class SoundStreamDecoder;
-class Resource;
 class FileWriter;
 
 class Resource
@@ -31,7 +29,7 @@ class Resource
     HashTable<int> m_displayLists;
 
     HashTable<int> m_textures;
-    HashTable<ShapeStatic*> m_shapes;
+    inline static HashTable<ShapeStatic*> m_shapes;
 
     int WildCmp(const char* _wild, const char* _string);
 
@@ -55,7 +53,7 @@ class Resource
     static BinaryReader* GetBinaryReader(std::string_view _filename);	// Caller must delete the BinaryReader when done
 
     // *** Shapes ****
-    ShapeStatic* GetShapeStatic(const char* _name);
+    static ShapeStatic* GetShapeStatic(const char* _name);
 
     // *** Normal resources ***
     SoundStreamDecoder* GetSoundStreamDecoder(const char* _filename); // Caller must delete the decoder when done

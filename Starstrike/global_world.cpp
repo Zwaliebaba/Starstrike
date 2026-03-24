@@ -51,7 +51,7 @@ GlobalBuilding::GlobalBuilding()
     m_type(Building::TypeTrunkPort),
     m_online(false),
     m_link(-1),
-    m_shape(nullptr) { m_shape = g_app->m_resource->GetShapeStatic("trunkport.shp"); }
+    m_shape(nullptr) { m_shape = Resource::GetShapeStatic("trunkport.shp"); }
 
 // ****************************************************************************
 // Class GlobalEventCondition
@@ -639,9 +639,9 @@ SphereWorld::SphereWorld()
     m_numLocations(0),
     m_spirits(nullptr)
 {
-  m_shapeOuter = g_app->m_resource->GetShapeStatic("globalworld_outer.shp");
-  m_shapeMiddle = g_app->m_resource->GetShapeStatic("globalworld_middle.shp");
-  m_shapeInner = g_app->m_resource->GetShapeStatic("globalworld_inner.shp");
+  m_shapeOuter = Resource::GetShapeStatic("globalworld_outer.shp");
+  m_shapeMiddle = Resource::GetShapeStatic("globalworld_middle.shp");
+  m_shapeInner = Resource::GetShapeStatic("globalworld_inner.shp");
 }
 
 void SphereWorld::AddLocation(int _locationId)

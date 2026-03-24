@@ -176,7 +176,7 @@ requires only `NeuronCore.h`).  `GameLogicPlatform.h` was also deleted.
 | `Entity::BeginRenderShadow`/`RenderShadow`/`EndRenderShadow` | ✅ Done | All three static shadow helpers removed from `entity.h` and `entity.cpp`.  `ShadowRenderer` in `GameRender/` is the sole implementation. |
 | Old `Render()` bodies in entity `.cpp` files | ✅ Cleaned | All 14 migrated entity types now have empty stub `Render()` bodies; full GL code deleted. Declarations remain in `.h` for Phase 4. |
 | Old `Render()` bodies in building `.cpp` files | ✅ Cleaned | All building subclass `Render()`/`RenderAlphas()` bodies removed from `.cpp` files.  Declarations removed from `.h` files. |
-| `Shape* m_shape` and `Shape* m_shapes[]` still on entities | ⚠️ Still coupled | `entity.h:66` still has `ShapeStatic* m_shape`; entity constructors still load shapes via `g_app->m_resource->GetShape()` |
+| `Shape* m_shape` and `Shape* m_shapes[]` still on entities | ⚠️ Still coupled | `entity.h:66` still has `ShapeStatic* m_shape`; entity constructors now load shapes via `GetShape()` (delegates through `ShapeStore` — returns `nullptr` on headless).  `Resource::GetShapeStatic()` fully removed from GameLogic (Phase 6.1). |
 | `building.h` render virtuals removed | ✅ Done | `Render()`, `RenderAlphas()`, `RenderLights()`, `RenderPorts()` removed from `building.h` and `building.cpp`.  All subclass overrides also removed.  `ShapeStatic* m_shape` still on line 98 — deferred to Phase 6. |
 | `worldobject.h` `virtual void Render(float)` removed | ✅ Done | Wave 6 created companions for all remaining `WorldObject` subclass `Render()` overrides.  `WorldObject::Render(float)` virtual deleted from `worldobject.h`.  No `Render()` declarations remain on any `WorldObject` subclass in `GameLogic`. |
 
@@ -202,9 +202,14 @@ requires only `NeuronCore.h`).  `GameLogicPlatform.h` was also deleted.
 
 ### Phase 6 — Presentation State Separation
 
-| Status | Notes |
-|--------|-------|
-| ⚠️ Partially achieved | New companions receive `const Entity&` / `const Building&` — correct layering. But `ArmyAntRenderer` reads `ant.m_shape->Render()` (the renderer reads `Shape*` from the simulation object, not from its own state). True const separation requires moving `Shape*` ownership to renderers. |
+| Task | Status | Notes |
+|------|--------|-------|
+| 6.0 — Audit `Shape*` usage | ✅ Done | 87 `m_shape` references across ~27 files cataloged into 5 categories: collision, per-frame markers, init-time markers, animation swap, explosion events.  Key finding: `ShapeStatic.h` has **zero GPU dependencies**; only `Render()` methods in `.cpp` use GL. |
+| ~~6.1 — Move `ShapeStatic` to NeuronCore~~ | ❌ Cancelled | `ShapeStatic` is an asset/mesh type — it belongs in `NeuronClient`, not `NeuronCore`.  `NeuronCore` is strictly shared server/client infrastructure (math, networking, timers, logging).  The current compile-time setup (forward declarations in `pch.h`, full include via NeuronClient include path) is correct.  Decoupling happens at **runtime** via `ShapeStore` (6.1) + null-safety (6.2). |
+| 6.1 — Shape loading via `ShapeStore` | ✅ Done | Abstract `ShapeStore` interface in `GameLogic/ShapeStore.h` with virtual `Get(const char*)`; `ClientShapeStore` in `GameRender/` delegates to `Resource::GetShapeStatic()`.  Global `g_shapeStore` set in `InitGameRenderers()` (`nullptr` on headless).  Inline `GetShape()` free function wraps null-check.  93 `Resource::GetShapeStatic()` calls across 46 files migrated to `GetShape()`.  50 stale `resource.h` includes removed (only `entity.cpp` retains it for `GetTextReader`). |
+| 6.2 — Null-safety for headless `Shape*` | ❌ Not started | Add null guards to ~12 simulation-side `m_shape` dereferences (`EntityLeg::GetLegRootPos`, `Squadie::Attack`, `ArmyAnt::GetCarryMarker`, `Armour::GetEntrance`, `LaserFence::GetTopPosition`, etc.). |
+| 6.3 — Decouple `SimEvent::Explosion` from `Shape*` | ❌ Not started | Replace `const ShapeStatic*` in `Explosion` variant with entity/building type ID; drain function looks up shape from renderer cache.  Removes last simulation→shape pointer crossing. |
+| 6.4 — Move `m_shape` ownership to renderers (optional) | ❌ Not started | Remove `ShapeStatic* m_shape` from `Entity`/`Building` base classes; renderers own shapes.  Lower priority — headless works after 6.1–6.2. |
 
 ### Phase 7 — Headless Bot Client
 
@@ -268,6 +273,18 @@ The highest-impact remaining work items, in recommended order:
     + forward declarations; `rgb_colour.h/.cpp` moved from NeuronClient
     to NeuronCore.  **GameLogic IS the simulation library** — no separate
     `GameSim` project needed.  Headless compilation proven.
+11. ~~**Phase 6.1 — Shape loading via `ShapeStore`**~~ ✅ Done —
+    abstract `ShapeStore` interface in `GameLogic/ShapeStore.h`;
+    `ClientShapeStore` in `GameRender/` delegates to
+    `Resource::GetShapeStatic()`.  93 call sites across 46 files
+    migrated to `GetShape()`.  50 stale `resource.h` includes removed.
+12. **Phase 6.2 — Null-safety for headless `Shape*`** — null guards on
+    ~12 simulation-side `m_shape` dereferences.  **After this step,
+    headless compilation and execution are fully unblocked for Phase 7.**
+13. **Phase 6.3 — Decouple `SimEvent::Explosion`** — replace
+    `const ShapeStatic*` with type ID in the `Explosion` variant.
+14. **Phase 6.4 — Move `m_shape` ownership to renderers** (optional).
+15. **Phase 7** — Headless bot client.
 
 ---
 
@@ -297,10 +314,12 @@ directly.
    device headers.  A headless server has no GPU.~~
    **✅ Resolved (Phase 5.1):** `pch.h` now includes `NeuronCore.h` only.
    `GameAppSim.h` replaces `GameApp.h` in all 59 `.cpp` files.
-2. **Entity constructors load rendering assets.**
-   e.g. `ArmyAnt::ArmyAnt()` calls `g_app->m_resource->GetShape("armyant.shp")`.
-   A headless process has no resource/shape system.
-   *(Phase 6 scope — `Shape*` ownership moves to renderers.)*
+2. ~~**Entity constructors load rendering assets.**~~
+   ~~e.g. `ArmyAnt::ArmyAnt()` calls `Resource::GetShapeStatic("armyant.shp")`.
+   A headless process has no resource/shape system.~~
+   **✅ Resolved (Phase 6.1):** All 93 `Resource::GetShapeStatic()` calls
+   migrated to `GetShape()` which returns `nullptr` on headless.
+   *(Phase 6.2 adds null guards to ~12 simulation-side `m_shape` dereferences.)*
 3. ~~**Simulation and rendering share mutable state.**~~
    ~~`Advance()` and `Render()` both read/write `m_shape`, `m_front`,
    `m_pos`, `m_scale` with no separation of simulation state from
@@ -1191,11 +1210,13 @@ directly.  Creating a separate project would have been unnecessary churn.
 
 **Remaining include dependencies** (utility headers, not GPU):
 GameLogic `.cpp` files still include NeuronClient utility headers
-(51× `resource.h`, 44× `ShapeStatic.h`, 44× `math_utils.h`,
+(1× `resource.h` — only `entity.cpp` for `GetTextReader`;
+44× `ShapeStatic.h`, 44× `math_utils.h`,
 25× `text_stream_readers.h`, 25× `file_writer.h`, etc.) and Starstrike
 infrastructure headers (35× `team.h`, 20× `main.h`, 11× `unit.h`, etc.).
-None of these are GPU/rendering headers.  Full removal is Phase 6 scope
-(moving `Shape*` ownership to renderers).
+None of these are GPU/rendering headers.  `resource.h` was reduced from
+51 to 1 include by Phase 6.1 (`ShapeStore` migration).  Full removal of
+`ShapeStatic.h` is Phase 6.4 scope (moving `Shape*` ownership to renderers).
 
 ### 5.2 — `GameRender/GameRender.vcxproj` (static library)
 
@@ -1236,25 +1257,256 @@ None of these are GPU/rendering headers.  Full removal is Phase 6 scope
 
 ## Phase 6 — Separate Simulation State from Presentation State
 
-> **STATUS: ⚠️ Partially achieved.**  New companions receive `const Entity&`
-> / `const Building&` — correct layering.  However, renderers still read
-> `Shape*` from simulation objects (e.g. `ant.m_shape->Render()`), so true
-> const separation requires moving `Shape*` ownership to renderers (Phase 4
-> prerequisite).
+> **STATUS: 6.1 ✅ Done; 6.2–6.4 ❌ Not started.**  Phase 6.0 audit
+> complete.  ~~Phase 6.1 (move `ShapeStatic` to NeuronCore) cancelled~~ —
+> `ShapeStatic` stays in `NeuronClient`.  **Phase 6.1 (`ShapeStore`)
+> complete:** abstract `ShapeStore` in `GameLogic/ShapeStore.h`;
+> `ClientShapeStore` in `GameRender/` delegates to
+> `Resource::GetShapeStatic()`.  93 call sites migrated; 50 stale
+> `resource.h` includes removed.  Null-safety guards (6.2) protect ~12
+> dereference sites; explosion events (6.3) replace `ShapeStatic*` with
+> type IDs.
 
-### 6.1 — Const access for renderers
+### 6.0 — Audit `Shape*` usage across GameLogic
 
-Render companions receive `const Entity&` / `const Building&`.  Renderers
-never write to simulation state.
+> **STATUS: ✅ Done.**  87 `m_shape` references across ~27 files.
 
-**Prerequisite (completed in Phase 2 pre-step):** `TreeRenderer` is the
-only existing renderer that mutates simulation state
-(`EnsureUploaded()` writes `m_meshDirty` and calls `Generate()`).  Phase 2
-pre-step moves `Generate()` into `Tree::Advance()`, eliminating the
-mutation before any new companions are written.  All subsequent companions
-are written against `const` references from the start.
+#### Key finding
 
-### 6.2 — Interpolation buffer (optional, future)
+`NeuronClient/ShapeStatic.h` includes **only NeuronCore types**
+(`llist.h`, `matrix34.h`, `rgb_colour.h`, `LegacyVector3.h`).  In
+`ShapeStatic.cpp`, 95% of the code is pure CPU — `Load()`, `RayHit()`,
+`SphereHit()`, `ShapeHit()`, `CalculateCenter()`, `CalculateRadius()`,
+`GetMarkerData()`, `GetMarkerWorldMatrix()`.  Only two `Render()`
+overloads (+ `ShapeFragmentData::Render`/`RenderSlow`) use GL calls.
+`ShapeStatic` stays in `NeuronClient` (it's an asset/mesh type, not shared
+server/client infrastructure).  The compile-time setup already works:
+`GameLogic/pch.h` forward-declares the types; `.cpp` files include
+`ShapeStatic.h` via the NeuronClient include path.  The decoupling problem
+is **runtime** — entity constructors call `Resource::GetShapeStatic()`
+which requires the full client resource system.  The fix is `ShapeStore`
+(Phase 6.1).
+
+#### Usage categories
+
+| Category | Description | Call sites | Headless requirement |
+|----------|-------------|------------|---------------------|
+| **Collision** | `CalculateCenter`/`CalculateRadius` for bounding; `RayHit`/`SphereHit`/`ShapeHit` for intersection | `Entity::Begin`, `Building::Initialise`, `Building::SetDetail`, `Building::DoesRayHit`, `Building::DoesSphereHit`, `Building::DoesShapeHit`, `Entity::RayHit`, `LaserFence::DoesRayHit` | Shape data must be available (loaded from file) |
+| **Per-frame markers** | `GetMarkerWorldMatrix()` every frame | `EntityLeg::GetLegRootPos()` (Spider/Tripod IK), `ArmyAnt::GetCarryMarker()`, `Squadie::Attack()`/`FireSecondaryWeapon()`, `Armour::GetEntrance()`, `LaserFence::GetTopPosition()` | Shape data must be available |
+| **Init-time markers** | `GetMarkerWorldMatrix()` or `GetMarkerData()` in constructors / `Initialise()` | `EntityLeg` constructor (thigh/shin lengths), `Building::SetShapePorts()` (port positions), `Building::SetShapeLights()` (light positions), `SporeGenerator` (tail markers), `Triffid` (launch/stem) | Shape data must be available |
+| **Animation swap** | Swap `m_shape` between pre-loaded static shapes | `ArmyAnt` (3 shapes), `Centipede` (head/body), `SoulDestroyer` (head/tail) | Shapes must be loaded (or swap becomes no-op) |
+| **Explosion events** | Pass `m_shape` to `SimEvent::MakeExplosion()` | 8+ call sites: `ArmyAnt`, `Armour`, `Spider`, `Tripod`, `SporeGenerator`, `Squadie`, `Building::Destroy()` ×3 | Can be replaced with type ID lookup |
+
+#### Entities with marker fields (simulation-visible)
+
+| Entity | Marker fields | Per-frame? |
+|--------|--------------|------------|
+| `ArmyAnt` | `m_carryMarker` | Yes — `GetCarryMarker()` positions carried spirit |
+| `Armour` | `m_markerEntrance`, `m_markerFlag` | Yes — `GetEntrance()` positions passengers |
+| `Squadie` | `m_laser`, `m_brass`, `m_eye1`, `m_eye2` | Yes — `Attack()` / `FireSecondaryWeapon()` fire position |
+| `Officer` | `m_flagMarker` | Init-time only |
+| `Spider` | `m_eggLay` + 6 `EntityLeg` root markers | Yes — `EntityLeg::GetLegRootPos()` every frame |
+| `Tripod` | 3 `EntityLeg` root markers | Yes — `EntityLeg::GetLegRootPos()` every frame |
+| `SporeGenerator` | `m_eggMarker`, `m_tail[4]` | Init-time only |
+| `SoulDestroyer` | `s_tailMarker` (static) | Init-time only |
+| `Triffid` | `m_launchPoint`, `m_stem` | Init-time only (via `Building::SetShape`) |
+| `LaserFence` | `m_marker2` | Yes — `GetTopPosition()` fence endpoint |
+
+#### Entities with no shape loading
+
+`Darwinian` (hardcodes `m_centerPos`/`m_radius` in `Begin()`),
+`SpaceInvader` (via `AirstrikeUnit`, no shape in constructor).
+
+#### Entities with multiple shapes
+
+`ArmyAnt` (3 in local array, animation swap), `Centipede` (2 statics:
+head/body), `SoulDestroyer` (2 statics: head/tail).
+
+#### `EntityLeg` — most architecturally challenging
+
+`EntityLeg` loads 2 shapes per leg (upper/lower) in its constructor, and
+calls `m_parent->m_shape->GetMarkerWorldMatrix(m_rootMarker, rootMat)`
+**every frame** in `GetLegRootPos()`.  Spider has 6 legs, Tripod has 3.
+This is the deepest per-frame `Shape*` dependency in simulation.
+
+### ~~6.1 — Move `ShapeStatic` to NeuronCore~~ (Cancelled)
+
+> **STATUS: ❌ Cancelled.**  `ShapeStatic` is an asset/mesh type — it
+> belongs in `NeuronClient`, not `NeuronCore`.  `NeuronCore` is strictly
+> shared server/client infrastructure (math, networking, timers, logging).
+> Moving `ShapeStatic` would also cascade to `text_stream_readers`,
+> `math_utils`, `plane`, and `vector2` — 6+ files pulled into NeuronCore
+> that don't belong there.
+>
+> The current compile-time setup works correctly:
+> - `GameLogic/pch.h` forward-declares `ShapeStatic`, `ShapeFragmentData`,
+>   `ShapeMarkerData`
+> - Individual `.cpp` files `#include "ShapeStatic.h"` via the NeuronClient
+>   include path
+> - `GameLogic.lib` compiles fine in the full solution context
+>
+> The actual problem is **runtime**: entity constructors call
+> `Resource::GetShapeStatic()` which requires the full client
+> resource system.  This is solved by `ShapeStore` (Phase 6.1) +
+> null-safety (Phase 6.2) — no header moves needed.
+
+### 6.1 — Shape loading via `ShapeStore`
+
+> **STATUS: ✅ Done.**  Abstract `ShapeStore` interface in
+> `GameLogic/ShapeStore.h`; `ClientShapeStore` concrete implementation in
+> `GameRender/ClientShapeStore.h/.cpp`.  93 `Resource::GetShapeStatic()`
+> calls across 46 GameLogic `.cpp` files migrated to `GetShape()`.
+> 50 stale `resource.h` includes removed (only `entity.cpp` retains it
+> for `g_app->m_resource->GetTextReader("stats.txt")`).  Build verified.
+
+**Goal:** Entity/building constructors no longer call
+`Resource::GetShapeStatic()` directly.  Instead, shapes are
+loaded through an abstract `ShapeStore` interface that the client
+populates and headless processes leave as `nullptr`.
+
+**Implementation (deviation from original design):**
+
+The original plan specified a `Register`/`Get` pattern where renderers
+would pre-populate a hash map.  The actual implementation is simpler:
+`ClientShapeStore::Get()` delegates directly to
+`Resource::GetShapeStatic()`, which already has a lazy-loading cache
+(`inline static HashTable<ShapeStatic*> m_shapes`).  No pre-registration
+is needed — the existing `Resource` cache serves that purpose.
+
+```cpp
+// GameLogic/ShapeStore.h
+#pragma once
+
+class ShapeStatic;
+
+class ShapeStore
+{
+public:
+    virtual ~ShapeStore() = default;
+    [[nodiscard]] virtual ShapeStatic* Get(const char* _name) = 0;
+};
+
+extern ShapeStore* g_shapeStore;  // nullptr on headless
+
+[[nodiscard]] inline ShapeStatic* GetShape(const char* _name)
+{
+    return g_shapeStore ? g_shapeStore->Get(_name) : nullptr;
+}
+```
+
+```cpp
+// GameRender/ClientShapeStore.h — delegates to Resource::GetShapeStatic()
+class ClientShapeStore : public ShapeStore
+{
+public:
+    [[nodiscard]] ShapeStatic* Get(const char* _name) override;
+};
+```
+
+**Wiring:** `GameRender/GameRender.cpp` — `InitGameRenderers()` sets
+`g_shapeStore = &s_clientShapeStore;` (static instance) as its first
+operation.
+
+**Migration pattern:**
+```diff
+- m_shape = Resource::GetShapeStatic("armyant.shp");
++ m_shape = GetShape("armyant.shp");
+```
+
+On headless (server), `g_shapeStore` is `nullptr` — `GetShape()` returns
+`nullptr` and constructors get null shapes.  Phase 6.2 adds null guards
+to the ~12 simulation-side dereferences.
+
+**Stale include cleanup:** After migration, 50 of 51 `resource.h`
+includes in GameLogic were no longer needed (no `Resource::` or
+`g_app->m_resource` usage remaining).  Only `entity.cpp` retains
+`resource.h` for `g_app->m_resource->GetTextReader("stats.txt")`.
+
+### 6.2 — Null-safety for headless `Shape*` usage
+
+> **STATUS: ❌ Not started.**  Prerequisite: 6.1 (constructors may
+> yield `nullptr`).
+
+**Goal:** All simulation-side `m_shape` dereferences handle `nullptr`
+gracefully so a headless process doesn't crash.
+
+**Call sites requiring null guards (~12):**
+
+| Call site | Current code | Null-safe replacement |
+|-----------|-------------|----------------------|
+| `Entity::Begin()` | `m_shape->CalculateCenter/Radius()` | Already has `if (m_shape)` in some paths; add to others |
+| `Building::Initialise()` | `m_shape->CalculateCenter/Radius()` | Guard + hardcoded defaults |
+| `Building::DoesRayHit()` | `m_shape->RayHit()` | Already has sphere fallback — use it when `m_shape == nullptr` |
+| `Building::DoesSphereHit()` | `m_shape->SphereHit()` | Already has sphere fallback |
+| `Building::DoesShapeHit()` | `m_shape->ShapeHit()` | Already has sphere fallback |
+| `Building::Destroy()` | `m_shape` → `MakeExplosion` | Guard (skip explosion on headless) |
+| `EntityLeg::GetLegRootPos()` | `m_parent->m_shape->GetMarkerWorldMatrix()` | Return identity position |
+| `ArmyAnt::GetCarryMarker()` | `m_shape->GetMarkerWorldMatrix()` | Return `m_pos` (entity position) |
+| `Squadie::Attack()` | `m_shape->GetMarkerWorldMatrix(m_laser)` | Return forward-offset from `m_pos` |
+| `Armour::GetEntrance()` | `m_shape->GetMarkerWorldMatrix(m_markerEntrance)` | Return `m_pos` |
+| `LaserFence::GetTopPosition()` | `m_shape->GetMarkerWorldMatrix(m_marker2)` | Return `m_pos + up * height` |
+| `Entity::RayHit()` | `m_shape->RayHit()` | Sphere fallback (already partially guarded) |
+
+### 6.3 — Decouple `SimEvent::Explosion` from `Shape*`
+
+> **STATUS: ❌ Not started.**  Prerequisite: 6.1 (renderers populate
+> `ShapeStore`).
+
+**Problem:** `GameSimEvent::Explosion` currently stores
+`const ShapeStatic* shape`.  This is the last pointer from simulation
+into presentation data.  On headless, `shape` would be `nullptr`, and
+the drain function would crash calling `g_explosionManager.AddExplosion()`.
+
+**Fix:** Replace the pointer with a type identifier:
+
+```cpp
+struct Explosion
+{
+    int entityOrBuildingType;   // Entity::Type or Building::Type
+    bool isBuilding;            // disambiguate the two enums
+    GameMatrix transform;
+    float fraction;
+};
+```
+
+The drain function in `Starstrike/main.cpp` looks up the shape:
+
+```cpp
+[](const GameSimEvent::Explosion& e) {
+    ShapeStatic* shape = e.isBuilding
+        ? g_buildingShapes.Get(e.entityOrBuildingType)
+        : g_entityShapes.Get(e.entityOrBuildingType);
+    if (shape)
+        g_explosionManager.AddExplosion(shape, e.transform, e.fraction);
+},
+```
+
+This removes the last `ShapeStatic*` crossing from simulation → client.
+
+### 6.4 — Move `m_shape` ownership to renderer companions (optional)
+
+> **STATUS: ❌ Not started.**  Lower priority — headless works after
+> 6.1–6.2.
+
+**Goal:** Remove `ShapeStatic* m_shape` from `Entity` and `Building`
+base classes entirely.  Renderers own and manage shape pointers.
+
+**Approach:**
+
+- Each `EntityRenderer` / `BuildingRenderer` subclass holds its own
+  `ShapeStatic*` member(s), loaded during `InitGameRenderers()` or
+  lazily on first `Render()`.
+- `ShapeMarkerData*` fields (`m_carryMarker`, `m_markerEntrance`, etc.)
+  either move to the renderer (if rendering-only) or are replaced with
+  data-driven `LegacyVector3` offsets (if simulation-visible).
+- `EntityLeg` constructor and `GetLegRootPos()` would need the shape
+  for IK — either query `ShapeStore` or receive pre-computed offsets.
+
+This is a large refactor touching ~27 files.  It is not required for
+headless operation (6.2 null-safety is sufficient) but achieves the
+cleanest possible simulation/presentation separation.
+
+### 6.5 — Interpolation buffer (optional, future)
 
 For smooth visuals independent of simulation tick rate:
 
@@ -1284,27 +1536,38 @@ With `GameLogic` fully decoupled:
 2. Links: `NeuronCore` + `GameLogic` + networking.
 3. No `NeuronClient`, no `GameRender`, no window, no GPU.
 4. Runs `Location::Advance()` in a loop, sends commands via network.
-5. All entity constructors work because `Shape*` has moved to renderers.
+5. `g_shapeStore` is `nullptr` — entity constructors get `nullptr` shapes;
+   null-safety guards (Phase 6.2) ensure no crashes.
 
 ---
 
 ## Handling `Shape*` in Constructors — The Asset Problem
 
+> **See Phase 6.1 (`ShapeStore`) and Phase 6.2 (null-safety) for the
+> implementation plan.**
+
 Currently `ArmyAnt::ArmyAnt()` does:
 ```cpp
-m_shapes[0] = g_app->m_resource->GetShape("armyant.shp");
+m_shapes[0] = Resource::GetShapeStatic("armyant.shp");
 ```
 
-The simulation does not need the shape.  The fix:
+The simulation does not need the shape for its core logic, but does use
+it for collision bounds (`CalculateCenter`/`CalculateRadius`) and marker
+lookups (`GetCarryMarker()`).  The fix:
 
-1. Move shape loading into the render companion init (or lazy-load on
-   first `Render()` call).
-2. The entity stores a type enum (it already does: `m_type = TypeArmyAnt`).
-   The renderer uses the type to look up the correct shapes.
-3. `GetCarryMarker()` (used in simulation for spirit attach position)
-   references `m_carryMarker` from the shape.  Replace with a data-driven
-   `LegacyVector3` offset loaded from a config file, not derived from a
-   mesh marker at runtime.
+1. **Phase 6.1** introduces `ShapeStore` (type-indexed cache in
+   `GameLogic`, populated by renderers at init).  Constructors change
+   from `Resource::GetShapeStatic("armyant.shp")` to
+   `g_shapeStore ? g_shapeStore->Get("armyant.shp") : nullptr`.
+   `ShapeStatic` stays in `NeuronClient` — the compile-time setup
+   (forward declarations in `pch.h`, full include via NeuronClient
+   include path) is correct as-is.
+2. **Phase 6.2** adds null guards to the ~12 simulation-side `m_shape`
+   dereferences so headless processes don't crash.
+3. **Phase 6.3** decouples `SimEvent::Explosion` from `ShapeStatic*`
+   by replacing the pointer with a type ID.
+4. **Phase 6.4** (optional) moves `m_shape` ownership entirely to
+   render companions.
 
 ---
 
@@ -1404,6 +1667,24 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 5.3 | `NeuronServer/NeuronServer.vcxproj` | Add `GameLogic` `ProjectReference` + `AdditionalIncludeDirectories` (Debug + Release) | ✅ |
 | 5 | ~~`GameLogic/GameLogic.vcxproj`~~ | ~~**Deleted**~~ | N/A — `GameLogic` stays |
 | 7 | `BotClient/BotClient.vcxproj` | **New** — headless executable | ❌ |
+| ~~6.1~~ | ~~`NeuronClient/ShapeStatic.h`~~ | ~~**Moved** to `NeuronCore/ShapeStatic.h`~~ | ❌ Cancelled — `ShapeStatic` stays in `NeuronClient` |
+| ~~6.1~~ | ~~`NeuronClient/ShapeStatic.cpp`~~ | ~~**Split** — data→NeuronCore, render→NeuronClient~~ | ❌ Cancelled |
+| ~~6.1~~ | ~~`NeuronClient/text_stream_readers.h/.cpp`~~ | ~~**Moved** to `NeuronCore/`~~ | ❌ Cancelled |
+| ~~6.1~~ | ~~`NeuronClient/math_utils.h/.cpp`~~ | ~~**Moved** to `NeuronCore/`~~ | ❌ Cancelled |
+| ~~6.1~~ | ~~`NeuronCore/NeuronCore.vcxproj`~~ | ~~Add `ShapeStatic.h/.cpp`, `text_stream_readers.h/.cpp`, `math_utils.h/.cpp`~~ | ❌ Cancelled |
+| ~~6.1~~ | ~~`NeuronClient/NeuronClient.vcxproj`~~ | ~~Remove moved files; add `ShapeStaticRender.cpp`~~ | ❌ Cancelled |
+| ~~6.1~~ | ~~`GameLogic/pch.h`~~ | ~~Replace forward declarations with `#include "ShapeStatic.h"`~~ | ❌ Cancelled — forward declarations stay |
+| 6.1 | `GameLogic/ShapeStore.h/.cpp` | **New** — abstract `ShapeStore` interface + `g_shapeStore` global + inline `GetShape()` free function | ✅ |
+| 6.1 | `GameRender/ClientShapeStore.h/.cpp` | **New** — concrete `ShapeStore` impl delegating to `Resource::GetShapeStatic()` | ✅ |
+| 6.1 | `GameRender/GameRender.cpp` | Added `g_shapeStore = &s_clientShapeStore;` in `InitGameRenderers()` | ✅ |
+| 6.1 | 46 `GameLogic/*.cpp` files | `Resource::GetShapeStatic()` → `GetShape()`; added `#include "ShapeStore.h"` | ✅ |
+| 6.1 | 50 `GameLogic/*.cpp` files | Removed stale `#include "resource.h"` (only `entity.cpp` retains it) | ✅ |
+| 6.2 | ~12 simulation `.cpp` files | Add null guards to `m_shape` dereferences | ❌ |
+| 6.3 | `GameLogic/GameSimEvent.h` | `Explosion::shape` → type ID (remove `ShapeStatic*` from variant) | ❌ |
+| 6.3 | `Starstrike/main.cpp` | `DrainSimEvents()` looks up shape from renderer cache | ❌ |
+| 6.4 | `GameLogic/entity.h` | Remove `ShapeStatic* m_shape` | ❌ |
+| 6.4 | `GameLogic/building.h` | Remove `ShapeStatic* m_shape` | ❌ |
+| 6.4 | ~27 entity/building `.cpp` files | Move `Shape*` fields and marker fields to renderer companions | ❌ |
 
 ---
 
@@ -1457,8 +1738,14 @@ A future phase can split `g_app` into `g_sim` (simulation globals) and
 | 4 — Remove base-class Render | 1 day | Low | Phase 2 + 3 complete | ✅ Done |
 | 2 W6 — WorldObject subclass renderers (Flag, Snow, BoxKite, SpaceInvader, weapons) | 3–5 days | Low | Phase 4 | ✅ Done |
 | 5 — GameLogic headless cleanup + GameRender project | 1–2 days | Low | Phase 4 + Wave 6 | ✅ Done (5.1 + 5.2 + 5.3) |
-| 6 — Presentation state separation | 1 week | Low | Phase 5 | ⚠️ Partial |
-| 7 — Bot client | 1–2 days | Low | Phase 6 | ❌ Not started |
+| 6.0 — Audit `Shape*` usage | 1 day | None | Phase 5 | ✅ Done |
+| ~~6.1 — Move `ShapeStatic` to NeuronCore~~ | — | — | — | ❌ Cancelled — `ShapeStatic` stays in NeuronClient |
+| 6.1 — Shape loading via `ShapeStore` | 2–3 days | Medium | Phase 6.0 | ✅ Done |
+| 6.2 — Null-safety for headless `Shape*` | 1 day | Low | Phase 6.1 | ❌ Not started |
+| 6.3 — Decouple `SimEvent::Explosion` | 1 day | Low | Phase 6.1 | ❌ Not started |
+| 6.4 — Move `m_shape` to renderers (optional) | 3–5 days | Medium | Phase 6.2 | ❌ Not started |
+| 6.5 — Interpolation buffer (optional) | 2–3 days | Low | Phase 6.4 | ❌ Not started |
+| 7 — Bot client | 1–2 days | Low | Phase 6.2 | ❌ Not started |
 
 Phase 1 alone is enough to start server-side simulation experiments
 immediately.  Phases 2–4 can run in parallel with other feature work.
@@ -1512,6 +1799,17 @@ immediately.  Phases 2–4 can run in parallel with other feature work.
     `AdditionalIncludeDirectories` added to both Debug and Release
     configs (also fixed pre-existing bug: Release config was missing
     include dirs entirely).
-16. **Phase 6** — Presentation state separation (`Shape*` ownership to
-    renderers).
-17. **Phase 7** — Headless bot client.
+16. ~~**Phase 6.1 — Shape loading via `ShapeStore`**~~ ✅ Done —
+    abstract `ShapeStore` in `GameLogic/ShapeStore.h`;
+    `ClientShapeStore` in `GameRender/` delegates to
+    `Resource::GetShapeStatic()`.  93 call sites across 46 files
+    migrated to `GetShape()`.  50 stale `resource.h` includes removed.
+    (`ShapeStatic` stays in `NeuronClient` — old Phase 6.1 that
+    proposed moving it to NeuronCore was cancelled.)
+17. **Phase 6.2 — Null-safety** — add null guards to ~12 `m_shape`
+    dereferences for headless operation.
+18. **Phase 6.3 — Decouple `SimEvent::Explosion`** — replace
+    `const ShapeStatic*` with type ID; drain function looks up shape.
+19. **Phase 6.4 — Move `m_shape` ownership to renderers** (optional) —
+    remove `ShapeStatic* m_shape` from base classes; renderers own shapes.
+20. **Phase 7** — Headless bot client.
