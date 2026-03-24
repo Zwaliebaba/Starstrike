@@ -4,7 +4,7 @@
 #include "preferences.h"
 #include "spam.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "globals.h"
 #include "entity_grid.h"
@@ -13,7 +13,7 @@
 #include "main.h"
 #include "camera.h"
 
-static inline float SpamReloadTime() { return SPAM_RELOADTIME - (SPAM_RELOADTIME / 2.0) * g_app->m_difficultyLevel / 10.0; }
+static inline float SpamReloadTime() { return SPAM_RELOADTIME - (SPAM_RELOADTIME / 2.0) * g_context->m_difficultyLevel / 10.0; }
 
 Spam::Spam()
   : Building(),
@@ -28,7 +28,7 @@ Spam::Spam()
 
   m_front.RotateAroundY(frand(2.0f * M_PI));
 
-  SetShape(g_app->m_resource->GetShapeStatic("researchitem.shp"));
+  SetShape(Resource::GetShapeStatic("researchitem.shp"));
 }
 
 void Spam::Initialise(Building* _template) { Building::Initialise(_template); }
@@ -37,7 +37,7 @@ void Spam::SetDetail(int _detail)
 {
   if (m_onGround)
   {
-    m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     m_pos.y += 20.0f;
   }
 
@@ -58,8 +58,8 @@ void Spam::Damage(float _damage)
   if (newHealthBand <= 0 || newHealthBand < oldHealthBand)
   {
     float percentDead = 1.0f - m_damage / SPAM_DAMAGE;
-    percentDead = min(percentDead, 1.0f);
-    percentDead = max(percentDead, 0.0f);
+    percentDead = std::min(percentDead, 1.0f);
+    percentDead = std::max(percentDead, 0.0f);
     Matrix34 mat(m_front, g_upVector, m_pos);
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, percentDead));
   }
@@ -67,7 +67,7 @@ void Spam::Damage(float _damage)
   if (!dead && m_damage <= 0.0f)
   {
     // We just died
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     if (gb)
       gb->m_online = true;
     g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
@@ -95,7 +95,7 @@ void Spam::SpawnInfection()
     infection->m_pos = m_centerPos;
     infection->m_vel = vel;
     infection->m_parentId = m_id.GetUniqueId();
-    int index = g_app->m_location->m_effects.PutData(infection);
+    int index = g_context->m_location->m_effects.PutData(infection);
     infection->m_id.Set(-1, UNIT_EFFECTS, index, -1);
     infection->m_id.GenerateUniqueId();
   }
@@ -112,7 +112,7 @@ bool Spam::Advance()
   {
     m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
-    float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     if (m_pos.y <= landHeight + 20.0f)
     {
       m_onGround = true;
@@ -133,7 +133,7 @@ bool Spam::Advance()
     {
       m_vel *= (1.0f - SERVER_ADVANCE_PERIOD * 0.3f);
       m_pos += m_vel * SERVER_ADVANCE_PERIOD;
-      float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+      float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
       m_pos.y = landHeight + 20.0f;
 
       Matrix34 mat(m_front, m_up, m_pos);
@@ -145,11 +145,11 @@ bool Spam::Advance()
     //
     // Push from nearby SPAM
 
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* b = g_app->m_location->m_buildings[i];
+        Building* b = g_context->m_location->m_buildings[i];
         if (b && b->m_type == TypeSpam)
         {
           bool intersect = SphereSphereIntersection(m_centerPos, m_radius, b->m_centerPos, b->m_radius);
@@ -213,7 +213,7 @@ SpamInfection::SpamInfection()
 
 bool SpamInfection::SearchForEntities()
 {
-  m_targetId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, SPAMINFECTION_MINSEARCHRANGE, SPAMINFECTION_MAXSEARCHRANGE,
+  m_targetId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, SPAMINFECTION_MINSEARCHRANGE, SPAMINFECTION_MAXSEARCHRANGE,
                                                              1);
 
   if (m_targetId.IsValid())
@@ -227,7 +227,7 @@ bool SpamInfection::SearchForEntities()
 
 bool SpamInfection::SearchForRandomPosition()
 {
-  Building* building = g_app->m_location->GetBuilding(m_parentId);
+  Building* building = g_context->m_location->GetBuilding(m_parentId);
   if (building)
   {
     float distance = (building->m_pos - m_pos).Mag();
@@ -243,8 +243,8 @@ bool SpamInfection::SearchForRandomPosition()
   m_targetPos.y += syncsfrand(200.0f);
   m_targetPos.z += syncsfrand(200.0f);
 
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
-  m_targetPos.y = max(m_targetPos.y, landHeight);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+  m_targetPos.y = std::max(m_targetPos.y, landHeight);
 
   return true;
 }
@@ -260,11 +260,11 @@ bool SpamInfection::SearchForSpirits()
   int index = -1;
   float nearest = 9999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       float theDist = (s->m_pos - m_pos).Mag();
 
       if (theDist <= SPAMINFECTION_MAXSEARCHRANGE && theDist >= SPAMINFECTION_MINSEARCHRANGE && theDist < nearest && s->m_state ==
@@ -319,7 +319,7 @@ void SpamInfection::AdvanceAttackingEntity()
   //
   // Is our target alive and well?
 
-  Entity* target = g_app->m_location->GetEntity(m_targetId);
+  Entity* target = g_context->m_location->GetEntity(m_targetId);
   if (!target || target->m_dead)
   {
     m_state = StateIdle;
@@ -334,12 +334,12 @@ void SpamInfection::AdvanceAttackingEntity()
     if (m_targetId.GetTeamId() == 0)
     {
       // Green darwinian
-      int darwinianResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeDarwinian);
+      int darwinianResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeDarwinian);
       if (darwinianResearch > 2 && syncfrand(10.0f) < 5.0f)
       {
-        g_app->m_location->SpawnEntities(target->m_pos, 1, -1, Entity::TypeDarwinian, 1, target->m_vel, 0.0f);
-        g_app->m_location->m_entityGrid->RemoveObject(m_targetId, target->m_pos.x, target->m_pos.z, target->m_radius);
-        g_app->m_location->m_teams[0].m_others.MarkNotUsed(m_targetId.GetIndex());
+        g_context->m_location->SpawnEntities(target->m_pos, 1, -1, Entity::TypeDarwinian, 1, target->m_vel, 0.0f);
+        g_context->m_location->m_entityGrid->RemoveObject(m_targetId, target->m_pos.x, target->m_pos.z, target->m_radius);
+        g_context->m_location->m_teams[0].m_others.MarkNotUsed(m_targetId.GetIndex());
         delete target;
       }
       else
@@ -370,13 +370,13 @@ void SpamInfection::AdvanceAttackingSpirit()
   //
   // Is our spirit still alive and well?
 
-  if (!g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+  if (!g_context->m_location->m_spirits.ValidIndex(m_spiritId))
   {
     m_state = StateIdle;
     return;
   }
 
-  Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+  Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
 
   if (spirit->m_state != Spirit::StateFloating)
   {
@@ -392,8 +392,8 @@ void SpamInfection::AdvanceAttackingSpirit()
     int entityType = Entity::TypeVirii;
     if (syncfrand(20.0f) < 1.0f)
       entityType = Entity::TypeSpider;
-    g_app->m_location->SpawnEntities(spirit->m_pos, 1, -1, entityType, 1, g_zeroVector, 0.0f, 200.0f);
-    g_app->m_location->m_spirits.MarkNotUsed(m_spiritId);
+    g_context->m_location->SpawnEntities(spirit->m_pos, 1, -1, entityType, 1, g_zeroVector, 0.0f, 200.0f);
+    g_context->m_location->m_spirits.MarkNotUsed(m_spiritId);
 
     int numFlashes = 5 + darwiniaRandom() % 5;
     for (int i = 0; i < numFlashes; ++i)

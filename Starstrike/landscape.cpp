@@ -377,10 +377,10 @@ void Landscape::GenerateHeightMap(LandscapeDef* _def)
 
 void Landscape::DeleteTile(int tileId)
 {
-  LandscapeTile* tile = g_app->m_location->m_levelFile->m_landscape.m_tiles[tileId];
+  LandscapeTile* tile = g_context->m_location->m_levelFile->m_landscape.m_tiles[tileId];
   delete tile;
-  g_app->m_location->m_levelFile->m_landscape.m_tiles.RemoveData(tileId);
-  LandscapeDef* def = &g_app->m_location->m_levelFile->m_landscape;
+  g_context->m_location->m_levelFile->m_landscape.m_tiles.RemoveData(tileId);
+  LandscapeDef* def = &g_context->m_location->m_levelFile->m_landscape;
   Init(def);
 }
 
@@ -495,8 +495,8 @@ void Landscape::Init(LandscapeDef* _def, bool _justMakeTheHeightMap)
   GenerateNormals();
   BuildOpenGlState();
 
-  if (g_app->m_location->m_water)
-    g_app->m_location->m_water->GenerateLightMap();
+  if (g_context->m_location->m_water)
+    g_context->m_location->m_water->GenerateLightMap();
 
   _def->m_cellSize = oldCellSize;
 }

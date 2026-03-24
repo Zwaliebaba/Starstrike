@@ -20,7 +20,7 @@
 UserInput::UserInput()
   : m_removeTopLevelMenu(false)
 {
-  EclInitialise(g_app->m_renderer->ScreenW(), g_app->m_renderer->ScreenH());
+  EclInitialise(g_context->m_renderer->ScreenW(), g_context->m_renderer->ScreenH());
 }
 
 extern signed char g_keyDeltas[KEY_MAX];
@@ -51,7 +51,7 @@ void UserInput::AdvanceMenus()
 // *** Advance
 void UserInput::Advance()
 {
-  START_PROFILE(g_app->m_profiler, "Advance UserInput");
+  START_PROFILE(g_context->m_profiler, "Advance UserInput");
 
   g_inputManager->Advance();
 
@@ -70,17 +70,17 @@ void UserInput::Advance()
     DebugKeyBindings::CheatButton();
 #endif
 
-  END_PROFILE(g_app->m_profiler, "Advance UserInput");
+  END_PROFILE(g_context->m_profiler, "Advance UserInput");
 }
 
 // *** Render
 void UserInput::Render()
 {
-  START_PROFILE(g_app->m_profiler, "Render UserInput");
+  START_PROFILE(g_context->m_profiler, "Render UserInput");
 
   EclRender();
 
-  END_PROFILE(g_app->m_profiler, "Render UserInput");
+  END_PROFILE(g_context->m_profiler, "Render UserInput");
 }
 
 // *** GetMousePos3d
@@ -92,14 +92,14 @@ void UserInput::RecalcMousePos3d()
   // Get click ray
   LegacyVector3 rayStart;
   LegacyVector3 rayDir;
-  g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+  g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
   ASSERT_VECTOR3_IS_SANE(rayStart);
   ASSERT_VECTOR3_IS_SANE(rayDir);
   rayStart += rayDir * 0.0f;
 
   bool landscapeHit = false;
-  if (g_app->m_location)
-    landscapeHit = g_app->m_location->m_landscape.RayHit(rayStart, rayDir, &m_mousePos3d);
+  if (g_context->m_location)
+    landscapeHit = g_context->m_location->m_landscape.RayHit(rayStart, rayDir, &m_mousePos3d);
   else
   {
     // We are in the global world
@@ -119,11 +119,11 @@ void UserInput::RecalcMousePos3d()
     // OK, we didn't hit against the landscape mesh, so hit against a sphere that
     // encloses the whole world
     LegacyVector3 sphereCenter;
-    sphereCenter.x = g_app->m_globalWorld->GetSize() * 0.5f;
+    sphereCenter.x = g_context->m_globalWorld->GetSize() * 0.5f;
     sphereCenter.y = 0.0f;
-    sphereCenter.z = g_app->m_globalWorld->GetSize() * 0.5f;
+    sphereCenter.z = g_context->m_globalWorld->GetSize() * 0.5f;
 
-    float sphereRadius = g_app->m_globalWorld->GetSize() * 40.0f;
+    float sphereRadius = g_context->m_globalWorld->GetSize() * 40.0f;
 
     rayStart += rayDir * (sphereRadius * 4.0f);
     rayDir = -rayDir;

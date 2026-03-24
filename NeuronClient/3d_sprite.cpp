@@ -9,8 +9,8 @@
 
 void Render3DSprite(LegacyVector3 const &_pos, float _width, float _height, int _textureId)
 {
-	LegacyVector3 camUp = g_app->m_camera->GetUp();
-	LegacyVector3 camRight = (camUp ^ g_app->m_camera->GetFront()) * (_width * 0.5f);
+	LegacyVector3 camUp = g_context->m_camera->GetUp();
+	LegacyVector3 camRight = (camUp ^ g_context->m_camera->GetFront()) * (_width * 0.5f);
 	camUp *= _height;
 
 	LegacyVector3 bottomLeft(_pos - camRight);

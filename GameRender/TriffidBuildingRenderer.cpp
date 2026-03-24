@@ -35,7 +35,7 @@ void TriffidBuildingRenderer::Render(const Building& _building, const BuildingRe
     glEnd();
 
     // Damage flicker effect
-    if (triffid.m_renderDamaged && !g_app->m_editing && triffid.m_damage > 0.0f)
+    if (triffid.m_renderDamaged && !g_context->m_editing && triffid.m_damage > 0.0f)
     {
         float timeIndex = g_gameTime + triffid.m_id.GetUniqueId() * 10;
         float thefrand = frand();
@@ -57,7 +57,7 @@ void TriffidBuildingRenderer::Render(const Building& _building, const BuildingRe
     if (triffid.m_triggered && GetHighResTime() > triffid.m_timerSync - triffid.m_reloadTime * 0.25f)
     {
         Matrix34 launchMat = triffid.m_shape->GetMarkerWorldMatrix(triffid.m_launchPoint, mat);
-        ShapeStatic* eggShape = g_app->m_resource->GetShapeStatic("triffidegg.shp");
+        ShapeStatic* eggShape = Resource::GetShapeStatic("triffidegg.shp");
         Matrix34 eggMat(launchMat.u, -launchMat.f, launchMat.pos);
         eggMat.f *= triffid.m_size;
         eggMat.u *= triffid.m_size;
@@ -73,7 +73,7 @@ void TriffidBuildingRenderer::Render(const Building& _building, const BuildingRe
 
 void TriffidBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
 {
-    if (!g_app->m_editing)
+    if (!g_context->m_editing)
         return;
 
     const Triffid& triffid = static_cast<const Triffid&>(_building);
@@ -107,7 +107,7 @@ void TriffidBuildingRenderer::RenderAlphas(const Building& _building, const Buil
     glEnd();
 
 #ifdef LOCATION_EDITOR
-    if (g_app->m_locationEditor->m_mode == LocationEditor::ModeBuilding && g_app->m_locationEditor->m_selectionId == triffid.m_id.GetUniqueId())
+    if (g_context->m_locationEditor->m_mode == LocationEditor::ModeBuilding && g_context->m_locationEditor->m_selectionId == triffid.m_id.GetUniqueId())
     {
         LegacyVector3 velocity = headMat.f;
         velocity.SetLength(triffid.m_force * triffid.m_size);
@@ -141,7 +141,7 @@ void TriffidBuildingRenderer::RenderAlphas(const Building& _building, const Buil
             {
                 float a = 2.0f * M_PI * static_cast<float>(i) / static_cast<float>(numSteps);
                 LegacyVector3 thisPos = triggerPos + LegacyVector3(sinf(a) * triffid.m_triggerRadius, 0.0f, cosf(a) * triffid.m_triggerRadius);
-                thisPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(thisPos.x, thisPos.z);
+                thisPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(thisPos.x, thisPos.z);
                 thisPos.y += 10.0f;
                 glVertex3fv(thisPos.GetData());
             }

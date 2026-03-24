@@ -11,7 +11,7 @@ ServerToClient::ServerToClient(char* _ip)
   strncpy(m_ip, _ip, sizeof(m_ip));
   m_ip[sizeof(m_ip) - 1] = '\0';
 
-  if (!g_app->m_bypassNetworking)
+  if (!g_context->m_bypassNetworking)
   {
     m_socket = new NetSocket();
     NetRetCode retCode = m_socket->Connect(_ip, 4001);

@@ -51,7 +51,7 @@ int TargetCursor::dY() const { return m_velocity[AXIS_Y]; }
 
 int TargetCursor::dZ() const { return m_velocity[AXIS_Z]; }
 
-bool secondaryInputEnabled() { return (EclGetWindows()->Size() == 0) && !g_app->m_taskManagerInterface->m_visible; }
+bool secondaryInputEnabled() { return (EclGetWindows()->Size() == 0) && !g_context->m_taskManagerInterface->m_visible; }
 
 void TargetCursor::Advance()
 {

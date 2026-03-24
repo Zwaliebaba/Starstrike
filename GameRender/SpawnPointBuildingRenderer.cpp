@@ -19,14 +19,14 @@ void SpawnPointBuildingRenderer::RenderAlphas(const Building& _building, const B
 
     const auto& sp = static_cast<const SpawnPoint&>(_building);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
 
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/cloudyglow.bmp"));
 
     float timeIndex = static_cast<float>(g_gameTime) + sp.m_id.GetUniqueId() * 10.0f;
 
@@ -47,7 +47,7 @@ void SpawnPointBuildingRenderer::RenderAlphas(const Building& _building, const B
         pos.z += cosf(timeIndex + i) * i * 0.7f;
 
         float size = 10.0f + sinf(timeIndex + i * 10.0f) * 10.0f;
-        size = max(size, 5.0f);
+        size = std::max(size, 5.0f);
 
         glColor4f(0.6f, 0.2f, 0.1f, alpha);
 
@@ -73,7 +73,7 @@ void SpawnPointBuildingRenderer::RenderPorts(const Building& _building)
 
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -92,11 +92,11 @@ void SpawnPointBuildingRenderer::RenderPorts(const Building& _building)
         // Render the status light
 
         float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
+        LegacyVector3 camR = g_context->m_camera->GetRight() * size;
+        LegacyVector3 camU = g_context->m_camera->GetUp() * size;
 
         LegacyVector3 statusPos = Building::s_controlPad->GetMarkerWorldMatrix(Building::s_controlPadStatus, mat).pos;
-        statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
+        statusPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(statusPos.x, statusPos.z);
         statusPos.y += 5.0f;
 
         WorldObjectId occupantId = const_cast<SpawnPoint&>(sp).GetPortOccupant(i);
@@ -106,7 +106,7 @@ void SpawnPointBuildingRenderer::RenderPorts(const Building& _building)
         }
         else
         {
-            RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
+            RGBAColour teamColour = g_context->m_location->m_teams[occupantId.GetTeamId()].m_colour;
             glColor4ubv(teamColour.GetData());
         }
 

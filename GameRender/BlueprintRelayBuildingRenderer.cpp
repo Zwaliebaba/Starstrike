@@ -15,7 +15,7 @@ void BlueprintRelayBuildingRenderer::Render(const Building& _building,
 
     // In the editor the relay's y position is snapped to its configured
     // altitude so the designer can see where it will float at runtime.
-    if (g_app->m_editing)
+    if (g_context->m_editing)
     {
         auto& relay = static_cast<const BlueprintRelay&>(_building);
         const_cast<BlueprintRelay&>(relay).m_pos.y = relay.m_altitude;

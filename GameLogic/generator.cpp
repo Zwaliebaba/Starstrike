@@ -10,7 +10,7 @@
 #include "constructionyard.h"
 #include "controltower.h"
 #include "rocket.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"
@@ -47,7 +47,7 @@ LegacyVector3 PowerBuilding::GetPowerLocation()
 
 bool PowerBuilding::IsInView()
 {
-  Building* powerLink = g_app->m_location->GetBuilding(m_powerLink);
+  Building* powerLink = g_context->m_location->GetBuilding(m_powerLink);
 
   if (powerLink)
   {
@@ -55,7 +55,7 @@ bool PowerBuilding::IsInView()
     float radius = (powerLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
 
-    return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
+    return (g_context->m_camera->SphereInViewFrustum(midPoint, radius));
   }
   return Building::IsInView();
 }
@@ -71,7 +71,7 @@ bool PowerBuilding::Advance()
       m_surges.RemoveData(i);
       --i;
 
-      Building* powerLink = g_app->m_location->GetBuilding(m_powerLink);
+      Building* powerLink = g_context->m_location->GetBuilding(m_powerLink);
       if (powerLink)
       {
         auto powerBuilding = static_cast<PowerBuilding*>(powerLink);
@@ -118,7 +118,7 @@ Generator::Generator()
     m_throughput(0.0f)
 {
   m_type = TypeGenerator;
-  SetShape(g_app->m_resource->GetShapeStatic("generator.shp"));
+  SetShape(Resource::GetShapeStatic("generator.shp"));
 
   m_counter = m_shape->GetMarkerData("MarkerCounter");
 }
@@ -159,11 +159,11 @@ bool Generator::Advance()
     // then returns to the level.  The tower is captured and cannot be changed, but
     // the m_enabled state of this building has been lost.
 
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings[i];
+        Building* building = g_context->m_location->m_buildings[i];
         if (building && building->m_type == TypeControlTower)
         {
           auto tower = static_cast<ControlTower*>(building);
@@ -188,7 +188,7 @@ bool Generator::Advance()
 
     if (m_throughput > 6.5f)
     {
-      GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+      GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
       gb->m_online = true;
     }
   }
@@ -204,7 +204,7 @@ Pylon::Pylon()
   : PowerBuilding()
 {
   m_type = TypePylon;
-  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
+  SetShape(Resource::GetShapeStatic("pylon.shp"));
 }
 
 bool Pylon::Advance() { return PowerBuilding::Advance(); }
@@ -218,7 +218,7 @@ PylonStart::PylonStart()
     m_reqBuildingId(-1)
 {
   m_type = TypePylonStart;
-  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
+  SetShape(Resource::GetShapeStatic("pylon.shp"));
 };
 
 void PylonStart::Initialise(Building* _template)
@@ -235,13 +235,13 @@ bool PylonStart::Advance()
 
   bool generatorOnline = false;
 
-  int generatorLocationId = g_app->m_globalWorld->GetLocationId("generator");
+  int generatorLocationId = g_context->m_globalWorld->GetLocationId("generator");
   GlobalBuilding* globalRefinery = nullptr;
-  for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
   {
-    if (g_app->m_globalWorld->m_buildings.ValidIndex(i))
+    if (g_context->m_globalWorld->m_buildings.ValidIndex(i))
     {
-      GlobalBuilding* gb = g_app->m_globalWorld->m_buildings[i];
+      GlobalBuilding* gb = g_context->m_globalWorld->m_buildings[i];
       if (gb && gb->m_locationId == generatorLocationId && gb->m_type == TypeGenerator && gb->m_online)
       {
         generatorOnline = true;
@@ -254,7 +254,7 @@ bool PylonStart::Advance()
   {
     //
     // Is our required building online yet?
-    GlobalBuilding* globalBuilding = g_app->m_globalWorld->GetBuilding(m_reqBuildingId, g_app->m_locationId);
+    GlobalBuilding* globalBuilding = g_context->m_globalWorld->GetBuilding(m_reqBuildingId, g_context->m_locationId);
     if (globalBuilding && globalBuilding->m_online)
     {
       if (syncfrand() > 0.7f)
@@ -287,12 +287,12 @@ PylonEnd::PylonEnd()
   : PowerBuilding()
 {
   m_type = TypePylonEnd;
-  SetShape(g_app->m_resource->GetShapeStatic("pylon.shp"));
+  SetShape(Resource::GetShapeStatic("pylon.shp"));
 };
 
 void PylonEnd::TriggerSurge(float _initValue)
 {
-  Building* building = g_app->m_location->GetBuilding(m_powerLink);
+  Building* building = g_context->m_location->GetBuilding(m_powerLink);
 
   if (building && building->m_type == TypeYard)
   {
@@ -316,7 +316,7 @@ SolarPanel::SolarPanel()
     m_operating(false)
 {
   m_type = TypeSolarPanel;
-  SetShape(g_app->m_resource->GetShapeStatic("solarpanel.shp"));
+  SetShape(Resource::GetShapeStatic("solarpanel.shp"));
 
   memset(m_glowMarker, 0, SOLARPANEL_NUMGLOWS * sizeof(ShapeMarkerData*));
 
@@ -338,7 +338,7 @@ SolarPanel::SolarPanel()
 
 void SolarPanel::Initialise(Building* _template)
 {
-  _template->m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
+  _template->m_up = g_context->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
   auto right = LegacyVector3(1, 0, 0);
   _template->m_front = right ^ _template->m_up;
 

@@ -3,15 +3,13 @@
 #include "file_writer.h"
 #include "text_stream_readers.h"
 #include "ShapeStatic.h"
-#include "preferences.h"
 #include "language_table.h"
 #include "rocket.h"
 #include "darwinian.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "camera.h"
 #include "team.h"
-#include "main.h"
 #include "GameSimEventQueue.h"
 #include "global_world.h"
 #include "script.h"
@@ -28,7 +26,7 @@ FuelBuilding::FuelBuilding()
 {
   if (!s_fuelPipe)
   {
-    s_fuelPipe = g_app->m_resource->GetShapeStatic("fuelpipe.shp");
+    s_fuelPipe = Resource::GetShapeStatic("fuelpipe.shp");
     DEBUG_ASSERT(s_fuelPipe);
   }
 }
@@ -59,13 +57,13 @@ void FuelBuilding::ProvideFuel(float _level)
 
   m_currentLevel = m_currentLevel * factor1 + _level * factor2;
 
-  m_currentLevel = min(m_currentLevel, 1.0f);
-  m_currentLevel = max(m_currentLevel, 0.0f);
+  m_currentLevel = std::min(m_currentLevel, 1.0f);
+  m_currentLevel = std::max(m_currentLevel, 0.0f);
 }
 
 FuelBuilding* FuelBuilding::GetLinkedBuilding()
 {
-  Building* building = g_app->m_location->GetBuilding(m_fuelLink);
+  Building* building = g_context->m_location->GetBuilding(m_fuelLink);
   if (building)
   {
     if (building->m_type == TypeFuelGenerator || building->m_type == TypeFuelPipe || building->m_type == TypeEscapeRocket || building->
@@ -101,7 +99,7 @@ bool FuelBuilding::IsInView()
     float radius = (theirPipePos - ourPipePos).Mag() / 2.0f;
     radius += m_radius;
 
-    return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
+    return (g_context->m_camera->SphereInViewFrustum(midPoint, radius));
   }
   return Building::IsInView();
 }
@@ -157,9 +155,9 @@ FuelGenerator::FuelGenerator()
 {
   m_type = TypeFuelGenerator;
 
-  SetShape(g_app->m_resource->GetShapeStatic("fuelgenerator.shp"));
+  SetShape(Resource::GetShapeStatic("fuelgenerator.shp"));
 
-  m_pump = g_app->m_resource->GetShapeStatic("fuelgeneratorpump.shp");
+  m_pump = Resource::GetShapeStatic("fuelgeneratorpump.shp");
   m_pumpTip = m_pump->GetMarkerData("MarkerTip");
 }
 
@@ -171,12 +169,12 @@ bool FuelGenerator::Advance()
   // Advance surges
 
   m_surges -= SERVER_ADVANCE_PERIOD * 1.0f;
-  m_surges = min(m_surges, 10);
-  m_surges = max(m_surges, 0);
+  m_surges = std::min(m_surges, 10.0f);
+  m_surges = std::max(m_surges, 0.0f);
 
   if (m_surges > 8)
   {
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     if (gb)
       gb->m_online = true;
   }
@@ -248,7 +246,7 @@ FuelPipe::FuelPipe()
 {
   m_type = TypeFuelPipe;
 
-  SetShape(g_app->m_resource->GetShapeStatic("fuelpipebase.shp"));
+  SetShape(Resource::GetShapeStatic("fuelpipebase.shp"));
 }
 
 bool FuelPipe::Advance()
@@ -278,14 +276,14 @@ FuelStation::FuelStation()
 {
   m_type = TypeFuelStation;
 
-  SetShape(g_app->m_resource->GetShapeStatic("fuelstation.shp"));
+  SetShape(Resource::GetShapeStatic("fuelstation.shp"));
 
   m_entrance = m_shape->GetMarkerData("MarkerEntrance");
 }
 
 bool FuelStation::IsLoading()
 {
-  Building* building = g_app->m_location->GetBuilding(m_fuelLink);
+  Building* building = g_context->m_location->GetBuilding(m_fuelLink);
   if (building && building->m_type == TypeEscapeRocket)
   {
     auto rocket = static_cast<EscapeRocket*>(building);
@@ -298,7 +296,7 @@ bool FuelStation::IsLoading()
 
 bool FuelStation::Advance()
 {
-  Building* building = g_app->m_location->GetBuilding(m_fuelLink);
+  Building* building = g_context->m_location->GetBuilding(m_fuelLink);
   if (building && building->m_type == TypeEscapeRocket)
   {
     auto rocket = static_cast<EscapeRocket*>(building);
@@ -307,7 +305,7 @@ bool FuelStation::Advance()
       //
       // Find a random Darwinian and make him board
 
-      Team* team = &g_app->m_location->m_teams[0];
+      Team* team = &g_context->m_location->m_teams[0];
       int numOthers = team->m_others.Size();
       if (numOthers > 0)
       {
@@ -338,7 +336,7 @@ LegacyVector3 FuelStation::GetEntrance()
 
 bool FuelStation::BoardRocket(WorldObjectId _id)
 {
-  Building* building = g_app->m_location->GetBuilding(m_fuelLink);
+  Building* building = g_context->m_location->GetBuilding(m_fuelLink);
   if (building && building->m_type == TypeEscapeRocket)
   {
     auto rocket = static_cast<EscapeRocket*>(building);
@@ -346,7 +344,7 @@ bool FuelStation::BoardRocket(WorldObjectId _id)
 
     if (result)
     {
-      Entity* entity = g_app->m_location->GetEntity(_id);
+      Entity* entity = g_context->m_location->GetEntity(_id);
       LegacyVector3 entityPos = entity ? entity->m_pos : g_zeroVector;
       entityPos.y += 2;
 
@@ -390,7 +388,7 @@ EscapeRocket::EscapeRocket()
 {
   m_type = TypeEscapeRocket;
 
-  SetShape(g_app->m_resource->GetShapeStatic("rocket.shp"));
+  SetShape(Resource::GetShapeStatic("rocket.shp"));
 
   m_booster = m_shape->GetMarkerData("MarkerBooster");
   ASSERT_TEXT(m_booster, "MarkerBooster not found in rocket.shp");
@@ -541,7 +539,7 @@ void EscapeRocket::Refuel()
       float factor1 = m_currentLevel * SERVER_ADVANCE_PERIOD * 0.01f;
       float factor2 = 1.0f - factor1;
       m_fuel = m_fuel * factor2 + targetFuel * factor1;
-      m_fuel = min(m_fuel, 100.0f);
+      m_fuel = std::min(m_fuel, 100.0f);
       break;
     }
 
@@ -551,7 +549,7 @@ void EscapeRocket::Refuel()
       float factor1 = m_currentLevel * SERVER_ADVANCE_PERIOD * 0.1;
       float factor2 = 1.0f - factor1;
       m_fuel = m_fuel * factor2 + targetFuel * factor1;
-      m_fuel = min(m_fuel, 100.0f);
+      m_fuel = std::min(m_fuel, 100.0f);
       break;
     }
   }
@@ -596,13 +594,13 @@ void EscapeRocket::AdvanceIgnition()
     if (m_spawnCompleted)
     {
       m_countdown = 10.0f;
-      g_app->m_taskManagerInterface->SetVisible(false);
-      if (g_app->m_script->IsRunningScript())
-        g_app->m_script->Skip();
+      g_context->m_taskManagerInterface->SetVisible(false);
+      if (g_context->m_script->IsRunningScript())
+        g_context->m_script->Skip();
 #ifdef DEMOBUILD
-      g_app->m_script->RunScript("launchpad_victory_demo.txt");
+      g_context->m_script->RunScript("launchpad_victory_demo.txt");
 #else
-      g_app->m_script->RunScript("launchpad_victory.txt");
+      g_context->m_script->RunScript("launchpad_victory.txt");
 #endif
     }
   }
@@ -617,11 +615,11 @@ void EscapeRocket::AdvanceReady()
   {
     if (m_countdown > 100.0f && m_countdown < 110.0f)
     {
-      Building* spawnBuilding = g_app->m_location->GetBuilding(m_spawnBuildingId);
+      Building* spawnBuilding = g_context->m_location->GetBuilding(m_spawnBuildingId);
       if (spawnBuilding)
       {
         LegacyVector3 spawnPos = spawnBuilding->m_pos + spawnBuilding->m_front * 40.0f;
-        g_app->m_location->SpawnEntities(spawnPos, 1, -1, Entity::TypeDarwinian, 1, g_zeroVector, 40.0f);
+        g_context->m_location->SpawnEntities(spawnPos, 1, -1, Entity::TypeDarwinian, 1, g_zeroVector, 40.0f);
       }
     }
   }
@@ -641,7 +639,7 @@ void EscapeRocket::AdvanceReady()
 void EscapeRocket::AdvanceCountdown()
 {
   m_countdown -= SERVER_ADVANCE_PERIOD * 0.5f;
-  m_countdown = max(m_countdown, 0.0f);
+  m_countdown = std::max(m_countdown, 0.0f);
 
   SetupAttackers();
   SetupSpectacle();
@@ -654,9 +652,9 @@ void EscapeRocket::AdvanceCountdown()
 
 void EscapeRocket::AdvanceFlight()
 {
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   float thrust = sqrtf(m_pos.y - landHeight) * 2;
-  thrust = max(thrust, 0.1f);
+  thrust = std::max(thrust, 0.1f);
 
   m_vel.Set(0, thrust, 0);
 
@@ -674,7 +672,7 @@ void EscapeRocket::AdvanceExploding()
   // Burn fuel
 
   m_fuel -= SERVER_ADVANCE_PERIOD * 10;
-  m_fuel = max(m_fuel, 0.0f);
+  m_fuel = std::max(m_fuel, 0.0f);
 
   //
   // Kill passengers
@@ -692,8 +690,8 @@ void EscapeRocket::AdvanceExploding()
     vel.RotateAround(windowMat.u * angle);
     vel.SetLength(10.0f + syncfrand(30.0f));
 
-    WorldObjectId id = g_app->m_location->SpawnEntities(windowMat.pos, 0, -1, Entity::TypeDarwinian, 1, vel, 0.0f);
-    auto darwinian = static_cast<Darwinian*>(g_app->m_location->GetEntity(id));
+    WorldObjectId id = g_context->m_location->SpawnEntities(windowMat.pos, 0, -1, Entity::TypeDarwinian, 1, vel, 0.0f);
+    auto darwinian = static_cast<Darwinian*>(g_context->m_location->GetEntity(id));
     darwinian->m_onGround = false;
     darwinian->SetFire();
   }
@@ -741,7 +739,7 @@ void EscapeRocket::SetupSpectacle()
   {
     for (int t = 0; t < NUM_TEAMS; ++t)
     {
-      Team* team = &g_app->m_location->m_teams[t];
+      Team* team = &g_context->m_location->m_teams[t];
       for (int i = 0; i < team->m_others.Size(); ++i)
       {
         if (team->m_others.ValidIndex(i))
@@ -774,7 +772,7 @@ void EscapeRocket::SetupAttackers()
 {
   if (!m_spawnCompleted && syncfrand() < 0.2f)
   {
-    Team* team = &g_app->m_location->m_teams[1];
+    Team* team = &g_context->m_location->m_teams[1];
     int numOthers = team->m_others.Size();
     if (numOthers > 0)
     {
@@ -848,7 +846,7 @@ bool EscapeRocket::Advance()
     m_cameraShake -= SERVER_ADVANCE_PERIOD;
 
     float actualShake = m_cameraShake / 5.0f;
-    g_app->m_camera->CreateCameraShake(actualShake);
+    g_context->m_camera->CreateCameraShake(actualShake);
   }
 
   if (m_state == StateReady || m_state == StateCountdown || m_state == StateFlight)
@@ -883,7 +881,7 @@ bool EscapeRocket::SafeToLaunch()
   LegacyVector3 testPos = m_pos + LegacyVector3(330, 0, 50);
   float testRadius = 100.0f;
 
-  int numEnemies = g_app->m_location->m_entityGrid->GetNumEnemies(testPos.x, testPos.z, testRadius, 0);
+  int numEnemies = g_context->m_location->m_entityGrid->GetNumEnemies(testPos.x, testPos.z, testRadius, 0);
 
   return (numEnemies < 2);
 }

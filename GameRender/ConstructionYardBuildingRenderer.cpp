@@ -42,14 +42,14 @@ void ConstructionYardBuildingRenderer::RenderAlphas(const Building& _building, c
 
     auto& yard = static_cast<const ConstructionYard&>(_building);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
 
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/cloudyglow.bmp"));
 
     float timeIndex = g_gameTime * 2;
 
@@ -70,7 +70,7 @@ void ConstructionYardBuildingRenderer::RenderAlphas(const Building& _building, c
     else if (yard.m_numPrimitives > 0)
         targetAlpha = (yard.m_numPrimitives / 9.0f) * 0.5f;
     if (yard.m_numSurges > 0)
-        targetAlpha = max(targetAlpha, 0.2f);
+        targetAlpha = std::max(targetAlpha, 0.2f);
 
     float factor1 = g_advanceTime;
     float factor2 = 1.0f - factor1;
@@ -89,7 +89,7 @@ void ConstructionYardBuildingRenderer::RenderAlphas(const Building& _building, c
         pos.z += cosf(timeIndex + i) * i * 1.7f;
 
         float size = 30.0f * sinf(timeIndex + i * 13);
-        size = max(size, 5.0f);
+        size = std::max(size, 5.0f);
 
         glColor4f(0.6f, 0.2f, 0.1f, alpha);
 
@@ -108,7 +108,7 @@ void ConstructionYardBuildingRenderer::RenderAlphas(const Building& _building, c
     //
     // Central starbursts
 
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
     int numStars = 10;
     if (buildingDetail == 2)
@@ -144,7 +144,7 @@ void ConstructionYardBuildingRenderer::RenderAlphas(const Building& _building, c
 
     if (yard.m_timer > 0.0f)
     {
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
         for (int r = 0; r < 2; ++r)
         {

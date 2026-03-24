@@ -29,7 +29,7 @@ void ReceiverBuildingRenderer::RenderAlphas(const Building& _building,
 
     float predictionTime = _ctx.predictionTime - 0.1f;
 
-    Building* spiritLink = g_app->m_location->GetBuilding(receiver.m_spiritLink);
+    Building* spiritLink = g_context->m_location->GetBuilding(receiver.m_spiritLink);
 
     int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
 
@@ -40,10 +40,10 @@ void ReceiverBuildingRenderer::RenderAlphas(const Building& _building,
         LegacyVector3 ourPos = const_cast<ReceiverBuilding&>(receiver).GetSpiritLocation();
         LegacyVector3 theirPos = receiverLink->GetSpiritLocation();
 
-        LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
+        LegacyVector3 camToOurPos = g_context->m_camera->GetPos() - ourPos;
         LegacyVector3 ourPosRight = camToOurPos ^ (theirPos - ourPos);
 
-        LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
+        LegacyVector3 camToTheirPos = g_context->m_camera->GetPos() - theirPos;
         LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
 
         glDisable(GL_CULL_FACE);
@@ -55,7 +55,7 @@ void ReceiverBuildingRenderer::RenderAlphas(const Building& _building,
         if (buildingDetail == 1)
         {
             glEnable(GL_TEXTURE_2D);
-            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+            glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -109,18 +109,18 @@ void ReceiverBuildingRenderer::BeginRenderUnprocessedSpirits()
 
     int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
     if (buildingDetail == 1)
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
 
-    s_nearPlaneStart = g_app->m_renderer->GetNearPlane();
-    g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart * 1.1f,
-                                           g_app->m_renderer->GetFarPlane());
+    s_nearPlaneStart = g_context->m_renderer->GetNearPlane();
+    g_context->m_camera->SetupProjectionMatrix(s_nearPlaneStart * 1.1f,
+                                           g_context->m_renderer->GetFarPlane());
 }
 
 void ReceiverBuildingRenderer::RenderUnprocessedSpirit(const LegacyVector3& _pos, float _life)
 {
     LegacyVector3 position = _pos;
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
     float scale = 2.0f * _life;
     float alphaValue = _life;
 
@@ -185,8 +185,8 @@ void ReceiverBuildingRenderer::RenderUnprocessedSpirit(const LegacyVector3& _pos
 
 void ReceiverBuildingRenderer::EndRenderUnprocessedSpirits()
 {
-    g_app->m_camera->SetupProjectionMatrix(s_nearPlaneStart,
-                                           g_app->m_renderer->GetFarPlane());
+    g_context->m_camera->SetupProjectionMatrix(s_nearPlaneStart,
+                                           g_context->m_renderer->GetFarPlane());
 
     glDisable(GL_TEXTURE_2D);
     glDepthMask(true);

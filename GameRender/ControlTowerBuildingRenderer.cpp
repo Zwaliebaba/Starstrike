@@ -41,14 +41,14 @@ void ControlTowerBuildingRenderer::RenderAlphas(const Building& _building, const
         s_lastRecalculation = static_cast<int>(GetHighResTime());
 
         float nearest = 99999.9f;
-        for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+        for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
         {
-            if (g_app->m_location->m_buildings.ValidIndex(i))
+            if (g_context->m_location->m_buildings.ValidIndex(i))
             {
-                Building* building = g_app->m_location->m_buildings[i];
+                Building* building = g_context->m_location->m_buildings[i];
                 if (building && building->m_type == Building::TypeControlTower)
                 {
-                    float camDist = (building->m_pos - g_app->m_camera->GetPos()).Mag();
+                    float camDist = (building->m_pos - g_context->m_camera->GetPos()).Mag();
                     if (camDist < nearest)
                         nearest = camDist;
                 }
@@ -77,19 +77,19 @@ void ControlTowerBuildingRenderer::RenderAlphas(const Building& _building, const
     Matrix34 worldMat = tower.m_shape->GetMarkerWorldMatrix(tower.m_lightPos, rootMat);
     LegacyVector3 lightPos = worldMat.pos;
 
-    LegacyVector3 camR = g_app->m_camera->GetRight();
-    LegacyVector3 camU = g_app->m_camera->GetUp();
+    LegacyVector3 camR = g_context->m_camera->GetRight();
+    LegacyVector3 camU = g_context->m_camera->GetUp();
 
     RGBAColour colour;
     if (tower.m_id.GetTeamId() == 255)
         colour.Set(128, 128, 128, 255);
     else
-        colour = g_app->m_location->m_teams[tower.m_id.GetTeamId()].m_colour;
+        colour = g_context->m_location->m_teams[tower.m_id.GetTeamId()].m_colour;
 
     //
     // Draw control line to heaven
 
-    if (!g_app->m_editing)
+    if (!g_context->m_editing)
     {
         LegacyVector3 controlUp(0, 50.0f + (tower.m_id.GetUniqueId() % 50), 0);
 
@@ -100,12 +100,12 @@ void ControlTowerBuildingRenderer::RenderAlphas(const Building& _building, const
         glDepthMask(false);
 
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-        float w = (lightPos - g_app->m_camera->GetPos()).Mag() * 0.002f;
-        w = max(0.5f, w);
+        float w = (lightPos - g_context->m_camera->GetPos()).Mag() * 0.002f;
+        w = std::max(0.5f, w);
 
         for (int i = 0; i < 10; ++i)
         {
@@ -153,9 +153,9 @@ void ControlTowerBuildingRenderer::RenderAlphas(const Building& _building, const
     //
     // Draw our signal flash
 
-    int lastSeqId = g_app->m_clientToServer->m_lastValidSequenceIdFromServer;
+    int lastSeqId = g_context->m_clientToServer->m_lastValidSequenceIdFromServer;
 
-    if ((tower.m_id.GetTeamId() != 255 && (lastSeqId % 10) / 2 == tower.m_id.GetTeamId()) || tower.m_beingReprogrammed[lastSeqId % 3] || g_app->m_editing)
+    if ((tower.m_id.GetTeamId() != 255 && (lastSeqId % 10) / 2 == tower.m_id.GetTeamId()) || tower.m_beingReprogrammed[lastSeqId % 3] || g_context->m_editing)
     {
         Matrix34 rootMat2(tower.m_front, g_upVector, tower.m_pos);
         Matrix34 worldMat2 = tower.m_shape->GetMarkerWorldMatrix(tower.m_lightPos, rootMat2);
@@ -166,7 +166,7 @@ void ControlTowerBuildingRenderer::RenderAlphas(const Building& _building, const
         glColor4ub(colour.r, colour.g, colour.b, 255);
 
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glDisable(GL_CULL_FACE);

@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "GameApp.h"
-
 #include "preferences.h"
 #include "resource.h"
 #include "text_stream_readers.h"
@@ -62,9 +60,8 @@ PrefsItem::PrefsItem(char* _line)
     }
     if (numDots == 1)
       m_type = TypeFloat;
-    else
-      if (numDots > 1)
-        m_type = TypeString;
+    else if (numDots > 1)
+      m_type = TypeString;
 
     // Convert string into a real number
     if (m_type == TypeFloat)
@@ -176,20 +173,11 @@ int GetDefaultSoundDSP()
 #endif
 }
 
-int GetDefaultSoundChannels()
-{
-  return 32;
-}
+int GetDefaultSoundChannels() { return 32; }
 
-int GetDefaultPixelShader()
-{
-  return 1;
-}
+int GetDefaultPixelShader() { return 1; }
 
-int GetDefaultGraphicsDetail()
-{
-  return 1;
-}
+int GetDefaultGraphicsDetail() { return 1; }
 
 void PrefsManager::CreateDefaultValues()
 {
@@ -251,28 +239,16 @@ void PrefsManager::CreateDefaultValues()
 
   AddLine("\n");
 
-AddLine("ControlMouseButtons = 3");
-AddLine("ControlMethod = 1");
+  AddLine("ControlMouseButtons = 3");
+  AddLine("ControlMethod = 1");
 
-#ifdef DEMOBUILD
-#ifndef DEMO2
-  AddLine("StartMap = mine"); AddLine("RenderSpecialLighting = 0");
-#else
-  AddLine("UserProfile = DemoUser"); AddLine("RenderSpecialLighting = 1"); AddLine("StartMap = launchpad");
-#endif
-#else
-  AddLine("BootLoader = firsttime");
   AddLine("UserProfile = NewUser");
-  AddLine("RenderSpecialLighting = 0");
   AddLine(OTHER_DIFFICULTY " = 1");
-#endif
 
   // Override the defaults above with stuff from a default preferences file
-  if (g_app && g_app->m_resource)
-  {
-    TextReader* reader = g_app->m_resource->GetTextReader("default_preferences.txt");
-    if (reader && reader->IsOpen()) { while (reader->ReadLine()) { AddLine(reader->GetRestOfLine(), true); } }
-  }
+  TextReader* reader = Resource::GetTextReader("default_preferences.txt");
+  if (reader && reader->IsOpen())
+    while (reader->ReadLine()) { AddLine(reader->GetRestOfLine(), true); }
 }
 
 void PrefsManager::Load(const char* _filename)

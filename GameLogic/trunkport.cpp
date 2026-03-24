@@ -8,7 +8,7 @@
 #include "language_table.h"
 #include "trunkport.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "global_world.h"
 #include "main.h"
@@ -21,7 +21,7 @@ TrunkPort::TrunkPort()
     m_openTimer(0.0f)
 {
   m_type = TypeTrunkPort;
-  SetShape(g_app->m_resource->GetShapeStatic("trunkport.shp"));
+  SetShape(Resource::GetShapeStatic("trunkport.shp"));
 
   m_destination1 = m_shape->GetMarkerData("MarkerDestination1");
   m_destination2 = m_shape->GetMarkerData("MarkerDestination2");
@@ -76,7 +76,7 @@ void TrunkPort::SetDetail(int _detail)
 
 bool TrunkPort::Advance()
 {
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
   if (gb && gb->m_online && m_openTimer == 0.0f)
   {
     m_openTimer = GetHighResTime();
@@ -102,16 +102,16 @@ bool TrunkPort::PerformDepthSort(LegacyVector3& _centerPos)
 
 void TrunkPort::ReprogramComplete()
 {
-  GlobalLocation* location = g_app->m_globalWorld->GetLocation(m_targetLocationId);
+  GlobalLocation* location = g_context->m_globalWorld->GetLocation(m_targetLocationId);
   if (location)
   {
     location->m_available = true;
 
     // Look for a "receiver" trunk port and set that to the same state
-    for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
     {
-      GlobalBuilding* building = g_app->m_globalWorld->m_buildings[i];
-      if (building->m_type == TypeTrunkPort && building->m_locationId == m_targetLocationId && building->m_link == g_app->m_locationId)
+      GlobalBuilding* building = g_context->m_globalWorld->m_buildings[i];
+      if (building->m_type == TypeTrunkPort && building->m_locationId == m_targetLocationId && building->m_link == g_context->m_locationId)
         building->m_online = true;
     }
   }

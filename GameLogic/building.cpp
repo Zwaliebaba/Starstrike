@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "building.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "ai.h"
 #include "anthill.h"
 #include "blueprintstore.h"
@@ -68,7 +68,7 @@ Building::Building()
 {
   std::call_once(s_controlPadOnce, []()
   {
-    s_controlPad = g_app->m_resource->GetShapeStatic("controlpad.shp");
+    s_controlPad = Resource::GetShapeStatic("controlpad.shp");
     DEBUG_ASSERT(s_controlPad);
 
     s_controlPadStatus = s_controlPad->GetMarkerData("MarkerStatus");
@@ -84,7 +84,7 @@ void Building::Initialise(Building* _template)
 {
   m_id = _template->m_id;
   m_pos = _template->m_pos;
-  m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   m_front = _template->m_front;
   m_up = _template->m_up;
   m_dynamic = _template->m_dynamic;
@@ -106,7 +106,7 @@ void Building::Initialise(Building* _template)
     m_radius = 13.0f;
   }
 
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_requestedLocationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_requestedLocationId);
   if (gb)
     m_id.SetTeamId(gb->m_teamId);
 
@@ -115,7 +115,7 @@ void Building::Initialise(Building* _template)
 
 void Building::SetDetail(int _detail)
 {
-  m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
   if (m_shape)
   {
@@ -186,7 +186,7 @@ void Building::SetShapePorts(const ShapeFragmentData* _fragment)
       port->m_marker = marker;
       port->m_mat = m_shape->GetMarkerWorldMatrix(marker, buildingMat);
       port->m_mat.pos = PushFromBuilding(port->m_mat.pos, 5.0f);
-      port->m_mat.pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(port->m_mat.pos.x, port->m_mat.pos.z);
+      port->m_mat.pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(port->m_mat.pos.x, port->m_mat.pos.z);
 
       for (int t = 0; t < NUM_TEAMS; ++t)
         port->m_counter[t] = 0;
@@ -211,18 +211,18 @@ void Building::ReprogramComplete()
 {
   g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ReprogramComplete"));
 
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
   if (gb)
     gb->m_online = !gb->m_online;
 
-  g_app->m_globalWorld->EvaluateEvents();
+  g_context->m_globalWorld->EvaluateEvents();
 }
 
 void Building::SetTeamId(int _teamId)
 {
   m_id.SetTeamId(_teamId);
 
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
   if (gb)
     gb->m_teamId = _teamId;
 
@@ -231,7 +231,7 @@ void Building::SetTeamId(int _teamId)
 
 LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius)
 {
-  START_PROFILE(g_app->m_profiler, "PushFromBuilding");
+  START_PROFILE(g_context->m_profiler, "PushFromBuilding");
 
   LegacyVector3 result = pos;
 
@@ -245,12 +245,12 @@ LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius
     while (DoesSphereHit(result, _radius)) { result -= pushForce; }
   }
 
-  END_PROFILE(g_app->m_profiler, "PushFromBuilding");
+  END_PROFILE(g_context->m_profiler, "PushFromBuilding");
 
   return result;
 }
 
-bool Building::IsInView() { return (g_app->m_camera->SphereInViewFrustum(m_centerPos, m_radius)); }
+bool Building::IsInView() { return (g_context->m_camera->SphereInViewFrustum(m_centerPos, m_radius)); }
 
 bool Building::PerformDepthSort(LegacyVector3& _centerPos) { return false; }
 
@@ -266,13 +266,13 @@ void Building::EvaluatePorts()
     // Look for a valid Darwinian near the port
 
     int numFound;
-    if (g_app->m_location->m_entityGrid)
+    if (g_context->m_location->m_entityGrid)
     {
-      WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(port->m_mat.pos.x, port->m_mat.pos.z, 5.0f, &numFound);
+      WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(port->m_mat.pos.x, port->m_mat.pos.z, 5.0f, &numFound);
       for (int i = 0; i < numFound; ++i)
       {
         WorldObjectId id = ids[i];
-        Entity* entity = g_app->m_location->GetEntity(id);
+        Entity* entity = g_context->m_location->GetEntity(id);
         if (entity && entity->m_type == Entity::TypeDarwinian)
         {
           auto darwinian = static_cast<Darwinian*>(entity);
@@ -295,7 +295,7 @@ void Building::EvaluatePorts()
       else
       {
         port->m_counter[t] -= 4;
-        port->m_counter[t] = max(port->m_counter[t], 0);
+        port->m_counter[t] = std::max(port->m_counter[t], 0);
       }
     }
   }
@@ -310,7 +310,7 @@ void Building::Destroy(float _intensity)
   Matrix34 mat(m_front, g_upVector, m_pos);
   for (int i = 0; i < 3; ++i)
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
-  g_app->m_location->Bang(m_pos, _intensity, _intensity / 4.0f);
+  g_context->m_location->Bang(m_pos, _intensity, _intensity / 4.0f);
 
   g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
 
@@ -405,7 +405,7 @@ void Building::OperatePort(int _portId, int _teamId)
   {
     BuildingPort* port = m_ports[_portId];
     port->m_counter[_teamId]++;
-    port->m_counter[_teamId] = min(port->m_counter[_teamId], 50);
+    port->m_counter[_teamId] = std::min(port->m_counter[_teamId], 50);
   }
 }
 

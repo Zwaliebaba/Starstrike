@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "feedingtube.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "file_writer.h"
 #include "location.h"
@@ -18,7 +18,7 @@ FeedingTube::FeedingTube()
   m_type = TypeFeedingTube;
   //m_front.Set(0,0,1);
 
-  SetShape(g_app->m_resource->GetShapeStatic("feedingtube.shp"));
+  SetShape(Resource::GetShapeStatic("feedingtube.shp"));
   m_focusMarker = m_shape->GetMarkerData("MarkerFocus");
 }
 
@@ -36,7 +36,7 @@ bool FeedingTube::Advance()
   Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_focusMarker, rootMat);
   LegacyVector3 dishPos = worldMat.pos;
 
-  auto ft = static_cast<FeedingTube*>(g_app->m_location->GetBuilding(m_receiverId));
+  auto ft = static_cast<FeedingTube*>(g_context->m_location->GetBuilding(m_receiverId));
   if (ft && ft->m_type == TypeFeedingTube)
     m_range = (ft->GetDishPos(0.0f) - dishPos).Mag();
   else
@@ -56,7 +56,7 @@ LegacyVector3 FeedingTube::GetDishFront(float _predictionTime)
 {
   if (m_receiverId != -1)
   {
-    auto receiver = static_cast<FeedingTube*>(g_app->m_location->GetBuilding(m_receiverId));
+    auto receiver = static_cast<FeedingTube*>(g_context->m_location->GetBuilding(m_receiverId));
     if (receiver)
     {
       LegacyVector3 ourDishPos = GetDishPos(_predictionTime);
@@ -119,7 +119,7 @@ int FeedingTube::GetBuildingLink() { return m_receiverId; }
 
 void FeedingTube::SetBuildingLink(int _buildingId)
 {
-  Building* b = g_app->m_location->GetBuilding(_buildingId);
+  Building* b = g_context->m_location->GetBuilding(_buildingId);
   if (b && b->m_type == TypeFeedingTube)
   {
     m_receiverId = _buildingId;
@@ -152,7 +152,7 @@ bool FeedingTube::IsInView()
   float radius = (startPoint - endPoint).Mag() / 2.0f;
   radius += m_radius;
 
-  if (g_app->m_camera->SphereInViewFrustum(midPoint, radius))
+  if (g_context->m_camera->SphereInViewFrustum(midPoint, radius))
     return true;
 
   return Building::IsInView();

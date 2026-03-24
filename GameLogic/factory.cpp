@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "factory.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "file_writer.h"
 #include "globals.h"
 #include "location.h"
@@ -23,7 +23,7 @@ Factory::Factory()
     m_state(StateUnused)
 {
   m_type = TypeFactory;
-  SetShape(g_app->m_resource->GetShapeStatic("factory.shp"));
+  SetShape(Resource::GetShapeStatic("factory.shp"));
 }
 
 void Factory::Initialise(Building* _template)
@@ -56,7 +56,7 @@ void Factory::RequestUnit(unsigned char _troopType, int _numToCreate)
 
   if (_troopType < Entity::TypeEngineer || _troopType == Entity::TypeInsertionSquadie)
   {
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     Unit* unit = team->NewUnit(_troopType, _numToCreate, &m_unitId, m_pos);
     unit->SetWayPoint(m_pos + m_front * 30.0f);
   }
@@ -106,7 +106,7 @@ void Factory::AdvanceStateCreating()
       LegacyVector3 vel(syncsfrand(1.0f), syncsfrand(1.0f), 5.0f + syncsfrand(1.0f));
 
       m_spiritStore.RemoveSpirits(1);
-      g_app->m_location->SpawnEntities(pos, m_id.GetTeamId(), m_unitId, m_troopType, 1, vel, 0.0f);
+      g_context->m_location->SpawnEntities(pos, m_id.GetTeamId(), m_unitId, m_troopType, 1, vel, 0.0f);
 
       ++numActuallyCreated;
     }

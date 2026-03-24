@@ -13,7 +13,7 @@ static int s_treeTextureId = -1;
 static int EnsureTreeTexture()
 {
     if (s_treeTextureId == -1)
-        s_treeTextureId = g_app->m_resource->GetTexture("textures/laser.bmp");
+        s_treeTextureId = Resource::GetTexture("textures/laser.bmp");
     return s_treeTextureId;
 }
 

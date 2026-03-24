@@ -17,7 +17,7 @@ void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, const 
 
     auto& station = static_cast<const FuelStation&>(_building);
 
-    Building* building = g_app->m_location->GetBuilding(station.m_fuelLink);
+    Building* building = g_context->m_location->GetBuilding(station.m_fuelLink);
     if (building && building->m_type == Building::TypeEscapeRocket)
     {
         auto rocket = static_cast<EscapeRocket*>(building);
@@ -35,7 +35,7 @@ void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, const 
             //
             // Render lines for over effect
 
-            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+            glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/interface_grey.bmp"));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glEnable(GL_TEXTURE_2D);
@@ -105,13 +105,13 @@ void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, const 
             //
             // Render projection effect
 
-            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+            glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
 
             LegacyVector3 ourPos = _building.m_pos + LegacyVector3(0, 90, 0);
             LegacyVector3 theirPos = _building.m_pos + LegacyVector3(0, 200, 0);
             theirPos += screenFront * 30.0f;
 
-            LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
+            LegacyVector3 camToTheirPos = g_context->m_camera->GetPos() - theirPos;
             LegacyVector3 lineTheirPos = camToTheirPos ^ (ourPos - theirPos);
             lineTheirPos.SetLength(_building.m_radius * 0.5f);
 

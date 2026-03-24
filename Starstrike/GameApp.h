@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GameAppSim.h"
+#include "GameContext.h"
 
-class GameApp : public GameAppSim, public GameMain
+class GameApp : public GameMain, public GameContext
 {
   public:
     GameApp();
@@ -19,13 +19,15 @@ class GameApp : public GameAppSim, public GameMain
     void OnSuspending() override;
     void OnResuming() override;
 
-    // --- GameAppSim overrides ---
-    void SetProfileName(const char* _profileName) override;
-    bool LoadProfile() override;
-    void ResetLevel(bool _global) override;
-    void SetLanguage(const char* _language, bool _test) override;
-    void LoadPrologue() override;
-    void LoadCampaign() override;
-    void UpdateDifficultyFromPreferences() override;
+    // --- Lifecycle methods ---
+    void SetProfileName(const char* _profileName);
+    bool LoadProfile();
+    void ResetLevel(bool _global);
+    void SetLanguage(const char* _language, bool _test);
+    void LoadPrologue();
+    void LoadCampaign();
+    void UpdateDifficultyFromPreferences();
 };
+
+extern GameApp* g_gameApp;
 

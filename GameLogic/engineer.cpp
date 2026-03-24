@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "engineer.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
+#include "GameSimEventQueue.h"
+#include "ShapeStatic.h"
 #include "bridge.h"
 #include "camera.h"
 #include "controltower.h"
@@ -10,13 +12,11 @@
 #include "language_table.h"
 #include "location.h"
 #include "main.h"
-#include "GameSimEventQueue.h"
 #include "math_utils.h"
 #include "matrix34.h"
 #include "obstruction_grid.h"
 #include "researchitem.h"
 #include "resource.h"
-#include "ShapeStatic.h"
 
 Engineer::Engineer()
   : Entity(),
@@ -29,7 +29,7 @@ Engineer::Engineer()
 {
   m_idleRotateRate = syncsfrand(0.5f);
 
-  m_shape = g_app->m_resource->GetShapeStatic("engineer.shp");
+  m_shape = Resource::GetShapeStatic("engineer.shp");
 
   Matrix34 mat(LegacyVector3(0, 0, 1), g_upVector, g_zeroVector);
   m_centerPos = m_shape->CalculateCenter(mat);
@@ -54,7 +54,7 @@ int Engineer::GetNumSpirits() { return m_spirits.Size(); }
 
 int Engineer::GetMaxSpirits()
 {
-  int engineerLevel = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeEngineer);
+  int engineerLevel = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeEngineer);
   switch (engineerLevel)
   {
   case 0:
@@ -80,11 +80,11 @@ bool Engineer::SearchForSpirits()
     int spiritId = -1;
     float closest = 999999.9f;
 
-    for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
     {
-      if (g_app->m_location->m_spirits.ValidIndex(i))
+      if (g_context->m_location->m_spirits.ValidIndex(i))
       {
-        Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+        Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
         float theDist = (s->m_pos - m_pos).Mag();
 
         if (theDist <= ENGINEER_SEARCHRANGE && theDist < closest && (s->m_state == Spirit::StateBirth || s->m_state ==
@@ -113,11 +113,11 @@ bool Engineer::SearchForControlTowers()
   int buildingIndex = -1;
   float closest = 99999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
+      Building* building = g_context->m_location->m_buildings[i];
       if (building->m_type == Building::TypeControlTower)
       {
         auto ct = static_cast<ControlTower*>(building);
@@ -137,7 +137,7 @@ bool Engineer::SearchForControlTowers()
 
   if (buildingIndex != -1)
   {
-    Building* building = g_app->m_location->m_buildings[buildingIndex];
+    Building* building = g_context->m_location->m_buildings[buildingIndex];
     m_buildingId = building->m_id.GetUniqueId();
     m_state = StateToControlTower;
     return true;
@@ -151,11 +151,11 @@ bool Engineer::SearchForBridges()
   int buildingIndex = -1;
   float closest = 99999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
+      Building* building = g_context->m_location->m_buildings[i];
       if (building->m_type == Building::TypeBridge)
       {
         auto bridge = static_cast<Bridge*>(building);
@@ -172,7 +172,7 @@ bool Engineer::SearchForBridges()
 
   if (buildingIndex != -1)
   {
-    Building* building = g_app->m_location->m_buildings[buildingIndex];
+    Building* building = g_context->m_location->m_buildings[buildingIndex];
     m_buildingId = building->m_id.GetUniqueId();
     m_state = StateToBridge;
     return true;
@@ -186,11 +186,11 @@ bool Engineer::SearchForResearchItems()
   float closest = 99999.9f;
   int buildingIndex = -1;
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
+      Building* building = g_context->m_location->m_buildings[i];
       if (building->m_type == Building::TypeResearchItem)
       {
         auto item = static_cast<ResearchItem*>(building);
@@ -206,11 +206,11 @@ bool Engineer::SearchForResearchItems()
 
   if (buildingIndex != -1)
   {
-    Building* building = g_app->m_location->m_buildings[buildingIndex];
+    Building* building = g_context->m_location->m_buildings[buildingIndex];
     m_buildingId = building->m_id.GetUniqueId();
     LegacyVector3 usToThem = (building->m_pos - m_pos).SetLength(35.0f);
     m_targetPos = building->m_pos - usToThem;
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
     m_targetPos.y += m_hoverHeight;
     m_state = StateToResearchItem;
     return true;
@@ -245,8 +245,8 @@ void Engineer::ChangeHealth(int amount)
     int healthBandAfter = static_cast<int>(m_stats[StatHealth] / 50.0f);
 
     float fractionDead = 1.0f - m_stats[StatHealth] / EntityBlueprint::GetStat(TypeEngineer, StatHealth);
-    fractionDead = max(fractionDead, 0.0f);
-    fractionDead = min(fractionDead, 1.0f);
+    fractionDead = std::max(fractionDead, 0.0f);
+    fractionDead = std::min(fractionDead, 1.0f);
 
     if (fractionDead == 1.0f || healthBandAfter < healthBandBefore)
     {
@@ -304,9 +304,9 @@ bool Engineer::Advance(Unit* _unit)
     while (m_spirits.Size() > 0)
     {
       int spiritId = m_spirits[0];
-      if (g_app->m_location->m_spirits.ValidIndex(spiritId))
+      if (g_context->m_location->m_spirits.ValidIndex(spiritId))
       {
-        Spirit* s = g_app->m_location->m_spirits.GetPointer(spiritId);
+        Spirit* s = g_context->m_location->m_spirits.GetPointer(spiritId);
         s->CollectorDrops();
         m_spirits.RemoveData(0);
       }
@@ -315,7 +315,7 @@ bool Engineer::Advance(Unit* _unit)
     // If I was reprogramming something, stop now
     if (m_state == StateReprogramming)
     {
-      Building* building = g_app->m_location->GetBuilding(m_buildingId);
+      Building* building = g_context->m_location->GetBuilding(m_buildingId);
       auto ct = static_cast<ControlTower*>(building);
       if (ct)
       {
@@ -335,7 +335,7 @@ bool Engineer::Advance(Unit* _unit)
     // If I was operating a bridge, stop now
     if (m_state == StateOperatingBridge)
     {
-      auto bridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(m_buildingId));
+      auto bridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(m_buildingId));
       if (bridge && bridge->m_type == Building::TypeBridge)
       {
         bridge->EndOperation();
@@ -363,9 +363,9 @@ bool Engineer::Advance(Unit* _unit)
   for (int i = 0; i < m_spirits.Size(); ++i)
   {
     int spiritId = m_spirits[i];
-    if (g_app->m_location->m_spirits.ValidIndex(spiritId))
+    if (g_context->m_location->m_spirits.ValidIndex(spiritId))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(spiritId);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(spiritId);
       if (s && s->m_state == Spirit::StateAttached)
       {
         if (m_positionHistory.ValidIndex(i + 1))
@@ -380,7 +380,7 @@ bool Engineer::Advance(Unit* _unit)
   //
   // Look to see if we've been pulled away by the player
 
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
   if (building && building->m_type == Building::TypeControlTower && m_positionId != -1 && m_state != StateReprogramming)
   {
     // We've been moved away from reprogramming
@@ -408,7 +408,7 @@ bool Engineer::Advance(Unit* _unit)
   //
   // If we own a bridge, check to make sure we are still in range of it
 
-  auto bridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(m_bridgeId));
+  auto bridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(m_bridgeId));
   if (bridge && bridge->m_type == Building::TypeBridge)
   {
     float range = (bridge->m_pos - m_pos).Mag();
@@ -434,7 +434,7 @@ bool Engineer::AdvanceToTargetPos()
     actualDir.Normalise();
 
     float desiredSpeed = distance.Mag();
-    desiredSpeed = min(desiredSpeed, m_stats[StatSpeed]);
+    desiredSpeed = std::min<float>(desiredSpeed, m_stats[StatSpeed]);
     if (m_state == StateIdle)
       desiredSpeed *= 0.25f;
 
@@ -447,7 +447,7 @@ bool Engineer::AdvanceToTargetPos()
     newPos = m_pos + moved;
 
     m_pos = newPos;
-    float targetHeight = max(g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z), 0.0f) + m_hoverHeight;
+    float targetHeight = std::max(g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z), 0.0f) + m_hoverHeight;
     m_pos.y = targetHeight;
     m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
     m_front = m_vel;
@@ -529,8 +529,8 @@ bool Engineer::AdvanceToWaypoint()
 bool Engineer::AdvanceToSpirit()
 {
   Spirit* s = nullptr;
-  if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
-    s = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+  if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
+    s = g_context->m_location->m_spirits.GetPointer(m_spiritId);
 
   if (!s || s->m_state == Spirit::StateDeath || s->m_state == Spirit::StateAttached)
   {
@@ -555,9 +555,9 @@ bool Engineer::AdvanceToSpirit()
 
 void Engineer::CollectSpirit(int _spiritId)
 {
-  if (g_app->m_location->m_spirits.ValidIndex(_spiritId))
+  if (g_context->m_location->m_spirits.ValidIndex(_spiritId))
   {
-    Spirit* spirit = g_app->m_location->m_spirits.GetPointer(_spiritId);
+    Spirit* spirit = g_context->m_location->m_spirits.GetPointer(_spiritId);
 
     spirit->CollectorArrives();
     m_spirits.PutData(_spiritId);
@@ -571,12 +571,12 @@ bool Engineer::SearchForIncubator()
   float nearest = 99999.9f;
   bool found = false;
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
-      if (building->m_type == Building::TypeIncubator && g_app->m_location->IsFriend(building->m_id.GetTeamId(), m_id.GetTeamId()))
+      Building* building = g_context->m_location->m_buildings[i];
+      if (building->m_type == Building::TypeIncubator && g_context->m_location->IsFriend(building->m_id.GetTeamId(), m_id.GetTeamId()))
       {
         float distance = (building->m_pos - m_pos).Mag();
         int population = static_cast<Incubator*>(building)->NumSpiritsInside();
@@ -597,12 +597,12 @@ bool Engineer::SearchForIncubator()
 
 bool Engineer::AdvanceToIncubator()
 {
-  auto incubator = static_cast<Incubator*>(g_app->m_location->GetBuilding(m_buildingId));
+  auto incubator = static_cast<Incubator*>(g_context->m_location->GetBuilding(m_buildingId));
 
   if (!incubator)
   {
     bool found = SearchForIncubator();
-    incubator = static_cast<Incubator*>(g_app->m_location->GetBuilding(m_buildingId));
+    incubator = static_cast<Incubator*>(g_context->m_location->GetBuilding(m_buildingId));
     if (!incubator)
     {
       // We can't find a friendly incubator, so go into holding pattern
@@ -619,11 +619,11 @@ bool Engineer::AdvanceToIncubator()
 
     // Arrived at our incubator, drop spirit off here one at a time
     int spiritId = m_spirits[0];
-    if (g_app->m_location->m_spirits.ValidIndex(spiritId))
+    if (g_context->m_location->m_spirits.ValidIndex(spiritId))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(spiritId);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(spiritId);
       incubator->AddSpirit(s);
-      g_app->m_location->m_spirits.MarkNotUsed(spiritId);
+      g_context->m_location->m_spirits.MarkNotUsed(spiritId);
       m_spirits.RemoveData(0);
     }
 
@@ -639,7 +639,7 @@ bool Engineer::AdvanceToIncubator()
 
 bool Engineer::AdvanceToControlTower()
 {
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
   if (!building)
   {
     m_state = StateIdle;
@@ -682,7 +682,7 @@ bool Engineer::AdvanceResearching()
   //
   // Make sure our research item is still available
 
-  auto item = static_cast<ResearchItem*>(g_app->m_location->GetBuilding(m_buildingId));
+  auto item = static_cast<ResearchItem*>(g_context->m_location->GetBuilding(m_buildingId));
   if (!item || item->m_type != Building::TypeResearchItem || !item->NeedsReprogram())
   {
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
@@ -745,7 +745,7 @@ bool Engineer::AdvanceResearching()
 
 bool Engineer::AdvanceReprogramming()
 {
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
 
   if (!building)
   {
@@ -795,7 +795,7 @@ bool Engineer::AdvanceReprogramming()
 
 void Engineer::BeginBridge(LegacyVector3 _to)
 {
-  int engineerLevel = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeEngineer);
+  int engineerLevel = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeEngineer);
   if (engineerLevel < 5)
     return;
 
@@ -819,12 +819,12 @@ void Engineer::BeginBridge(LegacyVector3 _to)
   for (int i = numComponents; i >= 0; --i)
   {
     auto component = static_cast<Bridge*>(Building::CreateBuilding(Building::TypeBridge));
-    g_app->m_location->m_buildings.PutData(component);
-    component->m_id.SetUniqueId(g_app->m_globalWorld->GenerateBuildingId());
+    g_context->m_location->m_buildings.PutData(component);
+    component->m_id.SetUniqueId(g_context->m_globalWorld->GenerateBuildingId());
     component->m_nextBridgeId = linkBuildingId;
     component->m_pos = m_wayPoint + componentSpan * static_cast<float>(i);
     component->m_pos += LegacyVector3(syncsfrand(15.0f), 0.0f, syncsfrand(15.0f));
-    component->m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(component->m_pos.x, component->m_pos.z);
+    component->m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(component->m_pos.x, component->m_pos.z);
     component->m_front = (_to - m_wayPoint).Normalise();
     if (i < numComponents && i > 0)
       component->m_front.RotateAroundY(0.5f * M_PI);
@@ -845,18 +845,18 @@ void Engineer::BeginBridge(LegacyVector3 _to)
       m_bridgeId = component->m_id.GetUniqueId();
   }
 
-  g_app->m_location->m_obstructionGrid->CalculateAll();
+  g_context->m_location->m_obstructionGrid->CalculateAll();
 }
 
 void Engineer::EndBridge()
 {
-  auto bridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(m_bridgeId));
+  auto bridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(m_bridgeId));
 
   while (bridge)
   {
     bridge->m_status = -1.0f;
     int nextBuildingId = bridge->m_nextBridgeId;
-    bridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(nextBuildingId));
+    bridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(nextBuildingId));
   }
 
   m_bridgeId = -1;
@@ -864,7 +864,7 @@ void Engineer::EndBridge()
 
 bool Engineer::AdvanceToBridge()
 {
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
   if (building && building->m_type == Building::TypeBridge)
   {
     auto bridge = static_cast<Bridge*>(building);
@@ -893,7 +893,7 @@ bool Engineer::AdvanceToBridge()
 
 bool Engineer::AdvanceOperatingBridge()
 {
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
   if (building && building->m_type == Building::TypeBridge)
   {
     LegacyVector3 front;
@@ -914,7 +914,7 @@ bool Engineer::AdvanceToResearchItem()
   //
   // Make sure our research item is still available
 
-  auto item = static_cast<ResearchItem*>(g_app->m_location->GetBuilding(m_buildingId));
+  auto item = static_cast<ResearchItem*>(g_context->m_location->GetBuilding(m_buildingId));
   if (!item || !item->NeedsReprogram())
   {
     m_buildingId = -1;

@@ -39,36 +39,36 @@ void OfficerRenderer::RenderSpirit(const LegacyVector3& _pos)
     glDisable(GL_TEXTURE_2D);
 
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 
     size = spiritOuterSize;
     glColor4ub(100, 250, 100, outerAlpha);
 
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 
     size = spiritGlowSize;
     glColor4ub(100, 250, 100, glowAlpha);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
     glTexCoord2i(1, 0);
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
     glTexCoord2i(1, 1);
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
     glTexCoord2i(0, 1);
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
     glDisable(GL_TEXTURE_2D);
 }
@@ -122,14 +122,14 @@ void OfficerRenderer::RenderFlag(const Officer& _officer, float _predictionTime)
 
     int texId = -1;
     if (_officer.m_orders == Officer::OrderNone)
-        texId = g_app->m_resource->GetTexture("icons/banner_none.bmp");
+        texId = Resource::GetTexture("icons/banner_none.bmp");
     else if (_officer.m_orders == Officer::OrderGoto)
-        texId = g_app->m_resource->GetTexture("icons/banner_goto.bmp");
+        texId = Resource::GetTexture("icons/banner_goto.bmp");
     else if (_officer.m_orders == Officer::OrderFollow && !_officer.m_absorb)
-        texId = g_app->m_resource->GetTexture("icons/banner_follow.bmp");
+        texId = Resource::GetTexture("icons/banner_follow.bmp");
     else
         if (_officer.m_orders == Officer::OrderFollow && _officer.m_absorb)
-            texId = g_app->m_resource->GetTexture("icons/banner_absorb.bmp");
+            texId = Resource::GetTexture("icons/banner_absorb.bmp");
 
     // Flag is a mutable object on the Officer — we need a non-const copy
     // to call SetTexture/SetPosition/SetOrientation/SetSize/Render.

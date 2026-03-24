@@ -1,15 +1,13 @@
 #include "pch.h"
-
 #include "FuelBuildingRenderer.h"
-#include "rocket.h"
-#include "main.h"
+#include "GameApp.h"
+#include "ShapeStatic.h"
 #include "camera.h"
+#include "main.h"
+#include "preferences.h"
 #include "renderer.h"
 #include "resource.h"
-#include "preferences.h"
-#include "ShapeStatic.h"
-#include "GameApp.h"
-#include "location.h"
+#include "rocket.h"
 
 void FuelBuildingRenderer::Render(const Building& _building, const BuildingRenderContext& _ctx)
 {
@@ -49,10 +47,10 @@ void FuelBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
             LegacyVector3 endPos = fuelBuilding->GetFuelPosition();
 
             LegacyVector3 midPos = (startPos + endPos) / 2.0f;
-            LegacyVector3 rightAngle = (g_app->m_camera->GetPos() - midPos) ^ (startPos - endPos);
+            LegacyVector3 rightAngle = (g_context->m_camera->GetPos() - midPos) ^ (startPos - endPos);
             rightAngle.SetLength(25.0f);
 
-            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/fuel.bmp"));
+            glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/fuel.bmp"));
             glEnable(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -65,13 +63,13 @@ void FuelBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
 
             glColor4f(1.0f, 0.4f, 0.1f, 0.4f * fuel.m_currentLevel);
 
-            float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_app->m_renderer->GetFarPlane());
+            float nearPlaneStart = g_context->m_renderer->GetNearPlane();
+            g_context->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_context->m_renderer->GetFarPlane());
 
             int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail");
             float maxLoops = 4 - buildingDetail;
-            maxLoops = max(maxLoops, 1);
-            maxLoops = min(maxLoops, 3);
+            maxLoops = std::max(maxLoops, 1.0f);
+            maxLoops = std::min(maxLoops, 3.0f);
 
             for (int i = 0; i < maxLoops; ++i)
             {
@@ -88,7 +86,7 @@ void FuelBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
                 rightAngle *= 0.7f;
             }
 
-            g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
+            g_context->m_camera->SetupProjectionMatrix(nearPlaneStart, g_context->m_renderer->GetFarPlane());
 
             glEnable(GL_DEPTH_TEST);
             glDisable(GL_TEXTURE_2D);

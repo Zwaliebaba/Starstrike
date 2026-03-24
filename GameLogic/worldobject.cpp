@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "worldobject.h"
 
@@ -91,9 +91,9 @@ void WorldObject::BounceOffLandscape()
   LegacyVector3 lastPos = m_pos; // - m_vel * g_advanceTime;
   LegacyVector3 impactPos = (m_pos + lastPos) * 0.5f;
   m_pos = impactPos;
-  m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
-  LegacyVector3 normal = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+  LegacyVector3 normal = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
   LegacyVector3 incomingVel = m_vel * -1.0f;
   float dotProd = normal * incomingVel;
   m_vel = 2.0f * dotProd * normal - incomingVel;

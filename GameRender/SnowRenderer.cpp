@@ -19,5 +19,5 @@ void SnowRenderer::Render(const WorldObject& _object, const WorldObjectRenderCon
     float size = 20.0f;
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0);
-    Render3DSprite(predictedPos, size, size, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    Render3DSprite(predictedPos, size, size, Resource::GetTexture("textures/starburst.bmp"));
 }

@@ -17,7 +17,7 @@ void ArmyAntRenderer::Render(const Entity& _entity, const EntityRenderContext& _
     LegacyVector3 predictedPos = ant.m_pos + ant.m_vel * _ctx.predictionTime;
     LegacyVector3 predictedUp = g_upVector;
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
     glDisable(GL_TEXTURE_2D);
 
     Matrix34 mat(ant.m_front, predictedUp, predictedPos);
@@ -27,5 +27,5 @@ void ArmyAntRenderer::Render(const Entity& _entity, const EntityRenderContext& _
 
     ant.m_shape->Render(_ctx.predictionTime, mat);
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 }

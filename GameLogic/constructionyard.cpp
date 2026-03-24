@@ -6,7 +6,7 @@
 #include "constructionyard.h"
 #include "researchitem.h"
 #include "armour.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "main.h"
 #include "global_world.h"
 #include "location.h"
@@ -23,10 +23,10 @@ ConstructionYard::ConstructionYard()
     m_alpha(0.0f)
 {
   m_type = TypeYard;
-  SetShape(g_app->m_resource->GetShapeStatic("constructionyard.shp"));
+  SetShape(Resource::GetShapeStatic("constructionyard.shp"));
 
-  m_rung = g_app->m_resource->GetShapeStatic("constructionyardrung.shp");
-  m_primitive = g_app->m_resource->GetShapeStatic("mineprimitive1.shp");
+  m_rung = Resource::GetShapeStatic("constructionyardrung.shp");
+  m_primitive = Resource::GetShapeStatic("mineprimitive1.shp");
 
   for (int i = 0; i < YARD_NUMPRIMITIVES; ++i)
   {
@@ -51,11 +51,11 @@ bool ConstructionYard::Advance()
 
   if (m_fractionPopulated > 0.0f && m_numSurges > 0 && m_numPrimitives > 0)
   {
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     if (gb && !gb->m_online)
     {
       gb->m_online = true;
-      g_app->m_globalWorld->EvaluateEvents();
+      g_context->m_globalWorld->EvaluateEvents();
     }
   }
 
@@ -80,8 +80,8 @@ bool ConstructionYard::Advance()
 
         Matrix34 mat(m_front, g_upVector, m_pos);
         Matrix34 prim = m_shape->GetMarkerWorldMatrix(m_primitives[5], mat);
-        WorldObjectId objId = g_app->m_location->SpawnEntities(prim.pos, 2, -1, Entity::TypeArmour, 1, g_zeroVector, 0.0f);
-        Entity* entity = g_app->m_location->GetEntity(objId);
+        WorldObjectId objId = g_context->m_location->SpawnEntities(prim.pos, 2, -1, Entity::TypeArmour, 1, g_zeroVector, 0.0f);
+        Entity* entity = g_context->m_location->GetEntity(objId);
         auto armour = static_cast<Armour*>(entity);
         armour->m_front.Set(0, 0, 1);
         armour->m_vel.Zero();
@@ -129,13 +129,13 @@ Matrix34 ConstructionYard::GetRungMatrix2()
 
 bool ConstructionYard::IsPopulationLocked()
 {
-  Team* team = g_app->m_location->GetMyTeam();
+  Team* team = g_context->m_location->GetMyTeam();
 
   int numArmour = 0;
   for (int i = 0; i < team->m_specials.Size(); ++i)
   {
     WorldObjectId id = *team->m_specials.GetPointer(i);
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
     if (entity && entity->m_type == Entity::TypeArmour)
       ++numArmour;
   }
@@ -162,9 +162,9 @@ DisplayScreen::DisplayScreen()
   : Building()
 {
   m_type = TypeDisplayScreen;
-  SetShape(g_app->m_resource->GetShapeStatic("displayscreen.shp"));
+  SetShape(Resource::GetShapeStatic("displayscreen.shp"));
 
-  m_armour = g_app->m_resource->GetShapeStatic("armour.shp");
+  m_armour = Resource::GetShapeStatic("armour.shp");
 
   for (int i = 0; i < DISPLAYSCREEN_NUMRAYS; ++i)
   {

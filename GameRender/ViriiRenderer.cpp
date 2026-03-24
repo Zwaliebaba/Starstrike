@@ -1,12 +1,9 @@
 #include "pch.h"
-
 #include "ViriiRenderer.h"
 #include "virii.h"
 #include "entity.h"
 #include "camera.h"
 #include "location.h"
-#include "main.h"
-#include "renderer.h"
 #include "resource.h"
 #include "preferences.h"
 #include "team.h"
@@ -24,7 +21,7 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
     int entityDetail = g_prefsManager->GetInt("RenderEntityDetail");
     if (entityDetail == 3)
     {
-        float rangeToCam = (v.m_pos - g_app->m_camera->GetPos()).Mag();
+        float rangeToCam = (v.m_pos - g_context->m_camera->GetPos()).Mag();
         if (rangeToCam > 1000.0f)
             _detail = 4;
         else if (rangeToCam > 600.0f)
@@ -34,7 +31,7 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
     }
     else
     {
-        float rangeToCam = (v.m_pos - g_app->m_camera->GetPos()).Mag();
+        float rangeToCam = (v.m_pos - g_context->m_camera->GetPos()).Mag();
         if (entityDetail == 1 && rangeToCam > 1000.0f)
             _detail = 2;
         else if (entityDetail == 2 && rangeToCam > 1000.0f)
@@ -44,11 +41,11 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
     }
 
     if (v.m_onGround && _detail == 1)
-        predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z) + v.m_hoverHeight;
+        predictedPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z) + v.m_hoverHeight;
 
     float health = static_cast<float>(v.m_stats[Entity::StatHealth]) / EntityBlueprint::GetStat(v.m_type, Entity::StatHealth);
 
-    RGBAColour wormColour = g_app->m_location->m_teams[v.m_id.GetTeamId()].m_colour * health;
+    RGBAColour wormColour = g_context->m_location->m_teams[v.m_id.GetTeamId()].m_colour * health;
     RGBAColour glowColour(200, 100, 100);
     wormColour.a = 200;
     glowColour.a = 150;
@@ -64,7 +61,7 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
 
     LegacyVector3 landNormal = g_upVector;
     if (_detail == 1)
-        landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
+        landNormal = g_context->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
 
     ViriiHistory prevPos;
     prevPos.m_pos = predictedPos;
@@ -90,7 +87,7 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
     if (_detail > 1)
     {
         int amountToChop = _detail - 1;
-        amountToChop = min(amountToChop, 2);
+        amountToChop = std::min(amountToChop, 2);
         lastIndex *= (1.0f - 0.25f * amountToChop);
     }
 

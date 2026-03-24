@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "clienttoserver.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "camera.h"
 #include "global_world.h"
@@ -30,7 +30,7 @@ FenceSwitch::FenceSwitch()
     m_switchValue(-1)
 {
   m_type = TypeFenceSwitch;
-  SetShape(g_app->m_resource->GetShapeStatic("fenceswitch.shp"));
+  SetShape(Resource::GetShapeStatic("fenceswitch.shp"));
   strncpy(m_script, "none", sizeof(m_script));
   m_script[sizeof(m_script) - 1] = '\0';
 }
@@ -80,7 +80,7 @@ bool FenceSwitch::Advance()
   else
     SetTeamId(1);
 
-  Building* b = g_app->m_location->GetBuilding(m_linkedBuildingId);
+  Building* b = g_context->m_location->GetBuilding(m_linkedBuildingId);
 
   bool switched = false;
 
@@ -92,7 +92,7 @@ bool FenceSwitch::Advance()
 
       if (GetNumPorts() == GetNumPortsOccupied())
       {
-        GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+        GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
         if (gb && !gb->m_online)
         {
           if (friendly)
@@ -106,7 +106,7 @@ bool FenceSwitch::Advance()
                 switched = true;
               }
 
-              Building* b2 = g_app->m_location->GetBuilding(m_linkedBuildingId2);
+              Building* b2 = g_context->m_location->GetBuilding(m_linkedBuildingId2);
               if (b2 && b2->m_type == TypeLaserFence)
               {
                 auto fence2 = static_cast<LaserFence*>(b2);
@@ -122,7 +122,7 @@ bool FenceSwitch::Advance()
                 switched = true;
               }
 
-              Building* b2 = g_app->m_location->GetBuilding(m_linkedBuildingId2);
+              Building* b2 = g_context->m_location->GetBuilding(m_linkedBuildingId2);
               if (b2 && b2->m_type == TypeLaserFence)
               {
                 auto fence2 = static_cast<LaserFence*>(b2);
@@ -142,7 +142,7 @@ bool FenceSwitch::Advance()
               switched = true;
             }
 
-            Building* b2 = g_app->m_location->GetBuilding(m_linkedBuildingId2);
+            Building* b2 = g_context->m_location->GetBuilding(m_linkedBuildingId2);
             if (b2 && b2->m_type == TypeLaserFence)
             {
               auto fence2 = static_cast<LaserFence*>(b2);
@@ -151,12 +151,12 @@ bool FenceSwitch::Advance()
             }
           }
           gb->m_online = true;
-          g_app->m_globalWorld->EvaluateEvents();
+          g_context->m_globalWorld->EvaluateEvents();
         }
       }
       else
       {
-        GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+        GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
         if (gb && gb->m_online)
         {
           m_switchValue = m_linkedBuildingId;
@@ -178,7 +178,7 @@ bool FenceSwitch::Advance()
               switched = true;
             }
 
-            Building* b2 = g_app->m_location->GetBuilding(m_linkedBuildingId2);
+            Building* b2 = g_context->m_location->GetBuilding(m_linkedBuildingId2);
             if (b2 && b2->m_type == TypeLaserFence)
             {
               auto fence2 = static_cast<LaserFence*>(b2);
@@ -187,7 +187,7 @@ bool FenceSwitch::Advance()
             }
           }
           gb->m_online = false;
-          g_app->m_globalWorld->EvaluateEvents();
+          g_context->m_globalWorld->EvaluateEvents();
         }
       }
     }
@@ -196,7 +196,7 @@ bool FenceSwitch::Advance()
   if (switched)
   {
     if (strstr(m_script, ".txt"))
-      g_app->m_script->RunScript(m_script);
+      g_context->m_script->RunScript(m_script);
     if (m_lockable)
       m_locked = true;
   }
@@ -269,12 +269,12 @@ void FenceSwitch::Switch()
     else
       m_switchValue = m_linkedBuildingId;
 
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     gb->m_online = false;
-    g_app->m_globalWorld->EvaluateEvents();
+    g_context->m_globalWorld->EvaluateEvents();
     /*if( strstr( m_script, ".txt" ) )
     {
-        g_app->m_script->RunScript( m_script );
+        g_context->m_script->RunScript( m_script );
     }*/
   }
 }
@@ -297,7 +297,7 @@ bool FenceSwitch::IsInView()
   if (m_linkedBuildingId != -1)
   {
     LegacyVector3 startPoint = m_pos;
-    Building* b = g_app->m_location->GetBuilding(m_linkedBuildingId);
+    Building* b = g_context->m_location->GetBuilding(m_linkedBuildingId);
     if (b)
     {
       LegacyVector3 endPoint = b->m_pos;
@@ -306,7 +306,7 @@ bool FenceSwitch::IsInView()
       float radius = (startPoint - endPoint).Mag() / 2.0f;
       radius += m_radius;
 
-      if (g_app->m_camera->SphereInViewFrustum(midPoint, radius))
+      if (g_context->m_camera->SphereInViewFrustum(midPoint, radius))
         return true;
     }
   }
@@ -314,7 +314,7 @@ bool FenceSwitch::IsInView()
   if (m_linkedBuildingId2 != -1)
   {
     LegacyVector3 startPoint = m_pos;
-    Building* b = g_app->m_location->GetBuilding(m_linkedBuildingId2);
+    Building* b = g_context->m_location->GetBuilding(m_linkedBuildingId2);
     if (b)
     {
       LegacyVector3 endPoint = b->m_pos;
@@ -323,7 +323,7 @@ bool FenceSwitch::IsInView()
       float radius = (startPoint - endPoint).Mag() / 2.0f;
       radius += m_radius;
 
-      if (g_app->m_camera->SphereInViewFrustum(midPoint, radius))
+      if (g_context->m_camera->SphereInViewFrustum(midPoint, radius))
         return true;
     }
   }

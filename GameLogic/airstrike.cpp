@@ -2,7 +2,7 @@
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "airstrike.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
 
@@ -14,7 +14,7 @@ AirstrikeUnit::AirstrikeUnit(int teamId, int unitId, int numEntities, const Lega
     m_state(StateApproaching)
 {
   m_attackPosition = _pos;
-  m_attackPosition.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_attackPosition.x, m_attackPosition.z) + 70.0f;
+  m_attackPosition.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_attackPosition.x, m_attackPosition.z) + 70.0f;
 
   m_speed = EntityBlueprint::GetStat(Entity::TypeSpaceInvader, Entity::StatSpeed) * 10.0f;
 }
@@ -23,8 +23,8 @@ void AirstrikeUnit::Begin()
 {
   float inset = 100.0f;
   float startHeight = 500.0f;
-  float landSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float landSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float landSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float landSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
 
   DArray<LegacyVector3> startPositions;
   startPositions.PutData(LegacyVector3(inset, startHeight, inset));
@@ -84,7 +84,7 @@ void AirstrikeUnit::Begin()
   //
   // Spawn our space invaders
 
-  g_app->m_location->SpawnEntities(m_enterPosition, m_teamId, m_unitId, Entity::TypeSpaceInvader, m_numInvaders, front, 0.0f);
+  g_context->m_location->SpawnEntities(m_enterPosition, m_teamId, m_unitId, Entity::TypeSpaceInvader, m_numInvaders, front, 0.0f);
 }
 
 bool AirstrikeUnit::AdvanceToTargetPosition(LegacyVector3 _targetPos)
@@ -117,11 +117,11 @@ bool AirstrikeUnit::Advance(int _slice)
   //
   // Has our target marker moved?
 
-  if (g_app->m_location->m_effects.ValidIndex(m_effectId))
+  if (g_context->m_location->m_effects.ValidIndex(m_effectId))
   {
-    WorldObject* targetMarker = g_app->m_location->m_effects[m_effectId];
+    WorldObject* targetMarker = g_context->m_location->m_effects[m_effectId];
     m_attackPosition = targetMarker->m_pos;
-    m_attackPosition.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_attackPosition.x, m_attackPosition.z) + 70.0f;
+    m_attackPosition.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_attackPosition.x, m_attackPosition.z) + 70.0f;
   }
 
   switch (m_state)
@@ -150,8 +150,8 @@ SpaceInvader::SpaceInvader()
   : Entity(),
     m_armed(true)
 {
-  m_shape = g_app->m_resource->GetShapeStatic("spaceinvader.shp");
-  m_bombShape = g_app->m_resource->GetShapeStatic("throwable.shp");
+  m_shape = Resource::GetShapeStatic("spaceinvader.shp");
+  m_bombShape = Resource::GetShapeStatic("throwable.shp");
 }
 
 bool SpaceInvader::Advance(Unit* _unit)
@@ -188,7 +188,7 @@ bool SpaceInvader::Advance(Unit* _unit)
       weapon->m_type = EffectThrowableAirstrikeBomb;
       weapon->m_life = 1.5f;
       weapon->m_power = 50.0f;
-      int index = g_app->m_location->m_effects.PutData(weapon);
+      int index = g_context->m_location->m_effects.PutData(weapon);
       weapon->m_id.Set(m_id.GetTeamId(), UNIT_EFFECTS, index, -1);
       weapon->m_id.GenerateUniqueId();
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "DropGrenade"));
@@ -199,8 +199,8 @@ bool SpaceInvader::Advance(Unit* _unit)
   //
   // Clip to edge of world
 
-  float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
 
   if (m_pos.x < 0.0f || m_pos.z < 0.0f || m_pos.x >= worldSizeX || m_pos.z >= worldSizeZ)
     return true;

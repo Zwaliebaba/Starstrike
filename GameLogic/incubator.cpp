@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "incubator.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "file_writer.h"
 #include "globals.h"
@@ -19,7 +19,7 @@ Incubator::Incubator()
 {
   m_type = TypeIncubator;
 
-  SetShape(g_app->m_resource->GetShapeStatic("incubator.shp"));
+  SetShape(Resource::GetShapeStatic("incubator.shp"));
 
   m_spiritCenter = m_shape->GetMarkerData("MarkerSpirits");
   m_exit = m_shape->GetMarkerData("MarkerExit");
@@ -126,7 +126,7 @@ void Incubator::SpawnEntity()
   if (teamId == 2)
     teamId = 0; // Green rather than yellow
 
-  g_app->m_location->SpawnEntities(exit.pos, teamId, -1, m_troopType, 1, exit.f, 0.0f);
+  g_context->m_location->SpawnEntities(exit.pos, teamId, -1, m_troopType, 1, exit.f, 0.0f);
 
   //
   // Remove a spirit
@@ -155,7 +155,7 @@ void Incubator::SpawnEntity()
   {
     LegacyVector3 vel(sfrand(15.0f), frand(35.0f), sfrand(15.0f));
     g_simEventQueue.Push(SimEvent::MakeParticle(exit.pos, vel, SimParticle::TypeControlFlash));
-    //g_app->m_particleSystem->CreateParticle( spiritPos, vel, Particle::TypeControlFlash );
+    //g_context->m_particleSystem->CreateParticle( spiritPos, vel, Particle::TypeControlFlash );
   }
 
   //

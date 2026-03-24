@@ -33,7 +33,7 @@ void ResearchItemBuildingRenderer::Render(const Building& _building, const Build
 
     item.m_shape->Render(0.0f, mat);
 
-    if (g_app->m_editing && item.m_researchType != -1)
+    if (g_context->m_editing && item.m_researchType != -1)
     {
         g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 25, 0), 5, GlobalResearch::GetTypeName(item.m_researchType));
         g_gameFont.DrawText3DCenter(predictedPos + LegacyVector3(0, 20, 0), 5, "%2.2f", item.m_reprogrammed);
@@ -46,14 +46,14 @@ void ResearchItemBuildingRenderer::RenderAlphas(const Building& _building, const
 
     const ResearchItem& item = static_cast<const ResearchItem&>(_building);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
 
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/cloudyglow.bmp"));
 
     float timeIndex = g_gameTime + item.m_id.GetUniqueId() * 10.0f;
 
@@ -74,7 +74,7 @@ void ResearchItemBuildingRenderer::RenderAlphas(const Building& _building, const
         pos.z += cosf(timeIndex + i) * i * 0.3f;
 
         float size = 5.0f + sinf(timeIndex + i * 10) * 7.0f;
-        size = max(size, 2.0f);
+        size = std::max(size, 2.0f);
 
         glColor4f(0.1f, 0.2f, 0.8f, alpha);
 
@@ -96,7 +96,7 @@ void ResearchItemBuildingRenderer::RenderAlphas(const Building& _building, const
     alpha = 1.0f - item.m_reprogrammed / 100.0f;
     alpha *= 0.3f;
 
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
     if (alpha > 0.0f)
     {
@@ -140,7 +140,7 @@ void ResearchItemBuildingRenderer::RenderAlphas(const Building& _building, const
 
     if (alpha > 0.0f)
     {
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
         glDisable(GL_CULL_FACE);
         glShadeModel(GL_SMOOTH);
 

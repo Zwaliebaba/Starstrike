@@ -6,7 +6,7 @@
 
 void MasterSpawnPointBuildingRenderer::Render(const Building& _building, const BuildingRenderContext& _ctx)
 {
-    if (_building.m_isGlobal || g_app->m_editing)
+    if (_building.m_isGlobal || g_context->m_editing)
     {
         SpawnBuildingRenderer::Render(_building, _ctx);
     }
@@ -14,7 +14,7 @@ void MasterSpawnPointBuildingRenderer::Render(const Building& _building, const B
 
 void MasterSpawnPointBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
 {
-    if (_building.m_isGlobal || g_app->m_editing)
+    if (_building.m_isGlobal || g_context->m_editing)
     {
         SpawnBuildingRenderer::RenderAlphas(_building, _ctx);
     }

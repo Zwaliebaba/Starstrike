@@ -6,7 +6,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "spiritreceiver.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "language_table.h"
 #include "location.h"
 #include "resource.h"
@@ -45,14 +45,14 @@ LegacyVector3 ReceiverBuilding::GetSpiritLocation()
 
 bool ReceiverBuilding::IsInView()
 {
-  Building* spiritLink = g_app->m_location->GetBuilding(m_spiritLink);
+  Building* spiritLink = g_context->m_location->GetBuilding(m_spiritLink);
 
   if (spiritLink)
   {
     LegacyVector3 midPoint = (spiritLink->m_centerPos + m_centerPos) / 2.0f;
     float radius = (spiritLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
-    return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
+    return (g_context->m_camera->SphereInViewFrustum(midPoint, radius));
   }
   return Building::IsInView();
 }
@@ -68,7 +68,7 @@ bool ReceiverBuilding::Advance()
       m_spirits.RemoveData(i);
       --i;
 
-      Building* spiritLink = g_app->m_location->GetBuilding(m_spiritLink);
+      Building* spiritLink = g_context->m_location->GetBuilding(m_spiritLink);
       if (spiritLink)
       {
         auto receiverBuilding = static_cast<ReceiverBuilding*>(spiritLink);
@@ -106,15 +106,15 @@ SpiritProcessor* ReceiverBuilding::GetSpiritProcessor()
 {
   static int processorId = -1;
 
-  auto processor = static_cast<SpiritProcessor*>(g_app->m_location->GetBuilding(processorId));
+  auto processor = static_cast<SpiritProcessor*>(g_context->m_location->GetBuilding(processorId));
 
   if (!processor || processor->m_type != TypeSpiritProcessor)
   {
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings[i];
+        Building* building = g_context->m_location->m_buildings[i];
         if (building->m_type == TypeSpiritProcessor)
         {
           processor = static_cast<SpiritProcessor*>(building);
@@ -140,7 +140,7 @@ SpiritProcessor::SpiritProcessor()
     m_throughput(0.0f)
 {
   m_type = TypeSpiritProcessor;
-  SetShape(g_app->m_resource->GetShapeStatic("spiritprocessor.shp"));
+  SetShape(Resource::GetShapeStatic("spiritprocessor.shp"));
 }
 
 void SpiritProcessor::Initialise(Building* _building)
@@ -152,8 +152,8 @@ void SpiritProcessor::Initialise(Building* _building)
 
   for (int i = 0; i < 150; ++i)
   {
-    float sizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-    float sizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+    float sizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+    float sizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
     float posY = syncfrand(1000.0f);
     auto spawnPos = LegacyVector3(syncfrand(sizeX), posY, syncfrand(sizeZ));
 
@@ -200,7 +200,7 @@ bool SpiritProcessor::Advance()
 
   if (m_throughput > 50.0f)
   {
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     gb->m_online = true;
   }
 
@@ -227,8 +227,8 @@ bool SpiritProcessor::Advance()
   {
     m_spawnSync = 0.2f;
 
-    float sizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-    float sizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+    float sizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+    float sizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
     float posY = 700.0f + syncfrand(300.0f);
     auto spawnPos = LegacyVector3(syncfrand(sizeX), posY, syncfrand(sizeZ));
     auto spirit = new UnprocessedSpirit();
@@ -247,7 +247,7 @@ ReceiverLink::ReceiverLink()
   : ReceiverBuilding()
 {
   m_type = TypeReceiverLink;
-  SetShape(g_app->m_resource->GetShapeStatic("receiverlink.shp"));
+  SetShape(Resource::GetShapeStatic("receiverlink.shp"));
 }
 
 bool ReceiverLink::Advance() { return ReceiverBuilding::Advance(); }
@@ -260,7 +260,7 @@ ReceiverSpiritSpawner::ReceiverSpiritSpawner()
   : ReceiverBuilding()
 {
   m_type = TypeReceiverSpiritSpawner;
-  SetShape(g_app->m_resource->GetShapeStatic("receiverlink.shp"));
+  SetShape(Resource::GetShapeStatic("receiverlink.shp"));
 }
 
 bool ReceiverSpiritSpawner::Advance()
@@ -282,7 +282,7 @@ SpiritReceiver::SpiritReceiver()
     m_spiritLink(nullptr)
 {
   m_type = TypeSpiritReceiver;
-  SetShape(g_app->m_resource->GetShapeStatic("spiritreceiver.shp"));
+  SetShape(Resource::GetShapeStatic("spiritreceiver.shp"));
   m_headMarker = m_shape->GetMarkerData("MarkerHead");
 
   for (int i = 0; i < SPIRITRECEIVER_NUMSTATUSMARKERS; ++i)
@@ -292,13 +292,13 @@ SpiritReceiver::SpiritReceiver()
     m_statusMarkers[i] = m_shape->GetMarkerData(name);
   }
 
-  m_headShape = g_app->m_resource->GetShapeStatic("spiritreceiverhead.shp");
+  m_headShape = Resource::GetShapeStatic("spiritreceiverhead.shp");
   m_spiritLink = m_headShape->GetMarkerData("MarkerSpiritLink");
 }
 
 void SpiritReceiver::Initialise(Building* _template)
 {
-  _template->m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
+  _template->m_up = g_context->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
   auto right = LegacyVector3(1, 0, 0);
   _template->m_front = right ^ _template->m_up;
 
@@ -412,11 +412,11 @@ bool UnprocessedSpirit::Advance()
   {
   case StateUnprocessedFalling:
     {
-      float heightAboveGround = m_pos.y - g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+      float heightAboveGround = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
       if (heightAboveGround > 15.0f)
       {
         float fractionAboveGround = heightAboveGround / 100.0f;
-        fractionAboveGround = min(fractionAboveGround, 1.0f);
+        fractionAboveGround = std::min(fractionAboveGround, 1.0f);
         m_hover.y = (-10.0f - syncfrand(10.0f)) * fractionAboveGround;
       }
       else
@@ -443,12 +443,10 @@ bool UnprocessedSpirit::Advance()
     break;
   }
 
-  LegacyVector3 oldPos = m_pos;
-
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
   m_pos += m_hover * SERVER_ADVANCE_PERIOD;
-  float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
   if (m_pos.x < 0.0f)
     m_pos.x = 0.0f;
   if (m_pos.z < 0.0f)
@@ -469,7 +467,7 @@ float UnprocessedSpirit::GetLife()
     {
       float timePassed = GetHighResTime() - m_timeSync;
       float life = timePassed / 10.0f;
-      life = min(life, 1.0f);
+      life = std::min(life, 1.0f);
       return life;
     }
 
@@ -480,8 +478,8 @@ float UnprocessedSpirit::GetLife()
     {
       float timeLeft = m_timeSync;
       float life = timeLeft / 10.0f;
-      life = min(life, 1.0f);
-      life = max(life, 0.0f);
+      life = std::min(life, 1.0f);
+      life = std::max(life, 0.0f);
       return life;
     }
   }

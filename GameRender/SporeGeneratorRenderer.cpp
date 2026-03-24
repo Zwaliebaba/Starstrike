@@ -10,7 +10,7 @@
 
 static void RenderTail(const LegacyVector3& _from, const LegacyVector3& _to, float _size)
 {
-  LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - _from;
+  LegacyVector3 camToOurPos = g_context->m_camera->GetPos() - _from;
   LegacyVector3 lineOurPos = camToOurPos ^ (_from - _to);
   lineOurPos.SetLength(_size);
 
@@ -41,7 +41,7 @@ void SporeGeneratorRenderer::Render(const Entity& _entity, const EntityRenderCon
   //
   // 3d Shape
 
-  g_app->m_renderer->SetObjectLighting();
+  g_context->m_renderer->SetObjectLighting();
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
 
@@ -116,7 +116,7 @@ void SporeGeneratorRenderer::Render(const Entity& _entity, const EntityRenderCon
   glDisable(GL_COLOR_MATERIAL);
   glEnable(GL_CULL_FACE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  g_app->m_renderer->UnsetObjectLighting();
+  g_context->m_renderer->UnsetObjectLighting();
 
   //
   // Shadow

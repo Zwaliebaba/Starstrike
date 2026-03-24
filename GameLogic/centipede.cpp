@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "math_utils.h"
 #include "profiler.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "GameSimEventQueue.h"
@@ -30,8 +30,8 @@ Centipede::Centipede()
 
   if (!s_shapeBody)
   {
-    s_shapeBody = g_app->m_resource->GetShapeStatic("centipede.shp");
-    s_shapeHead = g_app->m_resource->GetShapeStatic("centipedehead.shp");
+    s_shapeBody = Resource::GetShapeStatic("centipede.shp");
+    s_shapeHead = Resource::GetShapeStatic("centipedehead.shp");
   }
 
   m_shape = s_shapeBody;
@@ -47,7 +47,7 @@ void Centipede::Begin()
     //
     // Link every centipede in this unit into one long centipede
 
-    Team* myTeam = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* myTeam = &g_context->m_location->m_teams[m_id.GetTeamId()];
     Unit* myUnit = nullptr;
     if (myTeam->m_units.ValidIndex(m_id.GetUnitId()))
       myUnit = myTeam->m_units[m_id.GetUnitId()];
@@ -55,7 +55,7 @@ void Centipede::Begin()
     if (myUnit)
     {
       float size = 0.2f * pow(1.1f, myUnit->m_entities.Size());
-      size = min(size, 10.0f);
+      size = std::min(size, 10.0f);
 
       Centipede* prev = nullptr;
 
@@ -118,7 +118,7 @@ void Centipede::ChangeHealth(int _amount)
 
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, 1.0f));
 
-    auto next = static_cast<Centipede*>(g_app->m_location->GetEntitySafe(m_next, TypeCentipede));
+    auto next = static_cast<Centipede*>(g_context->m_location->GetEntitySafe(m_next, TypeCentipede));
     if (next)
       next->m_prev.SetInvalid();
 
@@ -132,13 +132,13 @@ void Centipede::Panic(float _time)
   if (m_panic <= 0.0f)
     g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Panic"));
 
-  m_panic = max(_time, m_panic);
+  m_panic = std::max(_time, m_panic);
 
   if (m_next.IsValid())
   {
     //
     // We're not the head, so pass on towards the head
-    WorldObject* wobj = g_app->m_location->GetEntity(m_next);
+    WorldObject* wobj = g_context->m_location->GetEntity(m_next);
     auto centipede = static_cast<Centipede*>(wobj);
     centipede->Panic(_time);
   }
@@ -163,7 +163,7 @@ bool Centipede::Advance(Unit* _unit)
 
     m_shape = s_shapeBody;
 
-    auto centipede = static_cast<Centipede*>(g_app->m_location->GetEntitySafe(m_next, TypeCentipede));
+    auto centipede = static_cast<Centipede*>(g_context->m_location->GetEntitySafe(m_next, TypeCentipede));
     if (centipede && !centipede->m_dead)
     {
       if (centipede->m_linked)
@@ -205,11 +205,11 @@ bool Centipede::Advance(Unit* _unit)
     }
     else if (m_targetEntity.IsValid())
     {
-      WorldObject* target = g_app->m_location->GetEntity(m_targetEntity);
+      WorldObject* target = g_context->m_location->GetEntity(m_targetEntity);
       if (target)
       {
         m_targetPos = target->m_pos;
-        m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+        m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
       }
       else
         m_targetEntity.SetInvalid();
@@ -247,9 +247,9 @@ bool Centipede::Advance(Unit* _unit)
     targetSize = 0.2f;
   else
   {
-    auto prev = static_cast<Centipede*>(g_app->m_location->GetEntitySafe(m_prev, TypeCentipede));
+    auto prev = static_cast<Centipede*>(g_context->m_location->GetEntitySafe(m_prev, TypeCentipede));
     targetSize = prev->m_size * 1.1f;
-    targetSize = min(targetSize, 1.0f);
+    targetSize = std::min(targetSize, 1.0f);
   }
 
   if (fabs(targetSize - m_size) > 0.01f)
@@ -262,8 +262,8 @@ bool Centipede::Advance(Unit* _unit)
     if (maxHealth > 255)
       maxHealth = 255;
     float newHealth = maxHealth * healthFraction;
-    newHealth = max(newHealth, 0);
-    newHealth = min(newHealth, 255);
+    newHealth = std::max(newHealth, 0.0f);
+    newHealth = std::min(newHealth, 255.0f);
     m_stats[StatHealth] = newHealth;
   }
 
@@ -281,12 +281,12 @@ bool Centipede::Advance(Unit* _unit)
 void Centipede::Attack(const LegacyVector3& _pos)
 {
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(_pos.x, _pos.z, m_radius, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(_pos.x, _pos.z, m_radius, &numFound, m_id.GetTeamId());
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    auto entity = g_app->m_location->GetEntity(id);
+    auto entity = g_context->m_location->GetEntity(id);
     LegacyVector3 pushVector = (entity->m_pos - _pos);
     float distance = pushVector.Mag();
     if (distance < m_radius)
@@ -295,9 +295,9 @@ void Centipede::Attack(const LegacyVector3& _pos)
 
       pushVector.SetLength(m_radius - distance);
 
-      g_app->m_location->m_entityGrid->RemoveObject(id, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
+      g_context->m_location->m_entityGrid->RemoveObject(id, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
       entity->m_pos += pushVector;
-      g_app->m_location->m_entityGrid->AddObject(id, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
+      g_context->m_location->m_entityGrid->AddObject(id, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
 
       entity->ChangeHealth((m_radius - distance) * -10.0f);
     }
@@ -309,7 +309,7 @@ void Centipede::EatSpirits()
   //
   // Are we already too big to eat spirits?
 
-  int size = g_app->m_location->GetUnit(m_id)->NumAliveEntities();
+  int size = g_context->m_location->GetUnit(m_id)->NumAliveEntities();
   if (size > CENTIPEDE_MAXSIZE)
     return;
 
@@ -318,11 +318,11 @@ void Centipede::EatSpirits()
   //
   // Find all spirits that we could potentially eat
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* spirit = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* spirit = g_context->m_location->m_spirits.GetPointer(i);
 
       if (spirit->m_state == Spirit::StateFloating)
       {
@@ -344,7 +344,7 @@ void Centipede::EatSpirits()
     if (syncfrand(1.0f) < eatChance)
     {
       int eatenIndex = m_eaten[i];
-      g_app->m_location->m_spirits.MarkNotUsed(eatenIndex);
+      g_context->m_location->m_spirits.MarkNotUsed(eatenIndex);
       ++m_numSpiritsEaten;
       break;
     }
@@ -361,7 +361,7 @@ void Centipede::EatSpirits()
     auto tail = this;
     while (true)
     {
-      auto centipede = static_cast<Centipede*>(g_app->m_location->GetEntitySafe(tail->m_prev, TypeCentipede));
+      auto centipede = static_cast<Centipede*>(g_context->m_location->GetEntitySafe(tail->m_prev, TypeCentipede));
       if (!centipede)
         break;
       tail = centipede;
@@ -370,7 +370,7 @@ void Centipede::EatSpirits()
     //
     // Add one segment for every 3 spirits
 
-    Team* myTeam = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* myTeam = &g_context->m_location->m_teams[m_id.GetTeamId()];
     Unit* myUnit = myTeam->m_units[m_id.GetUnitId()];
 
     while (m_numSpiritsEaten >= CENTIPEDE_NUMSPIRITSTOREGROW)
@@ -387,12 +387,12 @@ void Centipede::EatSpirits()
 
       centipede->m_pos = m_spawnPoint;
       centipede->m_size = tail->m_size;
-      centipede->m_size = max(0.2f, centipede->m_size);
+      centipede->m_size = std::max(0.2f, centipede->m_size);
       centipede->m_spawnPoint = m_spawnPoint;
       centipede->m_roamRange = m_roamRange;
       centipede->Begin();
 
-      g_app->m_location->m_entityGrid->AddObject(centipede->m_id, centipede->m_pos.x, centipede->m_pos.z, centipede->m_radius);
+      g_context->m_location->m_entityGrid->AddObject(centipede->m_id, centipede->m_pos.x, centipede->m_pos.z, centipede->m_radius);
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Grow"));
 
       tail = centipede;
@@ -406,7 +406,7 @@ bool Centipede::SearchForRetreatPosition()
   float maxRange = CENTIPEDE_MAXSEARCHRANGE * m_size;
 
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, maxRange, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, maxRange, &numFound, m_id.GetTeamId());
 
   WorldObjectId targetId;
   float bestDistance = 99999.9f;
@@ -414,7 +414,7 @@ bool Centipede::SearchForRetreatPosition()
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    WorldObject* entity = g_app->m_location->GetEntity(id);
+    WorldObject* entity = g_context->m_location->GetEntity(id);
     float distance = (entity->m_pos - m_pos).Mag();
     if (distance < bestDistance)
     {
@@ -425,7 +425,7 @@ bool Centipede::SearchForRetreatPosition()
 
   if (targetId.IsValid())
   {
-    WorldObject* obj = g_app->m_location->GetEntity(targetId);
+    WorldObject* obj = g_context->m_location->GetEntity(targetId);
     DEBUG_ASSERT(obj);
 
     float distance = 50.0f;
@@ -434,7 +434,7 @@ bool Centipede::SearchForRetreatPosition()
     retreatVector.RotateAroundY(angle);
     m_targetPos = m_pos + retreatVector * distance;
     m_targetPos = PushFromObstructions(m_targetPos);
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
     return true;
   }
 
@@ -446,7 +446,7 @@ bool Centipede::SearchForTargetEnemy()
   float maxRange = CENTIPEDE_MAXSEARCHRANGE * m_size;
   float minRange = CENTIPEDE_MINSEARCHRANGE * m_size;
 
-  WorldObjectId targetId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, minRange, maxRange, m_id.GetTeamId());
+  WorldObjectId targetId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, minRange, maxRange, m_id.GetTeamId());
 
   if (targetId.IsValid())
   {
@@ -463,19 +463,19 @@ bool Centipede::SearchForSpirits()
   //
   // Are we already too big to eat spirits?
 
-  int size = g_app->m_location->GetUnit(m_id)->NumAliveEntities();
+  int size = g_context->m_location->GetUnit(m_id)->NumAliveEntities();
   if (size > CENTIPEDE_MAXSIZE)
     return false;
 
-  START_PROFILE(g_app->m_profiler, "SearchSpirits");
+  START_PROFILE(g_context->m_profiler, "SearchSpirits");
   Spirit* found = nullptr;
   float nearest = 9999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       float theDist = (s->m_pos - m_pos).Mag();
 
       if (theDist <= CENTIPEDE_MAXSEARCHRANGE && theDist >= CENTIPEDE_MINSEARCHRANGE && theDist < nearest && s->m_state ==
@@ -490,10 +490,10 @@ bool Centipede::SearchForSpirits()
   if (found)
   {
     m_targetPos = found->m_pos;
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
   }
 
-  END_PROFILE(g_app->m_profiler, "SearchSpirits");
+  END_PROFILE(g_context->m_profiler, "SearchSpirits");
   return found;
 }
 
@@ -518,7 +518,7 @@ bool Centipede::SearchForRandomPosition()
     m_targetPos = PushFromObstructions(m_targetPos);
   }
 
-  m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+  m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
   return true;
 }
 
@@ -564,8 +564,8 @@ bool Centipede::AdvanceToTargetPosition()
   // Slow us down if we're going up hill
   // Speed up if going down hill
 
-  float currentHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(oldPos.x, oldPos.z);
-  float nextHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+  float currentHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(oldPos.x, oldPos.z);
+  float nextHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
   float factor = 1.0f - (currentHeight - nextHeight) / -10.0f;
   if (factor < 0.6f)
     factor = 0.6f;
@@ -574,7 +574,7 @@ bool Centipede::AdvanceToTargetPosition()
   speed *= factor;
 
   newPos = m_pos + actualDir * speed * SERVER_ADVANCE_PERIOD;
-  newPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  newPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
   LegacyVector3 moved = newPos - oldPos;
   if (moved.Mag() > speed * SERVER_ADVANCE_PERIOD)
@@ -591,7 +591,7 @@ bool Centipede::AdvanceToTargetPosition()
     return true;
   }
 
-  int nearestBuildingId = g_app->m_location->GetBuildingId(m_pos, m_front, 255, 150.0f);
+  int nearestBuildingId = g_context->m_location->GetBuildingId(m_pos, m_front, 255, 150.0f);
   if (nearestBuildingId != -1)
   {
     // We're on track to run into a building
@@ -601,4 +601,4 @@ bool Centipede::AdvanceToTargetPosition()
   return (m_pos - m_targetPos).Mag() < 20.0f;
 }
 
-bool Centipede::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
+bool Centipede::IsInView() { return g_context->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

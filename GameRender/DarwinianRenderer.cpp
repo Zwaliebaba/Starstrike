@@ -28,7 +28,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
 
     RGBAColour colour;
     if (d.m_id.GetTeamId() >= 0)
-        colour = g_app->m_location->m_teams[d.m_id.GetTeamId()].m_colour;
+        colour = g_context->m_location->m_teams[d.m_id.GetTeamId()].m_colour;
 
     LegacyVector3 predictedPos = d.m_pos + d.m_vel * _predictionTime;
     LegacyVector3 entityUp = g_upVector;
@@ -36,11 +36,11 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     if (_highDetail > 0.0f)
     {
         if (d.m_onGround && d.m_inWater == -1)
-            predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
+            predictedPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
         else if (!d.m_onGround)
             predictedPos.y += 3.0f;
 
-        entityUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
+        entityUp = g_context->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
 
         if (d.m_state == Darwinian::StateWorshipSpirit || d.m_state == Darwinian::StateOperatingPort || d.m_state == Darwinian::StateWatchingSpectacle)
             entityUp.RotateAround(d.m_front * sinf(g_gameTime) * 0.3f);
@@ -71,7 +71,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     if (_highDetail > 0.0f && d.m_shadowBuildingId == -1 && !d.m_dead)
     {
         int alpha = 150 * _highDetail;
-        alpha = min(alpha, 255);
+        alpha = std::min(alpha, 255);
         glColor4ub(0, 0, 0, alpha);
 
         LegacyVector3 pos1 = predictedPos - entityRight;
@@ -79,10 +79,10 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
         LegacyVector3 pos4 = pos1 + LegacyVector3(0.0f, 0.0f, size * 2.0f);
         LegacyVector3 pos3 = pos2 + LegacyVector3(0.0f, 0.0f, size * 2.0f);
 
-        pos1.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
-        pos2.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
-        pos3.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
-        pos4.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
+        pos1.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
+        pos2.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
+        pos3.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
+        pos4.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
 
         glDepthMask(false);
         glBegin(GL_QUADS);
@@ -173,7 +173,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
             // TODO Phase 6: eliminate mutation — m_shadowBuildingId write should move to Advance()
             Darwinian& mutableD = const_cast<Darwinian&>(d);
 
-            Building* building = g_app->m_location->GetBuilding(d.m_shadowBuildingId);
+            Building* building = g_context->m_location->GetBuilding(d.m_shadowBuildingId);
             if (building)
             {
                 float alpha = 1.0f;
@@ -197,8 +197,8 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
                     else
                         alpha = 0.0f;
                 }
-                alpha = min(alpha, 1.0f);
-                alpha = max(alpha, 0.0f);
+                alpha = std::min(alpha, 1.0f);
+                alpha = std::max(alpha, 0.0f);
 
                 if (alpha > 0.0f)
                 {
@@ -234,10 +234,10 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
                     pos4 -= entityRight;
                     pos3 += entityRight;
 
-                    pos1.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
-                    pos2.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
-                    pos3.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
-                    pos4.y = 0.3f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
+                    pos1.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
+                    pos2.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
+                    pos3.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
+                    pos4.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
 
                     glShadeModel(GL_SMOOTH);
                     glDepthMask(false);
@@ -267,7 +267,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     {
         if (d.m_id.GetUniqueId() % 3 == 0)
         {
-            int santaHatId = g_app->m_resource->GetTexture("sprites/santahat.bmp");
+            int santaHatId = Resource::GetTexture("sprites/santahat.bmp");
             glBindTexture(GL_TEXTURE_2D, santaHatId);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
             predictedPos += entityUp * 0.95f;
@@ -284,7 +284,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
             glTexCoord2i(0, 0);
             glVertex3fv((predictedPos - entityRight).GetData());
             glEnd();
-            glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+            glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/darwinian.bmp"));
         }
     }
 
@@ -294,7 +294,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     if (d.m_boxKiteId.IsValid())
     {
         // TODO Phase 6: eliminate mutation — box kite update should move to Advance()
-        auto boxKite = static_cast<BoxKite*>(g_app->m_location->GetEffect(d.m_boxKiteId));
+        auto boxKite = static_cast<BoxKite*>(g_context->m_location->GetEffect(d.m_boxKiteId));
         if (boxKite)
         {
             boxKite->m_up = entityUp;
@@ -329,7 +329,7 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
             predictedHealth -= 40 * _predictionTime;
         else
             predictedHealth -= 20 * _predictionTime;
-        float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
+        float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
 
         for (int i = 0; i < 3; ++i)
         {

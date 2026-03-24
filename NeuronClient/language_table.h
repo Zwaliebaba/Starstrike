@@ -1,72 +1,61 @@
 #pragma once
 
 #include "input_types.h"
-
-#include <sstream>
-
 #include "llist.h"
 #include "btree.h"
 #include "hash_table.h"
 
-
 class LangPhrase
 {
-public:
-	char				*m_key;			// malloced. The name used as an ID
-	char				*m_string;		// malloced. This bit is different for each language
+  public:
+    char* m_key; // malloced. The name used as an ID
+    char* m_string; // malloced. This bit is different for each language
 
-	LangPhrase();
-	~LangPhrase();
+    LangPhrase();
+    ~LangPhrase();
 };
-
 
 class LangTable
 {
-private:
-    LangPhrase  m_notFound;
-	BTree       <LangPhrase*>	m_phrasesRaw;
-	HashTable   <int>          *m_phrasesKbd;
-	HashTable   <int>          *m_phrasesXin;
-	char *                      m_chunk;
+  LangPhrase m_notFound;
+  BTree<LangPhrase*> m_phrasesRaw;
+  HashTable<int>* m_phrasesKbd;
+  HashTable<int>* m_phrasesXin;
+  char* m_chunk;
 
-	bool specific_key_exists  (const char * _key, InputMode _mood);
-	bool RawDoesPhraseExist   (char const *_key);
-	HashTable<int> *GetCurrentTable();
-	HashTable<int> *GetCurrentTable(InputMode _mood);
+  bool specific_key_exists(const char* _key, InputMode _mood);
+  bool RawDoesPhraseExist(const char* _key);
+  HashTable<int>* GetCurrentTable();
+  HashTable<int>* GetCurrentTable(InputMode _mood);
 
-	void RebuildTable( HashTable<int> *_phrases, std::ostringstream &stream, InputMode _mood );
+  void RebuildTable(HashTable<int>* _phrases, std::ostringstream& stream, InputMode _mood);
 
-public:
-	LangTable   (const char *_filename);
-	~LangTable  ();
+  public:
+    LangTable(const char* _filename);
+    ~LangTable();
 
-    void ParseLanguageFile    (char const *_filename);
-	void RebuildTables        ();
+    void ParseLanguageFile(const char* _filename);
+    void RebuildTables();
 
-	bool DoesPhraseExist      (char const *_key);
-	char *LookupPhrase        (char const *_key);
+    bool DoesPhraseExist(const char* _key);
+    char* LookupPhrase(const char* _key);
 
-	char *RawLookupPhrase     (char const *_key);
+    char* RawLookupPhrase(const char* _key);
 
-	bool RawDoesPhraseExist   (char const *_key, InputMode _mood);
-	char *RawLookupPhrase     (char const *_key, InputMode _mood);
+    bool RawDoesPhraseExist(const char* _key, InputMode _mood);
+    char* RawLookupPhrase(const char* _key, InputMode _mood);
 
-    DArray<LangPhrase *> *GetPhraseList();
+    DArray<LangPhrase*>* GetPhraseList();
 
     void TestAgainstEnglish();
 };
 
+LList<const char*>* WordWrapText(const char* _string, float _linewidth, float _fontWidth, bool _wrapToWindow = true);
 
-LList <const char *> *WordWrapText(const char *_string,
-                             float _linewidth,
-                             float _fontWidth,
-                             bool _wrapToWindow=true);
+#define LANGUAGEPHRASE(x)       g_context->m_langTable->LookupPhrase(x)
+#define ISLANGUAGEPHRASE(x)     g_context->m_langTable->DoesPhraseExist(x)
+#define ISLANGUAGEPHRASE_ANY(x) g_context->m_langTable->DoesPhraseExist(x)
 
-#define LANGUAGEPHRASE(x)       g_app->m_langTable->LookupPhrase(x)
-#define ISLANGUAGEPHRASE(x)     g_app->m_langTable->DoesPhraseExist(x)
-#define ISLANGUAGEPHRASE_ANY(x) g_app->m_langTable->DoesPhraseExist(x)
-
-#define RAWLANGUAGEPHRASE(x)           g_app->m_langTable->RawLookupPhrase(x)
-#define MOODYLANGUAGEPHRASE(x,y)       g_app->m_langTable->RawLookupPhrase((x),(y))
-#define MOODYISLANGUAGEPHRASE(x,y)     g_app->m_langTable->RawDoesPhraseExist((x),(y))
-
+#define RAWLANGUAGEPHRASE(x)           g_context->m_langTable->RawLookupPhrase(x)
+#define MOODYLANGUAGEPHRASE(x,y)       g_context->m_langTable->RawLookupPhrase((x),(y))
+#define MOODYISLANGUAGEPHRASE(x,y)     g_context->m_langTable->RawDoesPhraseExist((x),(y))

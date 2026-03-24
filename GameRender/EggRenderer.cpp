@@ -14,7 +14,7 @@ void EggRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
     const Egg& egg = static_cast<const Egg&>(_entity);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/egg.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/egg.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glEnable(GL_BLEND);
@@ -24,7 +24,7 @@ void EggRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
 
     RGBAColour colour;
     if (egg.m_id.GetTeamId() >= 0)
-        colour = g_app->m_location->m_teams[egg.m_id.GetTeamId()].m_colour;
+        colour = g_context->m_location->m_teams[egg.m_id.GetTeamId()].m_colour;
     float alpha = egg.m_stats[Entity::StatHealth] / EntityBlueprint::GetStat(Entity::TypeEgg, Entity::StatHealth);
     if (alpha < 0.1f)
         alpha = 0.1f;
@@ -32,8 +32,8 @@ void EggRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
 
     LegacyVector3 pos = egg.m_pos + egg.m_vel * _ctx.predictionTime;
     pos.y += 3.0f;
-    LegacyVector3 up = g_app->m_camera->GetUp();
-    LegacyVector3 right = g_app->m_camera->GetRight();
+    LegacyVector3 up = g_context->m_camera->GetUp();
+    LegacyVector3 right = g_context->m_camera->GetRight();
     float size = 4.0f;
 
     //
@@ -107,7 +107,7 @@ void EggRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
             predictedHealth -= 40.0f * _ctx.predictionTime;
         else
             predictedHealth -= 20.0f * _ctx.predictionTime;
-        float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z);
+        float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z);
 
         size *= 0.5f;
 

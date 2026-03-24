@@ -32,13 +32,13 @@ void BoxKiteRenderer::Render(const WorldObject& _object, const WorldObjectRender
         scale = deathScale * kite.m_size;
     }
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
     Matrix34 mat(kite.m_front, kite.m_up, predictedPos);
     mat.u *= scale;
     mat.r *= scale;
     mat.f *= scale;
     kite.m_shape->Render(_ctx.predictionTime, mat);
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 
     //
     // Candle in the middle
@@ -46,13 +46,13 @@ void BoxKiteRenderer::Render(const WorldObject& _object, const WorldObjectRender
     glEnable(GL_BLEND);
     glDepthMask(false);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp() * 3.0f * scale * kite.m_brightness;
-    LegacyVector3 camRight = g_app->m_camera->GetRight() * 3.0f * scale * kite.m_brightness;
+    LegacyVector3 camUp = g_context->m_camera->GetUp() * 3.0f * scale * kite.m_brightness;
+    LegacyVector3 camRight = g_context->m_camera->GetRight() * 3.0f * scale * kite.m_brightness;
 
     glColor4f(1.0f, 0.75f, 0.2f, kite.m_brightness);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
     glBegin(GL_QUADS);
     glTexCoord2i(0, 0);

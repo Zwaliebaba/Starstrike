@@ -5,7 +5,7 @@
 #include "ShapeStatic.h"
 #include "entity.h"
 #include "entity_leg.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "main.h"
 
@@ -13,8 +13,8 @@ EntityLeg::EntityLeg(int _legNum, Entity* _parent, const char* _shapeNameUpper, 
   : m_legNum(_legNum),
     m_parent(_parent)
 {
-  m_shapeUpper = g_app->m_resource->GetShapeStatic(_shapeNameUpper);
-  m_shapeLower = g_app->m_resource->GetShapeStatic(_shapeNameLower);
+  m_shapeUpper = Resource::GetShapeStatic(_shapeNameUpper);
+  m_shapeLower = Resource::GetShapeStatic(_shapeNameLower);
   ASSERT_TEXT(m_shapeUpper, "EntityLeg: Couldn't load leg shape %s", _shapeNameUpper);
   ASSERT_TEXT(m_shapeLower, "EntityLeg: Couldn't load leg shape %s", _shapeNameLower);
 
@@ -47,7 +47,7 @@ LegacyVector3 EntityLeg::CalcFootHomePos(float _targetHoverHeight)
   LegacyVector3 fromCenterToRoot = rootWorldPos - m_parent->m_pos;
   fromCenterToRoot.HorizontalAndNormalise();
 
-  LegacyVector3 groundNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(m_parent->m_pos.x, m_parent->m_pos.z);
+  LegacyVector3 groundNormal = g_context->m_location->m_landscape.m_normalMap->GetValue(m_parent->m_pos.x, m_parent->m_pos.z);
   fromCenterToRoot *= groundNormal.y;
 
   LegacyVector3 returnVal = rootWorldPos;
@@ -116,7 +116,7 @@ LegacyVector3 EntityLeg::CalcKneePos(const LegacyVector3& _footPos, const Legacy
 void EntityLeg::LiftFoot(float _targetHoverHeight)
 {
   m_foot.m_targetPos = CalcDesiredFootPos(_targetHoverHeight);
-  m_foot.m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_foot.m_targetPos.x, m_foot.m_targetPos.z);
+  m_foot.m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_foot.m_targetPos.x, m_foot.m_targetPos.z);
   m_foot.m_state = EntityFoot::Swinging;
   m_foot.m_leftGroundTimeStamp = g_gameTime;
   m_foot.m_lastGroundPos = m_foot.m_pos;

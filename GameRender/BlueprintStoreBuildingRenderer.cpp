@@ -25,7 +25,7 @@ void BlueprintStoreBuildingRenderer::RenderAlphas(const Building& _building,
     // Render main darwinian
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/darwinian.bmp"));
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glDepthMask(false);
@@ -62,7 +62,7 @@ void BlueprintStoreBuildingRenderer::RenderAlphas(const Building& _building,
     //
     // Render lines for over effect
 
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_grey.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/interface_grey.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);

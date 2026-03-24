@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "entity.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "ai.h"
 #include "airstrike.h"
 #include "armour.h"
@@ -46,7 +46,7 @@ float EntityBlueprint::m_stats[Entity::NumEntityTypes][Entity::NumStats];
 
 void EntityBlueprint::Initialise()
 {
-  TextReader* theFile = g_app->m_resource->GetTextReader("stats.txt");
+  TextReader* theFile = Resource::GetTextReader("stats.txt");
   ASSERT_TEXT(theFile && theFile->IsOpen(), "Couldn't open stats.txt");
 
   int entityIndex = 0;
@@ -82,7 +82,7 @@ float EntityBlueprint::GetStat(unsigned char _type, int _stat)
   if (_stat == Entity::StatSpeed)
   {
     if (_type != Entity::TypeSpaceInvader)
-      return m_stats[_type][_stat] * (1.0f + static_cast<float>(g_app->m_difficultyLevel) / 10.0f);
+      return m_stats[_type][_stat] * (1.0f + static_cast<float>(g_context->m_difficultyLevel) / 10.0f);
   }
 
   return m_stats[_type][_stat];
@@ -132,7 +132,7 @@ void Entity::ChangeHealth(int amount)
       m_stats[StatHealth] = 100;
       m_dead = true;
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "Die"));
-      g_app->m_location->SpawnSpirit(m_pos, m_vel * 0.5f, m_id.GetTeamId(), m_id);
+      g_context->m_location->SpawnSpirit(m_pos, m_vel * 0.5f, m_id.GetTeamId(), m_id);
     }
     else if (m_stats[StatHealth] + amount > 255)
       m_stats[StatHealth] = 255;
@@ -149,7 +149,7 @@ void Entity::Attack(const LegacyVector3& pos)
     LegacyVector3 fromPos = m_pos;
     fromPos.y += 2.0f;
     LegacyVector3 velocity = (toPos - fromPos).SetLength(200.0f);
-    g_app->m_location->FireLaser(fromPos, velocity, m_id.GetTeamId());
+    g_context->m_location->FireLaser(fromPos, velocity, m_id.GetTeamId());
 
     m_reloading = m_stats[StatRate];
     m_justFired = true;
@@ -178,7 +178,7 @@ bool Entity::AdvanceDead(Unit* _unit)
 
 int Entity::EnterTeleports(int _requiredId)
 {
-  LList<int>* buildings = g_app->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
+  LList<int>* buildings = g_context->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
 
   for (int i = 0; i < buildings->Size(); ++i)
   {
@@ -189,7 +189,7 @@ int Entity::EnterTeleports(int _requiredId)
       continue;
     }
 
-    Building* building = g_app->m_location->GetBuilding(buildingId);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
     DEBUG_ASSERT(building);
 
     if (building->m_type == Building::TypeRadarDish)
@@ -234,7 +234,7 @@ void Entity::AdvanceInAir(Unit* _unit)
 
   if (!m_dead)
   {
-    float groundLevel = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) + 0.1f;
+    float groundLevel = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) + 0.1f;
     if (m_pos.y <= groundLevel)
     {
       m_onGround = true;
@@ -281,7 +281,7 @@ void Entity::AdvanceInWater(Unit* _unit)
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
   m_pos.y = 0.0f - sinf(m_inWater * 3.0f) - 4.0f;
 
-  float groundLevel = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float groundLevel = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   if (groundLevel > 0.0f)
     m_inWater = -1;
 }
@@ -326,8 +326,8 @@ bool Entity::Advance(Unit* _unit)
   if (m_inWater != -1)
     AdvanceInWater(_unit);
 
-  float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
   if (m_pos.x < 0.0f)
     m_pos.x = 0.0f;
   if (m_pos.z < 0.0f)
@@ -353,14 +353,14 @@ LegacyVector3 Entity::PushFromEachOther(const LegacyVector3& _pos)
   LegacyVector3 result = _pos;
 
   int numFound;
-  WorldObjectId* neighbours = g_app->m_location->m_entityGrid->GetNeighbours(_pos.x, _pos.z, 2.0f, &numFound);
+  WorldObjectId* neighbours = g_context->m_location->m_entityGrid->GetNeighbours(_pos.x, _pos.z, 2.0f, &numFound);
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = neighbours[i];
     if (!(id == m_id))
     {
-      WorldObject* obj = g_app->m_location->GetEntity(id);
+      WorldObject* obj = g_context->m_location->GetEntity(id);
       //            float distance = (obj->m_pos - thisPos).Mag();
       //            while( distance < 1.0f )
       //            {
@@ -379,7 +379,7 @@ LegacyVector3 Entity::PushFromEachOther(const LegacyVector3& _pos)
     }
   }
 
-  result.y = g_app->m_location->m_landscape.m_heightMap->GetValue(result.x, result.z);
+  result.y = g_context->m_location->m_landscape.m_heightMap->GetValue(result.x, result.z);
   return result;
 }
 
@@ -400,7 +400,7 @@ LegacyVector3 Entity::PushFromCliffs(const LegacyVector3& pos, const LegacyVecto
       float angle = distance * 2.0f * M_PI;
       LegacyVector3 offset(cosf(angle) * distance, 0.0f, sinf(angle) * distance);
       LegacyVector3 newPos = result + offset;
-      newPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+      newPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
       horiz = (newPos - oldPos);
       horiz.y = 0.0f;
       horizDistance = horiz.Mag();
@@ -421,7 +421,7 @@ LegacyVector3 Entity::PushFromObstructions(const LegacyVector3& pos, bool killem
 {
   LegacyVector3 result = pos;
   if (m_onGround)
-    result.y = g_app->m_location->m_landscape.m_heightMap->GetValue(result.x, result.z);
+    result.y = g_context->m_location->m_landscape.m_heightMap->GetValue(result.x, result.z);
 
   Matrix34 transform(m_front, g_upVector, result);
 
@@ -437,7 +437,7 @@ LegacyVector3 Entity::PushFromObstructions(const LegacyVector3& pos, bool killem
       float angle = distance * pushAngle * M_PI;
       LegacyVector3 offset(cosf(angle) * distance, 0.0f, sinf(angle) * distance);
       LegacyVector3 newPos = result + offset;
-      float height = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+      float height = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
       if (height > 1.0f)
       {
         result = newPos;
@@ -451,12 +451,12 @@ LegacyVector3 Entity::PushFromObstructions(const LegacyVector3& pos, bool killem
   //
   // Push from buildings
 
-  LList<int>* buildings = g_app->m_location->m_obstructionGrid->GetBuildings(result.x, result.z);
+  LList<int>* buildings = g_context->m_location->m_obstructionGrid->GetBuildings(result.x, result.z);
 
   for (int b = 0; b < buildings->Size(); ++b)
   {
     int buildingId = buildings->GetData(b);
-    Building* building = g_app->m_location->GetBuilding(buildingId);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
     if (building)
     {
       bool hit = false;
@@ -478,7 +478,7 @@ LegacyVector3 Entity::PushFromObstructions(const LegacyVector3& pos, bool killem
           while (building->DoesSphereHit(result, 1.0f))
           {
             result -= pushForce;
-            //result.y = g_app->m_location->m_landscape.m_heightMap->GetValue( result.x, result.z );
+            //result.y = g_context->m_location->m_landscape.m_heightMap->GetValue( result.x, result.z );
           }
         }
       }
@@ -610,7 +610,7 @@ void Entity::SetWaypoint(const LegacyVector3 _waypoint) {}
 void Entity::FollowRoute()
 {
   DEBUG_ASSERT(m_routeId != -1);
-  Route* route = g_app->m_location->m_levelFile->GetRoute(m_routeId);
+  Route* route = g_context->m_location->m_levelFile->GetRoute(m_routeId);
   DEBUG_ASSERT(route);
 
   if (m_routeWayPointId == -1)

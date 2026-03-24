@@ -46,18 +46,18 @@ void MiscEffectRenderer::RenderOfficerOrders(const OfficerOrders& _orders, float
   if (_orders.m_arrivedTimer >= 0.0f)
   {
     float fraction = 1.0f - (_orders.m_arrivedTimer + _predictionTime);
-    fraction = max(fraction, 0.0f);
-    fraction = min(fraction, 1.0f);
+    fraction = std::max(fraction, 0.0f);
+    fraction = std::min(fraction, 1.0f);
     size *= fraction;
   }
 
-  LegacyVector3 camUp = g_app->m_camera->GetUp() * size;
-  LegacyVector3 camRight = g_app->m_camera->GetRight() * size;
+  LegacyVector3 camUp = g_context->m_camera->GetUp() * size;
+  LegacyVector3 camRight = g_context->m_camera->GetRight() * size;
 
   glColor4f(1.0f, 0.3f, 1.0f, alpha);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
   glDisable(GL_DEPTH_TEST);
 
   glBegin(GL_QUADS);
@@ -86,14 +86,14 @@ void MiscEffectRenderer::RenderSpamInfection(const SpamInfection& _infection, fl
   glShadeModel(GL_SMOOTH);
   glEnable(GL_BLEND);
   int maxLength = SPAMINFECTION_TAILLENGTH * (_infection.m_life / SPAMINFECTION_LIFE);
-  maxLength = max(maxLength, 2);
-  maxLength = min(maxLength, _infection.m_positionHistory.Size());
+  maxLength = std::max(maxLength, 2);
+  maxLength = std::min(maxLength, _infection.m_positionHistory.Size());
 
-  LegacyVector3 camPos = g_app->m_camera->GetPos();
+  LegacyVector3 camPos = g_context->m_camera->GetPos();
   int numRepeats = 4;
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
   for (int j = 0; j < numRepeats; ++j)
@@ -160,8 +160,8 @@ void MiscEffectRenderer::RenderZombie(const Zombie& _zombie, float _predictionTi
   float size = 5.0f;
 
   float alpha = 1.0f - (_zombie.m_life / 10.0f);
-  alpha = max(0.1f, alpha);
-  alpha = min(0.7f, alpha);
+  alpha = std::max(0.1f, alpha);
+  alpha = std::min(0.7f, alpha);
 
   float outerAlpha = (0.7f - alpha) * 0.1f;
 
@@ -175,7 +175,7 @@ void MiscEffectRenderer::RenderZombie(const Zombie& _zombie, float _predictionTi
   glDisable(GL_CULL_FACE);
   glColor4f(0.9f, 0.9f, 1.0f, alpha);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/ghost.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/ghost.bmp"));
 
   glBegin(GL_QUADS);
   glTexCoord2i(0, 0);

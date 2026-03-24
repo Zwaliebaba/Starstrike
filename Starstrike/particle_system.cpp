@@ -112,7 +112,7 @@ bool Particle::Advance()
 			// copies of the bits of p that we need
 			LegacyVector3 pos = m_pos;
 			LegacyVector3 vel = m_vel / 5.0f;
-            g_app->m_particleSystem->CreateParticle( pos, vel, Particle::TypeRocketTrail, m_size/2.0f );
+            g_context->m_particleSystem->CreateParticle( pos, vel, Particle::TypeRocketTrail, m_size/2.0f );
             particleCreated = true;
         }
     }
@@ -128,15 +128,15 @@ bool Particle::Advance()
             m_typeId == TypeBlueSpark ||
 			m_typeId == TypeLeaf )
         {
-            float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+            float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
             if( m_pos.y <= landHeight )
             {
 	            LegacyVector3 lastPos = m_pos;// - m_vel * g_advanceTime;
 	            LegacyVector3 impactPos = (m_pos + lastPos) * 0.5f;
 	            m_pos = impactPos;
-	            m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+	            m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
-                LegacyVector3 normal = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+                LegacyVector3 normal = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
                 float dotProd = normal * m_vel;
                 m_vel -= normal * 2.0f * dotProd * 0.7f;
             }
@@ -167,8 +167,8 @@ void Particle::Render(float _predictionTime)
 
     LegacyVector3 predictedPos = m_pos + _predictionTime * m_vel;
     float size = m_size/16.0f;
-	LegacyVector3 up(g_app->m_camera->GetUp() * size);
-	LegacyVector3 right(g_app->m_camera->GetRight() * size);
+	LegacyVector3 up(g_context->m_camera->GetUp() * size);
+	LegacyVector3 right(g_context->m_camera->GetRight() * size);
 
     if( m_typeId == TypeMissileTrail )
     {
@@ -326,7 +326,7 @@ void ParticleSystem::CreateParticle(LegacyVector3 const &_pos, LegacyVector3 con
 // *** Advance
 void ParticleSystem::Advance(int _slice)
 {
-    START_PROFILE(g_app->m_profiler, "Advance Particles");
+    START_PROFILE(g_context->m_profiler, "Advance Particles");
 
     int lower, upper;
     m_particles.GetNextSliceBounds( _slice, &lower, &upper );
@@ -342,21 +342,21 @@ void ParticleSystem::Advance(int _slice)
 		}
     }
 
-    END_PROFILE(g_app->m_profiler, "Advance Particles");
+    END_PROFILE(g_context->m_profiler, "Advance Particles");
 }
 
 
 // *** Render
 void ParticleSystem::Render()
 {
-    START_PROFILE(g_app->m_profiler, "Render Particles");
+    START_PROFILE(g_context->m_profiler, "Render Particles");
 
     glDisable   ( GL_CULL_FACE );
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE );
 
     glEnable    ( GL_BLEND );
 	glEnable	( GL_TEXTURE_2D );
-	glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/particle.bmp"));
+	glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/particle.bmp"));
 	glTexParameteri	(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glDepthMask ( false );
 
@@ -389,7 +389,7 @@ void ParticleSystem::Render()
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable    ( GL_CULL_FACE );
 
-    END_PROFILE(g_app->m_profiler, "Render Particles");
+    END_PROFILE(g_context->m_profiler, "Render Particles");
 }
 
 

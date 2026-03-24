@@ -5,7 +5,7 @@
 #include "goddish.h"
 #include "spam.h"
 #include "darwinian.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "globals.h"
 #include "global_world.h"
 #include "location.h"
@@ -22,7 +22,7 @@ GodDish::GodDish()
     m_spawnSpam(false)
 {
   m_type = TypeGodDish;
-  SetShape(g_app->m_resource->GetShapeStatic("goddish.shp"));
+  SetShape(Resource::GetShapeStatic("goddish.shp"));
 }
 
 void GodDish::Initialise(Building* _template) { Building::Initialise(_template); }
@@ -53,7 +53,7 @@ void GodDish::Activate()
   //
   // Make all green darwinians watch us
 
-  Team* team = &g_app->m_location->m_teams[0];
+  Team* team = &g_context->m_location->m_teams[0];
 
   for (int i = 0; i < team->m_others.Size(); ++i)
   {
@@ -83,13 +83,13 @@ void GodDish::DeActivate()
 void GodDish::SpawnSpam(bool _isResearch)
 {
   Spam spamTemplate;
-  int buildingId = g_app->m_globalWorld->GenerateBuildingId();
+  int buildingId = g_context->m_globalWorld->GenerateBuildingId();
   spamTemplate.m_id.SetUniqueId(buildingId);
   spamTemplate.m_id.SetUnitId(UNIT_BUILDINGS);
 
   auto spam = static_cast<Spam*>(CreateBuilding(TypeSpam));
   spam->Initialise(&spamTemplate);
-  g_app->m_location->m_buildings.PutData(spam);
+  g_context->m_location->m_buildings.PutData(spam);
 
   spam->SendFromHeaven();
   if (_isResearch)
@@ -102,11 +102,11 @@ void GodDish::SpawnSpam(bool _isResearch)
 
 void GodDish::TriggerSpam()
 {
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* b = g_app->m_location->m_buildings[i];
+      Building* b = g_context->m_location->m_buildings[i];
       if (b && b->m_type == TypeSpam)
       {
         auto spam = static_cast<Spam*>(b);

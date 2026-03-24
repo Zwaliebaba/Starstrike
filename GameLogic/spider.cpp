@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "spider.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "entity_leg.h"
@@ -50,7 +50,7 @@ Spider::Spider()
 {
   m_stats[StatHealth] = 200;
 
-  m_shape = g_app->m_resource->GetShapeStatic("spider.shp");
+  m_shape = Resource::GetShapeStatic("spider.shp");
   m_eggLay = m_shape->GetMarkerData("MarkerEggLay");
 
   m_parameters[0].m_legLift = 3.0f;
@@ -116,8 +116,8 @@ void Spider::ChangeHealth(int _amount)
     Entity::ChangeHealth(_amount);
 
     float fractionDead = 1.0f - static_cast<float>(m_stats[StatHealth]) / EntityBlueprint::GetStat(TypeSpider, StatHealth);
-    fractionDead = max(fractionDead, 0.0f);
-    fractionDead = min(fractionDead, 1.0f);
+    fractionDead = std::max(fractionDead, 0.0f);
+    fractionDead = std::min(fractionDead, 1.0f);
     Matrix34 transform(m_front, m_up, m_pos);
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, transform, fractionDead));
   }
@@ -168,11 +168,11 @@ void Spider::StompFoot(const LegacyVector3& _pos)
   // Damage everyone nearby
 
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(_pos.x, _pos.z, FOOT_DAMAGE_RADIUS, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(_pos.x, _pos.z, FOOT_DAMAGE_RADIUS, &numFound, m_id.GetTeamId());
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    WorldObject* obj = g_app->m_location->GetEntity(id);
+    WorldObject* obj = g_context->m_location->GetEntity(id);
     auto entity = static_cast<Entity*>(obj);
 
     float distance = (entity->m_pos - _pos).Mag();
@@ -255,7 +255,7 @@ float Spider::IsPathOK(const LegacyVector3& _dest)
   LegacyVector3 pos(m_pos);
   for (float i = 0.0f; i < distToDest; i += sampleSeperation)
   {
-    float height = g_app->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z);
+    float height = g_context->m_location->m_landscape.m_heightMap->GetValue(pos.x, pos.z);
     if (height > MAX_PATH_HEIGHT || height < 0.1f /*Sea level*/)
     {
       float rv = i / distToDest;
@@ -272,17 +272,17 @@ void Spider::DetectCollisions()
   LegacyVector3 pos(m_pos);
   pos += m_vel;
   int numFound;
-  WorldObjectId* neighbours = g_app->m_location->m_entityGrid->GetNeighbours(pos.x, pos.z, 22.0f, &numFound);
+  WorldObjectId* neighbours = g_context->m_location->m_entityGrid->GetNeighbours(pos.x, pos.z, 22.0f, &numFound);
 
   LegacyVector3 escapeVector;
   bool collisionDetected = false;
 
   for (int i = 0; i < numFound; ++i)
   {
-    Entity* ent = g_app->m_location->GetEntity(neighbours[i]);
+    Entity* ent = g_context->m_location->GetEntity(neighbours[i]);
     if (ent->m_type == TypeSpider && ent->m_id != m_id)
     {
-      Entity* entity = g_app->m_location->GetEntity(neighbours[darwiniaRandom() % numFound]);
+      Entity* entity = g_context->m_location->GetEntity(neighbours[darwiniaRandom() % numFound]);
       DEBUG_ASSERT(entity);
       LegacyVector3 toNeighbour = m_pos - entity->m_pos;
       toNeighbour.y = 0.0f;
@@ -432,7 +432,7 @@ bool Spider::AdvancePouncing()
   m_vel.y -= 40.0f;
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   if (m_pos.y < landHeight + 1.0f)
   {
     m_pos.y = landHeight + 1.0f;
@@ -450,11 +450,11 @@ bool Spider::AdvancePouncing()
     float squashRange = 40.0f;
     float damage = 100.0f;
     int numFound;
-    WorldObjectId* enemies = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, squashRange, &numFound, m_id.GetTeamId());
+    WorldObjectId* enemies = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, squashRange, &numFound, m_id.GetTeamId());
     for (int i = 0; i < numFound; ++i)
     {
       WorldObjectId id = enemies[i];
-      Entity* entity = g_app->m_location->GetEntity(id);
+      Entity* entity = g_context->m_location->GetEntity(id);
 
       float distance = (entity->m_pos - m_pos).Mag();
       float fraction = (squashRange - distance) / squashRange;
@@ -467,7 +467,7 @@ bool Spider::AdvancePouncing()
       push.y = push.Mag() * 4.0f;
 
       float pushLength = fraction * 30.0f;
-      pushLength = min(20.0f, pushLength);
+      pushLength = std::min(20.0f, pushLength);
       push.SetLength(pushLength);
 
       entity->m_vel += push;
@@ -490,7 +490,7 @@ bool Spider::SearchForRandomPos()
       break;
   }
 
-  float height = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+  float height = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
   m_targetPos.y = height;
   return true;
 }
@@ -500,9 +500,9 @@ bool Spider::SearchForEnemies()
   float maxRange = ATTACK_SEARCH_MAX_RADIUS;
   float minRange = ATTACK_SEARCH_MIN_RADIUS;
 
-  WorldObjectId targetId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, minRange, maxRange, m_id.GetTeamId());
+  WorldObjectId targetId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, minRange, maxRange, m_id.GetTeamId());
 
-  Entity* entity = g_app->m_location->GetEntity(targetId);
+  Entity* entity = g_context->m_location->GetEntity(targetId);
 
   if (entity && !entity->m_dead)
   {
@@ -515,16 +515,16 @@ bool Spider::SearchForEnemies()
 
 bool Spider::SearchForSpirits()
 {
-  START_PROFILE(g_app->m_profiler, "SearchSpirits");
+  START_PROFILE(g_context->m_profiler, "SearchSpirits");
   Spirit* found = nullptr;
   int foundIndex = -1;
   float nearest = 9999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       if (s->NumNearbyEggs() < 3 && s->m_pos.y > 10)
       {
         float theDist = (s->m_pos - m_pos).Mag();
@@ -545,11 +545,11 @@ bool Spider::SearchForSpirits()
     m_spiritId = foundIndex;
     LegacyVector3 usToThem = (found->m_pos - m_pos).Normalise() * 45.0f;
     m_targetPos = found->m_pos + usToThem;
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
     m_state = StateEggLaying;
   }
 
-  END_PROFILE(g_app->m_profiler, "SearchSpirits");
+  END_PROFILE(g_context->m_profiler, "SearchSpirits");
   return found;
 }
 
@@ -582,7 +582,7 @@ bool Spider::AdvanceEggLaying()
     Matrix34 mat(m_front, m_up, m_pos);
     Matrix34 eggLayMat = m_shape->GetMarkerWorldMatrix(m_eggLay, mat);
 
-    g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, g_zeroVector, 0.0f);
+    g_context->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, g_zeroVector, 0.0f);
 
     g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LayEgg"));
 
@@ -623,7 +623,7 @@ bool Spider::Advance(Unit* _unit)
       UpdateLegsPouncing();
     else
     {
-      float targetHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+      float targetHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
       targetHeight += m_targetHoverHeight;
       float factor1 = 1.0f * SERVER_ADVANCE_PERIOD;
       float factor2 = 1.0f - factor1;
@@ -635,4 +635,4 @@ bool Spider::Advance(Unit* _unit)
   return Entity::Advance(_unit);
 }
 
-bool Spider::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
+bool Spider::IsInView() { return g_context->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

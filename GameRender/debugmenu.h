@@ -5,7 +5,7 @@
 class DebugMenu : public DarwiniaWindow
 {
   public:
-    DebugMenu(char* name);
+    DebugMenu(const char* name);
 
     void Advance();
     void Create() override;

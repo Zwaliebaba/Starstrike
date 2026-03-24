@@ -95,17 +95,17 @@ static void AdjustWindowPositions(int _newWidth, int _newHeight, int _oldWidth, 
 
 void RestartWindowManagerAndRenderer()
 {
-  int oldWidth = g_app->m_renderer->ScreenW();
-  int oldHeight = g_app->m_renderer->ScreenH();
+  int oldWidth = g_context->m_renderer->ScreenW();
+  int oldHeight = g_context->m_renderer->ScreenH();
 
   // start new window
-  g_app->m_renderer = new Renderer();
-  g_app->m_renderer->Initialise();
-  g_app->m_resource->FlushOpenGlState();
-  g_app->m_resource->RegenerateOpenGlState();
+  g_context->m_renderer = new Renderer();
+  g_context->m_renderer->Initialise();
+  Resource::FlushOpenGlState();
+  Resource::RegenerateOpenGlState();
 
-  int newWidth = g_app->m_renderer->ScreenW();
-  int newHeight = g_app->m_renderer->ScreenH();
+  int newWidth = g_context->m_renderer->ScreenW();
+  int newHeight = g_context->m_renderer->ScreenH();
 
   AdjustWindowPositions(newWidth, newHeight, oldWidth, oldHeight);
 }
@@ -162,7 +162,7 @@ PrefsScreenWindow::PrefsScreenWindow()
   m_zDepth = g_prefsManager->GetInt(SCREEN_Z_DEPTH_PREFS_NAME, 24);
 
   SetMenuSize(410, height);
-  SetPosition(g_app->m_renderer->ScreenW() / 2 - m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_h / 2);
+  SetPosition(g_context->m_renderer->ScreenW() / 2 - m_w / 2, g_context->m_renderer->ScreenH() / 2 - m_h / 2);
 }
 
 void PrefsScreenWindow::Create()

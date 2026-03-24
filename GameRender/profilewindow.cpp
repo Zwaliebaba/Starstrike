@@ -31,11 +31,11 @@ public:
     {
 		if (_stricmp(m_caption, "Toggle glFinish") == 0)
 		{
-			g_app->m_profiler->m_doGlFinish = !g_app->m_profiler->m_doGlFinish;
+			g_context->m_profiler->m_doGlFinish = !g_context->m_profiler->m_doGlFinish;
 		}
 		else if (_stricmp(m_caption, "Reset History") == 0)
 		{
-			g_app->m_profiler->ResetHistory();
+			g_context->m_profiler->ResetHistory();
 		}
 		else if (_stricmp(m_caption, "Min") == 0)
 		{
@@ -67,7 +67,7 @@ ProfileWindow::ProfileWindow( const char *name )
 
 ProfileWindow::~ProfileWindow()
 {
-	g_app->m_profiler->m_doGlFinish = false;
+	g_context->m_profiler->m_doGlFinish = false;
 }
 
 
@@ -138,7 +138,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 				if (x > m_x && x < m_x+m_w &&
 					y > m_yPos + 5 && y < m_yPos + 17)
 				{
-					ASSERT_TEXT(child != g_app->m_profiler->m_rootElement,
+					ASSERT_TEXT(child != g_context->m_profiler->m_rootElement,
 						"ProfileWindow::RenderElementProfile child==root");
 					child->m_isExpanded = !child->m_isExpanded;
 				}
@@ -181,7 +181,7 @@ void ProfileWindow::Render( bool hasFocus )
 {
     DarwiniaWindow::Render( hasFocus );
 
-    if (g_app->m_profiler->m_doGlFinish)
+    if (g_context->m_profiler->m_doGlFinish)
 	{
 		g_editorFont.DrawText2D( m_x + 130, m_y + 28, DEF_FONT_SIZE, "Yes" );
 	}
@@ -190,15 +190,15 @@ void ProfileWindow::Render( bool hasFocus )
 		g_editorFont.DrawText2D( m_x + 130, m_y + 28, DEF_FONT_SIZE, "No" );
 	}
 
-    ProfiledElement *root = g_app->m_profiler->m_rootElement;
+    ProfiledElement *root = g_context->m_profiler->m_rootElement;
 
     m_yPos = m_y + 42;
 
     g_editorFont.DrawText2DRight( m_x + 330, m_yPos, DEF_FONT_SIZE * 0.85f, "calls x avrg = total" );
 
-START_PROFILE(g_app->m_profiler, "render profile");
+START_PROFILE(g_context->m_profiler, "render profile");
 	RenderElementProfile(root, 0);
-END_PROFILE(g_app->m_profiler, "render profile");
+END_PROFILE(g_context->m_profiler, "render profile");
 }
 
 
@@ -218,7 +218,7 @@ void ProfileWindow::Create()
 	resetHistBut->SetShortProperties("Reset History", 190, 18);
 	RegisterButton(resetHistBut);
 
-	g_app->m_profiler->m_doGlFinish = true;
+	g_context->m_profiler->m_doGlFinish = true;
 }
 
 

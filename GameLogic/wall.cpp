@@ -3,7 +3,7 @@
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "wall.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
 
@@ -13,12 +13,12 @@ Wall::Wall()
 {
   m_type = TypeWall;
 
-  SetShape(g_app->m_resource->GetShapeStatic("wall.shp"));
+  SetShape(Resource::GetShapeStatic("wall.shp"));
 }
 
 bool Wall::Advance()
 {
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   float targetY = landHeight + m_damage / 10 + 0.01f;
 
   if (m_pos.y > targetY)
@@ -35,7 +35,7 @@ bool Wall::Advance()
       for (int i = -5; i < 5; ++i)
       {
         LegacyVector3 particlePos = m_pos + right * i * frand(10.0f);
-        particlePos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(particlePos.x, particlePos.z) + 10.0f;
+        particlePos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(particlePos.x, particlePos.z) + 10.0f;
         LegacyVector3 particleVel(sfrand(10.0f), frand(10.0f), sfrand(10.0f));
 
         g_simEventQueue.Push(SimEvent::MakeParticle(particlePos, particleVel, SimParticle::TypeRocketTrail, 50.0f));

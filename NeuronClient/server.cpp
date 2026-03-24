@@ -37,11 +37,11 @@ static NetCallBackRetType ListenCallback(NetUdpPacket* udpdata)
     char newip[16];
     IpToString(fromAddr->sin_addr, newip);
 
-    if (g_app->m_server)
+    if (g_context->m_server)
     {
       auto letter = new NetworkUpdate(udpdata->m_data);
-      g_app->m_server->ReceiveLetter(letter, newip);
-      //            SET_PROFILE(g_app->m_profiler,  "#Server Receive", (double) udpdata->getLength() );
+      g_context->m_server->ReceiveLetter(letter, newip);
+      //            SET_PROFILE(g_context->m_profiler,  "#Server Receive", (double) udpdata->getLength() );
     }
 
     delete udpdata;
@@ -83,7 +83,7 @@ void Server::Initialise()
   m_inboxMutex = new NetMutex();
   m_outboxMutex = new NetMutex();
 
-  if (!g_app->m_bypassNetworking)
+  if (!g_context->m_bypassNetworking)
   {
     m_netLib = new NetLib();
     m_netLib->Initialise();
@@ -286,8 +286,8 @@ void Server::AdvanceSender()
 
     if (m_clients.ValidIndex(letter->GetClientId()))
     {
-      if (g_app->m_bypassNetworking)
-        g_app->m_clientToServer->ReceiveLetter(letter);
+      if (g_context->m_bypassNetworking)
+        g_context->m_clientToServer->ReceiveLetter(letter);
       else
       {
         int linearSize = 0;
@@ -308,13 +308,13 @@ void Server::AdvanceSender()
 
   if (bytesSentThisFrame > 0)
   {
-    //        SET_PROFILE(g_app->m_profiler,  "#Server Send", (double) bytesSentThisFrame );
+    //        SET_PROFILE(g_context->m_profiler,  "#Server Send", (double) bytesSentThisFrame );
   }
 }
 
 void Server::Advance()
 {
-  START_PROFILE(g_app->m_profiler, "Advance Server");
+  START_PROFILE(g_context->m_profiler, "Advance Server");
 
   //
   // Compile all incoming messages into a ServerToClientLetter
@@ -434,7 +434,7 @@ void Server::Advance()
 
   AdvanceSender();
 
-  END_PROFILE(g_app->m_profiler, "Advance Server");
+  END_PROFILE(g_context->m_profiler, "Advance Server");
 }
 
 void Server::LoadHistory(const char* _filename)

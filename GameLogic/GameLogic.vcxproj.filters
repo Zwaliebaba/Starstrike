@@ -184,7 +184,7 @@
     <ClInclude Include="prefs_keys.h" />
     <ClInclude Include="GameSimEvent.h" />
     <ClInclude Include="GameSimEventQueue.h" />
-    <ClInclude Include="GameAppSim.h" />
+    <ClInclude Include="GameContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

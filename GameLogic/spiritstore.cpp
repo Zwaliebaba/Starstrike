@@ -4,7 +4,7 @@
 #include "profiler.h"
 #include "resource.h"
 
-#include "GameAppSim.h"
+#include "GameContext.h"
 
 #include "spiritstore.h"
 

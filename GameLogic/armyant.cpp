@@ -4,7 +4,7 @@
 #include "ShapeStatic.h"
 #include "math_utils.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "unit.h"
 #include "entity_grid.h"
@@ -20,9 +20,9 @@ ArmyAnt::ArmyAnt()
 {
   m_type = TypeArmyAnt;
 
-  m_shapes[0] = g_app->m_resource->GetShapeStatic("armyant.shp");
-  m_shapes[1] = g_app->m_resource->GetShapeStatic("armyant2.shp");
-  m_shapes[2] = g_app->m_resource->GetShapeStatic("armyant3.shp");
+  m_shapes[0] = Resource::GetShapeStatic("armyant.shp");
+  m_shapes[1] = Resource::GetShapeStatic("armyant2.shp");
+  m_shapes[2] = Resource::GetShapeStatic("armyant3.shp");
 
   m_shape = m_shapes[0];
   m_carryMarker = m_shape->GetMarkerData("MarkerCarry");
@@ -67,9 +67,9 @@ void ArmyAnt::ChangeHealth(int _amount)
 
     if (m_spiritId != -1)
     {
-      if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+      if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
       {
-        Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+        Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
         if (spirit && spirit->m_state == Spirit::StateAttached)
         {
           spirit->CollectorDrops();
@@ -121,9 +121,9 @@ bool ArmyAnt::Advance(Unit* _unit)
     //
     // Keep attached spirits attached to us
 
-    if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+    if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
     {
-      Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+      Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
       if (spirit && spirit->m_state == Spirit::StateAttached)
       {
         LegacyVector3 carryPos, carryVel;
@@ -165,7 +165,7 @@ bool ArmyAnt::AdvanceScoutArea()
   bool arrived = AdvanceToTargetPosition();
   if (arrived)
   {
-    Entity* targetEntity = g_app->m_location->GetEntity(m_targetId);
+    Entity* targetEntity = g_context->m_location->GetEntity(m_targetId);
     if (targetEntity)
     {
       if (targetEntity->m_type == TypeDarwinian)
@@ -182,8 +182,8 @@ bool ArmyAnt::AdvanceScoutArea()
 bool ArmyAnt::AdvanceCollectSpirit()
 {
   Spirit* s = nullptr;
-  if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
-    s = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+  if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
+    s = g_context->m_location->m_spirits.GetPointer(m_spiritId);
 
   if (!s || s->m_state == Spirit::StateDeath || s->m_state == Spirit::StateAttached || s->m_state == Spirit::StateInEgg)
   {
@@ -194,7 +194,7 @@ bool ArmyAnt::AdvanceCollectSpirit()
   }
 
   m_wayPoint = s->m_pos;
-  m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+  m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
   bool arrived = AdvanceToTargetPosition();
   if (arrived)
   {
@@ -210,7 +210,7 @@ bool ArmyAnt::AdvanceCollectEntity()
   //
   // Is our entity still here
 
-  Entity* targetEntity = g_app->m_location->GetEntity(m_targetId);
+  Entity* targetEntity = g_context->m_location->GetEntity(m_targetId);
   if (!targetEntity || targetEntity->m_dead)
   {
     m_targetId.SetInvalid();
@@ -250,7 +250,7 @@ bool ArmyAnt::AdvanceAttackEnemy()
   //
   // Is our entity still here
 
-  Entity* targetEntity = g_app->m_location->GetEntity(m_targetId);
+  Entity* targetEntity = g_context->m_location->GetEntity(m_targetId);
   if (!targetEntity || targetEntity->m_dead)
   {
     m_targetId.SetInvalid();
@@ -265,7 +265,7 @@ bool ArmyAnt::AdvanceAttackEnemy()
   m_wayPoint = targetEntity->m_pos;
 
   if (targetEntity->m_type == TypeEngineer)
-    m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+    m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
 
   bool arrived = AdvanceToTargetPosition();
   if (arrived)
@@ -286,7 +286,7 @@ bool ArmyAnt::AdvanceReturnToBase()
   bool arrived = AdvanceToTargetPosition();
   if (arrived)
   {
-    Building* building = g_app->m_location->GetBuilding(m_buildingId);
+    Building* building = g_context->m_location->GetBuilding(m_buildingId);
 
     if (!building)
     {
@@ -302,18 +302,18 @@ bool ArmyAnt::AdvanceReturnToBase()
       antHill->m_numAntsInside++;
 
       // Drop off any spirits we are carrying
-      if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+      if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
       {
-        Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+        Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
         if (spirit && spirit->m_state == Spirit::StateAttached)
         {
           antHill->m_numSpiritsInside++;
-          g_app->m_location->m_spirits.MarkNotUsed(m_spiritId);
+          g_context->m_location->m_spirits.MarkNotUsed(m_spiritId);
         }
       }
 
       // Any Darwinians being carried are now killed
-      Entity* entity = g_app->m_location->GetEntity(m_targetId);
+      Entity* entity = g_context->m_location->GetEntity(m_targetId);
       if (entity && entity->m_type == TypeDarwinian)
       {
         auto darwinian = static_cast<Darwinian*>(entity);
@@ -339,11 +339,11 @@ bool ArmyAnt::AdvanceBaseDestroyed()
 
 void ArmyAnt::OrderReturnToBase()
 {
-  Building* building = g_app->m_location->GetBuilding(m_buildingId);
+  Building* building = g_context->m_location->GetBuilding(m_buildingId);
   if (building)
   {
     m_wayPoint = building->m_pos;
-    m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+    m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
     m_orders = ReturnToBase;
   }
   else
@@ -375,11 +375,11 @@ bool ArmyAnt::SearchForSpirits()
   int spiritId = -1;
   float closest = 999999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       float theDist = (s->m_pos - m_pos).Mag();
 
       if (theDist <= ARMYANT_SEARCHRANGE && theDist < closest && (s->m_state == Spirit::StateBirth || s->m_state == Spirit::StateFloating))
@@ -403,8 +403,8 @@ bool ArmyAnt::SearchForSpirits()
 
 bool ArmyAnt::SearchForEnemies()
 {
-  WorldObjectId enemyId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, ARMYANT_SEARCHRANGE, m_id.GetTeamId());
-  Entity* enemy = g_app->m_location->GetEntity(enemyId);
+  WorldObjectId enemyId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, ARMYANT_SEARCHRANGE, m_id.GetTeamId());
+  Entity* enemy = g_context->m_location->GetEntity(enemyId);
 
   if (enemy && !enemy->m_dead && enemy->m_type != TypeDarwinian)
   {
@@ -421,13 +421,13 @@ bool ArmyAnt::SearchForAntHill()
   int buildingId = -1;
   float nearest = 500.0f;
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
+      Building* building = g_context->m_location->m_buildings[i];
 
-      if (building->m_type == Building::TypeAntHill && g_app->m_location->IsFriend(building->m_id.GetTeamId(), m_id.GetTeamId()))
+      if (building->m_type == Building::TypeAntHill && g_context->m_location->IsFriend(building->m_id.GetTeamId(), m_id.GetTeamId()))
       {
         float distance = (building->m_pos - m_pos).Mag();
         if (distance < nearest)
@@ -470,7 +470,7 @@ bool ArmyAnt::SearchForRandomPosition()
     m_wayPoint = PushFromObstructions(m_wayPoint);
   }
 
-  m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+  m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
   return true;
 }
 
@@ -488,7 +488,7 @@ bool ArmyAnt::AdvanceToTargetPosition()
   LegacyVector3 actualDir = (m_wayPoint - m_pos).Normalise();
   LegacyVector3 newPos = m_pos + actualDir * speed * SERVER_ADVANCE_PERIOD;
   //newPos = PushFromObstructions( newPos );
-  newPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+  newPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
   LegacyVector3 moved = newPos - oldPos;
   if (moved.Mag() > speed * SERVER_ADVANCE_PERIOD)
     moved.SetLength(speed * SERVER_ADVANCE_PERIOD);
@@ -511,7 +511,7 @@ bool ArmyAnt::AdvanceToTargetPosition()
 
 void ArmyAnt::GetCarryMarker(LegacyVector3& _pos, LegacyVector3& _vel)
 {
-  LegacyVector3 groundUp = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+  LegacyVector3 groundUp = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
   Matrix34 mat(m_front, groundUp, m_pos);
   _pos = m_shape->GetMarkerWorldMatrix(m_carryMarker, mat).pos;
   _vel = m_vel;

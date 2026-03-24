@@ -7,8 +7,8 @@
 
 ObstructionGrid::ObstructionGrid(float _cellSizeX, float _cellSizeZ)
 {
-  float sizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float sizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float sizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float sizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
 
   ObstructionGridCell outSideValue;
   m_cells.Initialise(sizeX, sizeZ, 0.0f, 0.0f, _cellSizeX, _cellSizeZ, outSideValue);
@@ -18,17 +18,17 @@ ObstructionGrid::ObstructionGrid(float _cellSizeX, float _cellSizeZ)
 
 void ObstructionGrid::CalculateBuildingArea(int _buildingId)
 {
-  Building* building = g_app->m_location->GetBuilding(_buildingId);
+  Building* building = g_context->m_location->GetBuilding(_buildingId);
   if (building)
   {
     int buildingCellX = m_cells.GetMapIndexX(building->m_centerPos.x);
     int buildingCellZ = m_cells.GetMapIndexY(building->m_centerPos.z);
     int range = ceil(building->m_radius / m_cells.m_cellSizeX);
 
-    int minX = max(buildingCellX - range, 0);
-    int minZ = max(buildingCellZ - range, 0);
-    int maxX = min(buildingCellX + range, (int) m_cells.GetNumRows());
-    int maxZ = min(buildingCellZ + range, (int) m_cells.GetNumColumns());
+    int minX = std::max(buildingCellX - range, 0);
+    int minZ = std::max(buildingCellZ - range, 0);
+    int maxX = std::min(buildingCellX + range, (int) m_cells.GetNumRows());
+    int maxZ = std::min(buildingCellZ + range, (int) m_cells.GetNumColumns());
 
     for (int x = minX; x <= maxX; ++x)
     {
@@ -40,7 +40,7 @@ void ObstructionGrid::CalculateBuildingArea(int _buildingId)
         float cellRadius = m_cells.m_cellSizeX * 0.5f;
 
         LegacyVector3 cellPos(cellCenterX, 0.0f, cellCenterZ);
-        cellPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(cellPos.x, cellPos.z);
+        cellPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(cellPos.x, cellPos.z);
 
         if (building->DoesSphereHit(cellPos, cellRadius))
           cell->m_buildings.PutData(_buildingId);
@@ -54,7 +54,7 @@ void ObstructionGrid::CalculateBuildingArea(int _buildingId)
         auto fence = static_cast<LaserFence*>(building);
         if (fence->IsEnabled())
         {
-          Building* link = g_app->m_location->GetBuilding(building->GetBuildingLink());
+          Building* link = g_context->m_location->GetBuilding(building->GetBuildingLink());
 
           LegacyVector3 direction = (link->m_pos - building->m_pos);
 
@@ -103,11 +103,11 @@ void ObstructionGrid::CalculateAll()
   //
   // Add each building to the grid
 
-  for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
   {
-    if (g_app->m_location->m_buildings.ValidIndex(i))
+    if (g_context->m_location->m_buildings.ValidIndex(i))
     {
-      Building* building = g_app->m_location->m_buildings[i];
+      Building* building = g_context->m_location->m_buildings[i];
       CalculateBuildingArea(building->m_id.GetUniqueId());
     }
   }

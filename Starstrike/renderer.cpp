@@ -48,7 +48,7 @@ void Renderer::RenderFlatTexture()
 {
   glColor3ubv(g_colourWhite.GetData());
   glEnable(GL_TEXTURE_2D);
-  int textureId = g_app->m_resource->GetTexture("textures/privatedemo.bmp", true, true);
+  int textureId = Resource::GetTexture("textures/privatedemo.bmp", true, true);
   if (textureId == -1)
     return;
   glBindTexture(GL_TEXTURE_2D, textureId);
@@ -58,9 +58,9 @@ void Renderer::RenderFlatTexture()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
   float size = m_nearPlane * 0.3f;
-  LegacyVector3 up = g_app->m_camera->GetUp() * 1.0f * size;
-  LegacyVector3 right = g_app->m_camera->GetRight() * 1.0f * size;
-  LegacyVector3 pos = g_app->m_camera->GetPos() + g_app->m_camera->GetFront() * m_nearPlane * 1.01f;
+  LegacyVector3 up = g_context->m_camera->GetUp() * 1.0f * size;
+  LegacyVector3 right = g_context->m_camera->GetRight() * 1.0f * size;
+  LegacyVector3 pos = g_context->m_camera->GetPos() + g_context->m_camera->GetFront() * m_nearPlane * 1.01f;
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -115,7 +115,7 @@ void Renderer::RenderLogo()
   glColor4ub(255, 255, 255, 255);
   glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  int textureId = g_app->m_resource->GetTexture("textures/privatedemo.bmp", true, false);
+  int textureId = Resource::GetTexture("textures/privatedemo.bmp", true, false);
   if (textureId == -1)
     return;
   glBindTexture(GL_TEXTURE_2D, textureId);
@@ -147,7 +147,7 @@ void Renderer::RenderLogo()
 void Renderer::Render()
 {
 #ifdef PROFILER_ENABLED
-  g_app->m_profiler->RenderStarted();
+  g_context->m_profiler->RenderStarted();
 #endif
 
   AdvanceFade();
@@ -156,7 +156,7 @@ void Renderer::Render()
   RenderFrame();
 
 #ifdef PROFILER_ENABLED
-  g_app->m_profiler->RenderEnded();
+  g_context->m_profiler->RenderEnded();
 #endif // PROFILER_ENABLED
 }
 
@@ -217,8 +217,8 @@ void Renderer::RenderFadeOut()
 void Renderer::RenderPaused()
 {
   auto msg = "PAUSED";
-  int x = g_app->m_renderer->ScreenW() / 2;
-  int y = g_app->m_renderer->ScreenH() / 2;
+  int x = g_context->m_renderer->ScreenW() / 2;
+  int y = g_context->m_renderer->ScreenH() / 2;
   TextRenderer& font = g_gameFont;
 
   font.BeginText2D();
@@ -288,9 +288,9 @@ void Renderer::RenderHUD()
     g_editorFont.DrawText2D(84, 10, DEF_FONT_SIZE, "InputMode: %s", inmode.c_str());
   }
 
-  if (g_app->m_server)
+  if (g_context->m_server)
   {
-    int latency = g_app->m_server->m_sequenceId - g_lastProcessedSequenceId;
+    int latency = g_context->m_server->m_sequenceId - g_lastProcessedSequenceId;
     if (latency > 10)
     {
       glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
@@ -308,7 +308,7 @@ void Renderer::RenderHUD()
   //
   // Personalisation information
 
-  if (!g_app->m_taskManagerInterface->m_visible && !g_app->m_camera->IsInMode(Camera::ModeSphereWorldIntro) && !g_app->m_camera->IsInMode(
+  if (!g_context->m_taskManagerInterface->m_visible && !g_context->m_camera->IsInMode(Camera::ModeSphereWorldIntro) && !g_context->m_camera->IsInMode(
     Camera::ModeSphereWorldOutro))
   {
 #ifdef PROMOTIONAL_BUILD
@@ -319,8 +319,8 @@ void Renderer::RenderHUD()
   // StartSequence::Render2D() sets its own ortho (OrthoOffCenterRH(0, 800, ...))
   // which differs from the BeginText2D ortho.  This is intentional — the start
   // sequence uses a fixed 800-wide virtual coordinate system for its captions.
-  if (g_app->m_startSequence)
-    g_app->m_startSequence->Render2D();
+  if (g_context->m_startSequence)
+    g_context->m_startSequence->Render2D();
 }
 
 void Renderer::RenderFrame(bool withFlip)
@@ -329,7 +329,7 @@ void Renderer::RenderFrame(bool withFlip)
 
   SetOpenGLState();
 
-  if (g_app->m_locationId == -1)
+  if (g_context->m_locationId == -1)
   {
     m_nearPlane = 50.0f;
     m_farPlane = 10000000.0f;
@@ -343,43 +343,43 @@ void Renderer::RenderFrame(bool withFlip)
   FPSMeterAdvance();
   SetupMatricesFor3D();
 
-  START_PROFILE(g_app->m_profiler, "Render Clear");
-  RGBAColour* col = &g_app->m_backgroundColour;
-  if (g_app->m_location)
+  START_PROFILE(g_context->m_profiler, "Render Clear");
+  RGBAColour* col = &g_context->m_backgroundColour;
+  if (g_context->m_location)
     glClearColor(col->r / 255.0f, col->g / 255.0f, col->b / 255.0f, col->a / 255.0f);
   else
     glClearColor(0.05f, 0.0f, 0.05f, 0.1f);
   glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-  END_PROFILE(g_app->m_profiler, "Render Clear");
+  END_PROFILE(g_context->m_profiler, "Render Clear");
 
-  if (g_app->m_locationId != -1)
-    g_app->m_location->Render();
+  if (g_context->m_locationId != -1)
+    g_context->m_location->Render();
   else
-    g_app->m_globalWorld->Render();
+    g_context->m_globalWorld->Render();
 
   g_explosionManager.Render();
-  g_app->m_particleSystem->Render();
+  g_context->m_particleSystem->Render();
 
   // ====== 3D PASS ======
-  g_app->m_gameCursor->PrepareCursorState();
-  g_app->m_gameCursor->Render3D();
-  g_app->m_taskManagerInterface->Render3D();
+  g_context->m_gameCursor->PrepareCursorState();
+  g_context->m_gameCursor->Render3D();
+  g_context->m_taskManagerInterface->Render3D();
 
-  if (g_app->m_startSequence)
-    g_app->m_startSequence->Render3D();
+  if (g_context->m_startSequence)
+    g_context->m_startSequence->Render3D();
 
-  g_app->m_camera->Render();
+  g_context->m_camera->Render();
 
   // ====== 2D PASS ======
   // BeginText2D sets ortho projection and the 2D state contract:
   // GL_DEPTH_TEST off, glDepthMask(false), GL_CULL_FACE off, GL_BLEND on.
   g_editorFont.BeginText2D();
 
-  g_app->m_userInput->Render();
-  g_app->m_taskManagerInterface->Render2D();
-  g_app->m_gameCursor2D->Render();
-  g_app->m_gameCursor->WriteBackArrowBoost(
-    g_app->m_gameCursor2D->GetUpdatedArrowBoost());
+  g_context->m_userInput->Render();
+  g_context->m_taskManagerInterface->Render2D();
+  g_context->m_gameCursor2D->Render();
+  g_context->m_gameCursor->WriteBackArrowBoost(
+    g_context->m_gameCursor2D->GetUpdatedArrowBoost());
 
   RenderHUD();
 
@@ -387,12 +387,12 @@ void Renderer::RenderFrame(bool withFlip)
 
   OpenGLD3D::SnapshotFrameStats();
 
-  START_PROFILE(g_app->m_profiler, "GL Flip");
+  START_PROFILE(g_context->m_profiler, "GL Flip");
 
   if (withFlip)
     g_windowManager->Flip();
 
-  END_PROFILE(g_app->m_profiler, "GL Flip");
+  END_PROFILE(g_context->m_profiler, "GL Flip");
 
   CHECK_OPENGL_STATE();
 }
@@ -404,14 +404,14 @@ int Renderer::ScreenH() const { return m_screenH; }
 void Renderer::SetupProjMatrixFor3D() const
 {
   OpenGLD3D::GetProjectionStack().PerspectiveFovRH(
-    g_app->m_camera->GetFov(),
+    g_context->m_camera->GetFov(),
     static_cast<float>(m_screenW) / static_cast<float>(m_screenH),
     m_nearPlane, m_farPlane);
 }
 
 void Renderer::SetupMatricesFor3D() const
 {
-  Camera* camera = g_app->m_camera;
+  Camera* camera = g_context->m_camera;
 
   SetupProjMatrixFor3D();
   camera->SetupModelviewMatrix();
@@ -512,11 +512,11 @@ void Renderer::CheckOpenGLState() const
   glGetFloatv(GL_LIGHT_MODEL_AMBIENT, resultsf);
   DEBUG_ASSERT(resultsf[0] < 0.001f && resultsf[1] < 0.001f && resultsf[2] < 0.001f && resultsf[3] < 0.001f);
 
-  if (g_app->m_location)
+  if (g_context->m_location)
   {
-    for (int i = 0; i < g_app->m_location->m_lights.Size(); i++)
+    for (int i = 0; i < g_context->m_location->m_lights.Size(); i++)
     {
-      Light* light = g_app->m_location->m_lights.GetData(i);
+      Light* light = g_context->m_location->m_lights.GetData(i);
 
       float amb = 0.0f;
       GLfloat ambCol1[] = {amb, amb, amb, 1.0f};
@@ -553,10 +553,10 @@ void Renderer::CheckOpenGLState() const
   DEBUG_ASSERT(GetGLStateFloat(GL_FOG_END) >= 4000.0f);
   //DEBUG_ASSERT(GetGLStateFloat(GL_FOG_START) >= 1000.0f);
   glGetFloatv(GL_FOG_COLOR, resultsf);
-  //	DEBUG_ASSERT(fabsf(resultsf[0] - g_app->m_location->m_backgroundColour.r/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[1] - g_app->m_location->m_backgroundColour.g/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[2] - g_app->m_location->m_backgroundColour.b/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[3] - g_app->m_location->m_backgroundColour.a/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[0] - g_context->m_location->m_backgroundColour.r/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[1] - g_context->m_location->m_backgroundColour.g/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[2] - g_context->m_location->m_backgroundColour.b/255.0f) < 0.001f);
+  //	DEBUG_ASSERT(fabsf(resultsf[3] - g_context->m_location->m_backgroundColour.a/255.0f) < 0.001f);
   DEBUG_ASSERT(GetGLStateInt(GL_FOG_MODE) == GL_LINEAR);
   DEBUG_ASSERT(!glIsEnabled(GL_LINE_SMOOTH));
   DEBUG_ASSERT(!glIsEnabled(GL_POINT_SMOOTH));
@@ -610,10 +610,10 @@ void Renderer::SetOpenGLState() const
   glDisable(GL_LIGHT5);
   glDisable(GL_LIGHT6);
   glDisable(GL_LIGHT7);
-  if (g_app->m_location)
-    g_app->m_location->SetupLights();
+  if (g_context->m_location)
+    g_context->m_location->SetupLights();
   else
-    g_app->m_globalWorld->SetupLights();
+    g_context->m_globalWorld->SetupLights();
   float ambient[] = {0, 0, 0, 0};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
@@ -622,10 +622,10 @@ void Renderer::SetOpenGLState() const
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_ALPHA_TEST);
   glAlphaFunc(GL_GREATER, 0.01);
-  if (g_app->m_location)
-    g_app->m_location->SetupFog();
+  if (g_context->m_location)
+    g_context->m_location->SetupFog();
   else
-    g_app->m_globalWorld->SetupFog();
+    g_context->m_globalWorld->SetupFog();
   glDisable(GL_LINE_SMOOTH);
   glDisable(GL_POINT_SMOOTH);
 

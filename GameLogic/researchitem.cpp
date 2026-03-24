@@ -3,7 +3,7 @@
 #include "GameSimEventQueue.h"
 #include "camera.h"
 #include "file_writer.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "global_world.h"
 #include "globals.h"
 #include "location.h"
@@ -27,7 +27,7 @@ ResearchItem::ResearchItem()
   m_type = TypeResearchItem;
   m_researchType = GlobalResearch::TypeEngineer;
 
-  Building::SetShape(g_app->m_resource->GetShapeStatic("researchitem.shp"));
+  Building::SetShape(Resource::GetShapeStatic("researchitem.shp"));
 
   m_front.RotateAroundY(frand(2.0f * M_PI));
 
@@ -45,7 +45,7 @@ void ResearchItem::Initialise(Building* _template)
 
 void ResearchItem::SetDetail([[maybe_unused]] int _detail)
 {
-  m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   m_pos.y += 20.0f;
 
   Matrix34 mat(m_front, m_up, m_pos);
@@ -58,7 +58,7 @@ bool ResearchItem::Advance()
   if (m_vel.Mag() > 1.0f)
   {
     m_pos += m_vel * SERVER_ADVANCE_PERIOD;
-    m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     m_vel *= (1.0f - SERVER_ADVANCE_PERIOD * 0.5f);
 
     Matrix34 mat(m_front, g_upVector, m_pos);
@@ -67,7 +67,7 @@ bool ResearchItem::Advance()
   else
     m_vel.Zero();
 
-  if (m_researchType > -1 && g_app->m_globalWorld->m_research->HasResearch(m_researchType) && g_app->m_globalWorld->m_research->
+  if (m_researchType > -1 && g_context->m_globalWorld->m_research->HasResearch(m_researchType) && g_context->m_globalWorld->m_research->
     CurrentLevel(m_researchType) >= m_level)
     return true;
 
@@ -76,17 +76,17 @@ bool ResearchItem::Advance()
     Matrix34 mat(m_front, m_up, m_pos);
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));
 
-    int existingLevel = g_app->m_globalWorld->m_research->CurrentLevel(m_researchType);
+    int existingLevel = g_context->m_globalWorld->m_research->CurrentLevel(m_researchType);
 
-    g_app->m_globalWorld->m_research->AddResearch(m_researchType);
-    g_app->m_globalWorld->m_research->m_researchLevel[m_researchType] = m_level;
+    g_context->m_globalWorld->m_research->AddResearch(m_researchType);
+    g_context->m_globalWorld->m_research->m_researchLevel[m_researchType] = m_level;
 
   g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "AquireResearch"));
 
     if (existingLevel == 0)
-      g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearch, m_researchType, 4.0f);
+      g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearch, m_researchType, 4.0f);
     else
-      g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearchUpgrade, m_researchType, 4.0f);
+      g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearchUpgrade, m_researchType, 4.0f);
 
     return true;
   }
@@ -141,7 +141,7 @@ bool ResearchItem::IsInView()
   if (Building::IsInView())
     return true;
 
-  if (g_app->m_camera->PosInViewFrustum(m_pos + LegacyVector3(0, g_app->m_camera->GetPos().y, 0)))
+  if (g_context->m_camera->PosInViewFrustum(m_pos + LegacyVector3(0, g_context->m_camera->GetPos().y, 0)))
     return true;
 
   return false;

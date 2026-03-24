@@ -21,7 +21,7 @@ void TeleportBuildingRenderer::RenderAlphas(const Building& _building, const Bui
     {
         const WorldObjectId* id = teleport.m_inTransit.GetPointer(i);
         if (!id) continue;
-        WorldObject* obj = g_app->m_location->GetEntity(*id);
+        WorldObject* obj = g_context->m_location->GetEntity(*id);
         if (obj)
         {
             Entity* ent = static_cast<Entity*>(obj);
@@ -49,24 +49,24 @@ void TeleportBuildingRenderer::RenderSpirit(const LegacyVector3& _pos, int _team
 
     RGBAColour colour;
     if (_teamId >= 0)
-        colour = g_app->m_location->m_teams[_teamId].m_colour;
+        colour = g_context->m_location->m_teams[_teamId].m_colour;
 
     float size = spiritInnerSize;
     glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
 
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 
     size = spiritOuterSize;
     glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 }

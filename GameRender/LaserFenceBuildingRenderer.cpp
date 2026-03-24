@@ -46,7 +46,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
     //
     // Draw the laser fence connecting to the next laser fence
 
-    Building* nextBuilding = g_app->m_location->GetBuilding(fence.m_nextLaserFenceId);
+    Building* nextBuilding = g_context->m_location->GetBuilding(fence.m_nextLaserFenceId);
     if (!nextBuilding || nextBuilding->m_type != Building::TypeLaserFence)
     {
         // Original code mutates m_nextLaserFenceId = -1 here as a
@@ -68,7 +68,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
         glColor4ub(100, 100, 100, alpha);
     else
     {
-        RGBAColour* colour = &g_app->m_location->m_teams[fence.m_id.GetTeamId()].m_colour;
+        RGBAColour* colour = &g_context->m_location->m_teams[fence.m_id.GetTeamId()].m_colour;
         glColor4ub(colour->r, colour->g, colour->b, alpha);
     }
 
@@ -79,7 +79,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
         predictedStatus -= LASERFENCE_RAISESPEED * _ctx.predictionTime;
     if (fence.m_mode == LaserFence::ModeEnabling)
         predictedStatus += LASERFENCE_RAISESPEED * _ctx.predictionTime;
-    if (g_app->m_editing)
+    if (g_context->m_editing)
         predictedStatus = 1.0f;
 
     float ourFenceHeight = ourFenceMaxHeight * predictedStatus;
@@ -94,7 +94,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
         glEnable(GL_TEXTURE_2D);
 
         gglActiveTextureARB(GL_TEXTURE0_ARB);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence.bmp"));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -104,7 +104,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
         glEnable(GL_TEXTURE_2D);
 
         gglActiveTextureARB(GL_TEXTURE1_ARB);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence2.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence2.bmp"));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -147,7 +147,7 @@ void LaserFenceBuildingRenderer::RenderAlphas(const Building& _building, const B
     // Blend another poly over the top for burn effect
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence2.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence2.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);

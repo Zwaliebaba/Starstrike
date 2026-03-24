@@ -9,7 +9,7 @@
 #include "insertion_squad.h"
 #include "airstrike.h"
 #include "darwinian.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "entity_grid.h"
 #include "obstruction_grid.h"
 #include "location.h"
@@ -28,7 +28,7 @@ ThrowableWeapon::ThrowableWeapon(int _type, const LegacyVector3& _startPos, cons
     m_force(1.0f),
     m_numFlashes(0)
 {
-  m_shape = g_app->m_resource->GetShapeStatic("throwable.shp");
+  m_shape = Resource::GetShapeStatic("throwable.shp");
   m_pos = _startPos;
   m_vel = _front * _force;
 
@@ -83,7 +83,7 @@ bool ThrowableWeapon::Advance()
    m_front.Normalise();
    m_up.Normalise();
 
-    float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     if (m_pos.y < landHeight + 1.0f)
     {
       BounceOffLandscape();
@@ -144,7 +144,7 @@ bool Grenade::Advance()
   {
     TriggerSoundEvent("Explode");
 
-    g_app->m_location->Bang(m_pos, m_power / 2.0f, m_power * 2.0f);
+    g_context->m_location->Bang(m_pos, m_power / 2.0f, m_power * 2.0f);
     return true;
   }
 
@@ -179,7 +179,7 @@ bool AirStrikeMarker::Advance()
     if (m_airstrikeUnit.GetTeamId() != -1 && m_airstrikeUnit.GetUnitId() != -1)
     {
       // Air strike unit has been created
-      Unit* unit = g_app->m_location->GetUnit(m_airstrikeUnit);
+      Unit* unit = g_context->m_location->GetUnit(m_airstrikeUnit);
       if (!unit)
       {
         m_airstrikeUnit.SetInvalid();
@@ -195,11 +195,11 @@ bool AirStrikeMarker::Advance()
     else
     {
       // Summon an air strike now
-      int teamId = g_app->m_globalWorld->m_myTeamId;
+      int teamId = g_context->m_globalWorld->m_myTeamId;
       int unitId;
-      Team* team = g_app->m_location->GetMyTeam();
+      Team* team = g_context->m_location->GetMyTeam();
 
-      int airStikeResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeAirStrike);
+      int airStikeResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeAirStrike);
       auto unit = static_cast<AirstrikeUnit*>(team->NewUnit(Entity::TypeSpaceInvader, airStikeResearch, &unitId, m_pos));
       unit->m_effectId = m_id.GetIndex();
       m_airstrikeUnit.Set(teamId, unitId, -1, -1);
@@ -231,20 +231,20 @@ bool ControllerGrenade::Advance()
       g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, vel, SimParticle::TypeControlFlash, 100.0f));
     }
 
-    Task* currentTask = g_app->m_taskManager->GetCurrentTask();
+    Task* currentTask = g_context->m_taskManager->GetCurrentTask();
     if (currentTask && currentTask->m_type == GlobalResearch::TypeSquad)
     {
-      Unit* owner = g_app->m_location->GetUnit(currentTask->m_objId);
+      Unit* owner = g_context->m_location->GetUnit(currentTask->m_objId);
       if (owner && owner->m_troopType == Entity::TypeInsertionSquadie)
       {
         auto squad = static_cast<InsertionSquad*>(owner);
 
         int numFound;
-        WorldObjectId* ids = g_app->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, 50.0f, &numFound, m_id.GetTeamId());
+        WorldObjectId* ids = g_context->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, 50.0f, &numFound, m_id.GetTeamId());
         for (int i = 0; i < numFound; ++i)
         {
           WorldObjectId id = ids[i];
-          Entity* entity = g_app->m_location->GetEntity(id);
+          Entity* entity = g_context->m_location->GetEntity(id);
           if (entity && entity->m_type == Entity::TypeDarwinian)
           {
             auto darwinian = static_cast<Darwinian*>(entity);
@@ -271,7 +271,7 @@ Rocket::Rocket(LegacyVector3 _startPos, LegacyVector3 _targetPos)
   m_pos = _startPos + LegacyVector3(0, 2, 0);
   m_vel = (_targetPos - m_pos).Normalise() * 50.0f;
 
-  m_shape = g_app->m_resource->GetShapeStatic("throwable.shp");
+  m_shape = Resource::GetShapeStatic("throwable.shp");
 
   m_timer = GetHighResTime();
   m_type = EffectRocket;
@@ -304,7 +304,7 @@ bool Rocket::Advance()
   //
   // Have we run out of steam?
 
-  int rocketResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeRocket);
+  int rocketResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeRocket);
   float maxLife = 0.0f;
   switch (rocketResearch)
   {
@@ -327,7 +327,7 @@ bool Rocket::Advance()
 
   if (GetHighResTime() > m_timer + maxLife)
   {
-    g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
+    g_context->m_location->Bang(m_pos, 15.0f, 25.0f);
     g_simEventQueue.Push(SimEvent::MakeSoundStop(m_id));
     g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
     return true;
@@ -336,9 +336,9 @@ bool Rocket::Advance()
   //
   // Have we hit the ground?
 
-  if (g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) >= m_pos.y)
+  if (g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) >= m_pos.y)
   {
-    g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
+    g_context->m_location->Bang(m_pos, 15.0f, 25.0f);
     g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
     return true;
   }
@@ -346,15 +346,15 @@ bool Rocket::Advance()
   //
   // Have we hit any buildings?
 
-  LList<int>* buildings = g_app->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
+  LList<int>* buildings = g_context->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
 
   for (int b = 0; b < buildings->Size(); ++b)
   {
     int buildingId = buildings->GetData(b);
-    Building* building = g_app->m_location->GetBuilding(buildingId);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
     if (building->DoesSphereHit(m_pos, 3.0f))
     {
-      g_app->m_location->Bang(m_pos, 15.0f, 25.0f);
+      g_context->m_location->Bang(m_pos, 15.0f, 25.0f);
       g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeRocket, "Explode"));
       return true;
     }
@@ -388,7 +388,7 @@ bool Laser::Advance()
   //
   // Detect collisions with landscape / buildings / people
 
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
   if (m_pos.y <= landHeight)
   {
@@ -401,11 +401,11 @@ bool Laser::Advance()
     LegacyVector3 hitPoint;
     LegacyVector3 vel = m_vel;
     vel.Normalise();
-    g_app->m_location->m_landscape.RayHit(oldPos, vel, &hitPoint);
+    g_context->m_location->m_landscape.RayHit(oldPos, vel, &hitPoint);
     float distanceTravelled = (hitPoint - oldPos).Mag();
     float distanceTotal = (m_vel * SERVER_ADVANCE_PERIOD).Mag();
 
-    LegacyVector3 normal = g_app->m_location->m_landscape.m_normalMap->GetValue(hitPoint.x, hitPoint.z);
+    LegacyVector3 normal = g_context->m_location->m_landscape.m_normalMap->GetValue(hitPoint.x, hitPoint.z);
     LegacyVector3 incomingVel = m_vel * -1.0f;
     float dotProd = normal * incomingVel;
     m_vel = 2.0f * dotProd * normal - incomingVel;
@@ -419,7 +419,7 @@ bool Laser::Advance()
 
     m_bounced = true;
   }
-  else if (m_pos.x < 0 || m_pos.x > g_app->m_location->m_landscape.GetWorldSizeX() || m_pos.z < 0 || m_pos.z > g_app->m_location->
+  else if (m_pos.x < 0 || m_pos.x > g_context->m_location->m_landscape.GetWorldSizeX() || m_pos.z < 0 || m_pos.z > g_context->m_location->
     m_landscape.GetWorldSizeZ())
   {
     // Outside game world
@@ -435,10 +435,10 @@ bool Laser::Advance()
     LegacyVector3 hitPos(0, 0, 0);
     LegacyVector3 hitNorm(0, 0, 0);
 
-    LList<int>* nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
+    LList<int>* nearbyBuildings = g_context->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
     for (int i = 0; i < nearbyBuildings->Size(); ++i)
     {
-      Building* building = g_app->m_location->GetBuilding(nearbyBuildings->GetData(i));
+      Building* building = g_context->m_location->GetBuilding(nearbyBuildings->GetData(i));
       if (building->DoesRayHit(m_pos, rayDir, (m_vel * SERVER_ADVANCE_PERIOD).Mag(), &hitPos, &hitNorm))
       {
         LegacyVector3 vel(-m_vel / 15.0f);
@@ -461,11 +461,11 @@ bool Laser::Advance()
       LegacyVector3 rayEnd = m_pos + halfDelta;
       int numFound;
       float maxRadius = halfDelta.Mag() * 2.0f;
-      WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, maxRadius, &numFound, m_fromTeamId);
+      WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, maxRadius, &numFound, m_fromTeamId);
       for (int i = 0; i < numFound; ++i)
       {
         WorldObjectId id = ids[i];
-        WorldObject* wobj = g_app->m_location->GetEntity(id);
+        WorldObject* wobj = g_context->m_location->GetEntity(id);
         auto entity = static_cast<Entity*>(wobj);
 
         if (PointSegDist2D(Vector2(entity->m_pos), Vector2(rayStart), Vector2(rayEnd)) < 10.0f)
@@ -513,7 +513,7 @@ Shockwave::Shockwave(int _teamId, float _size)
     m_size(_size),
     m_life(_size)
 {
-  //    m_shape = g_app->m_resource->GetShapeStatic( "shockwave.shp" );
+  //    m_shape = Resource::GetShapeStatic( "shockwave.shp" );
   m_type = EffectShockwave;
 }
 
@@ -527,14 +527,14 @@ bool Shockwave::Advance()
   int numFound;
   WorldObjectId* ids;
   if (m_teamId != 255)
-    ids = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, radius, &numFound, m_teamId);
+    ids = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, radius, &numFound, m_teamId);
   else
-    ids = g_app->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, radius, &numFound);
+    ids = g_context->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, radius, &numFound);
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    WorldObject* wobj = g_app->m_location->GetEntity(id);
+    WorldObject* wobj = g_context->m_location->GetEntity(id);
     auto ent = static_cast<Entity*>(wobj);
     float distance = (ent->m_pos - m_pos).Mag();
     if (fabs(distance - radius) < 10.0f)
@@ -597,10 +597,10 @@ bool MuzzleFlash::Advance()
 Missile::Missile()
   : WorldObject()
 {
-  m_shape = g_app->m_resource->GetShapeStatic("missile.shp");
+  m_shape = Resource::GetShapeStatic("missile.shp");
   m_booster = m_shape->GetMarkerData("MarkerBooster");
 
-  int rocketResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeRocket);
+  int rocketResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeRocket);
   m_life = 5.0f + rocketResearch * 5.0f;
 }
 
@@ -611,7 +611,7 @@ bool Missile::AdvanceToTargetPosition(const LegacyVector3& _pos)
 
   // Look ahead to see if we're about to hit the ground
   LegacyVector3 forwardPos = m_pos + targetDir * 100.0f;
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(forwardPos.x, forwardPos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(forwardPos.x, forwardPos.z);
   if (forwardPos.y <= landHeight && (forwardPos - _pos).Mag() > 100.0f)
     targetDir = g_upVector;
 
@@ -621,7 +621,7 @@ bool Missile::AdvanceToTargetPosition(const LegacyVector3& _pos)
 
   LegacyVector3 oldPos = m_pos;
   LegacyVector3 newPos = m_pos + actualDir * speed * SERVER_ADVANCE_PERIOD;
-  landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+  landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
   if (newPos.y <= landHeight)
     return true;
 
@@ -675,7 +675,7 @@ bool Missile::Advance()
   return false;
 }
 
-void Missile::Explode() { g_app->m_location->Bang(m_pos, 20.0f, 100.0f); }
+void Missile::Explode() { g_context->m_location->Bang(m_pos, 20.0f, 100.0f); }
 
 // ****************************************************************************
 // Class TurretShell
@@ -702,7 +702,7 @@ bool TurretShell::Advance()
   if (m_life <= 0.0f)
     return true;
 
-  if (m_pos.x < 0 || m_pos.x > g_app->m_location->m_landscape.GetWorldSizeX() || m_pos.z < 0 || m_pos.z > g_app->m_location->m_landscape.
+  if (m_pos.x < 0 || m_pos.x > g_context->m_location->m_landscape.GetWorldSizeX() || m_pos.z < 0 || m_pos.z > g_context->m_location->m_landscape.
     GetWorldSizeZ() || m_pos.y < 0)
   {
     // Outside of world
@@ -715,12 +715,12 @@ bool TurretShell::Advance()
   LegacyVector3 centerPos = (m_pos + oldPos) / 2.0f;
   float radius = (m_pos - oldPos).Mag() / 1.0f;
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(centerPos.x, centerPos.z, radius, &numFound);
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(centerPos.x, centerPos.z, radius, &numFound);
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
     if (entity)
     {
       LegacyVector3 rayDir = m_vel;
@@ -750,11 +750,11 @@ bool TurretShell::Advance()
     LegacyVector3 hitPos(0, 0, 0);
     LegacyVector3 hitNorm(0, 0, 0);
 
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings.GetData(i);
+        Building* building = g_context->m_location->m_buildings.GetData(i);
         if (building->DoesRayHit(m_pos, rayDir, (m_vel * SERVER_ADVANCE_PERIOD).Mag(), &hitPos, &hitNorm))
         {
           for (int p = 0; p < 3; ++p)
@@ -777,13 +777,13 @@ bool TurretShell::Advance()
   //
   // Did we hit the landscape?
 
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
   if (m_pos.y <= landHeight)
   {
     for (int i = 0; i < 3; ++i)
     {
-      LegacyVector3 vel = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+      LegacyVector3 vel = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
       vel *= 50.0f;
       vel.x += sfrand(10.0f);
       vel.y += frand(10.0f);

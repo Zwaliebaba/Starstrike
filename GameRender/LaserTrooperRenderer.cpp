@@ -20,11 +20,11 @@ void LaserTrooperRenderer::Render(const Entity& _entity, const EntityRenderConte
 
     LegacyVector3 predictedPos = trooper.m_pos + trooper.m_vel * _ctx.predictionTime;
     if (trooper.m_onGround && trooper.m_inWater == -1)
-        predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
+        predictedPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
 
     float size = 2.0f;
 
-    LegacyVector3 entityUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
+    LegacyVector3 entityUp = g_context->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
     entityUp.Normalise();
     LegacyVector3 entityFront = trooper.m_front;
     entityFront.RotateAround(trooper.m_angVel * _ctx.predictionTime);
@@ -38,7 +38,7 @@ void LaserTrooperRenderer::Render(const Entity& _entity, const EntityRenderConte
 
     if (!trooper.m_dead)
     {
-        RGBAColour colour = g_app->m_location->m_teams[teamId].m_colour;
+        RGBAColour colour = g_context->m_location->m_teams[teamId].m_colour;
 
         if (trooper.m_reloading > 0.0f)
         {
@@ -79,10 +79,10 @@ void LaserTrooperRenderer::Render(const Entity& _entity, const EntityRenderConte
             LegacyVector3 pos4 = pos1 + LegacyVector3(0.0f, 0.0f, size * 2.0f);
             LegacyVector3 pos3 = pos2 + LegacyVector3(0.0f, 0.0f, size * 2.0f);
 
-            pos1.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
-            pos2.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
-            pos3.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
-            pos4.y = 0.2f + g_app->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
+            pos1.y = 0.2f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos1.x, pos1.z);
+            pos2.y = 0.2f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
+            pos3.y = 0.2f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
+            pos4.y = 0.2f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
 
             glBegin(GL_QUADS);
             glTexCoord2f(0.0f, 0.0f);
@@ -99,7 +99,7 @@ void LaserTrooperRenderer::Render(const Entity& _entity, const EntityRenderConte
         //
         // Draw a line through us if we are side-on with the camera
 
-        float alpha = 1.0f - fabsf(g_app->m_camera->GetFront() * trooper.m_front);
+        float alpha = 1.0f - fabsf(g_context->m_camera->GetFront() * trooper.m_front);
         if (alpha > 0.5f)
         {
             colour.a = 255 * alpha;
@@ -138,7 +138,7 @@ void LaserTrooperRenderer::Render(const Entity& _entity, const EntityRenderConte
             predictedHealth -= 40 * _ctx.predictionTime;
         else
             predictedHealth -= 20 * _ctx.predictionTime;
-        float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
+        float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
 
         for (int i = 0; i < 3; ++i)
         {

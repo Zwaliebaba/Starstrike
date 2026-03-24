@@ -16,8 +16,8 @@ class LoadUserProfileButton : public DarwiniaButton
 
     void MouseUp() override
     {
-      g_app->SetProfileName(m_profileName);
-      g_app->LoadProfile();
+      g_gameApp->SetProfileName(m_profileName);
+      g_gameApp->LoadProfile();
       EclRemoveWindow(m_parent->m_name);
       EclRemoveWindow(LANGUAGEPHRASE("dialog_mainmenu"));
     }
@@ -38,19 +38,19 @@ void UserProfileWindow::Render(bool hasFocus)
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + GetMenuSize(30), GetMenuSize(12), LANGUAGEPHRASE("dialog_currentprofilename"));
-  g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + GetMenuSize(45), GetMenuSize(16), g_app->m_userProfileName);
+  g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + GetMenuSize(45), GetMenuSize(16), g_context->m_userProfileName);
 }
 
 void UserProfileWindow::Create()
 {
   char profileDir[256];
-  snprintf(profileDir, sizeof(profileDir), "%susers/*.*", g_app->GetProfileDirectory());
+  snprintf(profileDir, sizeof(profileDir), "%susers/*.*", g_context->GetProfileDirectory());
   auto profileList = ListSubDirectoryNames(profileDir);
   int numProfiles = profileList.size();
 
   int windowH = 150 + numProfiles * 30;
   SetMenuSize(300, windowH);
-  SetPosition(g_app->m_renderer->ScreenW() / 2 - m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_h / 2);
+  SetPosition(g_context->m_renderer->ScreenW() / 2 - m_w / 2, g_context->m_renderer->ScreenH() / 2 - m_h / 2);
 
   DarwiniaWindow::Create();
 
@@ -111,8 +111,8 @@ class NewProfileButton : public DarwiniaButton
   void MouseUp() override
   {
     auto parent = static_cast<NewUserProfileWindow*>(m_parent);
-    g_app->SetProfileName(parent->s_profileName);
-    g_app->LoadProfile();
+    g_gameApp->SetProfileName(parent->s_profileName);
+    g_gameApp->LoadProfile();
     EclRemoveWindow(m_parent->m_name);
     EclRemoveWindow(LANGUAGEPHRASE("dialog_newprofile"));
     EclRemoveWindow(LANGUAGEPHRASE("dialog_mainmenu"));
@@ -127,7 +127,7 @@ NewUserProfileWindow::NewUserProfileWindow()
 void NewUserProfileWindow::Create()
 {
   SetMenuSize(300, 110);
-  SetPosition(g_app->m_renderer->ScreenW() / 2 - m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_h / 2);
+  SetPosition(g_context->m_renderer->ScreenW() / 2 - m_w / 2, g_context->m_renderer->ScreenH() / 2 - m_h / 2);
 
   DarwiniaWindow::Create();
 

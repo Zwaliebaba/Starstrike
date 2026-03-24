@@ -1,276 +1,247 @@
 #include "pch.h"
-
-#include <math.h>
-
-#include "math_utils.h"
-
-
-
-#include "GameAppSim.h"
-#include "camera.h"
-#include "entity_grid.h"
-#include "obstruction_grid.h"
-#include "location.h"
-#include "team.h"
-#include "global_world.h"
-
-#include "GameSimEventQueue.h"
-
 #include "spirit.h"
-#include "virii.h"
+#include "GameContext.h"
+#include "GameSimEventQueue.h"
+#include "camera.h"
 #include "egg.h"
-
+#include "entity_grid.h"
+#include "global_world.h"
+#include "location.h"
+#include "math_utils.h"
+#include "obstruction_grid.h"
+#include "virii.h"
 
 Spirit::Spirit()
-:   WorldObject(),
+  : WorldObject(),
     m_teamId(255),
-    m_positionOffset(0.0f),
     m_state(StateUnknown),
-    m_eggSearchTimer(0.0f),
     m_numNearbyEggs(0),
-    m_pushFromBuildings(true)
-{
-}
+    m_eggSearchTimer(0.0f),
+    m_positionOffset(0.0f),
+    m_pushFromBuildings(true) {}
 
-Spirit::~Spirit()
-{
-}
+Spirit::~Spirit() {}
 
 void Spirit::Begin()
 {
-    m_timeSync = 6.0f;
-    m_state = StateBirth;
+  m_timeSync = 6.0f;
+  m_state = StateBirth;
 
-    m_positionOffset = syncfrand(10.0f);
-    m_xaxisRate = syncfrand(2.0f);
-    m_yaxisRate = syncfrand(2.0f);
-    m_zaxisRate = syncfrand(2.0f);
+  m_positionOffset = syncfrand(10.0f);
+  m_xaxisRate = syncfrand(2.0f);
+  m_yaxisRate = syncfrand(2.0f);
+  m_zaxisRate = syncfrand(2.0f);
 
-    m_numNearbyEggs = 0;
-    m_eggSearchTimer = 0.0f;
+  m_numNearbyEggs = 0;
+  m_eggSearchTimer = 0.0f;
 
-    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Create"));
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Create"));
 }
 
 bool Spirit::Advance()
 {
-    m_vel *= 0.9f;
+  m_vel *= 0.9f;
 
-    if( m_state != StateAttached &&
-        m_state != StateInEgg )
-    {
-        //
-        // Make me float around slowly
-
-        m_timeSync -= SERVER_ADVANCE_PERIOD;
-        m_positionOffset += SERVER_ADVANCE_PERIOD;
-        m_xaxisRate += syncsfrand(1.0f);
-        m_yaxisRate += syncsfrand(1.0f);
-        m_zaxisRate += syncsfrand(1.0f);
-        if( m_xaxisRate > 2.0f ) m_xaxisRate = 2.0f;
-        if( m_xaxisRate < 0.0f ) m_xaxisRate = 0.0f;
-        if( m_yaxisRate > 2.0f ) m_yaxisRate = 2.0f;
-        if( m_yaxisRate < 0.0f ) m_yaxisRate = 0.0f;
-        if( m_zaxisRate > 2.0f ) m_zaxisRate = 2.0f;
-        if( m_zaxisRate < 0.0f ) m_zaxisRate = 0.0f;
-        m_hover.x = sinf( m_positionOffset ) * m_xaxisRate;
-        m_hover.y = sinf( m_positionOffset ) * m_yaxisRate;
-        m_hover.z = sinf( m_positionOffset ) * m_zaxisRate;
-
-        switch( m_state )
-        {
-            case StateBirth:
-            {
-                m_hover.y = max( m_hover.y, 0.0f + syncfrand(0.5f) );
-                float heightAboveGround = m_pos.y - g_app->m_location->m_landscape.m_heightMap->GetValue( m_pos.x, m_pos.z );
-                if( heightAboveGround > 10.0f )
-                {
-                    float fractionAboveGround = heightAboveGround / 100.0f;
-                    fractionAboveGround = min( fractionAboveGround, 1.0f );
-                    m_hover.y = (-10.0f - syncfrand(10.0f)) * fractionAboveGround;
-                }
-                else if( m_timeSync <= 0.0f )
-                {
-                    m_state = StateFloating;
-                    m_timeSync = 120.0f + syncsfrand(60.0f);
-                }
-                break;
-            }
-
-            case StateFloating:
-                if( m_timeSync <= 0.0f )
-                {
-                    m_state = StateDeath;
-                    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "BeginAscent"));
-                    m_timeSync = 180.0f;
-                    AddToGlobalWorld();
-                }
-                break;
-
-            case StateInStore:
-                break;
-
-            case StateDeath:
-                m_hover.y = max(m_hover.y, 2.0f + syncfrand(2.0f));
-                if( m_timeSync <= 0.0f )
-                {
-                    // We are now dead
-                    return true;
-                }
-                break;
-        };
-    }
-
-    LegacyVector3 oldPos = m_pos;
-
-    if( m_pushFromBuildings &&
-        m_state != StateInStore &&
-        m_state != StateDeath )
-    {
-        PushFromBuildings();
-    }
-
-    m_pos += m_vel * SERVER_ADVANCE_PERIOD;
-    m_pos += m_hover * SERVER_ADVANCE_PERIOD;
-    float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-    float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
-    if( m_pos.x < 0.0f ) m_pos.x = 0.0f;
-    if( m_pos.z < 0.0f ) m_pos.z = 0.0f;
-    if( m_pos.x >= worldSizeX ) m_pos.x = worldSizeX;
-    if( m_pos.z >= worldSizeZ ) m_pos.z = worldSizeZ;
-
-    if( m_state != StateInEgg && m_state != StateDeath )
-    {
-        float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue( m_pos.x, m_pos.z );
-        if( m_pos.y < landHeight + 2.0f ) m_pos.y = landHeight + 2.0f;
-    }
-
-    //m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
-
+  if (m_state != StateAttached && m_state != StateInEgg)
+  {
     //
-    // Update nearby eggs
+    // Make me float around slowly
 
-    if( m_state == StateFloating )
+    m_timeSync -= SERVER_ADVANCE_PERIOD;
+    m_positionOffset += SERVER_ADVANCE_PERIOD;
+    m_xaxisRate += syncsfrand(1.0f);
+    m_yaxisRate += syncsfrand(1.0f);
+    m_zaxisRate += syncsfrand(1.0f);
+    if (m_xaxisRate > 2.0f)
+      m_xaxisRate = 2.0f;
+    if (m_xaxisRate < 0.0f)
+      m_xaxisRate = 0.0f;
+    if (m_yaxisRate > 2.0f)
+      m_yaxisRate = 2.0f;
+    if (m_yaxisRate < 0.0f)
+      m_yaxisRate = 0.0f;
+    if (m_zaxisRate > 2.0f)
+      m_zaxisRate = 2.0f;
+    if (m_zaxisRate < 0.0f)
+      m_zaxisRate = 0.0f;
+    m_hover.x = sinf(m_positionOffset) * m_xaxisRate;
+    m_hover.y = sinf(m_positionOffset) * m_yaxisRate;
+    m_hover.z = sinf(m_positionOffset) * m_zaxisRate;
+
+    switch (m_state)
     {
-        m_eggSearchTimer -= SERVER_ADVANCE_PERIOD;
-
-        if( m_eggSearchTimer <= 0.0f )
+    case StateBirth:
+      {
+        m_hover.y = std::max(m_hover.y, 0.0f + syncfrand(0.5f));
+        float heightAboveGround = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+        if (heightAboveGround > 10.0f)
         {
-            m_eggSearchTimer = 3.0f;
-            m_numNearbyEggs = 0;
-
-            int numNeighbours;
-            WorldObjectId *ids = g_app->m_location->m_entityGrid->GetNeighbours(
-								    m_pos.x, m_pos.z, VIRII_MAXSEARCHRANGE, &numNeighbours );
-
-            for( int i = 0; i < numNeighbours; ++i )
-            {
-                WorldObjectId id = ids[i];
-                Egg *egg = (Egg *) g_app->m_location->GetEntitySafe( id, Entity::TypeEgg );
-                if( egg &&
-                    egg->m_state == Egg::StateDormant &&
-                    egg->m_onGround )
-                {
-                    m_nearbyEggs[ m_numNearbyEggs ] = id;
-                    ++m_numNearbyEggs;
-                    if( m_numNearbyEggs == SPIRIT_MAXNEARBYEGGS )
-                    {
-                        break;
-                    }
-                }
-            }
+          float fractionAboveGround = heightAboveGround / 100.0f;
+          fractionAboveGround = std::min(fractionAboveGround, 1.0f);
+          m_hover.y = (-10.0f - syncfrand(10.0f)) * fractionAboveGround;
         }
+        else if (m_timeSync <= 0.0f)
+        {
+          m_state = StateFloating;
+          m_timeSync = 120.0f + syncsfrand(60.0f);
+        }
+        break;
+      }
+
+    case StateFloating:
+      if (m_timeSync <= 0.0f)
+      {
+        m_state = StateDeath;
+        g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "BeginAscent"));
+        m_timeSync = 180.0f;
+        AddToGlobalWorld();
+      }
+      break;
+
+    case StateInStore:
+      break;
+
+    case StateDeath:
+      m_hover.y = std::max(m_hover.y, 2.0f + syncfrand(2.0f));
+      if (m_timeSync <= 0.0f)
+      {
+        // We are now dead
+        return true;
+      }
+      break;
     }
+  }
 
-    return false;
+  if (m_pushFromBuildings && m_state != StateInStore && m_state != StateDeath)
+    PushFromBuildings();
+
+  m_pos += m_vel * SERVER_ADVANCE_PERIOD;
+  m_pos += m_hover * SERVER_ADVANCE_PERIOD;
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
+  if (m_pos.x < 0.0f)
+    m_pos.x = 0.0f;
+  if (m_pos.z < 0.0f)
+    m_pos.z = 0.0f;
+  if (m_pos.x >= worldSizeX)
+    m_pos.x = worldSizeX;
+  if (m_pos.z >= worldSizeZ)
+    m_pos.z = worldSizeZ;
+
+  if (m_state != StateInEgg && m_state != StateDeath)
+  {
+    float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    if (m_pos.y < landHeight + 2.0f)
+      m_pos.y = landHeight + 2.0f;
+  }
+
+  //m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
+
+  //
+  // Update nearby eggs
+
+  if (m_state == StateFloating)
+  {
+    m_eggSearchTimer -= SERVER_ADVANCE_PERIOD;
+
+    if (m_eggSearchTimer <= 0.0f)
+    {
+      m_eggSearchTimer = 3.0f;
+      m_numNearbyEggs = 0;
+
+      int numNeighbours;
+      WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, VIRII_MAXSEARCHRANGE, &numNeighbours);
+
+      for (int i = 0; i < numNeighbours; ++i)
+      {
+        WorldObjectId id = ids[i];
+        auto egg = static_cast<Egg*>(g_context->m_location->GetEntitySafe(id, Entity::TypeEgg));
+        if (egg && egg->m_state == Egg::StateDormant && egg->m_onGround)
+        {
+          m_nearbyEggs[m_numNearbyEggs] = id;
+          ++m_numNearbyEggs;
+          if (m_numNearbyEggs == SPIRIT_MAXNEARBYEGGS)
+            break;
+        }
+      }
+    }
+  }
+
+  return false;
 }
-
 
 void Spirit::PushFromBuildings()
 {
-    LList<int> *obstructions = g_app->m_location->m_obstructionGrid->GetBuildings( m_pos.x, m_pos.z );
+  LList<int>* obstructions = g_context->m_location->m_obstructionGrid->GetBuildings(m_pos.x, m_pos.z);
 
-    bool hitFound = false;
+  bool hitFound = false;
 
-    for( int i = 0; i < obstructions->Size(); ++i )
+  for (int i = 0; i < obstructions->Size(); ++i)
+  {
+    int buildingId = obstructions->GetData(i);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
+    if (building && building->DoesSphereHit(m_pos, 5.0f))
     {
-        int buildingId = obstructions->GetData(i);
-        Building *building = g_app->m_location->GetBuilding( buildingId );
-        if( building && building->DoesSphereHit( m_pos, 5.0f ) )
-        {
-            hitFound = true;
-            LegacyVector3 hitVector = ( m_pos - building->m_pos );
-            m_vel += hitVector * 0.1f;
-            m_vel.y = 0.0f;
-            float speed = m_vel.Mag();
-            speed = min( speed, 10.0f );
-            m_vel.SetLength( speed );
-        }
+      hitFound = true;
+      LegacyVector3 hitVector = (m_pos - building->m_pos);
+      m_vel += hitVector * 0.1f;
+      m_vel.y = 0.0f;
+      float speed = m_vel.Mag();
+      speed = std::min(speed, 10.0f);
+      m_vel.SetLength(speed);
     }
+  }
 
-    if( !hitFound && m_vel.Mag() < 1.0f )
-    {
-        // Once we have cleared any buildings we are assumed to be safe
-        m_pushFromBuildings = false;
-    }
+  if (!hitFound && m_vel.Mag() < 1.0f)
+  {
+    // Once we have cleared any buildings we are assumed to be safe
+    m_pushFromBuildings = false;
+  }
 }
 
-
-void Spirit::SkipStage()
-{
-    m_timeSync = 0.0f;
-}
-
+void Spirit::SkipStage() { m_timeSync = 0.0f; }
 
 void Spirit::AddToGlobalWorld()
 {
-    int locationId = g_app->m_locationId;
-    GlobalLocation *location = g_app->m_globalWorld->GetLocation( locationId );
-    DEBUG_ASSERT(location);
-    location->AddSpirits(1);
+  int locationId = g_context->m_locationId;
+  GlobalLocation* location = g_context->m_globalWorld->GetLocation(locationId);
+  DEBUG_ASSERT(location);
+  location->AddSpirits(1);
 }
-
 
 void Spirit::CollectorArrives()
 {
-    m_state = StateAttached;
-    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PickedUp"));
+  m_state = StateAttached;
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PickedUp"));
 }
 
 void Spirit::CollectorDrops()
 {
-    m_vel.Zero();
-    m_hover.Zero();
-    m_state = StateFloating;
-    m_pushFromBuildings = true;
-//    Begin();
-    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Dropped"));
+  m_vel.Zero();
+  m_hover.Zero();
+  m_state = StateFloating;
+  m_pushFromBuildings = true;
+  //    Begin();
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "Dropped"));
 }
 
 void Spirit::InEgg()
 {
-    m_state = StateInEgg;
-    m_vel.Zero();
-    m_hover.Zero();
-    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PlacedInEgg"));
+  m_state = StateInEgg;
+  m_vel.Zero();
+  m_hover.Zero();
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "PlacedInEgg"));
 }
 
 void Spirit::EggDestroyed()
 {
-    m_vel.Zero();
-    m_hover.Zero();
-    m_state = StateFloating;
-//    Begin();
-    g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "EggDestroyed"));
+  m_vel.Zero();
+  m_hover.Zero();
+  m_state = StateFloating;
+  //    Begin();
+  g_simEventQueue.Push(SimEvent::MakeSoundOther(m_pos, m_id, SimSoundSource::TypeSpirit, "EggDestroyed"));
 }
 
-int Spirit::NumNearbyEggs()
-{
-    return m_numNearbyEggs;
-}
+int Spirit::NumNearbyEggs() { return m_numNearbyEggs; }
 
-WorldObjectId *Spirit::GetNearbyEggs()
-{
-    return m_nearbyEggs;
-}
-
+WorldObjectId* Spirit::GetNearbyEggs() { return m_nearbyEggs; }

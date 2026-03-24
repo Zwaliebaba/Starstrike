@@ -16,7 +16,7 @@ void GunTurretBuildingRenderer::Render(const Building& _building, const Building
     auto& turret = static_cast<const GunTurret&>(_building);
 
     LegacyVector3 turretFront = turret.m_turretFront;
-    if (g_app->m_editing)
+    if (g_context->m_editing)
         turretFront = turret.m_front;
 
     Matrix34 turretPos(turretFront, g_upVector, turret.m_pos);
@@ -37,7 +37,7 @@ void GunTurretBuildingRenderer::RenderPorts(const Building& _building)
 
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -53,8 +53,8 @@ void GunTurretBuildingRenderer::RenderPorts(const Building& _building)
         // Render the status light
 
         float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
+        LegacyVector3 camR = g_context->m_camera->GetRight() * size;
+        LegacyVector3 camU = g_context->m_camera->GetUp() * size;
 
         LegacyVector3 statusPos = worldMat.pos;
 
@@ -63,7 +63,7 @@ void GunTurretBuildingRenderer::RenderPorts(const Building& _building)
             glColor4ub(150, 150, 150, 255);
         else
         {
-            RGBAColour teamColour = g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
+            RGBAColour teamColour = g_context->m_location->m_teams[occupantId.GetTeamId()].m_colour;
             glColor4ubv(teamColour.GetData());
         }
 

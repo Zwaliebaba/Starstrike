@@ -35,8 +35,8 @@ class SkipPrologueButton : public DarwiniaButton
       EclRemoveWindow(w->m_name);
     }
 
-    g_app->m_script->Skip();
-    g_app->LoadCampaign();
+    g_context->m_script->Skip();
+    g_gameApp->LoadCampaign();
   }
 };
 
@@ -51,8 +51,8 @@ class PlayPrologueButton : public DarwiniaButton
       EclRemoveWindow(w->m_name);
     }
 
-    g_app->m_script->Skip();
-    g_app->LoadPrologue();
+    g_context->m_script->Skip();
+    g_gameApp->LoadPrologue();
   }
 };
 
@@ -144,8 +144,8 @@ class KeybindingsOptionsButton : public DarwiniaButton
 MainMenuWindow::MainMenuWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_mainmenu"))
 {
-  int screenW = g_app->m_renderer->ScreenW();
-  int screenH = g_app->m_renderer->ScreenH();
+  int screenW = g_context->m_renderer->ScreenW();
+  int screenH = g_context->m_renderer->ScreenH();
 
   SetMenuSize(220, 260);
   SetPosition(screenW / 2.0f - m_w / 2.0f, screenH / 2.0f - m_h / 2.0f);
@@ -160,8 +160,8 @@ void MainMenuWindow::Render(bool _hasFocus) { DarwiniaWindow::Render(_hasFocus);
 OptionsMenuWindow::OptionsMenuWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_options"))
 {
-  int screenW = g_app->m_renderer->ScreenW();
-  int screenH = g_app->m_renderer->ScreenH();
+  int screenW = g_context->m_renderer->ScreenW();
+  int screenH = g_context->m_renderer->ScreenH();
 
   SetMenuSize(240, 230);
   //    SetPosition( screenW/2.0f - m_w/2.0f,
@@ -234,15 +234,15 @@ class ExitLevelButton : public DarwiniaButton
   void MouseUp() override
   {
     EclRemoveWindow(m_parent->m_name);
-    g_app->m_requestedLocationId = -1;
+    g_context->m_requestedLocationId = -1;
   }
 };
 
 LocationWindow::LocationWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_locationmenu"))
 {
-  int screenW = g_app->m_renderer->ScreenW();
-  int screenH = g_app->m_renderer->ScreenH();
+  int screenW = g_context->m_renderer->ScreenW();
+  int screenH = g_context->m_renderer->ScreenH();
 
   SetMenuSize(200, 220);
   SetPosition(screenW / 2.0f - m_w / 2.0f, screenH / 2.0f - m_h / 2.0f);
@@ -261,7 +261,7 @@ void LocationWindow::Create()
 
   int gap = border;
 
-  GlobalLocation* loc = g_app->m_globalWorld->GetLocation(g_app->m_locationId);
+  GlobalLocation* loc = g_context->m_globalWorld->GetLocation(g_context->m_locationId);
 
   // Full game menu
 
@@ -276,7 +276,7 @@ void LocationWindow::Create()
     gap = h;
   }
 
-  if (g_app->m_gameMode == GameApp::GameModePrologue)
+  if (g_context->m_gameMode == GameContext::GameModePrologue)
   {
     auto exit = new GameExitButton();
     exit->SetShortProperties(LANGUAGEPHRASE("dialog_leavedarwinia"), border, y += h, buttonW, buttonH);
@@ -302,7 +302,7 @@ void LocationWindow::Create()
   RegisterButton(options);
   m_buttonOrder.PutData(options);
 
-  if (g_app->m_gameMode == GameApp::GameModePrologue)
+  if (g_context->m_gameMode == GameContext::GameModePrologue)
   {
     auto skip = new SkipPrologueWindowButton();
     skip->SetShortProperties(LANGUAGEPHRASE("dialog_skipprologue"), border, y += h, buttonW, buttonH);
@@ -329,7 +329,7 @@ class ResetLocationButton : public DarwiniaButton
     EclRemoveWindow(m_parent->m_name);
     EclRemoveWindow(LANGUAGEPHRASE("dialog_locationmenu"));
 
-g_app->ResetLevel(g_app->m_gameMode == GameApp::GameModePrologue);
+g_gameApp->ResetLevel(g_context->m_gameMode == GameContext::GameModePrologue);
   }
 };
 
@@ -461,7 +461,7 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
   DarwiniaWindow::Render(_hasFocus);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/darwinian.bmp"));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -529,7 +529,7 @@ void SkipPrologueWindow::Render(bool _hasFocus)
   DarwiniaWindow::Render(_hasFocus);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/campaign.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/campaign.bmp"));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -597,7 +597,7 @@ void PlayPrologueWindow::Render(bool _hasFocus)
   DarwiniaWindow::Render(_hasFocus);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/prologue.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/prologue.bmp"));
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

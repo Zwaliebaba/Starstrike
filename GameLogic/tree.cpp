@@ -9,7 +9,7 @@
 #include "tree.h"
 #include "render_backend_interface.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "globals.h"
 #include "location.h"
 
@@ -63,7 +63,7 @@ void Tree::SetDetail(int _detail)
     m_iterations = 0;
   else
     m_iterations -= (_detail - 1);
-  m_iterations = max(m_iterations, 3);
+  m_iterations = std::max(m_iterations, 3);
 
   Generate();
 
@@ -123,11 +123,11 @@ bool Tree::Advance()
     //
     // Spread to nearby trees
 
-    for (int b = 0; b < g_app->m_location->m_buildings.Size(); ++b)
+    for (int b = 0; b < g_context->m_location->m_buildings.Size(); ++b)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(b))
+      if (g_context->m_location->m_buildings.ValidIndex(b))
       {
-        Building* building = g_app->m_location->m_buildings[b];
+        Building* building = g_context->m_location->m_buildings[b];
         if (building != this && building->m_type == TypeTree)
         {
           auto tree = static_cast<Tree*>(building);
@@ -216,7 +216,7 @@ void Tree::Generate()
   {
     int alpha = m_leafColourArray[3];
     alpha *= pow(1.3f, treeDetail);
-    alpha = min(alpha, 255);
+    alpha = std::min(alpha, 255);
     m_leafColourArray[3] = alpha;
   }
 

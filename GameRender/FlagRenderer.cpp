@@ -11,7 +11,7 @@
 
 void FlagRenderer::Render(Flag& _flag)
 {
-    START_PROFILE( g_app->m_profiler, "RenderFlag" );
+    START_PROFILE( g_context->m_profiler, "RenderFlag" );
 
     //
     // Advance the flag
@@ -64,7 +64,7 @@ void FlagRenderer::Render(Flag& _flag)
     glDisable       ( GL_CULL_FACE );
     glDisable       ( GL_TEXTURE_2D );
 
-    LegacyVector3 right = _flag.m_up ^ ( g_app->m_camera->GetFront() );
+    LegacyVector3 right = _flag.m_up ^ ( g_context->m_camera->GetFront() );
     right.SetLength( 0.2f );
 
     glBegin( GL_QUADS );
@@ -107,7 +107,7 @@ void FlagRenderer::Render(Flag& _flag)
     glDisable       ( GL_TEXTURE_2D );
     glEnable        ( GL_CULL_FACE );
 
-    END_PROFILE( g_app->m_profiler, "RenderFlag" );
+    END_PROFILE( g_context->m_profiler, "RenderFlag" );
 }
 
 

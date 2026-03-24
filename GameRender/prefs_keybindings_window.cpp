@@ -89,12 +89,12 @@ class ApplyKeybindingsButton : public DarwiniaButton
     g_prefsManager->SetInt(CONTROL_MOUSEBUTTONS, parent->m_numMouseButtons);
     g_prefsManager->SetInt(CONTROL_METHOD, parent->m_controlMethod);
 
-    delete g_app->m_taskManagerInterface;
-    g_app->m_taskManagerInterface = new TaskManagerInterfaceIcons();
+    delete g_context->m_taskManagerInterface;
+    g_context->m_taskManagerInterface = new TaskManagerInterfaceIcons();
     g_prefsManager->Save();
     prefsMan.Save();
 
-    g_app->m_langTable->RebuildTables();
+    g_context->m_langTable->RebuildTables();
   }
 };
 
@@ -175,7 +175,7 @@ PrefsKeybindingsWindow::PrefsKeybindingsWindow()
   }
 
   SetMenuSize(460, 125 + 25 * i);
-  SetPosition(g_app->m_renderer->ScreenW() / 2 - m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_h / 2);
+  SetPosition(g_context->m_renderer->ScreenW() / 2 - m_w / 2, g_context->m_renderer->ScreenH() / 2 - m_h / 2);
 
   m_numMouseButtons = g_prefsManager->GetInt(CONTROL_MOUSEBUTTONS, 3);
   m_controlMethod = g_prefsManager->GetInt(CONTROL_METHOD);

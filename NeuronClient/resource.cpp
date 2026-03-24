@@ -11,17 +11,6 @@
 #include "sound_stream_decoder.h"
 #include "GameApp.h"
 #include "location.h"
-#include "renderer.h"
-
-Resource::Resource()
-  : m_nameSeed(1) {}
-
-Resource::~Resource()
-{
-  FlushOpenGlState();
-  m_bitmaps.EmptyAndDelete();
-  m_shapes.EmptyAndDelete();
-}
 
 void Resource::AddBitmap(const char* _name, const BitmapRGBA& _bmp, bool _mipMapping)
 {
@@ -286,8 +275,8 @@ void Resource::FlushOpenGlState()
   // Forget all the texture handles
   m_textures.Empty();
 
-  if (g_app->m_location)
-    g_app->m_location->FlushOpenGlState();
+  if (g_context->m_location)
+    g_context->m_location->FlushOpenGlState();
 }
 
 void Resource::RegenerateOpenGlState()
@@ -297,8 +286,8 @@ void Resource::RegenerateOpenGlState()
   g_gameFont.BuildOpenGlState();
 
   // Tell the location
-  if (g_app->m_location)
-    g_app->m_location->RegenerateOpenGlState();
+  if (g_context->m_location)
+    g_context->m_location->RegenerateOpenGlState();
 }
 
 char* Resource::GenerateName()

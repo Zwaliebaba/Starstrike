@@ -48,7 +48,7 @@ Unit::Unit(int troopType, int teamId, int unitId, int numEntities, LegacyVector3
 
 Unit::~Unit()
 {
-	Team *myTeam = &g_app->m_location->m_teams[m_teamId];
+	Team *myTeam = &g_context->m_location->m_teams[m_teamId];
 	if (myTeam->m_currentUnitId == m_unitId)
 	{
 		myTeam->m_currentUnitId = -1;
@@ -83,7 +83,7 @@ void Unit::RemoveEntity( int _index, float _posX, float _posZ )
 
 		WorldObjectId myId( m_teamId, m_unitId, _index, entity->m_id.GetUniqueId() );
 
-		g_app->m_location->m_entityGrid->RemoveObject( myId, _posX, _posZ, entity->m_radius );
+		g_context->m_location->m_entityGrid->RemoveObject( myId, _posX, _posZ, entity->m_radius );
 
 		m_entities.MarkNotUsed( _index );
         delete entity;
@@ -105,9 +105,9 @@ void Unit::AdvanceEntities(int _slice)
             {
                 LegacyVector3 oldPos( s->m_pos );
 
-                START_PROFILE( g_app->m_profiler, Entity::GetTypeName( s->m_type ) );
+                START_PROFILE( g_context->m_profiler, Entity::GetTypeName( s->m_type ) );
                 bool amIdead = s->Advance( this );
-                END_PROFILE( g_app->m_profiler, Entity::GetTypeName( s->m_type ) );
+                END_PROFILE( g_context->m_profiler, Entity::GetTypeName( s->m_type ) );
 
                 if( amIdead )
                 {
@@ -116,7 +116,7 @@ void Unit::AdvanceEntities(int _slice)
                 else
                 {
 					WorldObjectId myId( m_teamId, m_unitId, i, s->m_id.GetUniqueId() );
-                    g_app->m_location->m_entityGrid->UpdateObject( myId, oldPos.x, oldPos.z, s->m_pos.x, s->m_pos.z, s->m_radius );
+                    g_context->m_location->m_entityGrid->UpdateObject( myId, oldPos.x, oldPos.z, s->m_pos.x, s->m_pos.z, s->m_radius );
                 }
             }
         }
@@ -126,7 +126,7 @@ void Unit::AdvanceEntities(int _slice)
 
 bool Unit::IsInView()
 {
-    return( g_app->m_camera->SphereInViewFrustum( m_centerPos, m_radius ) );
+    return( g_context->m_camera->SphereInViewFrustum( m_centerPos, m_radius ) );
 }
 
 
@@ -225,7 +225,7 @@ bool Unit::Advance( int _slice )
                     float amountToMove = leadDistance;
                     if( amountToMove > distance ) amountToMove = distance;
                     pos += desiredDirection * amountToMove;
-                    pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue( pos.x, pos.z );
+                    pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue( pos.x, pos.z );
                     pos = l->PushFromObstructions( pos );
                     //pos = l->PushFromEachOther( pos );
 
@@ -293,7 +293,7 @@ void Unit::Attack( LegacyVector3 pos, bool _withGrenade )
 
         if( nearestEnt )
         {
-            g_app->m_location->ThrowWeapon( nearestEnt->m_pos, pos, WorldObject::EffectThrowableGrenade, m_teamId );
+            g_context->m_location->ThrowWeapon( nearestEnt->m_pos, pos, WorldObject::EffectThrowableGrenade, m_teamId );
         }
 	}
 
@@ -499,7 +499,7 @@ void Unit::RecalculateOffsets()
 void Unit::FollowRoute()
 {
 	DEBUG_ASSERT(m_routeId != -1);
-	Route *route = g_app->m_location->m_levelFile->GetRoute(m_routeId);
+	Route *route = g_context->m_location->m_levelFile->GetRoute(m_routeId);
 	DEBUG_ASSERT(route);
 
 	if (m_routeWayPointId == -1)

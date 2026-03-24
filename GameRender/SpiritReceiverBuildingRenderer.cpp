@@ -19,10 +19,10 @@ void SpiritReceiverBuildingRenderer::Render(const Building& _building,
 
     // Editor: update orientation from landscape normal (mutates sim state —
     // editor-only, matches legacy behaviour).
-    if (g_app->m_editing)
+    if (g_context->m_editing)
     {
         auto& mut = const_cast<SpiritReceiver&>(receiver);
-        mut.m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(
+        mut.m_up = g_context->m_location->m_landscape.m_normalMap->GetValue(
             receiver.m_pos.x, receiver.m_pos.z);
         LegacyVector3 right(1, 0, 0);
         mut.m_front = right ^ mut.m_up;
@@ -51,7 +51,7 @@ void SpiritReceiverBuildingRenderer::RenderPorts(const Building& _building)
 
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -63,8 +63,8 @@ void SpiritReceiverBuildingRenderer::RenderPorts(const Building& _building)
         Matrix34 worldMat = receiver.m_shape->GetMarkerWorldMatrix(receiver.m_statusMarkers[i], rootMat);
 
         float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
+        LegacyVector3 camR = g_context->m_camera->GetRight() * size;
+        LegacyVector3 camU = g_context->m_camera->GetUp() * size;
 
         LegacyVector3 statusPos = worldMat.pos;
 

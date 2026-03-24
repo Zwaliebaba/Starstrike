@@ -20,7 +20,7 @@ CachedSample::CachedSample(char const *_sampleName)
     char fullPath[512] = "sounds/";
 	strncat(fullPath, _sampleName, sizeof(fullPath) - strlen(fullPath) - 1);
 
-	m_soundStreamDecoder = g_app->m_resource->GetSoundStreamDecoder(fullPath);
+	m_soundStreamDecoder = Resource::GetSoundStreamDecoder(fullPath);
     ASSERT_TEXT( m_soundStreamDecoder, "Failed to open sound stream decoder : %s", fullPath );
 
 	m_numChannels = m_soundStreamDecoder->m_numChannels;

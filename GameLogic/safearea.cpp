@@ -4,7 +4,7 @@
 #include "hi_res_time.h"
 #include "language_table.h"
 #include "safearea.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "team.h"
 #include "entity_grid.h"
@@ -35,23 +35,23 @@ bool SafeArea::Advance()
   //
   // Is the world awake yet ?
 
-  if (!g_app->m_location)
+  if (!g_context->m_location)
     return false;
-  if (!g_app->m_location->m_teams)
+  if (!g_context->m_location->m_teams)
     return false;
-  if (g_app->m_location->m_teams[m_id.GetTeamId()].m_teamType == Team::TeamTypeUnused)
+  if (g_context->m_location->m_teams[m_id.GetTeamId()].m_teamType == Team::TeamTypeUnused)
     return false;
 
   if (GetHighResTime() > m_recountTimer)
   {
     int numFound;
-    WorldObjectId* ids = g_app->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, m_size, &numFound, m_id.GetTeamId());
+    WorldObjectId* ids = g_context->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, m_size, &numFound, m_id.GetTeamId());
     m_entitiesCounted = 0;
 
     for (int i = 0; i < numFound; ++i)
     {
       WorldObjectId id = ids[i];
-      Entity* entity = g_app->m_location->GetEntity(id);
+      Entity* entity = g_context->m_location->GetEntity(id);
       if (entity && entity->m_type == m_entityTypeRequired && !entity->m_dead)
         ++m_entitiesCounted;
     }
@@ -61,11 +61,11 @@ bool SafeArea::Advance()
     if ((m_id.GetTeamId() == 1 && m_entitiesCounted <= m_entitiesRequired) || (m_id.GetTeamId() != 1 && m_entitiesCounted >=
       m_entitiesRequired))
     {
-      GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+      GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
       if (gb && !gb->m_online)
       {
         gb->m_online = true;
-        g_app->m_globalWorld->EvaluateEvents();
+        g_context->m_globalWorld->EvaluateEvents();
       }
     }
   }
@@ -80,7 +80,7 @@ bool SafeArea::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return f
 bool SafeArea::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                           LegacyVector3* _norm)
 {
-  if (g_app->m_editing)
+  if (g_context->m_editing)
     return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, _norm);
   return false;
 }

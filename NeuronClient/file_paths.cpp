@@ -20,7 +20,7 @@ typedef std::map<int,string>::const_iterator localeIt;
 
 void readLocaleNames()
 {
-	TextReader *reader = g_app->m_resource->GetTextReader( INPUT_DATA_DIR + "locales.txt" );
+	TextReader *reader = Resource::GetTextReader( INPUT_DATA_DIR + "locales.txt" );
 	if ( reader && reader->IsOpen() ) {
 		while ( reader->ReadLine() ) {
 			char *k = reader->GetNextToken();
@@ -72,7 +72,7 @@ const string & InputPrefs::GetUserPrefsPath()
 	static string path = "";
 
 	if ( path == "" ) {
-		path = GameApp::GetProfileDirectory();
+		path = GameContext::GetProfileDirectory();
 		path.append( USER_INPUT_PREFS_FILE );
 	}
 

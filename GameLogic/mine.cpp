@@ -7,7 +7,7 @@
 #include "hi_res_time.h"
 #include "preferences.h"
 #include "language_table.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "global_world.h"
 #include "location.h"
@@ -44,16 +44,16 @@ MineBuilding::MineBuilding()
 {
   if (!s_cartShape)
   {
-    s_wheelShape = g_app->m_resource->GetShapeStatic("wheel.shp");
-    s_cartShape = g_app->m_resource->GetShapeStatic("minecart.shp");
+    s_wheelShape = Resource::GetShapeStatic("wheel.shp");
+    s_cartShape = Resource::GetShapeStatic("minecart.shp");
     s_cartMarker1 = s_cartShape->GetMarkerData("MarkerTrack1");
     s_cartMarker2 = s_cartShape->GetMarkerData("MarkerTrack2");
     s_cartContents[0] = s_cartShape->GetMarkerData("MarkerContents1");
     s_cartContents[1] = s_cartShape->GetMarkerData("MarkerContents2");
     s_cartContents[2] = s_cartShape->GetMarkerData("MarkerContents3");
 
-    s_polygon1 = g_app->m_resource->GetShapeStatic("minepolygon1.shp");
-    s_primitive1 = g_app->m_resource->GetShapeStatic("mineprimitive1.shp");
+    s_polygon1 = Resource::GetShapeStatic("minepolygon1.shp");
+    s_primitive1 = Resource::GetShapeStatic("mineprimitive1.shp");
   }
 }
 
@@ -79,14 +79,14 @@ void MineBuilding::Initialise(Building* _template)
 
 bool MineBuilding::IsInView()
 {
-  Building* trackLink = g_app->m_location->GetBuilding(m_trackLink);
+  Building* trackLink = g_context->m_location->GetBuilding(m_trackLink);
   if (trackLink)
   {
     LegacyVector3 midPoint = (trackLink->m_centerPos + m_centerPos) / 2.0f;
     float radius = (trackLink->m_centerPos - m_centerPos).Mag() / 2.0f;
     radius += m_radius;
 
-    if (g_app->m_camera->SphereInViewFrustum(midPoint, radius))
+    if (g_context->m_camera->SphereInViewFrustum(midPoint, radius))
       return true;
   }
 
@@ -113,7 +113,7 @@ bool MineBuilding::Advance()
         m_carts.RemoveData(i);
         --i;
 
-        Building* trackLink = g_app->m_location->GetBuilding(m_trackLink);
+        Building* trackLink = g_context->m_location->GetBuilding(m_trackLink);
         if (trackLink)
         {
           auto mineBuilding = static_cast<MineBuilding*>(trackLink);
@@ -139,7 +139,7 @@ void MineBuilding::TriggerCart(MineCart* _cart, float _initValue)
 
 LegacyVector3 MineBuilding::GetTrackMarker1()
 {
-  if (!m_trackMarker1 || g_app->m_editing)
+  if (!m_trackMarker1 || g_context->m_editing)
   {
     m_trackMarker1 = m_shape->GetMarkerData("MarkerTrack1");
     DEBUG_ASSERT(m_trackMarker1);
@@ -152,7 +152,7 @@ LegacyVector3 MineBuilding::GetTrackMarker1()
 
 LegacyVector3 MineBuilding::GetTrackMarker2()
 {
-  if (!m_trackMarker2 || g_app->m_editing)
+  if (!m_trackMarker2 || g_context->m_editing)
   {
     m_trackMarker2 = m_shape->GetMarkerData("MarkerTrack2");
     DEBUG_ASSERT(m_trackMarker2);
@@ -193,11 +193,11 @@ float MineBuilding::RefinerySpeed()
     int numFuelGenerators = 0;
     float fuelGeneratorFactor = 0.0f;
 
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings[i];
+        Building* building = g_context->m_location->m_buildings[i];
         if (building->m_type == TypeRefinery || building->m_type == TypeYard)
         {
           driver = building;
@@ -222,15 +222,15 @@ float MineBuilding::RefinerySpeed()
       s_refineryPopulation = fuelGeneratorFactor / static_cast<float>(numFuelGenerators);
     else
     {
-      int mineLocationId = g_app->m_globalWorld->GetLocationId("mine");
+      int mineLocationId = g_context->m_globalWorld->GetLocationId("mine");
       s_refineryPopulation = 0.0f;
 
       GlobalBuilding* globalRefinery = nullptr;
-      for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
+      for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
       {
-        if (g_app->m_globalWorld->m_buildings.ValidIndex(i))
+        if (g_context->m_globalWorld->m_buildings.ValidIndex(i))
         {
-          GlobalBuilding* gb = g_app->m_globalWorld->m_buildings[i];
+          GlobalBuilding* gb = g_context->m_globalWorld->m_buildings[i];
           if (gb && gb->m_locationId == mineLocationId && gb->m_type == TypeRefinery && gb->m_online)
           {
             s_refineryPopulation = 1.0f;
@@ -270,7 +270,7 @@ TrackLink::TrackLink()
   : MineBuilding()
 {
   m_type = TypeTrackLink;
-  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
+  SetShape(Resource::GetShapeStatic("tracklink.shp"));
 }
 
 bool TrackLink::Advance() { return MineBuilding::Advance(); }
@@ -283,7 +283,7 @@ TrackJunction::TrackJunction()
   : MineBuilding()
 {
   m_type = TypeTrackJunction;
-  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
+  SetShape(Resource::GetShapeStatic("tracklink.shp"));
 }
 
 void TrackJunction::Initialise(Building* _template)
@@ -304,7 +304,7 @@ void TrackJunction::TriggerCart(MineCart* _cart, float _initValue)
   {
     int chosenLink = syncrand() % m_trackLinks.Size();
     int buildingId = m_trackLinks[chosenLink];
-    Building* linkBuilding = g_app->m_location->GetBuilding(buildingId);
+    Building* linkBuilding = g_context->m_location->GetBuilding(buildingId);
     if (linkBuilding)
     {
       auto mine = static_cast<MineBuilding*>(linkBuilding);
@@ -343,7 +343,7 @@ TrackStart::TrackStart()
     m_reqBuildingId(-1)
 {
   m_type = TypeTrackStart;
-  SetShape(g_app->m_resource->GetShapeStatic("tracklink.shp"));
+  SetShape(Resource::GetShapeStatic("tracklink.shp"));
 }
 
 void TrackStart::Initialise(Building* _template)
@@ -359,7 +359,7 @@ bool TrackStart::Advance()
   // Is our required building online yet?
   // Fill carts with primitives when they reach 50%
 
-  GlobalBuilding* globalBuilding = g_app->m_globalWorld->GetBuilding(m_reqBuildingId, g_app->m_locationId);
+  GlobalBuilding* globalBuilding = g_context->m_globalWorld->GetBuilding(m_reqBuildingId, g_context->m_locationId);
 
   if (globalBuilding && globalBuilding->m_online)
   {
@@ -414,7 +414,7 @@ TrackEnd::TrackEnd()
     m_reqBuildingId(-1)
 {
   m_type = TypeTrackEnd;
-  SetShape(g_app->m_resource->GetShapeStatic("trackLink.shp"));
+  SetShape(Resource::GetShapeStatic("trackLink.shp"));
 }
 
 void TrackEnd::Initialise(Building* _template)
@@ -430,8 +430,8 @@ bool TrackEnd::Advance()
   // Is our required building online yet?
   // Empty carts of primitives when they reach 50%
 
-  //GlobalBuilding *globalBuilding = g_app->m_globalWorld->GetBuilding( m_reqBuildingId, g_app->m_locationId );
-  Building* building = g_app->m_location->GetBuilding(m_reqBuildingId);
+  //GlobalBuilding *globalBuilding = g_context->m_globalWorld->GetBuilding( m_reqBuildingId, g_context->m_locationId );
+  Building* building = g_context->m_location->GetBuilding(m_reqBuildingId);
 
   bool online = false;
   if (building->m_type == TypeTrunkPort && static_cast<TrunkPort*>(building)->m_openTimer > 0.0f)
@@ -500,7 +500,7 @@ Refinery::Refinery()
     m_counter1(nullptr)
 {
   m_type = TypeRefinery;
-  SetShape(g_app->m_resource->GetShapeStatic("refinery.shp"));
+  SetShape(Resource::GetShapeStatic("refinery.shp"));
 
   m_wheel1 = m_shape->GetMarkerData("MarkerWheel01");
   m_wheel2 = m_shape->GetMarkerData("MarkerWheel02");
@@ -511,7 +511,7 @@ Refinery::Refinery()
 
 const char* Refinery::GetObjectiveCounter()
 {
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
   int numRefined = 0;
   if (gb)
     numRefined = gb->m_link;
@@ -523,7 +523,7 @@ const char* Refinery::GetObjectiveCounter()
 
 bool Refinery::Advance()
 {
-  GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+  GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
 
   if (gb && gb->m_link == -1)
   {
@@ -536,7 +536,7 @@ bool Refinery::Advance()
     if (!gb->m_online)
     {
       gb->m_online = true;
-      g_app->m_globalWorld->EvaluateEvents();
+      g_context->m_globalWorld->EvaluateEvents();
     }
   }
 
@@ -567,7 +567,7 @@ void Refinery::TriggerCart(MineCart* _cart, float _initValue)
     int primIndex = syncrand() % 3;
     _cart->m_primitives[primIndex] = true;
 
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
 
     if (gb)
       gb->m_link++;
@@ -586,7 +586,7 @@ Mine::Mine()
     m_wheel2(nullptr)
 {
   m_type = TypeMine;
-  SetShape(g_app->m_resource->GetShapeStatic("mine.shp"));
+  SetShape(Resource::GetShapeStatic("mine.shp"));
 
   m_wheel1 = m_shape->GetMarkerData("MarkerWheel01");
   m_wheel2 = m_shape->GetMarkerData("MarkerWheel02");

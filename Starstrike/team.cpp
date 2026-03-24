@@ -1,34 +1,29 @@
 #include "pch.h"
-#include "math_utils.h"
-#include "profiler.h"
-#include "resource.h"
-
-#include "ShapeStatic.h"
-#include "preferences.h"
-
-#include "bitmap.h"
-#include "binary_stream_readers.h"
-#include "soundsystem.h"
-#include "GameApp.h"
-#include "camera.h"
-#include "location.h"
-#include "global_world.h"
-#include "main.h"
-#include "entity_grid.h"
-#include "renderer.h"
 #include "team.h"
-#include "unit.h"
 #include "EntityRenderRegistry.h"
 #include "EntityRenderer.h"
-#include "user_input.h"
-#include "gamecursor.h"
-#include "taskmanager.h"
-#include "entity.h"
-#include "insertion_squad.h"
-#include "virii.h"
+#include "GameApp.h"
 #include "airstrike.h"
+#include "binary_stream_readers.h"
+#include "bitmap.h"
+#include "camera.h"
+#include "entity.h"
+#include "entity_grid.h"
+#include "gamecursor.h"
+#include "global_world.h"
+#include "insertion_squad.h"
+#include "location.h"
+#include "main.h"
+#include "preferences.h"
+#include "profiler.h"
+#include "renderer.h"
+#include "resource.h"
+#include "soundsystem.h"
+#include "taskmanager.h"
+#include "unit.h"
+#include "user_input.h"
+#include "virii.h"
 #include "worldobject.h"
-#include "darwinian.h"
 
 // ****************************************************************************
 //  Class Team
@@ -54,9 +49,9 @@ void Team::Initialise(int _teamId)
   //
   // Generate the ViriiFull bmp
 
-  if (!g_app->m_resource->DoesTextureExist("sprites/viriifull.bmp"))
+  if (!Resource::DoesTextureExist("sprites/viriifull.bmp"))
   {
-    BinaryReader* reader = g_app->m_resource->GetBinaryReader("sprites/virii.bmp");
+    BinaryReader* reader = Resource::GetBinaryReader("sprites/virii.bmp");
     BitmapRGBA little(reader, "bmp");
     delete reader;
     BitmapRGBA big(32 + 128, 512);
@@ -77,12 +72,12 @@ void Team::Initialise(int _teamId)
       }
     }
 
-    reader = g_app->m_resource->GetBinaryReader("textures/glow.bmp");
+    reader = Resource::GetBinaryReader("textures/glow.bmp");
     BitmapRGBA glow(reader, "bmp");
     delete reader;
     big.Blit(0, 0, 128, 128, &glow, 32, 0, 128, 128, true);
 
-    g_app->m_resource->AddBitmap("sprites/viriifull.bmp", big, true);
+    Resource::AddBitmap("sprites/viriifull.bmp", big, true);
   }
 }
 
@@ -109,33 +104,33 @@ void Team::SelectUnit(int _unitId, int _entityId, int _buildingId)
   m_currentUnitId = _unitId;
   m_currentEntityId = _entityId;
 
-  if (m_teamId == g_app->m_globalWorld->m_myTeamId)
-    g_app->m_gameCursor->BoostSelectionArrows(2.0f);
+  if (m_teamId == g_context->m_globalWorld->m_myTeamId)
+    g_context->m_gameCursor->BoostSelectionArrows(2.0f);
 
   if (m_currentUnitId == -1 && m_currentBuildingId == -1 && m_others.ValidIndex(m_currentEntityId))
   {
     Entity* entity = m_others[m_currentEntityId];
     if (entity && entity->m_type == Entity::TypeOfficer)
-      g_app->m_taskManager->SelectTask(-1);
+      g_context->m_taskManager->SelectTask(-1);
   }
 
   if (_unitId == -1 && _entityId == -1 && _buildingId == -1)
-    g_app->m_soundSystem->TriggerOtherEvent(nullptr, "TaskManagerDeselectTask", SoundSourceBlueprint::TypeInterface);
+    g_context->m_soundSystem->TriggerOtherEvent(nullptr, "TaskManagerDeselectTask", SoundSourceBlueprint::TypeInterface);
   else
-    g_app->m_soundSystem->TriggerOtherEvent(nullptr, "TaskManagerSelectTask", SoundSourceBlueprint::TypeInterface);
+    g_context->m_soundSystem->TriggerOtherEvent(nullptr, "TaskManagerSelectTask", SoundSourceBlueprint::TypeInterface);
 
-  //    if( m_teamId == g_app->m_globalWorld->m_myTeamId )
+  //    if( m_teamId == g_context->m_globalWorld->m_myTeamId )
   //    {
   //        LegacyVector3 worldpos;
   //        if( m_units.ValidIndex(_unitId) )
   //        {
   //            Unit *unit = m_units[_unitId];
-  //            worldpos = unit->m_centerPos - g_app->m_camera->GetFront() * 200.0f;
+  //            worldpos = unit->m_centerPos - g_context->m_camera->GetFront() * 200.0f;
   //        }
   //        else if( m_others.ValidIndex(_entityId) )
   //        {
   //            Entity *entity = m_others[_entityId];
-  //            worldpos = entity->m_pos - g_app->m_camera->GetFront() * 200.0f;
+  //            worldpos = entity->m_pos - g_context->m_camera->GetFront() * 200.0f;
   //        }
   //    }
 }
@@ -256,7 +251,7 @@ void Team::Advance(int _slice)
 
   if (m_teamType > TeamTypeUnused)
   {
-    START_PROFILE(g_app->m_profiler, "Advance Unit Entities");
+    START_PROFILE(g_context->m_profiler, "Advance Unit Entities");
     for (int unit = 0; unit < m_units.Size(); ++unit)
     {
       if (m_units.ValidIndex(unit))
@@ -265,11 +260,11 @@ void Team::Advance(int _slice)
         theUnit->AdvanceEntities(_slice);
       }
     }
-    END_PROFILE(g_app->m_profiler, "Advance Unit Entities");
+    END_PROFILE(g_context->m_profiler, "Advance Unit Entities");
 
     if (_slice == 0)
     {
-      START_PROFILE(g_app->m_profiler, "Advance Units");
+      START_PROFILE(g_context->m_profiler, "Advance Units");
       for (int unit = 0; unit < m_units.Size(); ++unit)
       {
         if (m_units.ValidIndex(unit))
@@ -283,7 +278,7 @@ void Team::Advance(int _slice)
           }
         }
       }
-      END_PROFILE(g_app->m_profiler, "Advance Units");
+      END_PROFILE(g_context->m_profiler, "Advance Units");
     }
   }
 
@@ -292,7 +287,7 @@ void Team::Advance(int _slice)
 
   if (m_teamType > TeamTypeUnused)
   {
-    START_PROFILE(g_app->m_profiler, "Advance Others");
+    START_PROFILE(g_context->m_profiler, "Advance Others");
     int startIndex, endIndex;
     m_others.GetNextSliceBounds(_slice, &startIndex, &endIndex);
 
@@ -307,29 +302,29 @@ void Team::Advance(int _slice)
           WorldObjectId myId(m_teamId, -1, i, ent->m_id.GetUniqueId());
 
           const char* entityName = Entity::GetTypeName(ent->m_type);
-          START_PROFILE(g_app->m_profiler, entityName);
+          START_PROFILE(g_context->m_profiler, entityName);
           bool amIdead = ent->Advance(nullptr);
-          END_PROFILE(g_app->m_profiler, entityName);
+          END_PROFILE(g_context->m_profiler, entityName);
 
 #ifdef PROFILER_ENABLED
-          DEBUG_ASSERT(strcmp(g_app->m_profiler->m_currentElement->m_name, "Advance Others") == 0);
+          DEBUG_ASSERT(strcmp(g_context->m_profiler->m_currentElement->m_name, "Advance Others") == 0);
 #endif
 
           if (amIdead)
           {
-            g_app->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
+            g_context->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
             m_others.MarkNotUsed(i);
             delete ent;
           }
           else if (!ent->m_enabled)
-            g_app->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
+            g_context->m_location->m_entityGrid->RemoveObject(myId, oldPos.x, oldPos.z, ent->m_radius);
           else
-            g_app->m_location->m_entityGrid->UpdateObject(myId, oldPos.x, oldPos.z, ent->m_pos.x, ent->m_pos.z, ent->m_radius);
+            g_context->m_location->m_entityGrid->UpdateObject(myId, oldPos.x, oldPos.z, ent->m_pos.x, ent->m_pos.z, ent->m_radius);
         }
       }
     }
 
-    END_PROFILE(g_app->m_profiler, "Advance Others");
+    END_PROFILE(g_context->m_profiler, "Advance Others");
   }
 }
 
@@ -338,7 +333,7 @@ void Team::Render()
   //
   // Render Units
 
-  START_PROFILE(g_app->m_profiler, "Render Units");
+  START_PROFILE(g_context->m_profiler, "Render Units");
 
   float timeSinceAdvance = g_predictionTime;
 
@@ -358,9 +353,9 @@ void Team::Render()
        continue;  // Rendered in RenderVirii() with Virii-specific GL state
       if (unit->IsInView())
       {
-        START_PROFILE(g_app->m_profiler, Entity::GetTypeName( unit->m_troopType ));
+        START_PROFILE(g_context->m_profiler, Entity::GetTypeName( unit->m_troopType ));
         unit->Render(timeSinceAdvance);
-        END_PROFILE(g_app->m_profiler, Entity::GetTypeName( unit->m_troopType ));
+        END_PROFILE(g_context->m_profiler, Entity::GetTypeName( unit->m_troopType ));
       }
     }
   }
@@ -371,15 +366,15 @@ void Team::Render()
   glDisable(GL_TEXTURE_2D);
   glAlphaFunc(GL_GREATER, 0.01f);
 
-  END_PROFILE(g_app->m_profiler, "Render Units");
+  END_PROFILE(g_context->m_profiler, "Render Units");
 
   //
   // Render Others
 
   CHECK_OPENGL_STATE();
-  START_PROFILE(g_app->m_profiler, "Render Others");
+  START_PROFILE(g_context->m_profiler, "Render Others");
   RenderOthers(timeSinceAdvance);
-  END_PROFILE(g_app->m_profiler, "Render Others");
+  END_PROFILE(g_context->m_profiler, "Render Others");
   CHECK_OPENGL_STATE();
 
   //
@@ -388,9 +383,9 @@ void Team::Render()
   CHECK_OPENGL_STATE();
   if (m_teamId == 1 && m_teamType == TeamTypeCPU)
   {
-    START_PROFILE(g_app->m_profiler, "Render Virii");
+    START_PROFILE(g_context->m_profiler, "Render Virii");
     RenderVirii(timeSinceAdvance);
-    END_PROFILE(g_app->m_profiler, "Render Virii");
+    END_PROFILE(g_context->m_profiler, "Render Virii");
   }
   CHECK_OPENGL_STATE();
 
@@ -398,9 +393,9 @@ void Team::Render()
   // Render Darwinians
 
   CHECK_OPENGL_STATE();
-  START_PROFILE(g_app->m_profiler, "Render Darwinians");
+  START_PROFILE(g_context->m_profiler, "Render Darwinians");
   RenderDarwinians(timeSinceAdvance);
-  END_PROFILE(g_app->m_profiler, "Render Darwinians");
+  END_PROFILE(g_context->m_profiler, "Render Darwinians");
   CHECK_OPENGL_STATE();
 }
 
@@ -422,14 +417,14 @@ void Team::RenderVirii(float _predictionTime)
 
   int lastUpdated = m_others.GetLastUpdated();
 
-  float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-  g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.05f, g_app->m_renderer->GetFarPlane());
+  float nearPlaneStart = g_context->m_renderer->GetNearPlane();
+  g_context->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.05f, g_context->m_renderer->GetFarPlane());
 
   //
   // Render Red Virii shapes
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/viriifull.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/viriifull.bmp"));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -482,7 +477,7 @@ void Team::RenderVirii(float _predictionTime)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-  g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
+  g_context->m_camera->SetupProjectionMatrix(nearPlaneStart, g_context->m_renderer->GetFarPlane());
 }
 
 void Team::RenderDarwinians(float _predictionTime)
@@ -493,7 +488,7 @@ void Team::RenderDarwinians(float _predictionTime)
   int lastUpdated = m_others.GetLastUpdated();
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("sprites/darwinian.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("sprites/darwinian.bmp"));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glEnable(GL_BLEND);
@@ -524,10 +519,10 @@ void Team::RenderDarwinians(float _predictionTime)
       {
         if (entity->IsInView())
         {
-          float camDistSqd = (entity->m_pos - g_app->m_camera->GetPos()).MagSquared();
+          float camDistSqd = (entity->m_pos - g_context->m_camera->GetPos()).MagSquared();
           float highDetail = 1.0f - (camDistSqd / highDetailDistanceSqd);
-          highDetail = max(highDetail, 0.0f);
-          highDetail = min(highDetail, 1.0f);
+          highDetail = std::max(highDetail, 0.0f);
+          highDetail = std::min(highDetail, 1.0f);
 
           EntityRenderContext ctx;
           ctx.predictionTime = (i <= lastUpdated) ? _predictionTime : _predictionTime + SERVER_ADVANCE_PERIOD;
@@ -558,14 +553,14 @@ void Team::RenderOthers(float _predictionTime)
       Entity* entity = m_others.GetData(i);
       if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->IsInView())
       {
-        START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
+        START_PROFILE(g_context->m_profiler, Entity::GetTypeName( entity->m_type ));
         EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
         DEBUG_ASSERT(renderer);
         EntityRenderContext ctx;
         ctx.predictionTime = _predictionTime;
         ctx.highDetailFactor = 1.0f;
         renderer->Render(*entity, ctx);
-        END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
+        END_PROFILE(g_context->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }
   }
@@ -579,14 +574,14 @@ void Team::RenderOthers(float _predictionTime)
       Entity* entity = m_others.GetData(i);
       if (entity->m_type != Entity::TypeVirii && entity->m_type != Entity::TypeDarwinian && entity->IsInView())
       {
-        START_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
+        START_PROFILE(g_context->m_profiler, Entity::GetTypeName( entity->m_type ));
         EntityRenderer* renderer = g_entityRenderRegistry.Get(entity->m_type);
         DEBUG_ASSERT(renderer);
         EntityRenderContext ctx;
         ctx.predictionTime = _predictionTime;
         ctx.highDetailFactor = 1.0f;
         renderer->Render(*entity, ctx);
-        END_PROFILE(g_app->m_profiler, Entity::GetTypeName( entity->m_type ));
+        END_PROFILE(g_context->m_profiler, Entity::GetTypeName( entity->m_type ));
       }
     }
   }
@@ -653,10 +648,10 @@ void TeamControls::ClearFlags()
 
 void TeamControls::Advance()
 {
-  if (g_app->m_camera->IsInMode(Camera::ModeBuildingFocus))
+  if (g_context->m_camera->IsInMode(Camera::ModeBuildingFocus))
     return;
 
-  m_mousePos = g_app->m_userInput->GetMousePos3d();
+  m_mousePos = g_context->m_userInput->GetMousePos3d();
 
   m_primaryFireTarget |= g_inputManager->controlEvent(ControlUnitPrimaryFireTarget);
   m_secondaryFireTarget |= g_inputManager->controlEvent(ControlUnitSecondaryFireTarget);
@@ -664,7 +659,7 @@ void TeamControls::Advance()
     ControlCameraRotate);
   m_secondaryFireDirected |= g_inputManager->controlEvent(ControlUnitSecondaryFireDirected)
     /* && g_inputManager->controlEvent( ControlUnitStartSecondaryFireDirected ) */;
-  m_cameraEntityTracking |= g_app->m_camera->IsInMode(Camera::ModeEntityTrack);
+  m_cameraEntityTracking |= g_context->m_camera->IsInMode(Camera::ModeEntityTrack);
   m_unitMove |= g_inputManager->controlEvent(ControlUnitSetTarget) && !m_secondaryFireTarget;
   m_unitSecondaryMode |= g_inputManager->controlEvent(ControlUnitStartSecondaryFireDirected);
   m_endSetTarget |= g_inputManager->controlEvent(ControlUnitEndSetTarget);
@@ -672,7 +667,7 @@ void TeamControls::Advance()
   InputDetails details;
   if (g_inputManager->controlEvent(ControlUnitMove, details))
   {
-    LegacyVector3 right = g_app->m_camera->GetControlVector();
+    LegacyVector3 right = g_context->m_camera->GetControlVector();
     LegacyVector3 front = g_upVector ^ -right;
 
     LegacyVector3 waypoint = right * -details.x;

@@ -15,8 +15,6 @@
 #include "camera.h"
 #include "global_world.h"
 #include "location.h"
-#include "location_input.h"
-#include "main.h"
 #include "particle_system.h"
 #include "renderer.h"
 #include "script.h"
@@ -25,19 +23,17 @@
 #include "taskmanager_interface_icons.h"
 #include "gamecursor.h"
 #include "gamecursor_2d.h"
-#include "level_file.h"
 
-GameAppSim* g_app = nullptr;
+GameApp* g_gameApp = nullptr;
 
 #define GAMEDATAFILE "game.txt"
 
 GameApp::GameApp()
 {
-  g_app = this;
+  g_gameApp = this;
+  g_context = this;
 
   // Load resources
-
-  m_resource = new Resource();
 
   g_prefsManager = new PrefsManager(GetPreferencesPath());
 
@@ -126,13 +122,12 @@ GameApp::~GameApp()
   SAFE_DELETE(m_profiler);
 #endif
   SAFE_DELETE(g_prefsManager);
-  SAFE_DELETE(m_resource);
 }
 
 void GameApp::UpdateDifficultyFromPreferences()
 {
   // This method is called to make sure that the difficulty setting
-  // used to control the game play (g_app->m_difficultyLevel) is
+  // used to control the game play (g_context->m_difficultyLevel) is
   // consistent with the user preferences.
 
   // Preferences value is 1-based, m_difficultyLevel is 0-based.
@@ -167,11 +162,11 @@ void GameApp::SetLanguage(const char* _language, bool _test)
   // Load the MOD language file if it exists
 
   snprintf(langFilename, sizeof(langFilename), "strings_%s.txt", _language);
-  TextReader* modLangFile = g_app->m_resource->GetTextReader(langFilename);
+  TextReader* modLangFile = Resource::GetTextReader(langFilename);
   if (!modLangFile)
   {
     snprintf(langFilename, sizeof(langFilename), "strings_default.txt");
-    modLangFile = g_app->m_resource->GetTextReader(langFilename);
+    modLangFile = Resource::GetTextReader(langFilename);
   }
 
   if (modLangFile)
@@ -185,12 +180,12 @@ void GameApp::SetLanguage(const char* _language, bool _test)
 
   char fontFilename[256];
   snprintf(fontFilename, sizeof(fontFilename), "textures/speccy_font_%s.bmp", _language);
-  if (!g_app->m_resource->DoesTextureExist(fontFilename))
+  if (!Resource::DoesTextureExist(fontFilename))
     snprintf(fontFilename, sizeof(fontFilename), "textures/speccy_font_normal.bmp");
   g_gameFont.Initialise(fontFilename);
 
   snprintf(fontFilename, sizeof(fontFilename), "textures/editor_font_%s.bmp", _language);
-  if (!g_app->m_resource->DoesTextureExist(fontFilename))
+  if (!Resource::DoesTextureExist(fontFilename))
     snprintf(fontFilename, sizeof(fontFilename), "textures/editor_font_normal.bmp");
   g_editorFont.Initialise(fontFilename);
 
@@ -210,12 +205,12 @@ void GameApp::SetProfileName(const char* _profileName)
   }
 }
 
-const char* GameAppSim::GetProfileDirectory()
+const char* GameContext::GetProfileDirectory()
 {
   return "";
 }
 
-const char* GameAppSim::GetPreferencesPath()
+const char* GameContext::GetPreferencesPath()
 {
   // good leak #1
   static char* path = nullptr;
@@ -231,7 +226,7 @@ const char* GameAppSim::GetPreferencesPath()
   return path;
 }
 
-const char* GameAppSim::GetScreenshotDirectory()
+const char* GameContext::GetScreenshotDirectory()
 {
   return "";
 }
@@ -240,7 +235,7 @@ bool GameApp::LoadProfile()
 {
   DebugTrace("Loading profile {}\n", m_userProfileName);
 
-  if ((_stricmp(m_userProfileName, "AccessAllAreas") == 0 || _stricmp(m_userProfileName, "AttractMode") == 0) && g_app->m_gameMode !=
+  if ((_stricmp(m_userProfileName, "AccessAllAreas") == 0 || _stricmp(m_userProfileName, "AttractMode") == 0) && g_context->m_gameMode !=
     GameModePrologue)
   {
     // Cheat username that opens all locations

@@ -8,7 +8,7 @@
 #include "armour.h"
 #include "gunturret.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "main.h"
 #include "camera.h"
@@ -27,7 +27,7 @@ Armour::Armour()
 {
   SetType(TypeArmour);
 
-  m_shape = g_app->m_resource->GetShapeStatic("armour.shp");
+  m_shape = Resource::GetShapeStatic("armour.shp");
   m_markerEntrance = m_shape->GetMarkerData("MarkerEntrance");
   m_markerFlag = m_shape->GetMarkerData("MarkerFlag");
 
@@ -39,7 +39,7 @@ Armour::~Armour()
 {
   if (m_id.GetTeamId() != 255)
   {
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     team->UnRegisterSpecial(m_id);
   }
 }
@@ -52,7 +52,7 @@ void Armour::Begin()
 
   if (m_id.GetTeamId() != 255)
   {
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     team->RegisterSpecial(m_id);
   }
 
@@ -64,8 +64,6 @@ void Armour::Begin()
 
 void Armour::ChangeHealth(int _amount)
 {
-  bool dead = m_dead;
-
   if (_amount < 0 && _amount > -1000)
     _amount = -1;
 
@@ -76,8 +74,8 @@ void Armour::ChangeHealth(int _amount)
 
     int oldHealth = m_stats[StatHealth];
     int newHealth = oldHealth + _amount;
-    newHealth = max(newHealth, 0);
-    newHealth = min(newHealth, 255);
+    newHealth = std::max(newHealth, 0);
+    newHealth = std::min(newHealth, 255);
     m_stats[StatHealth] = newHealth;
 
     int healthBandBefore = static_cast<int>(oldHealth / 20.0f);
@@ -106,12 +104,12 @@ void Armour::ConvertToGunTurret()
   turretTemplate.m_dynamic = true;
 
   auto turret = static_cast<GunTurret*>(Building::CreateBuilding(Building::TypeGunTurret));
-  g_app->m_location->m_buildings.PutData(turret);
+  g_context->m_location->m_buildings.PutData(turret);
   turret->Initialise(&turretTemplate);
-  int id = g_app->m_globalWorld->GenerateBuildingId();
+  int id = g_context->m_globalWorld->GenerateBuildingId();
   turret->m_id.SetUnitId(UNIT_BUILDINGS);
   turret->m_id.SetUniqueId(id);
-  g_app->m_location->m_obstructionGrid->CalculateAll();
+  g_context->m_location->m_obstructionGrid->CalculateAll();
 
   //
   // Explode some polys, to cover the ropey change
@@ -147,19 +145,19 @@ void Armour::AdvanceToTargetPos()
   if (distance > 100.0f && angle < 1.0f)
   {
     m_speed += 10.0f * SERVER_ADVANCE_PERIOD;
-    m_speed = min(m_speed, m_stats[StatSpeed]);
+    m_speed = std::min<float>(m_speed, m_stats[StatSpeed]);
   }
   else if (distance > 10.0f)
   {
     float targetSpeed = distance * 0.2f;
     m_speed = m_speed * 0.95f + targetSpeed * 0.05f;
-    m_speed = min(m_speed, m_stats[StatSpeed]);
-    m_speed = max(m_speed, 0.0f);
+    m_speed = std::min<float>(m_speed, m_stats[StatSpeed]);
+    m_speed = std::max<float>(m_speed, 0.0f);
   }
   else
   {
     m_speed -= 5.0f * SERVER_ADVANCE_PERIOD;
-    m_speed = max(m_speed, 0.0f);
+    m_speed = std::max(m_speed, 0.0f);
   }
 
   //
@@ -168,14 +166,14 @@ void Armour::AdvanceToTargetPos()
   LegacyVector3 oldPos = m_pos;
   m_pos += m_front * m_speed * SERVER_ADVANCE_PERIOD;
   PushFromObstructions(m_pos);
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   if (m_pos.y <= landHeight)
   {
     float factor = SERVER_ADVANCE_PERIOD * 5.0f;
     m_pos.y = m_pos.y * (1.0f - factor) + landHeight * factor;
 
     factor = SERVER_ADVANCE_PERIOD * 5.0f;
-    LegacyVector3 landUp = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+    LegacyVector3 landUp = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
     m_up = m_up * (1.0f - factor) + landUp * factor;
 
     float distTravelled = (m_pos - oldPos).Mag();
@@ -184,13 +182,12 @@ void Armour::AdvanceToTargetPos()
   }
   else
   {
-    float heightAboveGround = m_pos.y - landHeight;
     m_vel.y -= 5.0f;
     m_pos.y += m_vel.y * SERVER_ADVANCE_PERIOD;
-    m_pos.y = max(m_pos.y, landHeight);
+    m_pos.y = std::max(m_pos.y, landHeight);
 
     float factor = SERVER_ADVANCE_PERIOD * 0.5f;
-    LegacyVector3 landUp = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+    LegacyVector3 landUp = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
     m_up = m_up * (1.0f - factor) + landUp * factor;
   }
 
@@ -202,17 +199,17 @@ void Armour::DetectCollisions()
   LegacyVector3 pos(m_pos);
   pos += m_vel;
   int numFound;
-  WorldObjectId* neighbours = g_app->m_location->m_entityGrid->GetNeighbours(pos.x, pos.z, 30.0f, &numFound);
+  WorldObjectId* neighbours = g_context->m_location->m_entityGrid->GetNeighbours(pos.x, pos.z, 30.0f, &numFound);
 
   LegacyVector3 escapeVector;
   bool collisionDetected = false;
 
   for (int i = 0; i < numFound; ++i)
   {
-    Entity* ent = g_app->m_location->GetEntity(neighbours[i]);
+    Entity* ent = g_context->m_location->GetEntity(neighbours[i]);
     if (ent->m_type == TypeArmour && ent->m_id != m_id)
     {
-      Entity* entity = g_app->m_location->GetEntity(neighbours[darwiniaRandom() % numFound]);
+      Entity* entity = g_context->m_location->GetEntity(neighbours[darwiniaRandom() % numFound]);
       DEBUG_ASSERT(entity);
       LegacyVector3 toNeighbour = m_pos - entity->m_pos;
       toNeighbour.y = 0.0f;
@@ -243,7 +240,6 @@ bool Armour::Advance(Unit* _unit)
   int numSmoke = 1 + static_cast<int>(velocity / 20.0f);
   for (int i = 0; i < numSmoke; ++i)
   {
-    LegacyVector3 right = m_up ^ m_front;
     LegacyVector3 vel = m_front;
     vel.RotateAround(m_up * syncfrand(2.0f * M_PI));
     vel.SetLength(syncfrand(5.0f));
@@ -314,20 +310,20 @@ void Armour::SetWayPoint(const LegacyVector3& _wayPoint)
   m_conversionPoint.Zero();
 
   m_wayPoint = _wayPoint;
-  m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+  m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
 }
 
 void Armour::SetConversionPoint(const LegacyVector3& _conversionPoint)
 {
   m_conversionPoint.Zero();
 
-  LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(_conversionPoint.x, _conversionPoint.z);
+  LegacyVector3 landNormal = g_context->m_location->m_landscape.m_normalMap->GetValue(_conversionPoint.x, _conversionPoint.z);
   if (landNormal.y > 0.95f)
   {
     SetWayPoint(_conversionPoint);
 
     m_conversionPoint = _conversionPoint;
-    m_conversionPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_conversionPoint.x, m_conversionPoint.z);
+    m_conversionPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_conversionPoint.x, m_conversionPoint.z);
   }
 }
 
@@ -341,7 +337,7 @@ bool Armour::IsUnloading()
 
 int Armour::Capacity()
 {
-  int research = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeArmour);
+  int research = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeArmour);
   switch (research)
   {
   case 0:

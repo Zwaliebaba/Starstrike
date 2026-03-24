@@ -56,20 +56,20 @@ void Task::Target(const LegacyVector3& _pos)
 
 void Task::TargetSquad(const LegacyVector3& _pos)
 {
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
-  int numEntities = 2 + g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeSquad);
+  int numEntities = 2 + g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeSquad);
 
   int unitId;
-  g_app->m_location->m_teams[teamId].NewUnit(Entity::TypeInsertionSquadie, numEntities, &unitId, _pos);
-  g_app->m_location->SpawnEntities(_pos, teamId, unitId, Entity::TypeInsertionSquadie, numEntities, g_zeroVector, 10);
+  g_context->m_location->m_teams[teamId].NewUnit(Entity::TypeInsertionSquadie, numEntities, &unitId, _pos);
+  g_context->m_location->SpawnEntities(_pos, teamId, unitId, Entity::TypeInsertionSquadie, numEntities, g_zeroVector, 10);
 
-  g_app->m_location->m_teams[teamId].SelectUnit(unitId, -1, -1);
+  g_context->m_location->m_teams[teamId].SelectUnit(unitId, -1, -1);
   m_objId.Set(teamId, unitId, -1, -1);
 
   m_state = StateRunning;
 
-  g_app->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
+  g_context->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
 
   int trackEntity = g_prefsManager->GetInt(OTHER_AUTOMATICCAM, 0);
   if (trackEntity == 0)
@@ -80,48 +80,48 @@ void Task::TargetSquad(const LegacyVector3& _pos)
   }
 
   if (trackEntity == 2)
-    g_app->m_camera->RequestEntityTrackMode(m_objId);
+    g_context->m_camera->RequestEntityTrackMode(m_objId);
 }
 
 void Task::TargetEngineer(const LegacyVector3& _pos)
 {
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
   LegacyVector3 pos = _pos;
   pos.y += 10.0f;
-  m_objId = g_app->m_location->SpawnEntities(pos, teamId, -1, Entity::TypeEngineer, 1, g_zeroVector, 0);
-  g_app->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
+  m_objId = g_context->m_location->SpawnEntities(pos, teamId, -1, Entity::TypeEngineer, 1, g_zeroVector, 0);
+  g_context->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
 
   m_state = StateRunning;
-  g_app->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
+  g_context->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
 }
 
 void Task::TargetArmour(const LegacyVector3& _pos)
 {
 #ifndef DEMOBUILD
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
-  m_objId = g_app->m_location->SpawnEntities(_pos, teamId, -1, Entity::TypeArmour, 1, g_zeroVector, 0);
-  g_app->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
+  m_objId = g_context->m_location->SpawnEntities(_pos, teamId, -1, Entity::TypeArmour, 1, g_zeroVector, 0);
+  g_context->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
 
   m_state = StateRunning;
 
-  g_app->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
+  g_context->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
 #endif
 }
 
 WorldObjectId Task::Promote(WorldObjectId _id)
 {
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
-  Entity* entity = g_app->m_location->GetEntity(_id);
+  Entity* entity = g_context->m_location->GetEntity(_id);
   DEBUG_ASSERT(entity);
 
   //
   // Spawn an Officer
 
-  WorldObjectId spawnedId = g_app->m_location->SpawnEntities(entity->m_pos, teamId, -1, Entity::TypeOfficer, 1, entity->m_vel, 0);
-  auto officer = static_cast<Officer*>(g_app->m_location->GetEntity(spawnedId));
+  WorldObjectId spawnedId = g_context->m_location->SpawnEntities(entity->m_pos, teamId, -1, Entity::TypeOfficer, 1, entity->m_vel, 0);
+  auto officer = static_cast<Officer*>(g_context->m_location->GetEntity(spawnedId));
   DEBUG_ASSERT(officer);
 
   //
@@ -131,7 +131,7 @@ WorldObjectId Task::Promote(WorldObjectId _id)
   for (int i = 0; i < numFlashes; ++i)
   {
     LegacyVector3 vel(sfrand(5.0f), frand(15.0f), sfrand(5.0f));
-    g_app->m_particleSystem->CreateParticle(entity->m_pos, vel, Particle::TypeControlFlash);
+    g_context->m_particleSystem->CreateParticle(entity->m_pos, vel, Particle::TypeControlFlash);
   }
 
   auto darwinian = static_cast<Darwinian*>(entity);
@@ -143,16 +143,16 @@ WorldObjectId Task::Promote(WorldObjectId _id)
 WorldObjectId Task::Demote(WorldObjectId _id)
 {
   // Make demoted officers return to green
-  //int teamId = g_app->m_globalWorld->m_myTeamId;
+  //int teamId = g_context->m_globalWorld->m_myTeamId;
   int teamId = 0;
 
-  Entity* entity = g_app->m_location->GetEntity(_id);
+  Entity* entity = g_context->m_location->GetEntity(_id);
   DEBUG_ASSERT(entity);
 
   //
   // Spawn a Darwinian
 
-  WorldObjectId spawnedId = g_app->m_location->SpawnEntities(entity->m_pos, teamId, -1, Entity::TypeDarwinian, 1, entity->m_vel, 0);
+  WorldObjectId spawnedId = g_context->m_location->SpawnEntities(entity->m_pos, teamId, -1, Entity::TypeDarwinian, 1, entity->m_vel, 0);
 
   //
   // Particle effect
@@ -161,7 +161,7 @@ WorldObjectId Task::Demote(WorldObjectId _id)
   for (int i = 0; i < numFlashes; ++i)
   {
     LegacyVector3 vel(sfrand(5.0f), frand(15.0f), sfrand(5.0f));
-    g_app->m_particleSystem->CreateParticle(entity->m_pos, vel, Particle::TypeControlFlash);
+    g_context->m_particleSystem->CreateParticle(entity->m_pos, vel, Particle::TypeControlFlash);
   }
 
   return spawnedId;
@@ -169,17 +169,17 @@ WorldObjectId Task::Demote(WorldObjectId _id)
 
 WorldObjectId Task::FindDarwinian(const LegacyVector3& _pos)
 {
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetFriends(_pos.x, _pos.z, 10.0f, &numFound, teamId);
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetFriends(_pos.x, _pos.z, 10.0f, &numFound, teamId);
   WorldObjectId nearestId;
   float nearest = 99999.9f;
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
     if (entity && entity->m_type == Entity::TypeDarwinian)
     {
       float distance = (entity->m_pos - _pos).MagSquared();
@@ -196,12 +196,12 @@ WorldObjectId Task::FindDarwinian(const LegacyVector3& _pos)
 
 void Task::TargetOfficer(const LegacyVector3& _pos)
 {
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
   //
   // We will not upgrade people if we're controlling something right now
 
-  Team* myTeam = g_app->m_location->GetMyTeam();
+  Team* myTeam = g_context->m_location->GetMyTeam();
   if (myTeam->m_currentUnitId != -1 || myTeam->m_currentEntityId != -1 || myTeam->m_currentBuildingId != -1)
     return;
 
@@ -216,11 +216,11 @@ void Task::TargetOfficer(const LegacyVector3& _pos)
   if (nearestId.IsValid())
   {
     WorldObjectId id = Promote(nearestId);
-    g_app->m_taskManager->TerminateTask(m_id);
-    g_app->m_location->m_teams[id.GetTeamId()].SelectUnit(id.GetUnitId(), id.GetIndex(), -1);
-    g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, GlobalResearch::TypeOfficer, 2.5f);
+    g_context->m_taskManager->TerminateTask(m_id);
+    g_context->m_location->m_teams[id.GetTeamId()].SelectUnit(id.GetUnitId(), id.GetIndex(), -1);
+    g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, GlobalResearch::TypeOfficer, 2.5f);
 
-    g_app->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
+    g_context->m_soundSystem->TriggerOtherEvent(nullptr, "GestureSuccess", SoundSourceBlueprint::TypeGesture);
   }
 }
 
@@ -233,11 +233,11 @@ bool Task::Advance()
     case GlobalResearch::TypeSquad:
     case GlobalResearch::TypeController:
       {
-        Unit* unit = g_app->m_location->GetUnit(m_objId);
+        Unit* unit = g_context->m_location->GetUnit(m_objId);
         if (!unit || unit->NumAliveEntities() == 0)
         {
-          if (g_app->m_taskManager->m_currentTaskId == m_id)
-            g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, m_type, 3.0f);
+          if (g_context->m_taskManager->m_currentTaskId == m_id)
+            g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, m_type, 3.0f);
           return true;
         }
         break;
@@ -246,11 +246,11 @@ bool Task::Advance()
     case GlobalResearch::TypeEngineer:
     case GlobalResearch::TypeArmour:
       {
-        Entity* entity = g_app->m_location->GetEntity(m_objId);
+        Entity* entity = g_context->m_location->GetEntity(m_objId);
         if (!entity || entity->m_dead)
         {
-          if (g_app->m_taskManager->m_currentTaskId == m_id)
-            g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, m_type, 3.0f);
+          if (g_context->m_taskManager->m_currentTaskId == m_id)
+            g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, m_type, 3.0f);
           return true;
         }
         break;
@@ -269,34 +269,34 @@ bool Task::Advance()
 
 void Task::SwitchTo()
 {
-  if (g_app->m_camera->IsInMode(Camera::ModeRadarAim) || g_app->m_camera->IsInMode(Camera::ModeTurretAim))
-    g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
+  if (g_context->m_camera->IsInMode(Camera::ModeRadarAim) || g_context->m_camera->IsInMode(Camera::ModeTurretAim))
+    g_context->m_camera->RequestMode(Camera::ModeFreeMovement);
 
-  int teamId = g_app->m_globalWorld->m_myTeamId;
+  int teamId = g_context->m_globalWorld->m_myTeamId;
 
   switch (m_type)
   {
   case GlobalResearch::TypeSquad:
     {
-      g_app->m_location->m_teams[teamId].SelectUnit(m_objId.GetUnitId(), -1, -1);
+      g_context->m_location->m_teams[teamId].SelectUnit(m_objId.GetUnitId(), -1, -1);
       break;
     }
 
   case GlobalResearch::TypeEngineer:
   case GlobalResearch::TypeArmour:
     {
-      g_app->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
+      g_context->m_location->m_teams[teamId].SelectUnit(-1, m_objId.GetIndex(), -1);
       break;
     }
 
   case GlobalResearch::TypeController:
     {
-      for (int i = 0; i < g_app->m_taskManager->m_tasks.Size(); ++i)
+      for (int i = 0; i < g_context->m_taskManager->m_tasks.Size(); ++i)
       {
-        Task* task = g_app->m_taskManager->m_tasks.GetData(i);
+        Task* task = g_context->m_taskManager->m_tasks.GetData(i);
         if (task->m_type == GlobalResearch::TypeSquad && task->m_objId == m_objId)
         {
-          g_app->m_taskManager->SelectTask(task->m_id);
+          g_context->m_taskManager->SelectTask(task->m_id);
           break;
         }
       }
@@ -305,7 +305,7 @@ void Task::SwitchTo()
 
   case GlobalResearch::TypeOfficer:
     {
-      g_app->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
+      g_context->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
       break;
     }
   }
@@ -317,7 +317,7 @@ void Task::Stop()
   {
   case GlobalResearch::TypeSquad:
     {
-      Unit* unit = g_app->m_location->GetUnit(m_objId);
+      Unit* unit = g_context->m_location->GetUnit(m_objId);
       if (unit)
       {
         for (int i = 0; i < unit->m_entities.Size(); ++i)
@@ -336,7 +336,7 @@ void Task::Stop()
   case GlobalResearch::TypeEngineer:
   case GlobalResearch::TypeArmour:
     {
-      auto entity = g_app->m_location->GetEntity(m_objId);
+      auto entity = g_context->m_location->GetEntity(m_objId);
       if (entity)
       {
         int health = entity->m_stats[Entity::StatHealth];
@@ -372,7 +372,7 @@ bool TaskManager::RunTask(Task* _task)
 
     return true;
   }
-  g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
+  g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
 
   return false;
 }
@@ -393,8 +393,8 @@ bool TaskManager::RunTask(int _type)
       bool success = RunTask(task);
       if (success)
       {
-        int teamId = g_app->m_globalWorld->m_myTeamId;
-        g_app->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
+        int teamId = g_context->m_globalWorld->m_myTeamId;
+        g_context->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
       }
       return success;
     }
@@ -404,7 +404,7 @@ bool TaskManager::RunTask(int _type)
       Task* task = GetCurrentTask();
       if (task && task->m_type == GlobalResearch::TypeSquad)
       {
-        Unit* unit = g_app->m_location->GetUnit(task->m_objId);
+        Unit* unit = g_context->m_location->GetUnit(task->m_objId);
         if (unit && unit->m_troopType == Entity::TypeInsertionSquadie)
         {
           auto squad = static_cast<InsertionSquad*>(unit);
@@ -422,7 +422,7 @@ bool TaskManager::RunTask(int _type)
             {
               squad->m_controllerId = controller->m_id;
               SelectTask(task->m_id);
-              g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, _type, 2.5f);
+              g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, _type, 2.5f);
             }
             return success;
           }
@@ -431,7 +431,7 @@ bool TaskManager::RunTask(int _type)
         }
       }
 
-      g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
+      g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
       return false;
     }
 
@@ -442,17 +442,17 @@ bool TaskManager::RunTask(int _type)
       Task* task = GetCurrentTask();
       if (task && task->m_type == GlobalResearch::TypeSquad)
       {
-        Unit* unit = g_app->m_location->GetUnit(task->m_objId);
+        Unit* unit = g_context->m_location->GetUnit(task->m_objId);
         if (unit && unit->m_troopType == Entity::TypeInsertionSquadie)
         {
           auto squad = static_cast<InsertionSquad*>(unit);
           squad->SetWeaponType(_type);
-          g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, _type, 2.5f);
+          g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, _type, 2.5f);
           return true;
         }
       }
 
-      g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
+      g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageFailure, -1, 2.5f);
       return false;
     }
   }
@@ -480,7 +480,7 @@ bool TaskManager::TerminateTask(int _id)
     Task* task = m_tasks[i];
     if (task->m_id == _id)
     {
-      g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, task->m_type, 3.0f);
+      g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageShutdown, task->m_type, 3.0f);
       m_tasks.RemoveData(i);
       task->Stop();
       delete task;
@@ -497,7 +497,7 @@ bool TaskManager::TerminateTask(int _id)
 
 int TaskManager::Capacity()
 {
-  int taskManagerResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeTaskManager);
+  int taskManagerResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeTaskManager);
   int capacity = 1 + taskManagerResearch;
   return capacity;
 }
@@ -537,7 +537,7 @@ void TaskManager::AdvanceTasks()
 
   Task* currentTask = GetCurrentTask();
   if (currentTask && currentTask->m_state == Task::StateStarted)
-    g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, currentTask->m_type, 2.5f);
+    g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageSuccess, currentTask->m_type, 2.5f);
 
   //
   // Advance all other tasks
@@ -551,8 +551,8 @@ void TaskManager::AdvanceTasks()
       if (m_currentTaskId == task->m_id)
       {
         m_currentTaskId = -1;
-        int teamId = g_app->m_globalWorld->m_myTeamId;
-        g_app->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
+        int teamId = g_context->m_globalWorld->m_myTeamId;
+        g_context->m_location->m_teams[teamId].SelectUnit(-1, -1, -1);
       }
 
       m_tasks.RemoveData(i);
@@ -572,7 +572,7 @@ void TaskManager::Advance()
 {
   AdvanceTasks();
 
-  g_app->m_globalWorld->m_research->AdvanceResearch();
+  g_context->m_globalWorld->m_research->AdvanceResearch();
 }
 
 void TaskManager::SelectTask(int _id)
@@ -598,7 +598,7 @@ void TaskManager::SelectTask(int _id)
     //m_tasks.PutDataAtStart( task );
     task->SwitchTo();
 
-    g_app->m_gameCursor->BoostSelectionArrows(2.0f);
+    g_context->m_gameCursor->BoostSelectionArrows(2.0f);
   }
 }
 
@@ -656,11 +656,11 @@ bool TaskManager::TargetTask(int _id, const LegacyVector3& _pos)
 
 bool TaskManager::IsValidTargetArea(int _id, const LegacyVector3& _pos)
 {
-  Task* task = g_app->m_taskManager->GetTask(_id);
+  Task* task = g_context->m_taskManager->GetTask(_id);
   if (!task)
     return false;
 
-  if (!g_app->m_location || !g_app->m_location->m_landscape.IsInLandscape(_pos))
+  if (!g_context->m_location || !g_context->m_location->m_landscape.IsInLandscape(_pos))
     return false;
 
   if (m_verifyTargetting)
@@ -668,12 +668,12 @@ bool TaskManager::IsValidTargetArea(int _id, const LegacyVector3& _pos)
     if (task->m_type == GlobalResearch::TypeOfficer)
     {
       int numFound;
-      WorldObjectId* ids = g_app->m_location->m_entityGrid->GetFriends(_pos.x, _pos.z, 10.0f, &numFound, g_app->m_globalWorld->m_myTeamId);
+      WorldObjectId* ids = g_context->m_location->m_entityGrid->GetFriends(_pos.x, _pos.z, 10.0f, &numFound, g_context->m_globalWorld->m_myTeamId);
       bool foundDarwinian = false;
       for (int i = 0; i < numFound; ++i)
       {
         WorldObjectId id = ids[i];
-        Entity* ent = g_app->m_location->GetEntity(id);
+        Entity* ent = g_context->m_location->GetEntity(id);
         if (ent && ent->m_type == Entity::TypeDarwinian)
         {
           foundDarwinian = true;
@@ -712,11 +712,11 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
     {
     case GlobalResearch::TypeArmour:
       {
-        for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+        for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
         {
-          if (g_app->m_location->m_buildings.ValidIndex(i))
+          if (g_context->m_location->m_buildings.ValidIndex(i))
           {
-            Building* building = g_app->m_location->m_buildings[i];
+            Building* building = g_context->m_location->m_buildings[i];
             if (building && building->m_type == Building::TypeTrunkPort && static_cast<TrunkPort*>(building)->m_openTimer > 0.0f)
             {
               TaskTargetArea tta;
@@ -732,7 +732,7 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
 
     case GlobalResearch::TypeEngineer:
       {
-        Team* team = g_app->m_location->GetMyTeam();
+        Team* team = g_context->m_location->GetMyTeam();
         for (int i = 0; i < team->m_units.Size(); ++i)
         {
           if (team->m_units.ValidIndex(i))
@@ -752,12 +752,12 @@ LList<TaskTargetArea>* TaskManager::GetTargetArea(int _id)
       }
 
     case GlobalResearch::TypeSquad:
-      for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+      for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
       {
-        if (g_app->m_location->m_buildings.ValidIndex(i))
+        if (g_context->m_location->m_buildings.ValidIndex(i))
         {
-          Building* building = g_app->m_location->m_buildings[i];
-          if (building && building->m_type == Building::TypeControlTower && building->m_id.GetTeamId() == g_app->m_location->GetMyTeam()->
+          Building* building = g_context->m_location->m_buildings[i];
+          if (building && building->m_type == Building::TypeControlTower && building->m_id.GetTeamId() == g_context->m_location->GetMyTeam()->
             m_teamId)
           {
             TaskTargetArea tta;

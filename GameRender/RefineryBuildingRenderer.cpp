@@ -56,8 +56,8 @@ void RefineryBuildingRenderer::Render(const Building& _building,
     //
     // Render counter
 
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(
-        refinery.m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(
+        refinery.m_id.GetUniqueId(), g_context->m_locationId);
     int numRefined = 0;
     if (gb)
         numRefined = gb->m_link;

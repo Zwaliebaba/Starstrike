@@ -14,7 +14,7 @@ void SpaceInvaderRenderer::Render(const Entity& _entity, const EntityRenderConte
     LegacyVector3 predictedPos = invader.m_pos + invader.m_vel * _ctx.predictionTime;
     glDisable(GL_TEXTURE_2D);
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     Matrix34 mat(invader.m_front, g_upVector, predictedPos);
     mat.f *= 2.0f;
@@ -28,5 +28,5 @@ void SpaceInvaderRenderer::Render(const Entity& _entity, const EntityRenderConte
         invader.m_bombShape->Render(_ctx.predictionTime, mat);
     }
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 }

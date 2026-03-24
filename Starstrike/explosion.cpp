@@ -232,7 +232,7 @@ void ExplosionManager::Reset()
 
 void ExplosionManager::Advance()
 {
-  START_PROFILE(g_app->m_profiler, "Advance Explosions");
+  START_PROFILE(g_context->m_profiler, "Advance Explosions");
 
   for (size_t i = 0; i < m_explosions.size(); ++i)
   {
@@ -245,24 +245,24 @@ void ExplosionManager::Advance()
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "Advance Explosions");
+  END_PROFILE(g_context->m_profiler, "Advance Explosions");
 }
 
 void ExplosionManager::Render()
 {
-  START_PROFILE(g_app->m_profiler, "Render Explosions");
+  START_PROFILE(g_context->m_profiler, "Render Explosions");
 
   if (!m_explosions.empty())
   {
     CHECK_OPENGL_STATE();
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/shapewireframe.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/shapewireframe.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     glEnable(GL_COLOR_MATERIAL);
     glDisable(GL_CULL_FACE);
@@ -275,11 +275,11 @@ void ExplosionManager::Render()
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glDisable(GL_COLOR_MATERIAL);
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glDisable(GL_TEXTURE_2D);
   }
 
-  END_PROFILE(g_app->m_profiler, "Render Explosions");
+  END_PROFILE(g_context->m_profiler, "Render Explosions");
 }

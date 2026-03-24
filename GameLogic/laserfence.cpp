@@ -7,7 +7,7 @@
 #include "text_stream_readers.h"
 #include "preferences.h"
 #include "main.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "obstruction_grid.h"
 #include "team.h"
@@ -29,7 +29,7 @@ LaserFence::LaserFence()
 {
   m_type = TypeLaserFence;
 
-  SetShape(g_app->m_resource->GetShapeStatic("laserfence.shp"));
+  SetShape(Resource::GetShapeStatic("laserfence.shp"));
 
   m_marker1 = m_shape->GetMarkerData("MarkerFence01");
   m_marker2 = m_shape->GetMarkerData("MarkerFence02");
@@ -61,7 +61,7 @@ void LaserFence::Spark()
   LegacyVector3 sparkPos = m_pos;
   sparkPos.y += frand(m_scale * 50.0f);
 
-  auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(m_nextLaserFenceId));
+  auto nextFence = static_cast<LaserFence*>(g_context->m_location->GetBuilding(m_nextLaserFenceId));
 
   int numSparks = 5.0f + frand(5.0f);
   for (int i = 0; i < numSparks; ++i)
@@ -85,7 +85,7 @@ bool LaserFence::Advance()
 {
   if (!m_radiusSet)
   {
-    Building* building = g_app->m_location->GetBuilding(m_nextLaserFenceId);
+    Building* building = g_context->m_location->GetBuilding(m_nextLaserFenceId);
     if (building)
     {
       m_centerPos = (building->m_pos + m_pos) / 2.0f;
@@ -110,7 +110,7 @@ bool LaserFence::Advance()
     m_status += LASERFENCE_RAISESPEED * SERVER_ADVANCE_PERIOD;
     if (m_status >= 0.5f && m_nextLaserFenceId != -1 && !m_nextToggled)
     {
-      auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(m_nextLaserFenceId));
+      auto nextFence = static_cast<LaserFence*>(g_context->m_location->GetBuilding(m_nextLaserFenceId));
       if (nextFence)
       {
         nextFence->Enable();
@@ -122,14 +122,14 @@ bool LaserFence::Advance()
       m_status = 1.0f;
       m_mode = ModeEnabled;
       if (m_nextLaserFenceId == -1)
-        g_app->m_location->m_obstructionGrid->CalculateAll();
+        g_context->m_location->m_obstructionGrid->CalculateAll();
     }
     break;
 
   case ModeDisabling:
     if (m_status <= 0.5f && m_nextLaserFenceId != -1 && !m_nextToggled)
     {
-      auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(m_nextLaserFenceId));
+      auto nextFence = static_cast<LaserFence*>(g_context->m_location->GetBuilding(m_nextLaserFenceId));
       if (nextFence)
       {
         nextFence->Disable();
@@ -142,7 +142,7 @@ bool LaserFence::Advance()
       m_status = 0.0f;
       m_mode = ModeDisabled;
       if (m_nextLaserFenceId == -1)
-        g_app->m_location->m_obstructionGrid->CalculateAll();
+        g_context->m_location->m_obstructionGrid->CalculateAll();
     }
     break;
 
@@ -152,7 +152,7 @@ bool LaserFence::Advance()
       {
         m_status = 1.0f;
         if (m_nextLaserFenceId == -1)
-          g_app->m_location->m_obstructionGrid->CalculateAll();
+          g_context->m_location->m_obstructionGrid->CalculateAll();
       }
       break;
     }
@@ -207,7 +207,7 @@ void LaserFence::Enable()
 
   if (m_mode == ModeNeverOn)
   {
-    auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(m_nextLaserFenceId));
+    auto nextFence = static_cast<LaserFence*>(g_context->m_location->GetBuilding(m_nextLaserFenceId));
     if (nextFence)
       nextFence->Toggle();
   }
@@ -222,7 +222,7 @@ void LaserFence::Disable()
 
   if (m_mode == ModeNeverOn)
   {
-    auto nextFence = static_cast<LaserFence*>(g_app->m_location->GetBuilding(m_nextLaserFenceId));
+    auto nextFence = static_cast<LaserFence*>(g_context->m_location->GetBuilding(m_nextLaserFenceId));
     if (nextFence)
       nextFence->Toggle();
   }
@@ -280,7 +280,7 @@ void LaserFence::Electrocute(const LegacyVector3& _pos) { g_simEventQueue.Push(S
 
 bool LaserFence::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 {
-  if (m_mode == ModeDisabled || g_app->m_editing)
+  if (m_mode == ModeDisabled || g_context->m_editing)
   {
     SpherePackage sphere(_pos, _radius);
     Matrix34 transform(m_front, m_up, m_pos);
@@ -321,7 +321,7 @@ bool LaserFence::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 bool LaserFence::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                             LegacyVector3* _norm)
 {
-  if (m_mode == ModeDisabled || g_app->m_editing)
+  if (m_mode == ModeDisabled || g_context->m_editing)
   {
     RayPackage ray(_rayStart, _rayDir, _rayLen);
     Matrix34 transform(m_front, m_up, m_pos);
@@ -333,7 +333,7 @@ bool LaserFence::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3&
 
   if (m_nextLaserFenceId != -1 && m_status > 0.0f)
   {
-    Building* nextFence = g_app->m_location->GetBuilding(m_nextLaserFenceId);
+    Building* nextFence = g_context->m_location->GetBuilding(m_nextLaserFenceId);
     float maxHeight = GetFenceFullHeight();
     float fenceHeight = maxHeight * m_status;
     LegacyVector3 pos1 = m_pos - LegacyVector3(0, fenceHeight / 3, 0);

@@ -19,7 +19,7 @@ void SpiderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
 
     glDisable(GL_TEXTURE_2D);
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     //
     // Render body
@@ -27,7 +27,7 @@ void SpiderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
     LegacyVector3 predictedMovement = _ctx.predictionTime * spider.m_vel;
     LegacyVector3 predictedPos = spider.m_pos + predictedMovement;
 
-    LegacyVector3 up = g_app->m_location->m_landscape.m_normalMap->GetValue(spider.m_pos.x, spider.m_pos.z);
+    LegacyVector3 up = g_context->m_location->m_landscape.m_normalMap->GetValue(spider.m_pos.x, spider.m_pos.z);
     LegacyVector3 right = spider.m_up ^ spider.m_front;
     LegacyVector3 front = right ^ up;
 
@@ -55,5 +55,5 @@ void SpiderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
     for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
         spider.m_legs[i]->Render(_ctx.predictionTime, predictedMovement);
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 }

@@ -35,7 +35,7 @@ void SpiritRenderer::RenderSpirit(const Spirit& _spirit, float _predictionTime)
 
   RGBAColour colour;
   if (_spirit.m_teamId != 255)
-    colour = g_app->m_location->m_teams[_spirit.m_teamId].m_colour;
+    colour = g_context->m_location->m_teams[_spirit.m_teamId].m_colour;
   else
     colour.Set(255, 255, 255);
 
@@ -48,18 +48,18 @@ void SpiritRenderer::RenderSpirit(const Spirit& _spirit, float _predictionTime)
   glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
 
   glBegin(GL_QUADS);
-  glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+  glVertex3fv((predictedPos - g_context->m_camera->GetUp() * size).GetData());
+  glVertex3fv((predictedPos + g_context->m_camera->GetRight() * size).GetData());
+  glVertex3fv((predictedPos + g_context->m_camera->GetUp() * size).GetData());
+  glVertex3fv((predictedPos - g_context->m_camera->GetRight() * size).GetData());
   glEnd();
 
   size = spiritOuterSize;
   glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
   glBegin(GL_QUADS);
-  glVertex3fv((predictedPos - g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos + g_app->m_camera->GetRight() * size).GetData());
-  glVertex3fv((predictedPos + g_app->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos - g_app->m_camera->GetRight() * size).GetData());
+  glVertex3fv((predictedPos - g_context->m_camera->GetUp() * size).GetData());
+  glVertex3fv((predictedPos + g_context->m_camera->GetRight() * size).GetData());
+  glVertex3fv((predictedPos + g_context->m_camera->GetUp() * size).GetData());
+  glVertex3fv((predictedPos - g_context->m_camera->GetRight() * size).GetData());
   glEnd();
 }

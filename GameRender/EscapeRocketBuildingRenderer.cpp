@@ -33,19 +33,19 @@ void EscapeRocketBuildingRenderer::RenderAlphas(const Building& _building, const
     // Render rocket glow
 
     float alpha = rocket.m_fuel / 100.0f;
-    alpha = min(alpha, 1.0f);
-    alpha = max(alpha, 0.0f);
+    alpha = std::min(alpha, 1.0f);
+    alpha = std::max(alpha, 0.0f);
 
     if (alpha > 0.0f)
     {
-        LegacyVector3 camUp = g_app->m_camera->GetUp();
-        LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.75f;
+        LegacyVector3 camUp = g_context->m_camera->GetUp();
+        LegacyVector3 camRight = g_context->m_camera->GetRight() * 0.75f;
 
         glDepthMask(false);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
         float timeIndex = g_gameTime * 2;
 
@@ -71,7 +71,7 @@ void EscapeRocketBuildingRenderer::RenderAlphas(const Building& _building, const
             pos.z += cosf(timeIndex * 0.3f + i) * i * 3.7f;
 
             float size = 20.0f * sinf(timeIndex + i * 2);
-            size = max(size, 5.0f);
+            size = std::max(size, 5.0f);
 
             for (int j = 0; j < 2; ++j)
             {
@@ -93,7 +93,7 @@ void EscapeRocketBuildingRenderer::RenderAlphas(const Building& _building, const
         //
         // Central starbursts
 
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
         int numStars = 10;
         if (buildingDetail == 2)

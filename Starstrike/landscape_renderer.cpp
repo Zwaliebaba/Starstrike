@@ -187,7 +187,7 @@ void LandscapeRenderer::GetLandscapeColour(float _height, float _gradient, unsig
 
   *_colour = m_landscapeColour->GetPixel(x, y);
 
-  if (g_app->m_negativeRenderer)
+  if (g_context->m_negativeRenderer)
     _colour->a = 0;
 }
 
@@ -235,13 +235,13 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D<float>* _heightMap)
   : m_vertexBuffer(0)
 {
   char fullFilname[256];
-  snprintf(fullFilname, sizeof(fullFilname), "terrain\\%s", g_app->m_location->m_levelFile->m_landscapeColourFilename);
+  snprintf(fullFilname, sizeof(fullFilname), "terrain\\%s", g_context->m_location->m_levelFile->m_landscapeColourFilename);
 
   if (Location::ChristmasModEnabled() == 1)
     strncpy(fullFilname, "terrain\\landscape_icecaps.bmp", sizeof(fullFilname));
     fullFilname[sizeof(fullFilname) - 1] = '\0';
 
-  BinaryReader* reader = g_app->m_resource->GetBinaryReader(fullFilname);
+  BinaryReader* reader = Resource::GetBinaryReader(fullFilname);
   ASSERT_TEXT(reader != nullptr, "Failed to get resource %s", fullFilname);
   m_landscapeColour = new BitmapRGBA(reader, "bmp");
   delete reader;
@@ -277,7 +277,7 @@ void LandscapeRenderer::RenderMainSlow()
   glEnable(GL_COLOR_MATERIAL);
   glEnable(GL_LIGHTING);
 
-  if (g_app->m_negativeRenderer)
+  if (g_context->m_negativeRenderer)
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
@@ -302,7 +302,7 @@ void LandscapeRenderer::RenderMainSlow()
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
 
-  if (g_app->m_negativeRenderer)
+  if (g_context->m_negativeRenderer)
     glDisable(GL_BLEND);
 
   glDisable(GL_COLOR_MATERIAL);
@@ -319,12 +319,12 @@ void LandscapeRenderer::RenderOverlaySlow()
   glDepthMask(false);
   glDepthFunc(GL_LEQUAL);
 
-  if (!g_app->m_negativeRenderer)
+  if (!g_context->m_negativeRenderer)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   else
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
 
-  int outlineTextureId = g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false);
+  int outlineTextureId = Resource::GetTexture("textures/triangleOutline.bmp", true, false);
   glBindTexture(GL_TEXTURE_2D, outlineTextureId);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -384,13 +384,13 @@ void LandscapeRenderer::Render()
   if (m_verts.Size() <= 0)
     return;
 
-  g_app->m_location->SetupFog();
+  g_context->m_location->SetupFog();
   glEnable(GL_FOG);
 
-  START_PROFILE(g_app->m_profiler, "Render Landscape");
+  START_PROFILE(g_context->m_profiler, "Render Landscape");
   RenderMainSlow();
   RenderOverlaySlow();
-  END_PROFILE(g_app->m_profiler, "Render Landscape");
+  END_PROFILE(g_context->m_profiler, "Render Landscape");
 
   glDisable(GL_FOG);
 }

@@ -16,7 +16,7 @@ StartSequence::StartSequence()
 {
   m_startTime = GetHighResTime();
 
-  float screenRatio = static_cast<float>(g_app->m_renderer->ScreenH()) / static_cast<float>(g_app->m_renderer->ScreenW());
+  float screenRatio = static_cast<float>(g_context->m_renderer->ScreenH()) / static_cast<float>(g_context->m_renderer->ScreenW());
   int screenH = 800 * screenRatio;
 
   float x = 150;
@@ -60,34 +60,34 @@ bool StartSequence::Advance()
   if (GetHighResTime() > m_startTime && !started)
   {
     started = true;
-    g_app->m_soundSystem->TriggerOtherEvent(nullptr, "StartSequence", SoundSourceBlueprint::TypeMusic);
-    g_app->m_camera->SetDebugMode(Camera::DebugModeAuto);
-    g_app->m_camera->RequestMode(Camera::ModeSphereWorldIntro);
+    g_context->m_soundSystem->TriggerOtherEvent(nullptr, "StartSequence", SoundSourceBlueprint::TypeMusic);
+    g_context->m_camera->SetDebugMode(Camera::DebugModeAuto);
+    g_context->m_camera->RequestMode(Camera::ModeSphereWorldIntro);
   }
 
   g_inputManager->PollForEvents();
 
-  if (g_inputManager->controlEvent(ControlSkipMessage) || g_app->m_requestQuit || (GetHighResTime() - m_startTime) > 90)
+  if (g_inputManager->controlEvent(ControlSkipMessage) || g_context->m_requestQuit || (GetHighResTime() - m_startTime) > 90)
   {
-    g_app->m_soundSystem->StopAllSounds(WorldObjectId(), "Music StartSequence");
+    g_context->m_soundSystem->StopAllSounds(WorldObjectId(), "Music StartSequence");
     return true;
   }
 
-  g_app->m_userInput->Advance();
-  g_app->m_camera->Advance();
-  g_app->m_soundSystem->Advance();
+  g_context->m_userInput->Advance();
+  g_context->m_camera->Advance();
+  g_context->m_soundSystem->Advance();
 #ifdef PROFILER_ENABLED
-  g_app->m_profiler->Advance();
+  g_context->m_profiler->Advance();
 #endif // PROFILER_ENABLED
 
-  g_app->m_renderer->Render();
+  g_context->m_renderer->Render();
 
   return false;
 }
 
 void StartSequence::Render2D()
 {
-  float screenRatio = static_cast<float>(g_app->m_renderer->ScreenH()) / static_cast<float>(g_app->m_renderer->ScreenW());
+  float screenRatio = static_cast<float>(g_context->m_renderer->ScreenH()) / static_cast<float>(g_context->m_renderer->ScreenW());
   int screenH = 800 * screenRatio;
 
   auto& mv = OpenGLD3D::GetModelViewStack();
@@ -213,7 +213,7 @@ void StartSequence::Render3D()
   glColor4f(0.5, 0.5, 1.0, 0.5);
 
   float percentDrawn = 1.0f - (timeNow - 50.0f) / 10.0f;
-  percentDrawn = max(percentDrawn, 0.0f);
+  percentDrawn = std::max(percentDrawn, 0.0f);
   xEnd -= (8000 + 4000 * r * percentDrawn);
   zEnd -= (8000 + 4000 * r * percentDrawn);
 
@@ -232,7 +232,7 @@ void StartSequence::Render3D()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDepthMask(true);
 
-  g_app->m_globalWorld->SetupFog();
+  g_context->m_globalWorld->SetupFog();
   glDisable(GL_FOG);
 
   mv.Pop();

@@ -1,12 +1,11 @@
 #include "pch.h"
 #include "file_writer.h"
-#include "math_utils.h"
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "generichub.h"
 #include "controltower.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "global_world.h"
 #include "GameSimEventQueue.h"
@@ -59,7 +58,7 @@ void DynamicBase::SetShapeName(char* _shapeName)
 
   if (strcmp(m_shapeName, "none") != 0)
   {
-    SetShape(g_app->m_resource->GetShapeStatic(m_shapeName));
+    SetShape(Resource::GetShapeStatic(m_shapeName));
 
     Matrix34 mat(m_front, m_up, m_pos);
 
@@ -83,7 +82,7 @@ DynamicHub::DynamicHub()
     m_minActiveLinks(0)
 {
   m_type = TypeDynamicHub;
-  //SetShape( g_app->m_resource->GetShapeStatic( "generator.shp" ) );
+  //SetShape( Resource::GetShapeStatic( "generator.shp" ) );
 }
 
 void DynamicHub::Initialise(Building* _template)
@@ -113,11 +112,11 @@ bool DynamicHub::Advance()
     // the m_enabled state of this building has been lost.
 
     bool towerFound = false;
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings[i];
+        Building* building = g_context->m_location->m_buildings[i];
         if (building && building->m_type == TypeControlTower)
         {
           auto tower = static_cast<ControlTower*>(building);
@@ -153,20 +152,20 @@ bool DynamicHub::Advance()
     {
       if (m_enabled)
       {
-        GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+        GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
         if (gb && !gb->m_online)
         {
           gb->m_online = true;
-          g_app->m_globalWorld->EvaluateEvents();
+          g_context->m_globalWorld->EvaluateEvents();
         }
       }
-      else if (!g_app->m_location->MissionComplete())
+      else if (!g_context->m_location->MissionComplete())
       {
-        GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+        GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
         if (gb && gb->m_online)
         {
           gb->m_online = false;
-          g_app->m_globalWorld->EvaluateEvents();
+          g_context->m_globalWorld->EvaluateEvents();
         }
       }
     }
@@ -194,7 +193,7 @@ bool DynamicHub::ChangeScore(int _points)
   if (m_reprogrammed && m_currentScore < m_requiredScore)
   {
     m_currentScore += _points;
-    m_currentScore = min(m_currentScore, m_requiredScore);
+    m_currentScore = std::min(m_currentScore, m_requiredScore);
     return true;
   }
   return false;
@@ -246,7 +245,7 @@ DynamicNode::DynamicNode()
     m_scoreSupplied(0)
 {
   m_type = TypeDynamicNode;
-  //SetShape( g_app->m_resource->GetShapeStatic( "solarpanel.shp" ) );
+  //SetShape( Resource::GetShapeStatic( "solarpanel.shp" ) );
 }
 
 void DynamicNode::Initialise(Building* _template)
@@ -277,7 +276,7 @@ bool DynamicNode::Advance()
       {
         if (friendly)
         {
-          auto hub = static_cast<DynamicHub*>(g_app->m_location->GetBuilding(m_buildingLink));
+          auto hub = static_cast<DynamicHub*>(g_context->m_location->GetBuilding(m_buildingLink));
           if (hub && hub->m_type == TypeDynamicHub)
           {
             m_operating = true;
@@ -291,7 +290,7 @@ bool DynamicNode::Advance()
   {
     if (GetNumPortsOccupied() < GetNumPorts())
     {
-      auto hub = static_cast<DynamicHub*>(g_app->m_location->GetBuilding(m_buildingLink));
+      auto hub = static_cast<DynamicHub*>(g_context->m_location->GetBuilding(m_buildingLink));
       if (hub && hub->m_type == TypeDynamicHub)
       {
         m_operating = false;
@@ -306,7 +305,7 @@ bool DynamicNode::Advance()
         if (m_scoreTimer <= 0.0f)
         {
           m_scoreTimer = 1.0f;
-          auto hub = static_cast<DynamicHub*>(g_app->m_location->GetBuilding(m_buildingLink));
+          auto hub = static_cast<DynamicHub*>(g_context->m_location->GetBuilding(m_buildingLink));
           if (hub && hub->m_type == TypeDynamicHub)
           {
             int scoreMod = 1;
@@ -330,7 +329,7 @@ void DynamicNode::ReprogramComplete()
 {
   if (GetNumPorts() == 0)
   {
-    auto hub = static_cast<DynamicHub*>(g_app->m_location->GetBuilding(m_buildingLink));
+    auto hub = static_cast<DynamicHub*>(g_context->m_location->GetBuilding(m_buildingLink));
     if (hub && hub->m_type == TypeDynamicHub)
     {
       m_operating = true;

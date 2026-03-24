@@ -118,7 +118,7 @@ bool GlobalEventCondition::Evaluate()
 
   case BuildingOnline:
     {
-      GlobalBuilding* building = g_app->m_globalWorld->GetBuilding(m_id, m_locationId);
+      GlobalBuilding* building = g_context->m_globalWorld->GetBuilding(m_id, m_locationId);
       if (building)
         return building->m_online;
       break;
@@ -126,17 +126,17 @@ bool GlobalEventCondition::Evaluate()
 
   case BuildingOffline:
     {
-      GlobalBuilding* building = g_app->m_globalWorld->GetBuilding(m_id, m_locationId);
+      GlobalBuilding* building = g_context->m_globalWorld->GetBuilding(m_id, m_locationId);
       if (building)
         return !building->m_online;
       break;
     }
 
   case ResearchOwned:
-    return (g_app->m_globalWorld->m_research->HasResearch(m_id));
+    return (g_context->m_globalWorld->m_research->HasResearch(m_id));
 
   case NotInLocation:
-    return (g_app->m_location == nullptr);
+    return (g_context->m_location == nullptr);
 
 case DebugKey:
   // JAMES_FIX: g_keys[] is internal to inputdriver_win32.cpp with no extern.
@@ -163,7 +163,7 @@ void GlobalEventCondition::Save(FileWriter* _out)
 
   case BuildingOnline:
   case BuildingOffline:
-    _out->printf(":%s,%d ", g_app->m_globalWorld->GetLocationName(m_locationId), m_id);
+    _out->printf(":%s,%d ", g_context->m_globalWorld->GetLocationName(m_locationId), m_id);
     break;
 
   case ResearchOwned:
@@ -198,7 +198,7 @@ void GlobalEventAction::Read(TextReader* _in)
   if (_stricmp(action, "SetMission") == 0)
   {
     m_type = SetMission;
-    m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
+    m_locationId = g_context->m_globalWorld->GetLocationId(_in->GetNextToken());
     DEBUG_ASSERT(m_locationId != -1);
     m_filename = _in->GetNextToken();
   }
@@ -210,7 +210,7 @@ void GlobalEventAction::Read(TextReader* _in)
   else if (_stricmp(action, "MakeAvailable") == 0)
   {
     m_type = MakeAvailable;
-    m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
+    m_locationId = g_context->m_globalWorld->GetLocationId(_in->GetNextToken());
     DEBUG_ASSERT(m_locationId != -1);
   }
   else { DEBUG_ASSERT(false); }
@@ -220,7 +220,7 @@ void GlobalEventAction::Write(FileWriter* _out)
 {
   _out->printf("\t\tAction %-10s ", GetTypeName(m_type));
 
-  const char* locationName = g_app->m_globalWorld->GetLocationName(m_locationId);
+  const char* locationName = g_context->m_globalWorld->GetLocationName(m_locationId);
 
   switch (m_type)
   {
@@ -246,19 +246,19 @@ void GlobalEventAction::Execute()
   {
   case SetMission:
     {
-      GlobalLocation* loc = g_app->m_globalWorld->GetLocation(m_locationId);
+      GlobalLocation* loc = g_context->m_globalWorld->GetLocation(m_locationId);
       DEBUG_ASSERT(loc);
       loc->m_missionFilename = m_filename;
       break;
     }
   case RunScript:
     {
-      g_app->m_script->RunScript(m_filename.c_str());
+      g_context->m_script->RunScript(m_filename.c_str());
       break;
     }
   case MakeAvailable:
     {
-      GlobalLocation* loc = g_app->m_globalWorld->GetLocation(m_locationId);
+      GlobalLocation* loc = g_context->m_globalWorld->GetLocation(m_locationId);
       DEBUG_ASSERT(loc);
       loc->m_available = true;
       break;
@@ -340,7 +340,7 @@ void GlobalEvent::Read(TextReader* _in)
 
     case GlobalEventCondition::BuildingOffline:
     case GlobalEventCondition::BuildingOnline:
-      condition->m_locationId = g_app->m_globalWorld->GetLocationId(_in->GetNextToken());
+      condition->m_locationId = g_context->m_globalWorld->GetLocationId(_in->GetNextToken());
       condition->m_id = atoi(_in->GetNextToken());
       DEBUG_ASSERT(condition->m_locationId != -1);
       break;
@@ -467,7 +467,7 @@ void GlobalResearch::EvaluateLevel(int _type)
       {
         // This action should only go off if a player UPGRADES an existing research item
         // Not if he finds a new one
-        g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearchUpgrade, _type, 4.0f);
+        g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageResearchUpgrade, _type, 4.0f);
       }
     }
   }
@@ -665,7 +665,7 @@ void SphereWorld::AddLocation(int _locationId)
     else
     {
       // Generate some new spirits
-      GlobalLocation* loc = g_app->m_globalWorld->GetLocation(locationId);
+      GlobalLocation* loc = g_context->m_globalWorld->GetLocation(locationId);
       if (loc)
       {
         if (loc->m_name == "receiver")
@@ -707,7 +707,7 @@ void SphereWorld::Render()
   RenderIslands();
   RenderTrunkLinks();
 
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
     RenderSpirits();
     RenderHeaven();
@@ -716,14 +716,14 @@ void SphereWorld::Render()
 
 void SphereWorld::RenderSpirits()
 {
-  START_PROFILE(g_app->m_profiler, "Spirits");
+  START_PROFILE(g_context->m_profiler, "Spirits");
 
   //
   // Advance all spirits
 
   for (int locationId = 0; locationId < m_numLocations; ++locationId)
   {
-    GlobalLocation* location = g_app->m_globalWorld->GetLocation(locationId);
+    GlobalLocation* location = g_context->m_globalWorld->GetLocation(locationId);
     if (location)
     {
       bool isReceiver = (location->m_name == "receiver");
@@ -766,21 +766,21 @@ void SphereWorld::RenderSpirits()
   glDepthMask(false);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
 
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
+  LegacyVector3 camRight = g_context->m_camera->GetRight();
+  LegacyVector3 camUp = g_context->m_camera->GetUp();
 
   for (int locationId = 0; locationId < m_numLocations; ++locationId)
   {
-    GlobalLocation* location = g_app->m_globalWorld->GetLocation(locationId);
+    GlobalLocation* location = g_context->m_globalWorld->GetLocation(locationId);
     if (location)
     {
       for (int i = 0; i < m_spirits[locationId].Size(); ++i)
       {
         float* thisSpirit = m_spirits[locationId].GetPointer(i);
 
-        LegacyVector3 fromPos = g_app->m_globalWorld->GetLocationPosition(locationId);
+        LegacyVector3 fromPos = g_context->m_globalWorld->GetLocationPosition(locationId);
 
         float alphaValue = *thisSpirit * 3.0f;
         if (alphaValue > 1.0f)
@@ -844,14 +844,14 @@ void SphereWorld::RenderSpirits()
   glDisable(GL_BLEND);
   glEnable(GL_CULL_FACE);
 
-  END_PROFILE(g_app->m_profiler, "Spirits");
+  END_PROFILE(g_context->m_profiler, "Spirits");
 }
 
 void SphereWorld::RenderWorldShape()
 {
-  START_PROFILE(g_app->m_profiler, "Shape");
+  START_PROFILE(g_context->m_profiler, "Shape");
 
-  g_app->m_globalWorld->SetupLights();
+  g_context->m_globalWorld->SetupLights();
 
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -894,12 +894,12 @@ void SphereWorld::RenderWorldShape()
   glDisable(GL_LIGHT0);
   glDisable(GL_LIGHT1);
 
-  END_PROFILE(g_app->m_profiler, "Shape");
+  END_PROFILE(g_context->m_profiler, "Shape");
 }
 
 void SphereWorld::RenderTrunkLinks()
 {
-  //if( g_app->m_editing ) return;
+  //if( g_context->m_editing ) return;
 
   Matrix34 rootMat(0);
 
@@ -909,18 +909,18 @@ void SphereWorld::RenderTrunkLinks()
 
   glBegin(GL_QUADS);
 
-  for (int i = 0; i < g_app->m_globalWorld->m_buildings.Size(); ++i)
+  for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
   {
-    GlobalBuilding* building = g_app->m_globalWorld->m_buildings[i];
+    GlobalBuilding* building = g_context->m_globalWorld->m_buildings[i];
     if (building->m_type == Building::TypeTrunkPort && building->m_link != -1)
     {
-      GlobalLocation* fromLoc = g_app->m_globalWorld->GetLocation(building->m_locationId);
-      GlobalLocation* toLoc = g_app->m_globalWorld->GetLocation(building->m_link);
+      GlobalLocation* fromLoc = g_context->m_globalWorld->GetLocation(building->m_locationId);
+      GlobalLocation* toLoc = g_context->m_globalWorld->GetLocation(building->m_link);
 
-      if (fromLoc && toLoc && (fromLoc->m_available && toLoc->m_available) || g_app->m_editing)
+      if (fromLoc && toLoc && (fromLoc->m_available && toLoc->m_available) || g_context->m_editing)
       {
-        LegacyVector3 fromPos = g_app->m_globalWorld->GetLocationPosition(building->m_locationId);
-        LegacyVector3 toPos = g_app->m_globalWorld->GetLocationPosition(building->m_link);
+        LegacyVector3 fromPos = g_context->m_globalWorld->GetLocationPosition(building->m_locationId);
+        LegacyVector3 toPos = g_context->m_globalWorld->GetLocationPosition(building->m_link);
 
         if (building->m_online)
           glColor4f(0.4f, 0.3f, 1.0f, 1.0f);
@@ -931,7 +931,7 @@ void SphereWorld::RenderTrunkLinks()
         //toPos *= 120.0f;
 
         LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-        LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
+        LegacyVector3 camToMidPoint = g_context->m_camera->GetPos() - midPoint;
         LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
 
         rightAngle *= 200.0f;
@@ -952,9 +952,9 @@ void SphereWorld::RenderTrunkLinks()
 
 void SphereWorld::RenderHeaven()
 {
-  START_PROFILE(g_app->m_profiler, "Heaven");
+  START_PROFILE(g_context->m_profiler, "Heaven");
 
-  g_app->m_globalWorld->SetupLights();
+  g_context->m_globalWorld->SetupLights();
 
   //
   // Render the central repository of spirits
@@ -963,14 +963,14 @@ void SphereWorld::RenderHeaven()
   mv.Push();
   mv.Scale(120.0f, 120.0f, 120.0f);
 
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
+  LegacyVector3 camUp = g_context->m_camera->GetUp();
+  LegacyVector3 camRight = g_context->m_camera->GetRight();
 
   glDepthMask(false);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
 
   for (int i = 0; i < 50; ++i)
   {
@@ -998,12 +998,12 @@ void SphereWorld::RenderHeaven()
   // Render god rays going down
 
   /*
-      glBindTexture   ( GL_TEXTURE_2D, g_app->m_resource->GetTexture( "textures/godray.bmp" ) );
+      glBindTexture   ( GL_TEXTURE_2D, Resource::GetTexture( "textures/godray.bmp" ) );
   
-    for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
+    for (int i = 0; i < g_context->m_globalWorld->m_locations.Size(); ++i)
     {
-      GlobalLocation *loc = g_app->m_globalWorld->m_locations.GetData(i);
-          LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id );
+      GlobalLocation *loc = g_context->m_globalWorld->m_locations.GetData(i);
+          LegacyVector3 islandPos = g_context->m_globalWorld->GetLocationPosition(loc->m_id );
           LegacyVector3 centerPos = g_zeroVector;
   
           for( int j = 0; j < 6; ++j )
@@ -1014,7 +1014,7 @@ void SphereWorld::RenderHeaven()
               godRayPos.y += sinf( g_gameTime + i + j/2 ) * 1000;
               godRayPos.z += cosf( g_gameTime + i + j/2 ) * 1000;
   
-              LegacyVector3 camToCenter = g_app->m_camera->GetPos() - centerPos;
+              LegacyVector3 camToCenter = g_context->m_camera->GetPos() - centerPos;
               LegacyVector3 lineToCenter = camToCenter ^ ( centerPos - godRayPos );
               lineToCenter.Normalise();
   
@@ -1036,24 +1036,24 @@ void SphereWorld::RenderHeaven()
   glDisable(GL_BLEND);
   glDepthMask(true);
 
-  END_PROFILE(g_app->m_profiler, "Heaven");
+  END_PROFILE(g_context->m_profiler, "Heaven");
 }
 
 void SphereWorld::RenderIslands()
 {
-  if (g_app->m_camera->IsInMode(Camera::ModeSphereWorldIntro) || g_app->m_camera->IsInMode(Camera::ModeSphereWorldOutro))
+  if (g_context->m_camera->IsInMode(Camera::ModeSphereWorldIntro) || g_context->m_camera->IsInMode(Camera::ModeSphereWorldOutro))
     return;
 
   //
   // Render the islands
 
-  START_PROFILE(g_app->m_profiler, "Islands");
+  START_PROFILE(g_context->m_profiler, "Islands");
 
   LegacyVector3 rayStart, rayDir;
-  g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+  g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
 
-  LegacyVector3 camRight = g_app->m_camera->GetRight();
-  LegacyVector3 camUp = g_app->m_camera->GetUp();
+  LegacyVector3 camRight = g_context->m_camera->GetRight();
+  LegacyVector3 camUp = g_context->m_camera->GetUp();
 
   //    glColor4f       ( 1.0f, 1.0f, 1.0f, 1.0f );
   glColor4f(0.6f, 0.2f, 0.1f, 1.0f);
@@ -1062,14 +1062,14 @@ void SphereWorld::RenderIslands()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_BLEND);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
-  for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
+  for (int i = 0; i < g_context->m_globalWorld->m_locations.Size(); ++i)
   {
-    GlobalLocation* loc = g_app->m_globalWorld->m_locations.GetData(i);
-    if (loc->m_available || g_app->m_editing)
+    GlobalLocation* loc = g_context->m_globalWorld->m_locations.GetData(i);
+    if (loc->m_available || g_context->m_editing)
     {
-      LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id);
+      LegacyVector3 islandPos = g_context->m_globalWorld->GetLocationPosition(loc->m_id);
 
       int numRedraws = 5;
       if (!loc->m_missionCompleted && _stricmp(loc->m_missionFilename.c_str(), "null") != 0 && fmodf(g_gameTime, 1.0f) < 0.7f)
@@ -1102,23 +1102,23 @@ void SphereWorld::RenderIslands()
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-  for (int i = 0; i < g_app->m_globalWorld->m_locations.Size(); ++i)
+  for (int i = 0; i < g_context->m_globalWorld->m_locations.Size(); ++i)
   {
-    GlobalLocation* loc = g_app->m_globalWorld->m_locations.GetData(i);
-    if (loc->m_available || g_app->m_editing)
+    GlobalLocation* loc = g_context->m_globalWorld->m_locations.GetData(i);
+    if (loc->m_available || g_context->m_editing)
     {
-      LegacyVector3 islandPos = g_app->m_globalWorld->GetLocationPosition(loc->m_id);
-      char* islandName = _strdup(g_app->m_globalWorld->GetLocationNameTranslated(loc->m_id));
+      LegacyVector3 islandPos = g_context->m_globalWorld->GetLocationPosition(loc->m_id);
+      char* islandName = _strdup(g_context->m_globalWorld->GetLocationNameTranslated(loc->m_id));
       _strupr(islandName);
 
-      float size = 5.0f * sqrtf((g_app->m_camera->GetPos() - islandPos).Mag());
+      float size = 5.0f * sqrtf((g_context->m_camera->GetPos() - islandPos).Mag());
       size = 1000.0f;
 
       g_gameFont.SetRenderShadow(true);
       glColor4f(0.7f, 0.7f, 0.7f, 0.0f);
       g_gameFont.DrawText3DCenter(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
-      if (g_app->m_editing)
+      if (g_context->m_editing)
       {
         g_gameFont.DrawText3DCenter(islandPos, size, loc->m_mapFilename.c_str());
         g_gameFont.DrawText3DCenter(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
@@ -1134,7 +1134,7 @@ void SphereWorld::RenderIslands()
 
       g_gameFont.DrawText3DCenter(islandPos + camUp * size * 1.5f, size * 3.0f, islandName);
 
-      if (g_app->m_editing)
+      if (g_context->m_editing)
       {
         g_gameFont.DrawText3DCenter(islandPos, size, loc->m_mapFilename.c_str());
         g_gameFont.DrawText3DCenter(islandPos - camUp * size, size, loc->m_missionFilename.c_str());
@@ -1144,7 +1144,7 @@ void SphereWorld::RenderIslands()
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "Islands");
+  END_PROFILE(g_context->m_profiler, "Islands");
 }
 
 // ****************************************************************************
@@ -1177,7 +1177,7 @@ GlobalWorld::~GlobalWorld()
 
 void GlobalWorld::Advance()
 {
-  if (g_app->m_editing)
+  if (g_context->m_editing)
   {
     if (m_editorMode == 0)
     {
@@ -1185,16 +1185,16 @@ void GlobalWorld::Advance()
       if (g_inputManager->controlEvent(ControlSelectLocation))
       {
         LegacyVector3 rayStart, rayDir;
-        g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+        g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
         int locId = LocationHit(rayStart, rayDir);
         if (locId != -1)
         {
           GlobalLocation* loc = GetLocation(locId);
-          g_app->m_requestedLocationId = locId;
-          strncpy(g_app->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
-          g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
-          strncpy(g_app->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
-          g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
+          g_context->m_requestedLocationId = locId;
+          strncpy(g_context->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_context->m_requestedMission));
+          g_context->m_requestedMission[sizeof(g_context->m_requestedMission) - 1] = '\0';
+          strncpy(g_context->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_context->m_requestedMap));
+          g_context->m_requestedMap[sizeof(g_context->m_requestedMap) - 1] = '\0';
         }
       }
     }
@@ -1204,7 +1204,7 @@ void GlobalWorld::Advance()
       if (g_inputManager->controlEvent(ControlSelectLocation))
       {
         LegacyVector3 rayStart, rayDir;
-        g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+        g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
         m_editorSelectionId = LocationHit(rayStart, rayDir);
       }
       else if (g_inputManager->controlEvent(ControlLocationDragActive))
@@ -1212,7 +1212,7 @@ void GlobalWorld::Advance()
         GlobalLocation* loc = GetLocation(m_editorSelectionId);
         if (loc)
         {
-          LegacyVector3 mousePos3D = g_app->m_userInput->GetMousePos3d();
+          LegacyVector3 mousePos3D = g_context->m_userInput->GetMousePos3d();
           loc->m_pos = mousePos3D / 120.0f;
         }
       }
@@ -1226,7 +1226,7 @@ void GlobalWorld::Advance()
     if (g_inputManager->controlEvent(ControlSelectLocation) && m_locationRequested == -1 && EclGetWindows()->Size() == 0)
     {
       LegacyVector3 rayStart, rayDir;
-      g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+      g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
       int locId = LocationHit(rayStart, rayDir);
       if (locId != -1)
       {
@@ -1235,7 +1235,7 @@ void GlobalWorld::Advance()
         {
           // Default behaviour is to go the location
           m_locationRequested = locId;
-          g_app->m_renderer->StartFadeOut();
+          g_context->m_renderer->StartFadeOut();
         }
       }
     }
@@ -1243,15 +1243,15 @@ void GlobalWorld::Advance()
     else if (m_locationRequested == -1 && EclGetWindows()->Size() == 0)
     {
       LegacyVector3 rayStart, rayDir;
-      g_app->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
+      g_context->m_camera->GetClickRay(g_target->X(), g_target->Y(), &rayStart, &rayDir);
       int locId = LocationHit(rayStart, rayDir, 10000.0f);
       if (locId != -1)
       {
         // We're close to a location, but not there, so drag the pointer towards it
         GlobalLocation* loc = GetLocation(locId);
         float locX, locY;
-        g_app->m_camera->Get2DScreenPos(loc->m_pos, &locX, &locY);
-        locY = g_app->m_renderer->ScreenH() - locY;
+        g_context->m_camera->Get2DScreenPos(loc->m_pos, &locX, &locY);
+        locY = g_context->m_renderer->ScreenH() - locY;
         int movX = static_cast<int>(locX - g_target->X());
         int movY = static_cast<int>(locY - g_target->Y());
         int movMag2 = movX * movX + movY * movY;
@@ -1262,14 +1262,14 @@ void GlobalWorld::Advance()
     }
 
     // Has the fade out finished?
-    if (m_locationRequested != -1 && g_app->m_renderer->IsFadeComplete())
+    if (m_locationRequested != -1 && g_context->m_renderer->IsFadeComplete())
     {
       GlobalLocation* loc = GetLocation(m_locationRequested);
-      g_app->m_requestedLocationId = m_locationRequested;
-      strncpy(g_app->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_app->m_requestedMission));
-      g_app->m_requestedMission[sizeof(g_app->m_requestedMission) - 1] = '\0';
-      strncpy(g_app->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_app->m_requestedMap));
-      g_app->m_requestedMap[sizeof(g_app->m_requestedMap) - 1] = '\0';
+      g_context->m_requestedLocationId = m_locationRequested;
+      strncpy(g_context->m_requestedMission, loc->m_missionFilename.c_str(), sizeof(g_context->m_requestedMission));
+      g_context->m_requestedMission[sizeof(g_context->m_requestedMission) - 1] = '\0';
+      strncpy(g_context->m_requestedMap, loc->m_mapFilename.c_str(), sizeof(g_context->m_requestedMap));
+      g_context->m_requestedMap[sizeof(g_context->m_requestedMap) - 1] = '\0';
 
       m_locationRequested = -1;
     }
@@ -1278,15 +1278,15 @@ void GlobalWorld::Advance()
 
 void GlobalWorld::Render()
 {
-  START_PROFILE(g_app->m_profiler, "Render Global World");
+  START_PROFILE(g_context->m_profiler, "Render Global World");
 
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
     m_globalInternet->Render();
   CHECK_OPENGL_STATE();
   m_sphereWorld->Render();
   CHECK_OPENGL_STATE();
 
-  END_PROFILE(g_app->m_profiler, "Render Global World");
+  END_PROFILE(g_context->m_profiler, "Render Global World");
 }
 
 // Returns the ID of the location the line intersects. Returns -1 if line
@@ -1326,14 +1326,14 @@ GlobalLocation* GlobalWorld::GetHighlightedLocation()
   int screenY = g_target->Y();
 
   LegacyVector3 rayStart, rayDir;
-  g_app->m_camera->GetClickRay(screenX, screenY, &rayStart, &rayDir);
-  int locId = g_app->m_globalWorld->LocationHit(rayStart, rayDir);
+  g_context->m_camera->GetClickRay(screenX, screenY, &rayStart, &rayDir);
+  int locId = g_context->m_globalWorld->LocationHit(rayStart, rayDir);
 
   GlobalLocation* loc = GetLocation(locId);
 
   if (loc && loc->m_available)
     return loc;
-  if (loc && g_app->m_editing)
+  if (loc && g_context->m_editing)
     return loc;
 
   return nullptr;
@@ -1543,15 +1543,15 @@ void GlobalWorld::LoadGame(const char* _filename)
 {
   TextReader* in = nullptr;
 
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
-    auto fullFilename = std::format("{}users/{}/{}", g_app->GetProfileDirectory(), g_app->m_userProfileName, _filename);
+    auto fullFilename = std::format("{}users/{}/{}", g_context->GetProfileDirectory(), g_context->m_userProfileName, _filename);
     if (DoesFileExist(fullFilename.c_str()))
       in = new TextFileReader(fullFilename.c_str());
   }
 
   if (!in)
-    in = g_app->m_resource->GetTextReader(_filename);
+    in = Resource::GetTextReader(_filename);
 
   if (in)
   {
@@ -1642,7 +1642,7 @@ void GlobalWorld::LoadGame(const char* _filename)
 
 void GlobalWorld::LoadLocations(const char* _filename)
 {
-  TextReader* in = g_app->m_resource->GetTextReader(_filename);
+  TextReader* in = Resource::GetTextReader(_filename);
 
   while (in->ReadLine())
   {
@@ -1668,7 +1668,7 @@ int GlobalWorld::GenerateBuildingId()
   int id = 0;
   while (true)
   {
-    if (!g_app->m_location->GetBuilding(id))
+    if (!g_context->m_location->GetBuilding(id))
       break;
     ++id;
   }
@@ -1681,7 +1681,7 @@ int GlobalWorld::GenerateBuildingId()
 // Returns true if actions remain to be completed
 bool GlobalWorld::EvaluateEvents()
 {
-  if (g_app->m_script && g_app->m_script->IsRunningScript())
+  if (g_context->m_script && g_context->m_script->IsRunningScript())
     return true;
 
   for (int i = 0; i < m_events.Size(); ++i)
@@ -1710,8 +1710,8 @@ void GlobalWorld::TransferSpirits(int _locationId)
   //
   // Count how many spirits remain on the location
 
-  DEBUG_ASSERT(g_app->m_location);
-  int remainingSpirits = g_app->m_location->m_spirits.NumUsed();
+  DEBUG_ASSERT(g_context->m_location);
+  int remainingSpirits = g_context->m_location->m_spirits.NumUsed();
 
   GlobalLocation* location = GetLocation(_locationId);
   ASSERT_TEXT(location, "GlobalWorld::TransferSpirits, failed to lookup location %d", _locationId);
@@ -1761,8 +1761,8 @@ void GlobalWorld::SetupFog()
 
 float GlobalWorld::GetSize()
 {
-  if (g_app->m_location)
-    return g_app->m_location->m_landscape.GetWorldSizeX();
+  if (g_context->m_location)
+    return g_context->m_location->m_landscape.GetWorldSizeX();
 
   return 2e5;
 }

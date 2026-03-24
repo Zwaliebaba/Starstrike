@@ -20,7 +20,7 @@ void EngineerRenderer::RenderShape(const Engineer& _engineer, float _predictionT
     LegacyVector3 predictedPos = _engineer.m_pos + _engineer.m_vel * _predictionTime;
     if (_engineer.m_onGround)
     {
-        predictedPos.y = max(g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z), 0.0f) +
+        predictedPos.y = std::max(g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z), 0.0f) +
             _engineer.m_hoverHeight;
     }
 
@@ -31,7 +31,7 @@ void EngineerRenderer::RenderShape(const Engineer& _engineer, float _predictionT
     LegacyVector3 entityRight = entityFront ^ entityUp;
     entityUp = entityRight ^ entityFront;
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     glEnable(GL_CULL_FACE);
     glDisable(GL_TEXTURE_2D);
@@ -46,7 +46,7 @@ void EngineerRenderer::RenderShape(const Engineer& _engineer, float _predictionT
     glEnable(GL_BLEND);
     glDisable(GL_COLOR_MATERIAL);
     glEnable(GL_TEXTURE_2D);
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
     glEnable(GL_CULL_FACE);
 }
 
@@ -55,7 +55,7 @@ void EngineerRenderer::RenderLaser(const Engineer& _engineer, float _predictionT
     LegacyVector3 fromPos = _engineer.m_pos;
     LegacyVector3 toPos;
 
-    Building* building = g_app->m_location->GetBuilding(_engineer.m_buildingId);
+    Building* building = g_context->m_location->GetBuilding(_engineer.m_buildingId);
     if (building)
     {
         if (building->m_type == Building::TypeControlTower)
@@ -81,7 +81,7 @@ void EngineerRenderer::RenderLaser(const Engineer& _engineer, float _predictionT
         }
 
         LegacyVector3 midPoint = fromPos + (toPos - fromPos) / 2.0f;
-        LegacyVector3 camToMidPoint = g_app->m_camera->GetPos() - midPoint;
+        LegacyVector3 camToMidPoint = g_context->m_camera->GetPos() - midPoint;
         LegacyVector3 rightAngle = (camToMidPoint ^ (midPoint - toPos)).Normalise();
 
         rightAngle *= 0.5f;
@@ -92,7 +92,7 @@ void EngineerRenderer::RenderLaser(const Engineer& _engineer, float _predictionT
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glDepthMask(false);
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
 
         glBegin(GL_QUADS);
         glTexCoord2i(0, 0);
@@ -119,7 +119,7 @@ void EngineerRenderer::Render(const Entity& _entity, const EntityRenderContext& 
     LegacyVector3 predictedPos = engineer.m_pos + engineer.m_vel * _ctx.predictionTime;
     if (engineer.m_onGround)
     {
-        predictedPos.y = max(g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z), 0.0f) +
+        predictedPos.y = std::max(g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z), 0.0f) +
             engineer.m_hoverHeight;
     }
 

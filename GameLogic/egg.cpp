@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "resource.h"
 #include "egg.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"
@@ -30,9 +30,9 @@ void Egg::ChangeHealth(int amount)
 
 bool Egg::Advance(Unit* _unit)
 {
-  if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+  if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
   {
-    Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+    Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
     spirit->m_pos = m_pos + LegacyVector3(0, 3, 0);
   }
 
@@ -44,8 +44,8 @@ bool Egg::Advance(Unit* _unit)
 
       if (m_timer >= 15.0f)
       {
-        g_app->m_location->m_spirits.MarkNotUsed(m_spiritId);
-        g_app->m_location->SpawnEntities(m_pos, m_id.GetTeamId(), -1, TypeVirii, 4, g_zeroVector, 0.0f, 200.0f);
+        g_context->m_location->m_spirits.MarkNotUsed(m_spiritId);
+        g_context->m_location->SpawnEntities(m_pos, m_id.GetTeamId(), -1, TypeVirii, 4, g_zeroVector, 0.0f, 200.0f);
         return true;
       }
     }
@@ -64,7 +64,7 @@ bool Egg::Advance(Unit* _unit)
 
   if (m_onGround)
   {
-    float groundLevel = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    float groundLevel = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     if (m_pos.y < groundLevel)
       m_pos.y = groundLevel;
     else if (m_pos.y > groundLevel)
@@ -73,9 +73,9 @@ bool Egg::Advance(Unit* _unit)
 
   if (m_dead)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(m_spiritId))
+    if (g_context->m_location->m_spirits.ValidIndex(m_spiritId))
     {
-      Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+      Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
       spirit->EggDestroyed();
       m_spiritId = -1;
     }
@@ -94,10 +94,10 @@ bool Egg::Advance(Unit* _unit)
 
 void Egg::Fertilise(int spiritId)
 {
-  if (g_app->m_location->m_spirits.ValidIndex(spiritId))
+  if (g_context->m_location->m_spirits.ValidIndex(spiritId))
   {
     m_spiritId = spiritId;
-    Spirit* spirit = g_app->m_location->m_spirits.GetPointer(m_spiritId);
+    Spirit* spirit = g_context->m_location->m_spirits.GetPointer(m_spiritId);
     spirit->InEgg();
     m_state = StateFertilised;
     m_timer = 0.0f;

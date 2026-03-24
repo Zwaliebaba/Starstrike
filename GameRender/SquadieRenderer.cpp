@@ -22,7 +22,7 @@ void SquadieRenderer::Render(const Entity& _entity, const EntityRenderContext& _
 
     LegacyVector3 predictedPos = squadie.m_pos + squadie.m_vel * _ctx.predictionTime;
     if (squadie.m_onGround)
-        predictedPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
+        predictedPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(predictedPos.x, predictedPos.z);
 
     LegacyVector3 entityUp = g_upVector;
     LegacyVector3 entityFront = squadie.m_front;
@@ -35,7 +35,7 @@ void SquadieRenderer::Render(const Entity& _entity, const EntityRenderContext& _
         //
         // 3d Shape
 
-        g_app->m_renderer->SetObjectLighting();
+        g_context->m_renderer->SetObjectLighting();
         glDisable(GL_TEXTURE_2D);
         glEnable(GL_COLOR_MATERIAL);
         glDisable(GL_BLEND);
@@ -65,6 +65,6 @@ void SquadieRenderer::Render(const Entity& _entity, const EntityRenderContext& _
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_COLOR_MATERIAL);
         glEnable(GL_TEXTURE_2D);
-        g_app->m_renderer->UnsetObjectLighting();
+        g_context->m_renderer->UnsetObjectLighting();
     }
 }

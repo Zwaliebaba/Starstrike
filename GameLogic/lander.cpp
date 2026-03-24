@@ -2,7 +2,7 @@
 #include "resource.h"
 #include "math_utils.h"
 #include "ShapeStatic.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "GameSimEventQueue.h"
 #include "team.h"
@@ -16,7 +16,7 @@ Lander::Lander()
 {
   m_type = TypeLander;
 
-  m_shape = g_app->m_resource->GetShapeStatic("lander.shp");
+  m_shape = Resource::GetShapeStatic("lander.shp");
   DEBUG_ASSERT(m_shape);
 }
 
@@ -29,7 +29,7 @@ bool Lander::Advance(Unit* _unit)
     bool amIDead = AdvanceDead(_unit);
     if (amIDead)
     {
-      g_app->m_location->Bang(m_pos, 30.0f, 50.0f);
+      g_context->m_location->Bang(m_pos, 30.0f, 50.0f);
       return true;
     }
   }
@@ -44,8 +44,8 @@ bool Lander::Advance(Unit* _unit)
     break;
   }
 
-  float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
   if (m_pos.x < 0.0f)
     m_pos.x = 0.0f;
   if (m_pos.z < 0.0f)
@@ -65,7 +65,7 @@ bool Lander::AdvanceSailing()
   m_vel = m_front * m_stats[StatSpeed];
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
-  float groundLevel = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float groundLevel = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   m_pos.y = groundLevel;
   if (m_pos.y < 0.0f)
     m_pos.y = 0.0f;
@@ -88,8 +88,8 @@ bool Lander::AdvanceLanded()
   {
     int unitId;
     int numToSpawn = syncfrand(2.0f) + 2.0f;
-    Unit* unit = g_app->m_location->m_teams[0].NewUnit(TypeLaserTroop, numToSpawn, &unitId, m_pos);
-    g_app->m_location->SpawnEntities(m_pos, m_id.GetTeamId(), unitId, TypeLaserTroop, numToSpawn, g_zeroVector, 0);
+    Unit* unit = g_context->m_location->m_teams[0].NewUnit(TypeLaserTroop, numToSpawn, &unitId, m_pos);
+    g_context->m_location->SpawnEntities(m_pos, m_id.GetTeamId(), unitId, TypeLaserTroop, numToSpawn, g_zeroVector, 0);
 
     LegacyVector3 offset(0.0f, 0.0f, syncsfrand(200.0f));
     unit->SetWayPoint(m_pos + m_front * 750.0f + offset);

@@ -33,12 +33,12 @@ void DisplayScreenBuildingRenderer::RenderAlphas(const Building& _building, cons
     //
     // Render black blob
 
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
     float size = 70.0f;
     glColor4f(0.4f, 0.3f, 0.4f, 0.0f);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
 
@@ -70,7 +70,7 @@ void DisplayScreenBuildingRenderer::RenderAlphas(const Building& _building, cons
         Matrix34 rayMat = _building.m_shape->GetMarkerWorldMatrix(screen.m_rays[i], buildingMat);
 
         LegacyVector3 rayToArmour = (rayMat.pos - targetPos).Normalise();
-        LegacyVector3 right = (g_app->m_camera->GetPos() - rayMat.pos) ^ rayToArmour;
+        LegacyVector3 right = (g_context->m_camera->GetPos() - rayMat.pos) ^ rayToArmour;
         right.Normalise();
 
         glBegin(GL_QUADS);
@@ -94,7 +94,7 @@ void DisplayScreenBuildingRenderer::RenderAlphas(const Building& _building, cons
     glBlendFunc(GL_ZERO, GL_SRC_COLOR);
     screen.m_armour->Render(_ctx.predictionTime, armourMat);
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 
     glDisable(GL_NORMALIZE);
 }

@@ -6,7 +6,7 @@
 #include "vector2.h"
 #include "entity_leg.h"
 #include "tripod.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "entity_grid.h"
 #include "GameSimEventQueue.h"
 #include "location.h"
@@ -59,7 +59,7 @@ Tripod::Tripod()
     m_up(g_upVector),
     m_bodyVel(0, 0, 0)
 {
-  m_shape = g_app->m_resource->GetShapeStatic("tripod.shp");
+  m_shape = Resource::GetShapeStatic("tripod.shp");
   m_modeStartTime = 0.0f;
 
   // Initialise legs
@@ -190,18 +190,18 @@ void Tripod::DoFallForTwoLegs()
 
 WorldObjectId Tripod::FindEntityToAttack()
 {
-  START_PROFILE(g_app->m_profiler, "FindEntityToA");
+  START_PROFILE(g_context->m_profiler, "FindEntityToA");
 
   WorldObjectId id;
 
   int numFound;
-  WorldObjectId* enemies = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ATTACK_SEARCH_RADIUS, &numFound, m_id.GetTeamId());
+  WorldObjectId* enemies = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ATTACK_SEARCH_RADIUS, &numFound, m_id.GetTeamId());
 
   int nearest = -1;
   float nearestDistSqrd = FLT_MAX;
   for (int i = 0; i < numFound; ++i)
   {
-    Entity* entity = g_app->m_location->GetEntity(enemies[i]);
+    Entity* entity = g_context->m_location->GetEntity(enemies[i]);
     float deltaX = entity->m_pos.x - m_pos.x;
     float deltaY = entity->m_pos.z - m_pos.z;
     float distSqrd = deltaX * deltaX + deltaY * deltaY;
@@ -215,17 +215,17 @@ WorldObjectId Tripod::FindEntityToAttack()
   if (nearest != -1)
     id = enemies[nearest];
 
-  END_PROFILE(g_app->m_profiler, "FindEntityToA");
+  END_PROFILE(g_context->m_profiler, "FindEntityToA");
 
   return id;
 }
 
 Vector2 Tripod::ChooseDestination()
 {
-  START_PROFILE(g_app->m_profiler, "ChooseDest");
+  START_PROFILE(g_context->m_profiler, "ChooseDest");
 
   int numFound;
-  WorldObjectId* enemies = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, NAVIGATION_SEARCH_RADIUS, &numFound,
+  WorldObjectId* enemies = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, NAVIGATION_SEARCH_RADIUS, &numFound,
                                                                        m_id.GetTeamId());
   Vector2 pos;
 
@@ -238,20 +238,20 @@ Vector2 Tripod::ChooseDestination()
   else
   {
     int i = syncrand() % numFound;
-    Entity* targetEnemy = g_app->m_location->GetEntity(enemies[i]);
+    Entity* targetEnemy = g_context->m_location->GetEntity(enemies[i]);
     pos = targetEnemy->m_pos;
     pos.x += syncsfrand(100.0f);
     pos.y += syncsfrand(100.0f);
   }
 
-  END_PROFILE(g_app->m_profiler, "ChooseDest");
+  END_PROFILE(g_context->m_profiler, "ChooseDest");
 
   return pos;
 }
 
 void Tripod::DoNavigation()
 {
-  START_PROFILE(g_app->m_profiler, "DoNav");
+  START_PROFILE(g_context->m_profiler, "DoNav");
 
   // If m_dir is -1 that means we aren't trying to go anywhere. We need to
   // wait until we come to rest before we choose a new direction to travel in
@@ -260,7 +260,7 @@ void Tripod::DoNavigation()
     float speed = m_vel.Mag();
     if (speed > 0.5f)
     {
-      END_PROFILE(g_app->m_profiler, "DoNav");
+      END_PROFILE(g_context->m_profiler, "DoNav");
       return;
     }
   }
@@ -315,7 +315,7 @@ void Tripod::DoNavigation()
   m_vel.x += m_navData.m_directions[m_navData.m_dir].x * 1.0f;
   m_vel.z += m_navData.m_directions[m_navData.m_dir].y * 1.0f;
 
-  END_PROFILE(g_app->m_profiler, "DoNav");
+  END_PROFILE(g_context->m_profiler, "DoNav");
 }
 
 LegacyVector3 Tripod::CalcAttackUpVector()
@@ -332,7 +332,7 @@ LegacyVector3 Tripod::CalcAttackUpVector()
 
 void Tripod::AdvanceWalk()
 {
-  START_PROFILE(g_app->m_profiler, "AdvanceWalk");
+  START_PROFILE(g_context->m_profiler, "AdvanceWalk");
 
   // Consider mode switch
   {
@@ -342,11 +342,11 @@ void Tripod::AdvanceWalk()
       WorldObjectId targetId = FindEntityToAttack();
       if (targetId.IsValid())
       {
-        Entity* target = g_app->m_location->GetEntity(targetId);
+        Entity* target = g_context->m_location->GetEntity(targetId);
         m_attackTarget = target->m_pos;
         m_mode = ModePreAttack;
         m_modeStartTime = g_gameTime;
-        END_PROFILE(g_app->m_profiler, "AdvanceWalk");
+        END_PROFILE(g_context->m_profiler, "AdvanceWalk");
         return;
       }
     }
@@ -376,24 +376,24 @@ void Tripod::AdvanceWalk()
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "AdvanceWalk");
+  END_PROFILE(g_context->m_profiler, "AdvanceWalk");
 }
 
 void Tripod::AdvancePreAttack()
 {
-  START_PROFILE(g_app->m_profiler, "AdvancePreAttack");
+  START_PROFILE(g_context->m_profiler, "AdvancePreAttack");
 
   // Exit if we haven't come to a stop yet
   if (m_vel.Mag() > 0.05f)
   {
-    END_PROFILE(g_app->m_profiler, "AdvancePreAttack");
+    END_PROFILE(g_context->m_profiler, "AdvancePreAttack");
     return;
   }
 
   m_targetHoverHeight = ATTACK_HOVER_HEIGHT;
 
   // See if we have achieved a full crouch yet
-  float height = m_pos.y - g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float height = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   if (height < ATTACK_HOVER_HEIGHT + 0.5f)
   {
     m_mode = ModeAttacking;
@@ -409,12 +409,12 @@ void Tripod::AdvancePreAttack()
   m_front = right ^ m_up;
   m_front.Normalise();
 
-  END_PROFILE(g_app->m_profiler, "AdvancePreAttack");
+  END_PROFILE(g_context->m_profiler, "AdvancePreAttack");
 }
 
 void Tripod::AdvanceAttack()
 {
-  START_PROFILE(g_app->m_profiler, "AdvanceAttack");
+  START_PROFILE(g_context->m_profiler, "AdvanceAttack");
 
   // Consider mode switch
   float timeInAttack = g_gameTime - m_modeStartTime;
@@ -422,7 +422,7 @@ void Tripod::AdvanceAttack()
   {
     m_mode = ModePostAttack;
     m_modeStartTime = g_gameTime;
-    END_PROFILE(g_app->m_profiler, "AdvanceAttack");
+    END_PROFILE(g_context->m_profiler, "AdvanceAttack");
     return;
   }
 
@@ -443,13 +443,13 @@ void Tripod::AdvanceAttack()
       LegacyVector3 pos = m_pos + right;
       toEnemy.x += syncsfrand(0.1f);
       toEnemy.z += syncsfrand(0.1f);
-      g_app->m_location->FireLaser(pos + toEnemy * 5.0f, toEnemy * speed, m_id.GetTeamId());
+      g_context->m_location->FireLaser(pos + toEnemy * 5.0f, toEnemy * speed, m_id.GetTeamId());
       pos = m_pos - right;
-      g_app->m_location->FireLaser(pos + toEnemy * 5.0f, toEnemy * speed, m_id.GetTeamId());
+      g_context->m_location->FireLaser(pos + toEnemy * 5.0f, toEnemy * speed, m_id.GetTeamId());
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "AdvanceAttack");
+  END_PROFILE(g_context->m_profiler, "AdvanceAttack");
 }
 
 void Tripod::AdvancePostAttack()
@@ -457,7 +457,7 @@ void Tripod::AdvancePostAttack()
   m_targetHoverHeight = STATIONARY_HOVER_HEIGHT;
 
   // Check if we have achieved full walking height yet
-  float height = m_pos.y - g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float height = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   if (height > STATIONARY_HOVER_HEIGHT - 0.5f)
   {
     m_mode = ModeWalking;
@@ -515,7 +515,7 @@ bool Tripod::Advance(Unit* _unit)
   // Adjust body height
 
   {
-    float targetHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    float targetHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     targetHeight += m_targetHoverHeight;
     float fact1 = 1.0f * SERVER_ADVANCE_PERIOD;
     float fact2 = 1.0f - fact1;
@@ -535,7 +535,7 @@ bool Tripod::Advance(Unit* _unit)
   //
   // Detect death
 
-  if (m_pos.y < g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z))
+  if (m_pos.y < g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z))
   {
     Matrix34 mat(m_front, m_up, m_pos);
     g_simEventQueue.Push(SimEvent::MakeExplosion(m_shape, mat, 1.0f));

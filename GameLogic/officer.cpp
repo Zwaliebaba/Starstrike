@@ -6,12 +6,10 @@
 #include "input.h"
 #include "officer.h"
 #include "teleport.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "team.h"
-#include "main.h"
 #include "GameSimEventQueue.h"
-#include "camera.h"
 #include "obstruction_grid.h"
 #include "entity_grid.h"
 #include "global_world.h"
@@ -29,7 +27,7 @@ Officer::Officer()
   m_state = StateIdle;
   m_orders = OrderNone;
 
-  m_shape = g_app->m_resource->GetShapeStatic("darwinian.shp");
+  m_shape = Resource::GetShapeStatic("darwinian.shp");
   ASSERT_TEXT(m_shape, "Shape not found : officer.shp");
 
   m_flagMarker = m_shape->GetMarkerData("MarkerFlag");
@@ -42,7 +40,7 @@ Officer::~Officer()
 {
   if (m_id.GetTeamId() != 255)
   {
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     team->UnRegisterSpecial(m_id);
   }
 }
@@ -60,7 +58,7 @@ void Officer::Begin()
 
   if (m_id.GetTeamId() != 255)
   {
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     team->RegisterSpecial(m_id);
   }
 }
@@ -71,11 +69,11 @@ void Officer::ChangeHealth(int amount)
 
   if (amount < 0 && m_shield > 0)
   {
-    int shieldLoss = min(m_shield*10, -amount);
+    int shieldLoss = std::min(m_shield*10, -amount);
     for (int i = 0; i < shieldLoss / 10.0f; ++i)
     {
       LegacyVector3 vel(syncsfrand(40.0f), 0.0f, syncsfrand(40.0f));
-      g_app->m_location->SpawnSpirit(m_pos, vel, 0, WorldObjectId());
+      g_context->m_location->SpawnSpirit(m_pos, vel, 0, WorldObjectId());
     }
     m_shield -= shieldLoss / 10.0f;
     amount += shieldLoss;
@@ -136,8 +134,8 @@ bool Officer::AdvanceToTargetPosition()
     // Slow us down if we're going up hill
     // Speed up if going down hill
 
-    float currentHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(oldPos.x, oldPos.z);
-    float nextHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
+    float currentHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(oldPos.x, oldPos.z);
+    float nextHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(newPos.x, newPos.z);
     float factor = 1.0f - (currentHeight - nextHeight) / -3.0f;
     if (factor < 0.1f)
       factor = 0.1f;
@@ -175,7 +173,7 @@ bool Officer::SearchForRandomPosition()
   m_wayPoint = m_pos + LegacyVector3(sinf(angle) * distance, 0.0f, cosf(angle) * distance);
 
   m_wayPoint = PushFromObstructions(m_wayPoint);
-  m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
+  m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_wayPoint.x, m_wayPoint.z);
 
   return true;
 }
@@ -183,7 +181,7 @@ bool Officer::SearchForRandomPosition()
 void Officer::Absorb()
 {
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, OFFICER_ABSORBRANGE, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetFriends(m_pos.x, m_pos.z, OFFICER_ABSORBRANGE, &numFound, m_id.GetTeamId());
 
   WorldObjectId nearestId;
   float nearestDistance = 99999.9f;
@@ -191,7 +189,7 @@ void Officer::Absorb()
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
     if (entity && entity->m_type == TypeDarwinian && !entity->m_dead)
     {
       float distance = (entity->m_pos - m_pos).Mag();
@@ -208,10 +206,10 @@ void Officer::Absorb()
     m_absorbTimer -= SERVER_ADVANCE_PERIOD;
     if (m_absorbTimer < 0.0f)
     {
-      Entity* entity = g_app->m_location->GetEntity(nearestId);
+      Entity* entity = g_context->m_location->GetEntity(nearestId);
 
-      g_app->m_location->m_entityGrid->RemoveObject(nearestId, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
-      g_app->m_location->m_teams[nearestId.GetTeamId()].m_others.MarkNotUsed(nearestId.GetIndex());
+      g_context->m_location->m_entityGrid->RemoveObject(nearestId, entity->m_pos.x, entity->m_pos.z, entity->m_radius);
+      g_context->m_location->m_teams[nearestId.GetTeamId()].m_others.MarkNotUsed(nearestId.GetIndex());
       ++m_shield;
       m_absorbTimer = 1.0f;
     }
@@ -227,7 +225,7 @@ bool Officer::Advance(Unit* _unit)
     AdvanceInWater(_unit);
 
   if (m_onGround && !m_dead)
-    m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 
   //
   // Advance in whatever state we are in
@@ -264,7 +262,7 @@ bool Officer::Advance(Unit* _unit)
       auto orders = new OfficerOrders();
       orders->m_pos = m_pos + LegacyVector3(0, 2, 0);
       orders->m_wayPoint = m_orderPosition;
-      int index = g_app->m_location->m_effects.PutData(orders);
+      int index = g_context->m_location->m_effects.PutData(orders);
       orders->m_id.Set(m_id.GetTeamId(), UNIT_EFFECTS, index, -1);
       orders->m_id.GenerateUniqueId();
     }
@@ -281,15 +279,15 @@ bool Officer::Advance(Unit* _unit)
 
   if (m_shield > 0)
   {
-    WorldObjectId id = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, OFFICER_ATTACKRANGE, m_id.GetTeamId());
+    WorldObjectId id = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, OFFICER_ATTACKRANGE, m_id.GetTeamId());
     if (id.IsValid())
     {
-      Entity* entity = g_app->m_location->GetEntity(id);
+      Entity* entity = g_context->m_location->GetEntity(id);
       entity->ChangeHealth(-10);
       m_shield--;
 
       LegacyVector3 themToUs = m_pos - entity->m_pos;
-      g_app->m_location->SpawnSpirit(m_pos, themToUs, 0, WorldObjectId());
+      g_context->m_location->SpawnSpirit(m_pos, themToUs, 0, WorldObjectId());
     }
   }
 
@@ -303,7 +301,7 @@ bool Officer::Advance(Unit* _unit)
     if (teleportId != -1)
     {
       m_ordersBuildingId = teleportId;
-      auto teleport = static_cast<Teleport*>(g_app->m_location->GetBuilding(teleportId));
+      auto teleport = static_cast<Teleport*>(g_context->m_location->GetBuilding(teleportId));
       LegacyVector3 exitPos, exitFront;
       bool exitFound = teleport->GetExit(exitPos, exitFront);
       if (exitFound)
@@ -325,11 +323,11 @@ void Officer::SetWaypoint(const LegacyVector3& _wayPoint)
   //
   // If we clicked near a teleport, tell the officer to go into it
   m_wayPointTeleportId = -1;
-  LList<int>* nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings(_wayPoint.x, _wayPoint.z);
+  LList<int>* nearbyBuildings = g_context->m_location->m_obstructionGrid->GetBuildings(_wayPoint.x, _wayPoint.z);
   for (int i = 0; i < nearbyBuildings->Size(); ++i)
   {
     int buildingId = nearbyBuildings->GetData(i);
-    Building* building = g_app->m_location->GetBuilding(buildingId);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
     if (building->m_type == Building::TypeRadarDish || building->m_type == Building::TypeBridge)
     {
       float distance = (building->m_pos - _wayPoint).Mag();
@@ -355,7 +353,7 @@ void Officer::SetOrders(const LegacyVector3& _orders)
 {
   static float lastOrderSet = 0.0f;
 
-  if (g_app->m_location->IsWalkable(m_pos, _orders))
+  if (g_context->m_location->IsWalkable(m_pos, _orders))
   {
     float distanceToOrders = (_orders - m_pos).Mag();
 
@@ -372,11 +370,11 @@ void Officer::SetOrders(const LegacyVector3& _orders)
       bool foundTeleport = false;
 
       m_ordersBuildingId = -1;
-      LList<int>* nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings(m_orderPosition.x, m_orderPosition.z);
+      LList<int>* nearbyBuildings = g_context->m_location->m_obstructionGrid->GetBuildings(m_orderPosition.x, m_orderPosition.z);
       for (int i = 0; i < nearbyBuildings->Size(); ++i)
       {
         int buildingId = nearbyBuildings->GetData(i);
-        Building* building = g_app->m_location->GetBuilding(buildingId);
+        Building* building = g_context->m_location->GetBuilding(buildingId);
         if (building->m_type == Building::TypeRadarDish || building->m_type == Building::TypeBridge)
         {
           float distance = (building->m_pos - _orders).Mag();
@@ -425,7 +423,7 @@ void Officer::SetOrders(const LegacyVector3& _orders)
     else
     {
       float timeNow = GetHighResTime();
-      int researchLevel = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
+      int researchLevel = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
 
       if (timeNow > lastOrderSet + 0.3f)
       {
@@ -497,7 +495,7 @@ void Officer::SetNextMode()
   static float lastOrderSet = 0.0f;
 
   float timeNow = GetHighResTime();
-  int researchLevel = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
+  int researchLevel = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
 
   if (timeNow > lastOrderSet + 0.3f)
   {
@@ -567,7 +565,7 @@ void Officer::SetPreviousMode()
   static float lastOrderSet = 0.0f;
 
   float timeNow = GetHighResTime();
-  int researchLevel = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
+  int researchLevel = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeOfficer);
 
   if (timeNow > lastOrderSet + 0.3f)
   {
@@ -659,8 +657,8 @@ bool OfficerOrders::Advance()
   {
     float speed = m_vel.Mag();
     speed *= 1.1f;
-    speed = max(speed, 30.0f);
-    speed = min(speed, 150.0f);
+    speed = std::max(speed, 30.0f);
+    speed = std::min(speed, 150.0f);
 
     LegacyVector3 toWaypoint = (m_wayPoint - m_pos);
     toWaypoint.y = 0.0f;
@@ -671,7 +669,7 @@ bool OfficerOrders::Advance()
     LegacyVector3 oldPos = m_pos;
     m_pos += m_vel * SERVER_ADVANCE_PERIOD;
 
-    float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+    float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
     m_pos.y = landHeight + 2.0f;
 
     m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;

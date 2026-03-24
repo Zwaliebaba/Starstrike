@@ -30,9 +30,9 @@ Water::Water()
   : m_waterDepthMap(nullptr),
     m_renderWaterEffect(false)
 {
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
-    Landscape* land = &g_app->m_location->m_landscape;
+    Landscape* land = &g_context->m_location->m_landscape;
 
     GenerateLightMap();
 
@@ -40,23 +40,23 @@ Water::Water()
 
     if (detail > 0)
     {
-      float worldSize = max(g_app->m_location->m_landscape.GetWorldSizeX(), g_app->m_location->m_landscape.GetWorldSizeZ());
+      float worldSize = std::max(g_context->m_location->m_landscape.GetWorldSizeX(), g_context->m_location->m_landscape.GetWorldSizeZ());
       worldSize /= 100.0f;
 
       m_cellSize = static_cast<float>(detail) * worldSize;
 
-      int alpha = (g_app->m_negativeRenderer ? 0 : 255);
+      int alpha = (g_context->m_negativeRenderer ? 0 : 255);
 
       // Load colour information from a bitmap
       {
         char fullFilename[256];
-        snprintf(fullFilename, sizeof(fullFilename), "terrain/%s", g_app->m_location->m_levelFile->m_wavesColourFilename);
+        snprintf(fullFilename, sizeof(fullFilename), "terrain/%s", g_context->m_location->m_levelFile->m_wavesColourFilename);
 
         if (Location::ChristmasModEnabled() == 1)
           strncpy(fullFilename, "terrain/waves_earth.bmp", sizeof(fullFilename));
           fullFilename[sizeof(fullFilename) - 1] = '\0';
 
-        BinaryReader* in = g_app->m_resource->GetBinaryReader(fullFilename);
+        BinaryReader* in = Resource::GetBinaryReader(fullFilename);
         BitmapRGBA bmp(in, "bmp");
         m_colourTable.resize(bmp.m_width);
         for (int x = 0; x < bmp.m_width; ++x)
@@ -88,8 +88,8 @@ void Water::GenerateLightMap()
 
 #define MASK_SIZE 128
 
-  float landSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float landSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float landSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float landSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
   float scaleFactorX = 2.0f * landSizeX / static_cast<float>(MASK_SIZE);
   float scaleFactorZ = 2.0f * landSizeZ / static_cast<float>(MASK_SIZE);
   int low = MASK_SIZE / 4;
@@ -108,7 +108,7 @@ void Water::GenerateLightMap()
   {
     for (int x = low; x < high; ++x)
     {
-      float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue((0.0f + static_cast<float>(x)) * scaleFactorX - offX,
+      float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue((0.0f + static_cast<float>(x)) * scaleFactorX - offX,
                                                                               (0.0f + static_cast<float>(z)) * scaleFactorZ - offZ);
       if (landHeight > 0.0f)
         landData.PutData(x, z, 1.0f);
@@ -172,13 +172,13 @@ void Water::GenerateLightMap()
     }
   }
 
-  if (g_app->m_resource->GetBitmap(LIGHTMAP_TEXTURE_NAME) != nullptr)
-    g_app->m_resource->DeleteBitmap(LIGHTMAP_TEXTURE_NAME);
+  if (Resource::GetBitmap(LIGHTMAP_TEXTURE_NAME) != nullptr)
+    Resource::DeleteBitmap(LIGHTMAP_TEXTURE_NAME);
 
-  if (g_app->m_resource->DoesTextureExist(LIGHTMAP_TEXTURE_NAME))
-    g_app->m_resource->DeleteTexture(LIGHTMAP_TEXTURE_NAME);
+  if (Resource::DoesTextureExist(LIGHTMAP_TEXTURE_NAME))
+    Resource::DeleteTexture(LIGHTMAP_TEXTURE_NAME);
 
-  g_app->m_resource->AddBitmap(LIGHTMAP_TEXTURE_NAME, finalImage);
+  Resource::AddBitmap(LIGHTMAP_TEXTURE_NAME, finalImage);
 
   //
   // Create the water depth map
@@ -186,7 +186,7 @@ void Water::GenerateLightMap()
   float depthMapCellSize = (landSizeX * 2.0f) / static_cast<float>(finalImage.m_height);
   m_waterDepthMap = new SurfaceMap2D<float>(landSizeX * 2.0f, landSizeZ * 2.0f, -landSizeX / 2.0f, -landSizeZ / 2.0f, depthMapCellSize,
                                             depthMapCellSize, 1.0f);
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
     for (int z = 0; z < finalImage.m_height; ++z)
     {
@@ -243,7 +243,7 @@ void Water::BuildOpenGlState()
 
 bool Water::IsVertNeeded(float x, float z)
 {
-  float landHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(x, z);
+  float landHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(x, z);
   if (landHeight > 4.0f)
     return false;
 
@@ -259,8 +259,8 @@ void Water::BuildTriangleStrips()
   m_renderVerts.SetStepDouble();
   m_strips.SetStepDouble();
 
-  const float landSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  const float landSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  const float landSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  const float landSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
 
   const float lowX = -landSizeX * 0.5f;
   const float lowZ = -landSizeZ * 0.5f;
@@ -400,14 +400,14 @@ void Water::RenderFlatWaterTiles(float posNorth, float posSouth, float posEast, 
 
 void Water::RenderFlatWater()
 {
-  Landscape* land = &g_app->m_location->m_landscape;
+  Landscape* land = &g_context->m_location->m_landscape;
 
   glDisable(GL_CULL_FACE);
   glEnable(GL_FOG);
   glDisable(GL_BLEND);
   glDepthMask(false);
 
-  if (g_app->m_negativeRenderer)
+  if (g_context->m_negativeRenderer)
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
@@ -417,14 +417,14 @@ void Water::RenderFlatWater()
     glColor4ub(255, 255, 255, 255);
 
   char waterFilename[256];
-  snprintf(waterFilename, sizeof(waterFilename), "terrain/%s", g_app->m_location->m_levelFile->m_waterColourFilename);
+  snprintf(waterFilename, sizeof(waterFilename), "terrain/%s", g_context->m_location->m_levelFile->m_waterColourFilename);
 
   if (Location::ChristmasModEnabled() == 1)
     strncpy(waterFilename, "terrain/water_icecaps.bmp", sizeof(waterFilename));
     waterFilename[sizeof(waterFilename) - 1] = '\0';
 
   gglActiveTextureARB(GL_TEXTURE0_ARB);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(waterFilename, true, true));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture(waterFilename, true, true));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -435,7 +435,7 @@ void Water::RenderFlatWater()
 
   // JAK HACK (DISABLED)
   gglActiveTextureARB(GL_TEXTURE1_ARB);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture(LIGHTMAP_TEXTURE_NAME));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture(LIGHTMAP_TEXTURE_NAME));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
@@ -519,8 +519,8 @@ void Water::UpdateDynamicWater()
       WaterVertex* vertex1 = &m_renderVerts[j];
       WaterVertex* vertex2 = &m_renderVerts[j + 1];
 
-      const float landSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-      const float landSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+      const float landSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+      const float landSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
       const float lowX = -landSizeX * 0.5f;
       const float lowZ = -landSizeZ * 0.5f;
       int indexX = static_cast<int>((vertex1->m_pos.x - lowX) / m_cellSize + 0.1f);
@@ -613,17 +613,17 @@ void Water::RenderDynamicWater()
 void Water::Render()
 {
   m_renderWaterEffect = g_prefsManager->GetInt("RenderPixelShader", 2) == 1;
-  if (g_app->m_editing)
+  if (g_context->m_editing)
   {
-    START_PROFILE(g_app->m_profiler, "Render Water");
+    START_PROFILE(g_context->m_profiler, "Render Water");
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/triangleOutline.bmp", true, false));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/triangleOutline.bmp", true, false));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    Landscape* land = &g_app->m_location->m_landscape;
+    Landscape* land = &g_context->m_location->m_landscape;
     glEnable(GL_BLEND);
     glColor4ub(250, 250, 250, 100);
     float size = 100.0f;
@@ -653,36 +653,36 @@ void Water::Render()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    END_PROFILE(g_app->m_profiler, "Render Water");
+    END_PROFILE(g_context->m_profiler, "Render Water");
   }
   else
   {
     if (g_prefsManager->GetInt("RenderWaterDetail") > 0)
     {
       //Advance();
-      START_PROFILE(g_app->m_profiler, "Render Water");
+      START_PROFILE(g_context->m_profiler, "Render Water");
       RenderFlatWater();
       RenderDynamicWater();
-      END_PROFILE(g_app->m_profiler, "Render Water");
+      END_PROFILE(g_context->m_profiler, "Render Water");
     }
     else
     {
-      START_PROFILE(g_app->m_profiler, "Render Water");
+      START_PROFILE(g_context->m_profiler, "Render Water");
       RenderFlatWater();
-      END_PROFILE(g_app->m_profiler, "Render Water");
+      END_PROFILE(g_context->m_profiler, "Render Water");
     }
   }
 
-  g_app->m_location->SetupFog();
-  g_app->m_renderer->CheckOpenGLState();
+  g_context->m_location->SetupFog();
+  g_context->m_renderer->CheckOpenGLState();
 }
 
 void Water::Advance()
 {
-  if (!g_app->m_editing && g_prefsManager->GetInt("RenderWaterDetail") > 0)
+  if (!g_context->m_editing && g_prefsManager->GetInt("RenderWaterDetail") > 0)
   {
-    START_PROFILE(g_app->m_profiler, "Advance Water");
+    START_PROFILE(g_context->m_profiler, "Advance Water");
     UpdateDynamicWater();
-    END_PROFILE(g_app->m_profiler, "Advance Water");
+    END_PROFILE(g_context->m_profiler, "Advance Water");
   }
 }

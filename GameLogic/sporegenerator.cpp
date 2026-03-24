@@ -10,7 +10,7 @@
 #include "sporegenerator.h"
 
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "main.h"
 #include "camera.h"
@@ -27,7 +27,7 @@ SporeGenerator::SporeGenerator()
 {
   SetType(TypeSporeGenerator);
 
-  m_shape = g_app->m_resource->GetShapeStatic("sporegenerator.shp");
+  m_shape = Resource::GetShapeStatic("sporegenerator.shp");
   m_eggMarker = m_shape->GetMarkerData("MarkerEggs");
 
   for (int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i)
@@ -43,7 +43,7 @@ void SporeGenerator::Begin()
   Entity::Begin();
 
   m_targetPos = m_pos;
-  m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   m_pos.y += SPOREGENERATOR_HOVERHEIGHT;
 }
 
@@ -54,8 +54,8 @@ void SporeGenerator::ChangeHealth(int _amount)
     Entity::ChangeHealth(_amount);
 
     float fractionDead = 1.0f - static_cast<float>(m_stats[StatHealth]) / EntityBlueprint::GetStat(TypeSporeGenerator, StatHealth);
-    fractionDead = max(fractionDead, 0.0f);
-    fractionDead = min(fractionDead, 1.0f);
+    fractionDead = std::max(fractionDead, 0.0f);
+    fractionDead = std::min(fractionDead, 1.0f);
     if (m_dead)
       fractionDead = 1.0f;
 
@@ -83,7 +83,7 @@ bool SporeGenerator::SearchForRandomPos()
   else
     m_targetPos = m_pos + LegacyVector3(syncsfrand(200.0f), 0.0f, syncsfrand(200.0f));
 
-  m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+  m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
   m_targetPos.y += SPOREGENERATOR_HOVERHEIGHT * (1.0f + syncsfrand(0.3f));
 
   m_state = StateIdle;
@@ -91,10 +91,10 @@ bool SporeGenerator::SearchForRandomPos()
   //
   // Give us a random chance we will lay some eggs anyway
 
-  if (syncfrand(100.0f) < 10.0f + 20.0f * g_app->m_difficultyLevel / 10.0f)
+  if (syncfrand(100.0f) < 10.0f + 20.0f * g_context->m_difficultyLevel / 10.0f)
   {
     m_state = StateEggLaying;
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
     m_targetPos.y += SPOREGENERATOR_EGGLAYHEIGHT;
   }
 
@@ -107,11 +107,11 @@ bool SporeGenerator::SearchForSpirits()
   int foundIndex = -1;
   float nearest = 9999.9f;
 
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       if (s->NumNearbyEggs() < 3 && s->m_pos.y > 0.0f)
       {
         float theDist = (s->m_pos - m_pos).Mag();
@@ -131,7 +131,7 @@ bool SporeGenerator::SearchForSpirits()
     m_spiritId = foundIndex;
     m_targetPos = found->m_pos;
     m_targetPos += LegacyVector3(syncsfrand(60.0f), 0.0f, syncsfrand(60.0f));
-    m_targetPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
+    m_targetPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_targetPos.x, m_targetPos.z);
     m_targetPos.y += SPOREGENERATOR_EGGLAYHEIGHT;
     m_state = StateEggLaying;
   }
@@ -158,7 +158,7 @@ bool SporeGenerator::AdvancePanic()
 
 bool SporeGenerator::AdvanceToTargetPosition()
 {
-  float heightAboveGround = m_pos.y - g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+  float heightAboveGround = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   LegacyVector3 toTarget = m_pos - m_targetPos;
   float distanceToTarget = toTarget.Mag();
 
@@ -246,10 +246,10 @@ bool SporeGenerator::AdvanceEggLaying()
     m_eggTimer -= SERVER_ADVANCE_PERIOD;
     if (m_eggTimer <= 0.0f)
     {
-      m_eggTimer = 2.0f + syncfrand(2.0f) - 1.0 * static_cast<float>(g_app->m_difficultyLevel) / 10.0f;
+      m_eggTimer = 2.0f + syncfrand(2.0f) - 1.0 * static_cast<float>(g_context->m_difficultyLevel) / 10.0f;
       Matrix34 mat(m_front, g_upVector, m_pos);
       Matrix34 eggLayMat = m_shape->GetMarkerWorldMatrix(m_eggMarker, mat);
-      g_app->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, m_vel, 0.0f);
+      g_context->m_location->SpawnEntities(eggLayMat.pos, m_id.GetTeamId(), -1, TypeEgg, 1, m_vel, 0.0f);
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "LayEgg"));
     }
   }
@@ -270,4 +270,4 @@ bool SporeGenerator::AdvanceEggLaying()
 }
 
 
-bool SporeGenerator::IsInView() { return g_app->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }
+bool SporeGenerator::IsInView() { return g_context->m_camera->SphereInViewFrustum(m_pos + m_centerPos, m_radius); }

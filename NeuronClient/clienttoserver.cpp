@@ -32,8 +32,8 @@ static NetCallBackRetType ListenCallback(NetUdpPacket* udpdata)
     IpToString(fromAddr->sin_addr, newip);
 
     auto letter = new ServerToClientLetter(udpdata->m_data, udpdata->m_length);
-    g_app->m_clientToServer->ReceiveLetter(letter);
-    //        SET_PROFILE(g_app->m_profiler,  "#Client Receive", udpdata->getLength() );
+    g_context->m_clientToServer->ReceiveLetter(letter);
+    //        SET_PROFILE(g_context->m_profiler,  "#Client Receive", udpdata->getLength() );
 
     delete udpdata;
   }
@@ -43,8 +43,8 @@ static NetCallBackRetType ListenCallback(NetUdpPacket* udpdata)
 
 static NetCallBackRetType ListenThread(void* ignored)
 {
-  g_app->m_clientToServer->m_receiveSocket = new NetSocketListener(4001);
-  NetRetCode retCode = g_app->m_clientToServer->m_receiveSocket->StartListening(ListenCallback);
+  g_context->m_clientToServer->m_receiveSocket = new NetSocketListener(4001);
+  NetRetCode retCode = g_context->m_clientToServer->m_receiveSocket->StartListening(ListenCallback);
   DEBUG_ASSERT(retCode == NetOk);
   return 0;
 }
@@ -56,7 +56,7 @@ ClientToServer::ClientToServer()
   m_inboxMutex = new NetMutex();
   m_outboxMutex = new NetMutex();
 
-  if (!g_app->m_bypassNetworking)
+  if (!g_context->m_bypassNetworking)
   {
     m_netLib = new NetLib();
     m_netLib->Initialise();
@@ -95,32 +95,32 @@ ClientToServer::~ClientToServer()
 void ClientToServer::AdvanceSender()
 {
   int bytesSentThisFrame = 0;
-  g_app->m_clientToServer->m_outboxMutex->Lock();
+  g_context->m_clientToServer->m_outboxMutex->Lock();
 
-  while (g_app->m_clientToServer->m_outbox.Size())
+  while (g_context->m_clientToServer->m_outbox.Size())
   {
-    NetworkUpdate* letter = g_app->m_clientToServer->m_outbox[0];
+    NetworkUpdate* letter = g_context->m_clientToServer->m_outbox[0];
     DEBUG_ASSERT(letter);
 
-    if (g_app->m_bypassNetworking)
-      g_app->m_server->ReceiveLetter(letter, g_app->m_clientToServer->GetOurIP_String());
+    if (g_context->m_bypassNetworking)
+      g_context->m_server->ReceiveLetter(letter, g_context->m_clientToServer->GetOurIP_String());
     else
     {
       int letterSize = 0;
       char* byteStream = letter->GetByteStream(&letterSize);
-      NetSocket* socket = g_app->m_clientToServer->m_sendSocket;
+      NetSocket* socket = g_context->m_clientToServer->m_sendSocket;
       socket->WriteData(byteStream, letterSize);
       bytesSentThisFrame += letterSize;
       delete letter;
     }
 
-    g_app->m_clientToServer->m_outbox.RemoveData(0);
+    g_context->m_clientToServer->m_outbox.RemoveData(0);
   }
-  g_app->m_clientToServer->m_outboxMutex->Unlock();
+  g_context->m_clientToServer->m_outboxMutex->Unlock();
 
   if (bytesSentThisFrame > 0)
   {
-    //        SET_PROFILE(g_app->m_profiler,  "#Client Send", bytesSentThisFrame );
+    //        SET_PROFILE(g_context->m_profiler,  "#Client Send", bytesSentThisFrame );
   }
 }
 
@@ -439,17 +439,17 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
     switch (update->m_type)
     {
     case NetworkUpdate::Alive:
-      g_app->m_location->UpdateTeam(update->m_teamId, update->m_teamControls);
+      g_context->m_location->UpdateTeam(update->m_teamId, update->m_teamControls);
       break;
 
     case NetworkUpdate::SelectUnit:
-      g_app->m_location->m_teams[update->m_teamId].SelectUnit(update->m_unitId, update->m_entityId, update->m_buildingId);
-      g_app->m_taskManager->SelectTask(WorldObjectId(update->m_teamId, update->m_unitId, update->m_entityId, -1));
+      g_context->m_location->m_teams[update->m_teamId].SelectUnit(update->m_unitId, update->m_entityId, update->m_buildingId);
+      g_context->m_taskManager->SelectTask(WorldObjectId(update->m_teamId, update->m_unitId, update->m_entityId, -1));
       break;
 
     case NetworkUpdate::CreateUnit:
       {
-        Building* building = g_app->m_location->GetBuilding(update->m_buildingId);
+        Building* building = g_context->m_location->GetBuilding(update->m_buildingId);
         if (building && building->m_type == Building::TypeFactory)
         {
           auto factory = static_cast<Factory*>(building);
@@ -459,9 +459,9 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
         {
           DEBUG_ASSERT(update->GetWorldPos() != g_zeroVector);
           int unitId;
-          Unit* unit = g_app->m_location->m_teams[update->m_teamId].NewUnit(update->m_entityType, update->m_numTroops, &unitId,
+          Unit* unit = g_context->m_location->m_teams[update->m_teamId].NewUnit(update->m_entityType, update->m_numTroops, &unitId,
                                                                             update->GetWorldPos());
-          g_app->m_location->SpawnEntities(update->GetWorldPos(), update->m_teamId, unitId, update->m_entityType, update->m_numTroops,
+          g_context->m_location->SpawnEntities(update->GetWorldPos(), update->m_teamId, unitId, update->m_entityType, update->m_numTroops,
                                            g_zeroVector, update->m_numTroops * 2);
         }
         break;
@@ -469,7 +469,7 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
 
     case NetworkUpdate::AimBuilding:
       {
-        Building* building = g_app->m_location->GetBuilding(update->m_buildingId);
+        Building* building = g_context->m_location->GetBuilding(update->m_buildingId);
         if (building && building->m_id.GetTeamId() == update->m_teamId && building->m_type == Building::TypeRadarDish)
         {
           auto radarDish = static_cast<RadarDish*>(building);
@@ -480,7 +480,7 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
 
     case NetworkUpdate::ToggleLaserFence:
       {
-        Building* building = g_app->m_location->GetBuilding(update->m_buildingId);
+        Building* building = g_context->m_location->GetBuilding(update->m_buildingId);
         if (building && building->m_type == Building::TypeLaserFence)
         {
           auto laserfence = static_cast<LaserFence*>(building);
@@ -491,14 +491,14 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
 
     case NetworkUpdate::RunProgram:
       {
-        g_app->m_taskManager->RunTask(update->m_program);
+        g_context->m_taskManager->RunTask(update->m_program);
         break;
       }
 
     case NetworkUpdate::TargetProgram:
       {
         int programId = update->m_program;
-        g_app->m_taskManager->TargetTask(programId, update->GetWorldPos());
+        g_context->m_taskManager->TargetTask(programId, update->GetWorldPos());
       }
     }
   }

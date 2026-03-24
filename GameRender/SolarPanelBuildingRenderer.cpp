@@ -15,11 +15,11 @@ void SolarPanelBuildingRenderer::Render(const Building& _building, const Buildin
 {
     const auto& panel = static_cast<const SolarPanel&>(_building);
 
-    if (g_app->m_editing)
+    if (g_context->m_editing)
     {
         // Editor live-update: keep orientation aligned to landscape normal.
         auto& mutablePanel = const_cast<SolarPanel&>(panel);
-        mutablePanel.m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(panel.m_pos.x, panel.m_pos.z);
+        mutablePanel.m_up = g_context->m_location->m_landscape.m_normalMap->GetValue(panel.m_pos.x, panel.m_pos.z);
         LegacyVector3 right(1, 0, 0);
         mutablePanel.m_front = right ^ mutablePanel.m_up;
     }
@@ -49,7 +49,7 @@ void SolarPanelBuildingRenderer::RenderAlphas(const Building& _building, const B
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
         glDepthMask(false);
         glDisable(GL_CULL_FACE);
 
@@ -83,7 +83,7 @@ void SolarPanelBuildingRenderer::RenderPorts(const Building& _building)
 
     glDisable(GL_CULL_FACE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -98,8 +98,8 @@ void SolarPanelBuildingRenderer::RenderPorts(const Building& _building)
 
         float size = 6.0f;
 
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
+        LegacyVector3 camR = g_context->m_camera->GetRight() * size;
+        LegacyVector3 camU = g_context->m_camera->GetUp() * size;
 
         LegacyVector3 statusPos = worldMat.pos;
 

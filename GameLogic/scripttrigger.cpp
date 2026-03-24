@@ -3,7 +3,7 @@
 #include "text_stream_readers.h"
 #include "language_table.h"
 #include "scripttrigger.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "globals.h"
 #include "location.h"
 #include "entity_grid.h"
@@ -41,7 +41,7 @@ void ScriptTrigger::Trigger()
   if (strstr(m_scriptFilename, ".txt"))
   {
     // Run a script, speficied by filename
-    g_app->m_script->RunScript(m_scriptFilename);
+    g_context->m_script->RunScript(m_scriptFilename);
     m_triggered = -1;
   }
   else
@@ -58,7 +58,7 @@ bool ScriptTrigger::Advance()
       return true;
     }
     if (m_triggered <= 0) {
-      bool alreadyRunningScript = g_app->m_script->IsRunningScript() || !g_app->m_camera->IsInteractive();
+      bool alreadyRunningScript = g_context->m_script->IsRunningScript() || !g_context->m_camera->IsInteractive();
 
       if (!alreadyRunningScript)
       {
@@ -73,19 +73,19 @@ bool ScriptTrigger::Advance()
             Trigger();
           else if (m_entityType == SCRIPTRIGGER_RUNCAMENTER)
           {
-            float camDistance = (g_app->m_camera->GetPos() - m_pos).Mag();
-            LegacyVector3 camVel = g_app->m_camera->GetVel();
-            bool camInteractive = g_app->m_camera->IsInteractive();
+            float camDistance = (g_context->m_camera->GetPos() - m_pos).Mag();
+            LegacyVector3 camVel = g_context->m_camera->GetVel();
+            bool camInteractive = g_context->m_camera->IsInteractive();
 
             if (camDistance <= m_range && camVel.Mag() < 5.0f && camInteractive)
               Trigger();
           }
           else if (m_entityType == SCRIPTRIGGER_RUNCAMVIEW)
           {
-            float camDistance = (g_app->m_camera->GetPos() - m_pos).Mag();
-            LegacyVector3 camVel = g_app->m_camera->GetVel();
-            bool camInteractive = g_app->m_camera->IsInteractive();
-            bool inView = RaySphereIntersection(g_app->m_camera->GetPos(), g_app->m_camera->GetFront(), m_pos, m_range);
+            float camDistance = (g_context->m_camera->GetPos() - m_pos).Mag();
+            LegacyVector3 camVel = g_context->m_camera->GetVel();
+            bool camInteractive = g_context->m_camera->IsInteractive();
+            bool inView = RaySphereIntersection(g_context->m_camera->GetPos(), g_context->m_camera->GetFront(), m_pos, m_range);
 
             if (camDistance <= (m_range + 300.0f) && camVel.Mag() < 5.0f && camInteractive && inView)
               Trigger();
@@ -97,13 +97,13 @@ bool ScriptTrigger::Advance()
           {
             int numFound;
             int numCorrectTypeFound = 0;
-            WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, m_range, &numFound);
+            WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(m_pos.x, m_pos.z, m_range, &numFound);
             for (int i = 0; i < numFound; ++i)
             {
               WorldObjectId id = ids[i];
               if (id.IsValid() && id.GetTeamId() == m_id.GetTeamId())
               {
-                Entity* entity = g_app->m_location->GetEntity(id);
+                Entity* entity = g_context->m_location->GetEntity(id);
                 if (entity && entity->m_type == m_entityType)
                 {
                   ++numCorrectTypeFound;
@@ -130,7 +130,7 @@ bool ScriptTrigger::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { ret
 bool ScriptTrigger::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                                LegacyVector3* _norm)
 {
-  if (g_app->m_editing)
+  if (g_context->m_editing)
     return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, _norm);
   return false;
 }

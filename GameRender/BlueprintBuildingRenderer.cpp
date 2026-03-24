@@ -37,7 +37,7 @@ void BlueprintBuildingRenderer::RenderAlphas(const Building& _building,
     auto& bp = static_cast<const BlueprintBuilding&>(_building);
 
     auto link = static_cast<BlueprintBuilding*>(
-        g_app->m_location->GetBuilding(bp.m_buildingLink));
+        g_context->m_location->GetBuilding(bp.m_buildingLink));
     if (link)
     {
         float infected = bp.m_infected / 100.0f;
@@ -55,13 +55,13 @@ void BlueprintBuildingRenderer::RenderAlphas(const Building& _building,
         LegacyVector3 theirPos = link->GetMarker(_ctx.predictionTime).pos;
 
         LegacyVector3 rightAngle =
-            (g_app->m_camera->GetPos() - ourPos) ^ (theirPos - ourPos);
+            (g_context->m_camera->GetPos() - ourPos) ^ (theirPos - ourPos);
         rightAngle.SetLength(20.0f);
 
         glDisable(GL_CULL_FACE);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D,
-                      g_app->m_resource->GetTexture("textures/laser.bmp"));
+                      Resource::GetTexture("textures/laser.bmp"));
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);

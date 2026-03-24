@@ -33,14 +33,14 @@ void SpamBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
 {
     const Spam& spam = static_cast<const Spam&>(_building);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
 
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/cloudyglow.bmp"));
 
     float timeIndex = g_gameTime + spam.m_id.GetUniqueId() * 10.0f;
 
@@ -64,7 +64,7 @@ void SpamBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
         pos.z += cosf(timeIndex + i) * i * 0.3f;
 
         float size = 5.0f + sinf(timeIndex + i * 10) * 7.0f;
-        size = max(size, 2.0f);
+        size = std::max(size, 2.0f);
 
         glColor4f(0.9f, 0.2f, 0.2f, alpha);
 
@@ -86,10 +86,10 @@ void SpamBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
     //
     // Starbursts
 
-    alpha = 1.0f - spam.m_timer / (SPAM_RELOADTIME - (SPAM_RELOADTIME / 2.0f) * g_app->m_difficultyLevel / 10.0f);
+    alpha = 1.0f - spam.m_timer / (SPAM_RELOADTIME - (SPAM_RELOADTIME / 2.0f) * g_context->m_difficultyLevel / 10.0f);
     alpha *= 0.3f;
 
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
     int numStars = 10;
     if (buildingDetail == 2)

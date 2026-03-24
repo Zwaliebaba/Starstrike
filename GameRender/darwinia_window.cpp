@@ -1,21 +1,12 @@
 #include "pch.h"
-
-#include <stdio.h>
-#include <string.h>
-
 #include "text_renderer.h"
 #include "resource.h"
 #include "input.h"
-
 #include "darwinia_window.h"
 #include "input_field.h"
-
 #include "GameApp.h"
 #include "renderer.h"
-#include "globals.h"
 #include "control_bindings.h"
-
-#include "targetcursor.h"
 
 // ****************************************************************************
 // Class DarwiniaButton
@@ -394,7 +385,7 @@ void DarwiniaWindow::Render(bool hasFocus)
   // Main body fill
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/interface_red.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/interface_red.bmp"));
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -469,7 +460,7 @@ void DarwiniaWindow::Render(bool hasFocus)
   glColor4ub(255, 255, 150, 30);
   int y = m_y + 9;
   int fontSize = GetMenuSize(12);
-  if (g_app->m_largeMenus)
+  if (g_context->m_largeMenus)
     y = m_y + fontSize / 2;
   g_gameFont.DrawText2DCenter(m_x + m_w / 2, y, fontSize, m_title);
   g_gameFont.DrawText2DCenter(m_x + m_w / 2, y, fontSize, m_title);
@@ -480,11 +471,11 @@ void DarwiniaWindow::Render(bool hasFocus)
 
 int DarwiniaWindow::GetMenuSize(int _value)
 {
-  if (g_app->m_largeMenus)
+  if (g_context->m_largeMenus)
   {
     //int h = m_originalH;
     //float scale = float(m_h)/float(h);
-    int screenH = g_app->m_renderer->ScreenH();
+    int screenH = g_context->m_renderer->ScreenH();
     float scale = 0.96f * (static_cast<float>(screenH) / 460.0f);
 
     return _value * scale;
@@ -494,9 +485,9 @@ int DarwiniaWindow::GetMenuSize(int _value)
 
 void DarwiniaWindow::SetMenuSize(int _w, int _h)
 {
-  if (g_app->m_largeMenus)
+  if (g_context->m_largeMenus)
   {
-    int screenH = g_app->m_renderer->ScreenH();
+    int screenH = g_context->m_renderer->ScreenH();
 
     float ratio = 0.96f * (static_cast<float>(screenH) / 460.0f);
 
@@ -538,7 +529,7 @@ void DarwiniaWindow::Update()
         b->MouseUp();
     }
 
-    if (g_inputManager->controlEvent(ControlMenuClose) && !g_app->m_atMainMenu)
+    if (g_inputManager->controlEvent(ControlMenuClose) && !g_context->m_atMainMenu)
       EclRemoveWindow(m_name);
   }
 }
@@ -559,7 +550,7 @@ void DarwiniaWindow::SetCurrentButton(EclButton* button)
 // Class GameExitButton
 // ****************************************************************************
 
-void GameExitButton::MouseUp() { g_app->m_requestQuit = true; }
+void GameExitButton::MouseUp() { g_context->m_requestQuit = true; }
 
 // ****************************************************************************
 // Class CloseButton

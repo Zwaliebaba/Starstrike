@@ -43,7 +43,7 @@ LegacyVector3 WayPoint::GetPos()
 
 	if (m_type == TypeGroundPos)
 	{
-		Landscape *land = &g_app->m_location->m_landscape;
+		Landscape *land = &g_context->m_location->m_landscape;
 		rv.y = land->m_heightMap->GetValue(rv.x, rv.z);
 		if (rv.y < 0.0f)
 		{
@@ -53,7 +53,7 @@ LegacyVector3 WayPoint::GetPos()
 	}
 	else if (m_type == TypeBuilding)
 	{
-		Building *building = g_app->m_location->GetBuilding(m_buildingId);
+		Building *building = g_context->m_location->GetBuilding(m_buildingId);
         if( building )
         {
             DEBUG_ASSERT( building->m_type == Building::TypeRadarDish ||

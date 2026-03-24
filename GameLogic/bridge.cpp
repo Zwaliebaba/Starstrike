@@ -4,7 +4,7 @@
 #include "resource.h"
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "entity_grid.h"
 #include "location.h"
 #include "team.h"
@@ -20,8 +20,8 @@ Bridge::Bridge()
   m_type = TypeBridge;
   m_sendPeriod = BRIDGE_TRANSPORTPERIOD;
 
-  m_shapes[0] = g_app->m_resource->GetShapeStatic("bridgeend.shp");
-  m_shapes[1] = g_app->m_resource->GetShapeStatic("bridgetower.shp");
+  m_shapes[0] = Resource::GetShapeStatic("bridgeend.shp");
+  m_shapes[1] = Resource::GetShapeStatic("bridgetower.shp");
 
   DEBUG_ASSERT(m_shapes[0]);
   DEBUG_ASSERT(m_shapes[1]);
@@ -100,7 +100,7 @@ void Bridge::Write(FileWriter* _out)
 
 bool Bridge::ReadyToSend()
 {
-  Building* nextBridge = g_app->m_location->GetBuilding(m_nextBridgeId);
+  Building* nextBridge = g_context->m_location->GetBuilding(m_nextBridgeId);
   return (m_status > 0.0f && nextBridge && m_bridgeType == BridgeTypeEnd && nextBridge->m_type == TypeBridge && Teleport::ReadyToSend());
 }
 
@@ -116,7 +116,7 @@ LegacyVector3 Bridge::GetEndPoint()
   auto nextBridge = this;
   while (nextBridge->m_nextBridgeId != -1)
   {
-    nextBridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(nextBridge->m_nextBridgeId));
+    nextBridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(nextBridge->m_nextBridgeId));
   }
 
   if (!nextBridge)
@@ -132,7 +132,7 @@ bool Bridge::GetExit(LegacyVector3& _pos, LegacyVector3& _front)
   auto nextBridge = this;
   while (nextBridge->m_nextBridgeId != -1)
   {
-    nextBridge = static_cast<Bridge*>(g_app->m_location->GetBuilding(nextBridge->m_nextBridgeId));
+    nextBridge = static_cast<Bridge*>(g_context->m_location->GetBuilding(nextBridge->m_nextBridgeId));
   }
 
   if (!nextBridge)
@@ -149,7 +149,7 @@ bool Bridge::GetExit(LegacyVector3& _pos, LegacyVector3& _front)
 
 bool Bridge::UpdateEntityInTransit(Entity* _entity)
 {
-  Building* building = g_app->m_location->GetBuilding(m_nextBridgeId);
+  Building* building = g_context->m_location->GetBuilding(m_nextBridgeId);
   auto nextBridge = static_cast<Bridge*>(building);
 
   WorldObjectId id(_entity->m_id);
@@ -186,7 +186,7 @@ bool Bridge::UpdateEntityInTransit(Entity* _entity)
         _entity->m_onGround = true;
         _entity->m_vel.Zero();
 
-        g_app->m_location->m_entityGrid->AddObject(id, _entity->m_pos.x, _entity->m_pos.z, _entity->m_radius);
+        g_context->m_location->m_entityGrid->AddObject(id, _entity->m_pos.x, _entity->m_pos.z, _entity->m_radius);
         return true;
       }
       if (nextBridge->m_bridgeType == BridgeTypeTower)
@@ -203,6 +203,6 @@ bool Bridge::UpdateEntityInTransit(Entity* _entity)
   _entity->m_enabled = true;
   _entity->m_vel = LegacyVector3(syncsfrand(10.0f), syncfrand(10.0f), syncsfrand(10.0f));
 
-  g_app->m_location->m_entityGrid->AddObject(id, _entity->m_pos.x, _entity->m_pos.z, _entity->m_radius);
+  g_context->m_location->m_entityGrid->AddObject(id, _entity->m_pos.x, _entity->m_pos.z, _entity->m_radius);
   return true;
 }

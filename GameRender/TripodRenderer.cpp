@@ -14,7 +14,7 @@ void TripodRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
 
     glDisable(GL_TEXTURE_2D);
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     //
     // Render body
@@ -31,5 +31,5 @@ void TripodRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
     for (int i = 0; i < 3; ++i)
         tripod.m_legs[i]->Render(_ctx.predictionTime, predictedMovement);
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 }

@@ -41,7 +41,7 @@ void MineBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
 
   if (mine.m_trackLink != -1)
   {
-    Building* trackLink = g_app->m_location->GetBuilding(mine.m_trackLink);
+    Building* trackLink = g_context->m_location->GetBuilding(mine.m_trackLink);
     if (trackLink)
     {
       int buildingDetail = g_prefsManager->GetInt("RenderBuildingDetail", 1);
@@ -59,11 +59,11 @@ void MineBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
       if (buildingDetail > 1)
         size = 1.0f;
 
-      LegacyVector3 camToOurPos1 = g_app->m_camera->GetPos() - ourPos1;
+      LegacyVector3 camToOurPos1 = g_context->m_camera->GetPos() - ourPos1;
       LegacyVector3 lineOurPos1 = camToOurPos1 ^ (ourPos1 - theirPos1);
       lineOurPos1.SetLength(size);
 
-      LegacyVector3 camToTheirPos1 = g_app->m_camera->GetPos() - theirPos1;
+      LegacyVector3 camToTheirPos1 = g_context->m_camera->GetPos() - theirPos1;
       LegacyVector3 lineTheirPos1 = camToTheirPos1 ^ (ourPos1 - theirPos1);
       lineTheirPos1.SetLength(size);
 
@@ -72,7 +72,7 @@ void MineBuildingRenderer::RenderAlphas(const Building& _building, const Buildin
       if (buildingDetail == 1)
       {
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -122,7 +122,7 @@ void MineBuildingRenderer::RenderCart(const MineBuilding& _mine, MineCart* _cart
   if (_mine.m_trackLink == -1)
     return;
 
-  Building* trackLink = g_app->m_location->GetBuilding(_mine.m_trackLink);
+  Building* trackLink = g_context->m_location->GetBuilding(_mine.m_trackLink);
   if (!trackLink)
     return;
 
@@ -150,7 +150,7 @@ void MineBuildingRenderer::RenderCart(const MineBuilding& _mine, MineCart* _cart
   LegacyVector3 cartPos = (trackLeft + trackRight) / 2.0f;
   cartPos += LegacyVector3(0, -40, 0);
 
-  if (g_app->m_camera->PosInViewFrustum(cartPos))
+  if (g_context->m_camera->PosInViewFrustum(cartPos))
   {
     LegacyVector3 cartFront = (trackLeft - trackRight) ^ g_upVector;
     cartFront.y = 0.0f;
@@ -162,7 +162,7 @@ void MineBuildingRenderer::RenderCart(const MineBuilding& _mine, MineCart* _cart
     LegacyVector3 cartLinkLeft = MineBuilding::s_cartShape->GetMarkerWorldMatrix(MineBuilding::s_cartMarker1, transform).pos;
     LegacyVector3 cartLinkRight = MineBuilding::s_cartShape->GetMarkerWorldMatrix(MineBuilding::s_cartMarker2, transform).pos;
 
-    LegacyVector3 camRight = g_app->m_camera->GetRight() * 0.5f;
+    LegacyVector3 camRight = g_context->m_camera->GetRight() * 0.5f;
     glBegin(GL_QUADS);
     glVertex3fv((trackLeft - camRight).GetData());
     glVertex3fv((trackLeft + camRight).GetData());
@@ -197,12 +197,12 @@ void MineBuildingRenderer::RenderCart(const MineBuilding& _mine, MineCart* _cart
 
           glColor4f(1.0f, 0.7f, 0.0f, 0.75f);
 
-          float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-          g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.1f, g_app->m_renderer->GetFarPlane());
+          float nearPlaneStart = g_context->m_renderer->GetNearPlane();
+          g_context->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.1f, g_context->m_renderer->GetFarPlane());
 
-          Render3DSprite(polyMat.pos - LegacyVector3(0, 25, 0), 50.0f, 50.0f, g_app->m_resource->GetTexture("textures/glow.bmp"));
+          Render3DSprite(polyMat.pos - LegacyVector3(0, 25, 0), 50.0f, 50.0f, Resource::GetTexture("textures/glow.bmp"));
 
-          g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
+          g_context->m_camera->SetupProjectionMatrix(nearPlaneStart, g_context->m_renderer->GetFarPlane());
 
           glEnable(GL_LIGHTING);
           glEnable(GL_DEPTH_TEST);

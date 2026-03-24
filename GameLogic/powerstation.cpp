@@ -9,7 +9,7 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 
 #include "building.h"
@@ -27,7 +27,7 @@ Powerstation::Powerstation()
     m_linkedBuildingId(-1)
 {
     m_type = Building::TypePowerstation;
-	SetShape( g_app->m_resource->GetShapeStatic("powerstation.shp") );
+	SetShape( Resource::GetShapeStatic("powerstation.shp") );
 }
 
 
@@ -43,7 +43,7 @@ void Powerstation::Initialise( Building *_template )
 // *** Advance
 bool Powerstation::Advance()
 {
-	Building *b = g_app->m_location->GetBuilding(m_linkedBuildingId);
+	Building *b = g_context->m_location->GetBuilding(m_linkedBuildingId);
 	if (b->m_type == Building::TypeLaserFence)
     {
         LaserFence *fence = (LaserFence *) b;

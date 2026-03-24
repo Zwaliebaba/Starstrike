@@ -9,8 +9,8 @@ ReallyQuitWindow::ReallyQuitWindow()
 {
 	m_w = 160;
 	m_h = 90;
-	m_x = g_app->m_renderer->ScreenW()/2 - m_w/2;
-	m_y = g_app->m_renderer->ScreenH()/2 - m_h/2;
+	m_x = g_context->m_renderer->ScreenW()/2 - m_w/2;
+	m_y = g_context->m_renderer->ScreenH()/2 - m_h/2;
 }
 
 void ReallyQuitWindow::Create()

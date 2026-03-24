@@ -15,14 +15,14 @@ void GodDishBuildingRenderer::RenderAlphas(const Building& _building, const Buil
 
     auto& dish = static_cast<const GodDish&>(_building);
 
-    LegacyVector3 camUp = g_app->m_camera->GetUp();
-    LegacyVector3 camRight = g_app->m_camera->GetRight();
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
 
     glDepthMask(false);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/cloudyglow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/cloudyglow.bmp"));
     glDisable(GL_DEPTH_TEST);
 
     float timeIndex = g_gameTime * 2;
@@ -38,7 +38,7 @@ void GodDishBuildingRenderer::RenderAlphas(const Building& _building, const Buil
     // Calculate alpha value
 
     float alpha = dish.m_timer * 0.1f;
-    alpha = min(alpha, 1.0f);
+    alpha = std::min(alpha, 1.0f);
 
     //
     // Central glow effect
@@ -51,7 +51,7 @@ void GodDishBuildingRenderer::RenderAlphas(const Building& _building, const Buil
         pos.z += cosf(timeIndex + i) * i * 1.7f;
 
         float size = 20.0f * sinf(timeIndex + i * 13);
-        size = max(size, 5.0f);
+        size = std::max(size, 5.0f);
 
         glColor4f(0.6f, 0.2f, 0.1f, alpha);
         glBegin(GL_QUADS);
@@ -69,7 +69,7 @@ void GodDishBuildingRenderer::RenderAlphas(const Building& _building, const Buil
     //
     // Central starbursts
 
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
 
     int numStars = 10;
     if (buildingDetail == 2)

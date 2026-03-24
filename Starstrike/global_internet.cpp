@@ -120,7 +120,7 @@ void GlobalInternet::DeleteInternet()
 
 void GlobalInternet::Render()
 {
-  START_PROFILE(g_app->m_profiler, "Internet");
+  START_PROFILE(g_context->m_profiler, "Internet");
 
   /*static*/
   float scale = 1000.0f;
@@ -147,7 +147,7 @@ void GlobalInternet::Render()
   glDisable(GL_CULL_FACE);
   glEnable(GL_TEXTURE_2D);
 
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence2.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence2.bmp"));
 
   glColor4f(0.25f, 0.25f, 0.5f, 0.8f);
 
@@ -181,7 +181,7 @@ void GlobalInternet::Render()
   }
   glEnd();
 
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
 
   glColor4f(0.8f, 0.8f, 1.0f, 0.6f);
   float nodeSize = 10.0f;
@@ -215,12 +215,12 @@ void GlobalInternet::Render()
 
   RenderPackets();
 
-  g_app->m_globalWorld->SetupFog();
+  g_context->m_globalWorld->SetupFog();
   glDisable(GL_FOG);
 
   mv.Pop();
 
-  END_PROFILE(g_app->m_profiler, "Internet");
+  END_PROFILE(g_context->m_profiler, "Internet");
 }
 
 void GlobalInternet::TriggerPacket(unsigned short _nodeId, unsigned short _fromLinkId)
@@ -278,8 +278,8 @@ void GlobalInternet::RenderPackets()
   // Advance / render all packets
 
   float packetSize = 30.0f;
-  LegacyVector3 camRight = g_app->m_camera->GetRight() * packetSize;
-  LegacyVector3 camUp = g_app->m_camera->GetUp() * packetSize;
+  LegacyVector3 camRight = g_context->m_camera->GetRight() * packetSize;
+  LegacyVector3 camUp = g_context->m_camera->GetUp() * packetSize;
   float posChange = g_advanceTime;
 
   glColor4f(0.25f, 0.25f, 0.5f, 0.8f);
@@ -288,7 +288,7 @@ void GlobalInternet::RenderPackets()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
   glDepthMask(false);
 
   glBegin(GL_QUADS);

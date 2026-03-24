@@ -1,9 +1,6 @@
 #include "pch.h"
-
 #include "FeedingTubeBuildingRenderer.h"
 #include "feedingtube.h"
-#include "matrix34.h"
-#include "ShapeStatic.h"
 #include "resource.h"
 #include "ogl_extensions.h"
 #include "profiler.h"
@@ -16,7 +13,7 @@ void FeedingTubeBuildingRenderer::RenderAlphas(const Building& _building, const 
 {
     const FeedingTube& tube = static_cast<const FeedingTube&>(_building);
 
-    if (g_app->m_editing)
+    if (g_context->m_editing)
         return;
 
     if (tube.m_receiverId != -1)
@@ -30,12 +27,12 @@ void FeedingTubeBuildingRenderer::RenderAlphas(const Building& _building, const 
 
 void FeedingTubeBuildingRenderer::RenderSignal(const FeedingTube& _tube, float _predictionTime, float _radius, float _alpha)
 {
-    START_PROFILE(g_app->m_profiler, "Signal");
+    START_PROFILE(g_context->m_profiler, "Signal");
 
-    auto receiver = static_cast<FeedingTube*>(g_app->m_location->GetBuilding(_tube.m_receiverId));
+    auto receiver = static_cast<FeedingTube*>(g_context->m_location->GetBuilding(_tube.m_receiverId));
     if (!receiver)
     {
-        END_PROFILE(g_app->m_profiler, "Signal");
+        END_PROFILE(g_context->m_profiler, "Signal");
         return;
     }
 
@@ -48,12 +45,12 @@ void FeedingTubeBuildingRenderer::RenderSignal(const FeedingTube& _tube, float _
     float distance = (startPos - endPos).Mag();
     float numRadii = 20.0f;
     int numSteps = static_cast<int>(distance / 200.0f);
-    numSteps = max(1, numSteps);
+    numSteps = std::max(1, numSteps);
 
     glEnable(GL_TEXTURE_2D);
 
     gglActiveTextureARB(GL_TEXTURE0_ARB);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence.bmp", true, true));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -63,7 +60,7 @@ void FeedingTubeBuildingRenderer::RenderSignal(const FeedingTube& _tube, float _
     glEnable(GL_TEXTURE_2D);
 
     gglActiveTextureARB(GL_TEXTURE1_ARB);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/radarsignal.bmp", true, true));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -150,5 +147,5 @@ void FeedingTubeBuildingRenderer::RenderSignal(const FeedingTube& _tube, float _
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-    END_PROFILE(g_app->m_profiler, "Signal");
+    END_PROFILE(g_context->m_profiler, "Signal");
 }

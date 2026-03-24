@@ -29,8 +29,8 @@ void TriffidEggRenderer::Render(const Entity& _entity, const EntityRenderContext
     //
     // Make our size pulsate a little
     float age = (egg.m_timerSync - GetHighResTime()) / egg.m_life;
-    age = max(age, 0.0f);
-    age = min(age, 1.0f);
+    age = std::max(age, 0.0f);
+    age = std::min(age, 1.0f);
     float size = egg.m_size + fabs(sinf(g_gameTime * 2.0f)) * (1.0f - age) * 0.4f;
 
     predictedPos.y -= size;
@@ -40,9 +40,9 @@ void TriffidEggRenderer::Render(const Entity& _entity, const EntityRenderContext
     transform.r *= size;
 
     glEnable(GL_NORMALIZE);
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
     egg.m_shape->Render(_ctx.predictionTime, transform);
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
     glDisable(GL_NORMALIZE);
 
     //

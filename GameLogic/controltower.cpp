@@ -8,7 +8,7 @@
 #include "hi_res_time.h"
 #include "clienttoserver.h"
 #include "GameSimEventQueue.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"
@@ -28,7 +28,7 @@ ControlTower::ControlTower()
   m_radius = 4.0f;
   m_type = TypeControlTower;
 
-  Building::SetShape(g_app->m_resource->GetShapeStatic("controltower.shp"));
+  Building::SetShape(Resource::GetShapeStatic("controltower.shp"));
   m_lightPos = m_shape->GetMarkerData("MarkerLightPos");
   m_dishPos = m_shape->GetMarkerData("MarkerDishPos");
 
@@ -45,7 +45,7 @@ ControlTower::ControlTower()
   }
 
   if (!s_dishShape)
-    s_dishShape = g_app->m_resource->GetShapeStatic("controltowerdish.shp");
+    s_dishShape = Resource::GetShapeStatic("controltowerdish.shp");
 }
 
 void ControlTower::Initialise(Building* _template)
@@ -63,7 +63,7 @@ bool ControlTower::Advance()
 
   if (m_dishMatrix == Matrix34())
   {
-    Building* targetBuilding = g_app->m_location->GetBuilding(m_controlBuildingId);
+    Building* targetBuilding = g_context->m_location->GetBuilding(m_controlBuildingId);
     if (targetBuilding)
     {
       Matrix34 mat(m_front, g_upVector, m_pos);
@@ -88,7 +88,7 @@ bool ControlTower::Advance()
 
   if (m_checkTargetTimer <= 0.0f)
   {
-    Building* building = g_app->m_location->GetBuilding(m_controlBuildingId);
+    Building* building = g_context->m_location->GetBuilding(m_controlBuildingId);
     if (building && building->m_type == TypeTrunkPort && m_id.GetTeamId() != 2)
     {
       auto tp = static_cast<TrunkPort*>(building);
@@ -163,7 +163,7 @@ bool ControlTower::Reprogram(int _teamId)
     if (m_ownership <= 0.0f)
     {
       m_id.SetTeamId(_teamId);
-      Building* targetBuilding = g_app->m_location->GetBuilding(m_controlBuildingId);
+      Building* targetBuilding = g_context->m_location->GetBuilding(m_controlBuildingId);
       if (targetBuilding && targetBuilding->m_id.GetTeamId() != m_id.GetTeamId())
         targetBuilding->SetTeamId(m_id.GetTeamId());
     }
@@ -177,7 +177,7 @@ bool ControlTower::Reprogram(int _teamId)
       if (m_ownership > 100.0f)
         m_ownership = 100.0f;
 
-      Building* targetBuilding = g_app->m_location->GetBuilding(m_controlBuildingId);
+      Building* targetBuilding = g_context->m_location->GetBuilding(m_controlBuildingId);
       if (targetBuilding)
       {
         targetBuilding->Reprogram(m_ownership);
@@ -185,16 +185,16 @@ bool ControlTower::Reprogram(int _teamId)
         if (m_ownership == 100.0f)
         {
           g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "ReprogramComplete"));
-          //g_app->m_sepulveda
+          //g_context->m_sepulveda
           targetBuilding->ReprogramComplete();
           SetTeamId(_teamId);
-          g_app->m_globalWorld->m_research->GiveResearchPoints(GLOBALRESEARCH_POINTS_CONTROLTOWER);
+          g_context->m_globalWorld->m_research->GiveResearchPoints(GLOBALRESEARCH_POINTS_CONTROLTOWER);
 
-          GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+          GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
           if (gb)
           {
             gb->m_online = true;
-            g_app->m_globalWorld->EvaluateEvents();
+            g_context->m_globalWorld->EvaluateEvents();
           }
           return true;
         }
@@ -222,8 +222,8 @@ bool ControlTower::IsInView()
   // Check against the tall thin control line to heaven
 
   LegacyVector3 towerPos = m_pos;
-  towerPos.y = g_app->m_camera->GetPos().y;
-  return g_app->m_camera->PosInViewFrustum(towerPos);
+  towerPos.y = g_context->m_camera->GetPos().y;
+  return g_context->m_camera->PosInViewFrustum(towerPos);
 }
 
 void ControlTower::Read(TextReader* _in, bool _dynamic)

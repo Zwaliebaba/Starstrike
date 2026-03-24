@@ -77,7 +77,7 @@ LangTable::~LangTable()
 
 void LangTable::ParseLanguageFile(char const *_filename)
 {
-    TextReader *in = g_app->m_resource->GetTextReader(_filename);
+    TextReader *in = Resource::GetTextReader(_filename);
 	ASSERT_TEXT(in && in->IsOpen(), "Couldn't open language file %s", _filename );
 
 	// Read all the phrases from the language file

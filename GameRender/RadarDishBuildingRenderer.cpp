@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "RadarDishBuildingRenderer.h"
-
 #include "radardish.h"
 #include "camera.h"
 #include "GameApp.h"
-#include "globals.h"
 #include "location.h"
 #include "main.h"
 #include "ogl_extensions.h"
@@ -41,7 +39,7 @@ void RadarDishBuildingRenderer::RenderSignal(const Building& _building, float _p
 {
     auto& dish = static_cast<const RadarDish&>(_building);
 
-    START_PROFILE(g_app->m_profiler, "Signal");
+    START_PROFILE(g_context->m_profiler, "Signal");
 
     LegacyVector3 startPos = const_cast<RadarDish&>(dish).GetStartPoint();
     LegacyVector3 endPos = const_cast<RadarDish&>(dish).GetEndPoint();
@@ -52,12 +50,12 @@ void RadarDishBuildingRenderer::RenderSignal(const Building& _building, float _p
     float distance = (startPos - endPos).Mag();
     float numRadii = 20.0f;
     int numSteps = static_cast<int>(distance / 200.0f);
-    numSteps = max(1, numSteps);
+    numSteps = std::max(1, numSteps);
 
     glEnable(GL_TEXTURE_2D);
 
     gglActiveTextureARB(GL_TEXTURE0_ARB);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp", true, true));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence.bmp", true, true));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -67,7 +65,7 @@ void RadarDishBuildingRenderer::RenderSignal(const Building& _building, float _p
     glEnable(GL_TEXTURE_2D);
 
     gglActiveTextureARB(GL_TEXTURE1_ARB);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/radarsignal.bmp", true, true));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/radarsignal.bmp", true, true));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -88,7 +86,7 @@ void RadarDishBuildingRenderer::RenderSignal(const Building& _building, float _p
     double eqn1[4] = {dishFront.x, dishFront.y, dishFront.z, -1.0f};
     glClipPlane(GL_CLIP_PLANE0, eqn1);
 
-    auto receiver = static_cast<RadarDish*>(g_app->m_location->GetBuilding(dish.m_receiverId));
+    auto receiver = static_cast<RadarDish*>(g_context->m_location->GetBuilding(dish.m_receiverId));
     LegacyVector3 receiverPos = receiver->GetDishPos(_predictionTime);
     LegacyVector3 receiverFront = receiver->GetDishFront(_predictionTime);
     mv.Translate(-startPos.x, -startPos.y, -startPos.z);
@@ -158,5 +156,5 @@ void RadarDishBuildingRenderer::RenderSignal(const Building& _building, float _p
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-    END_PROFILE(g_app->m_profiler, "Signal");
+    END_PROFILE(g_context->m_profiler, "Signal");
 }

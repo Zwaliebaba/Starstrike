@@ -7,7 +7,7 @@
 #include "math_utils.h"
 
 
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "entity_grid.h"
 #include "globals.h"
@@ -56,7 +56,7 @@ bool Teleport::Advance ()
     for( int i = 0; i < m_inTransit.Size(); ++i )
     {
         WorldObjectId *id = m_inTransit.GetPointer(i);
-        WorldObject *obj = g_app->m_location->GetEntity( *id );
+        WorldObject *obj = g_context->m_location->GetEntity( *id );
         Entity *ent = (Entity *) obj;
         if( ent )
         {
@@ -83,7 +83,7 @@ bool Teleport::Advance ()
     {
         TeleportMap *map = m_teleportMap.GetPointer(i);
         WorldObjectId unitId( map->m_teamId, map->m_fromUnitId, -1, -1 );
-        Unit *unit = g_app->m_location->GetUnit( unitId );
+        Unit *unit = g_context->m_location->GetUnit( unitId );
         if( !unit )
         {
             m_teleportMap.RemoveData(i);
@@ -104,7 +104,7 @@ bool Teleport::IsInView()
     float radius = ( startPoint - endPoint ).Mag() / 2.0f;
     radius += m_radius;
 
-    if( g_app->m_camera->SphereInViewFrustum( midPoint, radius ) )
+    if( g_context->m_camera->SphereInViewFrustum( midPoint, radius ) )
     {
         return true;
     }
@@ -126,7 +126,7 @@ bool Teleport::ReadyToSend()
 
 void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
 {
-    WorldObject *wobj = g_app->m_location->GetEntity( _id );
+    WorldObject *wobj = g_context->m_location->GetEntity( _id );
     Entity *entity = (Entity *) wobj;
 
     if( entity )
@@ -135,7 +135,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
 
         if( !_relay )
         {
-            Unit *oldUnit = g_app->m_location->GetUnit( _id );
+            Unit *oldUnit = g_context->m_location->GetUnit( _id );
             if( oldUnit )
             {
                 //
@@ -158,9 +158,9 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
 
                 if( newUnitId != -1 )
                 {
-                    if( g_app->m_location->m_teams[ _id.GetTeamId() ].m_units.ValidIndex( newUnitId ) )
+                    if( g_context->m_location->m_teams[ _id.GetTeamId() ].m_units.ValidIndex( newUnitId ) )
                     {
-                        newUnit = g_app->m_location->m_teams[ _id.GetTeamId() ].m_units[ newUnitId ];
+                        newUnit = g_context->m_location->m_teams[ _id.GetTeamId() ].m_units[ newUnitId ];
                     }
                     else
                     {
@@ -172,7 +172,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                 {
                     //
                     // Oh well, i'm the first, so create a new unit
-                    newUnit = g_app->m_location->m_teams[ _id.GetTeamId() ].NewUnit( oldUnit->m_troopType,
+                    newUnit = g_context->m_location->m_teams[ _id.GetTeamId() ].NewUnit( oldUnit->m_troopType,
                                                                                   oldUnit->m_entities.NumUsed(),
                                                                                   &newUnitId,
 																			      m_pos);
@@ -185,13 +185,13 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                     if( oldUnit->m_troopType == Entity::TypeInsertionSquadie )
                     {
                         // Shut down the old task
-                        for( int i = 0; i < g_app->m_taskManager->m_tasks.Size(); ++i )
+                        for( int i = 0; i < g_context->m_taskManager->m_tasks.Size(); ++i )
                         {
-                            Task *task = g_app->m_taskManager->m_tasks[i];
+                            Task *task = g_context->m_taskManager->m_tasks[i];
                             if( task->m_type == GlobalResearch::TypeSquad &&
                                 task->m_objId == WorldObjectId( oldUnit->m_teamId, oldUnit->m_unitId, -1, -1 ) )
                             {
-                                g_app->m_taskManager->m_tasks.RemoveData(i);
+                                g_context->m_taskManager->m_tasks.RemoveData(i);
                                 delete task;
                                 break;
                             }
@@ -201,13 +201,13 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                         task->m_type = GlobalResearch::TypeSquad;
                         task->m_state = Task::StateRunning;
                         task->m_objId.Set( newUnit->m_teamId, newUnit->m_unitId, -1, -1 );
-                        bool success = g_app->m_taskManager->RegisterTask( task );
-                        if( success ) g_app->m_taskManager->SelectTask( task->m_id );
+                        bool success = g_context->m_taskManager->RegisterTask( task );
+                        if( success ) g_context->m_taskManager->SelectTask( task->m_id );
 
                         ((InsertionSquad *)newUnit)->m_weaponType = ((InsertionSquad *)oldUnit)->m_weaponType;
                         ((InsertionSquad *)newUnit)->m_controllerId = ((InsertionSquad *)oldUnit)->m_controllerId;
                         ((InsertionSquad *)oldUnit)->m_controllerId = -1;
-                        Task *controller = g_app->m_taskManager->GetTask( ((InsertionSquad *)newUnit)->m_controllerId );
+                        Task *controller = g_context->m_taskManager->GetTask( ((InsertionSquad *)newUnit)->m_controllerId );
                         if( controller )
                         {
                             controller->m_objId = task->m_objId;
@@ -227,7 +227,7 @@ void Teleport::EnterTeleport( WorldObjectId _id, bool _relay )
                         GetExit( exitPos, exitFront );
                         LegacyVector3 newWayPoint(exitPos + exitFront * 50.0f);
                         newWayPoint += LegacyVector3( syncsfrand(35.0f), 0.0f, syncsfrand(35.0f) );
-                        newWayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue( newWayPoint.x, newWayPoint.z );
+                        newWayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue( newWayPoint.x, newWayPoint.z );
 				        newUnit->SetWayPoint(newWayPoint);
                     }
 

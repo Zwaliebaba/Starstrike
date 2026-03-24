@@ -22,7 +22,7 @@ void TrunkPortBuildingRenderer::Render(const Building& _building, const Building
 
     char caption[256];
 
-    const char* locationName = g_app->m_globalWorld->GetLocationNameTranslated(port.m_targetLocationId);
+    const char* locationName = g_context->m_globalWorld->GetLocationNameTranslated(port.m_targetLocationId);
     if (locationName)
     {
         strncpy(caption, locationName, sizeof(caption));
@@ -31,10 +31,10 @@ void TrunkPortBuildingRenderer::Render(const Building& _building, const Building
     else
         snprintf(caption, sizeof(caption), "[%s]", LANGUAGEPHRASE("location_unknown"));
 
-    START_PROFILE(g_app->m_profiler, "RenderDestination");
+    START_PROFILE(g_context->m_profiler, "RenderDestination");
 
     float fontSize = 70.0f / strlen(caption);
-    fontSize = min(fontSize, 10.0f);
+    fontSize = std::min(fontSize, 10.0f);
 
     Matrix34 portMat(port.m_front, g_upVector, port.m_pos);
 
@@ -61,7 +61,7 @@ void TrunkPortBuildingRenderer::Render(const Building& _building, const Building
 
     g_gameFont.SetRenderShadow(false);
 
-    END_PROFILE(g_app->m_profiler, "RenderDestination");
+    END_PROFILE(g_context->m_profiler, "RenderDestination");
 }
 
 void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
@@ -87,7 +87,7 @@ void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const Bu
         //
         // Calculate dif map based on sine curves
 
-        START_PROFILE(g_app->m_profiler, "Advance Heightmap");
+        START_PROFILE(g_context->m_profiler, "Advance Heightmap");
 
         LegacyVector3 difMap[TRUNKPORT_HEIGHTMAP_MAXSIZE][TRUNKPORT_HEIGHTMAP_MAXSIZE];
 
@@ -110,12 +110,12 @@ void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const Bu
             }
         }
 
-        END_PROFILE(g_app->m_profiler, "Advance Heightmap");
+        END_PROFILE(g_context->m_profiler, "Advance Heightmap");
 
         //
         // Render heightmap with dif map
 
-        START_PROFILE(g_app->m_profiler, "Render Heightmap");
+        START_PROFILE(g_context->m_profiler, "Render Heightmap");
 
         glDisable(GL_CULL_FACE);
         glEnable(GL_BLEND);
@@ -123,7 +123,7 @@ void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const Bu
         glDepthMask(false);
 
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laserfence.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laserfence.bmp"));
 
         float alphaValue = timeOpen;
         if (alphaValue > 0.7f)
@@ -157,7 +157,7 @@ void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const Bu
         }
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-        glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+        glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
         for (int x = 0; x < port.m_heightMapSize - 1; ++x)
@@ -193,6 +193,6 @@ void TrunkPortBuildingRenderer::RenderAlphas(const Building& _building, const Bu
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
 
-        END_PROFILE(g_app->m_profiler, "Render Heightmap");
+        END_PROFILE(g_context->m_profiler, "Render Heightmap");
     }
 }

@@ -27,11 +27,8 @@
 #include "taskmanager.h"
 #include "taskmanager_interface.h"
 #include "team.h"
-#include "tree.h"
-#include "tree_renderer.h"
 #include "BuildingRenderRegistry.h"
 #include "BuildingRenderer.h"
-#include "TreeBuildingRenderer.h"
 #include "WorldObjectRenderer.h"
 #include "WorldObjectRenderRegistry.h"
 #include "WeaponRenderer.h"
@@ -84,7 +81,7 @@ void Location::Init(const char* _missionFilename, const char* _mapFilename)
 
   m_water = new Water();
 
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
     InitBuildings();
 
@@ -106,12 +103,12 @@ void Location::Init(const char* _missionFilename, const char* _mapFilename)
   if (m_levelFile->m_levelDifficulty == -1)
   {
     // Remember the difficulty factor that this with which this level was created.
-    m_levelFile->m_levelDifficulty = g_app->m_difficultyLevel;
+    m_levelFile->m_levelDifficulty = g_context->m_difficultyLevel;
   }
   else
   {
     // Set difficulty level to the created level difficulty
-    g_app->m_difficultyLevel = m_levelFile->m_levelDifficulty;
+    g_context->m_difficultyLevel = m_levelFile->m_levelDifficulty;
   }
 }
 
@@ -151,7 +148,7 @@ void Location::LoadLevel(const char* missionFilename, const char* mapFilename)
   {
     m_missionComplete = true;
 
-    GlobalLocation* gloc = g_app->m_globalWorld->GetLocation(g_app->m_requestedLocationId);
+    GlobalLocation* gloc = g_context->m_globalWorld->GetLocation(g_context->m_requestedLocationId);
     gloc->m_missionCompleted = true;
   }
 }
@@ -175,7 +172,7 @@ void Location::InitBuildings()
   for (int i = 0; i < m_levelFile->m_buildings.Size(); i++)
   {
     Building* building = m_levelFile->m_buildings.GetData(i);
-    Building* existing = g_app->m_location->GetBuilding(building->m_id.GetUniqueId());
+    Building* existing = g_context->m_location->GetBuilding(building->m_id.GetUniqueId());
     if (existing)
     {
       ASSERT_TEXT(
@@ -289,10 +286,10 @@ LegacyVector3 Location::FindValidSpawnPosition(const LegacyVector3& _pos, float 
   // Failed to find a valid pos
 
   LegacyVector3 pos = _pos;
-  pos.x = max(pos.x, 20);
-  pos.z = max(pos.z, 20);
-  pos.x = min(pos.x, m_landscape.GetWorldSizeX()-20);
-  pos.z = min(pos.z, m_landscape.GetWorldSizeZ()-20);
+  pos.x = std::max(pos.x, 20.0f);
+  pos.z = std::max(pos.z, 20.0f);
+  pos.x = std::min(pos.x, m_landscape.GetWorldSizeX()-20.0f);
+  pos.z = std::min(pos.z, m_landscape.GetWorldSizeZ()-20.0f);
 
   return pos;
 }
@@ -446,7 +443,7 @@ Building* Location::GetBuilding(int _id)
   if (_id == -1)
     return nullptr;
 
-  if (g_app->m_editing)
+  if (g_context->m_editing)
     return m_levelFile->GetBuilding(_id);
   for (int i = 0; i < m_buildings.Size(); ++i)
   {
@@ -483,7 +480,7 @@ bool Location::IsVisible(const LegacyVector3& _from, const LegacyVector3& _to)
   LegacyVector3 startPos = _from + rayDir * tolerance;
 
   LegacyVector3 hitPos;
-  bool landHit = g_app->m_location->m_landscape.RayHit(startPos, rayDir, &hitPos);
+  bool landHit = g_context->m_location->m_landscape.RayHit(startPos, rayDir, &hitPos);
 
   if (!landHit)
     return true;
@@ -503,7 +500,7 @@ bool Location::IsWalkable(const LegacyVector3& _from, const LegacyVector3& _to, 
   if (_from.y <= waterLevel || _to.y <= waterLevel)
     return false;
 
-  START_PROFILE(g_app->m_profiler, "QueryWalkable");
+  START_PROFILE(g_context->m_profiler, "QueryWalkable");
 
   float stepSize = 50.0f;
   float totalDistance = (_from - _to).Mag();
@@ -521,7 +518,7 @@ bool Location::IsWalkable(const LegacyVector3& _from, const LegacyVector3& _to, 
 
     if (distanceUnderWater >= 100.0f)
     {
-      END_PROFILE(g_app->m_profiler, "QueryWalkable");
+      END_PROFILE(g_context->m_profiler, "QueryWalkable");
       return false;
     }
 
@@ -530,7 +527,7 @@ bool Location::IsWalkable(const LegacyVector3& _from, const LegacyVector3& _to, 
       float gradient = (position.y - oldPosition.y) / stepSize;
       if (gradient > 2.3f)
       {
-        END_PROFILE(g_app->m_profiler, "QueryWalkable");
+        END_PROFILE(g_context->m_profiler, "QueryWalkable");
         return false;
       }
     }
@@ -538,14 +535,14 @@ bool Location::IsWalkable(const LegacyVector3& _from, const LegacyVector3& _to, 
     position += diff;
   }
 
-  END_PROFILE(g_app->m_profiler, "QueryWalkable");
+  END_PROFILE(g_context->m_profiler, "QueryWalkable");
 
   return true;
 }
 
 void Location::AdvanceWeapons(int _slice)
 {
-  START_PROFILE(g_app->m_profiler, "Advance Lasers");
+  START_PROFILE(g_context->m_profiler, "Advance Lasers");
   int startIndex, endIndex;
   m_lasers.GetNextSliceBounds(_slice, &startIndex, &endIndex);
   for (int i = startIndex; i <= endIndex; ++i)
@@ -558,9 +555,9 @@ void Location::AdvanceWeapons(int _slice)
         m_lasers.MarkNotUsed(i);
     }
   }
-  END_PROFILE(g_app->m_profiler, "Advance Lasers");
+  END_PROFILE(g_context->m_profiler, "Advance Lasers");
 
-  START_PROFILE(g_app->m_profiler, "Advance Effects");
+  START_PROFILE(g_context->m_profiler, "Advance Effects");
   m_effects.GetNextSliceBounds(_slice, &startIndex, &endIndex);
   for (int i = startIndex; i <= endIndex; ++i)
   {
@@ -575,13 +572,13 @@ void Location::AdvanceWeapons(int _slice)
       }
     }
   }
-  END_PROFILE(g_app->m_profiler, "Advance Effects");
+  END_PROFILE(g_context->m_profiler, "Advance Effects");
 }
 
 // *** AdvanceBuildings
 void Location::AdvanceBuildings(int _slice)
 {
-  START_PROFILE(g_app->m_profiler, "Advance Buildings");
+  START_PROFILE(g_context->m_profiler, "Advance Buildings");
   bool obstructionGridChanged = false;
 
   int startIndex, endIndex;
@@ -592,9 +589,9 @@ void Location::AdvanceBuildings(int _slice)
     {
       Building* building = m_buildings.GetData(i);
 
-      START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+      START_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
       bool removeBuilding = building->Advance();
-      END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+      END_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
 
       if (removeBuilding)
       {
@@ -607,10 +604,10 @@ void Location::AdvanceBuildings(int _slice)
   if (obstructionGridChanged)
   {
     // TODO: This is WAY too slow, should only recalculate the areas affected
-    g_app->m_location->m_obstructionGrid->CalculateAll();
+    g_context->m_location->m_obstructionGrid->CalculateAll();
   }
 
-  END_PROFILE(g_app->m_profiler, "Advance Buildings");
+  END_PROFILE(g_context->m_profiler, "Advance Buildings");
 }
 
 /*
@@ -618,7 +615,7 @@ void Location::AdvanceBuildings( int _slice )
 {
     if( _slice == 5 )
     {
-        START_PROFILE(g_app->m_profiler, "Advance Buildings");
+        START_PROFILE(g_context->m_profiler, "Advance Buildings");
         bool obstructionGridChanged = false;
 
         for( int i = 0; i < m_buildings.Size(); ++i )
@@ -627,9 +624,9 @@ void Location::AdvanceBuildings( int _slice )
             {
                 Building *building = m_buildings.GetData(i);
 
-                START_PROFILE( g_app->m_profiler, Building::GetTypeName( building->m_type ) );
+                START_PROFILE( g_context->m_profiler, Building::GetTypeName( building->m_type ) );
                 bool removeBuilding = building->Advance();
-                END_PROFILE( g_app->m_profiler, Building::GetTypeName( building->m_type ) );
+                END_PROFILE( g_context->m_profiler, Building::GetTypeName( building->m_type ) );
 
                 if( removeBuilding )
                 {
@@ -642,10 +639,10 @@ void Location::AdvanceBuildings( int _slice )
         if( obstructionGridChanged )
         {
             // TODO: This is WAY too slow, should only recalculate the areas affected
-            g_app->m_location->m_obstructionGrid->CalculateAll();
+            g_context->m_location->m_obstructionGrid->CalculateAll();
         }
 
-        END_PROFILE(g_app->m_profiler, "Advance Buildings");
+        END_PROFILE(g_context->m_profiler, "Advance Buildings");
     }
 }*/
 
@@ -659,7 +656,7 @@ void Location::AdvanceTeams(int _slice)
 // *** AdvanceSpirits
 void Location::AdvanceSpirits(int _slice)
 {
-  START_PROFILE(g_app->m_profiler, "Advance Spirits");
+  START_PROFILE(g_context->m_profiler, "Advance Spirits");
 
   int startIndex, endIndex;
   m_spirits.GetNextSliceBounds(_slice, &startIndex, &endIndex);
@@ -674,7 +671,7 @@ void Location::AdvanceSpirits(int _slice)
     }
   }
 
-  END_PROFILE(g_app->m_profiler, "Advance Spirits");
+  END_PROFILE(g_context->m_profiler, "Advance Spirits");
 }
 
 // *** AdvanceClouds
@@ -682,9 +679,9 @@ void Location::AdvanceClouds(int _slice)
 {
   if (_slice == 3)
   {
-    START_PROFILE(g_app->m_profiler, "Advance Clouds");
+    START_PROFILE(g_context->m_profiler, "Advance Clouds");
     m_clouds->Advance();
-    END_PROFILE(g_app->m_profiler, "Advance Clouds");
+    END_PROFILE(g_context->m_profiler, "Advance Clouds");
   }
 }
 
@@ -695,10 +692,10 @@ void Location::DoMissionCompleteActions()
   //
   // Update the mission file for this location
 
-  GlobalLocation* gloc = g_app->m_globalWorld->GetLocation(g_app->m_locationId);
+  GlobalLocation* gloc = g_context->m_globalWorld->GetLocation(g_context->m_locationId);
   gloc->m_missionCompleted = true;
 
-  g_app->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageObjectivesComplete, -1, 5.0f);
+  g_context->m_taskManagerInterface->SetCurrentMessage(TaskManagerInterface::MessageObjectivesComplete, -1, 5.0f);
 }
 
 // *** MissionComplete
@@ -722,7 +719,7 @@ bool Location::MissionComplete()
 // *** Advance
 void Location::Advance(int _slice)
 {
-  if (g_app->m_paused)
+  if (g_context->m_paused)
     return;
 
   m_lastSliceProcessed = _slice;
@@ -818,7 +815,7 @@ void Location::RenderTeams()
 // *** Render Spirits
 void Location::RenderSpirits()
 {
-  START_PROFILE(g_app->m_profiler, "Render Spirits");
+  START_PROFILE(g_context->m_profiler, "Render Spirits");
 
   glDisable(GL_CULL_FACE);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -845,7 +842,7 @@ void Location::RenderSpirits()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
 
-  END_PROFILE(g_app->m_profiler, "Render Spirits");
+  END_PROFILE(g_context->m_profiler, "Render Spirits");
 }
 
 // *** RenderWater
@@ -883,7 +880,7 @@ void Location::Render(bool renderWaterAndClouds)
 
   RenderBuildings();
 
-  if (!g_app->m_editing && m_teams)
+  if (!g_context->m_editing && m_teams)
   {
     RenderTeams();
     CHECK_OPENGL_STATE();
@@ -898,7 +895,7 @@ void Location::Render(bool renderWaterAndClouds)
   RenderBuildingAlphas();
   CHECK_OPENGL_STATE();
 
-  if (!g_app->m_editing)
+  if (!g_context->m_editing)
   {
     CHECK_OPENGL_STATE();
     RenderParticles();
@@ -915,12 +912,12 @@ void Location::Render(bool renderWaterAndClouds)
 // *** Render Buildings
 void Location::RenderBuildings()
 {
-  START_PROFILE(g_app->m_profiler, "Render Buildings");
+  START_PROFILE(g_context->m_profiler, "Render Buildings");
   float timeSinceAdvance = g_predictionTime;
 
   SetupFog();
   glEnable(GL_FOG);
-  g_app->m_renderer->SetObjectLighting();
+  g_context->m_renderer->SetObjectLighting();
 
   //
   // Special lighting mode used for Demo2
@@ -970,7 +967,7 @@ void Location::RenderBuildings()
       Building* building = m_buildings.GetData(i);
       if (building->IsInView())
       {
-        START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+        START_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
 
         float predTime = (i > m_buildings.GetLastUpdated())
                            ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
@@ -982,16 +979,16 @@ void Location::RenderBuildings()
         ctx.predictionTime = predTime;
         renderer->Render(*building, ctx);
 
-        END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+        END_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
       }
     }
   }
 
   glDisable(GL_FOG);
-  g_app->m_renderer->SetObjectLighting();
-  g_app->m_renderer->UnsetObjectLighting();
+  g_context->m_renderer->SetObjectLighting();
+  g_context->m_renderer->UnsetObjectLighting();
 
-  END_PROFILE(g_app->m_profiler, "Render Buildings");
+  END_PROFILE(g_context->m_profiler, "Render Buildings");
 
   CHECK_OPENGL_STATE();
 }
@@ -1017,7 +1014,7 @@ int DepthSortedBuildingCompare(const void* elem1, const void* elem2)
 // *** Render Building Alphas
 void Location::RenderBuildingAlphas()
 {
-  START_PROFILE(g_app->m_profiler, "Render Building Alphas");
+  START_PROFILE(g_context->m_profiler, "Render Building Alphas");
   float timeSinceAdvance = g_predictionTime;
 
   //
@@ -1045,7 +1042,7 @@ void Location::RenderBuildingAlphas()
         LegacyVector3 centerPos;
         if (building->PerformDepthSort(centerPos))
         {
-          float distance = (centerPos - g_app->m_camera->GetPos()).MagSquared();
+          float distance = (centerPos - g_context->m_camera->GetPos()).MagSquared();
           s_sortedBuildings[s_nextSortedBuilding].m_buildingIndex = i;
           s_sortedBuildings[s_nextSortedBuilding].m_distance = distance;
           s_nextSortedBuilding++;
@@ -1053,7 +1050,7 @@ void Location::RenderBuildingAlphas()
         }
         else
         {
-          START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+          START_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
 
           float predTime = (i > m_buildings.GetLastUpdated())
                              ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
@@ -1065,7 +1062,7 @@ void Location::RenderBuildingAlphas()
           ctx.predictionTime = predTime;
           bldgRenderer->RenderAlphas(*building, ctx);
 
-          END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+          END_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
         }
       }
     }
@@ -1074,9 +1071,9 @@ void Location::RenderBuildingAlphas()
   //
   // Sort the buildings that require sorting
 
-  START_PROFILE(g_app->m_profiler, "Depth Sort");
+  START_PROFILE(g_context->m_profiler, "Depth Sort");
   qsort(s_sortedBuildings, s_nextSortedBuilding, sizeof(DepthSortedBuilding), DepthSortedBuildingCompare);
-  END_PROFILE(g_app->m_profiler, "Depth Sort");
+  END_PROFILE(g_context->m_profiler, "Depth Sort");
 
   //
   // Render those sorted buildings in reverse depth order
@@ -1086,7 +1083,7 @@ void Location::RenderBuildingAlphas()
     int buildingIndex = s_sortedBuildings[i].m_buildingIndex;
     Building* building = m_buildings.GetData(buildingIndex);
 
-    START_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+    START_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
 
     float predTime = (buildingIndex > m_buildings.GetLastUpdated())
                        ? timeSinceAdvance + SERVER_ADVANCE_PERIOD
@@ -1098,18 +1095,18 @@ void Location::RenderBuildingAlphas()
     ctx.predictionTime = predTime;
     renderer->RenderAlphas(*building, ctx);
 
-    END_PROFILE(g_app->m_profiler, Building::GetTypeName( building->m_type ));
+    END_PROFILE(g_context->m_profiler, Building::GetTypeName( building->m_type ));
   }
 
   glDisable(GL_FOG);
 
-  END_PROFILE(g_app->m_profiler, "Render Building Alphas");
+  END_PROFILE(g_context->m_profiler, "Render Building Alphas");
 }
 
 // *** Render Clouds
 void Location::RenderClouds()
 {
-  START_PROFILE(g_app->m_profiler, "Render Clouds");
+  START_PROFILE(g_context->m_profiler, "Render Clouds");
 
   if (m_clouds)
   {
@@ -1120,13 +1117,13 @@ void Location::RenderClouds()
       m_clouds->Render(timeSinceAdvance + 0.1f);
   }
 
-  END_PROFILE(g_app->m_profiler, "Render Clouds");
+  END_PROFILE(g_context->m_profiler, "Render Clouds");
 }
 
 // *** Render Effects
 void Location::RenderWeapons()
 {
-  START_PROFILE(g_app->m_profiler, "Render Weapons");
+  START_PROFILE(g_context->m_profiler, "Render Weapons");
 
   float timeSinceAdvance = g_predictionTime;
 
@@ -1163,10 +1160,10 @@ void Location::RenderWeapons()
   glEnable(GL_LINE_SMOOTH);
   glDisable(GL_CULL_FACE);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp", false));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp", false));
 
-  float nearPlaneStart = g_app->m_renderer->GetNearPlane();
-  g_app->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_app->m_renderer->GetFarPlane());
+  float nearPlaneStart = g_context->m_renderer->GetNearPlane();
+  g_context->m_camera->SetupProjectionMatrix(nearPlaneStart * 1.2f, g_context->m_renderer->GetFarPlane());
 
   for (int i = 0; i < m_lasers.Size(); ++i)
   {
@@ -1187,9 +1184,9 @@ void Location::RenderWeapons()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_LINE_SMOOTH);
 
-  g_app->m_camera->SetupProjectionMatrix(nearPlaneStart, g_app->m_renderer->GetFarPlane());
+  g_context->m_camera->SetupProjectionMatrix(nearPlaneStart, g_context->m_renderer->GetFarPlane());
 
-  END_PROFILE(g_app->m_profiler, "Render Weapons");
+  END_PROFILE(g_context->m_profiler, "Render Weapons");
 }
 
 void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
@@ -1206,7 +1203,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
   if (_teamType == Team::TeamTypeLocalPlayer)
   {
     DebugTrace("CLIENT : Assigned team {}\n", _teamId);
-    g_app->m_globalWorld->m_myTeamId = _teamId;
+    g_context->m_globalWorld->m_myTeamId = _teamId;
   }
 
   // Create instant units that belong to this team
@@ -1216,7 +1213,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
     if (team->m_teamId != iu->m_teamId)
       continue;
 
-    Team* team = &g_app->m_location->m_teams[iu->m_teamId];
+    Team* team = &g_context->m_location->m_teams[iu->m_teamId];
     LegacyVector3 pos(iu->m_posX, 0, iu->m_posZ);
     pos.y = m_landscape.m_heightMap->GetValue(pos.x, pos.z);
     int unitId = -1;
@@ -1254,13 +1251,13 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
 
     if (iu->m_type == Entity::TypeDarwinian && iu->m_number == 1 && iu->m_state == Darwinian::StateFollowingOrders)
     {
-      auto darwinian = static_cast<Darwinian*>(g_app->m_location->GetEntitySafe(spawnedId, Entity::TypeDarwinian));
+      auto darwinian = static_cast<Darwinian*>(g_context->m_location->GetEntitySafe(spawnedId, Entity::TypeDarwinian));
       if (darwinian)
         darwinian->GiveOrders(targetPos);
     }
     if (iu->m_type == Entity::TypeOfficer)
     {
-      auto officer = static_cast<Officer*>(g_app->m_location->GetEntitySafe(spawnedId, Entity::TypeOfficer));
+      auto officer = static_cast<Officer*>(g_context->m_location->GetEntitySafe(spawnedId, Entity::TypeOfficer));
       if (iu->m_state == Officer::OrderGoto)
         officer->SetOrders(targetPos);
       else
@@ -1268,7 +1265,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
     }
     if (iu->m_type == Entity::TypeArmour)
     {
-      auto armour = static_cast<Armour*>(g_app->m_location->GetEntitySafe(spawnedId, Entity::TypeArmour));
+      auto armour = static_cast<Armour*>(g_context->m_location->GetEntitySafe(spawnedId, Entity::TypeArmour));
       armour->SetWayPoint(targetPos);
       armour->m_state = iu->m_state;
     }
@@ -1305,7 +1302,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
         task->m_type = GlobalResearch::TypeEngineer;
         task->m_objId = objId;
         task->m_state = Task::StateRunning;
-        g_app->m_taskManager->RegisterTask(task);
+        g_context->m_taskManager->RegisterTask(task);
       }
 
       if (program->m_type == Entity::TypeInsertionSquadie)
@@ -1334,7 +1331,7 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
         task->m_type = GlobalResearch::TypeSquad;
         task->m_objId.Set(_teamId, unitId, -1, -1);
         task->m_state = Task::StateRunning;
-        g_app->m_taskManager->RegisterTask(task);
+        g_context->m_taskManager->RegisterTask(task);
       }
     }
   }
@@ -1348,8 +1345,8 @@ void Location::RemoveTeam(unsigned char _teamId)
     m_teams[_teamId].m_teamType = Team::TeamTypeUnused;
   }
 
-  if (_teamId == g_app->m_globalWorld->m_myTeamId)
-    g_app->m_globalWorld->m_myTeamId = 255;
+  if (_teamId == g_context->m_globalWorld->m_myTeamId)
+    g_context->m_globalWorld->m_myTeamId = 255;
 }
 
 // *** UpdateTeam
@@ -1388,7 +1385,7 @@ void Location::UpdateTeam(unsigned char teamId, const TeamControls& teamControls
     }
 
     if (unitMoved && teamControls.m_endSetTarget)
-      g_app->m_gameCursor->CreateMarker(teamControls.m_mousePos);
+      g_context->m_gameCursor->CreateMarker(teamControls.m_mousePos);
 
     unitMoved = unitMove;
 
@@ -1404,7 +1401,7 @@ void Location::UpdateTeam(unsigned char teamId, const TeamControls& teamControls
     if (entity)
     {
       if (teamControls.m_endSetTarget)
-        g_app->m_gameCursor->CreateMarker(teamControls.m_mousePos);
+        g_context->m_gameCursor->CreateMarker(teamControls.m_mousePos);
 
       entity->DirectControl(teamControls);
       switch (entity->m_type)
@@ -1482,8 +1479,8 @@ int Location::GetUnitId(const LegacyVector3& startRay, const LegacyVector3& dire
             if (entityHit && !entity->m_dead)
             {
               float centerPosX, centerPosY, rayHitX, rayHitY;
-              g_app->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
-              g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
+              g_context->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
+              g_context->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
               float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
               if (rangeSqd < closestRangeSqd)
@@ -1527,8 +1524,8 @@ WorldObjectId Location::GetEntityId(const LegacyVector3& startRay, const LegacyV
         if (rayHit)
         {
           float centerPosX, centerPosY, rayHitX, rayHitY;
-          g_app->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
-          g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
+          g_context->m_camera->Get2DScreenPos(spherePos, &centerPosX, &centerPosY);
+          g_context->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
           float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
           if (rangeSqd < closestRangeSqd)
@@ -1578,8 +1575,8 @@ int Location::GetBuildingId(const LegacyVector3& rayStart, const LegacyVector3& 
         if (rayHit)
         {
           float centerPosX, centerPosY, rayHitX, rayHitY;
-          g_app->m_camera->Get2DScreenPos(building->m_centerPos, &centerPosX, &centerPosY);
-          g_app->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
+          g_context->m_camera->Get2DScreenPos(building->m_centerPos, &centerPosX, &centerPosY);
+          g_context->m_camera->Get2DScreenPos(hitPos, &rayHitX, &rayHitY);
 
           float rangeSqd = pow(centerPosX - rayHitX, 2) + pow(centerPosY - rayHitY, 2);
           if (rangeSqd < closestRangeSqd)
@@ -1603,7 +1600,7 @@ void Location::ThrowWeapon(const LegacyVector3& _pos, const LegacyVector3& _targ
   float distance = (_target - _pos).Mag();
   float force = sqrtf(distance) * 8.0f;
 
-  int grenadeResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeGrenade);
+  int grenadeResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeGrenade);
   if (_fromTeamId == 1)
     grenadeResearch = 4;
 
@@ -1669,7 +1666,7 @@ void Location::FireRocket(const LegacyVector3& _pos, const LegacyVector3& _targe
 
 void Location::FireTurretShell(const LegacyVector3& _pos, const LegacyVector3& _vel)
 {
-  int armourResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeArmour);
+  int armourResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeArmour);
   float lifeTime = 0.0f;
   switch (armourResearch)
   {
@@ -1712,7 +1709,7 @@ void Location::FireTurretShell(const LegacyVector3& _pos, const LegacyVector3& _
 
 void Location::FireLaser(const LegacyVector3& _pos, const LegacyVector3& _vel, unsigned char _teamId)
 {
-  int laserResearch = g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeLaser);
+  int laserResearch = g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeLaser);
   float lifetime = 0.0f;
   switch (laserResearch)
   {
@@ -1752,9 +1749,9 @@ void Location::FireLaser(const LegacyVector3& _pos, const LegacyVector3& _vel, u
 
 Team* Location::GetMyTeam()
 {
-  if (g_app->m_globalWorld->m_myTeamId == 255)
+  if (g_context->m_globalWorld->m_myTeamId == 255)
     return nullptr;
-  return &m_teams[g_app->m_globalWorld->m_myTeamId];
+  return &m_teams[g_context->m_globalWorld->m_myTeamId];
 }
 
 // ****************************************************************************
@@ -1769,33 +1766,31 @@ void Location::Bang(const LegacyVector3& _pos, float _range, float _damage)
   {
     LegacyVector3 vel(syncsfrand(20.0f), 10.0f + syncfrand(10.0f), syncsfrand(20.0f));
     float size = 120.0f + syncfrand(60.0f);
-    g_app->m_particleSystem->CreateParticle(_pos + g_upVector * _range * 0.3f, vel, Particle::TypeExplosionCore, size);
+    g_context->m_particleSystem->CreateParticle(_pos + g_upVector * _range * 0.3f, vel, Particle::TypeExplosionCore, size);
   }
 
-  int numDebris = max(1, _range * _damage * 0.005f);
+  int numDebris = std::max<int>(1, _range * _damage * 0.005f);
   for (int p = 0; p < numDebris; ++p)
   {
     LegacyVector3 vel(syncsfrand(30.0f), 20.0f + syncfrand(20.0f), syncsfrand(30.0f));
     float size = 30.0f + syncfrand(20.0f);
-    g_app->m_particleSystem->CreateParticle(_pos + g_upVector * _range * 0.5f, vel, Particle::TypeExplosionDebris, size);
+    g_context->m_particleSystem->CreateParticle(_pos + g_upVector * _range * 0.5f, vel, Particle::TypeExplosionDebris, size);
   }
 
   //
   // Damage everyone nearby
 
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetNeighbours(_pos.x, _pos.z, _range * 2.0f, &numFound);
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(_pos.x, _pos.z, _range * 2.0f, &numFound);
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    WorldObject* obj = g_app->m_location->GetEntity(id);
+    WorldObject* obj = g_context->m_location->GetEntity(id);
     auto entity = static_cast<Entity*>(obj);
 
     float distance = (entity->m_pos - _pos).Mag();
     float fraction = (_range * 2.0f - distance) / _range * 2.0f;
-    //fraction *= (1.0f + syncfrand(0.3f));
-    //fraction *= 1.5f;
-    fraction = min(1.0f, fraction);
+    fraction = std::min(1.0f, fraction);
 
     entity->ChangeHealth(_damage * fraction * -1.0f);
 
@@ -1818,8 +1813,8 @@ void Location::Bang(const LegacyVector3& _pos, float _range, float _damage)
   // Is visible?
 
   LegacyVector3 tmp;
-  bool isVisible = !m_landscape.RayHit(g_app->m_camera->GetPos(), _pos - g_app->m_camera->GetPos(), &tmp) || (tmp - g_app->m_camera->
-    GetPos()).Mag() > (_pos - g_app->m_camera->GetPos()).Mag() - 0.3f;
+  bool isVisible = !m_landscape.RayHit(g_context->m_camera->GetPos(), _pos - g_context->m_camera->GetPos(), &tmp) || (tmp - g_context->m_camera->
+    GetPos()).Mag() > (_pos - g_context->m_camera->GetPos()).Mag() - 0.3f;
 
   //
   // Shockwave
@@ -1842,8 +1837,8 @@ void Location::Bang(const LegacyVector3& _pos, float _range, float _damage)
       {
         //float fraction = (_range*3.0f - dist) / _range*3.0f;
         float fraction = 1.0f - dist / maxBuildingRange;
-        fraction = max(0.0f, fraction);
-        fraction = min(1.0f, fraction);
+        fraction = std::max(0.0f, fraction);
+        fraction = std::min(1.0f, fraction);
         building->Damage(_damage * fraction * -1.0f);
       }
     }
@@ -1861,7 +1856,7 @@ void Location::CreateShockwave(const LegacyVector3& _pos, float _size, unsigned 
 
 void Location::SetupFog()
 {
-  float fogCol[] = {g_app->m_backgroundColour.r / 255.0f, g_app->m_backgroundColour.g / 255.0f, g_app->m_backgroundColour.b / 255.0f, 0};
+  float fogCol[] = {g_context->m_backgroundColour.r / 255.0f, g_context->m_backgroundColour.g / 255.0f, g_context->m_backgroundColour.b / 255.0f, 0};
 
   glHint(GL_FOG_HINT, GL_DONT_CARE);
   glFogf(GL_FOG_DENSITY, 1.0f);
@@ -1916,7 +1911,7 @@ int Location::ChristmasModEnabled()
   return 0;
 #endif
 
-  if (g_app->m_editing)
+  if (g_context->m_editing)
     return 0;
 
   // Last 2 weeks in December only
@@ -1975,8 +1970,8 @@ void Location::FlushOpenGlState()
 void Location::RegenerateOpenGlState()
 {
   // Tell the landscape
-  g_app->m_location->m_landscape.BuildOpenGlState();
+  g_context->m_location->m_landscape.BuildOpenGlState();
 
   // Tell the water
-  g_app->m_location->m_water->BuildOpenGlState();
+  g_context->m_location->m_water->BuildOpenGlState();
 }

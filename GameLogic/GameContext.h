@@ -1,14 +1,14 @@
-// GameLogic/GameAppSim.h
+// GameLogic/GameContext.h
 //
-// Simulation-side application state.  Contains all data members that
-// simulation code accesses through g_app->.  This header has NO
+// Plain simulation-state struct.  Contains all data members that
+// simulation code accesses through g_context->.  This header has NO
 // dependency on NeuronClient, GameMain, or any GPU/rendering headers.
 //
-// GameApp (Starstrike) inherits GameAppSim + GameMain.
+// GameApp (Starstrike) inherits GameContext (for data) + GameMain
+// (for rendering/window lifecycle).
+//
 // GameLogic .cpp files include this header instead of GameApp.h.
 // GameRender / Starstrike continue to include GameApp.h (which
-// includes this header and adds GameMain inheritance).
-
 #pragma once
 
 #include "rgb_colour.h"
@@ -19,7 +19,6 @@ class Server;
 class ClientToServer;
 class Renderer;
 class UserInput;
-class Resource;
 class SoundSystem;
 class LocationInput;
 class LangTable;
@@ -34,18 +33,12 @@ class GameCursor;
 class GameCursor2D;
 class StartSequence;
 class BitmapRGBA;
-class Sepulveda;
-
 class SoundLibrary2d;
 
-class GameAppSim
+struct GameContext
 {
-  public:
-    virtual ~GameAppSim() = default;
-
     // Library Code Objects
     UserInput* m_userInput = nullptr;
-    Resource* m_resource = nullptr;
     SoundSystem* m_soundSystem = nullptr;
     ParticleSystem* m_particleSystem = nullptr;
     LangTable* m_langTable = nullptr;
@@ -103,22 +96,6 @@ class GameAppSim
       NumGameModes
     };
 
-    // --- Lifecycle methods ---
-    // Overridden in GameApp (Starstrike).  Default implementations are
-    // no-ops so that a headless/server build does not require Starstrike.
-
-    virtual void SetProfileName([[maybe_unused]] const char* _profileName) {}
-    virtual bool LoadProfile() { return false; }
-    virtual void ResetLevel([[maybe_unused]] bool _global) {}
-
-    virtual void SetLanguage([[maybe_unused]] const char* _language,
-                             [[maybe_unused]] bool _test) {}
-
-    virtual void LoadPrologue() {}
-    virtual void LoadCampaign() {}
-
-    virtual void UpdateDifficultyFromPreferences() {}
-
     // --- Static utilities ---
 
     static const char* GetProfileDirectory();
@@ -126,4 +103,4 @@ class GameAppSim
     static const char* GetScreenshotDirectory();
 };
 
-extern GameAppSim* g_app;
+inline GameContext* g_context = {};

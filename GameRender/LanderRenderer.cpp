@@ -21,14 +21,14 @@ void LanderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
 
     LegacyVector3 predictedPos = lander.m_pos + lander.m_vel * _ctx.predictionTime;
 
-    LegacyVector3 entityUp = g_app->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
+    LegacyVector3 entityUp = g_context->m_location->m_landscape.m_normalMap->GetValue(predictedPos.x, predictedPos.z);
     LegacyVector3 entityFront = lander.m_front;
     entityFront.Normalise();
     LegacyVector3 entityRight = entityFront ^ entityUp;
     entityUp = entityRight ^ entityFront;
 
     int teamId = lander.m_id.GetTeamId();
-    RGBAColour colour = g_app->m_location->m_teams[teamId].m_colour;
+    RGBAColour colour = g_context->m_location->m_teams[teamId].m_colour;
 
     if (lander.m_reloading > 0.0f)
     {
@@ -41,7 +41,7 @@ void LanderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
     //
     // 3d Shape
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     glEnable(GL_CULL_FACE);
     glDisable(GL_TEXTURE_2D);
@@ -54,6 +54,6 @@ void LanderRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
     glEnable(GL_BLEND);
     glDisable(GL_COLOR_MATERIAL);
     glEnable(GL_TEXTURE_2D);
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
     glEnable(GL_CULL_FACE);
 }

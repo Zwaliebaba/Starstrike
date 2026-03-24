@@ -308,7 +308,7 @@ LRESULT CALLBACK W32InputDriver::WndProc(HWND hWnd, UINT message, WPARAM wParam,
         m_keyNewDeltas[wParam] = 1;
         g_keys[wParam] = 1;
         if (wParam == KEY_F4)
-          g_app->m_requestQuit = true;
+          g_context->m_requestQuit = true;
       }
       break;
     }

@@ -27,7 +27,6 @@ void SoulDestroyerRenderer::Render(const Entity& _entity, const EntityRenderCont
     LegacyVector3 predictedUp = sd.m_up;
     LegacyVector3 predictedRight = predictedUp ^ predictedFront;
     predictedFront = predictedRight ^ predictedUp;
-    Matrix34 mat(predictedFront, predictedUp, predictedPos);
 
     RenderShapes(_entity, predictionTime);
 
@@ -50,7 +49,7 @@ void SoulDestroyerRenderer::Render(const Entity& _entity, const EntityRenderCont
         scale *= 1.5f;
         if (i == sd.m_positionHistory.Size() - 1)
             scale = 0.8f;
-        scale = max(scale, 0.5f);
+        scale = std::max(scale, 0.5f);
 
         ShadowRenderer::Render(pos, scale * 20.0f);
     }
@@ -80,8 +79,8 @@ void SoulDestroyerRenderer::Render(const Entity& _entity, const EntityRenderCont
             else
             {
                 float alpha = 1.0f - (timeNow - sd.m_spirits[i]) / 60.0f;
-                alpha = min(alpha, 1.0f);
-                alpha = max(alpha, 0.0f);
+                alpha = std::min(alpha, 1.0f);
+                alpha = std::max(alpha, 0.0f);
                 LegacyVector3 pos = sd.m_pos + sd.m_spiritPosition[i];
                 pos += sd.m_vel * predictionTime;
                 RenderSpirit(pos, alpha);
@@ -112,7 +111,7 @@ void SoulDestroyerRenderer::RenderShapes(const Entity& _entity, float _predictio
     glEnable(GL_NORMALIZE);
     glDisable(GL_TEXTURE_2D);
 
-    g_app->m_renderer->SetObjectLighting();
+    g_context->m_renderer->SetObjectLighting();
 
     SoulDestroyer::s_shapeHead->Render(_predictionTime, mat);
 
@@ -132,7 +131,7 @@ void SoulDestroyerRenderer::RenderShapes(const Entity& _entity, float _predictio
         scale *= 1.5f;
         if (i == sd.m_positionHistory.Size() - 1)
             scale = 0.8f;
-        scale = max(scale, 0.5f);
+        scale = std::max(scale, 0.5f);
 
         Matrix34 tailMat(front, up, pos);
         tailMat.u *= scale;
@@ -142,7 +141,7 @@ void SoulDestroyerRenderer::RenderShapes(const Entity& _entity, float _predictio
         SoulDestroyer::s_shapeTail->Render(_predictionTime, tailMat);
     }
 
-    g_app->m_renderer->UnsetObjectLighting();
+    g_context->m_renderer->UnsetObjectLighting();
 
     glDisable(GL_NORMALIZE);
 }
@@ -157,24 +156,24 @@ void SoulDestroyerRenderer::RenderSpirit(const LegacyVector3& _pos, float _alpha
     int spiritOuterSize = 12 * _alpha;
 
     RGBAColour colour(100, 50, 50);
-    float distToParticle = (g_app->m_camera->GetPos() - pos).Mag();
+    float distToParticle = (g_context->m_camera->GetPos() - pos).Mag();
 
     float size = spiritInnerSize / sqrtf(sqrtf(distToParticle));
     glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
 
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 
     size = spiritOuterSize / sqrtf(sqrtf(distToParticle));
     glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
     glBegin(GL_QUADS);
-    glVertex3fv((pos - g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_app->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_app->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
+    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
+    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
     glEnd();
 }

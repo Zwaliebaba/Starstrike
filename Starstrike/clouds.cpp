@@ -21,17 +21,17 @@ void Clouds::Advance()
 
 void Clouds::Render(float _predictionTime)
 {
-  START_PROFILE(g_app->m_profiler, "RenderSky");
+  START_PROFILE(g_context->m_profiler, "RenderSky");
   RenderSky();
-  END_PROFILE(g_app->m_profiler, "RenderSky");
+  END_PROFILE(g_context->m_profiler, "RenderSky");
 
-  START_PROFILE(g_app->m_profiler, "RenderBlobby");
+  START_PROFILE(g_context->m_profiler, "RenderBlobby");
   RenderBlobby(_predictionTime);
-  END_PROFILE(g_app->m_profiler, "RenderBlobby");
+  END_PROFILE(g_context->m_profiler, "RenderBlobby");
 
-  START_PROFILE(g_app->m_profiler, "RenderFlat");
+  START_PROFILE(g_context->m_profiler, "RenderFlat");
   RenderFlat(_predictionTime);
-  END_PROFILE(g_app->m_profiler, "RenderFlat");
+  END_PROFILE(g_context->m_profiler, "RenderFlat");
 }
 
 // Renders a textured quad by spliting it up into a regular grid of smaller quads.
@@ -92,7 +92,7 @@ void Clouds::RenderFlat(float _predictionTime)
   LegacyVector3 offset = m_offset + m_vel * _predictionTime;
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/clouds.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/clouds.bmp"));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -124,7 +124,7 @@ void Clouds::RenderFlat(float _predictionTime)
     RenderQuad(zStart, zEnd, xStart, xEnd, height, offset.x / 2, offset.x / 2 + detail, offset.x / 2, offset.x / 2 + detail);
   }
 
-  g_app->m_location->SetupFog();
+  g_context->m_location->SetupFog();
   glDepthMask(true);
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
@@ -149,7 +149,7 @@ void Clouds::RenderBlobby(float _predictionTime)
   int cloudDetail = g_prefsManager->GetInt("RenderCloudDetail", 1);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/clouds.bmp", false));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/clouds.bmp", false));
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -183,7 +183,7 @@ void Clouds::RenderBlobby(float _predictionTime)
 
   if (cloudDetail == 1) { RenderQuad(zStart, zEnd, xStart, xEnd, height, offset.x, detail + offset.x, offset.z, detail + offset.z); }
 
-  g_app->m_location->SetupFog();
+  g_context->m_location->SetupFog();
   glEnable(GL_DEPTH_TEST);
   glDepthMask(true);
   glDisable(GL_BLEND);
@@ -218,7 +218,7 @@ void Clouds::RenderSky()
   glColor4f(0.5, 0.5, 1.0, 0.3);
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+  glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
 
   glBegin(GL_QUADS);
   for (int x = xStart; x < xEnd; x += gridSize)
@@ -248,5 +248,5 @@ void Clouds::RenderSky()
   glDisable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDepthMask(true);
-  g_app->m_location->SetupFog();
+  g_context->m_location->SetupFog();
 }

@@ -46,12 +46,12 @@ void BlueprintConsoleBuildingRenderer::RenderPorts(const Building& _building)
         // Render the status light
 
         float size = 6.0f;
-        LegacyVector3 camR = g_app->m_camera->GetRight() * size;
-        LegacyVector3 camU = g_app->m_camera->GetUp() * size;
+        LegacyVector3 camR = g_context->m_camera->GetRight() * size;
+        LegacyVector3 camU = g_context->m_camera->GetUp() * size;
 
         LegacyVector3 statusPos =
             Building::s_controlPad->GetMarkerWorldMatrix(Building::s_controlPadStatus, mat).pos;
-        statusPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(
+        statusPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(
             statusPos.x, statusPos.z);
         statusPos.y += 5.0f;
 
@@ -62,14 +62,14 @@ void BlueprintConsoleBuildingRenderer::RenderPorts(const Building& _building)
         else
         {
             RGBAColour teamColour =
-                g_app->m_location->m_teams[occupantId.GetTeamId()].m_colour;
+                g_context->m_location->m_teams[occupantId.GetTeamId()].m_colour;
             glColor4ubv(teamColour.GetData());
         }
 
         glDisable(GL_CULL_FACE);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D,
-                      g_app->m_resource->GetTexture("textures/starburst.bmp"));
+                      Resource::GetTexture("textures/starburst.bmp"));
         glDepthMask(false);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);

@@ -5,7 +5,7 @@
 #include "file_writer.h"
 #include "language_table.h"
 #include "blueprintstore.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "camera.h"
 #include "main.h"
@@ -38,7 +38,7 @@ void BlueprintBuilding::Initialise(Building* _template)
 
 bool BlueprintBuilding::Advance()
 {
-  auto blueprintBuilding = static_cast<BlueprintBuilding*>(g_app->m_location->GetBuilding(m_buildingLink));
+  auto blueprintBuilding = static_cast<BlueprintBuilding*>(g_context->m_location->GetBuilding(m_buildingLink));
   if (blueprintBuilding)
   {
     if (m_infected > 80.0f)
@@ -65,14 +65,14 @@ Matrix34 BlueprintBuilding::GetMarker(float _predictionTime)
 
 bool BlueprintBuilding::IsInView()
 {
-  Building* link = g_app->m_location->GetBuilding(m_buildingLink);
+  Building* link = g_context->m_location->GetBuilding(m_buildingLink);
 
   if (link)
   {
     LegacyVector3 midPoint = (link->m_centerPos + m_centerPos) / 2.0f;
     float radius = (link->m_centerPos - m_centerPos).Mag();
     radius += m_radius;
-    return (g_app->m_camera->SphereInViewFrustum(midPoint, radius));
+    return (g_context->m_camera->SphereInViewFrustum(midPoint, radius));
   }
   return Building::IsInView();
 }
@@ -86,8 +86,8 @@ void BlueprintBuilding::SendBlueprint(int _segment, bool _infected)
   else
     m_infected -= SERVER_ADVANCE_PERIOD * 10.0f;
 
-  m_infected = max(m_infected, 0.0f);
-  m_infected = min(m_infected, 100.0f);
+  m_infected = std::max(m_infected, 0.0f);
+  m_infected = std::min(m_infected, 100.0f);
 }
 
 void BlueprintBuilding::Read(TextReader* _in, bool _dynamic)
@@ -115,7 +115,7 @@ BlueprintStore::BlueprintStore()
 {
   m_type = TypeBlueprintStore;
 
-  SetShape(g_app->m_resource->GetShapeStatic("blueprintstore.shp"));
+  SetShape(Resource::GetShapeStatic("blueprintstore.shp"));
 }
 
 const char* BlueprintStore::GetObjectiveCounter()
@@ -157,8 +157,8 @@ void BlueprintStore::SendBlueprint(int _segment, bool _infected)
   else
     oldValue -= SERVER_ADVANCE_PERIOD * 1.0f;
 
-  oldValue = max(oldValue, 0.0f);
-  oldValue = min(oldValue, 100.0f);
+  oldValue = std::max(oldValue, 0.0f);
+  oldValue = std::min(oldValue, 100.0f);
 
   m_segments[_segment] = oldValue;
 }
@@ -186,8 +186,8 @@ bool BlueprintStore::Advance()
       {
         float oldValue = m_segments[i];
         oldValue += SERVER_ADVANCE_PERIOD * infectionChange;
-        oldValue = max(oldValue, 0.0f);
-        oldValue = min(oldValue, 100.0f);
+        oldValue = std::max(oldValue, 0.0f);
+        oldValue = std::min(oldValue, 100.0f);
         m_segments[i] = oldValue;
       }
     }
@@ -208,7 +208,7 @@ bool BlueprintStore::Advance()
 
   if (totallyClean)
   {
-    GlobalBuilding* gb = g_app->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_app->m_locationId);
+    GlobalBuilding* gb = g_context->m_globalWorld->GetBuilding(m_id.GetUniqueId(), g_context->m_locationId);
     if (gb)
       gb->m_online = true;
   }
@@ -260,7 +260,7 @@ BlueprintConsole::BlueprintConsole()
 {
   m_type = TypeBlueprintConsole;
 
-  SetShape(g_app->m_resource->GetShapeStatic("blueprintconsole.shp"));
+  SetShape(Resource::GetShapeStatic("blueprintconsole.shp"));
 }
 
 void BlueprintConsole::Initialise(Building* _template)
@@ -335,7 +335,7 @@ BlueprintRelay::BlueprintRelay()
 {
   m_type = TypeBlueprintRelay;
 
-  SetShape(g_app->m_resource->GetShapeStatic("blueprintrelay.shp"));
+  SetShape(Resource::GetShapeStatic("blueprintrelay.shp"));
 }
 
 void BlueprintRelay::Initialise(Building* _template)

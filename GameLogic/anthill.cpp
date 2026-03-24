@@ -4,7 +4,7 @@
 #include "math_utils.h"
 #include "resource.h"
 #include "text_stream_readers.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "entity_grid.h"
 #include "GameSimEventQueue.h"
@@ -29,7 +29,7 @@ AntHill::AntHill()
 {
   m_type = TypeAntHill;
 
-  SetShape(g_app->m_resource->GetShapeStatic("anthill.shp"));
+  SetShape(Resource::GetShapeStatic("anthill.shp"));
 }
 
 void AntHill::Initialise(Building* _template)
@@ -75,7 +75,7 @@ void AntHill::Damage(float _damage)
         LegacyVector3 vel = (pos - m_pos);
         vel.SetLength(syncfrand(50.0f));
 
-        g_app->m_location->SpawnSpirit(pos, vel, m_id.GetTeamId(), WorldObjectId());
+        g_context->m_location->SpawnSpirit(pos, vel, m_id.GetTeamId(), WorldObjectId());
       }
 
       g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Explode"));
@@ -117,11 +117,11 @@ bool AntHill::TargettedEntity(WorldObjectId _id)
 
 bool AntHill::SearchForSpirits(LegacyVector3& _pos)
 {
-  for (int i = 0; i < g_app->m_location->m_spirits.Size(); ++i)
+  for (int i = 0; i < g_context->m_location->m_spirits.Size(); ++i)
   {
-    if (g_app->m_location->m_spirits.ValidIndex(i))
+    if (g_context->m_location->m_spirits.ValidIndex(i))
     {
-      Spirit* s = g_app->m_location->m_spirits.GetPointer(i);
+      Spirit* s = g_context->m_location->m_spirits.GetPointer(i);
       float theDist = (s->m_pos - m_pos).Mag();
 
       if (theDist <= ANTHILL_SEARCHRANGE && !SearchingArea(s->m_pos) && (s->m_state == Spirit::StateBirth || s->m_state ==
@@ -139,12 +139,12 @@ bool AntHill::SearchForSpirits(LegacyVector3& _pos)
 bool AntHill::SearchForDarwinians(LegacyVector3& _pos, WorldObjectId& _id)
 {
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ANTHILL_SEARCHRANGE, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ANTHILL_SEARCHRANGE, &numFound, m_id.GetTeamId());
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
     if (entity && entity->m_type == Entity::TypeDarwinian)
     {
       auto darwinian = static_cast<Darwinian*>(entity);
@@ -165,12 +165,12 @@ bool AntHill::SearchForDarwinians(LegacyVector3& _pos, WorldObjectId& _id)
 bool AntHill::SearchForEnemies(LegacyVector3& _pos, WorldObjectId& _id)
 {
   int numFound;
-  WorldObjectId* ids = g_app->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ANTHILL_SEARCHRANGE, &numFound, m_id.GetTeamId());
+  WorldObjectId* ids = g_context->m_location->m_entityGrid->GetEnemies(m_pos.x, m_pos.z, ANTHILL_SEARCHRANGE, &numFound, m_id.GetTeamId());
 
   for (int i = 0; i < numFound; ++i)
   {
     WorldObjectId id = ids[i];
-    Entity* entity = g_app->m_location->GetEntity(id);
+    Entity* entity = g_context->m_location->GetEntity(id);
 
     float theDist = (entity->m_pos - m_pos).Mag();
 
@@ -192,7 +192,7 @@ bool AntHill::SearchForScoutArea(LegacyVector3& _pos)
   float theta = syncfrand(M_PI * 2);
   scoutPos.x += radius * sinf(theta);
   scoutPos.z += radius * cosf(theta);
-  scoutPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(scoutPos.x, scoutPos.z);
+  scoutPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(scoutPos.x, scoutPos.z);
 
   if (scoutPos.y > 0)
   {
@@ -213,11 +213,11 @@ bool AntHill::PopulationLocked()
   {
     m_populationLock = -2;
 
-    for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+    for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
     {
-      if (g_app->m_location->m_buildings.ValidIndex(i))
+      if (g_context->m_location->m_buildings.ValidIndex(i))
       {
-        Building* building = g_app->m_location->m_buildings[i];
+        Building* building = g_context->m_location->m_buildings[i];
         if (building && building->m_type == TypeSpawnPopulationLock)
         {
           auto lock = static_cast<SpawnPopulationLock*>(building);
@@ -237,7 +237,7 @@ bool AntHill::PopulationLocked()
 
   if (m_populationLock > 0)
   {
-    auto lock = static_cast<SpawnPopulationLock*>(g_app->m_location->GetBuilding(m_populationLock));
+    auto lock = static_cast<SpawnPopulationLock*>(g_context->m_location->GetBuilding(m_populationLock));
     if (lock && m_id.GetTeamId() != 255 && lock->m_teamCount[m_id.GetTeamId()] >= lock->m_maxPopulation)
       return true;
   }
@@ -252,11 +252,11 @@ bool AntHill::Advance()
   //
   // Is the world awake yet ?
 
-  if (!g_app->m_location)
+  if (!g_context->m_location)
     return false;
-  if (!g_app->m_location->m_teams)
+  if (!g_context->m_location->m_teams)
     return false;
-  if (g_app->m_location->m_teams[m_id.GetTeamId()].m_teamType != Team::TeamTypeCPU)
+  if (g_context->m_location->m_teams[m_id.GetTeamId()].m_teamType != Team::TeamTypeCPU)
     return false;
 
   bool popLocked = PopulationLocked();
@@ -285,7 +285,7 @@ bool AntHill::Advance()
       objective->m_pos = targetPos;
       objective->m_targetId = targetId;
 
-      objective->m_numToSend = 5 + 5 * (g_app->m_difficultyLevel / 10.0);
+      objective->m_numToSend = 5 + 5 * (g_context->m_difficultyLevel / 10.0);
       m_objectives.PutData(objective);
     }
 
@@ -297,18 +297,18 @@ bool AntHill::Advance()
 
   if (!popLocked && m_objectives.Size() > 0 && GetHighResTime() > m_spawnTimer && m_numAntsInside > 0)
   {
-    Unit* unit = g_app->m_location->GetUnit(WorldObjectId(m_id.GetTeamId(), m_unitId, -1, -1));
+    Unit* unit = g_context->m_location->GetUnit(WorldObjectId(m_id.GetTeamId(), m_unitId, -1, -1));
     if (!unit)
-      unit = g_app->m_location->m_teams[m_id.GetTeamId()].NewUnit(Entity::TypeArmyAnt, m_numAntsInside, &m_unitId, m_pos);
+      unit = g_context->m_location->m_teams[m_id.GetTeamId()].NewUnit(Entity::TypeArmyAnt, m_numAntsInside, &m_unitId, m_pos);
 
     int chosenIndex = syncrand() % m_objectives.Size();
     AntObjective* objective = m_objectives[chosenIndex];
     LegacyVector3 spawnPos = m_pos;
-    spawnPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(spawnPos.x, spawnPos.z);
+    spawnPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(spawnPos.x, spawnPos.z);
 
-    WorldObjectId spawnedId = g_app->m_location->SpawnEntities(spawnPos, m_id.GetTeamId(), m_unitId, Entity::TypeArmyAnt, 1, g_zeroVector,
+    WorldObjectId spawnedId = g_context->m_location->SpawnEntities(spawnPos, m_id.GetTeamId(), m_unitId, Entity::TypeArmyAnt, 1, g_zeroVector,
                                                                10.0f);
-    auto ant = static_cast<ArmyAnt*>(g_app->m_location->GetEntity(spawnedId));
+    auto ant = static_cast<ArmyAnt*>(g_context->m_location->GetEntity(spawnedId));
 
     ant->m_buildingId = m_id.GetUniqueId();
     ant->m_front = (ant->m_pos - m_pos).Normalise();
@@ -320,7 +320,7 @@ bool AntHill::Advance()
     ant->m_wayPoint.x += radius * sinf(theta);
     ant->m_wayPoint.z += radius * cosf(theta);
     ant->m_wayPoint = ant->PushFromObstructions(ant->m_wayPoint);
-    ant->m_wayPoint.y = g_app->m_location->m_landscape.m_heightMap->GetValue(ant->m_wayPoint.x, ant->m_wayPoint.z);
+    ant->m_wayPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(ant->m_wayPoint.x, ant->m_wayPoint.z);
 
     m_numAntsInside--;
 
@@ -328,7 +328,7 @@ bool AntHill::Advance()
     if (objective->m_numToSend <= 0)
       m_objectives.RemoveData(chosenIndex);
 
-    m_spawnTimer = GetHighResTime() + 0.2f - (0.2 * g_app->m_difficultyLevel / 10.0);
+    m_spawnTimer = GetHighResTime() + 0.2f - (0.2 * g_context->m_difficultyLevel / 10.0);
   }
 
   //

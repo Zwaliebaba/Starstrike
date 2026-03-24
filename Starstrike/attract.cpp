@@ -25,7 +25,7 @@ void AttractMode::Advance()
 	else
 	{
 		if( g_inputManager->controlEvent( ControlStopAttractMode ) ||
-			!g_app->m_script->IsRunningScript() ) // change to check for any user activity
+			!g_context->m_script->IsRunningScript() ) // change to check for any user activity
 		{
 			EndAttractMode();
 		}
@@ -34,13 +34,13 @@ void AttractMode::Advance()
 
 void AttractMode::StartAttractMode()
 {
-	strncpy( m_userProfile, g_app->m_userProfileName, sizeof(m_userProfile) );
+	strncpy( m_userProfile, g_context->m_userProfileName, sizeof(m_userProfile) );
 	m_userProfile[sizeof(m_userProfile) - 1] = '\0';
-	g_app->SetProfileName( "AttractMode" );
-    g_app->m_taskManagerInterface->m_lockTaskManager = true;
-	if( g_app->LoadProfile() )
+	g_gameApp->SetProfileName( "AttractMode" );
+	g_context->m_taskManagerInterface->m_lockTaskManager = true;
+	if( g_gameApp->LoadProfile() )
 	{
-		g_app->m_script->RunScript("attractmode.txt");
+		g_context->m_script->RunScript("attractmode.txt");
 		m_running = true;
 	}
 
@@ -55,12 +55,12 @@ void AttractMode::StartAttractMode()
 
 void AttractMode::EndAttractMode()
 {
-    g_app->m_script->m_waitForCamera = false;
-	g_app->m_script->RunScript("endattract.txt");
-	g_app->SetProfileName( m_userProfile );
-	g_app->LoadProfile();
+    g_context->m_script->m_waitForCamera = false;
+	g_context->m_script->RunScript("endattract.txt");
+	g_gameApp->SetProfileName( m_userProfile );
+	g_gameApp->LoadProfile();
 
-    g_app->m_taskManagerInterface->m_lockTaskManager = false;
+    g_context->m_taskManagerInterface->m_lockTaskManager = false;
 
 	m_running = false;
 	strncpy(m_userProfile, "none", sizeof(m_userProfile));

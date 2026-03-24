@@ -12,7 +12,7 @@ static float s_savedNearPlane;
 void ShadowRenderer::Begin()
 {
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/glow.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/glow.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glDisable(GL_CULL_FACE);
@@ -22,9 +22,9 @@ void ShadowRenderer::Begin()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
     glColor4f(0.6f, 0.6f, 0.6f, 0.0f);
 
-    s_savedNearPlane = g_app->m_renderer->GetNearPlane();
-    g_app->m_camera->SetupProjectionMatrix(s_savedNearPlane * 1.05f,
-                                           g_app->m_renderer->GetFarPlane());
+    s_savedNearPlane = g_context->m_renderer->GetNearPlane();
+    g_context->m_camera->SetupProjectionMatrix(s_savedNearPlane * 1.05f,
+                                           g_context->m_renderer->GetFarPlane());
 }
 
 void ShadowRenderer::End()
@@ -36,8 +36,8 @@ void ShadowRenderer::End()
     glEnable(GL_CULL_FACE);
     glDisable(GL_TEXTURE_2D);
 
-    g_app->m_camera->SetupProjectionMatrix(s_savedNearPlane,
-                                           g_app->m_renderer->GetFarPlane());
+    g_context->m_camera->SetupProjectionMatrix(s_savedNearPlane,
+                                           g_context->m_renderer->GetFarPlane());
 }
 
 void ShadowRenderer::Render(const LegacyVector3& _pos, float _size)
@@ -51,15 +51,15 @@ void ShadowRenderer::Render(const LegacyVector3& _pos, float _size)
     LegacyVector3 posC = shadowPos + shadowR + shadowU;
     LegacyVector3 posD = shadowPos - shadowR + shadowU;
 
-    posA.y = g_app->m_location->m_landscape.m_heightMap->GetValue(posA.x, posA.z) + 0.9f;
-    posB.y = g_app->m_location->m_landscape.m_heightMap->GetValue(posB.x, posB.z) + 0.9f;
-    posC.y = g_app->m_location->m_landscape.m_heightMap->GetValue(posC.x, posC.z) + 0.9f;
-    posD.y = g_app->m_location->m_landscape.m_heightMap->GetValue(posD.x, posD.z) + 0.9f;
+    posA.y = g_context->m_location->m_landscape.m_heightMap->GetValue(posA.x, posA.z) + 0.9f;
+    posB.y = g_context->m_location->m_landscape.m_heightMap->GetValue(posB.x, posB.z) + 0.9f;
+    posC.y = g_context->m_location->m_landscape.m_heightMap->GetValue(posC.x, posC.z) + 0.9f;
+    posD.y = g_context->m_location->m_landscape.m_heightMap->GetValue(posD.x, posD.z) + 0.9f;
 
-    posA.y = max(posA.y, 1.0f);
-    posB.y = max(posB.y, 1.0f);
-    posC.y = max(posC.y, 1.0f);
-    posD.y = max(posD.y, 1.0f);
+    posA.y = std::max(posA.y, 1.0f);
+    posB.y = std::max(posB.y, 1.0f);
+    posC.y = std::max(posC.y, 1.0f);
+    posD.y = std::max(posD.y, 1.0f);
 
     if (posA.y > _pos.y && posB.y > _pos.y && posC.y > _pos.y && posD.y > _pos.y)
     {

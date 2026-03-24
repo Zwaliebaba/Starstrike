@@ -6,7 +6,7 @@
 #include "ShapeStatic.h"
 #include "input.h"
 #include "input_types.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "camera.h"
 #include "location.h"
 #include "team.h"
@@ -88,7 +88,7 @@ void InsertionSquad::SetWayPoint(const LegacyVector3& _pos)
 
   // If this squad is using a Controller, update the Route
   // that the Controller points to
-  Task* controller = g_app->m_taskManager->GetTask(m_controllerId);
+  Task* controller = g_context->m_taskManager->GetTask(m_controllerId);
   if (controller)
   {
     LegacyVector3 lastAddedPos = controller->m_route->m_wayPoints[controller->m_route->m_wayPoints.Size() - 1]->GetPos();
@@ -100,11 +100,11 @@ void InsertionSquad::SetWayPoint(const LegacyVector3& _pos)
   //
   // If we clicked near a teleport, tell the unit to go into it
   m_teleportId = -1;
-  LList<int>* nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings(_pos.x, _pos.z);
+  LList<int>* nearbyBuildings = g_context->m_location->m_obstructionGrid->GetBuildings(_pos.x, _pos.z);
   for (int i = 0; i < nearbyBuildings->Size(); ++i)
   {
     int buildingId = nearbyBuildings->GetData(i);
-    Building* building = g_app->m_location->GetBuilding(buildingId);
+    Building* building = g_context->m_location->GetBuilding(buildingId);
     if (building->m_type == Building::TypeRadarDish || building->m_type == Building::TypeBridge)
     {
       auto teleport = static_cast<Teleport*>(building);
@@ -247,7 +247,7 @@ void InsertionSquad::DirectControl(const TeamControls& _teamControls)
     return;
   auto pointMan = static_cast<Squadie*>(point);
 
-  LegacyVector3 right = g_app->m_camera->GetControlVector();
+  LegacyVector3 right = g_context->m_camera->GetControlVector();
   LegacyVector3 front = g_upVector ^ -right;
 
   if (_teamControls.m_directUnitMove)
@@ -258,11 +258,11 @@ void InsertionSquad::DirectControl(const TeamControls& _teamControls)
     t.z += _teamControls.m_directUnitMoveDy;
     //t+= front * - _teamControls.m_directUnitMoveDy;
 
-    LList<int>* nearbyBuildings = g_app->m_location->m_obstructionGrid->GetBuildings(t.x, t.z);
+    LList<int>* nearbyBuildings = g_context->m_location->m_obstructionGrid->GetBuildings(t.x, t.z);
     for (int i = 0; i < nearbyBuildings->Size(); ++i)
     {
       int buildingId = nearbyBuildings->GetData(i);
-      Building* building = g_app->m_location->GetBuilding(buildingId);
+      Building* building = g_context->m_location->GetBuilding(buildingId);
       if (building->m_type == Building::TypeRadarDish || building->m_type == Building::TypeBridge)
       {
         auto teleport = static_cast<Teleport*>(building);
@@ -297,7 +297,7 @@ Squadie::Squadie()
     m_secondaryTimer(0.0f),
     m_retargetTimer(0.0f)
 {
-  m_shape = g_app->m_resource->GetShapeStatic("squad.shp");
+  m_shape = Resource::GetShapeStatic("squad.shp");
   DEBUG_ASSERT(m_shape);
 
   m_centerPos = m_shape->CalculateCenter(g_identityMatrix34);
@@ -375,10 +375,10 @@ bool Squadie::Advance(Unit* _theUnit)
       // Speed up if going down hill
 
       LegacyVector3 nextPos = m_pos + m_vel * SERVER_ADVANCE_PERIOD;
-      nextPos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(nextPos.x, nextPos.z);
-      float currentHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
-      float nextHeight = g_app->m_location->m_landscape.m_heightMap->GetValue(nextPos.x, nextPos.z);
-      LegacyVector3 landNormal = g_app->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
+      nextPos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(nextPos.x, nextPos.z);
+      float currentHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
+      float nextHeight = g_context->m_location->m_landscape.m_heightMap->GetValue(nextPos.x, nextPos.z);
+      LegacyVector3 landNormal = g_context->m_location->m_landscape.m_normalMap->GetValue(m_pos.x, m_pos.z);
       float factor = 1.0f - (currentHeight - nextHeight) / -3.0f;
       if (factor < 0.2f)
         factor = 0.2f;
@@ -392,10 +392,10 @@ bool Squadie::Advance(Unit* _theUnit)
         m_vel.SetLength(distance / SERVER_ADVANCE_PERIOD);
       m_pos += m_vel * SERVER_ADVANCE_PERIOD;
       m_pos = PushFromObstructions(m_pos);
-      m_pos.y = g_app->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) + 0.1f;
+      m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z) + 0.1f;
     }
 
-    Team* team = &g_app->m_location->m_teams[m_id.GetTeamId()];
+    Team* team = &g_context->m_location->m_teams[m_id.GetTeamId()];
     if (m_id.GetUnitId() == team->m_currentUnitId)
     {
       LegacyVector3 toMouse = team->m_currentMousePos - m_pos;
@@ -412,7 +412,7 @@ bool Squadie::Advance(Unit* _theUnit)
 
       RunAI();
 
-      Entity* enemy = g_app->m_location->GetEntity(m_enemyId);
+      Entity* enemy = g_context->m_location->GetEntity(m_enemyId);
       if (enemy)
         m_angVel = ((m_pos - enemy->m_pos).Normalise() ^ m_front) * 4.0f;
     }
@@ -441,8 +441,8 @@ bool Squadie::Advance(Unit* _theUnit)
 
   m_vel = (m_pos - oldPos) / SERVER_ADVANCE_PERIOD;
 
-  float worldSizeX = g_app->m_location->m_landscape.GetWorldSizeX();
-  float worldSizeZ = g_app->m_location->m_landscape.GetWorldSizeZ();
+  float worldSizeX = g_context->m_location->m_landscape.GetWorldSizeX();
+  float worldSizeZ = g_context->m_location->m_landscape.GetWorldSizeZ();
   if (m_pos.x < 0.0f)
     m_pos.x = 0.0f;
   if (m_pos.z < 0.0f)
@@ -473,14 +473,14 @@ void Squadie::RunAI()
 
   if (m_retargetTimer <= 0.0f)
   {
-    m_enemyId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, 100.0f, m_id.GetTeamId());
+    m_enemyId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, 0.0f, 100.0f, m_id.GetTeamId());
     m_retargetTimer = 1.0f;
   }
 
   //
   // Fire at the nearest enemy now and then
 
-  Entity* enemy = g_app->m_location->GetEntity(m_enemyId);
+  Entity* enemy = g_context->m_location->GetEntity(m_enemyId);
   if (enemy)
   {
     float distance = (enemy->m_pos - m_pos).Mag();
@@ -502,7 +502,7 @@ void Squadie::Attack(const LegacyVector3& _pos)
     LegacyVector3 fromPos = laserPos;
     LegacyVector3 toPos(_pos.x + syncsfrand(7.0f), _pos.y, _pos.z + syncsfrand(7.0f));
     LegacyVector3 velocity = (toPos - fromPos).SetLength(200.0f);
-    g_app->m_location->FireLaser(fromPos, velocity, m_id.GetTeamId());
+    g_context->m_location->FireLaser(fromPos, velocity, m_id.GetTeamId());
     m_justFired = true;
 
     //
@@ -525,10 +525,10 @@ bool Squadie::HasSecondaryWeapon() { return (m_secondaryTimer <= 0.0f); }
 
 void Squadie::FireSecondaryWeapon(const LegacyVector3& _pos)
 {
-  auto squad = static_cast<InsertionSquad*>(g_app->m_location->GetUnit(m_id));
+  auto squad = static_cast<InsertionSquad*>(g_context->m_location->GetUnit(m_id));
   DEBUG_ASSERT(squad);
 
-  if (g_app->m_globalWorld->m_research->HasResearch(squad->m_weaponType))
+  if (g_context->m_globalWorld->m_research->HasResearch(squad->m_weaponType))
   {
     Matrix34 mat(m_front, g_upVector, m_pos);
     LegacyVector3 laserPos = m_shape->GetMarkerWorldMatrix(m_laser, mat).pos;
@@ -537,25 +537,25 @@ void Squadie::FireSecondaryWeapon(const LegacyVector3& _pos)
     {
     case GlobalResearch::TypeGrenade:
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowGrenade"));
-      g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableGrenade, m_id.GetTeamId());
+      g_context->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeAirStrike:
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowAirStrike"));
-      g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableAirstrikeMarker, m_id.GetTeamId());
+      g_context->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableAirstrikeMarker, m_id.GetTeamId());
       m_secondaryTimer = 20.0f;
       break;
 
     case GlobalResearch::TypeController:
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "ThrowController"));
-      g_app->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableControllerGrenade, m_id.GetTeamId());
+      g_context->m_location->ThrowWeapon(laserPos, _pos, EffectThrowableControllerGrenade, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
 
     case GlobalResearch::TypeRocket:
       g_simEventQueue.Push(SimEvent::MakeSoundEntity(m_id, "FireRocket"));
-      g_app->m_location->FireRocket(laserPos, _pos, m_id.GetTeamId());
+      g_context->m_location->FireRocket(laserPos, _pos, m_id.GetTeamId());
       m_secondaryTimer = 4.0f;
       break;
     }
@@ -564,7 +564,7 @@ void Squadie::FireSecondaryWeapon(const LegacyVector3& _pos)
 
 LegacyVector3 Squadie::GetCameraFocusPoint()
 {
-  if (g_inputManager->controlEvent(ControlUnitPrimaryFireDirected /* ControlUnitStartSecondaryFireDirected */) && g_app->m_camera->
+  if (g_inputManager->controlEvent(ControlUnitPrimaryFireDirected /* ControlUnitStartSecondaryFireDirected */) && g_context->m_camera->
     IsInMode(Camera::ModeEntityTrack))
   {
     InputDetails details;
@@ -585,13 +585,13 @@ LegacyVector3 Squadie::GetSecondaryWeaponTarget()
 
   LegacyVector3 t = m_pos;
 
-  LegacyVector3 front = (m_pos - g_app->m_camera->GetPos());
+  LegacyVector3 front = (m_pos - g_context->m_camera->GetPos());
   front.y = 0.0f;
   front.Normalise();
   LegacyVector3 right = front;
   right.RotateAroundY(M_PI / 2.0f);
 
-  float force = ThrowableWeapon::GetMaxForce(g_app->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeGrenade));
+  float force = ThrowableWeapon::GetMaxForce(g_context->m_globalWorld->m_research->CurrentLevel(GlobalResearch::TypeGrenade));
   float maxRange = ThrowableWeapon::GetApproxMaxRange(force);
 
   // This should be dependent on distance of camera from units
@@ -602,7 +602,7 @@ LegacyVector3 Squadie::GetSecondaryWeaponTarget()
   float fMod = (rangeFactor * maxRange * static_cast<float>(float(details.y) / 40.0f));
   t += right * -rMod;
   t += front * -fMod;
-  t.y = g_app->m_location->m_landscape.m_heightMap->GetValue(t.x, t.z) + 5.0f;
+  t.y = g_context->m_location->m_landscape.m_heightMap->GetValue(t.x, t.z) + 5.0f;
 
   return t;
 }

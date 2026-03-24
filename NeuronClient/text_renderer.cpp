@@ -45,7 +45,7 @@ void TextRenderer::Initialise(char const *_filename)
 
 void TextRenderer::BuildOpenGlState()
 {
-	BinaryReader *reader = g_app->m_resource->GetBinaryReader(m_filename);
+	BinaryReader *reader = Resource::GetBinaryReader(m_filename);
 	char const *extension = GetExtensionPart(m_filename);
 	BitmapRGBA bmp(reader, extension);
 	delete reader;
@@ -461,7 +461,7 @@ void TextRenderer::DrawText3DSimple( LegacyVector3 const &_pos, float _size, cha
 	// Store the GL state
 	SaveGLFontDrawAttributes saveAttribs;
 
-	Camera *cam = g_app->m_camera;
+	Camera *cam = g_context->m_camera;
     LegacyVector3 pos(_pos);
 	LegacyVector3 vertSize = cam->GetUp() * _size;
 	LegacyVector3 horiSize = -cam->GetRight() * _size * HORIZONTAL_SIZE;
@@ -528,7 +528,7 @@ void TextRenderer::DrawText3DCenter( LegacyVector3 const &_pos, float _size, cha
 
 	LegacyVector3 pos = _pos;
 	float amount =  HORIZONTAL_SIZE * (float)strlen(buf) * 0.5f * _size;
-	pos += g_app->m_camera->GetRight() * amount;
+	pos += g_context->m_camera->GetRight() * amount;
 
 	DrawText3DSimple(pos, _size, buf);
 }
@@ -543,7 +543,7 @@ void TextRenderer::DrawText3DRight( LegacyVector3 const &_pos, float _size, char
 
 	LegacyVector3 pos = _pos;
 	float amount =  HORIZONTAL_SIZE * (float)strlen(buf) * _size;
-	pos += g_app->m_camera->GetRight() * amount;
+	pos += g_context->m_camera->GetRight() * amount;
 
 	DrawText3DSimple(pos, _size, buf);
 }
@@ -559,7 +559,7 @@ void TextRenderer::DrawText3D( LegacyVector3 const &_pos, LegacyVector3 const &_
 
 	SaveGLFontDrawAttributes saveAttribs;
 
-	Camera *cam = g_app->m_camera;
+	Camera *cam = g_context->m_camera;
 
     LegacyVector3 pos = _pos;
 	LegacyVector3 vertSize = _up * _size;

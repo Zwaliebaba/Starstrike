@@ -24,7 +24,7 @@ class ApplyGraphicsButton : public DarwiniaButton
   public:
     void MouseUp() override
     {
-      if (g_app->m_location)
+      if (g_context->m_location)
       {
         auto parent = static_cast<PrefsGraphicsWindow*>(m_parent);
 
@@ -33,17 +33,17 @@ class ApplyGraphicsButton : public DarwiniaButton
         g_prefsManager->SetInt(GRAPHICS_ENTITYDETAIL, parent->m_entityDetail);
         g_prefsManager->SetInt(GRAPHICS_CLOUDDETAIL, parent->m_cloudDetail);
 
-        LandscapeDef* def = &g_app->m_location->m_levelFile->m_landscape;
-        g_app->m_location->m_landscape.Init(def);
+        LandscapeDef* def = &g_context->m_location->m_levelFile->m_landscape;
+        g_context->m_location->m_landscape.Init(def);
 
-        delete g_app->m_location->m_water;
-        g_app->m_location->m_water = new Water();
+        delete g_context->m_location->m_water;
+        g_context->m_location->m_water = new Water();
 
-        for (int i = 0; i < g_app->m_location->m_buildings.Size(); ++i)
+        for (int i = 0; i < g_context->m_location->m_buildings.Size(); ++i)
         {
-          if (g_app->m_location->m_buildings.ValidIndex(i))
+          if (g_context->m_location->m_buildings.ValidIndex(i))
           {
-            Building* building = g_app->m_location->m_buildings[i];
+            Building* building = g_context->m_location->m_buildings[i];
             building->SetDetail(parent->m_buildingDetail);
           }
         }
@@ -57,7 +57,7 @@ PrefsGraphicsWindow::PrefsGraphicsWindow()
   : DarwiniaWindow(LANGUAGEPHRASE("dialog_graphicsoptions"))
 {
   SetMenuSize(360, 300);
-  SetPosition(g_app->m_renderer->ScreenW() / 2 - m_w / 2, g_app->m_renderer->ScreenH() / 2 - m_h / 2);
+  SetPosition(g_context->m_renderer->ScreenW() / 2 - m_w / 2, g_context->m_renderer->ScreenH() / 2 - m_h / 2);
 
   m_landscapeDetail = g_prefsManager->GetInt(GRAPHICS_LANDDETAIL, 1);
   m_cloudDetail = g_prefsManager->GetInt(GRAPHICS_CLOUDDETAIL, 1);
@@ -146,7 +146,7 @@ void RenderCPUUsage(LList<const char*>* elements, int x, int y)
   float totalOccup = 0.0f;
   for (int i = 0; i < elements->Size(); ++i)
   {
-    ProfiledElement* element = g_app->m_profiler->m_rootElement->m_children.GetData(elements->GetData(i));
+    ProfiledElement* element = g_context->m_profiler->m_rootElement->m_children.GetData(elements->GetData(i));
     if (element && element->m_lastNumCalls > 0)
     {
       float occup = element->m_lastTotalTime * 100;
@@ -185,6 +185,6 @@ void PrefsGraphicsWindow::Render(bool _hasFocus)
   g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_entitydetail"));
 
   char fpsCaption[64];
-  snprintf(fpsCaption, sizeof(fpsCaption), "%d FPS", g_app->m_renderer->m_fps);
+  snprintf(fpsCaption, sizeof(fpsCaption), "%d FPS", g_context->m_renderer->m_fps);
   g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + m_h - GetMenuSize(60), GetMenuSize(20), fpsCaption);
 }

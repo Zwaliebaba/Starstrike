@@ -4,7 +4,7 @@
 #include "math_utils.h"
 #include "input.h"
 #include "globals.h"
-#include "GameAppSim.h"
+#include "GameContext.h"
 #include "location.h"
 #include "team.h"
 #include "entity_grid.h"
@@ -27,11 +27,11 @@ GunTurret::GunTurret()
     m_health(60.0f),
     m_ownershipTimer(0.0f)
 {
-  SetShape(g_app->m_resource->GetShapeStatic("battlecannonbase.shp"));
+  SetShape(Resource::GetShapeStatic("battlecannonbase.shp"));
   m_type = TypeGunTurret;
 
-  m_turret = g_app->m_resource->GetShapeStatic("battlecannonturret.shp");
-  m_barrel = g_app->m_resource->GetShapeStatic("battlecannonbarrel.shp");
+  m_turret = Resource::GetShapeStatic("battlecannonturret.shp");
+  m_barrel = Resource::GetShapeStatic("battlecannonbarrel.shp");
 
   m_barrelMount = m_turret->GetMarkerData("MarkerBarrel");
 
@@ -52,7 +52,7 @@ GunTurret::GunTurret()
 
 void GunTurret::Initialise(Building* _template)
 {
-  _template->m_up = g_app->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
+  _template->m_up = g_context->m_location->m_landscape.m_normalMap->GetValue(_template->m_pos.x, _template->m_pos.z);
   LegacyVector3 right(1, 0, 0);
   _template->m_front = right ^ _template->m_up;
 
@@ -100,10 +100,10 @@ bool GunTurret::SearchForTargets()
 
   if (m_id.GetTeamId() != 255)
   {
-    m_targetId = g_app->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, GUNTURRET_MINRANGE, GUNTURRET_MAXRANGE, m_id.GetTeamId());
+    m_targetId = g_context->m_location->m_entityGrid->GetBestEnemy(m_pos.x, m_pos.z, GUNTURRET_MINRANGE, GUNTURRET_MAXRANGE, m_id.GetTeamId());
   }
 
-  Entity* entity = g_app->m_location->GetEntity(m_targetId);
+  Entity* entity = g_context->m_location->GetEntity(m_targetId);
 
   if (entity && m_targetId != previousTarget)
     g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "TargetSighted"));
@@ -175,7 +175,7 @@ void GunTurret::PrimaryFire()
       LegacyVector3 shellPos = barrelMat.pos;
       LegacyVector3 shellVel = barrelMountFront.SetLength(500.0f);
 
-      g_app->m_location->FireTurretShell(shellPos, shellVel);
+      g_context->m_location->FireTurretShell(shellPos, shellVel);
       fired = true;
     }
 
@@ -202,8 +202,8 @@ bool GunTurret::Advance()
     Building* aiTarget = CreateBuilding(TypeAITarget);
     aiTarget->m_pos = m_pos;
     aiTarget->m_front = m_front;
-    g_app->m_location->m_buildings.PutData(aiTarget);
-    int uniqueId = g_app->m_globalWorld->GenerateBuildingId();
+    g_context->m_location->m_buildings.PutData(aiTarget);
+    int uniqueId = g_context->m_globalWorld->GenerateBuildingId();
     aiTarget->m_id.SetUniqueId(uniqueId);
     m_aiTargetCreated = true;
   }
@@ -214,7 +214,7 @@ bool GunTurret::Advance()
   if (!m_targetCreated)
   {
     auto target = new GunTurretTarget(m_id.GetUniqueId());
-    int index = g_app->m_location->m_effects.PutData(target);
+    int index = g_context->m_location->m_effects.PutData(target);
     target->m_id.Set(m_id.GetTeamId(), UNIT_EFFECTS, index, -1);
     target->m_id.GenerateUniqueId();
     m_targetCreated = true;
@@ -230,7 +230,7 @@ bool GunTurret::Advance()
     m_ownershipTimer = GUNTURRET_OWNERSHIPTIMER;
   }
 
-  Team* team = g_app->m_location->GetMyTeam();
+  Team* team = g_context->m_location->GetMyTeam();
   bool underPlayerControl = (team && team->m_currentBuildingId == m_id.GetUniqueId());
 
   //
@@ -245,10 +245,10 @@ bool GunTurret::Advance()
     {
       // Player has lost control of the building
       team->SelectUnit(-1, -1, -1);
-      g_app->m_camera->RequestMode(Camera::ModeFreeMovement);
+      g_context->m_camera->RequestMode(Camera::ModeFreeMovement);
       return Building::Advance();
     }
-    m_target = g_app->m_userInput->GetMousePos3d();
+    m_target = g_context->m_userInput->GetMousePos3d();
 
     primaryFire = g_inputManager->controlEvent(ControlUnitPrimaryFireTarget) || g_inputManager->controlEvent(
       ControlUnitStartSecondaryFireDirected);
@@ -268,7 +268,7 @@ bool GunTurret::Advance()
     if (m_targetId.IsValid())
     {
       // Check our target is still alive
-      Entity* target = g_app->m_location->GetEntity(m_targetId);
+      Entity* target = g_context->m_location->GetEntity(m_targetId);
       if (!target)
       {
         m_targetId.SetInvalid();
@@ -322,7 +322,7 @@ LegacyVector3 GunTurret::GetTarget() { return m_target; }
 
 bool GunTurret::IsInView()
 {
-  Team* team = g_app->m_location->GetMyTeam();
+  Team* team = g_context->m_location->GetMyTeam();
   bool underPlayerControl = (team && team->m_currentBuildingId == m_id.GetUniqueId());
 
   if (underPlayerControl)
@@ -333,7 +333,7 @@ bool GunTurret::IsInView()
 bool GunTurret::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                            LegacyVector3* norm)
 {
-  if (g_app->m_editing)
+  if (g_context->m_editing)
     return RaySphereIntersection(_rayStart, _rayDir, m_pos, m_radius, _rayLen);
   return Building::DoesRayHit(_rayStart, _rayDir, _rayLen, _pos, norm);
 }
@@ -344,7 +344,7 @@ GunTurretTarget::GunTurretTarget(int _buildingId)
 
 bool GunTurretTarget::Advance()
 {
-  auto turret = static_cast<GunTurret*>(g_app->m_location->GetBuilding(m_buildingId));
+  auto turret = static_cast<GunTurret*>(g_context->m_location->GetBuilding(m_buildingId));
   if (!turret || turret->m_type != Building::TypeGunTurret)
     return true;
 

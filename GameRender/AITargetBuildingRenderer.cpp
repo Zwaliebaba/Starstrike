@@ -7,7 +7,7 @@
 
 void AITargetBuildingRenderer::Render(const Building& _building, const BuildingRenderContext& _ctx)
 {
-    if (g_app->m_editing)
+    if (g_context->m_editing)
         DefaultBuildingRenderer::Render(_building, _ctx);
 }
 

@@ -20,7 +20,7 @@ void FenceSwitchBuildingRenderer::RenderAlphas(const Building& _building, const 
     const FenceSwitch& sw = static_cast<const FenceSwitch&>(_building);
 
     // Connection to first linked fence
-    Building* b = g_app->m_location->GetBuilding(sw.m_linkedBuildingId);
+    Building* b = g_context->m_location->GetBuilding(sw.m_linkedBuildingId);
     if (b && b->m_type == Building::TypeLaserFence)
     {
         auto fence = static_cast<LaserFence*>(b);
@@ -29,7 +29,7 @@ void FenceSwitchBuildingRenderer::RenderAlphas(const Building& _building, const 
     }
 
     // Connection to second linked fence
-    b = g_app->m_location->GetBuilding(sw.m_linkedBuildingId2);
+    b = g_context->m_location->GetBuilding(sw.m_linkedBuildingId2);
     if (b && b->m_type == Building::TypeLaserFence)
     {
         auto fence = static_cast<LaserFence*>(b);
@@ -43,11 +43,11 @@ void FenceSwitchBuildingRenderer::RenderConnection(const LegacyVector3& _ourPos,
     LegacyVector3 ourPos = _ourPos;
     LegacyVector3 theirPos = _targetPos;
 
-    LegacyVector3 camToOurPos = g_app->m_camera->GetPos() - ourPos;
+    LegacyVector3 camToOurPos = g_context->m_camera->GetPos() - ourPos;
     LegacyVector3 ourPosRight = camToOurPos ^ (theirPos - ourPos);
     ourPosRight.SetLength(2.0f);
 
-    LegacyVector3 camToTheirPos = g_app->m_camera->GetPos() - theirPos;
+    LegacyVector3 camToTheirPos = g_context->m_camera->GetPos() - theirPos;
     LegacyVector3 theirPosRight = camToTheirPos ^ (theirPos - ourPos);
     theirPosRight.SetLength(2.0f);
 
@@ -62,7 +62,7 @@ void FenceSwitchBuildingRenderer::RenderConnection(const LegacyVector3& _ourPos,
         glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/laser.bmp"));
+    glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -84,7 +84,7 @@ void FenceSwitchBuildingRenderer::RenderLights(const Building& _building)
 
     if (sw.m_id.GetTeamId() != 255 && sw.m_lights.Size() > 0)
     {
-        if ((g_app->m_clientToServer->m_lastValidSequenceIdFromServer % 10) / 2 == sw.m_id.GetTeamId() || g_app->m_editing)
+        if ((g_context->m_clientToServer->m_lastValidSequenceIdFromServer % 10) / 2 == sw.m_id.GetTeamId() || g_context->m_editing)
         {
             for (int i = 0; i < sw.m_lights.Size(); ++i)
             {
@@ -94,8 +94,8 @@ void FenceSwitchBuildingRenderer::RenderLights(const Building& _building)
                 LegacyVector3 lightPos = worldMat.pos;
 
                 float signalSize = 6.0f;
-                LegacyVector3 camR = g_app->m_camera->GetRight();
-                LegacyVector3 camU = g_app->m_camera->GetUp();
+                LegacyVector3 camR = g_context->m_camera->GetRight();
+                LegacyVector3 camU = g_context->m_camera->GetUp();
 
                 if (sw.m_switchValue == sw.m_linkedBuildingId)
                     glColor3f(0.0f, 1.0f, 0.0f);
@@ -103,7 +103,7 @@ void FenceSwitchBuildingRenderer::RenderLights(const Building& _building)
                     glColor3f(1.0f, 0.0f, 0.0f);
 
                 glEnable(GL_TEXTURE_2D);
-                glBindTexture(GL_TEXTURE_2D, g_app->m_resource->GetTexture("textures/starburst.bmp"));
+                glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/starburst.bmp"));
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 glDisable(GL_CULL_FACE);
