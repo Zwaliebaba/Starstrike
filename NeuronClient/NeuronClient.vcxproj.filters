@@ -265,6 +265,7 @@
     <ClInclude Include="UploadRingBuffer.h" />
     <ClInclude Include="ShapeInstance.h" />
     <ClInclude Include="ShapeMeshCache.h" />
+    <ClInclude Include="QuadBatcher.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -484,6 +485,7 @@
     <ClCompile Include="UploadRingBuffer.cpp" />
     <ClCompile Include="ShapeInstance.cpp" />
     <ClCompile Include="ShapeMeshCache.cpp" />
+    <ClCompile Include="QuadBatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

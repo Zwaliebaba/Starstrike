@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "ShadowRenderer.h"
+#include "QuadBatcher.h"
 #include "GameApp.h"
 #include "location.h"
 #include "renderer.h"
@@ -8,6 +9,7 @@
 #include "resource.h"
 
 static float s_savedNearPlane;
+static uint32_t s_shadowColor;
 
 void ShadowRenderer::Begin()
 {
@@ -22,6 +24,8 @@ void ShadowRenderer::Begin()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
     glColor4f(0.6f, 0.6f, 0.6f, 0.0f);
 
+    s_shadowColor = QuadBatcher::PackColorF(0.6f, 0.6f, 0.6f, 0.0f);
+
     s_savedNearPlane = g_context->m_renderer->GetNearPlane();
     g_context->m_camera->SetupProjectionMatrix(s_savedNearPlane * 1.05f,
                                            g_context->m_renderer->GetFarPlane());
@@ -29,6 +33,8 @@ void ShadowRenderer::Begin()
 
 void ShadowRenderer::End()
 {
+    QuadBatcher::Get().Flush();
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
 
@@ -67,14 +73,10 @@ void ShadowRenderer::Render(const LegacyVector3& _pos, float _size)
         return;
     }
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3fv(posA.GetData());
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3fv(posB.GetData());
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3fv(posC.GetData());
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3fv(posD.GetData());
-    glEnd();
+    QuadBatcher::Get().Emit(
+        QuadBatcher::MakeVertex(posA.x, posA.y, posA.z, s_shadowColor, 0.f, 0.f),
+        QuadBatcher::MakeVertex(posB.x, posB.y, posB.z, s_shadowColor, 1.f, 0.f),
+        QuadBatcher::MakeVertex(posC.x, posC.y, posC.z, s_shadowColor, 1.f, 1.f),
+        QuadBatcher::MakeVertex(posD.x, posD.y, posD.z, s_shadowColor, 0.f, 1.f)
+    );
 }

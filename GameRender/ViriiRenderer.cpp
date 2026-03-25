@@ -8,6 +8,7 @@
 #include "preferences.h"
 #include "team.h"
 #include "GameApp.h"
+#include "QuadBatcher.h"
 
 void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
 {
@@ -91,7 +92,10 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
         lastIndex *= (1.0f - 0.25f * amountToChop);
     }
 
-    glBegin(GL_QUADS);
+    auto& batcher = QuadBatcher::Get();
+    auto makeVtx = [](const LegacyVector3& p, uint32_t c, float u, float v) {
+        return QuadBatcher::MakeVertex(p.x, p.y, p.z, c, u, v);
+    };
 
     for (int i = 0; i < lastIndex; i++)
     {
@@ -118,17 +122,16 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
         if (newCol < 0)
             newCol = 0;
         wormColour.a = newCol;
-        glColor4ubv(wormColour.GetData());
+        uint32_t wormColor = QuadBatcher::PackColorBGRA(wormColour.r, wormColour.g, wormColour.b, wormColour.a);
 
-        glTexCoord2f(0.0f, wormTexYpos);
-        glVertex3fv((prevPos.m_pos - wormRightAngle).GetData());
-        glTexCoord2f(wormTexW, wormTexYpos);
-        glVertex3fv((prevPos.m_pos + wormRightAngle).GetData());
+        float oldTexY = wormTexYpos;
         wormTexYpos += (distance * 6) / 512.0f;
-        glTexCoord2f(wormTexW, wormTexYpos);
-        glVertex3fv((pos + wormRightAngle).GetData());
-        glTexCoord2f(0.0f, wormTexYpos);
-        glVertex3fv((pos - wormRightAngle).GetData());
+
+        batcher.Emit(
+            makeVtx(prevPos.m_pos - wormRightAngle, wormColor, 0.0f, oldTexY),
+            makeVtx(prevPos.m_pos + wormRightAngle, wormColor, wormTexW, oldTexY),
+            makeVtx(pos + wormRightAngle, wormColor, wormTexW, wormTexYpos),
+            makeVtx(pos - wormRightAngle, wormColor, 0.0f, wormTexYpos));
 
         //
         // Glow effect
@@ -139,23 +142,19 @@ void ViriiRenderer::Render(const Entity& _entity, const EntityRenderContext& _ct
             if (newCol < 0)
                 newCol = 0;
             glowColour.a = newCol;
-            glColor4ubv(glowColour.GetData());
+            uint32_t glowColor = QuadBatcher::PackColorBGRA(glowColour.r, glowColour.g, glowColour.b, glowColour.a);
 
-            glTexCoord2f(glowTexXpos, 0.0f);
-            glVertex3fv((prevPos.m_pos - glowRightAngle + glowDiff).GetData());
-            glTexCoord2f(1.0f, 0.0f);
-            glVertex3fv((prevPos.m_pos + glowRightAngle + glowDiff).GetData());
-
-            glTexCoord2f(1.0f, glowTexH);
-            glVertex3fv((pos + glowRightAngle - glowDiff).GetData());
-            glTexCoord2f(glowTexXpos, glowTexH);
-            glVertex3fv((pos - glowRightAngle - glowDiff).GetData());
+            batcher.Emit(
+                makeVtx(prevPos.m_pos - glowRightAngle + glowDiff, glowColor, glowTexXpos, 0.0f),
+                makeVtx(prevPos.m_pos + glowRightAngle + glowDiff, glowColor, 1.0f, 0.0f),
+                makeVtx(pos + glowRightAngle - glowDiff, glowColor, 1.0f, glowTexH),
+                makeVtx(pos - glowRightAngle - glowDiff, glowColor, glowTexXpos, glowTexH));
         }
 
         prevPos = *history;
     }
 
-    glEnd();
+    // No Flush here — caller (Team::RenderVirii) flushes after all virii.
 
 #undef wormWidth
 #undef wormTexW

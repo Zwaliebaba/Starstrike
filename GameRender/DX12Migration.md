@@ -54,17 +54,31 @@ Renderer calls gl*()          CPU-side state tracking
 |---|---|---|---|
 | **GameRender** | 139 | ~1950 | 48 renderer `.cpp` files, UI framework |
 | **Starstrike** | 86 | ~1380 | `taskmanager_interface_icons` (46!), `renderer.cpp`, `global_world.cpp`, `landscape_renderer.cpp`, `water.cpp`, `particle_system.cpp`, `clouds.cpp`, `explosion.cpp`, `gamecursor.cpp` |
-| **NeuronClient** | 15 | ~260 | `ShapeStatic.cpp` (the biggest: called for every 3D model), `text_renderer.cpp`, `sphere_renderer.cpp`, `3d_sprite.cpp`, `render_utils.cpp` |
-| **Total** | **240** | **~3590** | |
+| **NeuronClient** | ~~15~~ 14 | ~260 | ~~`ShapeStatic.cpp`~~ (migrated to `ShapeMeshCache` — Phase 0), `text_renderer.cpp`, `sphere_renderer.cpp`, `3d_sprite.cpp`, `render_utils.cpp` |
+| **Total** | **~239** | **~3590** | |
 
 ### 1.4 Existing Native D3D12 Code
 
-**`TreeRenderer`** is the only renderer that bypasses the GL layer:
+**`TreeRenderer`** bypasses the GL layer:
 
 - Owns a `GraphicsPSO` with dedicated shaders (`TreeVertexShader.hlsl`/`TreePixelShader.hlsl`)
 - Manages per-tree GPU vertex buffers (upload once via ring buffer, reuse across frames)
 - Shares the root signature and `DrawConstants`/`SceneConstants` CB layout with the GL layer
 - Resolves GL texture IDs to SRV handles via `OpenGLD3D::GetTextureSRVGPUHandle()`
+
+**`ShapeMeshCache`** (Phase 0) bypasses the GL layer for vertex data:
+
+- Singleton cache mapping `ShapeStatic*` → `ShapeMeshGPU` (default-heap VB + per-fragment ranges)
+- Uploads shape geometry once on first render; GPU buffer reused across frames
+- Still uses the uber shader and `PrepareDrawState()` for CB upload and PSO selection
+- `ShapeFragmentData::RenderNative()` replaces `RenderSlow()` — issues `DrawInstanced` from GPU buffer instead of `glBegin/glEnd`
+
+**`QuadBatcher`** (Phase 1) bypasses per-quad `glBegin/glEnd`:
+
+- Singleton CPU-side vertex accumulator; collects `CustomVertex` quads via `Emit(v0,v1,v2,v3)`
+- `Flush()` uploads all accumulated vertices to ring buffer in one `memcpy`, then issues a single `DrawInstanced`
+- Still uses `PrepareDrawState()` for PSO/CB — one CB upload per flush instead of one per quad
+- Used by ShadowRenderer, SpiritRenderer, DefaultBuildingRenderer, ViriiRenderer, DarwinianRenderer
 
 **Existing D3D12 infrastructure** (all solid, no need to replace):
 
@@ -116,8 +130,8 @@ Renderer calls gl*()          CPU-side state tracking
 
 | Phase | Target | GL calls eliminated | Estimated effort | Performance impact |
 |---|---|---|---|---|
-| **0** | GPU-resident ShapeStatic meshes | ~23 `m_shape->Render()` call sites (each a deep `glBegin/glEnd` tree) | **Large** | **Very High** — eliminates per-frame vertex re-upload for all 3D models |
-| **1** | Batched billboard/quad renderer | ~60 `glBegin(GL_QUADS)` for billboards | Medium | **High** — collapses thousands of spirit/darwinian/effect quads into few draw calls |
+| **0** ✅ | GPU-resident ShapeStatic meshes | ~23 `m_shape->Render()` call sites (each a deep `glBegin/glEnd` tree) | **Large** | **Very High** — eliminates per-frame vertex re-upload for all 3D models |
+| **1** 🔧 | Batched billboard/quad renderer | ~60 `glBegin(GL_QUADS)` for billboards | Medium | **High** — collapses thousands of spirit/darwinian/effect quads into few draw calls |
 | **2** | Landscape & water native VBs | ~3 `glDrawArrays` + VBO setup | Small | Medium — already using VBOs, just remove GL indirection |
 | **3** | 2D/UI rendering (SpriteBatch) | ~80 `glBegin` in UI + HUD + cursors | Medium | Medium — UI is not a hot path but it's a large GL surface |
 | **4** | Particle system & effects | ~20 `glBegin` in `particle_system`, `explosion`, `clouds` | Medium | Medium–High — particles can be batched/instanced |
@@ -128,155 +142,144 @@ Renderer calls gl*()          CPU-side state tracking
 
 ## 4. Phase Details
 
-### Phase 0: GPU-Resident ShapeStatic Meshes
+### Phase 0: GPU-Resident ShapeStatic Meshes ✅ COMPLETED
 
-**Problem:**  `ShapeFragmentData::RenderSlow()` (NeuronClient/ShapeStatic.cpp:772–802) uses `glBegin(GL_TRIANGLES)` to submit every triangle of every fragment of every shape, **every frame**.  A building with 5 fragments × 200 triangles × 3 vertices = 3000 `glVertex3f` calls per building per frame, each going through `glVertex3f_impl` → CPU array → ring buffer → `DrawInstanced`.
+**Status:** Implemented and verified.  All 3D shape models (buildings, entities, SphereWorld) now render from GPU-resident vertex buffers.  Per-frame vertex re-upload is eliminated.
 
-There are **23 `m_shape->Render()` call sites** across GameRender, each triggering this path for every entity/building on screen.  For a scene with 50 buildings × 5 fragments, that's 250 `glBegin/glEnd` draw calls just for buildings, plus similar counts for entities.
+#### What Was Built
 
-**Solution:** Follow the `TreeRenderer` pattern:
+| Component | Description |
+|---|---|
+| **`ShapeMeshCache`** (singleton) | Maps `const ShapeStatic*` → `ShapeMeshGPU`.  On first render, DFS-walks the fragment tree, assembles `CustomVertex` data (pos + negated normal + color + zero UVs), and uploads to a default-heap vertex buffer via the ring buffer.  Follows the `TreeRenderer` pattern. |
+| **`ShapeMeshGPU`** | Owns `com_ptr<ID3D12Resource>` VB, `D3D12_VERTEX_BUFFER_VIEW`, and a `vector<FragmentGPURange>` indexed by fragment ordinal.  Valid for the shape's lifetime. |
+| **`ShapeFragmentData::RenderNative()`** | Replaces `RenderSlow()`.  Looks up GPU data from cache, computes predicted transform, pushes matrix stack, calls `PrepareDrawState(TRIANGLELIST)` + `IASetVertexBuffers` + `DrawInstanced` for this fragment's range, recurses children, pops matrix. |
+| **`ShapeFragmentData::m_ownerShape`** | Back-pointer to the owning `ShapeStatic`, set during `Load()` via DFS.  Allows `RenderNative()` to look up the cache without threading the owner through call sites. |
 
-1. **`ShapeMeshGPU` struct** — Per-ShapeStatic GPU resources:
-   ```cpp
-   struct FragmentGPURange {
-       UINT vertexStart;
-       UINT vertexCount;
-   };
-
-   struct ShapeMeshGPU {
-       com_ptr<ID3D12Resource> vertexBuffer;
-       D3D12_VERTEX_BUFFER_VIEW vbView;
-       std::vector<FragmentGPURange> fragments; // Indexed by fragment ordinal
-       int version = -1; // Matches ShapeStatic load version
-   };
-   ```
-
-2. **`ShapeMeshCache`** — Singleton cache mapping `ShapeStatic*` → `ShapeMeshGPU`.  Uploads vertex data (pos + normal + color) to a default-heap vertex buffer on first render.  Since shapes are loaded once and never modified, the GPU buffer is valid for the lifetime of the shape.
-
-3. **`ShapeStatic::RenderSlow()` replacement** — Instead of `glBegin/glEnd`, look up the GPU buffer and issue `DrawInstanced` for the fragment's vertex range:
-   ```cpp
-   void ShapeFragmentData::RenderNative(const FragmentState* states, float predictionTime) const
-   {
-       auto& cache = ShapeMeshCache::Get();
-       auto* gpu = cache.Get(/* owning ShapeStatic */);
-       if (!gpu) return;
-
-       // Push transform (still uses matrix stack for now — Phase 5 removes this)
-       auto& mv = OpenGLD3D::GetModelViewStack();
-       mv.Push();
-       mv.Multiply(predicted);
-
-       // Bind constants + PSO + draw
-       auto& range = gpu->fragments[m_fragmentIndex];
-       OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-       cmdList->IASetVertexBuffers(0, 1, &gpu->vbView);
-       cmdList->DrawInstanced(range.vertexCount, 1, range.vertexStart, 0);
-
-       // Recurse into children
-       for (int i = 0; i < m_childFragments.Size(); ++i)
-           m_childFragments.GetData(i)->RenderNative(states, predictionTime);
-
-       mv.Pop();
-   }
-   ```
-
-4. **Vertex format** — Reuse the existing `CustomVertex` layout (48 bytes) initially so the uber shader works without changes.  The GPU buffer stores pre-computed pos/normal/color per vertex.  UVs are zero (shapes don't use textures — they use vertex colors with `GL_COLOR_MATERIAL`).
-
-**What this keeps from the GL layer (temporarily):**
-- Matrix stack (`glPushMatrix/glPopMatrix`) — needed for fragment hierarchy
-- `PrepareDrawState` — still builds PSO and uploads `DrawConstants`
-- `uploadAndBindConstants` — still uploads per-draw CB
-
-**What this eliminates:**
-- Per-frame vertex assembly (`glVertex3f_impl` × thousands)
-- Per-frame vertex ring-buffer upload for mesh data
-- `glBegin/glEnd` for all shape rendering
-
-**Files changed:**
+#### Files Changed
 
 | File | Project | Action |
 |---|---|---|
-| `NeuronClient/ShapeMeshCache.h` | NeuronClient | New — singleton cache + `ShapeMeshGPU` struct |
-| `NeuronClient/ShapeMeshCache.cpp` | NeuronClient | New — upload logic (follows TreeRenderer pattern) |
-| `NeuronClient/ShapeStatic.h` | NeuronClient | Add `RenderNative()` to `ShapeFragmentData` |
-| `NeuronClient/ShapeStatic.cpp` | NeuronClient | Implement `RenderNative()`, keep `RenderSlow()` as fallback |
-| `NeuronClient/ShapeInstance.cpp` | NeuronClient | `Render()` calls `RenderNative()` instead of `RenderSlow()` |
-| `NeuronClient/opengl_directx.cpp` | NeuronClient | Expose `PrepareDrawState` and ring-buffer CB upload as public functions for native callers |
+| `NeuronClient/ShapeMeshCache.h` | NeuronClient | **New** — singleton cache + `ShapeMeshGPU` + `FragmentGPURange` structs |
+| `NeuronClient/ShapeMeshCache.cpp` | NeuronClient | **New** — `CountTotalTriangles` DFS, `WriteFragmentVertices` DFS, `EnsureUploaded` (default-heap VB + ring-buffer upload + barriers), `GetGPUData`, `Release`, `Shutdown` |
+| `NeuronClient/ShapeStatic.h` | NeuronClient | **Modified** — added `m_ownerShape` pointer to `ShapeFragmentData`, declared `RenderNative()` |
+| `NeuronClient/ShapeStatic.cpp` | NeuronClient | **Modified** — added `SetOwner` DFS in `Load()`, implemented `RenderNative()`, switched `ShapeStatic::Render()` to call `EnsureUploaded` + `RenderNative` |
+| `NeuronClient/ShapeInstance.cpp` | NeuronClient | **Modified** — `Render()` calls `EnsureUploaded` + `RenderNative` instead of old GL path |
+| `NeuronClient/opengl_directx.cpp` | NeuronClient | **Modified** — added `ShapeMeshCache::Get().Shutdown()` in `Direct3DShutdown()` |
 
-**Verification:** Render any level with buildings and entities.  All 3D models must look identical.  Use `FrameStats` to confirm draw call count is unchanged but `uploadBytes` drops significantly (vertex data no longer uploaded per frame).
+#### What This Keeps from the GL Layer (temporarily)
 
-**Risk:** Fragment transforms are computed recursively using the matrix stack.  The `DrawConstants.WorldMatrix` changes per fragment, so we still need a CB upload per fragment draw.  This is not a regression — it matches the current behavior — but it means the full CB-per-draw overhead remains until Phase 5 introduces per-instance transform buffers.
+- Matrix stack (`Push/Pop/Multiply`) — needed for fragment hierarchy transforms
+- `PrepareDrawState()` — still builds PSO key and uploads `DrawConstants` per draw
+- `uploadAndBindConstants()` — still uploads per-draw CB (672 bytes)
+- `glEnable/glDisable(GL_COLOR_MATERIAL)` — still set before/after `Render()` calls
+
+#### What This Eliminates
+
+- Per-frame vertex assembly (`glVertex3f_impl` × thousands of vertices)
+- Per-frame vertex ring-buffer upload for all mesh data
+- `glBegin/glEnd` for all shape rendering (`RenderSlow()` no longer called)
+
+#### Bug Found and Fixed
+
+**Normal negation mismatch.** The GL emulation layer's `glNormal3f_impl` negates all normals (`nx = -nx`, etc.) as part of the RH→LH coordinate conversion.  `WriteFragmentVertices` initially stored normals un-negated, causing incorrect lighting.
+
+- **Symptom:** `SphereWorld` (camera inside sphere) rendered with no visible color — outward-facing un-negated normals gave negative N·L → zero diffuse.  Other shapes (viewed from outside) appeared acceptable but had subtly incorrect lighting.
+- **Fix:** Negate normals in `WriteFragmentVertices` to match `glNormal3f_impl` convention.
+
+#### Remaining Phase 0 Overhead
+
+Fragment transforms are computed recursively via the matrix stack.  `DrawConstants.WorldMatrix` changes per fragment, requiring a CB upload per fragment draw.  This matches the old behavior and is acceptable.  Phase 5 can reduce this with per-instance transform buffers.
 
 ---
 
-### Phase 1: Batched Billboard/Quad Renderer
+### Phase 1: Batched Billboard/Quad Renderer 🔧 IN PROGRESS
 
-**Problem:** Darwinians, Virii, spirits, shadows, weapon effects, and building lights/ports all draw camera-aligned quads via individual `glBegin(GL_QUADS)...glEnd()` calls.  A scene with 2000 Darwinians generates 2000+ draw calls, each with its own CB upload and PSO bind.
+**Status:** Core infrastructure built and verified.  Highest-impact renderers migrated (Darwinians, Virii, spirits, shadows, building lights/ports).  Remaining ~10 renderers with billboard quads are lower priority and can be migrated incrementally.
 
-**Solution:** A `QuadBatcher` that collects quads into a CPU-side vertex array and flushes them in a single draw call per unique PSO state:
+#### What Was Built
 
-```cpp
-// NeuronClient/QuadBatcher.h
-class QuadBatcher
-{
-public:
-    static QuadBatcher& Get();
+| Component | Description |
+|---|---|
+| **`QuadBatcher`** (singleton) | CPU-side vertex accumulator.  `Emit(v0,v1,v2,v3)` decomposes a quad into 2 triangles (6 `CustomVertex` entries), appending to a `std::vector`.  `Flush()` uploads to the ring buffer and issues a single `DrawInstanced` via `PrepareDrawState(TRIANGLELIST)`.  Callers manage GL state; the batcher is intentionally "dumb". |
+| **`RecordBatchedDraw`** | New function in `opengl_directx.h/.cpp` that increments `FrameStats::drawCalls` and `uploadBytes` for batched draws, keeping metrics accurate without going through `issueDrawCall`. |
+| **Static helpers** | `PackColorBGRA(r,g,b,a)`, `PackColorF(r,g,b,a)`, `MakeVertex(x,y,z,color,u,v)` — used by all migrated renderers to construct `CustomVertex` values without touching the GL color/texcoord state. |
 
-    // Begin a batch.  All subsequent EmitQuad calls use this state.
-    void Begin(D3D12_GPU_DESCRIPTOR_HANDLE textureSRV, BlendMode blend);
+#### Design Decisions
 
-    // Add one quad (4 vertices → 6 indices, pre-decomposed to 2 triangles).
-    void EmitQuad(FXMVECTOR pos, float halfW, float halfH,
-                  uint32_t colorBGRA, float u0, float v0, float u1, float v1);
+1. **"Dumb accumulator" pattern.**  The batcher does NOT manage GL state, texture binds, or blend modes.  Callers set GL state before emitting quads, then call `Flush()`.  This keeps the batcher simple and lets it coexist with unmigrated GL code during the transition.
 
-    // Flush all accumulated quads as a single draw call.
-    void Flush();
+2. **Flush-before-state-change discipline.**  Migrated renderers call `batcher.Flush()` before any GL state change (e.g., `glDepthMask`, `glBlendFunc`, `glBindTexture`).  This ensures accumulated quads are drawn with the correct PSO.  The pattern:
+   ```
+   Emit quads (same state)...
+   Flush()                          // draw accumulated quads
+   glDepthMask(false);              // change state
+   glBegin/glEnd                    // rare inline draw
+   glDepthMask(true);               // restore state
+   Emit more quads...               // resume accumulating
+   ```
 
-private:
-    std::vector<CustomVertex> m_vertices;
-    D3D12_GPU_DESCRIPTOR_HANDLE m_textureSRV;
-    BlendMode m_blend;
-};
-```
+3. **Per-pass flush in callers.**  `Team::RenderVirii()`, `Team::RenderDarwinians()`, and `Location::RenderSpirits()` call `QuadBatcher::Get().Flush()` after their entity loops, before restoring GL state.  This collapses N entity draws into 1 draw call.
 
-**Usage in Virii/Darwinian pass:**
+4. **Rare quads stay inline.**  DarwinianRenderer's shadow, blue glow, GodDish shadow, and santa hat quads use different GL states (depthMask, blend func, texture).  They remain as `glBegin/glEnd` inline draws.  They're rare per-frame and the overhead is negligible.  They can be migrated in Phase 5 or when the renderer is restructured for multi-pass rendering.
 
-```cpp
-void Team::RenderVirii(float predictionTime)
-{
-    auto& batcher = QuadBatcher::Get();
-    batcher.Begin(viriiTextureSRV, BlendMode::Additive);
-
-    for (int i = 0; i < m_others.Size(); ++i)
-    {
-        Entity* e = m_others[i];
-        if (e->m_type != Entity::TypeVirii) continue;
-        // Compute pos, size, color from entity
-        batcher.EmitQuad(pos, halfSize, halfSize, color, 0, 0, 1, 1);
-    }
-
-    batcher.Flush(); // ONE draw call for all virii
-}
-```
-
-**Impact:** Collapses thousands of draw calls into a handful (one per texture × blend mode combination per pass).  Eliminates thousands of CB uploads, PSO lookups, and vertex buffer binds.
-
-**Depends on:** Nothing (can be done in parallel with Phase 0).  However, the `BillboardHelper` from `Render.md §2.3` is a stepping stone — if that's implemented first, `QuadBatcher` replaces the GL calls inside `BillboardHelper`.
-
-**Files changed:**
+#### Files Changed
 
 | File | Project | Action |
 |---|---|---|
-| `NeuronClient/QuadBatcher.h` | NeuronClient | New |
-| `NeuronClient/QuadBatcher.cpp` | NeuronClient | New — accumulate + flush logic |
-| `GameRender/DarwinianRenderer.cpp` | GameRender | Replace `glBegin/glEnd` with `QuadBatcher::EmitQuad` |
-| `GameRender/ViriiRenderer.cpp` | GameRender | Replace `glBegin/glEnd` with `QuadBatcher::EmitQuad` |
-| `GameRender/SpiritRenderer.cpp` | GameRender | Replace `glBegin/glEnd` with `QuadBatcher::EmitQuad` |
-| `GameRender/ShadowRenderer.cpp` | GameRender | Replace `glBegin/glEnd` with `QuadBatcher::EmitQuad` |
-| `GameRender/DefaultBuildingRenderer.cpp` | GameRender | `RenderLights`/`RenderPorts` use `QuadBatcher` |
-| (+ ~10 more renderers) | GameRender | Migrate billboard quads |
+| `NeuronClient/QuadBatcher.h` | NeuronClient | **New** — singleton class with `Emit`, `Flush`, `GetCount`, `PackColorBGRA`, `PackColorF`, `MakeVertex` |
+| `NeuronClient/QuadBatcher.cpp` | NeuronClient | **New** — `Emit` decomposes quad to 6 vertices; `Flush` does ring-buffer `Allocate` + `memcpy` + `PrepareDrawState(TRIANGLELIST)` + `IASetVertexBuffers` + `DrawInstanced` + `RecordBatchedDraw` |
+| `NeuronClient/opengl_directx.h` | NeuronClient | **Modified** — added `RecordBatchedDraw(unsigned int _uploadBytes)` declaration |
+| `NeuronClient/opengl_directx.cpp` | NeuronClient | **Modified** — added `RecordBatchedDraw` implementation (increments `FrameStats::drawCalls` and `uploadBytes`) |
+| `GameRender/ShadowRenderer.cpp` | GameRender | **Modified** — shadow color computed once in `Begin()`; `Render()` emits quad via `Emit()`; `End()` calls `Flush()` |
+| `GameRender/SpiritRenderer.cpp` | GameRender | **Modified** — inner + outer glow quads emitted via `Emit()` per spirit |
+| `GameRender/DefaultBuildingRenderer.cpp` | GameRender | **Modified** — `RenderLights`: GL state set once, all light quads batched (10 per light × N lights), single `Flush()`.  `RenderPorts`: split into shape pass + batched status-light quad pass |
+| `GameRender/ViriiRenderer.cpp` | GameRender | **Modified** — removed `glBegin/glEnd`; worm segments and glow quads emitted via `Emit()` per history entry |
+| `GameRender/DarwinianRenderer.cpp` | GameRender | **Modified** — main sprite quad and dead fragment quads (3 per dead darwinian) use `Emit()`.  Shadow, glow, GodDish shadow, and santa hat remain inline `glBegin/glEnd` with `Flush()` guards |
+| `Starstrike/location.cpp` | Starstrike | **Modified** — added `#include "QuadBatcher.h"` and `QuadBatcher::Get().Flush()` after spirit rendering loop |
+| `Starstrike/team.cpp` | Starstrike | **Modified** — added `#include "QuadBatcher.h"` and `QuadBatcher::Get().Flush()` after both `RenderVirii` and `RenderDarwinians` entity loops |
 
-**Verification:** Visual comparison on a stress level.  Confirm `FrameStats::drawCalls` drops by an order of magnitude for passes 3–4.
+#### What This Keeps from the GL Layer (temporarily)
+
+- `PrepareDrawState()` — `Flush()` calls it to build PSO, upload `DrawConstants` CB, and bind textures/samplers.  One CB upload per `Flush()` instead of one per quad.
+- `glEnable/glDisable/glBlendFunc/glDepthMask` — callers still use these to configure render state before `Flush()`.
+- `glBindTexture` — callers still bind textures via GL API.
+- Inline `glBegin/glEnd` for rare quads (DarwinianRenderer shadow/glow/GodDish/santa).
+
+#### What This Eliminates
+
+- Per-quad `glBegin/glEnd` → `issueDrawCall` for all high-frequency billboard quads (spirits, shadows, darwinian sprites, virii worm segments, building lights/ports).
+- Per-quad `DrawConstants` upload (672 bytes × N quads → 672 bytes × 1 flush per pass).
+- Per-quad PSO hash + lookup.
+- Per-quad vertex ring-buffer upload (N × 6 × 48 bytes → 1 bulk upload per flush).
+- Per-quad viewport/scissor/root-signature re-bind.
+
+#### Batching Impact (estimated)
+
+| Pass | Before (draw calls) | After (draw calls) | Reduction |
+|---|---|---|---|
+| Spirits (2000 spirits × 2 quads) | ~4000 | **1** | 4000× |
+| Darwinian main sprites (500 darwinians) | ~500 | **1** | 500× |
+| Virii (100 virii × ~10 segments × 2 quads) | ~100 | **1** | 100× |
+| Shadows (200 entities) | ~200 | **1** | 200× |
+| Building lights (50 buildings × 10 quads) | ~500 | **1** | 500× |
+
+#### Remaining Phase 1 Work
+
+The following renderers still use `glBegin(GL_QUADS)` for billboard-style quads and are candidates for `QuadBatcher` migration.  They are lower frequency than the migrated renderers:
+
+| Renderer | Project | Quads/frame | Priority |
+|---|---|---|---|
+| `ArmyAntRenderer` | GameRender | Low (few ants) | Low |
+| `CentipedeRenderer` | GameRender | Low | Low |
+| `SporeGeneratorRenderer` | GameRender | Medium | Medium |
+| `TriffidRenderer` | GameRender | Low | Low |
+| `PowerupRenderer` | GameRender | Low | Low |
+| `SoulDestroyer`/`SpiderRenderer` | GameRender | Low | Low |
+| DarwinianRenderer rare quads (shadow, glow, GodDish, santa) | GameRender | Low (conditional) | Deferred to Phase 5 |
+
+These can be migrated incrementally without blocking Phase 2.
+
+**Verification:** Visual comparison on a stress level.  Confirm `FrameStats::drawCalls` drops by an order of magnitude for spirit/darwinian/virii passes.
 
 ---
 
@@ -439,17 +442,17 @@ Each new shader pair **shares the same `PerFrameConstants.hlsli` CB layout** so 
 
 ## 7. Recommended Execution Order
 
-| Step | Phase | Dependencies | Risk | Effort |
-|---|---|---|---|---|
-| 1 | **Phase 0** — ShapeMeshCache | None | Medium (recursive transform, vertex format) | Large |
-| 2 | **Phase 1** — QuadBatcher | None (parallel with 0) | Low | Medium |
-| 3 | **Phase 2** — Landscape/Water | None (parallel with 0–1) | Low | Small |
-| 4 | **Phase 3** — SpriteBatch for UI | None | Low | Medium |
-| 5 | **Phase 4** — ParticleBatcher | Phase 1 (shares batcher pattern) | Low | Medium |
-| 6 | **Phase 5** — Matrix stack removal + RenderMode PSOs | Phases 0–4 complete | High (touches everything) | Large |
-| 7 | **Phase 6** — Delete GL layer | All above complete | Low (mechanical) | Small |
+| Step | Phase | Dependencies | Risk | Effort | Status |
+|---|---|---|---|---|---|
+| 1 | **Phase 0** — ShapeMeshCache | None | Medium (recursive transform, vertex format) | Large | ✅ Done |
+| 2 | **Phase 1** — QuadBatcher | None | Low | Medium | 🔧 In progress (core + 5 renderers done) |
+| 3 | **Phase 2** — Landscape/Water | None (parallel with 1) | Low | Small | **Next** |
+| 4 | **Phase 3** — SpriteBatch for UI | None | Low | Medium | |
+| 5 | **Phase 4** — ParticleBatcher | Phase 1 (shares batcher pattern) | Low | Medium | |
+| 6 | **Phase 5** — Matrix stack removal + RenderMode PSOs | Phases 0–4 complete | High (touches everything) | Large | |
+| 7 | **Phase 6** — Delete GL layer | All above complete | Low (mechanical) | Small | |
 
-Phases 0, 1, and 2 can proceed in parallel on separate branches.  Phase 5 is the riskiest and should be done last, after all other GL consumers are gone.
+Phases 1 and 2 can proceed in parallel on separate branches.  Phase 5 is the riskiest and should be done last, after all other GL consumers are gone.
 
 ---
 
@@ -479,12 +482,16 @@ Track these before starting and after each phase:
 
 | Risk | Phase | Mitigation |
 |---|---|---|
-| **ShapeStatic vertex format mismatch** — Current `CustomVertex` has 48 bytes (pos+normal+color+uv0+uv1). Shapes only use pos+normal+color. Wasting 16 bytes/vertex on unused UVs. | 0 | Use `CustomVertex` initially for compatibility with uber shader input layout.  Optimize vertex format in Phase 5 with a dedicated shape shader. |
-| **Fragment transform accumulation** — ShapeStatic fragments form a tree.  Each fragment's transform is relative to its parent. The matrix stack handles this naturally.  Replacing it requires explicit parent-child matrix multiplication. | 0, 5 | Phase 0 keeps the matrix stack.  Phase 5 replaces it with explicit `XMMATRIX worldMatrix = parentWorld * localTransform` passed down the recursion.  This is actually simpler and avoids global mutable state. |
+| **ShapeStatic vertex format mismatch** — Current `CustomVertex` has 48 bytes (pos+normal+color+uv0+uv1). Shapes only use pos+normal+color. Wasting 16 bytes/vertex on unused UVs. | 0 ✅ | Accepted for Phase 0 — used `CustomVertex` with zero UVs for compatibility with uber shader input layout.  Optimize vertex format in Phase 5 with a dedicated shape shader. |
+| **Fragment transform accumulation** — ShapeStatic fragments form a tree.  Each fragment's transform is relative to its parent. The matrix stack handles this naturally.  Replacing it requires explicit parent-child matrix multiplication. | 0 ✅, 5 | Phase 0 keeps the matrix stack (confirmed working).  Phase 5 replaces it with explicit `XMMATRIX worldMatrix = parentWorld * localTransform` passed down the recursion. |
+| **Normal negation mismatch** — The GL emulation layer negates normals in `glNormal3f_impl` (RH→LH conversion).  Native vertex upload must replicate this negation or lighting breaks. | 0 ✅ | **Encountered and fixed.**  `WriteFragmentVertices` must negate normals.  Future native renderers that bypass GL must apply the same negation.  Symptom was most visible for inside-sphere rendering (SphereWorld) where all normals faced away from camera. |
 | **Display list removal breaks `sphere_renderer.cpp`** — Only user of display lists. | 5 | `sphere_renderer` already generates vertices procedurally.  Replace with a static GPU vertex buffer (upload once at init, like TreeRenderer). |
 | **`glCopyTexImage2D` is a GPU→GPU copy** — Used for render-to-texture effects.  Cannot be replaced with a simple upload. | 3+ | Extract into `TextureManager::CopyFromBackBuffer()`.  The D3D12 implementation is already correct (barrier → CopyTextureRegion → barrier). |
-| **Per-draw CB upload still needed after Phase 0** — ShapeStatic fragments each have a unique world matrix, so DrawConstants must still be uploaded per fragment. | 0 | Accepted.  The CB upload overhead is small compared to the eliminated vertex upload.  Phase 5 can further reduce this with per-instance transform buffers for shapes with many fragments. |
+| **Per-draw CB upload still needed after Phase 0** — ShapeStatic fragments each have a unique world matrix, so DrawConstants must still be uploaded per fragment. | 0 ✅ | Accepted (confirmed in practice).  The CB upload overhead is small compared to the eliminated vertex upload.  Phase 5 can further reduce this with per-instance transform buffers for shapes with many fragments. |
 | **Regression in visual output** — The uber shader has specific fixed-function emulation behavior (GL-style lighting model, tex env modes, alpha test).  Native shaders must match exactly. | All | Keep uber shaders as the reference.  New specialized shaders should produce identical output for their use case.  Always A/B compare visually. |
+| **Flush-before-state-change discipline** — If a migrated renderer emits quads to the batcher and then changes GL state without flushing first, the accumulated quads will be drawn with the wrong PSO at next flush. | 1 🔧 | Established pattern: always call `batcher.Flush()` before any `glDepthMask`, `glBlendFunc`, `glBindTexture`, or `glDisable(GL_DEPTH_TEST)` call.  DarwinianRenderer's rare quads (shadow, glow, GodDish, santa) flush before each state change. |
+| **`std::clamp` name collision** — Naming a lambda `clamp` inside a `static` member function causes MSVC parse errors when `<algorithm>` is in scope via `pch.h`. | 1 🔧 | **Encountered and fixed.**  Renamed lambda to `toByte` in `QuadBatcher::PackColorF`.  Lesson: avoid naming locals after well-known `std::` functions when pch pulls in standard headers. |
+| **Interleaved inline GL draws + batched draws** — DarwinianRenderer's rare quads (shadow, glow) use `glBegin/glEnd` inline, interleaved with batched `Emit()` calls for main sprites.  Both paths write to the same D3D12 command list. | 1 🔧 | Safe: inline GL draws go through `issueDrawCall` → separate `DrawInstanced`; batched draws go through `Flush` → separate `DrawInstanced`.  Both read GL state at draw time, not at emit time.  Command list executes in order. |
 
 ---
 

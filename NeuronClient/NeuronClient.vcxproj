@@ -177,6 +177,7 @@
     <ClInclude Include="preference_names.h" />
     <ClInclude Include="presized_array.h" />
     <ClInclude Include="profiler.h" />
+    <ClInclude Include="QuadBatcher.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="render_utils.h" />
     <ClInclude Include="resource.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="preferences.cpp" />
     <ClCompile Include="profiler.cpp" />
+    <ClCompile Include="QuadBatcher.cpp" />
     <ClCompile Include="random.cpp" />
     <ClCompile Include="render_utils.cpp" />
     <ClCompile Include="resource.cpp" />

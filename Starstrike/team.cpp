@@ -2,6 +2,7 @@
 #include "team.h"
 #include "EntityRenderRegistry.h"
 #include "EntityRenderer.h"
+#include "QuadBatcher.h"
 #include "GameApp.h"
 #include "airstrike.h"
 #include "binary_stream_readers.h"
@@ -469,6 +470,8 @@ void Team::RenderVirii(float _predictionTime)
     }
   }
 
+  QuadBatcher::Get().Flush();
+
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
   glEnable(GL_CULL_FACE);
@@ -534,6 +537,8 @@ void Team::RenderDarwinians(float _predictionTime)
       }
     }
   }
+
+  QuadBatcher::Get().Flush();
 
   glDisable(GL_ALPHA_TEST);
   glAlphaFunc(GL_GREATER, 0.01);

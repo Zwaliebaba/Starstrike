@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "GameApp.h"
 #include "team.h"
+#include "QuadBatcher.h"
 
 void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext& _ctx)
 {
@@ -64,6 +65,11 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     entityRight *= size;
     entityUp *= size * 2.0f;
 
+    auto& batcher = QuadBatcher::Get();
+    auto makeVtx = [](const LegacyVector3& p, uint32_t c, float u, float v) {
+        return QuadBatcher::MakeVertex(p.x, p.y, p.z, c, u, v);
+    };
+
     //
     // Draw our shadow on the landscape
 
@@ -82,6 +88,9 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
         pos2.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos2.x, pos2.z);
         pos3.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos3.x, pos3.z);
         pos4.y = 0.3f + g_context->m_location->m_landscape.m_heightMap->GetValue(pos4.x, pos4.z);
+
+        // Flush accumulated main-sprite quads before changing depthMask
+        batcher.Flush();
 
         glDepthMask(false);
         glBegin(GL_QUADS);
@@ -111,7 +120,6 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
 
         if (d.m_dead)
         {
-            glEnable(GL_BLEND);
             colour.a = 2.5f * static_cast<float>(d.m_stats[Entity::StatHealth]);
             colour.r *= 0.2f;
             colour.g *= 0.2f;
@@ -125,23 +133,22 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
             colour.b *= 0.01f;
         }
 
-        glColor4ubv(colour.GetData());
-        glBegin(GL_QUADS);
-        glTexCoord2i(0, 1);
-        glVertex3fv((predictedPos - entityRight + entityUp).GetData());
-        glTexCoord2i(1, 1);
-        glVertex3fv((predictedPos + entityRight + entityUp).GetData());
-        glTexCoord2i(1, 0);
-        glVertex3fv((predictedPos + entityRight).GetData());
-        glTexCoord2i(0, 0);
-        glVertex3fv((predictedPos - entityRight).GetData());
-        glEnd();
+        // Main sprite — batched across all darwinians
+        uint32_t col = QuadBatcher::PackColorBGRA(colour.r, colour.g, colour.b, colour.a);
+        batcher.Emit(
+            makeVtx(predictedPos - entityRight + entityUp, col, 0.0f, 1.0f),
+            makeVtx(predictedPos + entityRight + entityUp, col, 1.0f, 1.0f),
+            makeVtx(predictedPos + entityRight, col, 1.0f, 0.0f),
+            makeVtx(predictedPos - entityRight, col, 0.0f, 0.0f));
 
         //
         // Draw a blue glow if we are under control
 
         if (d.m_state == Darwinian::StateUnderControl)
         {
+            // Flush accumulated main-sprite quads before changing blend/depth state
+            batcher.Flush();
+
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
@@ -193,6 +200,9 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
 
                 if (alpha > 0.0f)
                 {
+                    // Flush accumulated main-sprite quads before state changes
+                    batcher.Flush();
+
                     LegacyVector3 length = (predictedPos - building->m_pos).SetLength(size * 10);
 
                     // Shadow behind the Darwinian (green dudes only)
@@ -258,6 +268,9 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
     {
         if (d.m_id.GetUniqueId() % 3 == 0)
         {
+            // Flush accumulated main-sprite quads before texture change
+            batcher.Flush();
+
             int santaHatId = Resource::GetTexture("sprites/santahat.bmp");
             glBindTexture(GL_TEXTURE_2D, santaHatId);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -309,9 +322,8 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
         entityUp *= size * 2.0f;
         entityRight.Normalise();
         entityRight *= size;
-        unsigned char alpha = static_cast<float>(d.m_stats[Entity::StatHealth]) * 2.55f;
-
-        glColor4ub(0, 0, 0, alpha);
+        unsigned char deadAlpha = static_cast<float>(d.m_stats[Entity::StatHealth]) * 2.55f;
+        uint32_t deadColor = QuadBatcher::PackColorBGRA(0, 0, 0, deadAlpha);
 
         entityRight *= 0.5f;
         entityUp *= 0.5;
@@ -356,16 +368,14 @@ void DarwinianRenderer::Render(const Entity& _entity, const EntityRenderContext&
                 left += (right - left) / 2;
             }
 
-            glBegin(GL_QUADS);
-            glTexCoord2f(left, bottom);
-            glVertex3fv((fragmentPos - entityRight + entityUp).GetData());
-            glTexCoord2f(right, bottom);
-            glVertex3fv((fragmentPos + entityRight + entityUp).GetData());
-            glTexCoord2f(right, top);
-            glVertex3fv((fragmentPos + entityRight).GetData());
-            glTexCoord2f(left, top);
-            glVertex3fv((fragmentPos - entityRight).GetData());
-            glEnd();
+            // Dead fragment — batched with main sprites (same GL state)
+            batcher.Emit(
+                makeVtx(fragmentPos - entityRight + entityUp, deadColor, left, bottom),
+                makeVtx(fragmentPos + entityRight + entityUp, deadColor, right, bottom),
+                makeVtx(fragmentPos + entityRight, deadColor, right, top),
+                makeVtx(fragmentPos - entityRight, deadColor, left, top));
         }
     }
+
+    // No Flush here — caller (Team::RenderDarwinians) flushes after all darwinians.
 }

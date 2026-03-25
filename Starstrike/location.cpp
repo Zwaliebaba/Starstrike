@@ -28,6 +28,7 @@
 #include "taskmanager_interface.h"
 #include "team.h"
 #include "BuildingRenderRegistry.h"
+#include "QuadBatcher.h"
 #include "BuildingRenderer.h"
 #include "WorldObjectRenderer.h"
 #include "WorldObjectRenderRegistry.h"
@@ -836,6 +837,8 @@ void Location::RenderSpirits()
       SpiritRenderer::RenderSpirit(*r, predTime);
     }
   }
+
+  QuadBatcher::Get().Flush();
 
   glDepthMask(true);
   glDisable(GL_BLEND);

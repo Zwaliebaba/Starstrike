@@ -44,6 +44,7 @@ namespace OpenGLD3D {
   void ResetFrameStats();                // Called at start of frame
   void SnapshotFrameStats();             // Called at end of frame (copies live → snapshot)
   void RecordDrawCall();                 // Increment draw call counter (display list replays)
+  void RecordBatchedDraw(unsigned int _uploadBytes);  // Track a batched draw call + vertex upload bytes
 }
 
 // Mode declarations for glBegin

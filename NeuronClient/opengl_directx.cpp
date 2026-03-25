@@ -2156,6 +2156,12 @@ const OpenGLD3D::FrameStats& OpenGLD3D::GetFrameStats() { return s_snapshotStats
 
 void OpenGLD3D::RecordDrawCall() { s_liveStats.drawCalls++; }
 
+void OpenGLD3D::RecordBatchedDraw(unsigned int bytes)
+{
+    s_liveStats.drawCalls++;
+    s_liveStats.uploadBytes += bytes;
+}
+
 // --- Scene constants lazy upload ---
 
 static void ensureSceneConstantsUploaded()

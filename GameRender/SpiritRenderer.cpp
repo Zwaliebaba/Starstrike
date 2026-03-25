@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "SpiritRenderer.h"
+#include "QuadBatcher.h"
 #include "spirit.h"
 #include "camera.h"
 #include "GameApp.h"
@@ -44,22 +45,42 @@ void SpiritRenderer::RenderSpirit(const Spirit& _spirit, float _predictionTime)
   LegacyVector3 predictedPos = _spirit.m_pos + predTime * _spirit.m_vel;
   predictedPos += predTime * _spirit.m_hover;
 
-  float size = spiritInnerSize;
-  glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
+  LegacyVector3 camUp = g_context->m_camera->GetUp();
+  LegacyVector3 camRight = g_context->m_camera->GetRight();
 
-  glBegin(GL_QUADS);
-  glVertex3fv((predictedPos - g_context->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos + g_context->m_camera->GetRight() * size).GetData());
-  glVertex3fv((predictedPos + g_context->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos - g_context->m_camera->GetRight() * size).GetData());
-  glEnd();
+  auto& batcher = QuadBatcher::Get();
 
-  size = spiritOuterSize;
-  glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
-  glBegin(GL_QUADS);
-  glVertex3fv((predictedPos - g_context->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos + g_context->m_camera->GetRight() * size).GetData());
-  glVertex3fv((predictedPos + g_context->m_camera->GetUp() * size).GetData());
-  glVertex3fv((predictedPos - g_context->m_camera->GetRight() * size).GetData());
-  glEnd();
+  // Inner quad
+  {
+    float size = spiritInnerSize;
+    uint32_t color = QuadBatcher::PackColorBGRA(colour.r, colour.g, colour.b,
+                                                static_cast<unsigned char>(innerAlpha));
+    LegacyVector3 p0 = predictedPos - camUp * size;
+    LegacyVector3 p1 = predictedPos + camRight * size;
+    LegacyVector3 p2 = predictedPos + camUp * size;
+    LegacyVector3 p3 = predictedPos - camRight * size;
+    batcher.Emit(
+      QuadBatcher::MakeVertex(p0.x, p0.y, p0.z, color),
+      QuadBatcher::MakeVertex(p1.x, p1.y, p1.z, color),
+      QuadBatcher::MakeVertex(p2.x, p2.y, p2.z, color),
+      QuadBatcher::MakeVertex(p3.x, p3.y, p3.z, color)
+    );
+  }
+
+  // Outer quad
+  {
+    float size = spiritOuterSize;
+    uint32_t color = QuadBatcher::PackColorBGRA(colour.r, colour.g, colour.b,
+                                                static_cast<unsigned char>(outerAlpha));
+    LegacyVector3 p0 = predictedPos - camUp * size;
+    LegacyVector3 p1 = predictedPos + camRight * size;
+    LegacyVector3 p2 = predictedPos + camUp * size;
+    LegacyVector3 p3 = predictedPos - camRight * size;
+    batcher.Emit(
+      QuadBatcher::MakeVertex(p0.x, p0.y, p0.z, color),
+      QuadBatcher::MakeVertex(p1.x, p1.y, p1.z, color),
+      QuadBatcher::MakeVertex(p2.x, p2.y, p2.z, color),
+      QuadBatcher::MakeVertex(p3.x, p3.y, p3.z, color)
+    );
+  }
 }
