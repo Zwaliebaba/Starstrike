@@ -2,6 +2,7 @@
 
 #include "SoulDestroyerRenderer.h"
 #include "ShadowRenderer.h"
+#include "QuadBatcher.h"
 #include "souldestroyer.h"
 #include "ShapeStatic.h"
 #include "matrix34.h"
@@ -88,6 +89,8 @@ void SoulDestroyerRenderer::Render(const Entity& _entity, const EntityRenderCont
         }
     }
 
+    QuadBatcher::Get().Flush();
+
     glDepthMask(true);
     glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -149,7 +152,6 @@ void SoulDestroyerRenderer::RenderShapes(const Entity& _entity, float _predictio
 void SoulDestroyerRenderer::RenderSpirit(const LegacyVector3& _pos, float _alpha)
 {
     LegacyVector3 pos = _pos;
-
     int innerAlpha = 200 * _alpha;
     int outerAlpha = 100 * _alpha;
     int spiritInnerSize = 4 * _alpha;
@@ -158,22 +160,29 @@ void SoulDestroyerRenderer::RenderSpirit(const LegacyVector3& _pos, float _alpha
     RGBAColour colour(100, 50, 50);
     float distToParticle = (g_context->m_camera->GetPos() - pos).Mag();
 
+    LegacyVector3 camUp = g_context->m_camera->GetUp();
+    LegacyVector3 camRight = g_context->m_camera->GetRight();
+
+    auto& batcher = QuadBatcher::Get();
+    auto makeVtx = [](const LegacyVector3& p, uint32_t c) {
+        return QuadBatcher::MakeVertex(p.x, p.y, p.z, c);
+    };
+
+    // Inner glow
     float size = spiritInnerSize / sqrtf(sqrtf(distToParticle));
-    glColor4ub(colour.r, colour.g, colour.b, innerAlpha);
+    uint32_t innerColor = QuadBatcher::PackColorBGRA(colour.r, colour.g, colour.b, innerAlpha);
+    batcher.Emit(
+        makeVtx(pos - camUp * size, innerColor),
+        makeVtx(pos + camRight * size, innerColor),
+        makeVtx(pos + camUp * size, innerColor),
+        makeVtx(pos - camRight * size, innerColor));
 
-    glBegin(GL_QUADS);
-    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
-    glEnd();
-
+    // Outer glow
     size = spiritOuterSize / sqrtf(sqrtf(distToParticle));
-    glColor4ub(colour.r, colour.g, colour.b, outerAlpha);
-    glBegin(GL_QUADS);
-    glVertex3fv((pos - g_context->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos + g_context->m_camera->GetRight() * size).GetData());
-    glVertex3fv((pos + g_context->m_camera->GetUp() * size).GetData());
-    glVertex3fv((pos - g_context->m_camera->GetRight() * size).GetData());
-    glEnd();
+    uint32_t outerColor = QuadBatcher::PackColorBGRA(colour.r, colour.g, colour.b, outerAlpha);
+    batcher.Emit(
+        makeVtx(pos - camUp * size, outerColor),
+        makeVtx(pos + camRight * size, outerColor),
+        makeVtx(pos + camUp * size, outerColor),
+        makeVtx(pos - camRight * size, outerColor));
 }

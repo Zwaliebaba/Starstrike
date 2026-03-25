@@ -3,6 +3,9 @@
 #include "binary_stream_readers.h"
 #include "bitmap.h"
 #include "math_utils.h"
+#include "opengl_directx.h"
+#include "opengl_directx_internals.h"
+#include "UploadRingBuffer.h"
 #include "profiler.h"
 #include "resource.h"
 #include "rgb_colour.h"
@@ -232,7 +235,6 @@ const unsigned LandscapeRenderer::m_colOffset(sizeof(LegacyVector3) * 2);
 const unsigned LandscapeRenderer::m_uvOffset(sizeof(LegacyVector3) * 2 + sizeof(RGBAColour));
 
 LandscapeRenderer::LandscapeRenderer(SurfaceMap2D<float>* _heightMap)
-  : m_vertexBuffer(0)
 {
   char fullFilname[256];
   snprintf(fullFilname, sizeof(fullFilname), "terrain\\%s", g_context->m_location->m_levelFile->m_landscapeColourFilename);
@@ -262,8 +264,92 @@ void LandscapeRenderer::BuildOpenGlState(SurfaceMap2D<float>* _heightMap)
   BuildUVArray(_heightMap);
 }
 
+void LandscapeRenderer::UploadToGPU()
+{
+  if (m_gpuUploaded || m_verts.Size() <= 0)
+    return;
+
+  const int count = m_verts.NumUsed();
+  const SIZE_T bufferSize = static_cast<SIZE_T>(count) * sizeof(OpenGLD3D::CustomVertex);
+
+  // Convert LandVertex → CustomVertex (done once, matching glDrawArrays behavior)
+  std::vector<OpenGLD3D::CustomVertex> vertices(count);
+  for (int i = 0; i < count; ++i)
+  {
+    const LandVertex& src = m_verts[i];
+    OpenGLD3D::CustomVertex& dst = vertices[i];
+    dst.x  = src.m_pos.x;
+    dst.y  = src.m_pos.y;
+    dst.z  = src.m_pos.z;
+    // glDrawArrays does NOT negate normals (unlike glNormal3f_impl) — store as-is
+    dst.nx = src.m_norm.x;
+    dst.ny = src.m_norm.y;
+    dst.nz = src.m_norm.z;
+    // RGBAColour(r,g,b,a) → BGRA diffuse via named union members
+    dst.r8 = src.m_col.r;
+    dst.g8 = src.m_col.g;
+    dst.b8 = src.m_col.b;
+    dst.a8 = src.m_col.a;
+    dst.u  = src.m_uv.u;
+    dst.v  = src.m_uv.v;
+    dst.u2 = 0.0f;
+    dst.v2 = 0.0f;
+  }
+
+  // Create default-heap vertex buffer
+  auto* device  = Graphics::Core::Get().GetD3DDevice();
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
+
+  D3D12_HEAP_PROPERTIES defaultHeap{};
+  defaultHeap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+  D3D12_RESOURCE_DESC bufferDesc{};
+  bufferDesc.Dimension        = D3D12_RESOURCE_DIMENSION_BUFFER;
+  bufferDesc.Width            = bufferSize;
+  bufferDesc.Height           = 1;
+  bufferDesc.DepthOrArraySize = 1;
+  bufferDesc.MipLevels        = 1;
+  bufferDesc.SampleDesc.Count = 1;
+  bufferDesc.Layout           = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+  check_hresult(device->CreateCommittedResource(
+      &defaultHeap, D3D12_HEAP_FLAG_NONE, &bufferDesc,
+      D3D12_RESOURCE_STATE_COMMON, nullptr,
+      IID_GRAPHICS_PPV_ARGS(m_gpuVertexBuffer)));
+
+  // Upload via ring buffer
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(bufferSize, sizeof(float));
+  memcpy(alloc.cpuPtr, vertices.data(), bufferSize);
+
+  D3D12_RESOURCE_BARRIER barrier{};
+  barrier.Type                   = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+  barrier.Transition.pResource   = m_gpuVertexBuffer.get();
+  barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COMMON;
+  barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_COPY_DEST;
+  barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+  cmdList->ResourceBarrier(1, &barrier);
+
+  cmdList->CopyBufferRegion(m_gpuVertexBuffer.get(), 0,
+                            Graphics::GetCurrentUploadBuffer().GetResource(),
+                            alloc.offset, bufferSize);
+
+  barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+  barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+  cmdList->ResourceBarrier(1, &barrier);
+
+  m_gpuVBView.BufferLocation = m_gpuVertexBuffer->GetGPUVirtualAddress();
+  m_gpuVBView.SizeInBytes    = static_cast<UINT>(bufferSize);
+  m_gpuVBView.StrideInBytes  = sizeof(OpenGLD3D::CustomVertex);
+
+  m_gpuUploaded = true;
+
+  DebugTrace("LandscapeRenderer: uploaded {} vertices, {} bytes\n",
+             count, static_cast<unsigned int>(bufferSize));
+}
+
 void LandscapeRenderer::RenderMainSlow()
 {
+  // GL state setup — needed for PrepareDrawState PSO selection
   GLfloat materialSpecular[] = {0.0f, 0.0f, 0.0f, 0.0f};
   GLfloat materialDiffuse[] = {1.0f, 1.0f, 1.0f, 0.0f};
   GLfloat materialShininess[] = {100.0f};
@@ -283,24 +369,18 @@ void LandscapeRenderer::RenderMainSlow()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
   }
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-
-  auto vertData = (char*)m_verts.GetPointer(0);
-  glVertexPointer(3, GL_FLOAT, sizeof(LandVertex), vertData + m_posOffset);
-  glNormalPointer(GL_FLOAT, sizeof(LandVertex), vertData + m_normOffset);
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(LandVertex), vertData + m_colOffset);
+  // Native D3D12 draw — replaces glEnableClientState + glVertexPointer + glDrawArrays
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
+  OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+  cmdList->IASetVertexBuffers(0, 1, &m_gpuVBView);
 
   for (int z = 0; z < m_strips.Size(); ++z)
   {
     LandTriangleStrip* strip = m_strips[z];
-    glDrawArrays(GL_TRIANGLE_STRIP, strip->m_firstVertIndex, strip->m_numVerts);
+    cmdList->DrawInstanced(strip->m_numVerts, 1, strip->m_firstVertIndex, 0);
   }
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  OpenGLD3D::RecordBatchedDraw(0); // GPU-resident VB — no per-frame upload
 
   if (g_context->m_negativeRenderer)
     glDisable(GL_BLEND);
@@ -342,28 +422,18 @@ void LandscapeRenderer::RenderOverlaySlow()
   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialDiffuse);
   glMaterialfv(GL_FRONT, GL_SHININESS, materialShininess);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-
-  auto vertData = (char*)m_verts.GetPointer(0);
-  glVertexPointer(3, GL_FLOAT, sizeof(LandVertex), vertData + m_posOffset);
-  glNormalPointer(GL_FLOAT, sizeof(LandVertex), vertData + m_normOffset);
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(LandVertex), vertData + m_colOffset);
-  glTexCoordPointer(2, GL_FLOAT, sizeof(LandVertex), vertData + m_uvOffset);
+  // Native D3D12 draw — replaces glEnableClientState + glVertexPointer + glDrawArrays
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
+  OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+  cmdList->IASetVertexBuffers(0, 1, &m_gpuVBView);
 
   for (int z = 0; z < m_strips.Size(); ++z)
   {
     LandTriangleStrip* strip = m_strips[z];
-
-    glDrawArrays(GL_TRIANGLE_STRIP, strip->m_firstVertIndex, strip->m_numVerts);
+    cmdList->DrawInstanced(strip->m_numVerts, 1, strip->m_firstVertIndex, 0);
   }
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  OpenGLD3D::RecordBatchedDraw(0); // GPU-resident VB — no per-frame upload
 
   glDisable(GL_COLOR_MATERIAL);
   glDisable(GL_BLEND);
@@ -383,6 +453,10 @@ void LandscapeRenderer::Render()
 {
   if (m_verts.Size() <= 0)
     return;
+
+  // Lazy upload to GPU on first render (constructor runs during level load,
+  // before the D3D12 command list is available for copy operations)
+  UploadToGPU();
 
   g_context->m_location->SetupFog();
   glEnable(GL_FOG);

@@ -36,8 +36,6 @@ class LandTriangleStrip
 // Class LandscapeRenderer
 //*****************************************************************************
 
-struct IDirect3DVertexBuffer9;
-
 class LandscapeRenderer
 {
   protected:
@@ -46,7 +44,10 @@ class LandscapeRenderer
 
     FastDArray<LandVertex> m_verts;
 
-    unsigned int m_vertexBuffer;
+    // GPU-resident vertex buffer (uploaded once on first render)
+    com_ptr<ID3D12Resource> m_gpuVertexBuffer;
+    D3D12_VERTEX_BUFFER_VIEW m_gpuVBView{};
+    bool m_gpuUploaded = false;
 
     FastDArray<LandTriangleStrip*> m_strips;
 
@@ -55,6 +56,8 @@ class LandscapeRenderer
     void BuildUVArray(SurfaceMap2D<float>* _heightMap);
     void GetLandscapeColour(float _height, float _gradient, unsigned int _x, unsigned int _y, RGBAColour* _colour);
     void BuildColourArray();
+
+    void UploadToGPU();
 
   public:
     static const unsigned int m_posOffset;

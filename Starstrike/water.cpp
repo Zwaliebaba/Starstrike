@@ -6,6 +6,9 @@
 #include "hi_res_time.h"
 #include "math_utils.h"
 #include "ogl_extensions.h"
+#include "opengl_directx.h"
+#include "opengl_directx_internals.h"
+#include "UploadRingBuffer.h"
 #include "profiler.h"
 #include "preferences.h"
 #include "resource.h"
@@ -325,6 +328,7 @@ void Water::BuildTriangleStrips()
   // Up-size the empty FastDArrays to be the same size as the vertex array
   m_waterDepths.resize(m_renderVerts.NumUsed());
   m_shoreNoise.resize(m_renderVerts.NumUsed());
+  m_gpuDynamicVerts.resize(m_renderVerts.NumUsed());
 
   // Create other per-vertex arrays
   for (int i = 0; i < m_renderVerts.Size(); ++i)
@@ -361,7 +365,36 @@ void Water::RenderFlatWaterTiles(float posNorth, float posSouth, float posEast, 
   float texStepX2 = texSizeX2 / static_cast<float>(steps);
   float texStepZ2 = texSizeZ2 / static_cast<float>(steps);
 
-  glBegin(GL_QUADS);
+  // Accumulate quads as CustomVertex triangles (6 verts per quad)
+  // Read current color from GL state — set by RenderFlatWater before this call
+  UINT32 color;
+  {
+    // Match glColor4ub state: use the currently set GL color.
+    // RenderFlatWater calls glColor4ub before us — we read it from the
+    // current attributes by constructing the BGRA value directly.
+    // We don't have direct access to s_currentAttribs, so we replicate the
+    // color value that RenderFlatWater set.
+    unsigned char alpha = g_context->m_negativeRenderer ? 0 : 255;
+    OpenGLD3D::CustomVertex tmpV{};
+    tmpV.r8 = 255;
+    tmpV.g8 = 255;
+    tmpV.b8 = 255;
+    tmpV.a8 = alpha;
+    color = tmpV.diffuse;
+  }
+
+  std::vector<OpenGLD3D::CustomVertex> verts;
+  verts.reserve(static_cast<size_t>(steps) * steps * 6); // worst case
+
+  auto makeVtx = [&](float px, float py, float pz, float t1u, float t1v, float t2u, float t2v) -> OpenGLD3D::CustomVertex {
+    OpenGLD3D::CustomVertex v{};
+    v.x = px; v.y = py; v.z = pz;
+    v.diffuse = color;
+    v.u = t1u; v.v = t1v;
+    v.u2 = t2u; v.v2 = t2v;
+    return v;
+  };
+
   for (int j = 0; j < steps; ++j)
   {
     float pz = posNorth + j * posStepZ;
@@ -378,24 +411,38 @@ void Water::RenderFlatWaterTiles(float posNorth, float posSouth, float posEast, 
       float tx1 = texEast1 + i * texStepX1;
       float tx2 = texEast2 + i * texStepX2;
 
-      gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1);
-      gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2);
-      glVertex3f(px + posStepX, height, pz);
+      // Original quad winding: (px+step,pz), (px+step,pz+step), (px,pz+step), (px,pz)
+      auto v0 = makeVtx(px + posStepX, height, pz,           tx1 + texStepX1, tz1,               tx2 + texStepX2, tz2);
+      auto v1 = makeVtx(px + posStepX, height, pz + posStepZ, tx1 + texStepX1, tz1 + texStepZ1,   tx2 + texStepX2, tz2 + texStepZ2);
+      auto v2 = makeVtx(px,            height, pz + posStepZ, tx1,             tz1 + texStepZ1,   tx2,             tz2 + texStepZ2);
+      auto v3 = makeVtx(px,            height, pz,            tx1,             tz1,               tx2,             tz2);
 
-      gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1 + texStepX1, tz1 + texStepZ1);
-      gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2 + texStepX2, tz2 + texStepZ2);
-      glVertex3f(px + posStepX, height, pz + posStepZ);
-
-      gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1 + texStepZ1);
-      gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2 + texStepZ2);
-      glVertex3f(px, height, pz + posStepZ);
-
-      gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, tx1, tz1);
-      gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, tx2, tz2);
-      glVertex3f(px, height, pz);
+      // Decompose quad into 2 triangles (v0,v1,v2) (v0,v2,v3)
+      verts.push_back(v0); verts.push_back(v1); verts.push_back(v2);
+      verts.push_back(v0); verts.push_back(v2); verts.push_back(v3);
     }
   }
-  glEnd();
+
+  if (verts.empty())
+    return;
+
+  // Upload to ring buffer and issue a single draw call
+  const UINT vertexCount = static_cast<UINT>(verts.size());
+  const UINT vbSize = vertexCount * sizeof(OpenGLD3D::CustomVertex);
+
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(vbSize, sizeof(float));
+  memcpy(alloc.cpuPtr, verts.data(), vbSize);
+
+  D3D12_VERTEX_BUFFER_VIEW vbView{};
+  vbView.BufferLocation = alloc.gpuAddr;
+  vbView.SizeInBytes = vbSize;
+  vbView.StrideInBytes = sizeof(OpenGLD3D::CustomVertex);
+
+  OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
+  cmdList->IASetVertexBuffers(0, 1, &vbView);
+  cmdList->DrawInstanced(vertexCount, 1, 0, 0);
+  OpenGLD3D::RecordBatchedDraw(vbSize);
 }
 
 void Water::RenderFlatWater()
@@ -588,22 +635,52 @@ void Water::RenderDynamicWater()
   glEnable(GL_FOG);
   glEnable(GL_CULL_FACE);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  // Convert WaterVertex → CustomVertex (positions + colors only, no normals/texcoords)
+  const int count = m_renderVerts.NumUsed();
+  for (int i = 0; i < count; ++i)
+  {
+    const WaterVertex& src = m_renderVerts[i];
+    OpenGLD3D::CustomVertex& dst = m_gpuDynamicVerts[i];
+    dst.x  = src.m_pos.x;
+    dst.y  = src.m_pos.y;
+    dst.z  = src.m_pos.z;
+    dst.nx = 0.0f;
+    dst.ny = 0.0f;
+    dst.nz = 0.0f;
+    // RGBAColour(r,g,b,a) → BGRA diffuse via named union members
+    dst.r8 = src.m_col.r;
+    dst.g8 = src.m_col.g;
+    dst.b8 = src.m_col.b;
+    dst.a8 = src.m_col.a;
+    dst.u  = 0.0f;
+    dst.v  = 0.0f;
+    dst.u2 = 0.0f;
+    dst.v2 = 0.0f;
+  }
 
-  glVertexPointer(3, GL_FLOAT, sizeof(WaterVertex), &m_renderVerts[0].m_pos);
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(WaterVertex), &m_renderVerts[0].m_col);
+  // Upload to ring buffer
+  const UINT vertexCount = static_cast<UINT>(count);
+  const UINT vbSize = vertexCount * sizeof(OpenGLD3D::CustomVertex);
+  auto alloc = Graphics::GetCurrentUploadBuffer().Allocate(vbSize, sizeof(float));
+  memcpy(alloc.cpuPtr, m_gpuDynamicVerts.data(), vbSize);
+
+  D3D12_VERTEX_BUFFER_VIEW vbView{};
+  vbView.BufferLocation = alloc.gpuAddr;
+  vbView.SizeInBytes = vbSize;
+  vbView.StrideInBytes = sizeof(OpenGLD3D::CustomVertex);
+
+  OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+  auto* cmdList = Graphics::Core::Get().GetCommandList();
+  cmdList->IASetVertexBuffers(0, 1, &vbView);
 
   int numStrips = m_strips.Size();
   for (int i = 0; i < numStrips; ++i)
   {
     WaterTriangleStrip* strip = m_strips[i];
-
-    glDrawArrays(GL_TRIANGLE_STRIP, strip->m_startRenderVertIndex, strip->m_numVerts);
+    cmdList->DrawInstanced(strip->m_numVerts, 1, strip->m_startRenderVertIndex, 0);
   }
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  OpenGLD3D::RecordBatchedDraw(vbSize);
 
   glDisable(GL_FOG);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

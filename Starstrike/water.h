@@ -17,6 +17,8 @@
 #include "2d_surface_map.h"
 #include "LegacyVector3.h"
 
+#include "opengl_directx_internals.h"
+
 // ****************************************************************************
 // Class WaterTriangleStrip
 // ****************************************************************************
@@ -41,14 +43,15 @@ class WaterVertex
 // Class Water
 // ****************************************************************************
 
-struct IDirect3DVertexBuffer9;
-
 class Water
 {
   protected:
-    // Render data - referenced directly by OpenGL
+    // Render data
     FastDArray<WaterVertex> m_renderVerts;
     FastDArray<WaterTriangleStrip*> m_strips;
+
+    // Per-frame GPU vertex data (WaterVertex → CustomVertex, uploaded to ring buffer)
+    std::vector<OpenGLD3D::CustomVertex> m_gpuDynamicVerts;
 
     // Extra
     std::vector<float> m_waterDepths; // 1-to-1 mapping with verts. 1.0 is deepest, 0.0 is shallowest

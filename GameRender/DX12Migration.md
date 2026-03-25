@@ -15,7 +15,7 @@ functions on top of D3D12:
 | **Internals** | `opengl_directx_internals.h` (27 lines) | `CustomVertex` struct (pos + normal + diffuse + uv0 + uv1 = 48 bytes), `PrepareDrawState` declaration |
 | **Display lists** | `opengl_directx_dlist.h/.cpp`, `opengl_directx_dlist_dev.h/.cpp` | Records `glBegin/glEnd` into GPU vertex buffer + command list.  **Only used by `sphere_renderer.cpp`** |
 | **Matrix stack** | `opengl_directx_matrix_stack.h/.cpp` | `Push/Pop/Multiply/Load/GetTopXM`.  Used by ShapeStatic, ShapeInstance, and every renderer via `glPushMatrix/glPopMatrix/glMultMatrixf` |
-| **VBO extension** | `ogl_extensions.h`, `ogl_extensions_directx.cpp` | `gglGenBuffersARB/gglBindBufferARB/gglBufferDataARB` → D3D12 vertex buffers.  **Only used by `landscape_renderer.cpp` and `water.cpp`** |
+| **VBO extension** | `ogl_extensions.h`, `ogl_extensions_directx.cpp` | `gglGenBuffersARB/gglBindBufferARB/gglBufferDataARB` → D3D12 vertex buffers (**dead code** — VBO functions never called).  `gglActiveTextureARB/gglMultiTexCoord2fARB` still used by `water.cpp` for multi-texturing. |
 | **Uber shaders** | `Shaders/VertexShader.hlsl`, `Shaders/PixelShader.hlsl`, `Shaders/PerFrameConstants.hlsli` | Fixed-function emulation (8 lights, fog, alpha test, color material, 2 texture units, tex env modes) via `DrawConstants` flags |
 | **D3D12 backend** | `d3d12_backend.h` | `OpenGLTranslationState`: root signature, PSO cache, SRV allocation, sampler management, per-frame listener, default white texture |
 
@@ -131,8 +131,8 @@ Renderer calls gl*()          CPU-side state tracking
 | Phase | Target | GL calls eliminated | Estimated effort | Performance impact |
 |---|---|---|---|---|
 | **0** ✅ | GPU-resident ShapeStatic meshes | ~23 `m_shape->Render()` call sites (each a deep `glBegin/glEnd` tree) | **Large** | **Very High** — eliminates per-frame vertex re-upload for all 3D models |
-| **1** 🔧 | Batched billboard/quad renderer | ~60 `glBegin(GL_QUADS)` for billboards | Medium | **High** — collapses thousands of spirit/darwinian/effect quads into few draw calls |
-| **2** | Landscape & water native VBs | ~3 `glDrawArrays` + VBO setup | Small | Medium — already using VBOs, just remove GL indirection |
+| **1** ✅ | Batched billboard/quad renderer | ~60 `glBegin(GL_QUADS)` for billboards | Medium | **High** — collapses thousands of spirit/darwinian/effect quads into few draw calls |
+| **2** ✅ | Landscape & water native VBs | ~4 `glDrawArrays` + 1 `glBegin(GL_QUADS)` in flat water | Small | Medium — eliminates per-vertex CPU conversion loop in `glDrawArrays`, flat water `glBegin/glEnd` |
 | **3** | 2D/UI rendering (SpriteBatch) | ~80 `glBegin` in UI + HUD + cursors | Medium | Medium — UI is not a hot path but it's a large GL surface |
 | **4** | Particle system & effects | ~20 `glBegin` in `particle_system`, `explosion`, `clouds` | Medium | Medium–High — particles can be batched/instanced |
 | **5** | Remaining renderers & cleanup | ~60 remaining `glBegin` sites | Large | Low — long tail of misc renderers |
@@ -192,9 +192,9 @@ Fragment transforms are computed recursively via the matrix stack.  `DrawConstan
 
 ---
 
-### Phase 1: Batched Billboard/Quad Renderer 🔧 IN PROGRESS
+### Phase 1: Batched Billboard/Quad Renderer ✅ COMPLETED
 
-**Status:** Core infrastructure built and verified.  Highest-impact renderers migrated (Darwinians, Virii, spirits, shadows, building lights/ports).  Remaining ~10 renderers with billboard quads are lower priority and can be migrated incrementally.
+**Status:** Core infrastructure built and verified.  All billboard/quad renderers surveyed and migrated where applicable.  SoulDestroyer spirits, Darwinians, Virii, spirits, shadows, and building lights/ports all batch through `QuadBatcher`.  Remaining GL quad usage in this category is DarwinianRenderer's rare per-entity quads (shadow, glow, GodDish, santa), deferred to Phase 5.
 
 #### What Was Built
 
@@ -235,6 +235,7 @@ Fragment transforms are computed recursively via the matrix stack.  `DrawConstan
 | `GameRender/DefaultBuildingRenderer.cpp` | GameRender | **Modified** — `RenderLights`: GL state set once, all light quads batched (10 per light × N lights), single `Flush()`.  `RenderPorts`: split into shape pass + batched status-light quad pass |
 | `GameRender/ViriiRenderer.cpp` | GameRender | **Modified** — removed `glBegin/glEnd`; worm segments and glow quads emitted via `Emit()` per history entry |
 | `GameRender/DarwinianRenderer.cpp` | GameRender | **Modified** — main sprite quad and dead fragment quads (3 per dead darwinian) use `Emit()`.  Shadow, glow, GodDish shadow, and santa hat remain inline `glBegin/glEnd` with `Flush()` guards |
+| `GameRender/SoulDestroyerRenderer.cpp` | GameRender | **Modified** — `RenderSpirit` inner + outer glow quads use `Emit()`.  `Flush()` after spirit loop in `Render()`, before GL state restore |
 | `Starstrike/location.cpp` | Starstrike | **Modified** — added `#include "QuadBatcher.h"` and `QuadBatcher::Get().Flush()` after spirit rendering loop |
 | `Starstrike/team.cpp` | Starstrike | **Modified** — added `#include "QuadBatcher.h"` and `QuadBatcher::Get().Flush()` after both `RenderVirii` and `RenderDarwinians` entity loops |
 
@@ -262,46 +263,89 @@ Fragment transforms are computed recursively via the matrix stack.  `DrawConstan
 | Virii (100 virii × ~10 segments × 2 quads) | ~100 | **1** | 100× |
 | Shadows (200 entities) | ~200 | **1** | 200× |
 | Building lights (50 buildings × 10 quads) | ~500 | **1** | 500× |
+| SoulDestroyer spirits (1 SD × 20 spirits × 2 quads) | ~40 | **1** | 40× |
 
-#### Remaining Phase 1 Work
+#### Renderer Survey Results
 
-The following renderers still use `glBegin(GL_QUADS)` for billboard-style quads and are candidates for `QuadBatcher` migration.  They are lower frequency than the migrated renderers:
+The following renderers were surveyed for `glBegin(GL_QUADS)` billboard usage.  Most had no quad rendering — their `glBegin` call sites were either shape rendering (Phase 0), shadow rendering (already migrated), lines/debug viz, or `GL_QUAD_STRIP` (different topology):
 
-| Renderer | Project | Quads/frame | Priority |
-|---|---|---|---|
-| `ArmyAntRenderer` | GameRender | Low (few ants) | Low |
-| `CentipedeRenderer` | GameRender | Low | Low |
-| `SporeGeneratorRenderer` | GameRender | Medium | Medium |
-| `TriffidRenderer` | GameRender | Low | Low |
-| `PowerupRenderer` | GameRender | Low | Low |
-| `SoulDestroyer`/`SpiderRenderer` | GameRender | Low | Low |
-| DarwinianRenderer rare quads (shadow, glow, GodDish, santa) | GameRender | Low (conditional) | Deferred to Phase 5 |
-
-These can be migrated incrementally without blocking Phase 2.
+| Renderer | GL usage found | Action taken |
+|---|---|---|
+| `ArmyAntRenderer` | No `glBegin` — only `m_shape->Render()` | ❌ Nothing to do |
+| `CentipedeRenderer` | No `glBegin` — only `shape->Render()` | ❌ Nothing to do |
+| `SpiderRenderer` | No `glBegin` — only `m_shape->Render()` + legs | ❌ Nothing to do |
+| `TriffidEggRenderer` | No `glBegin` — uses ShadowRenderer (already migrated) | ❌ Nothing to do |
+| `TriffidBuildingRenderer` | `GL_LINES`/`GL_LINE_LOOP` only (stem lines, editor debug viz) | ❌ Not quads — leave for Phase 5 |
+| `SporeGeneratorRenderer` | `GL_QUAD_STRIP` tails with normals + `GL_COLOR_MATERIAL` lighting | ⚠️ Wrong topology for QuadBatcher — deferred to Phase 4/5 (strip/ribbon support) |
+| `SoulDestroyerRenderer` | 2 × `GL_QUADS` per spirit (inner + outer glow) | ✅ Migrated to `QuadBatcher::Emit` |
+| DarwinianRenderer rare quads | Shadow, glow, GodDish, santa — different GL states per quad | ⚠️ Deferred to Phase 5 (multi-pass restructure) |
 
 **Verification:** Visual comparison on a stress level.  Confirm `FrameStats::drawCalls` drops by an order of magnitude for spirit/darwinian/virii passes.
 
 ---
 
-### Phase 2: Landscape & Water Native Vertex Buffers
+### Phase 2: Landscape & Water Native Vertex Buffers ✅ COMPLETED
 
-**Problem:** `landscape_renderer.cpp` and `water.cpp` already use VBO extensions (`gglGenBuffersARB/gglBindBufferARB/gglBufferDataARB`), but these go through the GL VBO emulation in `ogl_extensions_directx.cpp` which wraps D3D12 vertex buffers.  They then call `glDrawArrays` which re-assembles vertices through the `CustomVertex` scratch buffer.
+**Status:** Implemented and verified.  Landscape terrain renders from a GPU-resident default-heap vertex buffer (upload once).  Water dynamic strips render from per-frame ring-buffer uploads with pre-allocated conversion buffer.  Flat water tiles render from accumulated quads via ring-buffer upload.
 
-**Solution:** Replace the VBO extension calls with direct `ID3D12Resource` vertex buffers and native draw calls.  These two files are self-contained and use a simple pattern (create VBO once, draw strips repeatedly), making them ideal early migration targets.
+#### Pre-Implementation Discovery
 
-**Approach:**
-1. Landscape: Replace `gglGenBuffersARB` + `gglBufferDataARB` with direct `CreateCommittedResource` + ring-buffer upload.  Replace `glDrawArrays(GL_TRIANGLE_STRIP, ...)` with `cmdList->IASetVertexBuffers` + `cmdList->DrawInstanced`.  Create a `LandscapePSO` (dedicated PSO, may use simplified shader without lighting).
-2. Water: Same pattern.  Water uses alpha blending and may need its own PSO variant.
+The original Phase 2 description assumed landscape and water used VBO extensions (`gglGenBuffersARB` etc.).  **This was incorrect.**  Investigation revealed:
 
-**Impact:** Eliminates the `glDrawArrays` per-vertex CPU loop (1738–1861 in opengl_directx.cpp) for landscape/water.  Also allows retiring the entire VBO extension emulation (`ogl_extensions_directx.cpp`).
+- **Landscape** used client-state vertex arrays (`glVertexPointer/glNormalPointer/glColorPointer/glTexCoordPointer` + `glDrawArrays(GL_TRIANGLE_STRIP)`) — the `glDrawArrays` implementation in `opengl_directx.cpp` performed a per-vertex conversion loop into the `CustomVertex` scratch buffer before issuing a draw.
+- **Water dynamic** used the same client-state array + `glDrawArrays(GL_TRIANGLE_STRIP)` pattern.
+- **Water flat** used `glBegin(GL_QUADS)` with multi-texturing via `gglMultiTexCoord2fARB` (both UV sets per vertex).
+- **VBO extension functions** (`gglGenBuffersARB/gglBindBufferARB/gglBufferDataARB`) are **completely dead code** — never called anywhere in the codebase.  Only multi-texture functions (`gglActiveTextureARB`, `gglMultiTexCoord2fARB`) from `ogl_extensions.h` are actually used.
 
-**Files changed:**
+#### What Was Built
+
+| Component | Description |
+|---|---|
+| **`LandscapeRenderer::UploadToGPU()`** | Converts `LandVertex` → `CustomVertex` once (pos + norm + col + uv, normals stored as-is matching `glDrawArrays` convention — no negation).  Creates a default-heap vertex buffer via ring-buffer upload with `COMMON→COPY_DEST→VERTEX_AND_CONSTANT_BUFFER` barriers.  Called lazily on first `Render()`. |
+| **`LandscapeRenderer` GPU members** | `com_ptr<ID3D12Resource> m_gpuVertexBuffer`, `D3D12_VERTEX_BUFFER_VIEW m_gpuVBView`, `bool m_gpuUploaded`.  Replaces dead `unsigned int m_vertexBuffer`. |
+| **`Water::m_gpuDynamicVerts`** | Pre-allocated `std::vector<CustomVertex>` sized in `BuildTriangleStrips()`.  Avoids per-frame allocation during `RenderDynamicWater()`. |
+| **`Water::RenderFlatWaterTiles()` rewrite** | Accumulates quads into a local `std::vector<CustomVertex>` with both UV sets (`u/v` + `u2/v2` for multi-texturing), decomposes each quad into 2 triangles, uploads to ring buffer, and issues a single `PrepareDrawState(TRIANGLELIST)` + `DrawInstanced`. |
+| **`Water::RenderDynamicWater()` rewrite** | Converts `WaterVertex` → `CustomVertex` per frame into pre-allocated member vector, uploads to ring buffer, and issues `PrepareDrawState(TRIANGLESTRIP)` + `DrawInstanced` per strip. |
+
+#### Files Changed
 
 | File | Project | Action |
 |---|---|---|
-| `Starstrike/landscape_renderer.cpp` | Starstrike | Replace VBO + glDrawArrays with native D3D12 |
-| `Starstrike/water.cpp` | Starstrike | Replace VBO + glDrawArrays with native D3D12 |
-| `NeuronClient/ogl_extensions_directx.cpp` | NeuronClient | Can be deleted after migration |
+| `Starstrike/landscape_renderer.h` | Starstrike | **Modified** — removed dead `unsigned int m_vertexBuffer` and `IDirect3DVertexBuffer9` forward decl; added `com_ptr<ID3D12Resource> m_gpuVertexBuffer`, `D3D12_VERTEX_BUFFER_VIEW m_gpuVBView{}`, `bool m_gpuUploaded = false`, `void UploadToGPU()` |
+| `Starstrike/landscape_renderer.cpp` | Starstrike | **Modified** — added D3D12 includes; added `UploadToGPU()` method (LandVertex→CustomVertex conversion + default-heap VB); replaced `RenderMainSlow()` and `RenderOverlaySlow()` `glDrawArrays` with `PrepareDrawState` + `IASetVertexBuffers` + `DrawInstanced`; added lazy `UploadToGPU()` call in `Render()` |
+| `Starstrike/water.h` | Starstrike | **Modified** — added `#include "opengl_directx_internals.h"`; added `std::vector<OpenGLD3D::CustomVertex> m_gpuDynamicVerts` member; removed `IDirect3DVertexBuffer9` forward decl |
+| `Starstrike/water.cpp` | Starstrike | **Modified** — added D3D12 includes; pre-allocated `m_gpuDynamicVerts` in `BuildTriangleStrips()`; replaced `RenderFlatWaterTiles()` `glBegin/glEnd` with native quad accumulation + single `DrawInstanced`; replaced `RenderDynamicWater()` `glDrawArrays` with `WaterVertex→CustomVertex` conversion + ring-buffer upload + native `DrawInstanced` per strip |
+
+#### What This Keeps from the GL Layer (temporarily)
+
+- `PrepareDrawState()` — still builds PSO key and uploads `DrawConstants` CB per draw
+- `glEnable/glDisable/glBlendFunc/glDepthMask` — callers still use these to configure render state for PSO selection
+- `glBindTexture/glTexParameteri/glTexEnvf` — callers still bind textures via GL API
+- `gglActiveTextureARB/gglMultiTexCoord2fARB` — GL multi-texture state setup retained for flat water (the actual vertex UV data is now written directly to `CustomVertex.u2/v2`)
+- `glMaterialfv/glEnable(GL_LIGHTING)` — material/lighting GL state for landscape PSO selection
+- Editor water rendering (2 inline `glBegin/glEnd` quads) — left as-is (editor-only, low priority)
+
+#### What This Eliminates
+
+- `glDrawArrays` per-vertex CPU conversion loop (lines 1738–1861 in `opengl_directx.cpp`) for landscape and dynamic water — vertices are now in `CustomVertex` format before upload
+- Per-frame landscape vertex upload — data is GPU-resident after first `UploadToGPU()` call
+- `glBegin/glEnd` per-tile for flat water — all tiles accumulated into a single draw call
+- Client-state vertex array setup (`glEnableClientState/glVertexPointer/glNormalPointer/glColorPointer/glTexCoordPointer`) for both landscape and water
+- Per-frame `CustomVertex` scratch buffer usage for landscape (static data now in default heap)
+
+#### Design Notes
+
+1. **Normal convention:** `glDrawArrays` does NOT negate normals (unlike `glNormal3f_impl` which negates for RH→LH conversion).  Landscape and water normals are stored as-is in `CustomVertex`, matching the original `glDrawArrays` behavior.
+
+2. **Flat water multi-texturing:** The original code used `gglMultiTexCoord2fARB(GL_TEXTURE0_ARB, ...)` and `gglMultiTexCoord2fARB(GL_TEXTURE1_ARB, ...)` per vertex.  The native implementation writes both UV sets directly into `CustomVertex.u/v` (texture unit 0) and `CustomVertex.u2/v2` (texture unit 1).  GL texture/sampler state is still set via `glBindTexture`/`gglActiveTextureARB` for `PrepareDrawState` PSO selection.
+
+3. **Dynamic water pre-allocation:** `m_gpuDynamicVerts` is sized once in `BuildTriangleStrips()` and reused every frame.  This avoids per-frame `std::vector` allocation/deallocation.
+
+4. **Editor water:** The editing-mode water rendering (2 `glBegin(GL_QUADS)` calls for a simple flat plane) is left unmigrated.  It runs only when `g_context->m_editing` is true, is not performance-sensitive, and can be cleaned up in Phase 5.
+
+#### VBO Extension Dead Code
+
+The VBO emulation functions in `ogl_extensions_directx.cpp` (`gglGenBuffersARB`, `gglBindBufferARB`, `gglBufferDataARB`, `gglDeleteBuffersARB`, `gglMapBufferARB`, `gglUnmapBufferARB`) are **never called** by any code in the repository.  They can be deleted in Phase 6 along with the rest of the GL emulation layer.  The multi-texture functions (`gglActiveTextureARB`, `gglMultiTexCoord2fARB`) in the same file are still used by water's GL state setup and must be retained until Phase 5/6.
 
 ---
 
@@ -445,9 +489,9 @@ Each new shader pair **shares the same `PerFrameConstants.hlsli` CB layout** so 
 | Step | Phase | Dependencies | Risk | Effort | Status |
 |---|---|---|---|---|---|
 | 1 | **Phase 0** — ShapeMeshCache | None | Medium (recursive transform, vertex format) | Large | ✅ Done |
-| 2 | **Phase 1** — QuadBatcher | None | Low | Medium | 🔧 In progress (core + 5 renderers done) |
-| 3 | **Phase 2** — Landscape/Water | None (parallel with 1) | Low | Small | **Next** |
-| 4 | **Phase 3** — SpriteBatch for UI | None | Low | Medium | |
+| 2 | **Phase 1** — QuadBatcher | None | Low | Medium | ✅ Done |
+| 3 | **Phase 2** — Landscape/Water | None (parallel with 1) | Low | Small | ✅ Done |
+| 4 | **Phase 3** — SpriteBatch for UI | None | Low | Medium | **Next** |
 | 5 | **Phase 4** — ParticleBatcher | Phase 1 (shares batcher pattern) | Low | Medium | |
 | 6 | **Phase 5** — Matrix stack removal + RenderMode PSOs | Phases 0–4 complete | High (touches everything) | Large | |
 | 7 | **Phase 6** — Delete GL layer | All above complete | Low (mechanical) | Small | |
