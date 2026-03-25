@@ -58,7 +58,6 @@
     <ClInclude Include="random.h" />
     <ClInclude Include="render_utils.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="rgb_colour.h" />
     <ClInclude Include="ShapeStatic.h" />
     <ClInclude Include="slice_darray.h" />
     <ClInclude Include="sorting_hash_table.h" />
@@ -265,6 +264,7 @@
     <ClInclude Include="FrameListener.h" />
     <ClInclude Include="UploadRingBuffer.h" />
     <ClInclude Include="ShapeInstance.h" />
+    <ClInclude Include="ShapeMeshCache.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -312,7 +312,6 @@
     <ClCompile Include="random.cpp" />
     <ClCompile Include="render_utils.cpp" />
     <ClCompile Include="resource.cpp" />
-    <ClCompile Include="rgb_colour.cpp" />
     <ClCompile Include="ShapeStatic.cpp" />
     <ClCompile Include="sphere_renderer.cpp" />
     <ClCompile Include="string_utils.cpp" />
@@ -484,6 +483,7 @@
     <ClCompile Include="tree_renderer.cpp" />
     <ClCompile Include="UploadRingBuffer.cpp" />
     <ClCompile Include="ShapeInstance.cpp" />
+    <ClCompile Include="ShapeMeshCache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">

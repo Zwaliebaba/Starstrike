@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ShapeInstance.h"
+#include "ShapeMeshCache.h"
 
 ShapeInstance::ShapeInstance()
   : m_master(nullptr),
@@ -68,12 +69,15 @@ void ShapeInstance::Render(float _predictionTime, const Matrix34& _transform) co
 
 void XM_CALLCONV ShapeInstance::Render(float _predictionTime, XMMATRIX _transform) const
 {
+  // Ensure GPU vertex buffer exists (no-op after first call)
+  ShapeMeshCache::Get().EnsureUploaded(m_master);
+
   glEnable(GL_COLOR_MATERIAL);
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
   mv.Multiply(_transform);
 
-  m_master->m_rootFragment->Render(m_fragmentStates, _predictionTime);
+  m_master->m_rootFragment->RenderNative(m_fragmentStates, _predictionTime);
 
   glDisable(GL_COLOR_MATERIAL);
   mv.Pop();

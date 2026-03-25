@@ -187,6 +187,7 @@
     <ClInclude Include="server.h" />
     <ClInclude Include="servertoclient.h" />
     <ClInclude Include="servertoclientletter.h" />
+    <ClInclude Include="ShapeMeshCache.h" />
     <ClInclude Include="ShapeStatic.h" />
     <ClInclude Include="ShapeInstance.h" />
     <ClInclude Include="slice_darray.h" />
@@ -290,6 +291,7 @@
     <ClCompile Include="server.cpp" />
     <ClCompile Include="servertoclient.cpp" />
     <ClCompile Include="servertoclientletter.cpp" />
+    <ClCompile Include="ShapeMeshCache.cpp" />
     <ClCompile Include="ShapeStatic.cpp" />
     <ClCompile Include="ShapeInstance.cpp" />
     <ClCompile Include="soundsystem.cpp" />

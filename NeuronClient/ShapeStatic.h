@@ -147,6 +147,7 @@ class ShapeFragmentData
     int m_fragmentIndex; // Ordinal in ShapeStatic's flat array
     LList<ShapeFragmentData*> m_childFragments;
     LList<ShapeMarkerData*> m_childMarkers;
+    ShapeStatic* m_ownerShape = nullptr; // Back-pointer set during Load(); used by ShapeMeshCache
 
     ShapeFragmentData(TextReader* _in, const char* _name);
     ShapeFragmentData(const char* _name, const char* _parentName);
@@ -161,6 +162,7 @@ class ShapeFragmentData
     // Render / hit-test (operate on shared data + external per-instance state)
     void Render(const FragmentState* _states, float _predictionTime) const;
     void RenderSlow() const;
+    void RenderNative(const FragmentState* _states, float _predictionTime) const;
 
     ShapeFragmentData* LookupFragment(const char* _name); // Recurses into child fragments
     ShapeMarkerData* LookupMarker(const char* _name); // Recurses into child fragments

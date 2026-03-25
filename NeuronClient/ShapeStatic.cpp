@@ -4,6 +4,8 @@
 #include "ShapeStatic.h"
 #include "text_stream_readers.h"
 #include "resource.h"
+#include "ShapeMeshCache.h"
+#include "opengl_directx_internals.h"
 
 // Per-thread scratch buffer for world-space positions in accurate hit-tests.
 // Grows to the largest fragment encountered and stays allocated for reuse.
@@ -802,6 +804,68 @@ void ShapeFragmentData::RenderSlow() const
 #endif
 }
 
+void ShapeFragmentData::RenderNative(const FragmentState* _states, float _predictionTime) const
+{
+#ifndef EXPORTER_BUILD
+  using namespace DirectX;
+
+  // Look up GPU data for the owning shape
+  DEBUG_ASSERT(m_ownerShape);
+  const ShapeMeshGPU* gpu = ShapeMeshCache::Get().GetGPUData(m_ownerShape);
+  if (!gpu)
+    return; // Fallback: shape not uploaded (should not happen after EnsureUploaded)
+
+  // Compute predicted transform for this fragment (same logic as Render())
+  Neuron::Transform3D predicted;
+  if (_states)
+  {
+    const FragmentState& state = _states[m_fragmentIndex];
+    predicted = state.transform;
+    predicted.RotateAround(XMVectorScale(
+      XMVectorSet(state.angVel.x, state.angVel.y, state.angVel.z, 0.0f), _predictionTime));
+    predicted.Translate(XMVectorScale(
+      XMVectorSet(state.vel.x, state.vel.y, state.vel.z, 0.0f), _predictionTime));
+  }
+  else
+  {
+    predicted = m_baseTransform;
+  }
+
+  bool matrixIsIdentity = predicted.IsIdentity();
+  auto& mv = OpenGLD3D::GetModelViewStack();
+  if (!matrixIsIdentity)
+  {
+    mv.Push();
+    mv.Multiply(predicted);
+  }
+
+  // Draw this fragment's triangles from the GPU buffer
+  if (m_numTriangles > 0 && m_fragmentIndex >= 0
+      && m_fragmentIndex < static_cast<int>(gpu->fragments.size()))
+  {
+    const FragmentGPURange& range = gpu->fragments[m_fragmentIndex];
+    if (range.vertexCount > 0)
+    {
+      // PrepareDrawState handles: CB upload, texture/sampler bind, PSO select,
+      // viewport/scissor set — same as the GL path through issueDrawCall.
+      OpenGLD3D::PrepareDrawState(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+      auto* cmdList = Graphics::Core::Get().GetCommandList();
+      cmdList->IASetVertexBuffers(0, 1, &gpu->vbView);
+      cmdList->DrawInstanced(range.vertexCount, 1, range.vertexStart, 0);
+    }
+  }
+
+  // Recurse into children
+  int numChildren = m_childFragments.Size();
+  for (int i = 0; i < numChildren; ++i)
+    m_childFragments.GetData(i)->RenderNative(_states, _predictionTime);
+
+  if (!matrixIsIdentity)
+    mv.Pop();
+#endif
+}
+
 // *** LookupFragment
 // Recursively look through all child fragments until we find a name match
 ShapeFragmentData* ShapeFragmentData::LookupFragment(const char* _name)
@@ -1099,6 +1163,19 @@ void ShapeStatic::Load(TextReader* _in)
   // Assign fragment indices via depth-first traversal
   m_numFragments = m_rootFragment->AssignIndices(0);
 
+  // Set owner back-pointers on all fragments (used by ShapeMeshCache)
+  struct SetOwner
+  {
+    static void Set(ShapeFragmentData* _frag, ShapeStatic* _owner)
+    {
+      _frag->m_ownerShape = _owner;
+      int numChildren = _frag->m_childFragments.Size();
+      for (int i = 0; i < numChildren; ++i)
+        Set(_frag->m_childFragments.GetData(i), _owner);
+    }
+  };
+  SetOwner::Set(m_rootFragment, this);
+
   // Build rest-pose default states from base transforms
   m_defaultStates = new FragmentState[m_numFragments];
   for (int i = 0; i < m_numFragments; ++i)
@@ -1144,12 +1221,15 @@ void ShapeStatic::Render(float _predictionTime, const Matrix34& _transform) cons
 
 void XM_CALLCONV ShapeStatic::Render(float _predictionTime, XMMATRIX _transform) const
 {
+  // Ensure GPU vertex buffer exists (no-op after first call)
+  ShapeMeshCache::Get().EnsureUploaded(this);
+
   glEnable(GL_COLOR_MATERIAL);
   auto& mv = OpenGLD3D::GetModelViewStack();
   mv.Push();
   mv.Multiply(_transform);
 
-  m_rootFragment->Render(m_defaultStates, _predictionTime);
+  m_rootFragment->RenderNative(m_defaultStates, _predictionTime);
 
   glDisable(GL_COLOR_MATERIAL);
   mv.Pop();
