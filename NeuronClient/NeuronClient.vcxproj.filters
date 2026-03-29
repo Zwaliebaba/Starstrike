@@ -266,6 +266,7 @@
     <ClInclude Include="ShapeInstance.h" />
     <ClInclude Include="ShapeMeshCache.h" />
     <ClInclude Include="QuadBatcher.h" />
+    <ClInclude Include="SpriteBatch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -486,6 +487,7 @@
     <ClCompile Include="ShapeInstance.cpp" />
     <ClCompile Include="ShapeMeshCache.cpp" />
     <ClCompile Include="QuadBatcher.cpp" />
+    <ClCompile Include="SpriteBatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project Files">
@@ -549,6 +551,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\TreeVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SpritePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\SpriteVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
