@@ -45,7 +45,7 @@ bool FeedingTube::Advance()
   return Building::Advance();
 }
 
-LegacyVector3 FeedingTube::GetDishPos(float _predictionTime)
+LegacyVector3 FeedingTube::GetDishPos([[maybe_unused]] float _predictionTime)
 {
   Matrix34 rootMat(m_front, g_upVector, m_pos);
   Matrix34 worldMat = m_shape->GetMarkerWorldMatrix(m_focusMarker, rootMat);
@@ -123,8 +123,6 @@ void FeedingTube::SetBuildingLink(int _buildingId)
   if (b && b->m_type == TypeFeedingTube)
   {
     m_receiverId = _buildingId;
-
-    auto p = static_cast<FeedingTube*>(b);
   }
 }
 

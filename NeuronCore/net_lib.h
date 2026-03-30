@@ -8,10 +8,6 @@
 
 #include "net_lib_win32.h"
 
-#if (!defined MIN)
-#define MIN(a,b) ((a < b) ? a : b)
-#endif
-
 #define MAX_HOSTNAME_LEN   	256
 #define MAX_PACKET_SIZE  	512
 

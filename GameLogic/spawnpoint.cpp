@@ -148,7 +148,6 @@ void SpawnBuilding::TriggerSpirit(SpawnBuildingSpirit* _spirit)
     SpawnBuildingLink* link = m_links[i];
     for (int j = 0; j < link->m_targets.Size(); ++j)
     {
-      int thisLink = link->m_targets[j];
       if (link->m_targets[j] == _spirit->m_targetBuildingId)
       {
         link->m_spirits.PutData(_spirit);
@@ -407,7 +406,9 @@ void SpawnPoint::RecalculateOwnership()
 void SpawnPoint::TriggerSpirit(SpawnBuildingSpirit* _spirit)
 {
   if (m_id.GetTeamId() == 0)
-    int b = 10;
+  {
+    // Debug placeholder removed
+  }
 
   if (m_id.GetUniqueId() == _spirit->m_targetBuildingId)
   {
@@ -576,6 +577,6 @@ void SpawnPopulationLock::Write(FileWriter* _out)
   _out->printf("%-8.2f %-6d", m_searchRadius, m_maxPopulation);
 }
 
-bool SpawnPopulationLock::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool SpawnPopulationLock::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool SpawnPopulationLock::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool SpawnPopulationLock::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }

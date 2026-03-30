@@ -26,7 +26,7 @@ void DefaultBuildingRenderer::Render(const Building& _building, const BuildingRe
     }
 }
 
-void DefaultBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+void DefaultBuildingRenderer::RenderAlphas(const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     RenderLights(_building);
     RenderPorts(_building);

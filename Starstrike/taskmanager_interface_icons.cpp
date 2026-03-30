@@ -65,12 +65,12 @@ TaskManagerInterfaceIcons::TaskManagerInterfaceIcons()
     char iconFilename[256];
     snprintf(iconFilename, sizeof(iconFilename), "icons/icon_%s.bmp", GlobalResearch::GetTypeName(i));
     if (Resource::DoesTextureExist(iconFilename))
-      unsigned int texId = Resource::GetTexture(iconFilename, true, false);
+      Resource::GetTexture(iconFilename, true, false);
 
     char gestureFilename[256];
     snprintf(gestureFilename, sizeof(gestureFilename), "icons/gesture_%s.bmp", GlobalResearch::GetTypeName(i));
     if (Resource::DoesTextureExist(gestureFilename))
-      unsigned int texId = Resource::GetTexture(gestureFilename, true, false);
+      Resource::GetTexture(gestureFilename, true, false);
   }
 
   Resource::GetTexture("textures/interface_grey.bmp", true, false);
@@ -1075,7 +1075,6 @@ void TaskManagerInterfaceIcons::RenderTargetAreas()
   if (task && task->m_type != GlobalResearch::TypeOfficer && task->m_state == Task::StateStarted)
   {
     LList<TaskTargetArea>* targetAreas = g_context->m_taskManager->GetTargetArea(task->m_id);
-    RGBAColour* colour = &g_context->m_location->GetMyTeam()->m_colour;
 
     for (int i = 0; i < targetAreas->Size(); ++i)
     {
@@ -1281,7 +1280,7 @@ void TaskManagerInterfaceIcons::RenderCreateTaskMenu()
     if (g_context->m_globalWorld->m_research->HasResearch(taskType))
     {
       char tooltipId[128];
-      snprintf(tooltipId, sizeof(tooltipId), "newcontrols_create_%s", GlobalResearch::GetTypeName(taskType), i + 1);
+      snprintf(tooltipId, sizeof(tooltipId), "newcontrols_create_%s", GlobalResearch::GetTypeName(taskType));
 
       auto zone = new ScreenZone("NewTask", LANGUAGEPHRASE(tooltipId), x + 5, y - h / 3, w - 10, h, taskType);
       zone->m_scrollZone = 1;
@@ -1430,7 +1429,6 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
   float iconGap = 10;
   float shadowOffset = 0;
   float shadowSize = iconSize + 10;
-  float totalWidth = (numSlots - 1) * (iconSize + iconGap);
 
   float iconAlpha = 0.9f;
 
@@ -1605,9 +1603,9 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
           if (availableWeapons.Size() > 0)
             zone->m_subZones = true;
 
-          for (int i = 0; i < availableWeapons.Size(); ++i)
+          for (int j = 0; j < availableWeapons.Size(); ++j)
           {
-            int weaponType = availableWeapons[i];
+            int weaponType = availableWeapons[j];
             snprintf(bmpFilename, sizeof(bmpFilename), "icons/icon_%s.bmp", Task::GetTaskName(weaponType));
             texId = Resource::GetTexture(bmpFilename);
 
@@ -1643,12 +1641,12 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
             glVertex2f(weaponX - weaponSize / 2, weaponY + weaponSize / 2);
             glEnd();
 
-            char captionId[256];
-            snprintf(captionId, sizeof(captionId), "newcontrols_select_%s", Task::GetTaskName(weaponType));
-            auto zone = new ScreenZone("SelectWeapon", LANGUAGEPHRASE(captionId), weaponX - weaponSize / 2, weaponY - weaponSize / 2,
+            char weaponCaptionId[256];
+            snprintf(weaponCaptionId, sizeof(weaponCaptionId), "newcontrols_select_%s", Task::GetTaskName(weaponType));
+            auto weaponZone = new ScreenZone("SelectWeapon", LANGUAGEPHRASE(weaponCaptionId), weaponX - weaponSize / 2, weaponY - weaponSize / 2,
                                        weaponSize, weaponSize, weaponType);
-            m_newScreenZones.PutData(zone);
-            zone->m_scrollZone = 3;
+            m_newScreenZones.PutData(weaponZone);
+            weaponZone->m_scrollZone = 3;
 
             weaponX += weaponSize;
             weaponX += weaponGap;
@@ -1704,12 +1702,12 @@ void TaskManagerInterfaceIcons::RenderRunningTasks()
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glDisable(GL_TEXTURE_2D);
 
-      char captionId[256];
-      snprintf(captionId, sizeof(captionId), "newcontrols_delete_%s", Task::GetTaskName(task->m_type));
+      char deleteCaptionId[256];
+      snprintf(deleteCaptionId, sizeof(deleteCaptionId), "newcontrols_delete_%s", Task::GetTaskName(task->m_type));
 
-      auto zone = new ScreenZone("DeleteTask", LANGUAGEPHRASE(captionId), deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f,
+      auto deleteZone = new ScreenZone("DeleteTask", LANGUAGEPHRASE(deleteCaptionId), deleteX - deleteSize / 2.0f, deleteY - deleteSize / 2.0f,
                                  deleteSize, deleteSize, task->m_id);
-      m_newScreenZones.PutData(zone);
+      m_newScreenZones.PutData(deleteZone);
     }
 
     iconY += iconSize;
@@ -2226,9 +2224,9 @@ void TaskManagerInterfaceIcons::RenderResearch()
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
       g_gameFont.DrawText2D(iconX + iconSize + 10, iconY + iconSize / 2, 20, "%s", GlobalResearch::GetTypeNameTranslated(i));
 
-      float boxX = 300;
-      float boxY = iconY + iconSize * 0.25f;
-      float boxH = iconSize * 0.4f;
+      float progBoxX = 300;
+      float progBoxY = iconY + iconSize * 0.25f;
+      float progBoxH = iconSize * 0.4f;
       float boxScale = 0.85f;
 
       glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/interface_grey.bmp"));
@@ -2244,10 +2242,10 @@ void TaskManagerInterfaceIcons::RenderResearch()
         float shadowOffset = 2.0f;
         glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
         glBegin(GL_QUADS);
-        glVertex2i(boxX, boxY);
-        glVertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY);
-        glVertex2i(boxX + requiredProgress * boxScale + shadowOffset, boxY + boxH + shadowOffset);
-        glVertex2i(boxX, boxY + boxH + shadowOffset);
+        glVertex2i(progBoxX, progBoxY);
+        glVertex2i(progBoxX + requiredProgress * boxScale + shadowOffset, progBoxY);
+        glVertex2i(progBoxX + requiredProgress * boxScale + shadowOffset, progBoxY + progBoxH + shadowOffset);
+        glVertex2i(progBoxX, progBoxY + progBoxH + shadowOffset);
         glEnd();
 
         if (researchLevel > level)
@@ -2256,13 +2254,13 @@ void TaskManagerInterfaceIcons::RenderResearch()
           glEnable(GL_TEXTURE_2D);
           glBegin(GL_QUADS);
           glTexCoord2i(0, 0);
-          glVertex2i(boxX, boxY);
+          glVertex2i(progBoxX, progBoxY);
           glTexCoord2i(10, 0);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY);
           glTexCoord2i(10, 1);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY + progBoxH);
           glTexCoord2i(0, 1);
-          glVertex2i(boxX, boxY + boxH);
+          glVertex2i(progBoxX, progBoxY + progBoxH);
           glEnd();
           float alpha = 1.0f;
           if (g_context->m_globalWorld->m_research->m_currentResearch == i)
@@ -2271,21 +2269,21 @@ void TaskManagerInterfaceIcons::RenderResearch()
           glBlendFunc(GL_SRC_ALPHA, GL_ONE);
           glBegin(GL_QUADS);
           glTexCoord2i(0, 0);
-          glVertex2i(boxX, boxY);
+          glVertex2i(progBoxX, progBoxY);
           glTexCoord2i(10, 0);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY);
           glTexCoord2i(10, 1);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY + progBoxH);
           glTexCoord2i(0, 1);
-          glVertex2i(boxX, boxY + boxH);
+          glVertex2i(progBoxX, progBoxY + progBoxH);
           glTexCoord2i(0, 0);
-          glVertex2i(boxX, boxY);
+          glVertex2i(progBoxX, progBoxY);
           glTexCoord2i(10, 0);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY);
           glTexCoord2i(10, 1);
-          glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
+          glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY + progBoxH);
           glTexCoord2i(0, 1);
-          glVertex2i(boxX, boxY + boxH);
+          glVertex2i(progBoxX, progBoxY + progBoxH);
           glEnd();
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
           glDisable(GL_TEXTURE_2D);
@@ -2297,13 +2295,13 @@ void TaskManagerInterfaceIcons::RenderResearch()
           glEnable(GL_TEXTURE_2D);
           glBegin(GL_QUADS);
           glTexCoord2i(0, 0);
-          glVertex2i(boxX, boxY);
+          glVertex2i(progBoxX, progBoxY);
           glTexCoord2i(10, 0);
-          glVertex2i(boxX + researchProgress * boxScale, boxY);
+          glVertex2i(progBoxX + researchProgress * boxScale, progBoxY);
           glTexCoord2i(10, 1);
-          glVertex2i(boxX + researchProgress * boxScale, boxY + boxH);
+          glVertex2i(progBoxX + researchProgress * boxScale, progBoxY + progBoxH);
           glTexCoord2i(0, 1);
-          glVertex2i(boxX, boxY + boxH);
+          glVertex2i(progBoxX, progBoxY + progBoxH);
           glEnd();
           if (g_context->m_globalWorld->m_research->m_currentResearch == i)
           {
@@ -2312,13 +2310,13 @@ void TaskManagerInterfaceIcons::RenderResearch()
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             glBegin(GL_QUADS);
             glTexCoord2i(0, 0);
-            glVertex2i(boxX, boxY);
+            glVertex2i(progBoxX, progBoxY);
             glTexCoord2i(10, 0);
-            glVertex2i(boxX + researchProgress * boxScale, boxY);
+            glVertex2i(progBoxX + researchProgress * boxScale, progBoxY);
             glTexCoord2i(10, 1);
-            glVertex2i(boxX + researchProgress * boxScale, boxY + boxH);
+            glVertex2i(progBoxX + researchProgress * boxScale, progBoxY + progBoxH);
             glTexCoord2i(0, 1);
-            glVertex2i(boxX, boxY + boxH);
+            glVertex2i(progBoxX, progBoxY + progBoxH);
             glEnd();
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
           }
@@ -2328,14 +2326,14 @@ void TaskManagerInterfaceIcons::RenderResearch()
 
         glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
         glBegin(GL_LINE_LOOP);
-        glVertex2i(boxX, boxY);
-        glVertex2i(boxX + requiredProgress * boxScale, boxY);
-        glVertex2i(boxX + requiredProgress * boxScale, boxY + boxH);
-        glVertex2i(boxX, boxY + boxH);
+        glVertex2i(progBoxX, progBoxY);
+        glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY);
+        glVertex2i(progBoxX + requiredProgress * boxScale, progBoxY + progBoxH);
+        glVertex2i(progBoxX, progBoxY + progBoxH);
         glEnd();
 
-        boxX += requiredProgress * boxScale;
-        boxX += 3;
+        progBoxX += requiredProgress * boxScale;
+        progBoxX += 3;
       }
 
       float texX = 630;

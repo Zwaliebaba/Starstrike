@@ -48,7 +48,7 @@ Explosion::Explosion(const ShapeFragmentData* _frag, const FragmentState* _state
   Matrix34 totalTransform(localTransform * _transform);
   LegacyVector3 transformedFragCenter = _frag->m_center * totalTransform;
 
-  for (int j = 0; j < _frag->m_numTriangles; ++j)
+  for (unsigned int j = 0; j < _frag->m_numTriangles; ++j)
   {
     if (_fraction < 1.0f && frand(1.0f) > _fraction)
       continue;
@@ -209,7 +209,7 @@ void ExplosionManager::AddExplosion(const ShapeFragmentData* _frag, const Fragme
       : Matrix34(_frag->m_baseTransform);
     Matrix34 totalMatrix(localTransform * _transform);
 
-    for (unsigned int i = 0; i < _frag->m_childFragments.Size(); ++i)
+    for (int i = 0; i < _frag->m_childFragments.Size(); ++i)
     {
       ShapeFragmentData* child = _frag->m_childFragments.GetData(i);
       AddExplosion(child, _states, totalMatrix, true, _fraction);

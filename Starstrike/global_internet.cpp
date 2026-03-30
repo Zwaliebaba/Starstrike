@@ -80,7 +80,6 @@ unsigned short GlobalInternet::GenerateInternet(const LegacyVector3& _pos, unsig
 
 void GlobalInternet::GenerateInternet()
 {
-  double timeStart = GetHighResTime();
 
   m_links.resize(GLOBALINTERNET_MAXLINKS);
   m_nodes.resize(GLOBALINTERNET_MAXNODES);
@@ -266,7 +265,7 @@ void GlobalInternet::RenderPackets()
     GlobalInternetNode* node = &m_nodes[m_bursts[i]];
     node->m_burst -= g_advanceTime;
     if (node->m_burst > 0.0f)
-      TriggerPacket(m_bursts[i], -1);
+      TriggerPacket(m_bursts[i], static_cast<unsigned short>(-1));
     else
     {
       m_bursts.RemoveData(i);

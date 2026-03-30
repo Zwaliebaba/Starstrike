@@ -144,7 +144,7 @@ int	Route::GetIdOfNearestWayPoint(LegacyVector3 const &_pos)
 
 
 // Returns the id of the first waypoint of the nearest edge
-int	Route::GetIdOfNearestEdge(LegacyVector3 const &_pos, float *_dist)
+int	Route::GetIdOfNearestEdge(LegacyVector3 const &_pos, [[maybe_unused]] float *_dist)
 {
 	int idOfNearest = 0;
 	float distToNearest = FLT_MAX;

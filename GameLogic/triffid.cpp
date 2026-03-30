@@ -95,8 +95,8 @@ Matrix34 Triffid::GetHead()
   return result;
 }
 
-bool Triffid::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
-                         LegacyVector3* _norm)
+bool Triffid::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, [[maybe_unused]] LegacyVector3* _pos,
+                         [[maybe_unused]] LegacyVector3* _norm)
 {
   Matrix34 mat = GetHead();
 
@@ -467,8 +467,8 @@ bool TriffidEgg::Advance(Unit* _unit)
   if (m_up.y < 0.3f && m_force < 0.4f)
   {
     m_up = m_up * 0.95f + g_upVector * 0.05f;
-    LegacyVector3 right = m_up ^ m_front;
-    m_front = right ^ m_up;
+    LegacyVector3 selfRight = m_up ^ m_front;
+    m_front = selfRight ^ m_up;
     m_up.Normalise();
     m_front.Normalise();
   }

@@ -481,7 +481,8 @@ void XInputDriver::Advance()
   memset(&m_state, 0, sizeof(ControllerState));
 
   dwResult = XInputGetState(0, &state);
-  if (m_state.isConnected = (ERROR_SUCCESS == dwResult))
+  m_state.isConnected = (ERROR_SUCCESS == dwResult);
+  if (m_state.isConnected)
   {
     correctDeadZones(state);
     scaleInputs(state);
@@ -577,7 +578,7 @@ bool XInputDriver::getInputDescription(const InputSpec& spec, InputDescription& 
 {
   bool controlInRange = (0 <= spec.control_id && spec.control_id < XInputNumControls);
   bool verbOK;
-  inputtype_t type;
+  inputtype_t type = INPUT_TYPE_BOOL;
 
   desc.noun = "control_gamepad_";
   if (controlInRange)

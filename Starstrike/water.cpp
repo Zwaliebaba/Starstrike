@@ -123,7 +123,7 @@ void Water::GenerateLightMap()
 
   constexpr int blurSize = 11;
   constexpr int halfBlurSize = 5;
-  float m[blurSize] = {0.2, 0.3, 0.4, 0.5, 0.8, 1.0, 0.8, 0.5, 0.4, 0.3, 0.2};
+  float m[blurSize] = {0.2f, 0.3f, 0.4f, 0.5f, 0.8f, 1.0f, 0.8f, 0.5f, 0.4f, 0.3f, 0.2f};
   for (int i = 0; i < blurSize; ++i)
     m[i] /= 5.4f;
 
@@ -751,7 +751,6 @@ void Water::Render()
   }
 
   g_context->m_location->SetupFog();
-  g_context->m_renderer->CheckOpenGLState();
 }
 
 void Water::Advance()

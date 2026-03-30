@@ -71,7 +71,7 @@ void TriffidBuildingRenderer::Render(const Building& _building, const BuildingRe
     glDisable(GL_NORMALIZE);
 }
 
-void TriffidBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+void TriffidBuildingRenderer::RenderAlphas(const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     if (!g_context->m_editing)
         return;

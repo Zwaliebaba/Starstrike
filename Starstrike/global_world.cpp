@@ -622,7 +622,7 @@ void ColourShapeFragment(ShapeFragmentData* _frag, const RGBAColour& _colour)
     _frag->m_colours = new RGBAColour [1];
   _frag->m_colours[0] = _colour;
 
-  for (int i = 0; i < _frag->m_numVertices; ++i)
+  for (unsigned int i = 0; i < _frag->m_numVertices; ++i)
   {
     VertexPosCol* vert = &_frag->m_vertices[i];
     vert->m_colId = 0;
@@ -1603,11 +1603,11 @@ void GlobalWorld::LoadGame(const char* _filename)
 
     for (auto missionName : Resource::ListResources("levels\\", filter.c_str(), false))
     {
-        LevelFile levFile(missionName.c_str(), loc->m_mapFilename.c_str());
+        LevelFile missionLevFile(missionName.c_str(), loc->m_mapFilename.c_str());
 
-      for (int b = 0; b < levFile.m_buildings.Size(); ++b)
+      for (int b = 0; b < missionLevFile.m_buildings.Size(); ++b)
       {
-        Building* building = levFile.m_buildings[b];
+        Building* building = missionLevFile.m_buildings[b];
         AddLevelBuildingToGlobalBuildings(building, loc->m_id);
 
         if (building->m_type == Building::TypeAntHill || building->m_type == Building::TypeTriffid || building->m_type ==
@@ -1622,9 +1622,9 @@ void GlobalWorld::LoadGame(const char* _filename)
       }
 
       bool objectivesComplete = true;
-      for (int i = 0; i < levFile.m_primaryObjectives.Size(); ++i)
+      for (int j = 0; j < missionLevFile.m_primaryObjectives.Size(); ++j)
       {
-        GlobalEventCondition* gec = levFile.m_primaryObjectives[i];
+        GlobalEventCondition* gec = missionLevFile.m_primaryObjectives[j];
         if (!gec->Evaluate())
         {
           objectivesComplete = false;

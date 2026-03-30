@@ -33,7 +33,7 @@ Spam::Spam()
 
 void Spam::Initialise(Building* _template) { Building::Initialise(_template); }
 
-void Spam::SetDetail(int _detail)
+void Spam::SetDetail([[maybe_unused]] int _detail)
 {
   if (m_onGround)
   {
@@ -96,7 +96,7 @@ void Spam::SpawnInfection()
     infection->m_vel = vel;
     infection->m_parentId = m_id.GetUniqueId();
     int index = g_context->m_location->m_effects.PutData(infection);
-    infection->m_id.Set(-1, UNIT_EFFECTS, index, -1);
+    infection->m_id.Set(255, UNIT_EFFECTS, index, -1);
     infection->m_id.GenerateUniqueId();
   }
 

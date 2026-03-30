@@ -230,7 +230,7 @@ bool SoundSystem::SoundLibraryMainCallback(unsigned int _channel, signed short* 
 
     int numSamplesWritten = instance->m_cachedSampleHandle->Read(_data, _numSamples);
 
-    if (numSamplesWritten < _numSamples)
+    if (numSamplesWritten < static_cast<int>(_numSamples))
     {
       signed short* loopStart = _data + numSamplesWritten;
       unsigned int numSamplesRemaining = _numSamples - numSamplesWritten;
@@ -299,7 +299,7 @@ bool SoundSystem::SoundLibraryMusicCallback(signed short* _data, unsigned int _n
 
     int numSamplesWritten = instance->m_cachedSampleHandle->Read(_data, _numSamples);
 
-    if (numSamplesWritten < _numSamples)
+    if (numSamplesWritten < static_cast<int>(_numSamples))
     {
       signed short* loopStart = _data + numSamplesWritten;
       unsigned int numSamplesRemaining = _numSamples - numSamplesWritten;

@@ -81,7 +81,7 @@ void ProfiledElement::Advance()
 	m_historyNumSeconds += 1.0;
 	m_historyNumCalls += m_lastNumCalls;
 
-	for (int i = 0; i < m_children.Size(); ++i)
+	for (unsigned int i = 0; i < m_children.Size(); ++i)
 	{
 		if (m_children.ValidIndex(i))
 		{

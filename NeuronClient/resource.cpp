@@ -252,14 +252,14 @@ void Resource::FlushOpenGlState()
 {
 #if 1 // Try to catch crash on shutdown bug
   // Tell OpenGL to delete the display lists
-  for (int i = 0; i < m_displayLists.Size(); ++i)
+  for (unsigned int i = 0; i < m_displayLists.Size(); ++i)
   {
     if (m_displayLists.ValidIndex(i))
       glDeleteLists(m_displayLists[i], 1);
   }
 
   // Tell OpenGL to delete the textures
-  for (int i = 0; i < m_textures.Size(); ++i)
+  for (unsigned int i = 0; i < m_textures.Size(); ++i)
   {
     if (m_textures.ValidIndex(i))
     {

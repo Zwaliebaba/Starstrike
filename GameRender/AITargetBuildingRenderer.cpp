@@ -11,7 +11,7 @@ void AITargetBuildingRenderer::Render(const Building& _building, const BuildingR
         DefaultBuildingRenderer::Render(_building, _ctx);
 }
 
-void AITargetBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+void AITargetBuildingRenderer::RenderAlphas([[maybe_unused]] const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     // Intentionally empty — original AITarget::RenderAlphas was empty.
 }

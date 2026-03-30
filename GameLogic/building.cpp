@@ -113,7 +113,7 @@ void Building::Initialise(Building* _template)
   g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Create"));
 }
 
-void Building::SetDetail(int _detail)
+void Building::SetDetail([[maybe_unused]] int _detail)
 {
   m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 

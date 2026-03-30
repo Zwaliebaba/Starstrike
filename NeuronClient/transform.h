@@ -9,6 +9,8 @@
 class InputTransform {
 
 public:
+  virtual ~InputTransform() = default;
+
 	virtual bool operator()() = 0;
 
 };

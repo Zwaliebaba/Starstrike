@@ -15,7 +15,7 @@ class BuildingRenderer
   public:
     virtual ~BuildingRenderer() = default;
     virtual void Render(const Building& _building, const BuildingRenderContext& _ctx) = 0;
-    virtual void RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx) {}
-    virtual void RenderLights(const Building& _building) {}
-    virtual void RenderPorts(const Building& _building) {}
+    virtual void RenderAlphas([[maybe_unused]] const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx) {}
+    virtual void RenderLights([[maybe_unused]] const Building& _building) {}
+    virtual void RenderPorts([[maybe_unused]] const Building& _building) {}
 };

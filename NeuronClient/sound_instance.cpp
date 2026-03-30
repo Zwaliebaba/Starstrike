@@ -562,7 +562,7 @@ bool SoundInstance::StartPlaying(int _channelIndex)
   UpdateParameter(m_freq);
   g_soundLibrary3d->SetChannelFrequency(m_channelIndex, m_cachedSampleHandle->m_cachedSample->m_freq * m_freq.GetOutput());
 
-  bool done = UpdateChannelVolume();
+  UpdateChannelVolume();
 
   Update3DPosition();
   g_soundLibrary3d->SetChannelPosition(m_channelIndex, m_pos, m_vel);
@@ -626,8 +626,6 @@ bool SoundInstance::Advance()
 
 bool SoundInstance::Update3DPosition()
 {
-  bool updateRequired = false;
-
   //
   // Work out our new position
   // And determine if we need to be updated
@@ -868,8 +866,8 @@ WorldObject* SoundInstance::GetAttachedObject()
       for (int i = 0; i < m_objIds.Size(); ++i)
       {
         WorldObjectId* id = m_objIds[i];
-        WorldObject* obj = g_context->m_location->GetWorldObject(*id);
-        if (!obj)
+        WorldObject* pruneObj = g_context->m_location->GetWorldObject(*id);
+        if (!pruneObj)
         {
           m_objIds.RemoveData(i);
           delete id;
@@ -903,8 +901,8 @@ WorldObject* SoundInstance::GetAttachedObject()
             for (int i = 0; i < m_objIds.Size(); ++i)
             {
               WorldObjectId* id = m_objIds[i];
-              WorldObject* obj = g_context->m_location->GetWorldObject(*id);
-              float distance = (g_context->m_camera->GetPos() - obj->m_pos).MagSquared();
+              WorldObject* nearObj = g_context->m_location->GetWorldObject(*id);
+              float distance = (g_context->m_camera->GetPos() - nearObj->m_pos).MagSquared();
               if (distance < nearest)
               {
                 nearest = distance;

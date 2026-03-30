@@ -61,6 +61,8 @@ protected:
 	void setName( std::string const &name );
 
 public:
+    virtual ~InputDriver() = default;
+
 	// Return STATE_DONE if we managed to parse these tokens, and put the parsed information
 	// into spec. Anything else means we failed.
 	virtual InputParserState parseInputSpecification( InputSpecTokens const &tokens,

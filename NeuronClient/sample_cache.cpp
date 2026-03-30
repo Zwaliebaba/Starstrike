@@ -42,7 +42,7 @@ void CachedSample::Read(signed short *_data, unsigned int _startSample, unsigned
 {
 	if (m_soundStreamDecoder)
 	{
-		int highestSampleRequested = _startSample + _numSamples - 1;
+        unsigned int highestSampleRequested = _startSample + _numSamples - 1;
 		if (highestSampleRequested >= m_amountCached)
 		{
 			int amountToRead = highestSampleRequested - m_amountCached + 1;

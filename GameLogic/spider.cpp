@@ -109,8 +109,6 @@ void Spider::Begin()
 
 void Spider::ChangeHealth(int _amount)
 {
-  bool dead = m_dead;
-
   if (!m_dead && _amount < -1)
   {
     Entity::ChangeHealth(_amount);
@@ -333,7 +331,7 @@ bool Spider::AdvanceToTarget()
   if (toTargetMag < 5.0f)
     return true;
 
-  bool facingTarget = FaceTarget();
+  FaceTarget();
 
   LegacyVector3 toTargetNormalised = toTarget / toTargetMag;
   float dotProd = toTargetNormalised * m_front;

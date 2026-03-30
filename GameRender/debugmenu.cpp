@@ -139,8 +139,6 @@ void DebugMenu::Create()
 
   y += pitch / 2.0f;
 
-  bool modsEnabled = g_prefsManager->GetInt("ModSystemEnabled", 0) != 0;
-
 #ifdef CHEATMENU_ENABLED
   button = new CheatButton();
   button->SetShortProperties("Cheat Menu (F4)", 10, y += pitch, m_w - 20);

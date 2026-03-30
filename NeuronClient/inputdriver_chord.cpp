@@ -105,8 +105,8 @@ bool ChordInputDriver::getInputDescription(const InputSpec& spec, InputDescripti
     for (InputSpecIt i = specs.begin(); i != specs.end(); ++i)
     {
       InputDescription d;
-      const InputSpec& spec = **i;
-      if (g_inputManager->getInputDescription(spec, d))
+      const InputSpec& innerSpec = **i;
+      if (g_inputManager->getInputDescription(innerSpec, d))
       {
         d.translate();
         if (firstPart)

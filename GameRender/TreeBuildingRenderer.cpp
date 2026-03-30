@@ -17,7 +17,7 @@ static int EnsureTreeTexture()
     return s_treeTextureId;
 }
 
-void TreeBuildingRenderer::Render(const Building& _building, const BuildingRenderContext& _ctx)
+void TreeBuildingRenderer::Render([[maybe_unused]] const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     // Trees use alpha-blended rendering only (PerformDepthSort returns true).
     // The opaque pass is a no-op.

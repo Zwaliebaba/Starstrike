@@ -225,7 +225,6 @@ float MineBuilding::RefinerySpeed()
       int mineLocationId = g_context->m_globalWorld->GetLocationId("mine");
       s_refineryPopulation = 0.0f;
 
-      GlobalBuilding* globalRefinery = nullptr;
       for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
       {
         if (g_context->m_globalWorld->m_buildings.ValidIndex(i))

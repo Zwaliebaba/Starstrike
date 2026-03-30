@@ -324,7 +324,7 @@ void ShapeFragmentData::ParsePositionBlock(TextReader* _in, unsigned int _numPos
 {
   auto positions = new LegacyVector3[_numPositions];
 
-  int expectedId = 0;
+  unsigned int expectedId = 0;
   while (expectedId < _numPositions)
   {
     if (_in->ReadLine() == 0)
@@ -333,7 +333,7 @@ void ShapeFragmentData::ParsePositionBlock(TextReader* _in, unsigned int _numPos
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
-      int id = atoi(c);
+      unsigned int id = atoi(c);
       if (id != expectedId || id >= _numPositions)
         return;
 
@@ -362,7 +362,7 @@ void ShapeFragmentData::ParseNormalBlock(TextReader* _in, unsigned int _numNorms
     m_normals = new LegacyVector3[_numNorms];
   m_numNormals = _numNorms;
 
-  int expectedId = 0;
+  unsigned int expectedId = 0;
   while (expectedId < _numNorms)
   {
     if (_in->ReadLine() == 0)
@@ -371,7 +371,7 @@ void ShapeFragmentData::ParseNormalBlock(TextReader* _in, unsigned int _numNorms
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
-      int id = atoi(c);
+      unsigned int id = atoi(c);
       if (id != expectedId || id >= _numNorms)
         DEBUG_ASSERT(0);
 
@@ -397,7 +397,7 @@ void ShapeFragmentData::ParseColourBlock(TextReader* _in, unsigned int _numColou
   m_colours = new RGBAColour[_numColours];
   m_numColours = _numColours;
 
-  int expectedId = 0;
+  unsigned int expectedId = 0;
   while (expectedId < _numColours)
   {
     if (_in->ReadLine() == 0)
@@ -406,7 +406,7 @@ void ShapeFragmentData::ParseColourBlock(TextReader* _in, unsigned int _numColou
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
-      int id = atoi(c);
+      unsigned int id = atoi(c);
       if (id != expectedId || id >= _numColours)
         DEBUG_ASSERT(0);
 
@@ -436,7 +436,7 @@ void ShapeFragmentData::ParseVertexBlock(TextReader* _in, unsigned int _numVerts
   m_vertices = new VertexPosCol[_numVerts];
   m_numVertices = _numVerts;
 
-  int expectedId = 0;
+  unsigned int expectedId = 0;
   while (expectedId < _numVerts)
   {
     if (_in->ReadLine() == 0)
@@ -445,7 +445,7 @@ void ShapeFragmentData::ParseVertexBlock(TextReader* _in, unsigned int _numVerts
     char* c = _in->GetNextToken();
     if (c && isdigit(c[0]))
     {
-      int id = atoi(c);
+      unsigned int id = atoi(c);
       if (id != expectedId || id >= _numVerts)
         DEBUG_ASSERT(0);
 
@@ -494,11 +494,11 @@ void ShapeFragmentData::ParseStripBlock(TextReader* _in)
 
     while (_in->TokenAvailable())
     {
-      char* c = _in->GetNextToken();
-      DEBUG_ASSERT(c[0] == 'v');
+      char* token = _in->GetNextToken();
+      DEBUG_ASSERT(token[0] == 'v');
 
-      c++;
-      int v3 = atoi(c);
+      token++;
+      int v3 = atoi(token);
       DEBUG_ASSERT(v3 < m_numVertices);
 
       if (i >= 2 && v1 != v2 && v2 != v3 && v1 != v3)
@@ -537,7 +537,7 @@ void ShapeFragmentData::ParseStripBlock(TextReader* _in)
 // *** ParseAllStripBlocks
 void ShapeFragmentData::ParseAllStripBlocks(TextReader* _in, unsigned int _numStrips)
 {
-  int expectedId = 0;
+  unsigned int expectedId = 0;
   while (_in->ReadLine())
   {
     char* c = _in->GetNextToken();
@@ -597,7 +597,7 @@ void ShapeFragmentData::GenerateNormals()
   m_normals = new LegacyVector3[m_numNormals];
   int normId = 0;
 
-  for (int j = 0; j < m_numTriangles; ++j)
+  for (unsigned int j = 0; j < m_numTriangles; ++j)
   {
     ShapeTriangle* tri = &m_triangles[j];
     const VertexPosCol& vertA = m_vertices[tri->v1];
@@ -617,7 +617,7 @@ void ShapeFragmentData::GenerateNormals()
 // *** RegisterPositions
 void ShapeFragmentData::RegisterPositions(LegacyVector3* _positions, unsigned int _numPositions)
 {
-  int i;
+  unsigned int i;
 
   delete [] m_positions;
   m_positions = _positions;
@@ -779,7 +779,7 @@ void ShapeFragmentData::RenderSlow() const
   glBegin(GL_TRIANGLES);
 
   int norm = 0;
-  for (int i = 0; i < m_numTriangles; i++)
+  for (unsigned int i = 0; i < m_numTriangles; i++)
   {
     const VertexPosCol* vertA = &m_vertices[m_triangles[i].v1];
     const VertexPosCol* vertB = &m_vertices[m_triangles[i].v2];
@@ -931,7 +931,7 @@ bool ShapeFragmentData::RayHit(const FragmentState* _states, RayPackage* _packag
       positionsInWS[i] = m_positions[i] * totalMatrix;
 
     // Check each triangle in this fragment for intersection
-    for (int j = 0; j < m_numTriangles; ++j)
+    for (unsigned int j = 0; j < m_numTriangles; ++j)
     {
       VertexPosCol* v1 = &m_vertices[m_triangles[j].v1];
       VertexPosCol* v2 = &m_vertices[m_triangles[j].v2];
@@ -977,7 +977,7 @@ bool ShapeFragmentData::SphereHit(const FragmentState* _states, SpherePackage* _
       positionsInWS[i] = m_positions[i] * totalMatrix;
 
     // Check each triangle in this fragment for intersection
-    for (int j = 0; j < m_numTriangles; ++j)
+    for (unsigned int j = 0; j < m_numTriangles; ++j)
     {
       VertexPosCol* v1 = &m_vertices[m_triangles[j].v1];
       VertexPosCol* v2 = &m_vertices[m_triangles[j].v2];

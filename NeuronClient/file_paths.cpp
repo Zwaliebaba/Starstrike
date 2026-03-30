@@ -54,7 +54,7 @@ const string & InputPrefs::GetLocalePrefsPath()
 	if ( path == "" ) {
 		if ( s_localeNames.empty() )
 			readLocaleNames();
-		int localeID = int(GetKeyboardLayout( 0 )) & 0xFFFF;
+        int localeID = static_cast<int>(reinterpret_cast<intptr_t>(GetKeyboardLayout( 0 )) & 0xFFFF);
 		localeIt it = s_localeNames.find( localeID );
 		if ( it != s_localeNames.end() ) defLocale = it->second;
 		string kb = g_prefsManager->GetString( KEYBOARD_LAYOUT.c_str(), defLocale.c_str() );

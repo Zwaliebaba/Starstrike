@@ -10,7 +10,7 @@
 #include "GameApp.h"
 #include "location.h"
 
-void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     // Intentionally skip FuelBuilding::RenderAlphas — the original
     // FuelStation::RenderAlphas prevented the fuel-flow quad from rendering.
@@ -121,8 +121,6 @@ void FuelStationBuildingRenderer::RenderAlphas(const Building& _building, const 
                 pos.x += sinf(g_gameTime + i) * 15;
                 pos.y += sinf(g_gameTime + i) * 15;
                 pos.z += cosf(g_gameTime + i) * 15;
-
-                float blue = 0.5f + fabs(sinf(g_gameTime * i)) * 0.5f;
 
                 glBegin(GL_QUADS);
                 glColor4f(1.0f, 0.4f, 0.2f, 0.4f);

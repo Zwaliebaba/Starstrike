@@ -153,7 +153,7 @@ bool consumeMarker( char const *_baseString, char *_dest, CaptionParserMode &_mo
 }
 
 
-bool consumeIfMarker( char const *_baseString, char *_dest, CaptionParserMode &_mode ) {
+bool consumeIfMarker( char const *_baseString, [[maybe_unused]] char *_dest, CaptionParserMode &_mode ) {
 	TRACE_FUNC( "consumeIfMarker", head( _baseString + _mode.inOffset ) << ", ..." );
 
 	bool done = false;
@@ -224,7 +224,7 @@ bool consumeKeyMarker( char const *_baseString, char *_dest, CaptionParserMode &
 						if( _mode.outOffset + keyLen < SEPULVEDA_MAX_PHRASE_LENGTH - 1 ) {
 							// Write the key name into the caption
 							memcpy(_dest + _mode.outOffset, keyName, keyLen + 1);
-							_mode.outOffset += keyLen;
+									_mode.outOffset += static_cast<int>(keyLen);
 						done = true;
 					}
 				}

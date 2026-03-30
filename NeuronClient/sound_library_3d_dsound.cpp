@@ -349,12 +349,12 @@ void SoundLibrary3dDirectSound::RefreshCapabilities()
   SOUNDASSERT(errCode, "Direct sound couldn't get driver caps");
 }
 
-BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext)
+BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, [[maybe_unused]] LPCTSTR lpszDrvName, [[maybe_unused]] LPVOID lpContext)
 {
   if (lpGUID)
   {
     char thisDriver[512];
-    snprintf(thisDriver, sizeof(thisDriver), "%d : %s\n", DirectSoundData::m_hwNumDevices, lpszDesc);
+    snprintf(thisDriver, sizeof(thisDriver), "%d : %ls\n", DirectSoundData::m_hwNumDevices, lpszDesc);
     strncat(DirectSoundData::m_hwDescription, thisDriver, strlen(thisDriver));
     DirectSoundData::m_hwNumDevices++;
   }
@@ -424,7 +424,7 @@ void SoundLibrary3dDirectSound::SetChannel3DMode(int _channel, int _mode)
     channel->m_3DMode = _mode;
 
     IDirectSound3DBuffer* buffer3d = channel->m_buffer3DInterface;
-    int errCode;
+    int errCode = 0;
 
     switch (_mode)
     {
@@ -474,7 +474,7 @@ void SoundLibrary3dDirectSound::SetChannelFrequency(int _channel, int _frequency
   else
     channel = &m_channels[_channel];
 
-  if (channel->m_freq != _frequency)
+  if (channel->m_freq != static_cast<unsigned int>(_frequency))
   {
     channel->m_freq = _frequency;
 
@@ -688,7 +688,7 @@ void SoundLibrary3dDirectSound::AdvanceChannel(int _channel, int _frameNum)
   else
   {
     channel->UpdateSimulatedPlayCursor(-1);
-    int sizeInBytes = channel->m_numBufferSamples * 2;
+    unsigned int sizeInBytes = channel->m_numBufferSamples * 2;
     playCursor = channel->m_simulatedPlayCursor + sizeInBytes - 1000;
     playCursor %= sizeInBytes;
     long delta = CalcWrappedDelta(channel->m_lastSampleWritten * 2, playCursor, sizeInBytes);
@@ -701,10 +701,10 @@ void SoundLibrary3dDirectSound::AdvanceChannel(int _channel, int _frameNum)
 
   int firstSample = channel->m_lastSampleWritten + 1;
   int playCursorAhead = playCursor / 2;
-  if (playCursor / 2 < channel->m_lastSampleWritten)
+  if (playCursorAhead < channel->m_lastSampleWritten)
     playCursorAhead += channel->m_numBufferSamples;
   int numSamples = playCursorAhead - firstSample - 1;
-  if (firstSample >= channel->m_numBufferSamples)
+  if (firstSample >= static_cast<int>(channel->m_numBufferSamples))
     firstSample -= channel->m_numBufferSamples;
 
   // Populate our buffer
@@ -794,10 +794,10 @@ void SoundLibrary3dDirectSound::ResetChannel(int _channel)
 
   int firstSample = writeCursor / 2;
   int playCursorAhead = playCursor / 2;
-  if (playCursor / 2 < firstSample)
+  if (playCursorAhead < firstSample)
     playCursorAhead += channel->m_numBufferSamples;
   int numSamples = playCursorAhead - firstSample - 1;
-  if (firstSample >= channel->m_numBufferSamples)
+  if (firstSample >= static_cast<int>(channel->m_numBufferSamples))
     firstSample -= channel->m_numBufferSamples;
 
   //

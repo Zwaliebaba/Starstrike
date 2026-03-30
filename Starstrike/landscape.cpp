@@ -202,7 +202,7 @@ void LandscapeTile::GenerateSquareMidpoint(int _x, int _z, int _halfSize)
 }
 
 // *** GenerateMidpoints
-void LandscapeTile::GenerateMidpoints(int _x1, int _z1, int _x2, int _z2)
+void LandscapeTile::GenerateMidpoints(int _x1, int _z1, int _x2, [[maybe_unused]] int _z2)
 {
   int halfSize = (_x2 - _x1) >> 1;
   int midX = _x1 + halfSize;
@@ -308,14 +308,10 @@ void Landscape::FlattenArea(const LandscapeFlattenArea* _area)
 void Landscape::MergeTileIntoLandscape(const LandscapeTile* _tile)
 {
   unsigned short posX = _tile->m_posX / m_heightMap->m_cellSizeX + 0.5f;
-  int posY = _tile->m_posY;
   unsigned short posZ = _tile->m_posZ / m_heightMap->m_cellSizeY + 0.5f;
 
   // Calculate num cells that this tile will occupy in the main landscape
   int numCells = static_cast<float>(_tile->m_size) / m_heightMap->m_cellSizeX;
-
-  // Calculate how much to increment in "tile space" for one unit in "main landscape space"
-  float factor = static_cast<float>(_tile->m_heightMap->GetNumColumns() - 1) / static_cast<float>(numCells - 1);
 
   float heightRange = _tile->m_heightMap->GetHighestValue() - _tile->m_outsideHeight;
   heightRange += 0.001f; // Prevent divide by zero below
@@ -391,7 +387,6 @@ void Landscape::GenerateNormals()
 
   for (unsigned short z = 0; z < m_heightMap->GetNumRows(); ++z)
   {
-    int zTimesNumCells = z * m_heightMap->GetNumColumns();
     for (unsigned short x = 0; x < m_heightMap->GetNumColumns(); ++x)
     {
       float heightN = m_heightMap->GetData(x, z - 1);
@@ -574,9 +569,9 @@ bool Landscape::RayHit(const LegacyVector3& _rayStart, const LegacyVector3& _ray
       bool intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
       if (!intersects)
       {
-        Vector2 segStart(0.0f, 0.0f);
-        Vector2 segEnd(0.0f, GetWorldSizeZ());
-        intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
+        Vector2 segStart2(0.0f, 0.0f);
+        Vector2 segEnd2(0.0f, GetWorldSizeZ());
+        intersects = SegRayIntersection2D(segStart2, segEnd2, _rayStart, rayDirNormalised, &segIntersectResult);
         if (!intersects)
           return false;
       }
@@ -590,9 +585,9 @@ bool Landscape::RayHit(const LegacyVector3& _rayStart, const LegacyVector3& _ray
       bool intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
       if (!intersects)
       {
-        Vector2 segStart(0.0f, 0.0f);
-        Vector2 segEnd(0.0f, GetWorldSizeZ());
-        intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
+        Vector2 segStart2(0.0f, 0.0f);
+        Vector2 segEnd2(0.0f, GetWorldSizeZ());
+        intersects = SegRayIntersection2D(segStart2, segEnd2, _rayStart, rayDirNormalised, &segIntersectResult);
         if (!intersects)
           return false;
       }
@@ -609,9 +604,9 @@ bool Landscape::RayHit(const LegacyVector3& _rayStart, const LegacyVector3& _ray
       bool intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
       if (!intersects)
       {
-        Vector2 segStart(GetWorldSizeX(), 0.0f);
-        Vector2 segEnd(GetWorldSizeX(), GetWorldSizeZ());
-        intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
+        Vector2 segStart2(GetWorldSizeX(), 0.0f);
+        Vector2 segEnd2(GetWorldSizeX(), GetWorldSizeZ());
+        intersects = SegRayIntersection2D(segStart2, segEnd2, _rayStart, rayDirNormalised, &segIntersectResult);
         if (!intersects)
           return false;
       }
@@ -625,9 +620,9 @@ bool Landscape::RayHit(const LegacyVector3& _rayStart, const LegacyVector3& _ray
       bool intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
       if (!intersects)
       {
-        Vector2 segStart(GetWorldSizeX(), 0.0f);
-        Vector2 segEnd(GetWorldSizeX(), GetWorldSizeZ());
-        intersects = SegRayIntersection2D(segStart, segEnd, _rayStart, rayDirNormalised, &segIntersectResult);
+        Vector2 segStart2(GetWorldSizeX(), 0.0f);
+        Vector2 segEnd2(GetWorldSizeX(), GetWorldSizeZ());
+        intersects = SegRayIntersection2D(segStart2, segEnd2, _rayStart, rayDirNormalised, &segIntersectResult);
         if (!intersects)
           return false;
       }

@@ -123,9 +123,9 @@ bool ScriptTrigger::Advance()
   return Building::Advance();
 }
 
-bool ScriptTrigger::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool ScriptTrigger::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool ScriptTrigger::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool ScriptTrigger::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }
 
 bool ScriptTrigger::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                                LegacyVector3* _norm)

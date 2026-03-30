@@ -87,9 +87,9 @@ void Camera::AdvanceDebugMode()
     m_up = mat * m_up;
     m_front = mat * m_front;
 
-    LegacyVector3 right = GetRight();
+    LegacyVector3 rotRight = GetRight();
     mat.SetToIdentity();
-    mat.FastRotateAround(right, static_cast<float>(my) * -0.005f);
+    mat.FastRotateAround(rotRight, static_cast<float>(my) * -0.005f);
     m_up = mat * m_up;
     m_front = mat * m_front;
   }
@@ -184,8 +184,6 @@ void Camera::AdvanceSphereWorldMode()
   LegacyVector3 idealPos = focusPos - m_front * 30000;
   if (idealPos.Mag() > 35000.0f)
     idealPos.SetLength(35000.0f);
-  LegacyVector3 toIdealPos = idealPos - m_pos;
-  float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
   // Set up viewing matrices
@@ -227,12 +225,9 @@ void Camera::AdvanceSphereWorldMode()
 
 void Camera::AdvanceSphereWorldScriptedMode()
 {
-  int b = 10;
-
   m_height = 50.0f;
 
   const int screenH = g_context->m_renderer->ScreenH();
-  const int screenW = g_context->m_renderer->ScreenW();
 
   auto focusPos = LegacyVector3(0, m_height * -400, 0);
   focusPos.x += sinf(g_gameTime * 0.5f) * 4000.0f;
@@ -273,8 +268,6 @@ void Camera::AdvanceSphereWorldScriptedMode()
   LegacyVector3 idealPos = focusPos - m_front * 30000;
   if (idealPos.Mag() > 35000.0f)
     idealPos.SetLength(35000.0f);
-  LegacyVector3 toIdealPos = idealPos - m_pos;
-  float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
   mv.Pop();
@@ -341,7 +334,7 @@ void Camera::AdvanceSphereWorldIntroMode()
 
     m_pos.Set(-965852, 1720000, 2600000);
     m_front.Set(-1, 0, 0);
-    m_up.Set(0.15, 0.93, 0.31);
+    m_up.Set(0.15f, 0.93f, 0.31f);
     m_front.Normalise();
     m_up.Normalise();
 
@@ -411,7 +404,6 @@ void Camera::AdvanceSphereWorldOutroMode()
     targetPos.Set(-965852, 1720000, 2600000);
 
   LegacyVector3 targetFront = (targetPos - m_pos) * -1.0f;
-  float distance = targetFront.Mag();
 
   float forwardSpeed = sqrtf(m_pos.Mag()) * 4;
   forwardSpeed = std::max(forwardSpeed, 1000.0f);
@@ -544,7 +536,6 @@ void Camera::AdvanceFreeMovementMode()
 
   int screenW = g_context->m_renderer->ScreenW();
   int screenH = g_context->m_renderer->ScreenH();
-  InputManager* im = g_inputManager;
 
   // Set up viewing matrices
   auto& mv = OpenGLD3D::GetModelViewStack();
@@ -1004,10 +995,6 @@ bool Camera::AdvanceRopeModel(LegacyVector3& cameraTarget)
   }
 
   // Distance to stay outside of
-
-  float cameraHeight = m_pos.y - m_predictedEntityPos.y;
-
-  // outsideD should be dependent on the camera height
   // (oustideD = h / tan theta, where theta is the angle of elevation of the camera from the entity's point of view)
   // Important that outsideD < d;
 
@@ -1288,8 +1275,6 @@ void Camera::AdvanceRadarAimMode()
   horiCamFront.y = 0.0f;
   horiCamFront.Normalise();
   idealPos -= horiCamFront * (0.0f + m_height * 1.5f);
-  LegacyVector3 toIdealPos = idealPos - m_pos;
-  float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
   // Set up viewing matrices
@@ -1337,7 +1322,6 @@ void Camera::AdvanceTurretAimMode()
 
   LegacyVector3 groundPos = m_targetPos;
   groundPos.y += 20.0f;
-  float minY = g_context->m_location->m_landscape.m_heightMap->GetValue(groundPos.x, groundPos.z);
 
   groundPos -= m_front * m_height;
   //groundPos.y = max( groundPos.y, minY );
@@ -1385,8 +1369,6 @@ void Camera::AdvanceTurretAimMode()
   horiCamFront.y = 0.0f;
   horiCamFront.Normalise();
   idealPos -= horiCamFront * (0.0f + m_height * 0.4f);
-  LegacyVector3 toIdealPos = idealPos - m_pos;
-  float distToIdealPos = toIdealPos.Mag();
   m_pos = idealPos * factor1 + m_pos * factor2;
 
   // Set up viewing matrices
@@ -1456,8 +1438,7 @@ void Camera::AdvanceFirstPersonMode()
   LegacyVector3 accelRight = GetRight();
   accelRight.y = 0.0f;
   accelRight.Normalise();
-  float moveRate = 100.0f;
-  //    if (g_controlBindings->CameraLeft())		m_vel += accelRight * g_advanceTime * moveRate;
+  //    if (g_controlBindings->CameraLeft())
   //	if (g_controlBindings->CameraRight())		m_vel -= accelRight * g_advanceTime * moveRate;
   //	if (g_controlBindings->CameraForwards())	m_vel += accelForward * g_advanceTime * moveRate * 2.0f;
   //	if (g_controlBindings->CameraBackwards())	m_vel -= accelForward * g_advanceTime * moveRate;

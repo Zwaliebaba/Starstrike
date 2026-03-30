@@ -304,7 +304,7 @@ void PrefsManager::Save()
   // write out all the new prefs items because they didn't exist in m_fileText.
 
   // First clear the "has been written" flags on all the items
-  for (int i = 0; i < m_items.Size(); ++i)
+  for (unsigned int i = 0; i < m_items.Size(); ++i)
   {
     if (m_items.ValidIndex(i))
       m_items[i]->m_hasBeenWritten = false;
@@ -353,7 +353,7 @@ void PrefsManager::Save()
   }
 
   // Finally output any items that haven't already been written
-  for (int i = 0; i < m_items.Size(); ++i)
+  for (unsigned int i = 0; i < m_items.Size(); ++i)
   {
     if (m_items.ValidIndex(i))
     {

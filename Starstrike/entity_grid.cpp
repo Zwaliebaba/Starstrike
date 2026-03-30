@@ -146,7 +146,7 @@ bool EntityGridCell::RemoveObjectId(WorldObjectId _objectId)
 //  Class EntityGrid
 // ****************************************************************************
 
-void LogEntityGridError(WorldObjectId _id, const LegacyVector3& _pos, int _error)
+void LogEntityGridError([[maybe_unused]] WorldObjectId _id, [[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] int _error)
 {
 #ifdef DEBUG_ENTITY_GRID
   for (int i = 0; i < s_entityGridErrors.Size(); ++i)
@@ -473,8 +473,6 @@ int EntityGrid::GetNumNeighbours(float _worldX, float _worldZ, float _range, boo
   rightMostCell = std::min(m_numCellsX - 1, rightMostCell);
   upMostCell = std::max(0, upMostCell);
   downMostCell = std::min(m_numCellsZ - 1, downMostCell);
-
-  float rangeSqrd = _range * _range;
 
   int numFoundSoFar = 0;
 

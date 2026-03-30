@@ -215,7 +215,7 @@ void Clouds::RenderSky()
   glFogf(GL_FOG_START, 2000.0f);
   glFogf(GL_FOG_END, 4000.0f);
   glEnable(GL_FOG);
-  glColor4f(0.5, 0.5, 1.0, 0.3);
+  glColor4f(0.5f, 0.5f, 1.0f, 0.3f);
 
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, Resource::GetTexture("textures/laser.bmp"));

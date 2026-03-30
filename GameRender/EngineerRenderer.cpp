@@ -50,7 +50,7 @@ void EngineerRenderer::RenderShape(const Engineer& _engineer, float _predictionT
     glEnable(GL_CULL_FACE);
 }
 
-void EngineerRenderer::RenderLaser(const Engineer& _engineer, float _predictionTime)
+void EngineerRenderer::RenderLaser(const Engineer& _engineer, [[maybe_unused]] float _predictionTime)
 {
     LegacyVector3 fromPos = _engineer.m_pos;
     LegacyVector3 toPos;

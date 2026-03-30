@@ -138,7 +138,7 @@ void StartSequence::Render2D()
     {
       char theString[256];
       snprintf(theString, sizeof(theString), "%s", caption->m_caption);
-      int stringLength = strlen(theString);
+      int stringLength = static_cast<int>(strlen(theString));
       int maxTimeLength = (timeNow - caption->m_startTime) * 20;
       if (maxTimeLength < stringLength)
         theString[maxTimeLength] = '\x0';
@@ -146,7 +146,7 @@ void StartSequence::Render2D()
       glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
       g_gameFont.DrawText2D(caption->m_x, caption->m_y, caption->m_size, theString);
 
-      int finishedLen = strlen(theString);
+      int finishedLen = static_cast<int>(strlen(theString));
       int texW = g_gameFont.GetTextWidth(finishedLen, caption->m_size);
       cursorPos.Set(caption->m_x + texW, caption->m_y - 7.25f);
       cursorFlash = maxTimeLength > stringLength;

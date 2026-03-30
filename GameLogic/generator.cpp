@@ -236,7 +236,6 @@ bool PylonStart::Advance()
   bool generatorOnline = false;
 
   int generatorLocationId = g_context->m_globalWorld->GetLocationId("generator");
-  GlobalBuilding* globalRefinery = nullptr;
   for (int i = 0; i < g_context->m_globalWorld->m_buildings.Size(); ++i)
   {
     if (g_context->m_globalWorld->m_buildings.ValidIndex(i))
@@ -290,7 +289,7 @@ PylonEnd::PylonEnd()
   SetShape(Resource::GetShapeStatic("pylon.shp"));
 };
 
-void PylonEnd::TriggerSurge(float _initValue)
+void PylonEnd::TriggerSurge([[maybe_unused]] float _initValue)
 {
   Building* building = g_context->m_location->GetBuilding(m_powerLink);
 

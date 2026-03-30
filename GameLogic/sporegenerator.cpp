@@ -158,7 +158,6 @@ bool SporeGenerator::AdvancePanic()
 
 bool SporeGenerator::AdvanceToTargetPosition()
 {
-  float heightAboveGround = m_pos.y - g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
   LegacyVector3 toTarget = m_pos - m_targetPos;
   float distanceToTarget = toTarget.Mag();
 
@@ -225,7 +224,7 @@ bool SporeGenerator::AdvanceIdle()
       return false;
   }
 
-  bool arrived = AdvanceToTargetPosition();
+  AdvanceToTargetPosition();
 
   return false;
 }

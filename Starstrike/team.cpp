@@ -148,7 +148,7 @@ Unit* Team::GetMyUnit()
 Entity* Team::RayHitEntity(const LegacyVector3& _rayStart, const LegacyVector3& _rayEnd)
 {
   // Hit against Units
-  for (unsigned int i = 0; i < m_units.Size(); ++i)
+  for (int i = 0; i < m_units.Size(); ++i)
   {
     if (m_units.ValidIndex(i))
     {
@@ -159,7 +159,7 @@ Entity* Team::RayHitEntity(const LegacyVector3& _rayStart, const LegacyVector3& 
   }
 
   // Hit against Others
-  for (unsigned int i = 0; i < m_others.Size(); ++i)
+  for (int i = 0; i < m_others.Size(); ++i)
   {
     if (m_others.ValidIndex(i))
     {
@@ -541,7 +541,7 @@ void Team::RenderDarwinians(float _predictionTime)
   QuadBatcher::Get().Flush();
 
   glDisable(GL_ALPHA_TEST);
-  glAlphaFunc(GL_GREATER, 0.01);
+  glAlphaFunc(GL_GREATER, 0.01f);
   glDisable(GL_TEXTURE_2D);
   glDisable(GL_BLEND);
   glEnable(GL_CULL_FACE);

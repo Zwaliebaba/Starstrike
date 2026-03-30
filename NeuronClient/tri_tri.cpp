@@ -54,13 +54,13 @@
 #define SET(dest,src) dest[0]=src[0]; dest[1]=src[1]; dest[2]=src[2];
 
 /* sort so that a<=b */
-#define SORT(a,b)       \
-             if(a>b)    \
-             {          \
-               float c; \
-               c=a;     \
-               a=b;     \
-               b=c;     \
+#define SORT(a,b)            \
+             if(a>b)         \
+             {               \
+               float _tmp_c; \
+               _tmp_c=a;     \
+               a=b;          \
+               b=_tmp_c;     \
              }
 
 #define ISECT(VV0,VV1,VV2,D0,D1,D2,isect0,isect1) \

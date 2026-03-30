@@ -276,7 +276,7 @@ int LaserFence::GetBuildingLink() { return m_nextLaserFenceId; }
 
 void LaserFence::SetBuildingLink(int _buildingId) { m_nextLaserFenceId = _buildingId; }
 
-void LaserFence::Electrocute(const LegacyVector3& _pos) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Electrocute")); }
+void LaserFence::Electrocute([[maybe_unused]] const LegacyVector3& _pos) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Electrocute")); }
 
 bool LaserFence::DoesSphereHit(const LegacyVector3& _pos, float _radius)
 {

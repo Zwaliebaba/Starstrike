@@ -4,7 +4,7 @@
 NetUdpPacket::NetUdpPacket(int sockfd, NetIpAddress* clientAddress, char* buf, int len)
   : m_sockfd(sockfd)
 {
-  m_length = MIN(len, MAX_PACKET_SIZE);
+  m_length = std::min(len, MAX_PACKET_SIZE);
   memcpy(&m_clientAddress, clientAddress, sizeof(NetIpAddress));
   memcpy(m_data, buf, m_length * sizeof(char));
 }

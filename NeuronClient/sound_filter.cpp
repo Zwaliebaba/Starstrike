@@ -123,7 +123,7 @@ void DspBitCrusher::Process( signed short *_data, unsigned int _numSamples)
     float valueRange = powf(2, m_bitRate);
     float stepSize = 65536.0 / valueRange;
 
-    for( int i = 0; i < _numSamples; ++i )
+    for( unsigned int i = 0; i < _numSamples; ++i )
     {
         float sample = (float) _data[i];
         int numSteps = sample / stepSize;

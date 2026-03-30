@@ -73,9 +73,9 @@ bool SafeArea::Advance()
   return false;
 }
 
-bool SafeArea::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool SafeArea::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool SafeArea::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool SafeArea::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }
 
 bool SafeArea::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
                           LegacyVector3* _norm)

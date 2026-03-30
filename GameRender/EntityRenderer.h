@@ -16,5 +16,5 @@ class EntityRenderer
   public:
     virtual ~EntityRenderer() = default;
     virtual void Render(const Entity& _entity, const EntityRenderContext& _ctx) = 0;
-    virtual void RenderAlphas(const Entity& _entity, const EntityRenderContext& _ctx) {}
+    virtual void RenderAlphas([[maybe_unused]] const Entity& _entity, [[maybe_unused]] const EntityRenderContext& _ctx) {}
 };

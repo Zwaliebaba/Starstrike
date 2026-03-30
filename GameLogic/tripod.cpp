@@ -473,7 +473,7 @@ void Tripod::AdvancePostAttack()
   m_front.Normalise();
 }
 
-bool Tripod::Advance(Unit* _unit)
+bool Tripod::Advance([[maybe_unused]] Unit* _unit)
 {
   //
   // Advance current mode

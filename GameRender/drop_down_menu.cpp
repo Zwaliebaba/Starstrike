@@ -348,10 +348,9 @@ void DropDownMenuOption::Render( int realX, int realY, bool highlighted, bool cl
     DarwiniaWindow *window = (DarwiniaWindow *)EclGetWindow( m_parentWindowName );
     if( window )
     {
-        EclButton *button = window->GetButton( m_parentMenuName );
-        if( button )
-        {
-            DropDownMenu *menu = (DropDownMenu *) button;
+		EclButton *button = window->GetButton( m_parentMenuName );
+		if( button )
+		{
 			if( window->m_buttonOrder[window->m_currentButton] == this )
             {
                 BorderlessButton::Render( realX, realY, highlighted, true );

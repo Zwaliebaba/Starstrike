@@ -123,7 +123,7 @@ int BinaryFileReader::ReadS32()
 
 unsigned int BinaryFileReader::ReadBytes(unsigned int _count, unsigned char *_buffer)
 {
-	int bytesRead = fread(_buffer, 1, _count, m_file);
+	unsigned int bytesRead = static_cast<unsigned int>(fread(_buffer, 1, _count, m_file));
 	if (bytesRead < _count)
 	{
 		m_eof = true;

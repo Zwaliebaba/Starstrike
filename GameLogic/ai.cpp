@@ -19,7 +19,7 @@ AI::AI()
   : Entity(),
     m_timer(0.0f) { SetType(TypeAI); }
 
-void AI::ChangeHealth(int _amount) {}
+void AI::ChangeHealth([[maybe_unused]] int _amount) {}
 
 void AI::Begin()
 {

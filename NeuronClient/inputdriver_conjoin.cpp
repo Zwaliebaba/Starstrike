@@ -19,7 +19,7 @@ InputParserState ConjoinInputDriver::parseInputSpecification(const InputSpecToke
 
   spec.type = INPUT_TYPE_BOOL;
 
-  for (int i = 0; i <= tokens.length(); ++i)
+  for (unsigned int i = 0; i <= tokens.length(); ++i)
   {
     if (i < tokens.length() && tokens[i] != "&&")
       s += " " + tokens[i];
@@ -105,15 +105,15 @@ bool ConjoinInputDriver::getInputDescription(const InputSpec& spec, InputDescrip
     for (InputSpecIt i = specs.begin(); i != specs.end(); ++i)
     {
       InputDescription d;
-      const InputSpec& spec = **i;
-      if (g_inputManager->getInputDescription(spec, d))
+      const InputSpec& innerSpec = **i;
+      if (g_inputManager->getInputDescription(innerSpec, d))
       {
-        if (!descSet || spec.type >= curr_type)
+        if (!descSet || innerSpec.type >= curr_type)
         {
           // This is our actual return value
           desc.noun = d.noun;
           desc.verb = d.verb;
-          curr_type = spec.type;
+          curr_type = innerSpec.type;
           descSet = true;
         }
       }

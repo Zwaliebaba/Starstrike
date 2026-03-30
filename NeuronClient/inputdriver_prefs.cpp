@@ -27,7 +27,7 @@ InputParserState PrefsInputDriver::parseInputSpecification( InputSpecTokens cons
 		                                                    InputSpec &spec )
 {
 	InputParserState state = STATE_WANT_DRIVER;
-	int idx = 0;
+    unsigned idx = 0;
 	if ( ( idx >= tokens.length() ) ||
 	     ( tokens[idx++] != "pref" ) ) return state;
 

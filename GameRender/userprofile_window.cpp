@@ -46,7 +46,7 @@ void UserProfileWindow::Create()
   char profileDir[256];
   snprintf(profileDir, sizeof(profileDir), "%susers/*.*", g_context->GetProfileDirectory());
   auto profileList = ListSubDirectoryNames(profileDir);
-  int numProfiles = profileList.size();
+  int numProfiles = static_cast<int>(profileList.size());
 
   int windowH = 150 + numProfiles * 30;
   SetMenuSize(300, windowH);

@@ -492,7 +492,7 @@ const char* EscapeRocket::GetObjectiveCounter()
   return buffer;
 }
 
-bool EscapeRocket::BoardRocket(WorldObjectId _id)
+bool EscapeRocket::BoardRocket([[maybe_unused]] WorldObjectId _id)
 {
   if (m_state == StateLoading)
   {

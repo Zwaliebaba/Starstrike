@@ -19,8 +19,8 @@ Triangle::Triangle( LegacyVector3 const &c1, LegacyVector3 const &c2, LegacyVect
 
 Sphere::Sphere()
 {
-	float const x = 0.5257311121;
-	float const z = 0.85065080835;
+   float const x = 0.5257311121f;
+	float const z = 0.85065080835f;
 
 	LegacyVector3 c[12];
 	c[0] = LegacyVector3(-x, 0, z);

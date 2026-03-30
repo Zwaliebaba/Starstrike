@@ -196,10 +196,8 @@ WorldObjectId Task::FindDarwinian(const LegacyVector3& _pos)
 
 void Task::TargetOfficer(const LegacyVector3& _pos)
 {
-  int teamId = g_context->m_globalWorld->m_myTeamId;
-
   //
-  // We will not upgrade people if we're controlling something right now
+  // We will not upgrade people
 
   Team* myTeam = g_context->m_location->GetMyTeam();
   if (myTeam->m_currentUnitId != -1 || myTeam->m_currentEntityId != -1 || myTeam->m_currentBuildingId != -1)
@@ -325,8 +323,7 @@ void Task::Stop()
           if (unit->m_entities.ValidIndex(i))
           {
             Entity* entity = unit->m_entities[i];
-            int health = entity->m_stats[Entity::StatHealth];
-            entity->ChangeHealth(-1000);
+              entity->ChangeHealth(-1000);
           }
         }
       }
@@ -339,7 +336,6 @@ void Task::Stop()
       auto entity = g_context->m_location->GetEntity(m_objId);
       if (entity)
       {
-        int health = entity->m_stats[Entity::StatHealth];
         entity->ChangeHealth(-1000);
       }
       break;

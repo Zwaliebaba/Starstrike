@@ -170,6 +170,8 @@ void Unit::Render( float _predictionTime )
 
 bool Unit::Advance( int _slice )
 {
+    (void)_slice;
+
     //
     // Maintain our center and radius values
 
@@ -533,7 +535,7 @@ void Unit::FollowRoute()
 
 Entity *Unit::RayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDir)
 {
-	for (unsigned int i = 0; i < m_entities.Size(); ++i)
+	for (int i = 0; i < m_entities.Size(); ++i)
 	{
 		if (m_entities.ValidIndex(i))
 		{
@@ -547,7 +549,7 @@ Entity *Unit::RayHit(LegacyVector3 const &_rayStart, LegacyVector3 const &_rayDi
 	return nullptr;
 }
 
-void Unit::DirectControl( TeamControls const& _teamControls )
+void Unit::DirectControl( [[maybe_unused]] TeamControls const& _teamControls )
 {
 }
 

@@ -29,7 +29,7 @@ void StaticShape::Initialise(Building* _template)
   SetShapeName(staticShape->m_shapeName);
 }
 
-void StaticShape::SetDetail(int _detail)
+void StaticShape::SetDetail([[maybe_unused]] int _detail)
 {
   m_pos.y = g_context->m_location->m_landscape.m_heightMap->GetValue(m_pos.x, m_pos.z);
 

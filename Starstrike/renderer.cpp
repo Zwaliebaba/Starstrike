@@ -80,7 +80,7 @@ void Renderer::RenderFlatTexture()
   glVertex3fv((pos - up - right).GetData());
   glEnd();
 
-  glAlphaFunc(GL_GREATER, 0.01);
+  glAlphaFunc(GL_GREATER, 0.01f);
   glDisable(GL_ALPHA_TEST);
   glDisable(GL_BLEND);
 
@@ -244,12 +244,12 @@ void Renderer::RenderHUD()
   {
     const auto& gpuStats = OpenGLD3D::GetFrameStats();
 
-    glColor4f(0, 0, 0, 0.6);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
     glBegin(GL_QUADS);
-    glVertex2f(8.0, 1.0f);
-    glVertex2f(290.0, 1.0f);
-    glVertex2f(290.0, 15.0f);
-    glVertex2f(8.0, 15.0f);
+    glVertex2f(8.0f, 1.0f);
+    glVertex2f(290.0f, 1.0f);
+    glVertex2f(290.0f, 15.0f);
+    glVertex2f(8.0f, 15.0f);
     glEnd();
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -263,12 +263,12 @@ void Renderer::RenderHUD()
 
   if (m_displayInputMode)
   {
-    glColor4f(0, 0, 0, 0.6);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.6f);
     glBegin(GL_QUADS);
-    glVertex2f(80.0, 1.0f);
-    glVertex2f(230.0, 1.0f);
-    glVertex2f(230.0, 18.0f);
-    glVertex2f(80.0, 18.0f);
+    glVertex2f(80.0f, 1.0f);
+    glVertex2f(230.0f, 1.0f);
+    glVertex2f(230.0f, 18.0f);
+    glVertex2f(80.0f, 18.0f);
     glEnd();
 
     std::string inmode;
@@ -478,114 +478,6 @@ float Renderer::GetGLStateFloat(int pname) const
   return returnVal;
 }
 
-void Renderer::CheckOpenGLState() const
-{
-  return;
-  int results[10];
-  float resultsf[10];
-
-  // Geometry
-  DEBUG_ASSERT(GetGLStateInt(GL_FRONT_FACE) == GL_CCW);
-  glGetIntegerv(GL_POLYGON_MODE, results);
-  DEBUG_ASSERT(results[0] == GL_FILL);
-  DEBUG_ASSERT(results[1] == GL_FILL);
-  DEBUG_ASSERT(GetGLStateInt(GL_SHADE_MODEL) == GL_FLAT);
-  DEBUG_ASSERT(!glIsEnabled(GL_NORMALIZE));
-
-  // Colour
-  DEBUG_ASSERT(!glIsEnabled(GL_COLOR_MATERIAL));
-  DEBUG_ASSERT(GetGLStateInt(GL_COLOR_MATERIAL_FACE) == GL_FRONT_AND_BACK);
-  DEBUG_ASSERT(GetGLStateInt(GL_COLOR_MATERIAL_PARAMETER) == GL_AMBIENT_AND_DIFFUSE);
-
-  // Lighting
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHTING));
-
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT0));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT1));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT2));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT3));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT4));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT5));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT6));
-  DEBUG_ASSERT(!glIsEnabled(GL_LIGHT7));
-
-  glGetFloatv(GL_LIGHT_MODEL_AMBIENT, resultsf);
-  DEBUG_ASSERT(resultsf[0] < 0.001f && resultsf[1] < 0.001f && resultsf[2] < 0.001f && resultsf[3] < 0.001f);
-
-  if (g_context->m_location)
-  {
-    for (int i = 0; i < g_context->m_location->m_lights.Size(); i++)
-    {
-      Light* light = g_context->m_location->m_lights.GetData(i);
-
-      float amb = 0.0f;
-      GLfloat ambCol1[] = {amb, amb, amb, 1.0f};
-
-      GLfloat pos1_actual[4];
-      GLfloat ambient1_actual[4];
-      GLfloat diffuse1_actual[4];
-      GLfloat specular1_actual[4];
-
-      glGetLightfv(GL_LIGHT0 + i, GL_POSITION, pos1_actual);
-      glGetLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse1_actual);
-      glGetLightfv(GL_LIGHT0 + i, GL_SPECULAR, specular1_actual);
-      glGetLightfv(GL_LIGHT0 + i, GL_AMBIENT, ambient1_actual);
-
-      for (int i = 0; i < 4; i++)
-      {
-        //			DEBUG_ASSERT(fabsf(lightPos1[i] - pos1_actual[i]) < 0.001f);
-        //			DEBUG_ASSERT(fabsf(light->m_colour[i] - diffuse1_actual[i]) < 0.001f);
-        //			DEBUG_ASSERT(fabsf(light->m_colour[i] - specular1_actual[i]) < 0.0001f);
-        //			DEBUG_ASSERT(fabsf(ambCol1[i] - ambient1_actual[i]) < 0.001f);
-      }
-    }
-  }
-
-  // Blending, Anti-aliasing, Fog and Polygon Offset
-  //	DEBUG_ASSERT(!glIsEnabled(GL_BLEND));
-  DEBUG_ASSERT(GetGLStateInt(GL_BLEND_DST) == GL_ONE_MINUS_SRC_ALPHA);
-  DEBUG_ASSERT(GetGLStateInt(GL_BLEND_SRC) == GL_SRC_ALPHA);
-  DEBUG_ASSERT(!glIsEnabled(GL_ALPHA_TEST));
-  DEBUG_ASSERT(GetGLStateInt(GL_ALPHA_TEST_FUNC) == GL_GREATER);
-  DEBUG_ASSERT(GetGLStateFloat(GL_ALPHA_TEST_REF) == 0.01f);
-  DEBUG_ASSERT(!glIsEnabled(GL_FOG));
-  DEBUG_ASSERT(GetGLStateFloat(GL_FOG_DENSITY) == 1.0f);
-  DEBUG_ASSERT(GetGLStateFloat(GL_FOG_END) >= 4000.0f);
-  //DEBUG_ASSERT(GetGLStateFloat(GL_FOG_START) >= 1000.0f);
-  glGetFloatv(GL_FOG_COLOR, resultsf);
-  //	DEBUG_ASSERT(fabsf(resultsf[0] - g_context->m_location->m_backgroundColour.r/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[1] - g_context->m_location->m_backgroundColour.g/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[2] - g_context->m_location->m_backgroundColour.b/255.0f) < 0.001f);
-  //	DEBUG_ASSERT(fabsf(resultsf[3] - g_context->m_location->m_backgroundColour.a/255.0f) < 0.001f);
-  DEBUG_ASSERT(GetGLStateInt(GL_FOG_MODE) == GL_LINEAR);
-  DEBUG_ASSERT(!glIsEnabled(GL_LINE_SMOOTH));
-  DEBUG_ASSERT(!glIsEnabled(GL_POINT_SMOOTH));
-
-  // Texture Mapping
-  DEBUG_ASSERT(!glIsEnabled(GL_TEXTURE_2D));
-  glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, results);
-  DEBUG_ASSERT(results[0] == GL_CLAMP);
-  glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, results);
-  DEBUG_ASSERT(results[0] == GL_CLAMP);
-  glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, results);
-  DEBUG_ASSERT(results[0] == GL_MODULATE);
-  glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, results);
-  DEBUG_ASSERT(results[0] == 0);
-  DEBUG_ASSERT(results[1] == 0);
-  DEBUG_ASSERT(results[2] == 0);
-  DEBUG_ASSERT(results[3] == 0);
-
-  // Frame Buffer
-  DEBUG_ASSERT(glIsEnabled(GL_DEPTH_TEST));
-  DEBUG_ASSERT(GetGLStateInt(GL_DEPTH_WRITEMASK) != 0);
-  DEBUG_ASSERT(GetGLStateInt(GL_DEPTH_FUNC) == GL_LEQUAL);
-  DEBUG_ASSERT(glIsEnabled(GL_SCISSOR_TEST) == 0);
-
-  // Hints
-  DEBUG_ASSERT(GetGLStateInt(GL_FOG_HINT) == GL_DONT_CARE);
-  DEBUG_ASSERT(GetGLStateInt(GL_POLYGON_SMOOTH_HINT) == GL_DONT_CARE);
-}
-
 void Renderer::SetOpenGLState() const
 {
   // Geometry
@@ -621,7 +513,7 @@ void Renderer::SetOpenGLState() const
   glDisable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_ALPHA_TEST);
-  glAlphaFunc(GL_GREATER, 0.01);
+  glAlphaFunc(GL_GREATER, 0.01f);
   if (g_context->m_location)
     g_context->m_location->SetupFog();
   else

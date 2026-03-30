@@ -23,7 +23,7 @@ DarwiniaButton::DarwiniaButton()
 void DarwiniaButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
-    _w = strlen(_name) * 7 + 9;
+    _w = static_cast<int>(strlen(_name)) * 7 + 9;
 
   if (_h == -1)
     _h = 15;
@@ -159,7 +159,7 @@ BorderlessButton::BorderlessButton()
 void BorderlessButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
-    _w = strlen(_name) * 7 + 9;
+    _w = static_cast<int>(strlen(_name)) * 7 + 9;
 
   if (_h == -1)
     _h = 15;
@@ -602,7 +602,7 @@ void CloseButton::Render(int realX, int realY, bool highlighted, bool clicked)
 // Class InvertexBox
 // ****************************************************************************
 
-void InvertedBox::Render(int realX, int realY, bool highlighted, bool clicked)
+void InvertedBox::Render(int realX, int realY, [[maybe_unused]] bool highlighted, [[maybe_unused]] bool clicked)
 {
   //DarwiniaButton::Render( realX, realY, highlighted, clicked );
 
@@ -640,7 +640,7 @@ void InvertedBox::Render(int realX, int realY, bool highlighted, bool clicked)
   glEnd();
 }
 
-void LabelButton::Render(int realX, int realY, bool highlighted, bool clicked)
+void LabelButton::Render(int realX, int realY, [[maybe_unused]] bool highlighted, [[maybe_unused]] bool clicked)
 {
   if (m_disabled)
     glColor4f(0.5f, 0.5f, 0.5f, 1.0f);

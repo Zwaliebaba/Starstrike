@@ -277,7 +277,7 @@ bool Teleport::GetEntrance( LegacyVector3 &_pos, LegacyVector3 &_front )
     return true;
 }
 
-bool Teleport::GetExit( LegacyVector3 &_pos, LegacyVector3 &_front )
+bool Teleport::GetExit( [[maybe_unused]] LegacyVector3 &_pos, [[maybe_unused]] LegacyVector3 &_front )
 {
     DEBUG_ASSERT( false );
     return false;

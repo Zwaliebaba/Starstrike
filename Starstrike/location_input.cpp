@@ -111,7 +111,7 @@ void LocationInput::AdvanceNoSelection()
   if (g_inputManager->controlEvent(ControlSelectLocation) && !g_context->m_taskManagerInterface->m_visible)
   {
     WorldObjectId id;
-    bool objectFound = GetObjectUnderMouse(id, g_context->m_globalWorld->m_myTeamId);
+    GetObjectUnderMouse(id, g_context->m_globalWorld->m_myTeamId);
 
     if (id.IsValid())
     {
@@ -247,7 +247,7 @@ void LocationInput::AdvanceTeamControl()
     !g_context->m_taskManagerInterface->m_visible && !taskStarted)
   {
     WorldObjectId id;
-    bool objectUnderMouse = GetObjectUnderMouse(id, g_context->m_globalWorld->m_myTeamId);
+    GetObjectUnderMouse(id, g_context->m_globalWorld->m_myTeamId);
     if (id.IsValid() && id.GetUnitId() != 255 && id.GetUnitId() != UNIT_BUILDINGS)
     {
       g_context->m_clientToServer->RequestSelectUnit(id.GetTeamId(), id.GetUnitId(), id.GetIndex(), -1);

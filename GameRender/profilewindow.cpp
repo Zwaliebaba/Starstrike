@@ -109,7 +109,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 				icon[0] = child->m_isExpanded ? '-' : '+';
 			}
 
-			float lastColumn;
+			float lastColumn = 0.0f;
 			if (minAvgMax == 0)			lastColumn = child->m_shortest;
 			else if (minAvgMax == 1)	lastColumn = avrgTime / 1000.0f;
 			else if (minAvgMax == 2)	lastColumn = child->m_longest;

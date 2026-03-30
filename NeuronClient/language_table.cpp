@@ -132,8 +132,8 @@ void LangTable::ParseLanguageFile(char const *_filename)
 
 bool is_suffix( const char * str, const char * suf )
 {
-	int suf_len = strlen( suf );
-	int off = strlen( str ) - suf_len;
+	int suf_len = static_cast<int>(strlen( suf ));
+	int off = static_cast<int>(strlen( str )) - suf_len;
 	if ( off >= 0 ) {
 		return strncmp( str + off, suf, suf_len ) == 0;
 	} else return false;
@@ -168,7 +168,7 @@ bool LangTable::specific_key_exists( const char * _key, InputMode _mood )
 {
 	if ( _key && _mood ) {
 		char key[128];
-		int len = strlen(_key);
+		int len = static_cast<int>(strlen(_key));
 		strncpy( key, _key, 123 ); key[123] = '\0';
 
 		switch ( _mood ) {
@@ -192,7 +192,7 @@ bool buildCaption(char const *_baseString, char *_dest, InputMode _mood); // see
 bool printTable( HashTable<int> const *keys, const char *table, std::ostream &out )
 {
 	if ( keys && table && out.good() ) {
-		for ( int i = 0; i < keys->Size(); ++i ) {
+		for ( unsigned int i = 0; i < keys->Size(); ++i ) {
 			if ( keys->ValidIndex( i ) ) {
 				out << keys->GetName( i ) << '\t'
 				    << ( table + keys->GetData( i ) ) << std::endl;
@@ -327,7 +327,7 @@ bool LangTable::RawDoesPhraseExist(char const *_key, InputMode _mood)
 		if ( RawDoesPhraseExist( _key ) ) {
 			ans = true;
 		} else {
-			int len = strlen( _key );
+			int len = static_cast<int>(strlen( _key ));
 				char *key = new char[ len + 5 ];
 				memcpy( key, _key, len + 1 );
 				switch( _mood ) {
@@ -409,7 +409,7 @@ char *LangTable::RawLookupPhrase(char const *_key, InputMode _mood)
     else
     {
 		if ( !phrase ) {
-			int len = strlen( _key );
+			int len = static_cast<int>(strlen( _key ));
 			char *key = new char[ len + 5 ];
 			memcpy( key, _key, len + 1 );
 			switch( _mood ) {

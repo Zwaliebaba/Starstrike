@@ -26,7 +26,7 @@ InputParserState SimpleInputDriver::parseInputSpecification( InputSpecTokens con
                                                              InputSpec &spec ) {
 
 	InputParserState state = STATE_WANT_DRIVER;
-	for ( int i = 0; i < tokens.length(); ++i ) {
+   for ( unsigned i = 0; i < tokens.length(); ++i ) {
 		if ( !acceptToken( state, tokens[ i ], spec ) ) break;
 	}
 

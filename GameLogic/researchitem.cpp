@@ -129,12 +129,12 @@ void ResearchItem::Write(FileWriter* _out)
   _out->printf("%6d", m_level);
 }
 
-bool ResearchItem::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool ResearchItem::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool ResearchItem::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool ResearchItem::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }
 
-bool ResearchItem::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
-                              LegacyVector3* norm) { return RaySphereIntersection(_rayStart, _rayDir, m_pos, m_radius, _rayLen); }
+bool ResearchItem::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, [[maybe_unused]] LegacyVector3* _pos,
+                              [[maybe_unused]] LegacyVector3* norm) { return RaySphereIntersection(_rayStart, _rayDir, m_pos, m_radius, _rayLen); }
 
 bool ResearchItem::IsInView()
 {

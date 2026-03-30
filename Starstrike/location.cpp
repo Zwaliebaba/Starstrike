@@ -461,7 +461,7 @@ Building* Location::GetBuilding(int _id)
 
 Building* Location::GetBuilding(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir)
 {
-  for (unsigned int i = 0; i < m_buildings.Size(); ++i)
+  for (int i = 0; i < m_buildings.Size(); ++i)
   {
     if (m_buildings.ValidIndex(i))
     {
@@ -772,7 +772,7 @@ void Location::AdvanceChristmas()
       auto snow = new Snow();
       snow->m_pos = spawnPos;
       int index = m_effects.PutData(snow);
-      snow->m_id.Set(-1, UNIT_EFFECTS, index, -1);
+      snow->m_id.Set(255, UNIT_EFFECTS, index, -1);
       snow->m_id.GenerateUniqueId();
     }
   }
@@ -788,7 +788,7 @@ void Location::AdvanceChristmas()
     auto snow = new Snow();
     snow->m_pos = spawnPos;
     int index = m_effects.PutData(snow);
-    snow->m_id.Set(-1, UNIT_EFFECTS, index, -1);
+    snow->m_id.Set(255, UNIT_EFFECTS, index, -1);
     snow->m_id.GenerateUniqueId();
   }
 }
@@ -824,7 +824,6 @@ void Location::RenderSpirits()
   glDepthMask(false);
 
   float timeSinceAdvance = g_predictionTime;
-  float numPerSlice = m_spirits.Size() / static_cast<float>(NUM_SLICES_PER_FRAME);
 
   for (int i = 0; i < m_spirits.Size(); ++i)
   {
@@ -1216,14 +1215,14 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
     if (team->m_teamId != iu->m_teamId)
       continue;
 
-    Team* team = &g_context->m_location->m_teams[iu->m_teamId];
+    Team* iuTeam = &g_context->m_location->m_teams[iu->m_teamId];
     LegacyVector3 pos(iu->m_posX, 0, iu->m_posZ);
     pos.y = m_landscape.m_heightMap->GetValue(pos.x, pos.z);
     int unitId = -1;
     Unit* newUnit = nullptr;
     if (iu->m_inAUnit)
     {
-      newUnit = team->NewUnit(iu->m_type, iu->m_number, &unitId, pos);
+      newUnit = iuTeam->NewUnit(iu->m_type, iu->m_number, &unitId, pos);
       newUnit->SetWayPoint(pos);
       newUnit->m_routeId = iu->m_routeId;
       iu->m_routeId = -1;
@@ -1237,9 +1236,9 @@ void Location::InitialiseTeam(unsigned char _teamId, unsigned char _teamType)
 
     LegacyVector3 targetPos(iu->m_waypointX, 0, iu->m_waypointZ);
     LList<int>* buildingIds = m_obstructionGrid->GetBuildings(iu->m_waypointX, iu->m_waypointZ);
-    for (int i = 0; i < buildingIds->Size(); ++i)
+    for (int j = 0; j < buildingIds->Size(); ++j)
     {
-      Building* building = GetBuilding(buildingIds->GetData(i));
+      Building* building = GetBuilding(buildingIds->GetData(j));
       if (building && building->m_type == Building::TypeRadarDish)
       {
         LegacyVector3 waypointToBuilding = (building->m_pos - targetPos);
@@ -1344,7 +1343,6 @@ void Location::RemoveTeam(unsigned char _teamId)
 {
   if (_teamId < NUM_TEAMS)
   {
-    Team* team = &m_teams[_teamId];
     m_teams[_teamId].m_teamType = Team::TeamTypeUnused;
   }
 
@@ -1695,7 +1693,7 @@ void Location::FireTurretShell(const LegacyVector3& _pos, const LegacyVector3& _
   shell->m_vel = _vel;
 
   int weaponId = m_effects.PutData(shell);
-  shell->m_id.Set(-1, UNIT_EFFECTS, weaponId, -1);
+  shell->m_id.Set(255, UNIT_EFFECTS, weaponId, -1);
   shell->m_id.GenerateUniqueId();
 
   //
@@ -1706,7 +1704,7 @@ void Location::FireTurretShell(const LegacyVector3& _pos, const LegacyVector3& _
 
   auto mf = new MuzzleFlash(_pos, flashFront, 40.0f, 2.0f);
   int index = m_effects.PutData(mf);
-  mf->m_id.Set(-1, UNIT_EFFECTS, index, -1);
+  mf->m_id.Set(255, UNIT_EFFECTS, index, -1);
   mf->m_id.GenerateUniqueId();
 }
 

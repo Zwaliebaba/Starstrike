@@ -87,7 +87,7 @@ NetRetCode NetSocket::Connect(char *host, unsigned short port)
 	{
 		m_port = port;
 		memset(m_hostname, 0, MAX_HOSTNAME_LEN);
-		memcpy(m_hostname, host, MIN(strlen(host), MAX_HOSTNAME_LEN - 1));
+		memcpy(m_hostname, host, std::min(strlen(host), static_cast<size_t>(MAX_HOSTNAME_LEN - 1)));
 		
 		ret = Connect();
 	}

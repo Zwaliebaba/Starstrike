@@ -168,10 +168,10 @@ bool Darwinian::Advance(Unit* _unit)
     m_retargetTimer -= SERVER_ADVANCE_PERIOD;
     if (m_retargetTimer <= 0.0)
     {
-      bool newTaskFound = SearchForNewTask();
+      SearchForNewTask();
 
       if (m_state == StateIdle)
-        bool victoryDance = BeginVictoryDance();
+        BeginVictoryDance();
 
       m_retargetTimer = 1.0f + syncfrand(1.0f);
     }
@@ -295,7 +295,6 @@ bool Darwinian::AdvanceWatchingSpectacle()
   //
   // Face the spectacle
 
-  float amountToTurn = SERVER_ADVANCE_PERIOD * 4.0f;
   LegacyVector3 targetPos = building->m_centerPos;
   targetPos += LegacyVector3(sinf(g_gameTime) * 30.0f, cosf(g_gameTime) * 20.0f, sinf(g_gameTime) * 25.0f);
   LegacyVector3 targetDir = (targetPos - m_pos).Normalise();
@@ -540,9 +539,9 @@ bool Darwinian::AdvanceCombat()
       LegacyVector3 targetVector = (threat->m_pos - m_pos);
       float angle = syncsfrand(M_PI * 0.5f);
       targetVector.RotateAroundY(angle);
-      float distance = targetVector.Mag();
+      float innerDistance = targetVector.Mag();
       float ourDesiredRange = 20.0f + syncfrand(20.0f);
-      targetVector.SetLength(distance - ourDesiredRange);
+      targetVector.SetLength(innerDistance - ourDesiredRange);
       m_wayPoint = m_pos + targetVector;
     }
     m_wayPoint = PushFromObstructions(m_wayPoint);
@@ -1112,7 +1111,7 @@ bool Darwinian::AdvanceAttackingBuilding()
   LegacyVector3 moveVector = (m_pos - building->m_pos);
   moveVector.SetLength(100 + syncfrand(50.0f));
   m_wayPoint = building->m_pos + moveVector;
-  bool arrived = AdvanceToTargetPosition();
+  AdvanceToTargetPosition();
 
   //
   // Shoot at the building if we are in range

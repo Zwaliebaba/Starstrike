@@ -103,7 +103,7 @@ public:
 
     void		 WriteSilence       (signed short *_data, unsigned int _numSamples);
 
-	virtual void StartRecordToFile	(char const *_filename) {}
+	virtual void StartRecordToFile	([[maybe_unused]] char const *_filename) {}
 	virtual void EndRecordToFile	() {}
 };
 

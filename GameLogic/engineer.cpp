@@ -601,7 +601,7 @@ bool Engineer::AdvanceToIncubator()
 
   if (!incubator)
   {
-    bool found = SearchForIncubator();
+    SearchForIncubator();
     incubator = static_cast<Incubator*>(g_context->m_location->GetBuilding(m_buildingId));
     if (!incubator)
     {
@@ -897,7 +897,6 @@ bool Engineer::AdvanceOperatingBridge()
   if (building && building->m_type == Building::TypeBridge)
   {
     LegacyVector3 front;
-    auto bridge = static_cast<Bridge*>(building);
     // Nothing to do really
   }
   else

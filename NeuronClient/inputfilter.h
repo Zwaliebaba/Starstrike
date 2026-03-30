@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <iostream>
+#include <iosfwd>
 
 #include "inputfilterspec.h"
 #include "input_types.h"
@@ -27,6 +27,8 @@ public:
 	virtual void Advance() = 0;
 
 	virtual const std::string &getName() const;
+
+  virtual ~InputFilter() = default;
 
 };
 

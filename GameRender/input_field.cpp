@@ -89,7 +89,7 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 		BorderlessButton::Render(realX, realY, true, clicked);
 		if (fmodf(GetHighResTime(), 1.0f) < 0.5f)
 		{
-			int cursorOffset = strlen(m_buf) * PIXELS_PER_CHAR + 2;
+         int cursorOffset = static_cast<int>(strlen(m_buf)) * PIXELS_PER_CHAR + 2;
 			glBegin( GL_LINES );
 				glVertex2f( fieldX + cursorOffset, realY + 2 );
 				glVertex2f( fieldX + cursorOffset, realY + m_h - 2 );
@@ -113,8 +113,8 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
 			case TypeFloat:     snprintf(m_buf, sizeof(m_buf), "%.2f", *m_float);               break;
 	        case TypeString:    strncpy(m_buf, m_string, sizeof(m_buf) - 1);    break;
 	    }
-		m_inputBoxWidth = strlen(m_buf) * PIXELS_PER_CHAR + 7;
-    }
+		m_inputBoxWidth = static_cast<int>(strlen(m_buf)) * PIXELS_PER_CHAR + 7;
+	}
 	DarwiniaWindow *parent = (DarwiniaWindow *)m_parent;
 	fieldX = realX + m_w - parent->GetMenuSize(m_inputBoxWidth);
 	g_editorFont.DrawText2D( fieldX + 2, realY + 10, parent->GetMenuSize(DEF_FONT_SIZE), m_buf);
@@ -127,11 +127,11 @@ void InputField::MouseUp()
 }
 
 
-void InputField::Keypress ( int keyCode, bool shift, bool ctrl, bool alt )
+void InputField::Keypress ( int keyCode, bool shift, [[maybe_unused]] bool ctrl, [[maybe_unused]] bool alt )
 {
 	if (strcmp(m_parent->m_currentTextEdit, "None") == 0)	return;
 
-	int len = strlen(m_buf);
+	int len = static_cast<int>(strlen(m_buf));
 	if (keyCode == KEY_BACKSPACE)
 	{
 		if (len > 0) m_buf[len - 1] = '\0';
@@ -198,8 +198,8 @@ void InputField::Keypress ( int keyCode, bool shift, bool ctrl, bool alt )
         if( m_type == TypeString && keyCode >= KEY_A && keyCode <= KEY_Z )
         {
             unsigned char ascii = keyCode & 0xff;
-            if( !shift ) ascii -= ( 'A' - 'a' );
-            int location = strlen(m_buf);
+			if( !shift ) ascii += ( 'a' - 'A' );
+			int location = static_cast<int>(strlen(m_buf));
             m_buf[ location ] = ascii;
             m_buf[ location+1 ] = '\x0';
         }
@@ -211,7 +211,7 @@ void InputField::Keypress ( int keyCode, bool shift, bool ctrl, bool alt )
         }
     }
 
-	m_inputBoxWidth = strlen(m_buf) * PIXELS_PER_CHAR + 7;
+	m_inputBoxWidth = static_cast<int>(strlen(m_buf)) * PIXELS_PER_CHAR + 7;
 }
 
 

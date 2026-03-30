@@ -7,5 +7,5 @@
 class NullBuildingRenderer : public BuildingRenderer
 {
   public:
-    void Render(const Building& _building, const BuildingRenderContext& _ctx) override {}
+    void Render([[maybe_unused]] const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx) override {}
 };

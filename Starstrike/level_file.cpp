@@ -1234,9 +1234,9 @@ void LevelFile::GenerateInstantUnits()
           else if (entity->m_type == Entity::TypeArmour)
           {
             bool taskControlled = false;
-            for (int i = 0; i < g_context->m_taskManager->m_tasks.Size(); ++i)
+            for (int ti = 0; ti < g_context->m_taskManager->m_tasks.Size(); ++ti)
             {
-              Task* task = g_context->m_taskManager->m_tasks[i];
+              Task* task = g_context->m_taskManager->m_tasks[ti];
               if (task->m_type == GlobalResearch::TypeArmour && task->m_objId == entity->m_id)
               {
                 taskControlled = true;
@@ -1430,8 +1430,6 @@ void LevelFile::WriteRunningPrograms(FileWriter* _out)
 {
   if (!g_context->m_editing)
   {
-    Team* team = g_context->m_location->GetMyTeam();
-
     _out->printf("\nRunningPrograms_StartDefinition\n");
     //_out->printf( "\t# x      y       z      size\n");
     _out->printf("\t# ==========================\n");

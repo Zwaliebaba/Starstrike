@@ -58,7 +58,7 @@ bool Lander::Advance(Unit* _unit)
   return false;
 }
 
-void Lander::ChangeHealth(int amount) { g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash)); }
+void Lander::ChangeHealth([[maybe_unused]] int amount) { g_simEventQueue.Push(SimEvent::MakeParticle(m_pos, g_zeroVector, SimParticle::TypeMuzzleFlash)); }
 
 bool Lander::AdvanceSailing()
 {

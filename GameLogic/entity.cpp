@@ -158,7 +158,7 @@ void Entity::Attack(const LegacyVector3& pos)
   }
 }
 
-bool Entity::AdvanceDead(Unit* _unit)
+bool Entity::AdvanceDead([[maybe_unused]] Unit* _unit)
 {
   int newHealth = m_stats[StatHealth];
   if (m_onGround)

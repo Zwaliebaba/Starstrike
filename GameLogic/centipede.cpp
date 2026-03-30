@@ -255,13 +255,13 @@ bool Centipede::Advance(Unit* _unit)
   if (fabs(targetSize - m_size) > 0.01f)
   {
     m_size = m_size * 0.9f + targetSize * 0.1f;
-    float maxHealth = EntityBlueprint::GetStat(TypeCentipede, StatHealth);
-    maxHealth *= m_size * 2;
-    if (maxHealth < 0)
-      maxHealth = 0;
-    if (maxHealth > 255)
-      maxHealth = 255;
-    float newHealth = maxHealth * healthFraction;
+    float scaledMaxHealth = EntityBlueprint::GetStat(TypeCentipede, StatHealth);
+    scaledMaxHealth *= m_size * 2;
+    if (scaledMaxHealth < 0)
+      scaledMaxHealth = 0;
+    if (scaledMaxHealth > 255)
+      scaledMaxHealth = 255;
+    float newHealth = scaledMaxHealth * healthFraction;
     newHealth = std::max(newHealth, 0.0f);
     newHealth = std::min(newHealth, 255.0f);
     m_stats[StatHealth] = newHealth;
@@ -536,8 +536,6 @@ bool Centipede::GetTrailPosition(LegacyVector3& _pos, LegacyVector3& _vel, int _
 {
   if (m_positionHistory.Size() < 3)
     return false;
-
-  float timeSinceAdvance = g_gameTime - m_lastAdvance;
 
   LegacyVector3 pos1 = *m_positionHistory.GetPointer(_numSteps + 1);
   LegacyVector3 pos2 = *m_positionHistory.GetPointer(_numSteps);

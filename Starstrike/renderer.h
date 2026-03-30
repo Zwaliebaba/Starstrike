@@ -52,7 +52,6 @@ class Renderer
     float GetFarPlane() const;
     void SetNearAndFar(float _nearPlane, float _farPlane);
 
-    void CheckOpenGLState() const;
     void SetOpenGLState() const;
 
     void SetObjectLighting() const;

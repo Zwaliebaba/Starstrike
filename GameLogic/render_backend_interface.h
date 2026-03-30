@@ -14,8 +14,8 @@ class IRenderBackend
 {
   public:
     virtual ~IRenderBackend() = default;
-    virtual void ReleaseEntity(int _uniqueId) {}
-    virtual void ReleaseBuilding(int _uniqueId) {}
+    virtual void ReleaseEntity([[maybe_unused]] int _uniqueId) {}
+    virtual void ReleaseBuilding([[maybe_unused]] int _uniqueId) {}
 };
 
 extern IRenderBackend* g_renderBackend;

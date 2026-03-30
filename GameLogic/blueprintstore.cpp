@@ -350,7 +350,7 @@ void BlueprintRelay::Initialise(Building* _template)
   m_centerPos = m_shape->CalculateCenter(mat);
 }
 
-void BlueprintRelay::SetDetail(int _detail)
+void BlueprintRelay::SetDetail([[maybe_unused]] int _detail)
 {
   m_pos.y = m_altitude;
 

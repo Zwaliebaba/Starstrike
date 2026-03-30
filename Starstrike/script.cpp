@@ -177,7 +177,7 @@ void Script::RunCommand_SetMission(char* _locName, char* _missionName)
   loc->m_missionCompleted = false;
 }
 
-void Script::RunCommand_Say(char* _stringId) {  }
+void Script::RunCommand_Say([[maybe_unused]] char* _stringId) {  }
 
 void Script::RunCommand_ShutUp() {  }
 
@@ -202,7 +202,7 @@ void Script::RunCommand_WaitPlayerNotBusy()
   m_waitForPlayerNotBusy = true;
 }
 
-void Script::RunCommand_Highlight(int _buildingId) {  }
+void Script::RunCommand_Highlight([[maybe_unused]] int _buildingId) {  }
 
 void Script::RunCommand_ClearHighlights() {  }
 
@@ -222,7 +222,7 @@ void Script::RunCommand_StopSound(const char* _event)
   g_context->m_soundSystem->StopAllSounds(WorldObjectId(), eventName);
 }
 
-void Script::RunCommand_DemoGesture(const char* _name) {  }
+void Script::RunCommand_DemoGesture([[maybe_unused]] const char* _name) {  }
 
 void Script::RunCommand_GiveResearch(const char* _name)
 {
@@ -614,7 +614,7 @@ void Script::AdvanceScript()
 
   case OpSetCutsceneMode:
     {
-      int cutsceneMode = atoi(nextWord);
+      (void)atoi(nextWord);
       break;
     }
 

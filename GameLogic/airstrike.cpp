@@ -136,7 +136,7 @@ bool AirstrikeUnit::Advance(int _slice)
 
   case StateLeaving:
     {
-      bool amIThere = AdvanceToTargetPosition(m_exitPosition);
+      AdvanceToTargetPosition(m_exitPosition);
       break;
     }
   }
@@ -208,6 +208,6 @@ bool SpaceInvader::Advance(Unit* _unit)
   return false;
 }
 
-void SpaceInvader::ChangeHealth(int _amount)
+void SpaceInvader::ChangeHealth([[maybe_unused]] int _amount)
 {
 }

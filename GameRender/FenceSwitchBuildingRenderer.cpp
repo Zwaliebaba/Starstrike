@@ -12,7 +12,7 @@
 #include "team.h"
 #include "clienttoserver.h"
 
-void FenceSwitchBuildingRenderer::RenderAlphas(const Building& _building, const BuildingRenderContext& _ctx)
+void FenceSwitchBuildingRenderer::RenderAlphas(const Building& _building, [[maybe_unused]] const BuildingRenderContext& _ctx)
 {
     // No base-class RenderAlphas — FenceSwitch renders its own connections
     // instead of lights/ports.

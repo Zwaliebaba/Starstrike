@@ -12,6 +12,7 @@ protected:
 
 public:
 	Movement2D() : vX(0), vY(0) {}
+	virtual ~Movement2D() = default;
 
 	virtual void Advance() = 0;
 

@@ -3,7 +3,7 @@
 #include "main.h"
 #include "window_manager.h"
 
-int WINAPI wWinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPWSTR _cmdLine, int _iCmdShow)
+int WINAPI wWinMain(HINSTANCE _hInstance, [[maybe_unused]] HINSTANCE _hPrevInstance, [[maybe_unused]] LPWSTR _cmdLine, int _iCmdShow)
 {
 #if defined(_DEBUG)
     //  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
