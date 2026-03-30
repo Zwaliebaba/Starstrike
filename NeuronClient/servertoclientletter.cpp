@@ -46,7 +46,7 @@ ServerToClientLetter::ServerToClientLetter( ServerToClientLetter &copyMe )
 
 
 // *** Constructor
-ServerToClientLetter::ServerToClientLetter(char *_byteStream, int _len)
+ServerToClientLetter::ServerToClientLetter(char *_byteStream, [[maybe_unused]] int _len)
 :   m_clientId(-1),
     m_type(Invalid),
     m_sequenceId(0),

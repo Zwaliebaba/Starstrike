@@ -64,8 +64,8 @@ void StaticShape::SetShapeName(char* _shapeName)
   }
 }
 
-bool StaticShape::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
-                             LegacyVector3* norm)
+bool StaticShape::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, [[maybe_unused]] LegacyVector3* _pos,
+                             [[maybe_unused]] LegacyVector3* norm)
 {
   if (m_shape)
   {

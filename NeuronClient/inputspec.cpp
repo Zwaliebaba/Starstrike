@@ -31,7 +31,7 @@ InputSpecTokens::~InputSpecTokens() {}
 
 unsigned InputSpecTokens::length() const
 {
-	return m_tokens.size();
+	return static_cast<unsigned>(m_tokens.size());
 }
 
 

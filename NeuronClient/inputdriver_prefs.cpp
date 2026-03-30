@@ -98,7 +98,7 @@ const std::string &PrefsInputDriver::getLastParseError( InputParserState state )
 }
 
 
-bool PrefsInputDriver::getInputDescription( InputSpec const &spec, InputDescription &desc )
+bool PrefsInputDriver::getInputDescription( InputSpec const &spec, [[maybe_unused]] InputDescription &desc )
 {
 	InputDetails details;
 	return getInput( spec, details );
@@ -113,7 +113,7 @@ int PrefsInputDriver::keyPosition( string const &key )
 
 	if ( i == m_keys.end() ) {
 		m_keys.push_back( std::unique_ptr<string>( new string( key ) ) );
-		return m_keys.size();
+		return static_cast<int>(m_keys.size());
 	} else {
 		return i - m_keys.begin();
 	}

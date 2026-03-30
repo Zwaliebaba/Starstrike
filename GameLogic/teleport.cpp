@@ -295,7 +295,7 @@ LegacyVector3 Teleport::GetEndPoint()
     return LegacyVector3();
 }
 
-bool Teleport::UpdateEntityInTransit( Entity *_entity )
+bool Teleport::UpdateEntityInTransit( [[maybe_unused]] Entity *_entity )
 {
     DEBUG_ASSERT(false);
     return false;

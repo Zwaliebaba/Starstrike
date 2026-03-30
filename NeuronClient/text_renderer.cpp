@@ -131,7 +131,7 @@ void TextRenderer::DrawText2DUp( float _x, float _y, float _size, char const *_t
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-	unsigned numChars = strlen(_text);
+  unsigned numChars = static_cast<unsigned>(strlen(_text));
     for( unsigned int i = 0; i < numChars; ++i )
     {
         unsigned char thisChar = _text[i];
@@ -173,7 +173,7 @@ void TextRenderer::DrawText2DDown( float _x, float _y, float _size, char const *
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-	unsigned numChars = strlen(_text);
+  unsigned numChars = static_cast<unsigned>(strlen(_text));
     for( unsigned int i = 0; i < numChars; ++i )
     {
         unsigned char thisChar = _text[i];
@@ -252,7 +252,7 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 
-	unsigned numChars = strlen(_text);
+  unsigned numChars = static_cast<unsigned>(strlen(_text));
     for( unsigned int i = 0; i < numChars; ++i )
     {
         unsigned char thisChar = _text[i];
@@ -295,14 +295,10 @@ void TextRenderer::DrawText2DSimple(float _x, float _y, float _size, char const 
     }
 
     glBlendFunc     ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-    //glDisable       ( GL_BLEND );                             // Not here, Blending is enabled during Eclipse render
     glDisable       ( GL_TEXTURE_2D );
 }
 
 // Draw the text, justified depending on the _xJustification parameter.
-//		_xJustification < 0		Right justified text
-//	    _xJustification == 0	Centerd text
-//		_xJustification > 0		Left justified text
 void TextRenderer::DrawText2DJustified( float _x, float _y, float _size, int _xJustification, char const *_text, ... )
 {
     char buf[512];
@@ -313,7 +309,7 @@ void TextRenderer::DrawText2DJustified( float _x, float _y, float _size, int _xJ
 	if (_xJustification > 0)
 		DrawText2DSimple( _x, _y, _size, buf );			// Left Justification
 	else {
-		float width = GetTextWidth( strlen(buf), _size );
+       float width = GetTextWidth( static_cast<unsigned>(strlen(buf)), _size );
 
 		if (_xJustification < 0)
 			DrawText2DSimple( _x - width, _y, _size, buf );	// Right Justification
@@ -340,7 +336,7 @@ void TextRenderer::DrawText2DRight( float _x, float _y, float _size, char const 
     va_start (ap, _text);
     vsprintf(buf, _text, ap);
 
-    float width = GetTextWidth( strlen(buf), _size );
+    float width = GetTextWidth( static_cast<unsigned int>(strlen(buf)), _size );
     DrawText2DSimple( _x - width, _y, _size, buf );
 }
 
@@ -352,7 +348,7 @@ void TextRenderer::DrawText2DCenter( float _x, float _y, float _size, char const
     va_start (ap, _text);
     vsprintf(buf, _text, ap);
 
-    float width = GetTextWidth( strlen(buf), _size );
+    float width = GetTextWidth( static_cast<unsigned int>(strlen(buf)), _size );
     DrawText2DSimple( _x - width/2, _y, _size, buf );
 }
 
@@ -465,7 +461,7 @@ void TextRenderer::DrawText3DSimple( LegacyVector3 const &_pos, float _size, cha
     LegacyVector3 pos(_pos);
 	LegacyVector3 vertSize = cam->GetUp() * _size;
 	LegacyVector3 horiSize = -cam->GetRight() * _size * HORIZONTAL_SIZE;
-	unsigned int numChars = strlen(_text);
+	unsigned int numChars = static_cast<unsigned int>(strlen(_text));
 	pos += vertSize * 0.5f;
 
 
@@ -559,12 +555,10 @@ void TextRenderer::DrawText3D( LegacyVector3 const &_pos, LegacyVector3 const &_
 
 	SaveGLFontDrawAttributes saveAttribs;
 
-	Camera *cam = g_context->m_camera;
-
-    LegacyVector3 pos = _pos;
+	LegacyVector3 pos = _pos;
 	LegacyVector3 vertSize = _up * _size;
 	LegacyVector3 horiSize = ( _up ^ _front ) * _size * HORIZONTAL_SIZE;
-	unsigned int numChars = strlen(buf);
+	unsigned int numChars = static_cast<unsigned int>(strlen(buf));
 	pos -= horiSize * numChars * 0.5f;
     pos += vertSize * 0.5f;
 

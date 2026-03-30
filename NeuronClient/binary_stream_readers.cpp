@@ -200,7 +200,7 @@ unsigned char BinaryDataReader::ReadU8()
 	if (m_offset >= m_dataSize)
 	{
 		m_eof = true;
-		return EOF;
+		return static_cast<unsigned char>(EOF);
 	}
 
 	return m_data[m_offset++];

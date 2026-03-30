@@ -486,7 +486,7 @@ void ShapeFragmentData::ParseStripBlock(TextReader* _in)
 
   // Now just read a sequence of verts
   int i = 0;
-  int v1 = -1, v2 = -1;
+  unsigned int v1 = 0, v2 = 0;
   while (i < numVerts)
   {
     if (_in->ReadLine() == 0)
@@ -498,7 +498,7 @@ void ShapeFragmentData::ParseStripBlock(TextReader* _in)
       DEBUG_ASSERT(token[0] == 'v');
 
       token++;
-      int v3 = atoi(token);
+      unsigned int v3 = static_cast<unsigned int>(atoi(token));
       DEBUG_ASSERT(v3 < m_numVertices);
 
       if (i >= 2 && v1 != v2 && v2 != v3 && v1 != v3)
@@ -544,7 +544,7 @@ void ShapeFragmentData::ParseAllStripBlocks(TextReader* _in, unsigned int _numSt
     if (c && _stricmp(c, "Strip") == 0)
     {
       c = _in->GetNextToken();
-      int id = atoi(c);
+      unsigned int id = static_cast<unsigned int>(atoi(c));
 
       DEBUG_ASSERT(id == expectedId);
 
@@ -680,10 +680,9 @@ void ShapeFragmentData::RegisterPositions(LegacyVector3* _positions, unsigned in
       delta.y = 0.0f;
       float magSquared = delta.MagSquared();
       if (magSquared > radiusSquared)
-        radiusSquared = magSquared;
-    }
-    float radius = sqrtf(radiusSquared);
-    float height = m_mostPositiveY - m_mostNegativeY;
+            radiusSquared = magSquared;
+        }
+        float height = m_mostPositiveY - m_mostNegativeY;
     float cylinderVolume = M_PI * radiusSquared * height;
     float sphereVolume = 4.0f / 3.0f * M_PI * m_radius * m_radius * m_radius;
 

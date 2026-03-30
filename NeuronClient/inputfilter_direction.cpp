@@ -12,9 +12,9 @@ enum CompassDirection {
 
 
 // Apply the filter to a set of InputDetails to get another InputDetails
-bool DirectionInputFilter::filter( InputDetailsList const &inDetails,
-                                   InputFilterSpec const &filterSpec,
-                                   InputDetails &outDetails )
+bool DirectionInputFilter::filter( [[maybe_unused]] InputDetailsList const &inDetails,
+								   [[maybe_unused]] InputFilterSpec const &filterSpec,
+								   [[maybe_unused]] InputDetails &outDetails )
 {
 	return false;
 }
@@ -48,7 +48,7 @@ bool DirectionInputFilter::parseFilterSpecification( InputSpecTokens const &toke
 }
 
 
-void DirectionInputFilter::calcDetails( InputFilterSpec const &spec, InputDetails &details )
+void DirectionInputFilter::calcDetails( [[maybe_unused]] InputFilterSpec const &spec, [[maybe_unused]] InputDetails &details )
 {
 	// Um.
 }

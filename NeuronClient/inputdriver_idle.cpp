@@ -131,7 +131,7 @@ condition_t IdleInputDriver::getConditionID( std::string const &name, inputtype_
 }
 
 
-bool IdleInputDriver::getInputDescription( InputSpec const &spec, InputDescription &desc )
+bool IdleInputDriver::getInputDescription( [[maybe_unused]] InputSpec const &spec, [[maybe_unused]] InputDescription &desc )
 {
 	// TODO: This
 	return false;

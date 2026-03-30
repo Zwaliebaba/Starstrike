@@ -28,10 +28,10 @@ void TriffidEggRenderer::Render(const Entity& _entity, const EntityRenderContext
 
     //
     // Make our size pulsate a little
-    float age = (egg.m_timerSync - GetHighResTime()) / egg.m_life;
+    float age = static_cast<float>((egg.m_timerSync - GetHighResTime()) / egg.m_life);
     age = std::max(age, 0.0f);
     age = std::min(age, 1.0f);
-    float size = egg.m_size + fabs(sinf(g_gameTime * 2.0f)) * (1.0f - age) * 0.4f;
+    float size = egg.m_size + fabs(sinf(static_cast<float>(g_gameTime) * 2.0f)) * (1.0f - age) * 0.4f;
 
     predictedPos.y -= size;
     Matrix34 transform(front, up, predictedPos);

@@ -112,7 +112,7 @@ void LangTable::ParseLanguageFile(char const *_filename)
 
         phrase->m_string = _strdup( aString );
 
-        int stringLength = strlen( phrase->m_string );
+		int stringLength = static_cast<int>(strlen( phrase->m_string ));
         if( phrase->m_string[stringLength-1] == '\n' )
         {
             phrase->m_string[stringLength-1] = '\x0';

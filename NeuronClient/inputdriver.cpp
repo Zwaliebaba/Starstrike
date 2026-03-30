@@ -82,13 +82,13 @@ InputMode InputDriver::getInputMode()
 }
 
 
-bool InputDriver::getInputDescription( InputSpec const &spec, InputDescription &desc )
+bool InputDriver::getInputDescription( [[maybe_unused]] InputSpec const &spec, [[maybe_unused]] InputDescription &desc )
 {
 	return false;
 }
 
 
-bool InputDriver::getFirstActiveInput( InputSpec &spec, bool instant )
+bool InputDriver::getFirstActiveInput( [[maybe_unused]] InputSpec &spec, [[maybe_unused]] bool instant )
 {
 	return false;
 }

@@ -71,7 +71,7 @@ Server::~Server()
   m_outboxMutex->Unlock();
 }
 
-static NetCallBackRetType ListenThread(void* ptr)
+static NetCallBackRetType ListenThread([[maybe_unused]] void* ptr)
 {
   auto m_listener = new NetSocketListener(4000);
   m_listener->StartListening(ListenCallback);
@@ -113,7 +113,7 @@ int Server::ConvertIPToInt(const char* _ip)
   char ipCopy[17];
   strncpy(ipCopy, _ip, sizeof(ipCopy));
   ipCopy[sizeof(ipCopy) - 1] = '\0';
-  int ipLen = strlen(ipCopy);
+  int ipLen = static_cast<int>(strlen(ipCopy));
 
   for (int i = 0; i < ipLen; ++i)
   {

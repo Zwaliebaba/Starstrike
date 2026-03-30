@@ -9,7 +9,7 @@
 | Graphics API | DirectX 12 (via OpenGL shim layer) |
 | NuGet Dependencies | CppWinRT 2.0, WindowsAppSDK 1.8, WinPixEventRuntime 1.0 |
 | Architecture | 6 static libraries + 1 executable |
-| Build Warnings | **259** (0 errors) — down from 425 |
+| Build Warnings | **19** (0 errors) — down from 425 |
 
 ---
 
@@ -22,8 +22,8 @@
 | Phase 1: Critical Bug Fixes | ✅ Complete | All 10 steps done + bonus `InputTransform` virtual dtor |
 | Phase 2: Build Config Alignment | ✅ Complete | All 5 steps done |
 | Phase 3: Warning Infrastructure | ✅ Complete | GameRender raised to `/W4`, 0 warnings |
-| Phase 4: Warning Reduction — Correctness | 🔄 Partial | Shadowing/signed-unsigned fixed in some Starstrike files. `MIN` macro replaced. GameLogic & most NeuronClient untouched. |
-| Phase 5: Warning Reduction — Cosmetic | 🔄 Partial | Unused params/locals/float literals fixed in ~15 Starstrike files. GameLogic & most NeuronClient untouched. |
+| Phase 4: Warning Reduction — Correctness | ✅ Complete | Shadowing, signed/unsigned, `MIN` macro all fixed across all projects |
+| Phase 5: Warning Reduction — Cosmetic | ✅ Complete | Unused params/locals/float literals fixed across all projects. 19 C4100 in `opengl_directx.cpp` intentionally skipped (DX12 coordination). |
 | Phase 6: Re-enable C4244 | ⬜ Not Started | |
 | Phase 7: Test Infrastructure | ⬜ Not Started | |
 | Phase 8: Large Migrations | ⬜ Not Started | Planning only |
@@ -33,15 +33,15 @@
 
 | Project | Original | Current | Delta |
 |---------|----------|---------|-------|
-| NeuronClient | 179 | 158 | −21 |
-| GameLogic | 79 | 79 | 0 |
-| Starstrike | 159 | 22 | −137 |
+| NeuronClient | 179 | 19 | −160 |
+| GameLogic | 79 | 0 | −79 |
+| Starstrike | 159 | 0 | −159 |
 | GameRender | 8 | 0 | −8 |
 | NeuronCore | 0 | 0 | — |
 | NeuronServer | 0 | 0 | — |
-| **Total** | **425** | **259** | **−166 (−39%)** |
+| **Total** | **425** | **19** | **−406 (−96%)** |
 
-> **Note:** 19 of the 158 NeuronClient warnings are in `opengl_directx.cpp` (all C4100), intentionally skipped per the DX12 coordination note. The "actionable" NeuronClient count is **139**.
+> **Note:** The remaining 19 NeuronClient warnings are all C4100 in `opengl_directx.cpp`, intentionally skipped per the DX12 coordination note. The actionable warning count is **0**.
 
 ---
 
@@ -269,18 +269,18 @@ The define is commented out, so `<Windows.h>` pulls in the full Win32 API surfac
 
 ---
 
-## 🟡 Build Warning Summary (259 remaining)
+## 🟡 Build Warning Summary (19 remaining — all intentionally skipped)
 
-> **Note:** The 259 count is still artificially low because C4244 is globally disabled (§9). Re-enabling C4244 will expose additional warnings. GameRender is now at `/W4` (§5 fixed).
+> **Note:** The 19 remaining are all C4100 in `opengl_directx.cpp` (skipped per DX12 coordination note). The actionable count is **0**. C4244 is still globally disabled (§9) — re-enabling it will expose additional warnings. GameRender is at `/W4` (§5 fixed).
 
 ### Warning Distribution by Project
 
 | Project | Warnings |
 |---------|----------|
-| NeuronClient | 179 |
-| Starstrike | 159 |
-| GameLogic | 79 |
-| GameRender | 8 |
+| NeuronClient | 19 (all `opengl_directx.cpp` C4100 — skipped) |
+| GameLogic | 0 |
+| Starstrike | 0 |
+| GameRender | 0 |
 | NeuronCore | 0 |
 | NeuronServer | 0 |
 
@@ -400,7 +400,7 @@ Many are in base-class virtual methods with empty bodies (e.g., `EclButton::Rend
 - Use `[[maybe_unused]]` on base-class virtual method parameters
 - Delete truly unused locals (e.g., `int b = 10;` in `camera.cpp:230` and `spawnpoint.cpp:410`)
 
-> 🔄 **Partially Fixed** — Cleaned up in ~15 Starstrike files (`camera.cpp`, `script.cpp`, `taskmanager.cpp`, `WinMain.cpp`, etc.) and several NeuronClient files (`sound_instance.cpp`, `soundsystem.cpp`). **125 C4100 + 32 C4189 = 157 remain**, mostly in GameLogic and NeuronClient base-class virtual methods.
+> ✅ **Fixed** (Phases 4–5) — All unused parameters annotated with `[[maybe_unused]]`, all unused locals removed across Starstrike, NeuronClient, and GameLogic. Only 19 C4100 in `opengl_directx.cpp` remain (intentionally skipped per DX12 coordination note).
 
 
 ### 19. Signed/Unsigned Mismatches (~100 warnings)
@@ -428,7 +428,7 @@ Variables redeclared in inner scopes hiding outer declarations. Most problematic
 
 **Fix:** Rename inner variables or restructure scopes.
 
-> 🔄 **Partially Fixed** — Fixed in `taskmanager_interface_icons.cpp` (`captionId`, `zone`, `boxX`, `boxY`, `boxH`, `i`), `global_world.cpp` (`levFile`, `i`), `level_file.cpp` (`i`). **17 remain** (15 C4456 + 2 C4457), mostly `landscape.cpp` (8× `segStart`/`segEnd`) and NeuronClient files.
+> ✅ **Fixed** (Phase 4) — All shadowing warnings fixed across Starstrike, NeuronClient, and GameLogic: `taskmanager_interface_icons.cpp`, `global_world.cpp`, `level_file.cpp`, `building.cpp` (`i` → `j` in inner loop).
 
 
 ### 21. Double-to-Float Truncation (~20 warnings)

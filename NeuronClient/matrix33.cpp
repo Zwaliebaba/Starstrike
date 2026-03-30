@@ -7,7 +7,7 @@
 
 Matrix33::Matrix33() {}
 
-Matrix33::Matrix33(int _ignored) { SetToIdentity(); }
+Matrix33::Matrix33([[maybe_unused]] int _ignored) { SetToIdentity(); }
 
 Matrix33::Matrix33(const Matrix33& _other) { memcpy(this, &_other, sizeof(Matrix33)); }
 

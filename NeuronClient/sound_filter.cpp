@@ -156,7 +156,7 @@ void DspGargle::ProcessTriangle(signed short *_data, unsigned int _numSamples)
 	float wet = m_wetDryMix / 100.0f;
 	float dry = 1.0f - wet;
 
-	int i = 0;
+	unsigned int i = 0;
 	while (1)
 	{
 		while (m_phase < 1.0f)
@@ -187,7 +187,7 @@ void DspGargle::ProcessSquare(signed short *_data, unsigned int _numSamples)
 	// m_phase ranges from 0 to 2
 	float inc = (2.0f * m_freq) / (float)m_sampleRate;
 
-	int i = 0;
+	unsigned int i = 0;
 	while (1)
 	{
 		while (m_phase < 1.0f)
@@ -313,10 +313,10 @@ void DspEcho::Process(signed short *_data, unsigned int _numSamples)
 //
 //		m_currentBufferIndex = i % delaySize;
 //	}
-	int i = 0;
+	unsigned int i = 0;
 	while (i < _numSamples)
 	{
-		int numSamplesRemaining = _numSamples - i;
+		unsigned int numSamplesRemaining = _numSamples - i;
 		int finalIndex = delayInSamples - 1;
 		int numSamplesToTakeFromBufferThisIteration = finalIndex - m_currentBufferIndex + 1;
 		if (i + numSamplesToTakeFromBufferThisIteration > numSamplesRemaining)
@@ -379,17 +379,15 @@ DspReverb::~DspReverb()
 }
 
 
-void DspReverb::SetParameters(float const *_params)
+void DspReverb::SetParameters([[maybe_unused]] float const *_params)
 {
 }
 
 
 void DspReverb::Process(signed short *_data, unsigned int _numSamples)
 {
-	float wetProportion = m_wetDryMix * 0.01f;
-	float dryProportion = 1.0f - wetProportion;
-
-	int i, j, k=0, s;
+	int i, j, s;
+	unsigned int k = 0;
 	int const delaySize = 3 * m_sampleRate;
 
 	while (k < _numSamples)

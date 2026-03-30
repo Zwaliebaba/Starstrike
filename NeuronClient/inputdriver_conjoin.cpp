@@ -54,7 +54,7 @@ InputParserState ConjoinInputDriver::parseInputSpecification(const InputSpecToke
 
   // Parsing went OK. Save this.
   m_specs.push_back(std::move(speclist));
-  spec.control_id = m_specs.size() - 1;
+  spec.control_id = static_cast<control_id_t>(m_specs.size() - 1);
   return STATE_DONE;
 }
 
@@ -89,7 +89,7 @@ bool ConjoinInputDriver::getInput(const InputSpec& spec, InputDetails& details)
 
 void ConjoinInputDriver::Advance() {}
 
-const string& ConjoinInputDriver::getLastParseError(InputParserState state) { return lastError; }
+const string& ConjoinInputDriver::getLastParseError([[maybe_unused]] InputParserState state) { return lastError; }
 
 bool ConjoinInputDriver::getInputDescription(const InputSpec& spec, InputDescription& desc)
 {

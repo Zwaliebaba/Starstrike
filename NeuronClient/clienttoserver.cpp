@@ -41,7 +41,7 @@ static NetCallBackRetType ListenCallback(NetUdpPacket* udpdata)
   return 0;
 }
 
-static NetCallBackRetType ListenThread(void* ignored)
+static NetCallBackRetType ListenThread([[maybe_unused]] void* ignored)
 {
   g_context->m_clientToServer->m_receiveSocket = new NetSocketListener(4001);
   NetRetCode retCode = g_context->m_clientToServer->m_receiveSocket->StartListening(ListenCallback);
@@ -459,8 +459,8 @@ void ClientToServer::ProcessServerUpdates(ServerToClientLetter* letter)
         {
           DEBUG_ASSERT(update->GetWorldPos() != g_zeroVector);
           int unitId;
-          Unit* unit = g_context->m_location->m_teams[update->m_teamId].NewUnit(update->m_entityType, update->m_numTroops, &unitId,
-                                                                            update->GetWorldPos());
+          g_context->m_location->m_teams[update->m_teamId].NewUnit(update->m_entityType, update->m_numTroops, &unitId,
+                                                                             update->GetWorldPos());
           g_context->m_location->SpawnEntities(update->GetWorldPos(), update->m_teamId, unitId, update->m_entityType, update->m_numTroops,
                                            g_zeroVector, update->m_numTroops * 2);
         }

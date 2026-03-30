@@ -217,7 +217,7 @@ void ScrollBarButton::MouseDown()
         DEBUG_ASSERT( m_scrollBar );
         int pixelsInside = g_target->Y() - ( m_parent->m_y + m_y );
         float fractionInside = (float) pixelsInside / (float) m_h;
-        int centerVal = fractionInside * m_scrollBar->m_numRows;
+        int centerVal = static_cast<int>(fractionInside * m_scrollBar->m_numRows);
         int desiredVal = centerVal - m_grabOffset;
         m_scrollBar->SetCurrentValue( desiredVal );
     }
@@ -232,7 +232,7 @@ void ScrollBarButton::MouseDown()
         //if( barEnd >= m_h ) barEnd = m_h-1;
         if( mouseY >= barTop && mouseY <= barEnd )
         {
-            m_grabOffset = m_scrollBar->m_winSize * float( mouseY - barTop ) / float( barEnd - barTop );
+            m_grabOffset = static_cast<int>(m_scrollBar->m_winSize * float( mouseY - barTop ) / float( barEnd - barTop ));
         }
     }
 }

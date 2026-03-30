@@ -72,7 +72,7 @@ void EclButton::SetTooltip(const char* _tooltip)
 
 void EclButton::SetParent(EclWindow* _parent) { m_parent = _parent; }
 
-void EclButton::Render(int realX, int realY, bool highlighted, bool clicked) {}
+void EclButton::Render([[maybe_unused]] int realX, [[maybe_unused]] int realY, [[maybe_unused]] bool highlighted, [[maybe_unused]] bool clicked) {}
 
 void EclButton::MouseUp() {}
 
@@ -80,4 +80,4 @@ void EclButton::MouseDown() {}
 
 void EclButton::MouseMove() {}
 
-void EclButton::Keypress(int keyCode, bool shift, bool ctrl, bool alt) {}
+void EclButton::Keypress([[maybe_unused]] int keyCode, [[maybe_unused]] bool shift, [[maybe_unused]] bool ctrl, [[maybe_unused]] bool alt) {}

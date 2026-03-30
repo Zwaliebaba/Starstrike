@@ -56,7 +56,7 @@ inline void glVertex3fv(const GLfloat* v)
 
 inline void glVertex3d(GLdouble x, GLdouble y, GLdouble z)
 {
-  glVertex3f_impl(x, y, z);
+  glVertex3f_impl(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 inline void glVertex3f(GLfloat x, GLfloat y, GLfloat z)

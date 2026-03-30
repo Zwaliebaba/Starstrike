@@ -147,7 +147,7 @@ void EclWindow::Keypress(int keyCode, bool shift, bool ctrl, bool alt)
     currentTextEdit->Keypress(keyCode, shift, ctrl, alt);
 }
 
-void EclWindow::MouseEvent(bool lmb, bool rmb, bool up, bool down) {}
+void EclWindow::MouseEvent([[maybe_unused]] bool lmb, [[maybe_unused]] bool rmb, [[maybe_unused]] bool up, [[maybe_unused]] bool down) {}
 
 void EclWindow::Render(bool hasFocus)
 {

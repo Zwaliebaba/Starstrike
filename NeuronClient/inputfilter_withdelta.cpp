@@ -8,7 +8,7 @@ typedef std::unique_ptr<const InputFilterSpec> FilterSpecPtr;
 void InputFilterWithDelta::registerDeltaID( InputFilterSpec &spec )
 {
 	InputDetails details;
-	spec.id = m_oldDetails.size();
+	spec.id = static_cast<filterspec_id_t>(m_oldDetails.size());
 	details.type = spec.type;
 	details.x = details.y = 0;
 

@@ -37,9 +37,9 @@ void FlagRenderer::Render(Flag& _flag)
                                 1.0f/(float) (FLAG_RESOLUTION-1) * _flag.m_front * _flag.m_size;
             }
 
-            targetPos.x += 1 * cosf( g_gameTime + x * 1.5f ) * (float) x / (float) FLAG_RESOLUTION;
-            targetPos.y += 3 * sinf( g_gameTime + x * 1.1f ) * (float) x / (float) FLAG_RESOLUTION;
-            targetPos.z += 1 * cosf( g_gameTime + x * 1.3f ) * (float) x / (float) FLAG_RESOLUTION;
+            targetPos.x += 1 * cosf( static_cast<float>(g_gameTime) + x * 1.5f ) * (float) x / (float) FLAG_RESOLUTION;
+            targetPos.y += 3 * sinf( static_cast<float>(g_gameTime) + x * 1.1f ) * (float) x / (float) FLAG_RESOLUTION;
+            targetPos.z += 1 * cosf( static_cast<float>(g_gameTime) + x * 1.3f ) * (float) x / (float) FLAG_RESOLUTION;
 
             _flag.m_flag[x][z] = _flag.m_flag[x][z] * factor2 + targetPos * factor1;
 

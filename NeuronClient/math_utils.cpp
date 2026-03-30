@@ -308,10 +308,10 @@ float RayRayDist(const LegacyVector3& a, const LegacyVector3& aDir, const Legacy
   // Now we are going to find the points in the two
   {
     // Where line A intersects planeB is the point of closest approach to line B
-    int result1 = RayPlaneIntersection(a, aDir, planeB, posOnA);
+    [[maybe_unused]] int result1 = RayPlaneIntersection(a, aDir, planeB, posOnA);
 
     // Where line B intersects planeA is the point of closest approach to line A
-    int result2 = RayPlaneIntersection(b, bDir, planeA, posOnB);
+    [[maybe_unused]] int result2 = RayPlaneIntersection(b, bDir, planeA, posOnB);
   }
 
   float dist = ((*posOnA) - (*posOnB)).Mag();

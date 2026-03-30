@@ -106,7 +106,7 @@ DirectSoundChannel::DirectSoundChannel()
     m_lastSampleWritten(0),
     m_channelHealth(0.0f),
     m_silenceRemaining(0),
-    m_freq(-1),
+    m_freq(static_cast<unsigned int>(-1)),
     m_volume(-1.0f),
     m_minDist(-1.0f),
     m_pos(0, 0, 0),
@@ -905,7 +905,7 @@ void SoundLibrary3dDirectSound::EnableDspFX(int _channel, int _numFilters, const
   }
 }
 
-void SoundLibrary3dDirectSound::UpdateDspFX(int _channel, int _filterType, int _numParams, const float* _params)
+void SoundLibrary3dDirectSound::UpdateDspFX(int _channel, int _filterType, [[maybe_unused]] int _numParams, const float* _params)
 {
   DEBUG_ASSERT(_channel >= 0 && _channel < m_numChannels);
   DEBUG_ASSERT(GetNumFilters(_channel) > 0);

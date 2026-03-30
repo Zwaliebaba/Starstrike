@@ -12,7 +12,7 @@
 #include "GameApp.h"
 #include "location.h"
 
-void Resource::AddBitmap(const char* _name, const BitmapRGBA& _bmp, bool _mipMapping)
+void Resource::AddBitmap(const char* _name, const BitmapRGBA& _bmp, [[maybe_unused]] bool _mipMapping)
 {
   // Only insert if a bitmap with no other bitmap is already using that name
   if (m_bitmaps.GetIndex(_name) == -1)

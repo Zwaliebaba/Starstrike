@@ -50,7 +50,7 @@ void InputManager::parseInputPrefs(TextReader& reader, bool replace)
         {
           if (inputspec != "")
           {
-            unsigned len = inputspec.length() - 1;
+            unsigned len = static_cast<unsigned>(inputspec.length()) - 1;
             if (inputspec[len] == '\n')
               inputspec = inputspec.substr(0, len--);
             if (inputspec[len] == '\r')

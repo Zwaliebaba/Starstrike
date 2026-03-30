@@ -56,7 +56,7 @@ InputParserState PipeInputDriver::parseInputSpecification( InputSpecTokens const
 	spec.type = INPUT_TYPE_BOOL;
 
 	// Get the last position of an arrow token
-	unsigned arrowPos = -1;
+	unsigned arrowPos = static_cast<unsigned>(-1);
 	for ( unsigned i = tokens.length(); i >= 0; --i )
 		if ( tokens[ i ] == "->" ) {
 			arrowPos = i;
@@ -126,7 +126,7 @@ InputParserState PipeInputDriver::parseInputSpecification( InputSpecTokens const
 
 	// Parsing went OK. Save this.
 	m_specs.push_back(std::move(filterWithArgs ));
-	spec.control_id = m_specs.size() - 1;
+	spec.control_id = static_cast<control_id_t>(m_specs.size() - 1);
 	return STATE_DONE;
 }
 
@@ -146,7 +146,7 @@ void PipeInputDriver::Advance()
 }
 
 
-const string &PipeInputDriver::getLastParseError( InputParserState state )
+const string &PipeInputDriver::getLastParseError( [[maybe_unused]] InputParserState state )
 {
 	return lastError;
 }

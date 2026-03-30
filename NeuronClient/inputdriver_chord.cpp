@@ -69,7 +69,7 @@ InputParserState ChordInputDriver::parseInputSpecification(const InputSpecTokens
 
   // Parsing went OK. Save this.
   m_specs.push_back(std::move(speclist));
-  spec.control_id = m_specs.size() - 1;
+  spec.control_id = static_cast<control_id_t>(m_specs.size() - 1);
   return STATE_DONE;
 }
 
@@ -90,7 +90,7 @@ bool ChordInputDriver::getInput(const InputSpec& spec, InputDetails& details)
 
 void ChordInputDriver::Advance() {}
 
-const string& ChordInputDriver::getLastParseError(InputParserState state) { return lastError; }
+const string& ChordInputDriver::getLastParseError([[maybe_unused]] InputParserState state) { return lastError; }
 
 bool ChordInputDriver::getInputDescription(const InputSpec& spec, InputDescription& desc)
 {

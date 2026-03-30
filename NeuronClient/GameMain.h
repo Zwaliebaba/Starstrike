@@ -75,7 +75,7 @@ namespace Neuron
       virtual void OnWindowMoved()
       {
         const auto r = Graphics::Core::Get().GetOutputSize();
-        Graphics::Core::Get().WindowSizeChanged(r.Width, r.Height);
+        Graphics::Core::Get().WindowSizeChanged(static_cast<int>(r.Width), static_cast<int>(r.Height));
       }
 
       virtual void OnDisplayChange() { Graphics::Core::Get().UpdateColorSpace(); }

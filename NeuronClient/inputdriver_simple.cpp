@@ -91,12 +91,12 @@ condition_t SimpleInputDriver::getConditionID( string const &name, inputtype_t &
 }
 
 
-InputParserState SimpleInputDriver::writeExtraSpecInfo( InputSpec &spec ) {
+InputParserState SimpleInputDriver::writeExtraSpecInfo( [[maybe_unused]] InputSpec &spec ) {
 	return STATE_DONE; // No extra info to write. We're done.
 }
 
-InputParserState SimpleInputDriver::parseExtraToken( std::string const &token,
-                                                     InputSpec &spec ) {
+InputParserState SimpleInputDriver::parseExtraToken( [[maybe_unused]] std::string const &token,
+													 [[maybe_unused]] InputSpec &spec ) {
 	return STATE_BAD_EXTRA; // Got into STATE_WANT_MODIFIER with no handler.
 }
 

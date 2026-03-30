@@ -35,7 +35,7 @@ void InvertInputDriver::Advance()
 }
 
 
-const string &InvertInputDriver::getLastParseError( InputParserState state )
+const string &InvertInputDriver::getLastParseError( [[maybe_unused]] InputParserState state )
 {
 	return lastError;
 }
@@ -62,7 +62,7 @@ InputParserState InvertInputDriver::parseInputSpecification( InputSpecTokens con
 			}
 			m_specs.push_back( std::unique_ptr<const InputSpec>( new InputSpec( invspec ) ) );
 			spec.type = INPUT_TYPE_BOOL;
-			spec.control_id = m_specs.size() - 1;
+			spec.control_id = static_cast<control_id_t>(m_specs.size() - 1);
 			return STATE_DONE;
 		}
 		return state;

@@ -83,7 +83,7 @@ CachedSampleHandle::~CachedSampleHandle()
 
 unsigned int CachedSampleHandle::Read(signed short *_data, unsigned int _numSamples)
 {
-	int samplesRemaining = m_cachedSample->m_numSamples - m_nextSampleIndex;
+	unsigned int samplesRemaining = m_cachedSample->m_numSamples - m_nextSampleIndex;
 	if (_numSamples > samplesRemaining)
 	{
 		_numSamples = samplesRemaining;
@@ -109,7 +109,7 @@ void CachedSampleHandle::Restart()
 
 CachedSampleManager::~CachedSampleManager()
 {
-	for (int i = 0; i < m_cache.Size(); ++i)
+	for (unsigned int i = 0; i < m_cache.Size(); ++i)
 	{
 		delete m_cache.GetData(i);
 	}
@@ -141,11 +141,11 @@ int CachedSampleManager::GetMemoryUsage()
 {
     int memoryUsage = 0;
 
-    for( int i = 0; i < m_cache.Size(); ++i )
-    {
-        if( m_cache.ValidIndex(i) )
-        {
-            CachedSample *sample = m_cache.GetData(i);
+	for( unsigned int i = 0; i < m_cache.Size(); ++i )
+	{
+		if( m_cache.ValidIndex(i) )
+		{
+			CachedSample *sample = m_cache.GetData(i);
             int sampleSize = sizeof(signed short) * sample->m_numChannels * sample->m_numSamples;
             memoryUsage += sampleSize;
         }

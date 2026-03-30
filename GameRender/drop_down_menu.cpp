@@ -238,8 +238,8 @@ void DropDownMenu::CreateMenu()
     EclRegisterWindow( window );
 
     int screenH = g_context->m_renderer->ScreenH();
-    int numColumnsRequired = 1 + ( m_h * m_options.Size() ) / (screenH * 0.8f);
-    int numPerColumn =  ceil( (float) m_options.Size() / (float) numColumnsRequired );
+    int numColumnsRequired = static_cast<int>(1 + ( m_h * m_options.Size() ) / (screenH * 0.8f));
+    int numPerColumn = static_cast<int>(ceil( (float) m_options.Size() / (float) numColumnsRequired ));
 
     int index = 0;
 

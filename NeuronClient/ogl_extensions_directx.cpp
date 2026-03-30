@@ -67,7 +67,7 @@ void __stdcall glBindBufferD3D(GLenum _target, GLuint _bufferId)
     s_currentVBO = nullptr;
 }
 
-void __stdcall glBufferDataD3D(GLenum _target, GLsizeiptrARB _size, const GLvoid* _data, GLenum _usage)
+void __stdcall glBufferDataD3D(GLenum _target, GLsizeiptrARB _size, const GLvoid* _data, [[maybe_unused]] GLenum _usage)
 {
   DEBUG_ASSERT(_target == GL_ARRAY_BUFFER_ARB);
   DEBUG_ASSERT(s_currentVBO != nullptr);
@@ -146,4 +146,4 @@ void ShutdownOGLExtensions()
   s_lastVertexBufferId = 0;
 }
 
-int IsOGLExtensionSupported(const char* extension) { return 0; }
+int IsOGLExtensionSupported([[maybe_unused]] const char* extension) { return 0; }

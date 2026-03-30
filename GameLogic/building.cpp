@@ -205,7 +205,7 @@ void Building::SetShapePorts(const ShapeFragmentData* _fragment)
   }
 }
 
-void Building::Reprogram(float _complete) {}
+void Building::Reprogram([[maybe_unused]] float _complete) {}
 
 void Building::ReprogramComplete()
 {
@@ -252,7 +252,7 @@ LegacyVector3 Building::PushFromBuilding(const LegacyVector3& pos, float _radius
 
 bool Building::IsInView() { return (g_context->m_camera->SphereInViewFrustum(m_centerPos, m_radius)); }
 
-bool Building::PerformDepthSort(LegacyVector3& _centerPos) { return false; }
+bool Building::PerformDepthSort([[maybe_unused]] LegacyVector3& _centerPos) { return false; }
 
 void Building::EvaluatePorts()
 {
@@ -269,9 +269,9 @@ void Building::EvaluatePorts()
     if (g_context->m_location->m_entityGrid)
     {
       WorldObjectId* ids = g_context->m_location->m_entityGrid->GetNeighbours(port->m_mat.pos.x, port->m_mat.pos.z, 5.0f, &numFound);
-      for (int i = 0; i < numFound; ++i)
+      for (int j = 0; j < numFound; ++j)
       {
-        WorldObjectId id = ids[i];
+        WorldObjectId id = ids[j];
         Entity* entity = g_context->m_location->GetEntity(id);
         if (entity && entity->m_type == Entity::TypeDarwinian)
         {
@@ -301,7 +301,7 @@ void Building::EvaluatePorts()
   }
 }
 
-void Building::Damage(float _damage) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Damage")); }
+void Building::Damage([[maybe_unused]] float _damage) { g_simEventQueue.Push(SimEvent::MakeSoundBuilding(m_id, "Damage")); }
 
 void Building::Destroy(float _intensity)
 {
@@ -324,8 +324,8 @@ void Building::Destroy(float _intensity)
   }
 }
 
-bool Building::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, LegacyVector3* _pos,
-                          LegacyVector3* norm)
+bool Building::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir, float _rayLen, [[maybe_unused]] LegacyVector3* _pos,
+                          [[maybe_unused]] LegacyVector3* norm)
 {
   if (m_shape)
   {
@@ -362,7 +362,7 @@ bool Building::DoesShapeHit(ShapeStatic* _shape, Matrix34 _theTransform)
 
 int Building::GetBuildingLink() { return -1; }
 
-void Building::SetBuildingLink(int _buildingId) {}
+void Building::SetBuildingLink([[maybe_unused]] int _buildingId) {}
 
 int Building::GetNumPorts() { return m_ports.Size(); }
 

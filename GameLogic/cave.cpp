@@ -49,7 +49,7 @@ bool Cave::Advance()
     spawnPoint.y = g_context->m_location->m_landscape.m_heightMap->GetValue(spawnPoint.x, spawnPoint.z);
 
     int numFound;
-    WorldObjectId* objs = g_context->m_location->m_entityGrid->GetFriends(spawnPoint.x, spawnPoint.z, 100.0f, &numFound, m_id.GetTeamId());
+    g_context->m_location->m_entityGrid->GetFriends(spawnPoint.x, spawnPoint.z, 100.0f, &numFound, m_id.GetTeamId());
     if (numFound < 30)
       g_context->m_location->SpawnEntities(spawnPoint, m_id.GetTeamId(), m_id.GetUniqueId(), m_troopType, 1, g_zeroVector, 0.0f);
 

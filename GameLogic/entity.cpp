@@ -227,7 +227,7 @@ int Entity::EnterTeleports(int _requiredId)
   return -1;
 }
 
-void Entity::AdvanceInAir(Unit* _unit)
+void Entity::AdvanceInAir([[maybe_unused]] Unit* _unit)
 {
   m_vel += LegacyVector3(0, -15.0, 0) * SERVER_ADVANCE_PERIOD;
   m_pos += m_vel * SERVER_ADVANCE_PERIOD;
@@ -601,11 +601,11 @@ bool Entity::RayHit(const LegacyVector3& _rayStart, const LegacyVector3& _rayDir
   return RaySphereIntersection(_rayStart, _rayDir, m_pos, 5.0f);
 }
 
-void Entity::DirectControl(const TeamControls& _teamControls) {}
+void Entity::DirectControl([[maybe_unused]] const TeamControls& _teamControls) {}
 
 LegacyVector3 Entity::GetCameraFocusPoint() { return m_pos + m_vel; }
 
-void Entity::SetWaypoint(const LegacyVector3 _waypoint) {}
+void Entity::SetWaypoint([[maybe_unused]] const LegacyVector3 _waypoint) {}
 
 void Entity::FollowRoute()
 {

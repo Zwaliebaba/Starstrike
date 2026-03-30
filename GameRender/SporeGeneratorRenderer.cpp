@@ -49,7 +49,7 @@ void SporeGeneratorRenderer::Render(const Entity& _entity, const EntityRenderCon
 
   if (spore.m_renderDamaged)
   {
-    float timeIndex = g_gameTime + spore.m_id.GetUniqueId() * 10;
+    float timeIndex = static_cast<float>(g_gameTime) + spore.m_id.GetUniqueId() * 10;
     float thefrand = frand();
     if (thefrand > 0.7f)
       mat.f *= (1.0f - sinf(timeIndex) * 0.5f);
@@ -87,7 +87,7 @@ void SporeGeneratorRenderer::Render(const Entity& _entity, const EntityRenderCon
       prevTailDir = (thisTailPos - prevTailPos);
       prevTailDir.HorizontalAndNormalise();
 
-      float timeIndex = g_gameTime + i + j + spore.m_id.GetUniqueId() * 10;
+      float timeIndex = static_cast<float>(g_gameTime) + i + j + spore.m_id.GetUniqueId() * 10;
       thisTailPos += LegacyVector3(sinf(timeIndex) * 10.0f, sinf(timeIndex) * 10.0f, sinf(timeIndex) * 10.0f);
 
       LegacyVector3 vel = s_vel;
@@ -98,13 +98,14 @@ void SporeGeneratorRenderer::Render(const Entity& _entity, const EntityRenderCon
       if (spore.m_state == SporeGenerator::StatePanic)
       {
         float panicFraction = 5.0f;
-        thisTailPos += LegacyVector3(cosf(g_gameTime * panicFraction + i + j) * 5.0f, cosf(g_gameTime * panicFraction + i + j) * 5.0f,
-                                     cosf(g_gameTime * panicFraction + i + j) * 5.0f);
+        float panicTime = static_cast<float>(g_gameTime) * panicFraction + i + j;
+        thisTailPos += LegacyVector3(cosf(panicTime) * 5.0f, cosf(panicTime) * 5.0f,
+                                     cosf(panicTime) * 5.0f);
       }
 
       float size = 1.0f - static_cast<float>(j) / static_cast<float>(numTailParts);
       size *= 2.0f;
-      size += sinf(g_gameTime + i + j) * 0.3f;
+      size += sinf(static_cast<float>(g_gameTime) + i + j) * 0.3f;
 
       RenderTail(prevTailPos, thisTailPos, size);
       prevTailPos = thisTailPos;

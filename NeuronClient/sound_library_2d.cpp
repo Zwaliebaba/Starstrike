@@ -63,7 +63,7 @@ SoundLib2dBuf::~SoundLib2dBuf()
 // Class SoundLibrary2d
 //*****************************************************************************
 
-void CALLBACK WaveOutProc(HWAVEOUT _dev, UINT _msg, DWORD _userData, DWORD _param1, DWORD _param2)
+void CALLBACK WaveOutProc([[maybe_unused]] HWAVEOUT _dev, UINT _msg, [[maybe_unused]] DWORD _userData, [[maybe_unused]] DWORD _param1, [[maybe_unused]] DWORD _param2)
 {
 	if (_msg != WOM_DONE) return;
 	if (!s_device)	return;

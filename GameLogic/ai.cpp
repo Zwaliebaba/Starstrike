@@ -166,7 +166,7 @@ int AI::FindNearestTarget(const LegacyVector3& _fromPos)
   return id;
 }
 
-bool AI::Advance(Unit* _unit)
+bool AI::Advance([[maybe_unused]] Unit* _unit)
 {
   //
   // Try to get Darwinians to stay near AI Targets
@@ -460,9 +460,9 @@ void AITarget::RecalculatePriority()
   }
 }
 
-bool AITarget::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool AITarget::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool AITarget::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool AITarget::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }
 
 // ============================================================================
 
@@ -647,6 +647,6 @@ void AISpawnPoint::Write(FileWriter* _out)
   _out->printf("%-6d %-6d %-6d %-6d %-6d %-6d", m_activatorId, m_entityType, m_count, m_period, m_spawnLimit, m_routeId);
 }
 
-bool AISpawnPoint::DoesSphereHit(const LegacyVector3& _pos, float _radius) { return false; }
+bool AISpawnPoint::DoesSphereHit([[maybe_unused]] const LegacyVector3& _pos, [[maybe_unused]] float _radius) { return false; }
 
-bool AISpawnPoint::DoesShapeHit(ShapeStatic* _shape, Matrix34 _transform) { return false; }
+bool AISpawnPoint::DoesShapeHit([[maybe_unused]] ShapeStatic* _shape, [[maybe_unused]] Matrix34 _transform) { return false; }

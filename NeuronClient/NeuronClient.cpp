@@ -103,7 +103,7 @@ Windows::Foundation::Point ClientEngine::OutputTopLeft()
     return { static_cast<float>(pt.x), static_cast<float>(pt.y) };
 }
 
-static void HandlePointer(GameMain* _app, HWND hwnd, WPARAM wParam, LPARAM lParam)
+static void HandlePointer(GameMain* _app, HWND hwnd, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     const UINT32 pointerId = GET_POINTERID_WPARAM(wParam);
     POINTER_INFO pi{};

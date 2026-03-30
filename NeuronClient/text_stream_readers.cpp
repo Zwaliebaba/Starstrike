@@ -63,7 +63,7 @@ void TextReader::CleanLine()
 
 	if (m_fileEncrypted != 0)
 	{
-		int len = strlen(m_line);
+		int len = static_cast<int>(strlen(m_line));
 
 		// Check if file is encrypted
 		if (m_fileEncrypted == -1)

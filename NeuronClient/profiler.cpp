@@ -124,7 +124,6 @@ double ProfiledElement::GetMaxChildTime()
 	while (i != -1)
 	{
 		float val = m_children[i]->m_historyTotalTime;
-		ProfiledElement *child = m_children[i];
 		if (val > rv)
 		{
 			rv = val;

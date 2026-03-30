@@ -235,7 +235,7 @@ void W32InputDriver::Advance()
 
 void W32InputDriver::PollForEvents() { g_windowManager->NastyPollForMessages(); }
 
-LRESULT CALLBACK W32InputDriver::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK W32InputDriver::WndProc([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
