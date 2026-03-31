@@ -74,6 +74,7 @@ static char s_filePathBuffer[FILE_PATH_BUFFER_SIZE + 1];
 const char* GetDirectoryPart(const char* _fullFilePath)
 {
     strncpy(s_filePathBuffer, _fullFilePath, FILE_PATH_BUFFER_SIZE);
+    s_filePathBuffer[FILE_PATH_BUFFER_SIZE] = '\0';
 
     char* finalSlash = strrchr(s_filePathBuffer, '/');
     if (finalSlash)

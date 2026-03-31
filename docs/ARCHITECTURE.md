@@ -54,7 +54,7 @@ The renderer is built on DirectX 12 and implements modern rendering techniques.
 - **Frame Graph**: Dependency-based rendering pipeline for automatic synchronization
 
 **Ownership Model:**
-- GPU resources managed via `ComPtr<>` (Microsoft COM smart pointer)
+- GPU resources managed via `winrt::com_ptr<>` (C++/WinRT COM smart pointer)
 - CPU-side resources use standard smart pointers (`std::unique_ptr`, `std::shared_ptr`)
 - Explicit resource barriers for state transitions
 

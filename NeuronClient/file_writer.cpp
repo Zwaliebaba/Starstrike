@@ -38,7 +38,7 @@ int FileWriter::printf(char const *_fmt, ...)
 	char buf[10240];
     va_list ap;
     va_start (ap, _fmt);
-    int len = vsprintf(buf, _fmt, ap);
+    int len = vsnprintf(buf, sizeof(buf), _fmt, ap);
 
 	if (m_encrypt)
 	{

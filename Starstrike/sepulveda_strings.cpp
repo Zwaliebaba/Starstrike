@@ -54,9 +54,15 @@ const char * head( char const * _str ) {
 	int len = 1;
 	while ( len < maxLen && head_str[len] != '\0' ) ++len;
 	if ( len >= maxLen )
-		strcpy( head_str + (maxLen - 4), "...\"" );
+ {
+		strncpy( head_str + (maxLen - 4), "...\"", sizeof(head_str) - (maxLen - 4) );
+		head_str[sizeof(head_str) - 1] = '\0';
+	}
 	else
-		strcpy( head_str + len, "\"" );
+ {
+		strncpy( head_str + len, "\"", sizeof(head_str) - len );
+		head_str[sizeof(head_str) - 1] = '\0';
+	}
 	return head_str;
 }
 

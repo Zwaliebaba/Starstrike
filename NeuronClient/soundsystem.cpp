@@ -414,6 +414,7 @@ void SoundSystem::LoadBlueprints()
     if (_stricmp(group, "ENTITY") == 0)
     {
       strncpy(objectName, type, 127);
+      objectName[127] = '\0';
       int entityType = Entity::GetTypeId(type);
       DEBUG_ASSERT(entityType >= 0 && entityType < Entity::NumEntityTypes);
       DEBUG_ASSERT(!m_entityBlueprints.ValidIndex( entityType ));

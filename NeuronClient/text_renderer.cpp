@@ -304,7 +304,7 @@ void TextRenderer::DrawText2DJustified( float _x, float _y, float _size, int _xJ
     char buf[512];
     va_list ap;
     va_start (ap, _text);
-    vsprintf(buf, _text, ap);
+    vsnprintf(buf, sizeof(buf), _text, ap);
 
 	if (_xJustification > 0)
 		DrawText2DSimple( _x, _y, _size, buf );			// Left Justification

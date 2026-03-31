@@ -38,6 +38,7 @@ BinaryFileReader::BinaryFileReader(char const *_filename)
 	if (_filename)
 	{
 		strncpy(m_filename, _filename, sizeof(m_filename) - 1);
+        m_filename[sizeof(m_filename) - 1] = '\0';
 		m_file = fopen(_filename, "rb");
 		DEBUG_ASSERT(m_file);
 	}

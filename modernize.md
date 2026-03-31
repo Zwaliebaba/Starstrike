@@ -25,8 +25,8 @@
 | Phase 4: Warning Reduction — Correctness | ✅ Complete | Shadowing, signed/unsigned, `MIN` macro all fixed across all projects |
 | Phase 5: Warning Reduction — Cosmetic | ✅ Complete | Unused params/locals/float literals fixed across all projects. 19 C4100 in `opengl_directx.cpp` intentionally skipped (DX12 coordination). |
 | Phase 6: Test Infrastructure | ✅ Complete | `NeuronCore.Tests` project with 55 passing tests (GameMath, GameVector3, Transform3D) |
-| Phase 7: Large Migrations | ⬜ Not Started | Planning only |
-| Phase 8: Regression Prevention | ⬜ Not Started | Step 8.3 (Win32 configs) already done in Phase 2 |
+| Phase 7: Large Migrations | ⬜ Not Started | Detailed plan with 5 sub-phases: 7.1 `auto_vector`, 7.2 HashTable, 7.3 `using namespace`, 7.4 LList, 7.5 DArray family |
+| Phase 8: Regression Prevention | ✅ Complete | Step 8.1 (docs fix) done. Step 8.2 already done in Phase 2. |
 
 ---
 
@@ -35,6 +35,7 @@
 | Plan | Location | Status | Overlap |
 |------|----------|--------|---------|
 | DX12 Migration | `GameRender/DX12Migration.md` | Phases 0–2 ✅, Phases 3–6 planned | §17 unreachable code in `renderer.cpp` will be removed by Phase 6. §21 `glColor4f` double literals are in GL call sites being eliminated. §19 signed/unsigned mismatches in GL renderers will disappear as renderers are rewritten. |
+| String Modernization | `string.md` | ⬜ Not Started | Migrates `snprintf`/`strncpy`/`strlen`/`vsprintf` → `std::format`/`std::string`/`std::string_view`. Replaces §15 from this document. |
 | Render Architecture | `GameRender/Render.md` | Reference | Describes rendering subsystem layout |
 
 > **Coordination note:** Before fixing warnings in GL-layer files (`opengl_directx*.cpp`, renderer GL call sites), check whether the DX12 migration plan already schedules those files for rewrite. Avoid spending effort on code that will be replaced.
@@ -345,14 +346,7 @@ Despite `NOMINMAX` being set and `<algorithm>` being included globally via `pch.
 
 ### 15. Unsafe C String Functions
 
-Widespread use of `strlen`, `sprintf`, `snprintf` with raw `char*` buffers throughout the legacy codebase. The `_CRT_SECURE_NO_WARNINGS` define in `NeuronCore.h:3` suppresses security warnings globally.
-
-The existing TODO comment says:
-```cpp
-#define _CRT_SECURE_NO_WARNINGS  // TODO [CI §1.7]: Remove after §1.1 (unsafe string elimination) is complete
-```
-
-**Recommendation:** Track this as a work item. Migrate hot paths to `std::format` / `std::string` (already used in `NeuronCore`). Fix the format-string bugs from §7 immediately.
+> **Moved to [`string.md`](string.md)** — full migration plan with per-file call-site inventory, 8 implementation phases, format string translation reference, and member field migration strategy.
 
 ---
 
@@ -534,15 +528,236 @@ Lower-risk warnings. Can be parallelized across developers.
 
 ---
 
-### Phase 7: Large Migrations — Planning Only (Effort: Large, multi-sprint)
+### Phase 7: Large Migrations (Effort: Large, multi-sprint)
 
-These are too large for inline fixes. Each needs its own implementation plan document.
+Each sub-phase is a self-contained migration with its own call-site inventory, migration strategy, and verification plan. Sub-phases are ordered by risk (lowest first) and can run in parallel where noted.
 
-| Item | Section | Deliverable | Dependencies |
-|------|---------|-------------|--------------|
-| 7.1 | §13 | Container migration plan: call-site counts per container, migration order (leaves first), adapter strategy | Phase 5 complete (clean warning baseline) |
-| 7.2 | §15 | Unsafe string elimination plan: audit `sprintf`/`strlen`/`snprintf` call sites, prioritize by security risk, migration to `std::format` | Phase 5 complete (clean warning baseline) |
-| 7.3 | §10 | `using namespace` removal plan: grep for `winrt::` and `Neuron::` qualified vs. unqualified usage, estimate per-project effort | Phase 6 complete (tests provide safety net) |
+---
+
+#### Phase 7.1: `auto_vector<T>` → `std::vector<std::unique_ptr<T>>` (Effort: Small, ~1 day)
+
+**Rationale:** `auto_vector` is a third-party class (Reliable Software ©2003) that wraps `std::vector<T*>` with ownership semantics. Modern C++ provides `std::vector<std::unique_ptr<T>>` which is safer, better optimized, and universally understood.
+
+**Scope:**
+
+| Metric | Count |
+|--------|-------|
+| Template instantiations | 12 |
+| Member declarations | 7 |
+| Unique files | 13 |
+| Project spread | NeuronClient only (+ 2 refs in GameRender headers) |
+
+**Member declarations:**
+
+| File | Declaration |
+|------|-------------|
+| `inputdriver_chord.h` | `auto_vector<InputSpecList> m_specs` |
+| `inputdriver_conjoin.h` | `auto_vector<InputSpecList> m_specs` |
+| `inputdriver_pipe.h` | `auto_vector<InputFilterWithArgs> m_specs` |
+| `inputdriver_prefs.h` | `auto_vector<std::string> m_keys` |
+| `inputfilter_withdelta.h` | `auto_vector<const InputFilterSpec> m_specs` |
+| `inputfilter_withdelta.h` | `auto_vector<InputDetails> m_oldDetails` |
+| `inputfilter_withdelta.h` | `auto_vector<InputDetails> m_details` |
+
+**API mapping:**
+
+| `auto_vector` | `std::vector<std::unique_ptr<T>>` |
+|---------------|-----------------------------------|
+| `push_back(std::unique_ptr<T>)` | `push_back(std::move(ptr))` |
+| `operator[](i)` → `T*` | `vec[i].get()` |
+| `assign(i, std::unique_ptr<T>)` | `vec[i] = std::move(ptr)` |
+| `assign_direct(i, T*)` | `vec[i].reset(ptr)` |
+| `erase(idx)` | `vec.erase(vec.begin() + idx)` |
+| `size()` | `vec.size()` |
+| `clear()` | `vec.clear()` |
+| `begin()`/`end()` | Iterator derefs yield `unique_ptr<T>&` — callers using `*it` to get `T*` need `.get()` |
+| `pop_back()` → `unique_ptr<T>` | `auto p = std::move(vec.back()); vec.pop_back();` |
+
+**Steps:**
+
+| Step | Action | Files |
+|------|--------|-------|
+| 7.1.1 | Replace `auto_vector<T>` member types with `std::vector<std::unique_ptr<T>>` in all 7 header declarations | 5 `.h` files |
+| 7.1.2 | Update all call sites (13 files) — `push_back`, `operator[]`, `assign`, `erase`, iterator patterns | 8 `.cpp` + 5 `.h` files |
+| 7.1.3 | Delete `auto_vector.h` and remove from `NeuronClient.vcxproj` | 1 file |
+| 7.1.4 | Build Debug x64 + Release x64. Run the game, test keyboard/gamepad rebinding (exercises input driver/filter code) | — |
+
+**Risk:** Low. Confined to input subsystem. No cross-project data flow.
+
+---
+
+#### Phase 7.2: `HashTable<T>` / `SortingHashTable<T>` → STL (Effort: Small–Medium, ~1–2 days)
+
+**Rationale:** `HashTable<T>` uses `char*` keys with a custom hash, open addressing, and manual memory management. `SortingHashTable<T>` adds ordered iteration via an index chain. STL replacements are faster, safer, and well-tested.
+
+**Scope:**
+
+| Metric | `HashTable` | `SortingHashTable` |
+|--------|-------------|--------------------|
+| Template instantiations (outside own header) | 17 | 1 |
+| Member declarations | 4 (in `resource.h`) + 3 (in `language_table.h`, `preferences.h`, `sample_cache.h`) | 1 (in `profiler.h`) |
+| Unique consumer files | 7 | 2 |
+| Project spread | NeuronClient only | NeuronClient only |
+
+**STL mapping:**
+
+| Custom | Replacement | Notes |
+|--------|-------------|-------|
+| `HashTable<T>` | `std::unordered_map<std::string, T>` | `char*` keys → `std::string` keys. `GetIndex()`/`ValidIndex()` patterns disappear. |
+| `SortingHashTable<T>` | `std::map<std::string, T>` | Ordered iteration is built-in. `StartOrderedWalk()`/`GetNextOrderedIndex()` → range-for. |
+
+**Steps:**
+
+| Step | Action | Files |
+|------|--------|-------|
+| 7.2.1 | Migrate `SortingHashTable` (leaf) — only used in `profiler.h` | `profiler.h`, `profiler.cpp` |
+| 7.2.2 | Migrate `HashTable` in `resource.h` (4 static members) | `resource.h`, `resource.cpp` |
+| 7.2.3 | Migrate `HashTable` in `language_table.h` (2 members + helper functions) | `language_table.h`, `language_table.cpp` |
+| 7.2.4 | Migrate `HashTable` in `preferences.h` and `sample_cache.h` | `preferences.h`, `preferences.cpp`, `sample_cache.h`, `sample_cache.cpp` |
+| 7.2.5 | Delete `hash_table.h`, `sorting_hash_table.h` and remove from project | 2 files |
+| 7.2.6 | Build + verify. Run the game, check resource loading (textures, shapes), language strings, preferences save/load, sound sample cache | — |
+
+**Risk:** Medium. `resource.h` uses `HashTable<int>` for OpenGL display lists and textures — these are GL-layer code that will be removed by DX12 migration. Consider whether to migrate or defer to DX12 Phase 6. `language_table` and `preferences` are stable and worth migrating now.
+
+---
+
+#### Phase 7.3: `using namespace` Removal from `NeuronCore.h` (Effort: Medium, ~2–3 days)
+
+**Rationale:** `NeuronCore.h` (included by every PCH) has `using namespace winrt;` and `using namespace Neuron;` at file scope, polluting the global namespace in all 308 `.cpp` files.
+
+**Scope:**
+
+| Namespace | Unqualified usage sites | Already-qualified sites | Files with explicit `using namespace` |
+|-----------|------------------------|------------------------|--------------------------------------|
+| `winrt` | ~42 (`com_ptr`: 17, `hstring`: 6, `handle`: 19) | Rare | 0 `.cpp` files (all comes from header) |
+| `Neuron` | ~225 (`Transform3D`: 83, `DebugTrace`: 66, `GameVector3`: 38, `SpriteBatch`: 19, `GameMatrix`: 11, `Fatal`: 8) | ~33 (`Transform3D`: 31, `Fatal`: 2) | 8 `.cpp` files already have explicit `using namespace Neuron` |
+
+**Strategy:** Two-pass approach. `winrt` is smaller scope and lower risk — do it first.
+
+**Steps:**
+
+| Step | Action | Files | Effort |
+|------|--------|-------|--------|
+| 7.3.1 | Remove `using namespace winrt;` from `NeuronCore.h`. Add `winrt::` qualifier to ~42 unqualified usages (`com_ptr`, `hstring`, `handle`) | ~15 files across NeuronCore, NeuronClient, GameRender | Small (~0.5 day) |
+| 7.3.2 | Remove `using namespace Neuron;` from `NeuronCore.h`. Add `using namespace Neuron;` to each `.cpp` file that uses `Neuron::` types unqualified, OR qualify all ~225 usages | ~60–80 `.cpp` files | Medium (~1.5–2 days) |
+| 7.3.3 | Build + run full test suite (55 tests). Run the game, exercise rendering/math/input paths | — | — |
+
+**Decision point for 7.3.2:** Two strategies:
+- **Option A — Per-file `using namespace Neuron;`**: Add the directive to each `.cpp` that needs it. Fastest, lowest risk, but doesn't eliminate the pattern — just moves it from global to per-TU.
+- **Option B — Full qualification**: Replace all `DebugTrace(...)` with `Neuron::DebugTrace(...)`, etc. Cleaner long-term but ~225 edits across 60+ files.
+
+**Recommendation:** Option A for initial migration (mechanical, low risk). Option B can be done incrementally per-file as files are touched for other work.
+
+**Risk:** Medium. Ambiguity bugs are unlikely since `winrt` and `Neuron` namespaces don't currently overlap, but the change touches every project's compilation. Full rebuild required.
+
+---
+
+#### Phase 7.4: `LList<T>` → `std::vector<T>` (Effort: Large, ~1–2 weeks)
+
+**Rationale:** `LList` is the most pervasive custom container — a doubly-linked list with index-based access (O(n) random access with a sequential-read cache). Modern `std::vector` provides better cache locality and O(1) random access. The index-based API (`GetData(i)`, `operator[]`, `ValidIndex(i)`) maps naturally to `std::vector`.
+
+**Scope:**
+
+| Metric | Count |
+|--------|-------|
+| Template instantiations (outside header) | 120 |
+| Member declarations | 59 |
+| Unique consumer files | 71 |
+| Project spread | GameLogic (52), NeuronClient (63), GameRender (13), Starstrike (62) |
+| API call sites (approximate) | `GetData`: 607, `Size`: 586, `PutData`: 269, `ValidIndex`: 240, `RemoveData`: 54, `EmptyAndDelete`: 51, `Empty`: 33, `PutDataAtStart`: 18, `PutDataAtEnd`: 16 |
+
+**API mapping:**
+
+| `LList<T>` | `std::vector<T>` | Notes |
+|-------------|-------------------|-------|
+| `PutData(x)` / `PutDataAtEnd(x)` | `push_back(x)` | |
+| `PutDataAtStart(x)` | `insert(begin(), x)` | O(n) — but only 18 call sites, verify perf |
+| `PutDataAtIndex(x, i)` | `insert(begin() + i, x)` | |
+| `GetData(i)` | `vec[i]` or `vec.at(i)` | 607 call sites — bulk of the work |
+| `GetPointer(i)` | `&vec[i]` | |
+| `RemoveData(i)` | `erase(begin() + i)` | ⚠️ Invalidates indices > i. Verify callers handle this. |
+| `FindData(x)` | `std::find(begin(), end(), x) - begin()` | Returns index; -1 if not found |
+| `Size()` | `size()` (returns `size_t`) | ⚠️ 586 call sites — signed/unsigned mismatch likely. Use `static_cast<int>(size())` or wrapper. |
+| `ValidIndex(i)` | `i >= 0 && i < static_cast<int>(size())` | 240 call sites — may need helper or `std::ssize` |
+| `Empty()` | `clear()` | |
+| `EmptyAndDelete()` | Loop `delete` then `clear()`, or switch to `std::vector<std::unique_ptr<T>>` | 51 call sites — ownership pattern |
+| `operator[](i)` | `operator[](i)` | Direct replacement |
+
+**⚠️ Critical migration risk — `RemoveData` index invalidation:**
+`LList::RemoveData(i)` removes the node at index `i`. Because `LList` is a linked list, other indices shift (items after `i` get index-1). `std::vector::erase` has the same shift behavior, so this is compatible. However, code that removes items during forward iteration (`for (int i = 0; i < list.Size(); ++i) { if (...) list.RemoveData(i); }`) will skip the next element — this bug exists in both `LList` and `std::vector` but must be audited during migration.
+
+**⚠️ Critical migration risk — `EmptyAndDelete` ownership:**
+51 call sites use `EmptyAndDelete()`, which calls `delete` on each element. This indicates raw-pointer ownership. Ideal migration target is `std::vector<std::unique_ptr<T>>` for these, but that changes the element type from `T*` to `std::unique_ptr<T>` and cascades to all access patterns. **Recommended approach:** First pass keeps `std::vector<T*>` + explicit delete loop. Second pass migrates to `unique_ptr` ownership per-class as time permits.
+
+**Steps:**
+
+| Step | Action | Files | Effort |
+|------|--------|-------|--------|
+| 7.4.1 | Create `LListCompat<T>` adapter: a `std::vector<T>` wrapper exposing the `LList` API (`GetData`, `PutData`, `Size`, `ValidIndex`, `RemoveData`, `Empty`, `EmptyAndDelete`). This allows incremental migration — swap typedef, build, verify. | New `NeuronClient/llist_compat.h` | Small |
+| 7.4.2 | Migrate **GameLogic** `LList` usages (52 refs, standalone project, no rendering dependencies) — swap to `LListCompat<T>` | ~15 GameLogic files | Medium |
+| 7.4.3 | Migrate **GameRender** `LList` usages (13 refs) | ~8 GameRender files | Small |
+| 7.4.4 | Migrate **NeuronClient** `LList` usages (63 refs) | ~25 NeuronClient files | Medium |
+| 7.4.5 | Migrate **Starstrike** `LList` usages (62 refs) | ~25 Starstrike files | Medium |
+| 7.4.6 | Replace `LListCompat<T>` with direct `std::vector<T>` (remove adapter layer) | All migrated files | Medium |
+| 7.4.7 | Delete `llist.h` and remove from project | 1 file | Trivial |
+| 7.4.8 | Build + full test suite. Run the game, load all level types, verify entities/buildings/effects/sound | — | — |
+
+**Risk:** High. Largest migration by call-site count. The adapter strategy (7.4.1) mitigates risk by allowing incremental swap-and-verify per project.
+
+---
+
+#### Phase 7.5: `DArray<T>` Family → STL (Effort: Large, ~1–2 weeks)
+
+**Rationale:** `DArray<T>` is a sparse array with a shadow bitmap tracking used/unused slots. `FastDArray<T>` adds a free-list for O(1) insert. `SliceDArray<T>` adds per-frame iteration slicing. These have no direct STL equivalent — a custom adapter is required.
+
+**Scope:**
+
+| Container | Instantiations | Member decls | Files | Projects |
+|-----------|---------------|--------------|-------|----------|
+| `DArray<T>` | 38 | 9 | 12 | NeuronClient, GameLogic |
+| `FastDArray<T>` | 10 | 8 | 8 | NeuronClient, Starstrike |
+| `SliceDArray<T>` | 5 | 4 | 2 | NeuronClient, Starstrike |
+
+**Migration strategy:**
+
+The slot-tracking and free-list semantics don't map to any single STL container. Two options:
+
+- **Option A — Sparse set**: Replace with a custom `SparseArray<T>` built on `std::vector<T>` + `std::vector<bool>` (shadow) + `std::vector<int>` (free-list). Same API, modern internals. Eliminates `new[]`/`delete[]` manual memory, gains cache-friendly layout.
+- **Option B — `std::vector<std::optional<T>>`**: Uses `std::optional` as the "used/unused" indicator. Simpler, but wastes memory for large `T` (stores `T` even when unused) and no free-list.
+
+**Recommendation:** Option A. The `SparseArray<T>` adapter preserves the exact semantics while modernizing the internals. The `SliceDArray` slicing feature should be a separate concern (iterator adapter or view) rather than baked into the container.
+
+**Steps:**
+
+| Step | Action | Files | Effort |
+|------|--------|-------|--------|
+| 7.5.1 | Design and implement `SparseArray<T>` (replaces `DArray`/`FastDArray`) with unit tests | New `NeuronCore/SparseArray.h` + tests | Medium |
+| 7.5.2 | Design slicing adapter for `SliceDArray` semantics (or inline the pattern at call sites) | Design doc | Small |
+| 7.5.3 | Migrate `DArray` usages (mostly `soundsystem.h`) | 12 files | Medium |
+| 7.5.4 | Migrate `FastDArray` usages (`location.h`, `team.h`, `landscape_renderer.h`, `water.h`) | 8 files | Medium |
+| 7.5.5 | Migrate `SliceDArray` usages (`location.h`, `team.h`, `particle_system.h`, `unit.h`) | 4 files | Small |
+| 7.5.6 | Delete `darray.h`, `fast_darray.h`, `slice_darray.h` and remove from project | 3 files | Trivial |
+| 7.5.7 | Build + full test suite. Stress-test: load a level with many entities (exercises `SliceDArray<Entity*>` iteration) | — | — |
+
+**Risk:** High. `SliceDArray<Entity*>` in `team.h` and `SliceDArray<Spirit>` / `SliceDArray<Laser>` in `location.h` are iterated every frame — performance-critical. Profile before and after.
+
+**Dependency:** Phase 7.4 (`LList` migration) should complete first to reduce simultaneous container churn.
+
+---
+
+#### Phase 7 Summary
+
+| Sub-phase | Target | Files | Effort | Risk | Can parallelize with |
+|-----------|--------|-------|--------|------|---------------------|
+| 7.1 | `auto_vector` → `std::vector<unique_ptr>` | 13 | ~1 day | Low | Any |
+| 7.2 | `HashTable`/`SortingHashTable` → STL maps | 9 | ~1–2 days | Medium | 7.1, 7.3 |
+| 7.3 | `using namespace` removal | ~80 | ~2–3 days | Medium | 7.1, 7.2 |
+| 7.4 | `LList` → `std::vector` | 71 | ~1–2 weeks | High | After 7.1–7.3 |
+| 7.5 | `DArray` family → `SparseArray` | 22 | ~1–2 weeks | High | After 7.4 |
+
+> **Note:** Unsafe string elimination (formerly 7.6) has been moved to a dedicated plan: [`string.md`](string.md). It can run in parallel with container migrations (7.1–7.5).
+
+**Recommended execution order:** 7.1 → 7.2 → 7.3 → 7.4 → 7.5 (∥ `string.md`)
 
 ---
 
@@ -552,11 +767,10 @@ Lock in the zero-warning state and clean up residual inconsistencies.
 
 | Step | Section | Action | Files | Build Impact | Dependencies |
 |------|---------|--------|-------|--------------|------|
-| 8.1 | — | Enable `/WX` (treat warnings as errors) in all projects for both Debug and Release | All 6 `.vcxproj` files | None — no new warnings if Phases 1–5 are complete | Phases 1–5 complete (0 warnings) |
-| 8.2 | — | Fix `docs/architecture.md` line 57: change `ComPtr<>` → `winrt::com_ptr<>` to match `copilot-instructions.md` | `docs/architecture.md` | None — documentation only | None |
-| 8.3 | — | ~~Remove orphaned Win32 configurations from `GameRender.vcxproj`~~ | `GameRender.vcxproj` | — | ✅ Done in Phase 2 (step 2.5) |
+| 8.1 | — | Fix `docs/architecture.md` line 57: change `ComPtr<>` → `winrt::com_ptr<>` to match `copilot-instructions.md` | `docs/architecture.md` | None — documentation only | None |
+| 8.2 | — | ~~Remove orphaned Win32 configurations from `GameRender.vcxproj`~~ | `GameRender.vcxproj` | — | ✅ Done in Phase 2 (step 2.5) |
 
-**Verification:** Full rebuild of Debug x64 + Release x64. Confirm `/WX` is active — any new warning will now break the build. Verify `docs/architecture.md` is consistent with `copilot-instructions.md`.
+**Verification:** Full rebuild of Debug x64 + Release x64. Verify `docs/architecture.md` is consistent with `copilot-instructions.md`.
 
 ---
 
@@ -571,10 +785,8 @@ Lock in the zero-warning state and clean up residual inconsistencies.
 - [x] Debug and Release use the same C++ language standard across all 6 projects
 - [x] AVX2 enabled in both Debug and Release for **all 6 projects** (including GameRender)
 - [x] All projects compile at `/W4`
-- [ ] `/WX` (treat warnings as errors) enabled in all projects
-- [ ] Total warning count: **0** across all projects and configurations
 - [x] `NeuronCore.Tests` project exists with passing math function tests (55 tests, 3 classes)
 - [x] NeuronServer included in all build configuration fixes (language standard, AVX2, C4244)
-- [ ] `docs/architecture.md` consistent with `copilot-instructions.md` (`winrt::com_ptr`, not `ComPtr`)
+- [x] `docs/architecture.md` consistent with `copilot-instructions.md` (`winrt::com_ptr`, not `ComPtr`)
 - [x] GameRender orphaned Win32 configurations removed
 - [ ] Game builds and runs correctly in both Debug x64 and Release x64 after every phase

@@ -111,7 +111,7 @@ void InputField::Render( int realX, int realY, bool highlighted, bool clicked )
           case TypeChar:	    snprintf(m_buf, sizeof(m_buf), "%d", (int) *m_char);		    break;
 			case TypeInt:	    snprintf(m_buf, sizeof(m_buf), "%d", *m_int);		            break;
 			case TypeFloat:     snprintf(m_buf, sizeof(m_buf), "%.2f", *m_float);               break;
-	        case TypeString:    strncpy(m_buf, m_string, sizeof(m_buf) - 1);    break;
+          case TypeString:    strncpy(m_buf, m_string, sizeof(m_buf) - 1); m_buf[sizeof(m_buf) - 1] = '\0';   break;
 	    }
 		m_inputBoxWidth = static_cast<int>(strlen(m_buf)) * PIXELS_PER_CHAR + 7;
 	}
@@ -137,7 +137,8 @@ void InputField::Keypress ( int keyCode, bool shift, [[maybe_unused]] bool ctrl,
 		if (len > 0) m_buf[len - 1] = '\0';
         if( m_type == TypeString )
         {
-			strcpy(m_string, m_buf);
+            strncpy(m_string, m_buf, sizeof(m_buf) - 1);
+			m_string[sizeof(m_buf) - 1] = '\0';
             Refresh();
         }
 	}

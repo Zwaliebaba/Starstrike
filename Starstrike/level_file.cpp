@@ -160,6 +160,7 @@ void LevelFile::ParseCameraMounts(TextReader* _in)
 
     // Read name
     strncpy(cmnt->m_name, word, CAMERA_MOUNT_MAX_NAME_LEN);
+    cmnt->m_name[CAMERA_MOUNT_MAX_NAME_LEN] = '\0';
 
     // Read pos
     word = _in->GetNextToken();

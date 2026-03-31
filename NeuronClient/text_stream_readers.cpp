@@ -129,6 +129,7 @@ void TextReader::CleanLine()
 void TextReader::SetSeperatorChars(char const *_seperatorChars)
 {
 	strncpy(m_seperatorChars, _seperatorChars, 15);
+   m_seperatorChars[15] = '\0';
 }
 
 
