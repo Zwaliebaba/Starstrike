@@ -72,7 +72,7 @@ void Sierpinski3D::Render(float scale)
 	OpenGLD3D::GetModelViewStack().Scale(scale, scale, scale);
 
 	float alpha = 128.0f * scale;
-	glColor4ub(alpha*0.4f, alpha*0.7f, alpha, 128);
+	glColor4ub(static_cast<GLubyte>(alpha*0.4f), static_cast<GLubyte>(alpha*0.7f), static_cast<GLubyte>(alpha), 128);
 
 	glBegin(GL_POINTS);
 		for (unsigned int i = 0; i < m_points.size(); ++i)

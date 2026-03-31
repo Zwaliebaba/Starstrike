@@ -8,14 +8,14 @@
 | Platform Toolset | v145 (MSVC 14.50) |
 | Graphics API | DirectX 12 (via OpenGL shim layer) |
 | NuGet Dependencies | CppWinRT 2.0, WindowsAppSDK 1.8, WinPixEventRuntime 1.0 |
-| Architecture | 6 static libraries + 1 executable |
+| Architecture | 6 static libraries + 1 executable + 1 test DLL |
 | Build Warnings | **19** (0 errors) — down from 425 |
 
 ---
 
 ## 📊 Current Status
 
-> Last verified: full solution Rebuild (Debug x64).
+> Last verified: full solution Build (Debug x64) — 0 errors, all projects up-to-date.
 
 | Phase | Status | Summary |
 |-------|--------|---------|
@@ -24,24 +24,9 @@
 | Phase 3: Warning Infrastructure | ✅ Complete | GameRender raised to `/W4`, 0 warnings |
 | Phase 4: Warning Reduction — Correctness | ✅ Complete | Shadowing, signed/unsigned, `MIN` macro all fixed across all projects |
 | Phase 5: Warning Reduction — Cosmetic | ✅ Complete | Unused params/locals/float literals fixed across all projects. 19 C4100 in `opengl_directx.cpp` intentionally skipped (DX12 coordination). |
-| Phase 6: Re-enable C4244 | ⬜ Not Started | |
-| Phase 7: Test Infrastructure | ⬜ Not Started | |
-| Phase 8: Large Migrations | ⬜ Not Started | Planning only |
-| Phase 9: Regression Prevention | ⬜ Not Started | Step 9.3 (Win32 configs) already done in Phase 2 |
-
-### Warning Counts (Full Rebuild Debug x64)
-
-| Project | Original | Current | Delta |
-|---------|----------|---------|-------|
-| NeuronClient | 179 | 19 | −160 |
-| GameLogic | 79 | 0 | −79 |
-| Starstrike | 159 | 0 | −159 |
-| GameRender | 8 | 0 | −8 |
-| NeuronCore | 0 | 0 | — |
-| NeuronServer | 0 | 0 | — |
-| **Total** | **425** | **19** | **−406 (−96%)** |
-
-> **Note:** The remaining 19 NeuronClient warnings are all C4100 in `opengl_directx.cpp`, intentionally skipped per the DX12 coordination note. The actionable warning count is **0**.
+| Phase 6: Test Infrastructure | ✅ Complete | `NeuronCore.Tests` project with 55 passing tests (GameMath, GameVector3, Transform3D) |
+| Phase 7: Large Migrations | ⬜ Not Started | Planning only |
+| Phase 8: Regression Prevention | ⬜ Not Started | Step 8.3 (Win32 configs) already done in Phase 2 |
 
 ---
 
@@ -83,6 +68,8 @@ Variables used before guaranteed initialization — can cause random crashes or 
 | `NeuronClient\sound_library_3d_dsound.cpp` | 442 | `errCode` |
 
 **Fix:** Initialize both variables at declaration.
+
+> ✅ **Fixed** (Phase 1) — Both variables initialized at declaration.
 
 ---
 
@@ -165,6 +152,8 @@ This can cause **ODR violations** and subtle behavioral differences when code us
 
 **⚠️ Warning count impact:** GameRender has 48+ renderer `.cpp` files currently at `/W3`. Raising to `/W4` will expose a significant number of new C4100/C4189/C4267 warnings (estimate: 30–80 new warnings). **Recommended approach:** Fix the existing 8 GameRender warnings at `/W3` first, then raise to `/W4`, then fix the new crop in a follow-up pass.
 
+> ✅ **Fixed** (Phases 2–3) — GameRender raised to `/W4`. All exposed warnings fixed. 0 GameRender warnings at `/W4`.
+
 ---
 
 ### 6. AVX2 Missing in Release Builds (Solution-Wide)
@@ -214,20 +203,16 @@ int localeID = int(GetKeyboardLayout(0)) & 0xFFFF;
 
 ### 9. Global `#pragma warning(disable:4244)` Undermines Warning Fixes
 
-`NeuronCore/NeuronCore.h:13` globally disables C4244:
+~~`NeuronCore/NeuronCore.h:13` globally disables C4244.~~ **Update:** The global disable has been removed from `NeuronCore.h`. C4244 is now suppressed **only** in `NeuronCore/pch.h:3`:
 ```cpp
-#pragma warning(disable:4244) // conversion from 'x' to 'y', possible loss of data
+#pragma warning(disable:4244) // TODO: Remove after fixing C4244 warnings in this project
 ```
 
-This header is included by every `pch.h` in the solution. **C4244 is the very class of warning** that §8 (pointer truncation), §19 (signed/unsigned), and §21 (double→float) are trying to fix. The current 425-warning count is artificially low — re-enabling C4244 will expose *far more* warnings.
+All other projects (GameLogic, GameRender, NeuronClient, NeuronServer, Starstrike) have C4244 fully enabled and compile clean. The other disabled warnings (`C4201`, `C4238`, `C4324`) remain in `NeuronCore.h` — these are for legitimate MSVC extensions used by DirectX/WinRT headers.
 
-**This is a blocker:** Fixes to §19 and §21 will not be verified by the compiler while C4244 is suppressed. The other disabled warnings (`C4201`, `C4238`, `C4324`) are less harmful but should also be reviewed.
+**Remaining work:** Fix C4244 warnings in NeuronCore translation units, then remove the pragma from `NeuronCore/pch.h`. Not currently prioritized — will be addressed when NeuronCore warnings become relevant.
 
-**Fix:** Phase the re-enablement:
-1. Fix all known C4244 sites in a single project (start with `GameLogic` — smallest at 79 warnings)
-2. Re-enable C4244 for that project only (move the `#pragma` to per-project `pch.h` files instead of `NeuronCore.h`)
-3. Repeat for each project
-4. Remove the global disable from `NeuronCore.h` last
+> 🟡 **Partially Fixed** — C4244 re-enabled in 5 of 6 projects. Only `NeuronCore/pch.h` still suppresses it.
 
 ---
 
@@ -267,11 +252,13 @@ The define is commented out, so `<Windows.h>` pulls in the full Win32 API surfac
 
 **Fix:** Uncomment the `#define`. Note: `<winsock2.h>` is already included explicitly (line 68), so Winsock is not affected. Test that no code depends on headers excluded by `WIN32_LEAN_AND_MEAN` (e.g., `<mmsystem.h>` for audio — may need an explicit include in sound files).
 
+> ✅ **Fixed** (Phase 2) — `WIN32_LEAN_AND_MEAN` uncommented. No missing-header errors encountered.
+
 ---
 
 ## 🟡 Build Warning Summary (19 remaining — all intentionally skipped)
 
-> **Note:** The 19 remaining are all C4100 in `opengl_directx.cpp` (skipped per DX12 coordination note). The actionable count is **0**. C4244 is still globally disabled (§9) — re-enabling it will expose additional warnings. GameRender is at `/W4` (§5 fixed).
+> **Note:** The 19 remaining are all C4100 in `opengl_directx.cpp` (skipped per DX12 coordination note). The actionable warning count is **0**. C4244 is re-enabled in 5 of 6 projects (§9) — only NeuronCore still suppresses it. GameRender is at `/W4` (§5 fixed).
 
 ### Warning Distribution by Project
 
@@ -352,6 +339,8 @@ Despite `NOMINMAX` being set and `<algorithm>` being included globally via `pch.
 
 **Fix:** Replace with `std::min` throughout the networking code.
 
+> ✅ **Fixed** (Phase 4) — `MIN` macro replaced with `std::min` in networking code.
+
 ---
 
 ### 15. Unsafe C String Functions
@@ -377,6 +366,8 @@ The solution has **zero test projects**. The `copilot-instructions.md` mentions 
 - `Transform3D.h` — matrix construction, `Right()`/`Up()`/`Forward()`/`Pos()` accessors
 
 These are pure logic with no external dependencies and are critical for correctness.
+
+> ✅ **Fixed** (Phase 6) — `NeuronCore.Tests` project created with 55 tests across 3 test classes (`GameMathTests`, `GameVector3Tests`, `Transform3DTests`). All tests passing. Project uses VS Native Unit Test Framework, matches solution conventions (v145, `stdcpplatest`, AVX2, `/W4`).
 
 ---
 
@@ -530,62 +521,40 @@ Lower-risk warnings. Can be parallelized across developers.
 
 ---
 
-### Phase 6: Re-enable C4244 (Effort: Medium–Large, ~3–5 days)
-
-**Blocker awareness:** This phase cannot produce verified results until C4244 is re-enabled per-project. Must be done project-by-project to keep the warning count manageable.
-
-| Step | Section | Action | Files | Build Impact | Dependencies |
-|------|---------|--------|-------|--------------|-------|
-| 6.1 | §9 | Move `#pragma warning(disable:4244)` from `NeuronCore.h` to each project's `pch.h` | All `pch.h` files + `NeuronCore/NeuronCore.h` | High — full rebuild | None |
-| 6.2 | §9 | Remove `#pragma warning(disable:4244)` from `GameLogic/pch.h`, fix exposed warnings | `GameLogic/pch.h` + various `GameLogic/*.cpp` | Medium — GameLogic rebuild | 6.1 |
-| 6.3 | §9 | Remove from `GameRender/pch.h`, fix exposed warnings | `GameRender/pch.h` + various `GameRender/*.cpp` | Medium — GameRender rebuild | 6.1 |
-| 6.4 | §9 | Remove from `NeuronClient/pch.h`, fix exposed warnings | `NeuronClient/pch.h` + various `NeuronClient/*.cpp` | Medium — NeuronClient rebuild | 6.1 |
-| 6.5 | §9 | Remove from `NeuronServer/pch.h`, fix exposed warnings | `NeuronServer/pch.h` + various `NeuronServer/*.cpp` | Medium — NeuronServer rebuild | 6.1 |
-| 6.6 | §9 | Remove from `Starstrike/pch.h`, fix exposed warnings | `Starstrike/pch.h` + various `Starstrike/*.cpp` | Medium — Starstrike rebuild | 6.1 |
-| 6.7 | §9 | Remove from `NeuronCore/pch.h` — C4244 now enabled everywhere | `NeuronCore/pch.h` | Medium — NeuronCore rebuild | 6.2–6.6 |
-
-> **Parallelism:** After step 6.1, steps 6.2–6.6 are **independent** and can be done in parallel across developers. Only 6.7 (NeuronCore itself) must wait for all others, since NeuronCore warnings propagate through dependents.
-
-**Verification:** After each sub-step, build the affected project and confirm 0 C4244 warnings. After 6.7, full rebuild of Debug x64 + Release x64 with 0 warnings.
-
----
-
-### Phase 7: Test Infrastructure (Effort: Medium, ~2–3 days)
-
-Can be started in parallel with Phases 3–6.
+### Phase 6: Test Infrastructure (Effort: Medium, ~2–3 days)
 
 | Step | Section | Action | Files | Build Impact |
 |------|---------|--------|-------|--------------|
-| 7.1 | §16 | Create `NeuronCore.Tests` project (VS Native Unit Test Framework) | New `NeuronCore.Tests/NeuronCore.Tests.vcxproj` + `pch.h/cpp` | None — new project |
-| 7.2 | §16 | Add tests for `GameMath.h` vector operations | New `NeuronCore.Tests/GameMathTests.cpp` | None — new file |
-| 7.3 | §16 | Add tests for `GameVector3.h` `Load()`/`Store()` round-trips | New `NeuronCore.Tests/GameVector3Tests.cpp` | None — new file |
-| 7.4 | §16 | Add tests for `Transform3D.h` accessors and matrix construction | New `NeuronCore.Tests/Transform3DTests.cpp` | None — new file |
+| 6.1 | §16 | Create `NeuronCore.Tests` project (VS Native Unit Test Framework) | New `NeuronCore.Tests/NeuronCore.Tests.vcxproj` + `pch.h/cpp` | None — new project |
+| 6.2 | §16 | Add tests for `GameMath.h` vector operations | New `NeuronCore.Tests/GameMathTests.cpp` | None — new file |
+| 6.3 | §16 | Add tests for `GameVector3.h` `Load()`/`Store()` round-trips | New `NeuronCore.Tests/GameVector3Tests.cpp` | None — new file |
+| 6.4 | §16 | Add tests for `Transform3D.h` accessors and matrix construction | New `NeuronCore.Tests/Transform3DTests.cpp` | None — new file |
 
-**Verification:** Run all tests via Test Explorer. All green. These tests serve as a regression safety net for Phases 4–6.
+**Verification:** Run all tests via Test Explorer. All green. These tests serve as a regression safety net for future changes.
 
 ---
 
-### Phase 8: Large Migrations — Planning Only (Effort: Large, multi-sprint)
+### Phase 7: Large Migrations — Planning Only (Effort: Large, multi-sprint)
 
 These are too large for inline fixes. Each needs its own implementation plan document.
 
 | Item | Section | Deliverable | Dependencies |
 |------|---------|-------------|--------------|
-| 8.1 | §13 | Container migration plan: call-site counts per container, migration order (leaves first), adapter strategy | Phase 5 complete (clean warning baseline) |
-| 8.2 | §15 | Unsafe string elimination plan: audit `sprintf`/`strlen`/`snprintf` call sites, prioritize by security risk, migration to `std::format` | Phase 6 complete (C4244 re-enabled) |
-| 8.3 | §10 | `using namespace` removal plan: grep for `winrt::` and `Neuron::` qualified vs. unqualified usage, estimate per-project effort | Phase 7 complete (tests provide safety net) |
+| 7.1 | §13 | Container migration plan: call-site counts per container, migration order (leaves first), adapter strategy | Phase 5 complete (clean warning baseline) |
+| 7.2 | §15 | Unsafe string elimination plan: audit `sprintf`/`strlen`/`snprintf` call sites, prioritize by security risk, migration to `std::format` | Phase 5 complete (clean warning baseline) |
+| 7.3 | §10 | `using namespace` removal plan: grep for `winrt::` and `Neuron::` qualified vs. unqualified usage, estimate per-project effort | Phase 6 complete (tests provide safety net) |
 
 ---
 
-### Phase 9: Regression Prevention & Cleanup (Effort: Small, ~1 day)
+### Phase 8: Regression Prevention & Cleanup (Effort: Small, ~1 day)
 
 Lock in the zero-warning state and clean up residual inconsistencies.
 
 | Step | Section | Action | Files | Build Impact | Dependencies |
 |------|---------|--------|-------|--------------|------|
-| 9.1 | — | Enable `/WX` (treat warnings as errors) in all projects for both Debug and Release | All 6 `.vcxproj` files | None — no new warnings if Phases 1–6 are complete | Phases 1–6 complete (0 warnings) |
-| 9.2 | — | Fix `docs/architecture.md` line 57: change `ComPtr<>` → `winrt::com_ptr<>` to match `copilot-instructions.md` | `docs/architecture.md` | None — documentation only | None |
-| 9.3 | — | ~~Remove orphaned Win32 configurations from `GameRender.vcxproj`~~ | `GameRender.vcxproj` | — | ✅ Done in Phase 2 (step 2.5) |
+| 8.1 | — | Enable `/WX` (treat warnings as errors) in all projects for both Debug and Release | All 6 `.vcxproj` files | None — no new warnings if Phases 1–5 are complete | Phases 1–5 complete (0 warnings) |
+| 8.2 | — | Fix `docs/architecture.md` line 57: change `ComPtr<>` → `winrt::com_ptr<>` to match `copilot-instructions.md` | `docs/architecture.md` | None — documentation only | None |
+| 8.3 | — | ~~Remove orphaned Win32 configurations from `GameRender.vcxproj`~~ | `GameRender.vcxproj` | — | ✅ Done in Phase 2 (step 2.5) |
 
 **Verification:** Full rebuild of Debug x64 + Release x64. Confirm `/WX` is active — any new warning will now break the build. Verify `docs/architecture.md` is consistent with `copilot-instructions.md`.
 
@@ -603,9 +572,8 @@ Lock in the zero-warning state and clean up residual inconsistencies.
 - [x] AVX2 enabled in both Debug and Release for **all 6 projects** (including GameRender)
 - [x] All projects compile at `/W4`
 - [ ] `/WX` (treat warnings as errors) enabled in all projects
-- [ ] C4244 re-enabled globally (no `#pragma warning(disable:4244)`)
 - [ ] Total warning count: **0** across all projects and configurations
-- [ ] `NeuronCore.Tests` project exists with passing math function tests
+- [x] `NeuronCore.Tests` project exists with passing math function tests (55 tests, 3 classes)
 - [x] NeuronServer included in all build configuration fixes (language standard, AVX2, C4244)
 - [ ] `docs/architecture.md` consistent with `copilot-instructions.md` (`winrt::com_ptr`, not `ComPtr`)
 - [x] GameRender orphaned Win32 configurations removed

@@ -2,6 +2,9 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
+  <Folder Name="/Unit Tests/">
+    <Project Path="NeuronCore.Tests/NeuronCore.Tests.vcxproj" Id="e7a91b4c-5d2f-4c39-a8b0-1c2d3e4f5a78" />
+  </Folder>
   <Project Path="GameLogic/GameLogic.vcxproj" Id="bd9afe8a-a1a3-4965-ba73-4722b25ec6fa" />
   <Project Path="GameRender/GameRender.vcxproj" Id="17f7f4af-210e-45fc-9fb3-5faa92a25c94" />
   <Project Path="NeuronClient/NeuronClient.vcxproj" Id="734da3fb-1b67-4a07-ba69-328c9babdd61" />
