@@ -143,9 +143,9 @@ void PrefsOtherWindow::ListAvailableLanguages()
   auto fileList = Resource::ListResources("language/", "*.*", false);
   for (int i = 0; i < fileList.size(); ++i)
   {
-    size_t len = fileList[i].size() + 1;
-    char* lang = new char[len];
-    strncpy(lang, fileList[i].c_str(), len);
+    char* lang = new char[fileList[i].size() + 1];
+    std::ranges::copy(fileList[i], lang);
+    lang[fileList[i].size()] = '\0';
     char* dot = strrchr(lang, '.');
     if (dot)
       *dot = '\x0';
@@ -201,10 +201,9 @@ void PrefsOtherWindow::Create()
   language->SetShortProperties(LANGUAGEPHRASE("dialog_language"), x, y += h, buttonW, buttonH);
   for (int i = 0; i < m_languages.Size(); ++i)
   {
-    char languageString[256];
-    snprintf(languageString, sizeof(languageString), "language_%s", m_languages[i]);
-    if (ISLANGUAGEPHRASE(languageString))
-      language->AddOption(LANGUAGEPHRASE(languageString));
+    auto languageString = std::format("language_{}", m_languages[i]);
+    if (ISLANGUAGEPHRASE(languageString.c_str()))
+      language->AddOption(LANGUAGEPHRASE(languageString.c_str()));
     else
       language->AddOption(m_languages[i]);
   }
@@ -219,22 +218,22 @@ void PrefsOtherWindow::Create()
 
   for (int i = 0; i < 10; i++)
   {
-    char option[32];
+    std::string option;
     switch (i)
     {
     case 0:
-      snprintf(option, sizeof(option), "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_standard_difficulty"));
+      option = std::format("{} ({})", i + 1, LANGUAGEPHRASE("dialog_standard_difficulty"));
       break;
 
     case 9:
-      snprintf(option, sizeof(option), "%d (%s)", i + 1, LANGUAGEPHRASE("dialog_hard_difficulty"));
+      option = std::format("{} ({})", i + 1, LANGUAGEPHRASE("dialog_hard_difficulty"));
       break;
 
     default:
-      snprintf(option, sizeof(option), "%d", i + 1);
+      option = std::format("{}", i + 1);
       break;
     }
-    difficulty->AddOption(option, i);
+    difficulty->AddOption(option.c_str(), i);
   }
   difficulty->RegisterInt(&m_difficulty);
   difficulty->SetDisabled(g_context->m_locationId != -1);

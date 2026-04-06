@@ -732,6 +732,7 @@ location_pattern_buffer                Pattern Buffer
 location_biosphere                     Biosphere
 location_receiver                      Receiver
 location_temple                        Temple
+location_colony                        Colony
 
 location_unknown                       unknown location
 

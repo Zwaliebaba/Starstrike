@@ -27,9 +27,8 @@ bool Library::Advance()
         if( !m_scrollSpawned[i] &&
             g_context->m_globalWorld->m_research->HasResearch(i) )
         {
-            char markerName[256];
-            snprintf( markerName, sizeof(markerName), "MarkerResearch%02d", i+1 );
-            ShapeMarkerData *scrollMarker = m_shape->GetMarkerData( markerName );
+            auto markerName = std::format("MarkerResearch{:02d}", i+1);
+            ShapeMarkerData *scrollMarker = m_shape->GetMarkerData( markerName.c_str() );
             DEBUG_ASSERT( scrollMarker );
 
             Matrix34 rootMat(m_front, g_upVector, m_pos);

@@ -306,11 +306,10 @@ const char* Triffid::GetSpawnNameTranslated(int _spawnType)
 {
   const char* spawnName = GetSpawnName(_spawnType);
 
-  char stringId[256];
-  snprintf(stringId, sizeof(stringId), "spawnname_%s", spawnName);
+  auto stringId = std::format("spawnname_{}", spawnName);
 
-  if (ISLANGUAGEPHRASE(stringId))
-    return LANGUAGEPHRASE(stringId);
+  if (ISLANGUAGEPHRASE(stringId.c_str()))
+    return LANGUAGEPHRASE(stringId.c_str());
   return spawnName;
 }
 

@@ -545,6 +545,7 @@
     <Text Include="Assets\Language\russian.txt" />
     <Text Include="Assets\Language\spanish.txt" />
     <Text Include="Assets\Levels\map_biosphere.txt" />
+    <Text Include="Assets\Levels\map_colony.txt" />
     <Text Include="Assets\Levels\map_containment.txt" />
     <Text Include="Assets\Levels\map_escort.txt" />
     <Text Include="Assets\Levels\map_garden.txt" />
@@ -558,6 +559,7 @@
     <Text Include="Assets\Levels\map_yard.txt" />
     <Text Include="Assets\Levels\mission_biosphere_attract.txt" />
     <Text Include="Assets\Levels\mission_biosphere_recapture.txt" />
+    <Text Include="Assets\Levels\mission_colony_explore.txt" />
     <Text Include="Assets\Levels\mission_containment_enable.txt" />
     <Text Include="Assets\Levels\mission_escort_escort.txt" />
     <Text Include="Assets\Levels\mission_garden_liberate.txt" />

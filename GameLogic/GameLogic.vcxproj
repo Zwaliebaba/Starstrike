@@ -119,6 +119,7 @@
     <ClInclude Include="mine.h" />
     <ClInclude Include="officer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PerlinNoise.h" />
     <ClInclude Include="powerstation.h" />
     <ClInclude Include="prefs_keys.h" />
     <ClInclude Include="radardish.h" />
@@ -139,6 +140,9 @@
     <ClInclude Include="staticshape.h" />
     <ClInclude Include="switch.h" />
     <ClInclude Include="teleport.h" />
+    <ClInclude Include="TerrainCell.h" />
+    <ClInclude Include="TerrainChunk.h" />
+    <ClInclude Include="TerrainWorld.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="tree_mesh_data.h" />
     <ClInclude Include="triffid.h" />
@@ -184,6 +188,7 @@
     <ClCompile Include="library.cpp" />
     <ClCompile Include="mine.cpp" />
     <ClCompile Include="officer.cpp" />
+    <ClCompile Include="PerlinNoise.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -206,6 +211,8 @@
     <ClCompile Include="staticshape.cpp" />
     <ClCompile Include="switch.cpp" />
     <ClCompile Include="teleport.cpp" />
+    <ClCompile Include="TerrainChunk.cpp" />
+    <ClCompile Include="TerrainWorld.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="triffid.cpp" />
     <ClCompile Include="tripod.cpp" />

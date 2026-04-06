@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <string.h>
-
 #include "text_renderer.h"
 #include "language_table.h"
 
@@ -49,9 +47,7 @@ MessageDialog::MessageDialog(char const *_name, char const *_message)
 		{
 			int lineLen = _message - lineStart;
 			if (lineLen > longestLine) longestLine = lineLen;
-			m_messageLines[m_numLines] = new char [lineLen + 1];
-			strncpy(m_messageLines[m_numLines], lineStart, lineLen);
-			m_messageLines[m_numLines][lineLen] = '\0';
+			m_messageLines[m_numLines].assign(lineStart, lineLen);
 			m_numLines++;
 			lineStart = _message + 1;
 		}
@@ -74,13 +70,7 @@ MessageDialog::MessageDialog(char const *_name, char const *_message)
 }
 
 
-MessageDialog::~MessageDialog()
-{
-	for (int i = 0; i < m_numLines; ++i)
-	{
-		delete [] m_messageLines[i];
-	}
-}
+MessageDialog::~MessageDialog() = default;
 
 
 void MessageDialog::Create()
@@ -104,6 +94,6 @@ void MessageDialog::Render(bool _hasFocus)
 
 	for (int i = 0; i < m_numLines; ++i)
 	{
-		g_editorFont.DrawText2D(m_x + 10, m_y + GetMenuSize(32) + i * GetMenuSize(DEF_FONT_SIZE), GetMenuSize(DEF_FONT_SIZE), m_messageLines[i]);
+		g_editorFont.DrawText2D(m_x + 10, m_y + GetMenuSize(32) + i * GetMenuSize(DEF_FONT_SIZE), GetMenuSize(DEF_FONT_SIZE), m_messageLines[i].c_str());
 	}
 }

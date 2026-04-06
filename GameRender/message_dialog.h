@@ -6,7 +6,7 @@
 class MessageDialog : public DarwiniaWindow
 {
 protected:
-	char *m_messageLines[20];
+   std::string m_messageLines[20];
 	int m_numLines;
 
 public:

@@ -17,6 +17,7 @@
 #include "preferences.h"
 #include "profiler.h"
 #include "resource.h"
+#include "server.h"
 #include "startsequence.h"
 #include "taskmanager_interface.h"
 #include "text_renderer.h"

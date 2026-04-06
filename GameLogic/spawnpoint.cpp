@@ -303,17 +303,17 @@ bool MasterSpawnPoint::Advance()
 
 const char* MasterSpawnPoint::GetObjectiveCounter()
 {
-  static char result[256];
+  static std::string result;
 
   if (g_context->m_location->m_teams[1].m_teamType != Team::TeamTypeUnused)
   {
     int numRed = g_context->m_location->m_teams[1].m_others.NumUsed();
-    snprintf(result, sizeof(result), "%s : %d", LANGUAGEPHRASE("objective_redpopulation"), numRed);
+    result = std::format("{} : {}", LANGUAGEPHRASE("objective_redpopulation"), numRed);
   }
   else
-    snprintf(result, sizeof(result), "%s", LANGUAGEPHRASE("objective_redpopulation"));
+    result = LANGUAGEPHRASE("objective_redpopulation");
 
-  return result;
+  return result.c_str();
 }
 
 // ============================================================================

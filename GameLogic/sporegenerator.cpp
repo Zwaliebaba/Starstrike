@@ -32,9 +32,8 @@ SporeGenerator::SporeGenerator()
 
   for (int i = 0; i < SPOREGENERATOR_NUMTAILS; ++i)
   {
-    char name[256];
-    snprintf(name, sizeof(name), "MarkerTail0%d", i + 1);
-    m_tail[i] = m_shape->GetMarkerData(name);
+    auto name = std::format("MarkerTail0{}", i + 1);
+    m_tail[i] = m_shape->GetMarkerData(name.c_str());
   }
 }
 

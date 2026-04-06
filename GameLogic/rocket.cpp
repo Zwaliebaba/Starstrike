@@ -234,9 +234,9 @@ LegacyVector3 FuelGenerator::GetPumpPos()
 
 const char* FuelGenerator::GetObjectiveCounter()
 {
-  static char buffer[256];
-  snprintf(buffer, sizeof(buffer), "%s %d%%", LANGUAGEPHRASE("objective_fuelpressure"), static_cast<int>(m_currentLevel * 100));
-  return buffer;
+  static std::string buffer;
+  buffer = std::format("{} {}%", LANGUAGEPHRASE("objective_fuelpressure"), static_cast<int>(m_currentLevel * 100));
+  return buffer.c_str();
 }
 
 // ============================================================================
@@ -395,10 +395,9 @@ EscapeRocket::EscapeRocket()
 
   for (int i = 0; i < 3; ++i)
   {
-    char name[256];
-    snprintf(name, sizeof(name), "MarkerWindow0%d", i + 1);
-    m_window[i] = m_shape->GetMarkerData(name);
-    ASSERT_TEXT(m_window[i], "%s not found", name);
+    auto name = std::format("MarkerWindow0{}", i + 1);
+    m_window[i] = m_shape->GetMarkerData(name.c_str());
+    ASSERT_TEXT(m_window[i], "{} not found", name);
   }
 }
 
@@ -486,10 +485,10 @@ void EscapeRocket::Initialise(Building* _template)
 
 const char* EscapeRocket::GetObjectiveCounter()
 {
-  static char buffer[256];
-  snprintf(buffer, sizeof(buffer), "%s %d%%, %s %d%%", LANGUAGEPHRASE("objective_fuel"), static_cast<int>(m_fuel), LANGUAGEPHRASE("objective_passengers"),
+  static std::string buffer;
+  buffer = std::format("{} {}%, {} {}%", LANGUAGEPHRASE("objective_fuel"), static_cast<int>(m_fuel), LANGUAGEPHRASE("objective_passengers"),
           static_cast<int>(m_passengers));
-  return buffer;
+  return buffer.c_str();
 }
 
 bool EscapeRocket::BoardRocket([[maybe_unused]] WorldObjectId _id)

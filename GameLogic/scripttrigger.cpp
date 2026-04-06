@@ -166,17 +166,17 @@ void ScriptTrigger::Write(FileWriter* _out)
 {
   Building::Write(_out);
 
-  char entityType[64];
+  std::string entityType;
   if (m_entityType == SCRIPTRIGGER_RUNALWAYS)
-    snprintf(entityType, sizeof(entityType), "always");
+    entityType = "always";
   else if (m_entityType == SCRIPTRIGGER_RUNNEVER)
-    snprintf(entityType, sizeof(entityType), "never");
+    entityType = "never";
   else if (m_entityType == SCRIPTRIGGER_RUNCAMENTER)
-    snprintf(entityType, sizeof(entityType), "camenter");
+    entityType = "camenter";
   else if (m_entityType == SCRIPTRIGGER_RUNCAMVIEW)
-    snprintf(entityType, sizeof(entityType), "camview");
+    entityType = "camview";
   else
-    snprintf(entityType, sizeof(entityType), "%s", Entity::GetTypeName(m_entityType));
+    entityType = Entity::GetTypeName(m_entityType);
 
-  _out->printf("%-6d %-6.2f %s %s", m_linkId, m_range, m_scriptFilename, entityType);
+  _out->printf("%-6d %-6.2f %s %s", m_linkId, m_range, m_scriptFilename, entityType.c_str());
 }

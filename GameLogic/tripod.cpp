@@ -65,9 +65,8 @@ Tripod::Tripod()
   // Initialise legs
   for (int i = 0; i < 3; ++i)
   {
-    char markerName[] = "MarkerLegX";
-    markerName[strlen(markerName) - 1] = '0' + i;
-    m_legs[i] = new EntityLeg(i, this, "tripod_leg_part.shp", "tripod_leg_part.shp", markerName);
+    auto markerName = std::format("MarkerLeg{}", i);
+    m_legs[i] = new EntityLeg(i, this, "tripod_leg_part.shp", "tripod_leg_part.shp", markerName.c_str());
     m_legs[i]->m_legLift = LEG_LIFT;
     m_legs[i]->m_idealLegSlope = IDEAL_LEG_SLOPE;
     m_legs[i]->m_legSwingDuration = LEG_SWING_DURATION;

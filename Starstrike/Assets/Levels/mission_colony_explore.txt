@@ -1,0 +1,3 @@
+PrimaryObjectives_StartDefinition
+	BuildingOnline:colony,0	colony_primary	colony_intro.txt
+PrimaryObjectives_EndDefinition

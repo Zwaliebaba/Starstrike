@@ -515,9 +515,9 @@ const char* Refinery::GetObjectiveCounter()
   if (gb)
     numRefined = gb->m_link;
 
-  static char result[256];
-  snprintf(result, sizeof(result), "%s : %d", LANGUAGEPHRASE("objective_refined"), numRefined);
-  return result;
+  static std::string result;
+  result = std::format("{} : {}", LANGUAGEPHRASE("objective_refined"), numRefined);
+  return result.c_str();
 }
 
 bool Refinery::Advance()

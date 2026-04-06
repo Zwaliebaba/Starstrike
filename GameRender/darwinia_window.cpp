@@ -23,7 +23,7 @@ DarwiniaButton::DarwiniaButton()
 void DarwiniaButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
-    _w = static_cast<int>(strlen(_name)) * 7 + 9;
+    _w = static_cast<int>(std::string_view(_name).size()) * 7 + 9;
 
   if (_h == -1)
     _h = 15;
@@ -159,7 +159,7 @@ BorderlessButton::BorderlessButton()
 void BorderlessButton::SetShortProperties(const char* _name, int _x, int _y, int _w, int _h, const char* _caption, const char* _tooltip)
 {
   if (_w == -1)
-    _w = static_cast<int>(strlen(_name)) * 7 + 9;
+    _w = static_cast<int>(std::string_view(_name).size()) * 7 + 9;
 
   if (_h == -1)
     _h = 15;
@@ -306,18 +306,16 @@ void DarwiniaWindow::CreateValueControl(const char* name, int dataType, void* va
 
   if (dataType != InputField::TypeString)
   {
-    char nameLeft[64];
-    snprintf(nameLeft, sizeof(nameLeft), "%s left", name);
+    auto nameLeft = std::format("{} left", name);
     auto left = new InputScroller();
-    left->SetProperties(nameLeft, input->m_x + input->m_w + 5, y, 15, 15, "<", "Value left");
+    left->SetProperties(nameLeft.c_str(), input->m_x + input->m_w + 5, y, 15, 15, "<", "Value left");
     left->m_inputField = input;
     left->m_change = -change;
     RegisterButton(left);
 
-    char nameRight[64];
-    snprintf(nameRight, sizeof(nameRight), "%s right", name);
+    auto nameRight = std::format("{} right", name);
     auto right = new InputScroller();
-    right->SetProperties(nameRight, input->m_x + input->m_w + 22, y, 15, 15, ">", "Value right");
+    right->SetProperties(nameRight.c_str(), input->m_x + input->m_w + 22, y, 15, 15, ">", "Value right");
     right->m_inputField = input;
     right->m_change = change;
     RegisterButton(right);
@@ -328,13 +326,11 @@ void DarwiniaWindow::RemoveValueControl(char* name)
 {
   RemoveButton(name);
 
-  char nameLeft[64];
-  snprintf(nameLeft, sizeof(nameLeft), "%s left", name);
-  RemoveButton(nameLeft);
+  auto nameLeft = std::format("{} left", name);
+  RemoveButton(nameLeft.c_str());
 
-  char nameRight[64];
-  snprintf(nameRight, sizeof(nameRight), "%s right", name);
-  RemoveButton(nameRight);
+  auto nameRight = std::format("{} right", name);
+  RemoveButton(nameRight.c_str());
 }
 
 void DarwiniaWindow::CreateColourControl(const char* name, int* value, int y, DarwiniaButton* callback, int x, int w)

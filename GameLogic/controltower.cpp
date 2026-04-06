@@ -35,13 +35,11 @@ ControlTower::ControlTower()
   for (int i = 0; i < 3; ++i)
   {
     m_beingReprogrammed[i] = false;
-    char markerName[64];
+    auto markerName = std::format("MarkerReprogrammer{}", i);
+    m_reprogrammer[i] = m_shape->GetMarkerData(markerName.c_str());
 
-    snprintf(markerName, sizeof(markerName), "MarkerReprogrammer%d", i);
-    m_reprogrammer[i] = m_shape->GetMarkerData(markerName);
-
-    snprintf(markerName, sizeof(markerName), "MarkerConsole%d", i);
-    m_console[i] = m_shape->GetMarkerData(markerName);
+    markerName = std::format("MarkerConsole{}", i);
+    m_console[i] = m_shape->GetMarkerData(markerName.c_str());
   }
 
   if (!s_dishShape)

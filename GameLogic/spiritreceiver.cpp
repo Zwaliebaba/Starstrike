@@ -165,9 +165,9 @@ void SpiritProcessor::Initialise(Building* _building)
 
 const char* SpiritProcessor::GetObjectiveCounter()
 {
-  static char result[256];
-  snprintf(result, sizeof(result), "%s : %2.2f", LANGUAGEPHRASE("objective_throughput"), m_throughput);
-  return result;
+  static std::string result;
+  result = std::format("{} : {:.2f}", LANGUAGEPHRASE("objective_throughput"), m_throughput);
+  return result.c_str();
 }
 
 void SpiritProcessor::TriggerSpirit(float _initValue)
@@ -287,9 +287,8 @@ SpiritReceiver::SpiritReceiver()
 
   for (int i = 0; i < SPIRITRECEIVER_NUMSTATUSMARKERS; ++i)
   {
-    char name[64];
-    snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->GetMarkerData(name);
+    auto name = std::format("MarkerStatus0{}", i + 1);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name.c_str());
   }
 
   m_headShape = Resource::GetShapeStatic("spiritreceiverhead.shp");

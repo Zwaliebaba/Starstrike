@@ -77,9 +77,8 @@ Spider::Spider()
   // Initialise legs
   for (int i = 0; i < SPIDER_NUM_LEGS; ++i)
   {
-    char markerName[] = "MarkerLegX";
-    markerName[strlen(markerName) - 1] = '0' + i;
-    m_legs[i] = new EntityLeg(i, this, "spider_leg_upper.shp", "spider_leg_lower.shp", markerName);
+    auto markerName = std::format("MarkerLeg{}", i);
+    m_legs[i] = new EntityLeg(i, this, "spider_leg_upper.shp", "spider_leg_lower.shp", markerName.c_str());
     m_legs[i]->m_legLift = m_parameters[2].m_legLift;
     m_legs[i]->m_idealLegSlope = m_parameters[2].m_idealLegSlope;
     m_legs[i]->m_legSwingDuration = m_parameters[2].m_legSwingDuration;

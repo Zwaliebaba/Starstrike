@@ -20,44 +20,40 @@ void TrunkPortBuildingRenderer::Render(const Building& _building, const Building
 
     const TrunkPort& port = static_cast<const TrunkPort&>(_building);
 
-    char caption[256];
-
     const char* locationName = g_context->m_globalWorld->GetLocationNameTranslated(port.m_targetLocationId);
+    std::string caption;
     if (locationName)
-    {
-        strncpy(caption, locationName, sizeof(caption));
-        caption[sizeof(caption) - 1] = '\0';
-    }
+        caption = locationName;
     else
-        snprintf(caption, sizeof(caption), "[%s]", LANGUAGEPHRASE("location_unknown"));
+        caption = std::format("[{}]", LANGUAGEPHRASE("location_unknown"));
 
     START_PROFILE(g_context->m_profiler, "RenderDestination");
 
-    float fontSize = 70.0f / strlen(caption);
+    float fontSize = 70.0f / caption.size();
     fontSize = std::min(fontSize, 10.0f);
 
     Matrix34 portMat(port.m_front, g_upVector, port.m_pos);
 
     Matrix34 destMat = port.m_shape->GetMarkerWorldMatrix(port.m_destination1, portMat);
     glColor4f(0.9f, 0.8f, 0.8f, 1.0f);
-    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption);
+    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption.c_str());
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += (destMat.f ^ destMat.u) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
     glColor4f(0.9f, 0.8f, 0.8f, 0.0f);
-    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption);
+    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption.c_str());
 
     g_gameFont.SetRenderShadow(false);
     glColor4f(0.9f, 0.8f, 0.8f, 1.0f);
     destMat = port.m_shape->GetMarkerWorldMatrix(port.m_destination2, portMat);
-    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption);
+    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption.c_str());
     g_gameFont.SetRenderShadow(true);
     destMat.pos += destMat.f * 0.1f;
     destMat.pos += (destMat.f ^ destMat.u) * 0.2f;
     destMat.pos += destMat.u * 0.2f;
     glColor4f(0.9f, 0.8f, 0.8f, 0.0f);
-    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption);
+    g_gameFont.DrawText3D(destMat.pos, destMat.f, destMat.u, fontSize, "%s", caption.c_str());
 
     g_gameFont.SetRenderShadow(false);
 

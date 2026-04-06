@@ -9,6 +9,7 @@
 #include "level_file.h"
 #include "location.h"
 #include "water.h"
+#include "TerrainWorld.h"
 
 // ****************************************************************************
 // Class LandscapeTile
@@ -444,7 +445,8 @@ Landscape::Landscape()
   : m_heightMap(nullptr),
     m_normalMap(nullptr),
     m_outsideHeight(-20),
-    m_renderer(nullptr) {}
+    m_renderer(nullptr),
+    m_terrainWorld(nullptr) {}
 
 // *** Destructor
 Landscape::~Landscape() { Empty(); }
@@ -505,6 +507,8 @@ void Landscape::Empty()
   m_heightMap = nullptr;
   delete m_normalMap;
   m_normalMap = nullptr;
+  delete m_terrainWorld;
+  m_terrainWorld = nullptr;
 }
 
 // *** Render
@@ -844,4 +848,44 @@ float Landscape::SphereHit(const LegacyVector3& _center, float _radius) const
     dist = -1.0f;
 
   return dist;
+}
+
+
+// ============================================================================
+// TerrainWorld integration
+// ============================================================================
+
+void Landscape::GenerateTerrainWorld(int _seed)
+{
+  DEBUG_ASSERT(m_heightMap);
+
+  const int cellsX = static_cast<int>(m_worldSizeX / m_heightMap->m_cellSizeX);
+  const int cellsZ = static_cast<int>(m_worldSizeZ / m_heightMap->m_cellSizeY);
+
+  // Extract flat height data from SurfaceMap2D.
+  // GetConstPointer(0,0) returns the start of the underlying row-major array.
+  const float* heightData = m_heightMap->GetConstPointer(0, 0);
+  const int    heightW    = m_heightMap->GetNumColumns();
+  const int    heightH    = m_heightMap->GetNumRows();
+
+  if (!m_terrainWorld)
+    m_terrainWorld = new TerrainWorld();
+
+  m_terrainWorld->Generate(cellsX, cellsZ, _seed, heightData, heightW, heightH);
+}
+
+void Landscape::TickCA(float _alpha, float _beta, float _maxPh)
+{
+  DEBUG_ASSERT(m_terrainWorld);
+  m_terrainWorld->TickActiveChunks(_alpha, _beta, _maxPh);
+}
+
+TerrainWorld* Landscape::GetTerrainWorld()
+{
+  return m_terrainWorld;
+}
+
+const TerrainWorld* Landscape::GetTerrainWorld() const
+{
+  return m_terrainWorld;
 }

@@ -87,9 +87,9 @@ bool SafeArea::DoesRayHit(const LegacyVector3& _rayStart, const LegacyVector3& _
 
 const char* SafeArea::GetObjectiveCounter()
 {
-  static char result[256];
-  snprintf(result, sizeof(result), "%s : %d", LANGUAGEPHRASE("objective_currentcount"), m_entitiesCounted);
-  return result;
+  static std::string result;
+  result = std::format("{} : {}", LANGUAGEPHRASE("objective_currentcount"), m_entitiesCounted);
+  return result.c_str();
 }
 
 void SafeArea::Read(TextReader* _in, bool _dynamic)

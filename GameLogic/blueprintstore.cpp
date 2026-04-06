@@ -120,16 +120,16 @@ BlueprintStore::BlueprintStore()
 
 const char* BlueprintStore::GetObjectiveCounter()
 {
-  static char result[256];
+  static std::string result;
 
   float totalInfection = 0;
   for (int i = 0; i < BLUEPRINTSTORE_NUMSEGMENTS; ++i)
     totalInfection += m_segments[i];
 
-  snprintf(result, sizeof(result), "%s %d%%", LANGUAGEPHRASE("objective_totalinfection"),
+  result = std::format("{} {}%", LANGUAGEPHRASE("objective_totalinfection"),
            static_cast<int>(100.0f * totalInfection / float(BLUEPRINTSTORE_NUMSEGMENTS * 100.0f)));
 
-  return result;
+  return result.c_str();
 }
 
 void BlueprintStore::Initialise(Building* _template)

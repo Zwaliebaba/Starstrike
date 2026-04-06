@@ -429,6 +429,8 @@ void LevelFile::ParseLandscapeData(TextReader* _in)
     { strncpy(m_wavesColourFilename, secondWord, MAX_FILENAME_LEN); m_wavesColourFilename[MAX_FILENAME_LEN - 1] = '\0'; }
     else if (_stricmp("waterColourFile", word) == 0)
     { strncpy(m_waterColourFilename, secondWord, MAX_FILENAME_LEN); m_waterColourFilename[MAX_FILENAME_LEN - 1] = '\0'; }
+   else if (_stricmp("terrainSeed", word) == 0)
+     m_landscape.m_terrainSeed = atoi(secondWord);
     else if (_stricmp("landscape_endDefinition", word) == 0)
       return;
   }

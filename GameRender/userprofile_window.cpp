@@ -43,9 +43,8 @@ void UserProfileWindow::Render(bool hasFocus)
 
 void UserProfileWindow::Create()
 {
-  char profileDir[256];
-  snprintf(profileDir, sizeof(profileDir), "%susers/*.*", g_context->GetProfileDirectory());
-  auto profileList = ListSubDirectoryNames(profileDir);
+  auto profileDir = std::format("{}users/*.*", g_context->GetProfileDirectory());
+  auto profileList = ListSubDirectoryNames(profileDir.c_str());
   int numProfiles = static_cast<int>(profileList.size());
 
   int windowH = 150 + numProfiles * 30;
@@ -78,10 +77,9 @@ void UserProfileWindow::Create()
   for (int i = 0; i < profileList.size(); ++i)
   {
     const char* profileName = profileList[i].c_str();
-    char caption[256];
-    snprintf(caption, sizeof(caption), "%s: '%s'", LANGUAGEPHRASE("dialog_loadprofile"), profileName);
+    auto caption = std::format("{}: '{}'", LANGUAGEPHRASE("dialog_loadprofile"), profileName);
     auto button = new LoadUserProfileButton();
-    button->SetShortProperties(caption, 20, y += h, m_w - 40, GetMenuSize(20));
+    button->SetShortProperties(caption.c_str(), 20, y += h, m_w - 40, GetMenuSize(20));
     button->m_profileName = (char*)profileName;
     button->m_fontSize = GetMenuSize(11);
     button->m_centered = true;

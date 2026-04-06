@@ -184,7 +184,6 @@ void PrefsGraphicsWindow::Render(bool _hasFocus)
   g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_buildingdetail"));
   g_editorFont.DrawText2D(x, y += h, size, LANGUAGEPHRASE("dialog_entitydetail"));
 
-  char fpsCaption[64];
-  snprintf(fpsCaption, sizeof(fpsCaption), "%d FPS", g_context->m_renderer->m_fps);
-  g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + m_h - GetMenuSize(60), GetMenuSize(20), fpsCaption);
+  auto fpsCaption = std::format("{} FPS", g_context->m_renderer->m_fps);
+  g_editorFont.DrawText2DCenter(m_x + m_w / 2, m_y + m_h - GetMenuSize(60), GetMenuSize(20), fpsCaption.c_str());
 }

@@ -12,6 +12,7 @@ Locations_StartDefinition
 	   9	1		map_biosphere.txt			    mission_biosphere_recapture.txt
        10   1       map_receiver.txt                mission_receiver_recapture.txt
        11   1       map_temple.txt                  mission_temple_cutscene.txt
+       12   1       map_colony.txt                  mission_colony_explore.txt
 Locations_EndDefinition
 
 

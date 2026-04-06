@@ -10,9 +10,8 @@ class DropDownOptionData
 {
 public:
 	DropDownOptionData(const char *_word, int _value);
-	~DropDownOptionData();
 
-	char	*m_word;
+    std::string	m_word;
 	int		m_value;
 };
 
@@ -77,16 +76,15 @@ public:
 class DropDownMenuOption : public BorderlessButton
 {
 public:
-    char    *m_parentWindowName;
-    char    *m_parentMenuName;
+	std::string m_parentWindowName;
+	std::string m_parentMenuName;
 //    int     m_menuIndex;
 	int		m_value;			// An integer that the client specifies - often a value from an enum
 
 public:
-    DropDownMenuOption();
-	~DropDownMenuOption();
+	DropDownMenuOption();
 
-    void SetParentMenu( EclWindow *_window, DropDownMenu *_menu, int _value );
+	void SetParentMenu( EclWindow *_window, DropDownMenu *_menu, int _value );
 
     void Render ( int realX, int realY, bool highlighted, bool clicked );
     void MouseUp();

@@ -1,0 +1,38 @@
+Landscape_StartDefinition
+	worldSizeX 5000
+	worldSizeZ 5000
+	cellSize 19.53
+	outsideHeight -12.00
+	landColourFile landscape_default.bmp
+	wavesColourFile waves_default.bmp
+	waterColourFile water_default.bmp
+	terrainSeed 42
+Landscape_EndDefinition
+
+LandscapeTiles_StartDefinition
+	#                            frac  height desired gen         lowland
+	# x       y       z    size   dim  scale  height  method seed smooth  guideGrid
+	# =============================================================================
+	  2500  -2.00   2500   2500  0.65   0.90    350      0 420001   1.00     0
+	  1200   0.00   1200   1800  0.55   0.70    280      0 420002   0.80     0
+	  3800   0.00   3800   1800  0.60   0.80    300      0 420003   0.90     0
+	  1000   0.00   3500   1400  0.50   0.60    250      0 420004   0.70     0
+LandscapeTiles_EndDefinition
+
+LandFlattenAreas_StartDefinition
+	# x      y       z      size
+	# ==========================
+LandFlattenAreas_EndDefinition
+
+Lights_StartDefinition
+	# x      y      z        r      g      b
+	# =========================================
+	  0.85   0.52   0.09     1.24   1.16   1.04
+	 -0.66   0.30  -0.69     1.04   1.16   1.24
+Lights_EndDefinition
+
+Buildings_StartDefinition
+	# Type              id      x       z       tm      rx      rz      isGlobal
+	# ==========================================================================
+	ControlTower        0       2500.00 2500.00 2       1.00    0.00    1           -1
+Buildings_EndDefinition

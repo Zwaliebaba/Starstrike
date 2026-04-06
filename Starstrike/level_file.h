@@ -110,12 +110,14 @@ class LandscapeDef
     int m_worldSizeX;
     int m_worldSizeZ;
     float m_outsideHeight;
+   int m_terrainSeed;        // -1 = no terrain grid (legacy); >= 0 = generate TerrainGrid from this seed
 
     LandscapeDef()
       : m_cellSize(12.0f),
         m_worldSizeX(2000),
         m_worldSizeZ(2000),
-        m_outsideHeight(-10) {}
+       m_outsideHeight(-10),
+       m_terrainSeed(-1) {}
 
     ~LandscapeDef()
     {

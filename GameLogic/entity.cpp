@@ -582,11 +582,10 @@ const char* Entity::GetTypeNameTranslated(int _troopType)
 {
   const char* typeName = GetTypeName(_troopType);
 
-  char stringId[256];
-  snprintf(stringId, sizeof(stringId), "entityname_%s", typeName);
+  auto stringId = std::format("entityname_{}", typeName);
 
-  if (ISLANGUAGEPHRASE(stringId))
-    return LANGUAGEPHRASE(stringId);
+  if (ISLANGUAGEPHRASE(stringId.c_str()))
+    return LANGUAGEPHRASE(stringId.c_str());
   return typeName;
 }
 

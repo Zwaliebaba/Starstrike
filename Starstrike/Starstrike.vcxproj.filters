@@ -722,6 +722,8 @@
     <Text Include="Assets\Scripts\yard_primary3.txt">
       <Filter>Assets\Scripts</Filter>
     </Text>
+    <Text Include="Assets\Levels\map_colony.txt" />
+    <Text Include="Assets\Levels\mission_colony_explore.txt" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Icons\background.bmp">

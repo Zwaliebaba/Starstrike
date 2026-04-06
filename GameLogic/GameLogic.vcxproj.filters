@@ -185,6 +185,10 @@
     <ClInclude Include="GameSimEvent.h" />
     <ClInclude Include="GameSimEventQueue.h" />
     <ClInclude Include="GameContext.h" />
+    <ClInclude Include="TerrainCell.h" />
+    <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="TerrainChunk.h" />
+    <ClInclude Include="TerrainWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -366,6 +370,9 @@
       <Filter>GameObjects</Filter>
     </ClCompile>
     <ClCompile Include="GameSimEventQueue.cpp" />
+    <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="TerrainChunk.cpp" />
+    <ClCompile Include="TerrainWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interface">

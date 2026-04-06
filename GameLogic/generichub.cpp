@@ -217,18 +217,18 @@ void DynamicHub::Write(FileWriter* _out)
 
 const char* DynamicHub::GetObjectiveCounter()
 {
-  static char result[256];
+  static std::string result;
 
   if (m_requiredScore > 0)
   {
     float current = m_currentScore;
     float required = m_requiredScore;
     float percentComplete = current / required * 100.0f;
-    snprintf(result, sizeof(result), "percent complete: %.0f", percentComplete);
+    result = std::format("percent complete: {:.0f}", percentComplete);
   }
   else
-    result[0] = '\0';
-  return result;
+    result.clear();
+  return result.c_str();
 }
 
 int DynamicHub::PointsPerHub() { return m_requiredScore / m_minActiveLinks; }

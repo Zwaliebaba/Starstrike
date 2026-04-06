@@ -134,9 +134,9 @@ void Generator::TriggerSurge(float _initValue)
 
 const char* Generator::GetObjectiveCounter()
 {
-  static char result[256];
-  snprintf(result, sizeof(result), "%s : %d Gq/s", LANGUAGEPHRASE("objective_output"), static_cast<int>(m_throughput * 10));
-  return result;
+  static std::string result;
+  result = std::format("{} : {} Gq/s", LANGUAGEPHRASE("objective_output"), static_cast<int>(m_throughput * 10));
+  return result.c_str();
 }
 
 void Generator::ReprogramComplete()
@@ -321,17 +321,15 @@ SolarPanel::SolarPanel()
 
   for (int i = 0; i < SOLARPANEL_NUMGLOWS; ++i)
   {
-    char name[64];
-    snprintf(name, sizeof(name), "MarkerGlow0%d", i + 1);
-    m_glowMarker[i] = m_shape->GetMarkerData(name);
+    auto name = std::format("MarkerGlow0{}", i + 1);
+    m_glowMarker[i] = m_shape->GetMarkerData(name.c_str());
     DEBUG_ASSERT(m_glowMarker[i]);
   }
 
   for (int i = 0; i < SOLARPANEL_NUMSTATUSMARKERS; ++i)
   {
-    char name[64];
-    snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->GetMarkerData(name);
+    auto name = std::format("MarkerStatus0{}", i + 1);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name.c_str());
   }
 }
 

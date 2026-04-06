@@ -37,16 +37,14 @@ GunTurret::GunTurret()
 
   for (int i = 0; i < GUNTURRET_NUMBARRELS; ++i)
   {
-    char name[64];
-    snprintf(name, sizeof(name), "MarkerBarrelEnd0%d", i + 1);
-    m_barrelEnd[i] = m_barrel->GetMarkerData(name);
+    auto name = std::format("MarkerBarrelEnd0{}", i + 1);
+    m_barrelEnd[i] = m_barrel->GetMarkerData(name.c_str());
   }
 
   for (int i = 0; i < GUNTURRET_NUMSTATUSMARKERS; ++i)
   {
-    char name[64];
-    snprintf(name, sizeof(name), "MarkerStatus0%d", i + 1);
-    m_statusMarkers[i] = m_shape->GetMarkerData(name);
+    auto name = std::format("MarkerStatus0{}", i + 1);
+    m_statusMarkers[i] = m_shape->GetMarkerData(name.c_str());
   }
 }
 

@@ -53,7 +53,8 @@ Location::Location()
     m_clouds(nullptr),
     m_water(nullptr),
     m_teams(nullptr),
-    m_christmasTimer(-99.9f)
+    m_christmasTimer(-99.9f),
+    m_caAccumulator(0.0f)
 {
   m_spirits.SetTotalNumSlices(NUM_SLICES_PER_FRAME);
   m_lasers.SetTotalNumSlices(NUM_SLICES_PER_FRAME);
@@ -79,6 +80,12 @@ void Location::Init(const char* _missionFilename, const char* _mapFilename)
 
   InitLights();
   InitLandscape();
+
+  // Generate terrain world (biome overlay) from seed + heightmap.
+  // Legacy maps (terrainSeed == -1) get an all-Earth grid with zero pheromones.
+  // GetTerrainWorld() is never null after this point.
+  int terrainSeed = m_levelFile->m_landscape.m_terrainSeed;
+  m_landscape.GenerateTerrainWorld(terrainSeed);
 
   m_water = new Water();
 
@@ -755,8 +762,35 @@ void Location::Advance(int _slice)
     DoMissionCompleteActions();
   }
 
+  // CA substrate tick (server-only, decoupled from render frame rate).
+  // Entity logic (pheromone deposits) has already run above via AdvanceTeams,
+  // so deposits from this frame are diffused immediately.
+  AdvanceCA();
+
   if (ChristmasModEnabled() == 1)
     AdvanceChristmas();
+}
+
+// *** AdvanceCA
+// Runs the pheromone cellular automata tick at a fixed rate, decoupled from
+// the render frame rate.  Only meaningful on the server.
+void Location::AdvanceCA()
+{
+  if (!m_landscape.GetTerrainWorld())
+    return;
+
+  static constexpr float CA_ALPHA        = 0.05f;
+  static constexpr float CA_BETA         = 0.992f;
+  static constexpr float CA_MAX_PH       = 100.0f;
+  static constexpr float CA_TICK_RATE_HZ = 10.0f;
+  static constexpr float CA_TICK_INTERVAL = 1.0f / CA_TICK_RATE_HZ;
+
+  m_caAccumulator += SERVER_ADVANCE_PERIOD;
+  while (m_caAccumulator >= CA_TICK_INTERVAL)
+  {
+    m_landscape.TickCA(CA_ALPHA, CA_BETA, CA_MAX_PH);
+    m_caAccumulator -= CA_TICK_INTERVAL;
+  }
 }
 
 void Location::AdvanceChristmas()

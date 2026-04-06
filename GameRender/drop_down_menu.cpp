@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "text_renderer.h"
-#include "string_utils.h"
-
-#include <string.h>
 
 #include "GameApp.h"
 #include "renderer.h"
@@ -15,13 +12,8 @@
 // ****************************************************************************
 
 DropDownOptionData::DropDownOptionData(const char *_word, int _value)
-	: m_word(NewStr(_word)), m_value(_value)
+	: m_word(_word), m_value(_value)
 {
-}
-
-DropDownOptionData::~DropDownOptionData()
-{
-	delete [] m_word;
 }
 
 
@@ -121,7 +113,7 @@ void DropDownMenu::AddOption( char const *_word, int _value )
 		int i;
 		for (i = 0; i < size; ++i)
 		{
-			if (_stricmp(_word, m_options[i]->m_word) < 0)
+			if (_stricmp(_word, m_options[i]->m_word.c_str()) < 0)
 			{
 				break;
 			}
@@ -145,7 +137,7 @@ void DropDownMenu::SelectOption( int _value )
     }
     else
     {
-        SetCaption( m_options[m_currentOption]->m_word );
+        SetCaption( m_options[m_currentOption]->m_word.c_str() );
     }
 
     if( m_int && _value != -1 ) *m_int = _value;
@@ -156,7 +148,7 @@ bool DropDownMenu::SelectOption2(char const *_option)
 {
 	for (int i = 0; i < m_options.Size(); ++i)
 	{
-		char *itemName = m_options[i]->m_word;
+		const char *itemName = m_options[i]->m_word.c_str();
 		if (_stricmp(itemName, _option) == 0)
 		{
 			SelectOption(m_options[i]->m_value);
@@ -185,7 +177,7 @@ char const *DropDownMenu::GetSelectionName()
 	{
 		return NULL;
 	}
-	return m_options[m_currentOption]->m_word;
+	return m_options[m_currentOption]->m_word.c_str();
 }
 
 
@@ -249,14 +241,13 @@ void DropDownMenu::CreateMenu()
         {
             if( index >= m_options.Size() ) break;
 
-            char *thisOption = m_options[index]->m_word;
-            char thisName[64];
-            snprintf( thisName, sizeof(thisName), "%s %d", m_name, index );
+            const char *thisOption = m_options[index]->m_word.c_str();
+            auto thisName = std::format("{} {}", m_name, index);
 
             int w = m_w - 4;
 
             DropDownMenuOption *menuOption = new DropDownMenuOption();
-            menuOption->SetProperties( thisName, col*m_w+2, (i+1)*m_h, w, m_h, thisOption );
+            menuOption->SetProperties( thisName.c_str(), col*m_w+2, (i+1)*m_h, w, m_h, thisOption );
             menuOption->SetParentMenu( m_parent, this, m_options[index]->m_value );
             window->RegisterButton( menuOption );
 			window->m_buttonOrder.PutData( menuOption );
@@ -307,33 +298,14 @@ bool DropDownMenu::IsMenuVisible()
 
 DropDownMenuOption::DropDownMenuOption()
 :   BorderlessButton(),
-    m_parentWindowName(NULL),
-    m_parentMenuName(NULL),
-    m_value(-1)
+	m_value(-1)
 {
-}
-
-DropDownMenuOption::~DropDownMenuOption()
-{
-	delete [] m_parentWindowName;
-	delete [] m_parentMenuName;
 }
 
 void DropDownMenuOption::SetParentMenu( EclWindow *_window, DropDownMenu *_menu, int _value )
 {
-    if( m_parentWindowName )
-    {
-        delete [] m_parentWindowName;
-        m_parentWindowName = NULL;
-    }
-    m_parentWindowName = NewStr( _window->m_name );
-
-    if( m_parentMenuName )
-    {
-        delete [] m_parentMenuName;
-        m_parentMenuName = NULL;
-    }
-    m_parentMenuName = NewStr( _menu->m_name );
+	m_parentWindowName = _window->m_name;
+	m_parentMenuName = _menu->m_name;
 
 //    m_menuIndex = _index;
 	m_value = _value;
@@ -345,10 +317,10 @@ void DropDownMenuOption::Render( int realX, int realY, bool highlighted, bool cl
     //BorderlessButton::Render( realX, realY, highlighted, clicked );
     //return;
 
-    DarwiniaWindow *window = (DarwiniaWindow *)EclGetWindow( m_parentWindowName );
-    if( window )
-    {
-		EclButton *button = window->GetButton( m_parentMenuName );
+	DarwiniaWindow *window = (DarwiniaWindow *)EclGetWindow( m_parentWindowName.c_str() );
+	if( window )
+	{
+		EclButton *button = window->GetButton( m_parentMenuName.c_str() );
 		if( button )
 		{
 			if( window->m_buttonOrder[window->m_currentButton] == this )
@@ -366,10 +338,10 @@ void DropDownMenuOption::Render( int realX, int realY, bool highlighted, bool cl
 
 void DropDownMenuOption::MouseUp()
 {
-    EclWindow *window = EclGetWindow( m_parentWindowName );
+    EclWindow *window = EclGetWindow( m_parentWindowName.c_str() );
     if( window )
     {
-        EclButton *button = window->GetButton( m_parentMenuName );
+        EclButton *button = window->GetButton( m_parentMenuName.c_str() );
         if( button )
         {
             DropDownMenu *menu = (DropDownMenu *) button;

@@ -48,24 +48,20 @@ void ScrollBar::Create( char *name,
     EclWindow *parent = EclGetWindow( m_parentWindow );
     DEBUG_ASSERT( parent );
 
-    char barName[256];
-    char upName[256];
-    char downName[256];
-
-    snprintf( barName, sizeof(barName), "%s bar", name );
-    snprintf( upName, sizeof(upName), "%s up", name );
-    snprintf( downName, sizeof(downName), "%s down", name );
+    auto barName = std::format("{} bar", name);
+    auto upName = std::format("{} up", name);
+    auto downName = std::format("{} down", name);
 
     ScrollChangeButton *up = new ScrollChangeButton(this, stepSize*-1);
-    up->SetProperties( upName, x, y, w, 18, "^", " " );
+    up->SetProperties( upName.c_str(), x, y, w, 18, "^", " " );
     parent->RegisterButton( up );
 
     ScrollBarButton *bar = new ScrollBarButton(this);
-    bar->SetProperties( barName, x, y+18, w, h-36, " ", " " );
+    bar->SetProperties( barName.c_str(), x, y+18, w, h-36, " ", " " );
     parent->RegisterButton( bar );
 
     ScrollChangeButton *down = new ScrollChangeButton(this, stepSize);
-    down->SetProperties( downName, x, y+h-18, w, 18, "v", " " );
+    down->SetProperties( downName.c_str(), x, y+h-18, w, 18, "v", " " );
     parent->RegisterButton( down );
 
 }
@@ -75,17 +71,13 @@ void ScrollBar::Remove()
     EclWindow *parent = EclGetWindow( m_parentWindow );
     if( parent )
     {
-        char barName[256];
-        char upName[256];
-        char downName[256];
+        auto barName = std::format("{} bar", m_name);
+        auto upName = std::format("{} up", m_name);
+        auto downName = std::format("{} down", m_name);
 
-        snprintf( barName, sizeof(barName), "%s bar", m_name );
-        snprintf( upName, sizeof(upName), "%s up", m_name );
-        snprintf( downName, sizeof(downName), "%s down", m_name );
-
-        parent->RemoveButton( barName );
-        parent->RemoveButton( upName );
-        parent->RemoveButton( downName );
+        parent->RemoveButton( barName.c_str() );
+        parent->RemoveButton( upName.c_str() );
+        parent->RemoveButton( downName.c_str() );
     }
 }
 

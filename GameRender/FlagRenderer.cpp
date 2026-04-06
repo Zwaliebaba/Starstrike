@@ -111,7 +111,7 @@ void FlagRenderer::Render(Flag& _flag)
 }
 
 
-void FlagRenderer::RenderText(Flag& _flag, int _posX, int _posY, char* _caption)
+void FlagRenderer::RenderText(Flag& _flag, int _posX, int _posY, const char* _caption)
 {
     if( _posX < 0 || _posY < 0 ||
         _posX >= FLAG_RESOLUTION ||

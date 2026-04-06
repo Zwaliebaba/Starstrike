@@ -10,5 +10,5 @@ class FlagRenderer
 {
 public:
     static void Render(Flag& _flag);
-    static void RenderText(Flag& _flag, int _posX, int _posY, char* _caption);
+    static void RenderText(Flag& _flag, int _posX, int _posY, const char* _caption);
 };

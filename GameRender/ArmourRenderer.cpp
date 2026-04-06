@@ -83,9 +83,8 @@ void ArmourRenderer::Render(const Entity& _entity, const EntityRenderContext& _c
 
   if (armour.m_numPassengers > 0)
   {
-    char caption[16];
-    snprintf(caption, sizeof(caption), "%d", armour.m_numPassengers);
-    FlagRenderer::RenderText(flag, 2, 2, caption);
+    auto caption = std::format("{}", armour.m_numPassengers);
+    FlagRenderer::RenderText(flag, 2, 2, caption.c_str());
   }
 
   //

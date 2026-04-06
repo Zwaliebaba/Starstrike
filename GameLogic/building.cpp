@@ -694,10 +694,9 @@ const char* Building::GetTypeNameTranslated(int _type)
 {
   const char* typeName = GetTypeName(_type);
 
-  char stringId[256];
-  snprintf(stringId, sizeof(stringId), "buildingname_%s", typeName);
+  auto stringId = std::format("buildingname_{}", typeName);
 
-  if (ISLANGUAGEPHRASE(stringId))
-    return LANGUAGEPHRASE(stringId);
+  if (ISLANGUAGEPHRASE(stringId.c_str()))
+    return LANGUAGEPHRASE(stringId.c_str());
   return typeName;
 }

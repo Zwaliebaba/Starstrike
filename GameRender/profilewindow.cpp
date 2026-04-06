@@ -76,7 +76,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 	if (_pe->m_children.NumUsed() == 0) return;
 
     int left = m_x + 10;
-    char caption[256];
+    std::string caption;
 	EclButton *minAvgMaxButton = GetButton("Avg");
 	int minAvgMax = 0;
 	if (_stricmp(minAvgMaxButton->m_caption, "Avg") == 0)
@@ -115,12 +115,11 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 			else if (minAvgMax == 2)	lastColumn = child->m_longest;
 			lastColumn *= 1000.0f;
 
-			snprintf(caption, sizeof(caption),
-					"%*s%-*s:%5d x%4.2f = %4.0f %4.2f",
-					_indent + 1,
+			caption = std::format("{:>{}}{:<{}}:{:5d} x{:4.2f} = {:4.0f} {:4.2f}",
 					icon,
-					24 - _indent,
+					_indent + 1,
 					child->m_name,
+					24 - _indent,
 					child->m_lastNumCalls,
 					time/(float)child->m_lastNumCalls,
 					time,
@@ -144,7 +143,7 @@ void ProfileWindow::RenderElementProfile(ProfiledElement *_pe, unsigned int _ind
 				}
 			}
 
-			g_editorFont.DrawText2D( left, m_yPos+=12, DEF_FONT_SIZE, caption );
+			g_editorFont.DrawText2D( left, m_yPos+=12, DEF_FONT_SIZE, caption.c_str() );
 
             int lineLeft = left + 360;
             int lineY = m_yPos - 6;

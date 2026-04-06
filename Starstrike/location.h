@@ -1,19 +1,13 @@
 #pragma once
 
-#include <float.h>
-
-#include "fast_darray.h"
-#include "slice_darray.h"
 #include "LegacyVector3.h"
-
-#include "server.h"
-
-#include "globals.h"
-#include "landscape.h"
 #include "building.h"
-#include "worldobject.h"
-#include "weapons.h"
+#include "fast_darray.h"
+#include "landscape.h"
+#include "slice_darray.h"
 #include "spirit.h"
+#include "weapons.h"
+#include "worldobject.h"
 
 class ServerToClientLetter;
 class WorldObject;
@@ -41,7 +35,6 @@ class Location
     int m_lastSliceProcessed;
     bool m_missionComplete;
 
-    void SetMyTeamId(unsigned char _teamId);
     void LoadLevel(const char* _missionFilename, const char* _mapFilename);
 
     void AdvanceWeapons(int _slice);
@@ -49,6 +42,7 @@ class Location
     void AdvanceTeams(int _slice);
     void AdvanceSpirits(int _slice);
     void AdvanceClouds(int _slice);
+    void AdvanceCA();
 
     void RenderLandscape();
     void RenderWeapons();
@@ -56,7 +50,6 @@ class Location
     void RenderBuildingAlphas();
     void RenderParticles();
     void RenderTeams();
-    void RenderMagic();
     void RenderSpirits();
     void RenderClouds();
     void RenderWater();
@@ -80,6 +73,9 @@ class Location
     Team* m_teams;
 
     float m_christmasTimer;
+
+    // CA tick accumulator (server-only, decoupled from render frame rate)
+    float m_caAccumulator;
 
     FastDArray<Light*> m_lights;
     SliceDArray<Building*> m_buildings;

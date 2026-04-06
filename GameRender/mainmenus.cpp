@@ -481,12 +481,11 @@ void AboutDarwiniaWindow::Render(bool _hasFocus)
 
   float fontSize = GetMenuSize(13);
 
-  char about[512];
-  snprintf(about, sizeof(about), "%s %s", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
+  auto about = std::format("{} {}", LANGUAGEPHRASE("bootloader_credits_4"), LANGUAGEPHRASE("bootloader_credits_5"));
 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, "Darwinia v1.5.4");
-  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += 2 * h, fontSize, about);
+  g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += 2 * h, fontSize, about.c_str());
   g_gameFont.DrawText2DCenter(m_x + m_w / 2, y += h, fontSize, "http://www.introversion.co.uk");
 }
 
