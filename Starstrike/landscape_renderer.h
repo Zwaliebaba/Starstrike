@@ -95,9 +95,8 @@ class LandscapeRenderer
 
     FastDArray<LandTriangleStrip*> m_strips;
 
-    // Compiled PSOs — created once at init, no runtime PSO cache lookup.
-    com_ptr<ID3D12PipelineState> m_mainPSO;         // Opaque base terrain
-    com_ptr<ID3D12PipelineState> m_overlayPSO;      // Triangle-outline overlay (additive blend)
+    // Single PSO using dedicated landscape shaders (base + overlay in one pass).
+    com_ptr<ID3D12PipelineState> m_pso;
 
     void BuildVertArrayAndTriStrip(const SurfaceMap2D<float>* _heightMap);
     void BuildNormArray();
@@ -109,8 +108,6 @@ class LandscapeRenderer
     void InitPipeline();
     void InvalidateGPU();
     void UploadToGPU();
-    void RenderMainPass(ID3D12GraphicsCommandList* _cmdList);
-    void RenderOverlayPass(ID3D12GraphicsCommandList* _cmdList);
     void DrawStrips(ID3D12GraphicsCommandList* _cmdList) const;
 
     int m_overlayTextureId = -1;

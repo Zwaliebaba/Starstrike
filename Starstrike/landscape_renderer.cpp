@@ -18,8 +18,8 @@
 #include "rgb_colour.h"
 #include "texture_uv.h"
 
-#include "CompiledShaders/VertexShader.h"
-#include "CompiledShaders/PixelShader.h"
+#include "CompiledShaders/LandscapeVS.h"
+#include "CompiledShaders/LandscapePS.h"
 
 //*****************************************************************************
 // Protected Functions
@@ -331,52 +331,37 @@ void LandscapeRenderer::InitPipeline()
     {"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT,    0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
   };
 
-  // Base PSO desc — shared settings for all landscape PSOs.
-  D3D12_GRAPHICS_PIPELINE_STATE_DESC base = {};
-  base.pRootSignature = OpenGLD3D::GetSharedRootSignature();
-  base.VS = {g_pVertexShader, sizeof(g_pVertexShader)};
-  base.PS = {g_pPixelShader, sizeof(g_pPixelShader)};
-  base.InputLayout = {inputLayout, _countof(inputLayout)};
-  base.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-  base.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
-  base.RasterizerState.FrontCounterClockwise = TRUE;
-  base.RasterizerState.DepthClipEnable = TRUE;
-  base.DepthStencilState.DepthEnable = TRUE;
-  base.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-  base.DepthStencilState.StencilEnable = FALSE;
-  base.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-  base.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-  base.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-  base.SampleMask = UINT_MAX;
-  base.SampleDesc.Count = 1;
-  base.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-  base.NumRenderTargets = 1;
-  base.RTVFormats[0] = Graphics::Core::Get().GetBackBufferFormat();
-  base.DSVFormat = Graphics::Core::Get().GetDepthBufferFormat();
+  // Single opaque PSO using the dedicated landscape shaders.
+  // The pixel shader combines base vertex colour + overlay texture in one pass.
+  D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+  desc.pRootSignature = OpenGLD3D::GetSharedRootSignature();
+  desc.VS = {g_pLandscapeVS, sizeof(g_pLandscapeVS)};
+  desc.PS = {g_pLandscapePS, sizeof(g_pLandscapePS)};
+  desc.InputLayout = {inputLayout, _countof(inputLayout)};
+  desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+  desc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+  desc.RasterizerState.FrontCounterClockwise = TRUE;
+  desc.RasterizerState.DepthClipEnable = TRUE;
+  desc.DepthStencilState.DepthEnable = TRUE;
+  desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+  desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+  desc.DepthStencilState.StencilEnable = FALSE;
+  desc.BlendState.RenderTarget[0].BlendEnable = FALSE;
+  desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+  desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+  desc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+  desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+  desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+  desc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+  desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+  desc.SampleMask = UINT_MAX;
+  desc.SampleDesc.Count = 1;
+  desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+  desc.NumRenderTargets = 1;
+  desc.RTVFormats[0] = Graphics::Core::Get().GetBackBufferFormat();
+  desc.DSVFormat = Graphics::Core::Get().GetDepthBufferFormat();
 
-  // --- Main pass (opaque) ---
-  {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = base;
-    desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    desc.BlendState.RenderTarget[0].BlendEnable = FALSE;
-    desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-    desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-    desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-    desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-    check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_mainPSO)));
-  }
-
-  // --- Overlay pass (additive blend, no depth write) ---
-  {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = base;
-    desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
-    desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-    desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-    desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-    check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_overlayPSO)));
-  }
+  check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_pso)));
 }
 
 LandscapeRenderer::~LandscapeRenderer()
@@ -559,86 +544,12 @@ void LandscapeRenderer::DrawStrips(ID3D12GraphicsCommandList* _cmdList) const
   }
 }
 
-void LandscapeRenderer::RenderMainPass(ID3D12GraphicsCommandList* _cmdList)
-{
-  // ---- Draw constants (b1) ----
-  // Start from current render state (matrices, lights already configured by Renderer).
-  OpenGLD3D::DrawConstants dc = OpenGLD3D::BuildDrawConstants();
-
-  // Material: specular black, ambient+diffuse white, shininess 100.
-  dc.MatSpecular = {0.0f, 0.0f, 0.0f, 0.0f};
-  dc.MatDiffuse = {1.0f, 1.0f, 1.0f, 0.0f};
-  dc.MatAmbient = {1.0f, 1.0f, 1.0f, 0.0f};
-  dc.MatShininess = 100.0f;
-
-  dc.LightingEnabled = 1;
-  dc.Lights[0].Enabled = 1;
-  dc.Lights[1].Enabled = 1;
-  dc.ColorMaterialEnabled = 1;
-  dc.ColorMaterialMode = 1; // AMBIENT_AND_DIFFUSE
-  dc.FogEnabled = 1;
-  dc.TexturingEnabled0 = 0;
-  dc.TexturingEnabled1 = 0;
-
-  auto cbAlloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
-  memcpy(cbAlloc.cpuPtr, &dc, sizeof(OpenGLD3D::DrawConstants));
-  _cmdList->SetGraphicsRootConstantBufferView(1, cbAlloc.gpuAddr);
-
-  // ---- Textures ----
-  _cmdList->SetGraphicsRootDescriptorTable(2, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
-  _cmdList->SetGraphicsRootDescriptorTable(3, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
-
-  // ---- PSO ----
-  _cmdList->SetPipelineState(m_mainPSO.get());
-
-  DrawStrips(_cmdList);
-  OpenGLD3D::RecordBatchedDraw(0);
-}
-
-void LandscapeRenderer::RenderOverlayPass(ID3D12GraphicsCommandList* _cmdList)
-{
-  // ---- Draw constants (b1) ----
-  OpenGLD3D::DrawConstants dc = OpenGLD3D::BuildDrawConstants();
-
-  // Material: specular grey, ambient+diffuse over-bright, shininess 40.
-  dc.MatSpecular = {0.5f, 0.5f, 0.5f, 1.0f};
-  dc.MatDiffuse = {1.2f, 1.2f, 1.2f, 0.0f};
-  dc.MatAmbient = {1.2f, 1.2f, 1.2f, 0.0f};
-  dc.MatShininess = 40.0f;
-
-  dc.LightingEnabled = 1;
-  dc.Lights[0].Enabled = 1;
-  dc.Lights[1].Enabled = 1;
-  dc.ColorMaterialEnabled = 1;
-  dc.ColorMaterialMode = 1; // AMBIENT_AND_DIFFUSE
-  dc.FogEnabled = 1;
-  dc.TexturingEnabled0 = 1;
-  dc.TexturingEnabled1 = 0;
-  dc.TexEnvMode0 = 0; // MODULATE
-
-  auto cbAlloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
-  memcpy(cbAlloc.cpuPtr, &dc, sizeof(OpenGLD3D::DrawConstants));
-  _cmdList->SetGraphicsRootConstantBufferView(1, cbAlloc.gpuAddr);
-
-  // ---- Textures ----
-  if (m_overlayTextureId < 0)
-    m_overlayTextureId = Resource::GetTexture("textures/triangleOutline.bmp", true, false);
-  _cmdList->SetGraphicsRootDescriptorTable(2, OpenGLD3D::GetTextureSRVGPUHandle(m_overlayTextureId));
-  _cmdList->SetGraphicsRootDescriptorTable(3, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
-
-  // ---- PSO ----
-  _cmdList->SetPipelineState(m_overlayPSO.get());
-
-  DrawStrips(_cmdList);
-  OpenGLD3D::RecordBatchedDraw(0);
-}
-
 void LandscapeRenderer::Render()
 {
   if (m_verts.Size() <= 0)
     return;
 
-  #ifdef PHEROMONE_ACTIVE
+#ifdef PHEROMONE_ACTIVE
   // Pheromone overlay — blend tints into vertex colours when dirty.
   if (m_pheromoneDirty && m_terrainWorld)
   {
@@ -656,30 +567,48 @@ void LandscapeRenderer::Render()
   auto* cmdList = core.GetCommandList();
   const int frameIdx = static_cast<int>(core.GetCurrentFrameIndex());
 
-  // ---- Shared state (set once for both passes) ----
-
-  // Scene constants (b0) — lazy per-frame upload.
+  // ---- Scene constants (b0) ----
   OpenGLD3D::EnsureSceneConstantsUploaded();
   cmdList->SetGraphicsRootConstantBufferView(0, OpenGLD3D::GetSceneConstantsGPUAddr());
 
-  // Viewport / Scissor.
+  // ---- Draw constants (b1) ----
+  // The dedicated landscape VS handles lighting directly; we still need
+  // matrices, light params, and fog state from the DrawConstants cbuffer.
+  OpenGLD3D::DrawConstants dc = OpenGLD3D::BuildDrawConstants();
+  dc.LightingEnabled = 1;
+  dc.Lights[0].Enabled = 1;
+  dc.Lights[1].Enabled = 1;
+  dc.ColorMaterialEnabled = 1;
+  dc.ColorMaterialMode = 1; // AMBIENT_AND_DIFFUSE
+  dc.FogEnabled = 1;
+
+  auto cbAlloc = Graphics::GetCurrentUploadBuffer().Allocate(sizeof(OpenGLD3D::DrawConstants), 256);
+  memcpy(cbAlloc.cpuPtr, &dc, sizeof(OpenGLD3D::DrawConstants));
+  cmdList->SetGraphicsRootConstantBufferView(1, cbAlloc.gpuAddr);
+
+  // ---- Overlay texture (t0) ----
+  if (m_overlayTextureId < 0)
+    m_overlayTextureId = Resource::GetTexture("textures/triangleOutline.bmp", true, false);
+  cmdList->SetGraphicsRootDescriptorTable(2, OpenGLD3D::GetTextureSRVGPUHandle(m_overlayTextureId));
+  cmdList->SetGraphicsRootDescriptorTable(3, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
+
+  // ---- Sampler (param 4) ----
+  cmdList->SetGraphicsRootDescriptorTable(4, OpenGLD3D::GetSamplerBaseGPUHandle());
+
+  // ---- Viewport / Scissor ----
   D3D12_VIEWPORT viewport = core.GetScreenViewport();
   cmdList->RSSetViewports(1, &viewport);
   D3D12_RECT scissor = core.GetScissorRect();
   cmdList->RSSetScissorRects(1, &scissor);
 
-  // Vertex buffer + topology (same geometry for both passes).
+  // ---- VB / topology / PSO ----
   cmdList->IASetVertexBuffers(0, 1, &m_gpuVBViews[frameIdx]);
   cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+  cmdList->SetPipelineState(m_pso.get());
 
-  // Samplers (param 4) — same linear/wrap/mipLinear for both passes.
-  cmdList->SetGraphicsRootDescriptorTable(4, OpenGLD3D::GetSamplerBaseGPUHandle());
-
-  // ---- Pass 1: Base terrain (vertex-coloured, no texture) ----
-  RenderMainPass(cmdList);
-
-  // ---- Pass 2: Triangle-outline overlay (textured, additive blend) ----
-  RenderOverlayPass(cmdList);
+  // ---- Single draw — base + overlay combined in pixel shader ----
+  DrawStrips(cmdList);
+  OpenGLD3D::RecordBatchedDraw(0);
 
   END_PROFILE(g_context->m_profiler, "Render Landscape");
 }
