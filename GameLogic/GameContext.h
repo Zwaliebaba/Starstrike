@@ -63,7 +63,6 @@ struct GameContext
     StartSequence* m_startSequence = nullptr;
 
     bool m_bypassNetworking = false;
-    bool m_negativeRenderer = false;
     int m_difficultyLevel = 0; // Cached from preferences
     bool m_largeMenus = false;
 

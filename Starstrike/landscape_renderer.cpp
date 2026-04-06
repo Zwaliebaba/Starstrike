@@ -194,9 +194,6 @@ void LandscapeRenderer::GetLandscapeColour(float _height, float _gradient, unsig
     y = m_landscapeColour->m_height - 1;
 
   *_colour = m_landscapeColour->GetPixel(x, y);
-
-  if (g_context->m_negativeRenderer)
-    _colour->a = 0;
 }
 
 // Biome-aware colour lookup — selects the ramp based on TerrainType.
@@ -231,9 +228,6 @@ void LandscapeRenderer::GetBiomeColour(float _height, float _gradient, unsigned 
     py = ramp->m_height - 1;
 
   *_colour = ramp->GetPixel(px, py);
-
-  if (g_context->m_negativeRenderer)
-    _colour->a = 0;
 }
 
 void LandscapeRenderer::BuildColourArray()
@@ -324,20 +318,6 @@ LandscapeRenderer::LandscapeRenderer(SurfaceMap2D<float>* _heightMap)
   InitPipeline();
 }
 
-// Map colour-manipulating blend factors to their alpha equivalents.
-// D3D12 forbids SRC_COLOR / INV_SRC_COLOR etc. in SrcBlendAlpha / DestBlendAlpha.
-static D3D12_BLEND ToAlphaBlend(D3D12_BLEND blend)
-{
-  switch (blend)
-  {
-  case D3D12_BLEND_SRC_COLOR:      return D3D12_BLEND_SRC_ALPHA;
-  case D3D12_BLEND_INV_SRC_COLOR:  return D3D12_BLEND_INV_SRC_ALPHA;
-  case D3D12_BLEND_DEST_COLOR:     return D3D12_BLEND_DEST_ALPHA;
-  case D3D12_BLEND_INV_DEST_COLOR: return D3D12_BLEND_INV_DEST_ALPHA;
-  default: return blend;
-  }
-}
-
 void LandscapeRenderer::InitPipeline()
 {
   auto* device = Graphics::Core::Get().GetD3DDevice();
@@ -386,18 +366,6 @@ void LandscapeRenderer::InitPipeline()
     check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_mainPSO)));
   }
 
-  // --- Main pass (negative renderer — src_alpha / inv_src_color) ---
-  {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = base;
-    desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-    desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
-    desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
-    desc.BlendState.RenderTarget[0].SrcBlendAlpha = ToAlphaBlend(D3D12_BLEND_SRC_ALPHA);
-    desc.BlendState.RenderTarget[0].DestBlendAlpha = ToAlphaBlend(D3D12_BLEND_INV_SRC_COLOR);
-    check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_mainNegPSO)));
-  }
-
   // --- Overlay pass (additive blend, no depth write) ---
   {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = base;
@@ -405,21 +373,9 @@ void LandscapeRenderer::InitPipeline()
     desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
     desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
     desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-    desc.BlendState.RenderTarget[0].SrcBlendAlpha = ToAlphaBlend(D3D12_BLEND_SRC_ALPHA);
-    desc.BlendState.RenderTarget[0].DestBlendAlpha = ToAlphaBlend(D3D12_BLEND_ONE);
+    desc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+    desc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
     check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_overlayPSO)));
-  }
-
-  // --- Overlay pass (negative renderer) ---
-  {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = base;
-    desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    desc.BlendState.RenderTarget[0].BlendEnable = TRUE;
-    desc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-    desc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
-    desc.BlendState.RenderTarget[0].SrcBlendAlpha = ToAlphaBlend(D3D12_BLEND_SRC_ALPHA);
-    desc.BlendState.RenderTarget[0].DestBlendAlpha = ToAlphaBlend(D3D12_BLEND_INV_SRC_COLOR);
-    check_hresult(device->CreateGraphicsPipelineState(&desc, IID_GRAPHICS_PPV_ARGS(m_overlayNegPSO)));
   }
 }
 
@@ -633,7 +589,7 @@ void LandscapeRenderer::RenderMainPass(ID3D12GraphicsCommandList* _cmdList)
   _cmdList->SetGraphicsRootDescriptorTable(3, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
 
   // ---- PSO ----
-  _cmdList->SetPipelineState(g_context->m_negativeRenderer ? m_mainNegPSO.get() : m_mainPSO.get());
+  _cmdList->SetPipelineState(m_mainPSO.get());
 
   DrawStrips(_cmdList);
   OpenGLD3D::RecordBatchedDraw(0);
@@ -671,7 +627,7 @@ void LandscapeRenderer::RenderOverlayPass(ID3D12GraphicsCommandList* _cmdList)
   _cmdList->SetGraphicsRootDescriptorTable(3, OpenGLD3D::GetDefaultTextureSRVGPUHandle());
 
   // ---- PSO ----
-  _cmdList->SetPipelineState(g_context->m_negativeRenderer ? m_overlayNegPSO.get() : m_overlayPSO.get());
+  _cmdList->SetPipelineState(m_overlayPSO.get());
 
   DrawStrips(_cmdList);
   OpenGLD3D::RecordBatchedDraw(0);

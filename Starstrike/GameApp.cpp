@@ -39,11 +39,7 @@ GameApp::GameApp()
 
   m_bypassNetworking = g_prefsManager->GetInt("BypassNetwork") ? true : false;
 
-  m_negativeRenderer = g_prefsManager->GetInt("RenderNegative", 0) ? true : false;
-  if (m_negativeRenderer)
-    m_backgroundColour.Set(255, 255, 255, 255);
-  else
-    m_backgroundColour.Set(0, 0, 0, 0);
+  m_backgroundColour.Set(0, 0, 0, 0);
 
   UpdateDifficultyFromPreferences();
 

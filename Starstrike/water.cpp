@@ -48,7 +48,7 @@ Water::Water()
 
       m_cellSize = static_cast<float>(detail) * worldSize;
 
-      int alpha = (g_context->m_negativeRenderer ? 0 : 255);
+      int alpha = 255;
 
       // Load colour information from a bitmap
       {
@@ -374,7 +374,7 @@ void Water::RenderFlatWaterTiles(float posNorth, float posSouth, float posEast, 
     // current attributes by constructing the BGRA value directly.
     // We don't have direct access to s_currentAttribs, so we replicate the
     // color value that RenderFlatWater set.
-    unsigned char alpha = g_context->m_negativeRenderer ? 0 : 255;
+    unsigned char alpha = 255;
     OpenGLD3D::CustomVertex tmpV{};
     tmpV.r8 = 255;
     tmpV.g8 = 255;
@@ -454,14 +454,7 @@ void Water::RenderFlatWater()
   glDisable(GL_BLEND);
   glDepthMask(false);
 
-  if (g_context->m_negativeRenderer)
-  {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
-    glColor4ub(255, 255, 255, 0);
-  }
-  else
-    glColor4ub(255, 255, 255, 255);
+  glColor4ub(255, 255, 255, 255);
 
   char waterFilename[256];
   snprintf(waterFilename, sizeof(waterFilename), "terrain/%s", g_context->m_location->m_levelFile->m_waterColourFilename);

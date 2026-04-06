@@ -97,9 +97,7 @@ class LandscapeRenderer
 
     // Compiled PSOs — created once at init, no runtime PSO cache lookup.
     com_ptr<ID3D12PipelineState> m_mainPSO;         // Opaque base terrain
-    com_ptr<ID3D12PipelineState> m_mainNegPSO;      // Base terrain with negative-renderer blend
     com_ptr<ID3D12PipelineState> m_overlayPSO;      // Triangle-outline overlay (additive blend)
-    com_ptr<ID3D12PipelineState> m_overlayNegPSO;   // Overlay with negative-renderer blend
 
     void BuildVertArrayAndTriStrip(const SurfaceMap2D<float>* _heightMap);
     void BuildNormArray();
