@@ -39,6 +39,12 @@
 #include "weapons.h"
 #include "worldobject.h"
 
+#include "server.h"
+#include "servertoclientletter.h"
+#include "bytestream.h"
+#include "TerrainChunk.h"
+#include "TerrainWorld.h"
+
 // ****************************************************************************
 //  Class Location
 // ****************************************************************************
@@ -54,7 +60,8 @@ Location::Location()
     m_water(nullptr),
     m_teams(nullptr),
     m_christmasTimer(-99.9f),
-    m_caAccumulator(0.0f)
+    m_caAccumulator(0.0f),
+    m_caHeartbeatTick(0)
 {
   m_spirits.SetTotalNumSlices(NUM_SLICES_PER_FRAME);
   m_lasers.SetTotalNumSlices(NUM_SLICES_PER_FRAME);
@@ -774,23 +781,201 @@ void Location::Advance(int _slice)
 // *** AdvanceCA
 // Runs the pheromone cellular automata tick at a fixed rate, decoupled from
 // the render frame rate.  Only meaningful on the server.
+// Ordering: snapshot → tick → build deltas → send  (§7.3 R7).
 void Location::AdvanceCA()
 {
-  if (!m_landscape.GetTerrainWorld())
+  TerrainWorld* world = m_landscape.GetTerrainWorld();
+  if (!world)
     return;
 
-  static constexpr float CA_ALPHA        = 0.05f;
-  static constexpr float CA_BETA         = 0.992f;
-  static constexpr float CA_MAX_PH       = 100.0f;
-  static constexpr float CA_TICK_RATE_HZ = 10.0f;
-  static constexpr float CA_TICK_INTERVAL = 1.0f / CA_TICK_RATE_HZ;
+  static constexpr float CA_ALPHA           = 0.05f;
+  static constexpr float CA_BETA            = 0.992f;
+  static constexpr float CA_MAX_PH          = 100.0f;
+  static constexpr float CA_TICK_RATE_HZ    = 10.0f;
+  static constexpr float CA_TICK_INTERVAL   = 1.0f / CA_TICK_RATE_HZ;
+  static constexpr float CA_DELTA_THRESHOLD = 0.05f;
+  static constexpr int   MAX_DELTAS_PER_CHUNK = 4096;
 
   m_caAccumulator += SERVER_ADVANCE_PERIOD;
+
+  // Auto-subscribe any newly connected clients to all chunks and send
+  // them a full pheromone sync so they start with correct state (§7.5).
+  AutoSubscribeNewClients();
+
   while (m_caAccumulator >= CA_TICK_INTERVAL)
   {
+    // 1. Capture pre-tick baseline for delta detection.
+    world->SnapshotAllDirtyChunks();
+
+    // 2. Diffuse + evaporate.
     m_landscape.TickCA(CA_ALPHA, CA_BETA, CA_MAX_PH);
+
+    // 3. Build + send deltas per dirty chunk to subscribed clients.
+    if (g_context->m_server)
+    {
+      for (int i = 0; i < world->GetActiveChunkCount(); ++i)
+      {
+        TerrainChunk* chunk = world->GetActiveChunk(i);
+        if (!chunk || !chunk->m_dirty)
+          continue;
+
+        TerrainChunk::PhDelta deltas[MAX_DELTAS_PER_CHUNK];
+        int count = chunk->BuildDelta(deltas, MAX_DELTAS_PER_CHUNK, CA_DELTA_THRESHOLD);
+        if (count > 0)
+        {
+          // Serialize: [int chunkX][int chunkZ][ushort count][PhDelta × count]
+          int payloadSize = static_cast<int>(
+            sizeof(int) * 2 + sizeof(unsigned short) + count * sizeof(TerrainChunk::PhDelta));
+
+          auto* letter = new ServerToClientLetter();
+          letter->SetType(ServerToClientLetter::ChunkPheromoneUpdate);
+          letter->m_bulkDataSize = payloadSize;
+          letter->m_bulkData = new char[payloadSize];
+
+          char* ptr = letter->m_bulkData;
+          WRITE_INT(ptr, chunk->GetChunkX());
+          WRITE_INT(ptr, chunk->GetChunkZ());
+          WRITE_UNSIGNED_SHORT(ptr, static_cast<unsigned short>(count));
+          memcpy(ptr, deltas, count * sizeof(TerrainChunk::PhDelta));
+
+          g_context->m_server->SendLetterToChunkSubscribers(
+            letter, chunk->GetChunkX(), chunk->GetChunkZ());
+        }
+
+        chunk->m_dirty = false;
+      }
+    }
+
+    // 4. Staggered heartbeat re-sync to cap pheromone drift from packet loss (§A.6).
+    ++m_caHeartbeatTick;
+    HeartbeatReSync();
+
     m_caAccumulator -= CA_TICK_INTERVAL;
   }
+}
+
+// *** SendChunkFullSync
+// Build a ChunkPheromoneFullSync letter for one chunk and send to a specific client.
+// Payload: [int chunkX][int chunkZ][raw float pairs from SerializePheromones]
+void Location::SendChunkFullSync(int _clientId, int _chunkX, int _chunkZ)
+{
+  TerrainWorld* world = m_landscape.GetTerrainWorld();
+  if (!world || !g_context->m_server)
+    return;
+
+  TerrainChunk* chunk = world->GetChunk(_chunkX, _chunkZ);
+  if (!chunk)
+    return;
+
+  // Two ints for chunk coords + CELL_COUNT * 2 floats for pheromone data.
+  static constexpr int PH_DATA_SIZE = TerrainChunk::CELL_COUNT * 2 * static_cast<int>(sizeof(float));
+  static constexpr int HEADER_SIZE  = static_cast<int>(sizeof(int) * 2);
+  static constexpr int PAYLOAD_SIZE = HEADER_SIZE + PH_DATA_SIZE;
+
+  auto* letter = new ServerToClientLetter();
+  letter->SetType(ServerToClientLetter::ChunkPheromoneFullSync);
+  letter->m_bulkDataSize = PAYLOAD_SIZE;
+  letter->m_bulkData = new char[PAYLOAD_SIZE];
+
+  char* ptr = letter->m_bulkData;
+  WRITE_INT(ptr, _chunkX);
+  WRITE_INT(ptr, _chunkZ);
+
+  int bytesWritten = chunk->SerializePheromones(ptr, PH_DATA_SIZE);
+  DEBUG_ASSERT(bytesWritten == PH_DATA_SIZE);
+
+  g_context->m_server->SendLetterToClient(letter, _clientId);
+}
+
+// *** AutoSubscribeNewClients
+// For the initial implementation, subscribe every connected client that has an
+// empty subscription set to all chunks and send a full pheromone sync per chunk.
+// In a future AoI-aware version, clients would send ChunkSubscribe messages based
+// on camera position instead.
+void Location::AutoSubscribeNewClients()
+{
+  if (!g_context->m_server)
+    return;
+
+  TerrainWorld* world = m_landscape.GetTerrainWorld();
+  if (!world)
+    return;
+
+  const int chunksX = world->GetChunksX();
+  const int chunksZ = world->GetChunksZ();
+
+  DArray<ClientChunkState*>& states = g_context->m_server->m_chunkStates;
+  for (int i = 0; i < states.Size(); ++i)
+  {
+    if (!states.ValidIndex(i))
+      continue;
+
+    ClientChunkState* state = states[i];
+    if (!state->m_subscribed.empty())
+      continue; // already subscribed — not a new client
+
+    // Subscribe to all chunks and send full sync for each.
+    for (int cz = 0; cz < chunksZ; ++cz)
+    {
+      for (int cx = 0; cx < chunksX; ++cx)
+      {
+        g_context->m_server->SubscribeClientToChunk(state->m_clientId, cx, cz);
+        SendChunkFullSync(state->m_clientId, cx, cz);
+      }
+    }
+  }
+}
+
+// *** HeartbeatReSync
+// Every HEARTBEAT_INTERVAL_TICKS CA ticks (~30 s at 10 Hz), send a full pheromone
+// sync for one chunk to all its subscribers.  Chunks are staggered so at most one
+// chunk is re-synced per tick, spreading the bandwidth cost over time (§A.6).
+void Location::HeartbeatReSync()
+{
+  if (!g_context->m_server)
+    return;
+
+  TerrainWorld* world = m_landscape.GetTerrainWorld();
+  if (!world)
+    return;
+
+  static constexpr int HEARTBEAT_INTERVAL_TICKS = 300; // 30 s at 10 Hz
+
+  const int totalChunks = world->GetChunksX() * world->GetChunksZ();
+  if (totalChunks == 0)
+    return;
+
+  // Each tick, check one chunk — the one whose flat index matches the
+  // heartbeat tick modulo the interval.  This staggers re-syncs so each
+  // chunk gets a full sync exactly once per HEARTBEAT_INTERVAL_TICKS.
+  const int chunkIndex = m_caHeartbeatTick % (totalChunks * HEARTBEAT_INTERVAL_TICKS);
+  if (chunkIndex >= totalChunks)
+    return; // not this tick's turn for any chunk
+
+  const int cx = chunkIndex % world->GetChunksX();
+  const int cz = chunkIndex / world->GetChunksX();
+
+  TerrainChunk* chunk = world->GetChunk(cx, cz);
+  if (!chunk)
+    return;
+
+  // Build one full-sync letter and fan out to all subscribers.
+  static constexpr int PH_DATA_SIZE = TerrainChunk::CELL_COUNT * 2 * static_cast<int>(sizeof(float));
+  static constexpr int HEADER_SIZE  = static_cast<int>(sizeof(int) * 2);
+  static constexpr int PAYLOAD_SIZE = HEADER_SIZE + PH_DATA_SIZE;
+
+  auto* letter = new ServerToClientLetter();
+  letter->SetType(ServerToClientLetter::ChunkPheromoneFullSync);
+  letter->m_bulkDataSize = PAYLOAD_SIZE;
+  letter->m_bulkData = new char[PAYLOAD_SIZE];
+
+  char* ptr = letter->m_bulkData;
+  WRITE_INT(ptr, cx);
+  WRITE_INT(ptr, cz);
+  chunk->SerializePheromones(ptr, PH_DATA_SIZE);
+
+  // SendLetterToChunkSubscribers deep-copies per client and deletes the original.
+  g_context->m_server->SendLetterToChunkSubscribers(letter, cx, cz);
 }
 
 void Location::AdvanceChristmas()

@@ -236,6 +236,21 @@ void TerrainWorld::ExchangeHalos()
 
 
 // ============================================================================
+// Delta sync support
+// ============================================================================
+
+void TerrainWorld::SnapshotAllDirtyChunks()
+{
+    for (int i = 0; i < m_activeChunkCount; ++i)
+    {
+        TerrainChunk* chunk = m_activeChunks[i];
+        if (chunk->m_dirty)
+            chunk->SnapshotPheromones();
+    }
+}
+
+
+// ============================================================================
 // CA tick — OMP parallel over active chunks
 // ============================================================================
 

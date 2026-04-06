@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opengl_directx_matrix_stack.h"
+#include "ShaderConstants.h"
 
 class Matrix34;
 
@@ -28,6 +29,19 @@ namespace OpenGLD3D {
   // the cached GPU address without re-uploading.
   void EnsureSceneConstantsUploaded();
   D3D12_GPU_VIRTUAL_ADDRESS GetSceneConstantsGPUAddr();
+
+  // Build a DrawConstants struct from the current GL render state (matrices,
+  // lights, material, flags).  Native D3D12 renderers can override specific
+  // fields before uploading to the GPU.
+  DrawConstants BuildDrawConstants();
+
+  // --- Shared rendering resources ---
+  // Accessors for the shared root signature, default 1x1 white texture, and
+  // sampler descriptor block.  These are engine-level resources used by all
+  // renderers (both legacy GL-shim and native D3D12).
+  ID3D12RootSignature* GetSharedRootSignature();
+  D3D12_GPU_DESCRIPTOR_HANDLE GetDefaultTextureSRVGPUHandle();
+  D3D12_GPU_DESCRIPTOR_HANDLE GetSamplerBaseGPUHandle();
 
   // --- Per-frame GPU pipeline statistics ---
   // Counters accumulated during a frame and snapshotted at EndFrame.

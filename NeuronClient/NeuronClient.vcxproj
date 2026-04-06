@@ -189,6 +189,7 @@
     <ClInclude Include="server.h" />
     <ClInclude Include="servertoclient.h" />
     <ClInclude Include="servertoclientletter.h" />
+    <ClInclude Include="ShaderConstants.h" />
     <ClInclude Include="ShapeMeshCache.h" />
     <ClInclude Include="ShapeStatic.h" />
     <ClInclude Include="ShapeInstance.h" />

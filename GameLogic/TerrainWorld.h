@@ -41,6 +41,12 @@ public:
     int            GetActiveChunkCount() const { return m_activeChunkCount; }
     TerrainChunk*  GetActiveChunk(int _index);
 
+    // --- Delta sync support ---
+    // Snapshot current pheromone state for all dirty active chunks.
+    // Must be called before TickActiveChunks() so BuildDelta() can
+    // compare post-tick state against the pre-tick baseline (§7.3 R7).
+    void SnapshotAllDirtyChunks();
+
     // --- CA tick (server-only, OMP parallel over active chunks) ---
     void TickActiveChunks(float _alpha, float _beta, float _maxPh);
 

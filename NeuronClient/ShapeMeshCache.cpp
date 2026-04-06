@@ -220,7 +220,7 @@ void ShapeMeshCache::EnsureUploaded(const ShapeStatic* _shape)
 
     m_cache.emplace(_shape, std::move(gpu));
 
-    DebugTrace("ShapeMeshCache: uploaded '%s' — %u triangles, %u bytes\n",
+    DebugTrace("ShapeMeshCache: uploaded '{}' - {} triangles, {} bytes\n",
                _shape->m_name ? _shape->m_name : "<unnamed>",
                totalTriangles,
                static_cast<unsigned int>(bufferSize));

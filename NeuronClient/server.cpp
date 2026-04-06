@@ -61,6 +61,7 @@ Server::~Server()
   m_history.EmptyAndDelete();
   m_clients.EmptyAndDelete();
   m_teams.EmptyAndDelete();
+  m_chunkStates.EmptyAndDelete();
 
   m_inboxMutex->Lock();
   m_inbox.EmptyAndDelete();
@@ -141,7 +142,14 @@ void Server::RegisterNewClient(char* _ip)
 {
   DEBUG_ASSERT(GetClientId(_ip) == -1);
   auto sToC = new ServerToClient(_ip);
-  m_clients.PutData(sToC);
+  int clientId = m_clients.PutData(sToC);
+
+  // Create matching chunk subscription state
+  auto* chunkState = new ClientChunkState();
+  chunkState->m_clientId = clientId;
+  if (m_chunkStates.Size() <= clientId)
+    m_chunkStates.SetSize(clientId + 1);
+  m_chunkStates.PutData(chunkState, clientId);
 
   //
   // Tell all clients about it
@@ -158,6 +166,13 @@ void Server::RemoveClient(char* _ip)
   ServerToClient* sToC = m_clients[clientId];
   m_clients.MarkNotUsed(clientId);
   delete sToC;
+
+  // Remove chunk subscription state
+  if (m_chunkStates.ValidIndex(clientId))
+  {
+    delete m_chunkStates[clientId];
+    m_chunkStates.MarkNotUsed(clientId);
+  }
 
   //
   // Tell all clients about it
@@ -272,6 +287,74 @@ void Server::SendLetter(ServerToClientLetter* letter)
   m_sequenceId++;
 
   m_history.PutDataAtEnd(letter);
+}
+
+// *** SendLetterToClient — bypasses m_history, sends directly to one client's outbox.
+//     Pheromone bulk letters do NOT consume a sequence ID — they are out-of-band
+//     data that the client processes separately from the simulation tick stream.
+void Server::SendLetterToClient(ServerToClientLetter* letter, int _clientId)
+{
+  if (!m_clients.ValidIndex(_clientId))
+  {
+    delete letter;
+    return;
+  }
+
+  // Pheromone letters get sequenceId 0 (sentinel — not tracked by the
+  // client's sequence-gap detector).  Normal letters get a real ID.
+  bool isBulk = (letter->m_type == ServerToClientLetter::ChunkPheromoneUpdate ||
+                 letter->m_type == ServerToClientLetter::ChunkPheromoneFullSync);
+  if (isBulk)
+  {
+    letter->SetSequenceId(0);
+  }
+  else
+  {
+    letter->SetSequenceId(m_sequenceId);
+    m_sequenceId++;
+  }
+  letter->SetClientId(_clientId);
+
+  m_outboxMutex->Lock();
+  m_outbox.PutDataAtEnd(letter);
+  m_outboxMutex->Unlock();
+}
+
+// *** SendLetterToChunkSubscribers — fan-out a letter to every client subscribed
+//     to the given chunk.  The letter is deep-copied per client; the original is deleted.
+void Server::SendLetterToChunkSubscribers(ServerToClientLetter* letter, int _chunkX, int _chunkZ)
+{
+  unsigned int packedId = ClientChunkState::PackChunkId(_chunkX, _chunkZ);
+  int sentCount = 0;
+
+  for (int i = 0; i < m_chunkStates.Size(); ++i)
+  {
+    if (!m_chunkStates.ValidIndex(i)) continue;
+    ClientChunkState* state = m_chunkStates[i];
+    if (state->m_subscribed.count(packedId) == 0) continue;
+
+    auto* copy = new ServerToClientLetter(*letter);
+    SendLetterToClient(copy, state->m_clientId);
+    ++sentCount;
+  }
+
+  delete letter;
+}
+
+// *** SubscribeClientToChunk
+void Server::SubscribeClientToChunk(int _clientId, int _chunkX, int _chunkZ)
+{
+  if (!m_chunkStates.ValidIndex(_clientId)) return;
+  ClientChunkState* state = m_chunkStates[_clientId];
+  state->m_subscribed.insert(ClientChunkState::PackChunkId(_chunkX, _chunkZ));
+}
+
+// *** UnsubscribeClientFromChunk
+void Server::UnsubscribeClientFromChunk(int _clientId, int _chunkX, int _chunkZ)
+{
+  if (!m_chunkStates.ValidIndex(_clientId)) return;
+  ClientChunkState* state = m_chunkStates[_clientId];
+  state->m_subscribed.erase(ClientChunkState::PackChunkId(_chunkX, _chunkZ));
 }
 
 void Server::AdvanceSender()

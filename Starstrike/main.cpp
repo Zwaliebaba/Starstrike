@@ -46,6 +46,11 @@
 #include "window_manager.h"
 #include "GameRender.h"
 #include "GameSimEventQueue.h"
+#include "landscape_renderer.h"
+#include "bytestream.h"
+#include "net_mutex.h"
+#include "TerrainChunk.h"
+#include "TerrainWorld.h"
 
 #define TARGET_FRAME_RATE_INCREMENT 0.25f
 
@@ -195,6 +200,57 @@ bool ProcessServerLetters(ServerToClientLetter* letter)
     else
       g_context->m_location->InitialiseTeam(letter->m_teamId, Team::TeamTypeRemotePlayer);
     return true;
+
+  case ServerToClientLetter::ChunkPheromoneUpdate:
+  {
+    if (!letter->m_bulkData || letter->m_bulkDataSize < 10)
+      return true;
+
+    char* ptr = letter->m_bulkData;
+    int chunkX            = READ_INT(ptr);
+    int chunkZ            = READ_INT(ptr);
+    unsigned short count  = READ_UNSIGNED_SHORT(ptr);
+
+    TerrainWorld* world = g_context->m_location->m_landscape.GetTerrainWorld();
+    TerrainChunk* chunk = world ? world->GetChunk(chunkX, chunkZ) : nullptr;
+    if (chunk && count > 0)
+    {
+      // Reinterpret remaining payload as PhDelta array (12 bytes each).
+      auto* deltas = reinterpret_cast<TerrainChunk::PhDelta*>(ptr);
+      chunk->ApplyDelta(deltas, static_cast<int>(count));
+
+#ifdef PHEROMONE_ACTIVE
+      // Mark renderer dirty so pheromone overlay is rebuilt next frame.
+      if (g_context->m_location->m_landscape.m_renderer)
+        g_context->m_location->m_landscape.m_renderer->MarkPheromoneDirty();
+#endif
+    }
+    return true;
+  }
+
+  case ServerToClientLetter::ChunkPheromoneFullSync:
+  {
+    if (!letter->m_bulkData || letter->m_bulkDataSize < 8)
+      return true;
+
+    char* ptr = letter->m_bulkData;
+    int chunkX = READ_INT(ptr);
+    int chunkZ = READ_INT(ptr);
+    int remaining = letter->m_bulkDataSize - 8;
+
+    TerrainWorld* world = g_context->m_location->m_landscape.GetTerrainWorld();
+    TerrainChunk* chunk = world ? world->GetChunk(chunkX, chunkZ) : nullptr;
+    if (chunk)
+    {
+      chunk->DeserializePheromones(ptr, remaining);
+
+#ifdef PHEROMONE_ACTIVE
+      if (g_context->m_location->m_landscape.m_renderer)
+        g_context->m_location->m_landscape.m_renderer->MarkPheromoneDirty();
+#endif
+    }
+    return true;
+  }
 
   default:
     return false;
@@ -377,6 +433,24 @@ bool LocationGameLoop()
       }
 
       g_context->m_clientToServer->Advance();
+
+      // Drain pheromone bulk letters — these bypass sequence tracking and
+      // are processed independently from the simulation tick stream.
+      {
+        g_context->m_clientToServer->m_inboxMutex->Lock();
+        while (g_context->m_clientToServer->m_bulkInbox.Size() > 0)
+        {
+          ServerToClientLetter* bulk = g_context->m_clientToServer->m_bulkInbox[0];
+          g_context->m_clientToServer->m_bulkInbox.RemoveData(0);
+          g_context->m_clientToServer->m_inboxMutex->Unlock();
+
+          ProcessServerLetters(bulk);
+          delete bulk;
+
+          g_context->m_clientToServer->m_inboxMutex->Lock();
+        }
+        g_context->m_clientToServer->m_inboxMutex->Unlock();
+      }
 
       int slicesToAdvance = GetNumSlicesToAdvance();
 

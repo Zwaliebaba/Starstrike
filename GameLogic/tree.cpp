@@ -202,8 +202,6 @@ static void intToArray(unsigned x, unsigned char* a)
 
 void Tree::Generate()
 {
-  float timeNow = GetHighResTime();
-
   m_hitcheckCenter.Zero();
   m_hitcheckRadius = 0.0f;
   m_numLeafs = 0;
@@ -239,9 +237,6 @@ void Tree::Generate()
   m_hitcheckRadius *= 0.8f;
 
   m_meshDirty = true;
-
-  float totalTime = GetHighResTime() - timeNow;
-  DebugTrace("Tree generated in {}ms\n", static_cast<int>(totalTime * 1000.0f));
 }
 
 bool Tree::PerformDepthSort(LegacyVector3& _centerPos)

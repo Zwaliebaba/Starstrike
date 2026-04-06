@@ -84,6 +84,7 @@ ClientToServer::~ClientToServer()
   //while (m_outbox.Size() > 0) {}
 
   m_inbox.EmptyAndDelete();
+  m_bulkInbox.EmptyAndDelete();
   m_outbox.EmptyAndDelete();
   SAFE_DELETE(m_inboxMutex);
   SAFE_DELETE(m_outboxMutex);
@@ -230,6 +231,19 @@ void ClientToServer::ReceiveLetter(ServerToClientLetter* letter)
     return;
   }
 #endif
+
+  //
+  // Pheromone bulk letters bypass sequence tracking entirely — they are
+  // not simulation ticks and must not inflate the lag counter (§A.5).
+
+  if (letter->m_type == ServerToClientLetter::ChunkPheromoneUpdate ||
+      letter->m_type == ServerToClientLetter::ChunkPheromoneFullSync)
+  {
+    m_inboxMutex->Lock();
+    m_bulkInbox.PutDataAtEnd(letter);
+    m_inboxMutex->Unlock();
+    return;
+  }
 
   //
   // Check for duplicates

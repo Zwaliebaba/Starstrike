@@ -19,7 +19,9 @@ ServerToClientLetter::ServerToClientLetter()
     m_sequenceId(0),
     m_teamId(0),
     m_teamType(0),
-    m_ip(0)
+    m_ip(0),
+    m_bulkData(nullptr),
+    m_bulkDataSize(0)
 {
 }
 
@@ -31,7 +33,9 @@ ServerToClientLetter::ServerToClientLetter( ServerToClientLetter &copyMe )
     m_sequenceId( copyMe.m_sequenceId ),
     m_teamId(copyMe.m_teamId),
     m_teamType(copyMe.m_teamType),
-    m_ip(copyMe.m_ip)
+    m_ip(copyMe.m_ip),
+    m_bulkData(nullptr),
+    m_bulkDataSize(0)
 {
     //memcpy( m_updates, copyMe.m_updates, MAX_SERVER_TO_CLIENT_UPDATES*sizeof(NetworkUpdate) );
 
@@ -42,47 +46,81 @@ ServerToClientLetter::ServerToClientLetter( ServerToClientLetter &copyMe )
         memcpy( newUpdate, copyUpdate, sizeof(NetworkUpdate) );
         m_updates.PutData( newUpdate );
     }
+
+    // Deep-copy bulk payload
+    if (copyMe.m_bulkData && copyMe.m_bulkDataSize > 0)
+    {
+        m_bulkDataSize = copyMe.m_bulkDataSize;
+        m_bulkData = new char[m_bulkDataSize];
+        memcpy(m_bulkData, copyMe.m_bulkData, m_bulkDataSize);
+    }
 }
 
 
 // *** Constructor
 ServerToClientLetter::ServerToClientLetter(char *_byteStream, [[maybe_unused]] int _len)
 :   m_clientId(-1),
-    m_type(Invalid),
-    m_sequenceId(0),
-    m_teamId(0),
-    m_teamType(0),
-    m_ip(0)
+	m_type(Invalid),
+	m_sequenceId(0),
+	m_teamId(0),
+	m_teamType(0),
+	m_ip(0),
+	m_bulkData(nullptr),
+	m_bulkDataSize(0)
 {
 	m_type = (LetterType)READ_INT(_byteStream);
-    m_sequenceId = READ_INT(_byteStream);
+	m_sequenceId = READ_INT(_byteStream);
 
-    switch(m_type)
-    {
-    case HelloClient:
-    case GoodbyeClient:
-        m_ip         = READ_INT(_byteStream);
-        break;
+	switch(m_type)
+	{
+	case HelloClient:
+	case GoodbyeClient:
+		m_ip         = READ_INT(_byteStream);
+		break;
 
-    case TeamAssign:
-        m_teamId    = READ_UNSIGNED_CHAR(_byteStream);
-        m_teamType  = READ_UNSIGNED_CHAR(_byteStream);
-        m_ip        = READ_INT(_byteStream);
-        break;
+	case TeamAssign:
+		m_teamId    = READ_UNSIGNED_CHAR(_byteStream);
+		m_teamType  = READ_UNSIGNED_CHAR(_byteStream);
+		m_ip        = READ_INT(_byteStream);
+		break;
 
-    case Update:
-        int numUpdates = READ_INT(_byteStream);
+	case Update:
+	{
+		int numUpdates = READ_INT(_byteStream);
 		DEBUG_ASSERT(numUpdates >= 0);
 
-        for( int i = 0; i < numUpdates; ++i )
-        {
-            NetworkUpdate *update = new NetworkUpdate();
-            _byteStream += update->ReadByteStream( _byteStream );
-            m_updates.PutData( update );
-        }
-        break;
-    }
+		for( int i = 0; i < numUpdates; ++i )
+		{
+			NetworkUpdate *update = new NetworkUpdate();
+			_byteStream += update->ReadByteStream( _byteStream );
+			m_updates.PutData( update );
+		}
+		break;
+	}
 
+	case ChunkPheromoneUpdate:
+	case ChunkPheromoneFullSync:
+	{
+		// Bulk payload: the remaining bytes after the header are the payload.
+		m_bulkDataSize = READ_INT(_byteStream);
+		if (m_bulkDataSize > 0)
+		{
+			m_bulkData = new char[m_bulkDataSize];
+			memcpy(m_bulkData, _byteStream, m_bulkDataSize);
+			_byteStream += m_bulkDataSize;
+		}
+		break;
+	}
+	}
+
+}
+
+// *** Destructor
+ServerToClientLetter::~ServerToClientLetter()
+{
+	m_updates.EmptyAndDelete();
+	delete[] m_bulkData;
+	m_bulkData = nullptr;
 }
 
 
@@ -169,21 +207,52 @@ char *ServerToClientLetter::GetByteStream(int *_linearSize)
         WRITE_INT( byteStream, m_ip );
         break;
 
-    case Update:
-        int numUpdates = m_updates.Size();
+	case Update:
+	{
+		int numUpdates = m_updates.Size();
 		DEBUG_ASSERT(numUpdates >= 0);
-        WRITE_INT(byteStream, numUpdates);
+		WRITE_INT(byteStream, numUpdates);
 
-        for( int i = 0; i < numUpdates; ++i )
-        {
-            NetworkUpdate *update = m_updates[i];
-            int updateSize;
-            char *updateBytes = update->GetByteStream( &updateSize );
-            memcpy( byteStream, updateBytes, updateSize );
-            byteStream += updateSize;
-        }
-        break;
-    }
+		for( int i = 0; i < numUpdates; ++i )
+		{
+			NetworkUpdate *update = m_updates[i];
+			int updateSize;
+			char *updateBytes = update->GetByteStream( &updateSize );
+			memcpy( byteStream, updateBytes, updateSize );
+			byteStream += updateSize;
+		}
+		break;
+	}
+
+	case ChunkPheromoneUpdate:
+	case ChunkPheromoneFullSync:
+	{
+		// Bulk payload is too large for s_byteStream.
+		// Allocate a temporary buffer: header (type + seqId + bulkSize) + payload.
+		int headerSize = sizeof(int) * 3; // type + sequenceId + bulkDataSize
+		int totalSize = headerSize + m_bulkDataSize;
+		// Use a thread-local dynamic buffer to avoid per-call allocation.
+		static thread_local char* s_bulkStream = nullptr;
+		static thread_local int   s_bulkStreamCapacity = 0;
+		if (totalSize > s_bulkStreamCapacity)
+		{
+			delete[] s_bulkStream;
+			s_bulkStreamCapacity = totalSize + 1024; // headroom
+			s_bulkStream = new char[s_bulkStreamCapacity];
+		}
+		char* bulkPtr = s_bulkStream;
+		WRITE_INT(bulkPtr, m_type);
+		WRITE_INT(bulkPtr, m_sequenceId);
+		WRITE_INT(bulkPtr, m_bulkDataSize);
+		if (m_bulkData && m_bulkDataSize > 0)
+		{
+			memcpy(bulkPtr, m_bulkData, m_bulkDataSize);
+			bulkPtr += m_bulkDataSize;
+		}
+		*_linearSize = static_cast<int>(bulkPtr - s_bulkStream);
+		return s_bulkStream;
+	}
+	}
 
 	*_linearSize = byteStream - s_byteStream;
 	DEBUG_ASSERT( *_linearSize < SERVERTOCLIENTLETTER_BYTESTREAMSIZE );

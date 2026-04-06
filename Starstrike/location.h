@@ -43,6 +43,9 @@ class Location
     void AdvanceSpirits(int _slice);
     void AdvanceClouds(int _slice);
     void AdvanceCA();
+    void AutoSubscribeNewClients();
+    void HeartbeatReSync();
+    void SendChunkFullSync(int _clientId, int _chunkX, int _chunkZ);
 
     void RenderLandscape();
     void RenderWeapons();
@@ -76,6 +79,7 @@ class Location
 
     // CA tick accumulator (server-only, decoupled from render frame rate)
     float m_caAccumulator;
+    int   m_caHeartbeatTick;   // global CA tick counter for staggered heartbeat re-sync
 
     FastDArray<Light*> m_lights;
     SliceDArray<Building*> m_buildings;

@@ -2187,6 +2187,67 @@ static void ensureSceneConstantsUploaded()
 void OpenGLD3D::EnsureSceneConstantsUploaded() { ensureSceneConstantsUploaded(); }
 D3D12_GPU_VIRTUAL_ADDRESS OpenGLD3D::GetSceneConstantsGPUAddr() { return s_sceneConstantsCache.gpuAddr; }
 
+DrawConstants OpenGLD3D::BuildDrawConstants()
+{
+  DrawConstants dc = {};
+
+  // Matrices
+  XMStoreFloat4x4(&dc.WorldMatrix, s_modelViewMatrixStack.GetTopXM());
+  XMStoreFloat4x4(&dc.ProjectionMatrix, s_projectionMatrixStack.GetTopXM());
+
+  // Lights
+  for (int i = 0; i < 8; i++)
+  {
+    dc.Lights[i].Enabled = s_renderState.lightsEnabled[i] ? 1 : 0;
+    memcpy(&dc.Lights[i].Position, s_renderState.lights[i].position, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Diffuse, s_renderState.lights[i].diffuse, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Specular, s_renderState.lights[i].specular, sizeof(float) * 4);
+    memcpy(&dc.Lights[i].Ambient, s_renderState.lights[i].ambient, sizeof(float) * 4);
+  }
+
+  // Material
+  memcpy(&dc.MatAmbient, s_renderState.matAmbient, sizeof(float) * 4);
+  memcpy(&dc.MatDiffuse, s_renderState.matDiffuse, sizeof(float) * 4);
+  memcpy(&dc.MatSpecular, s_renderState.matSpecular, sizeof(float) * 4);
+  memcpy(&dc.MatEmissive, s_renderState.matEmissive, sizeof(float) * 4);
+  dc.MatShininess = s_renderState.matShininess;
+
+  // Flags
+  dc.LightingEnabled = s_renderState.lightingEnabled ? 1 : 0;
+  dc.FogEnabled = s_renderState.fogEnabled ? 1 : 0;
+  dc.TexturingEnabled0 = 0;
+  dc.TexturingEnabled1 = 0;
+  dc.TexEnvMode0 = 0;
+  dc.TexEnvMode1 = 0;
+  dc.ColorMaterialEnabled = 0;
+  dc.ColorMaterialMode = 0;
+  dc.AlphaTestEnabled = s_renderState.alphaTestEnabled ? 1 : 0;
+  dc.AlphaTestFunc = 0;
+  dc.AlphaTestRef = s_renderState.alphaRef;
+  dc.NormalizeNormals = s_renderState.normalizeEnabled ? 1 : 0;
+  dc.FlatShading = (s_renderState.shadeModel == GL_FLAT) ? 1 : 0;
+  dc.PointSize = s_renderState.pointSize;
+
+  return dc;
+}
+
+// --- Shared rendering resource accessors ---
+
+ID3D12RootSignature* OpenGLD3D::GetSharedRootSignature()
+{
+  return g_glState.GetRawRootSignature();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE OpenGLD3D::GetDefaultTextureSRVGPUHandle()
+{
+  return g_glState.GetDefaultTextureSRVGPUHandle();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE OpenGLD3D::GetSamplerBaseGPUHandle()
+{
+  return g_glState.GetSamplerBaseGPUHandle();
+}
+
 void glHint(GLenum target, GLenum mode)
 {
   switch (target)

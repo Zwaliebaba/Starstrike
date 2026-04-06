@@ -30,6 +30,7 @@ public:
     NetMutex            *m_outboxMutex;
     LList               <ServerToClientLetter *> m_inbox;
     LList               <NetworkUpdate *> m_outbox;
+    LList               <ServerToClientLetter *> m_bulkInbox;  // pheromone letters (no sequence tracking)
 
     int                 m_lastValidSequenceIdFromServer;    // eg if we have 11,12,13,15,18 then this is 13
 

@@ -267,6 +267,7 @@
     <ClInclude Include="ShapeMeshCache.h" />
     <ClInclude Include="QuadBatcher.h" />
     <ClInclude Include="SpriteBatch.h" />
+    <ClInclude Include="ShaderConstants.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />

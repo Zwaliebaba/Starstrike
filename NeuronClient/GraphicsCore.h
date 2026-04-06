@@ -11,6 +11,8 @@ namespace Neuron::Graphics
   // Controls all the DirectX device resources.
   class Core
   {
+    static constexpr size_t MAX_BACK_BUFFER_COUNT = 3;
+
     public:
       static constexpr unsigned int ALLOW_TEARING = 0x1;
       static constexpr unsigned int ENABLE_HDR = 0x2;
@@ -23,7 +25,7 @@ namespace Neuron::Graphics
       void UnregisterFrameListener(IFrameListener* listener);
 
       // Device notification callback for game-layer resource management.
-      void RegisterDeviceNotify(Neuron::IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
+      void RegisterDeviceNotify(IDeviceNotify* deviceNotify) noexcept { m_deviceNotify = deviceNotify; }
 
       Core(const Core&) = delete;
       Core& operator=(const Core&) = delete;
@@ -72,6 +74,8 @@ namespace Neuron::Graphics
       D3D12_RECT GetScissorRect() noexcept { return m_scissorRect; }
       UINT GetCurrentFrameIndex() noexcept { return m_backBufferIndex; }
       UINT GetBackBufferCount() noexcept { return m_backBufferCount; }
+      static constexpr UINT GetMaxBackBufferCount() noexcept { return MAX_BACK_BUFFER_COUNT; }
+
       DXGI_COLOR_SPACE_TYPE GetColorSpace() noexcept { return m_colorSpace; }
       unsigned int GetDeviceOptions() noexcept { return m_options; }
 
@@ -97,8 +101,6 @@ namespace Neuron::Graphics
 
       void MoveToNextFrame();
       void GetAdapter(IDXGIAdapter1** ppAdapter);
-
-      static constexpr size_t MAX_BACK_BUFFER_COUNT = 3;
 
       UINT m_backBufferIndex{};
 
@@ -146,7 +148,7 @@ namespace Neuron::Graphics
       unsigned int m_options{};
 
       // Device notification callback.
-      Neuron::IDeviceNotify* m_deviceNotify{};
+      IDeviceNotify* m_deviceNotify{};
 
       // Occlusion tracking.
       bool m_isOccluded{};

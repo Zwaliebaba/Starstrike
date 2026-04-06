@@ -20,7 +20,9 @@ public:
         HelloClient,
         GoodbyeClient,
         TeamAssign,
-        Update
+        Update,
+        ChunkPheromoneUpdate,    // Bulk pheromone delta for one chunk (§A.5)
+        ChunkPheromoneFullSync   // Full pheromone state for one chunk
     };
 
     LetterType m_type;                      // If you add any new data here, remember to update the copy constructor
@@ -30,6 +32,13 @@ public:
 
     LList<NetworkUpdate *> m_updates;
 
+    // Variable-length bulk payload for pheromone data (§A.5).
+    // Heap-allocated; nullptr when unused.  Layout depends on m_type:
+    //   ChunkPheromoneUpdate:   [int chunkX][int chunkZ][ushort count][PhDelta × count]
+    //   ChunkPheromoneFullSync: [int chunkX][int chunkZ][raw float pairs]
+    char* m_bulkData;
+    int   m_bulkDataSize;
+
 private:
     int m_clientId;                 // An index into the server's DArray of ServerToClient objects
     int m_sequenceId;
@@ -38,6 +47,7 @@ public:
     ServerToClientLetter();
     ServerToClientLetter( ServerToClientLetter &copyMe );
 	ServerToClientLetter(char *_byteStream, int _len);
+    ~ServerToClientLetter();
 
     void SetClientId    (int _id);
     void SetType        ( LetterType _type );

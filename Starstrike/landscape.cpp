@@ -872,6 +872,13 @@ void Landscape::GenerateTerrainWorld(int _seed)
     m_terrainWorld = new TerrainWorld();
 
   m_terrainWorld->Generate(cellsX, cellsZ, _seed, heightData, heightW, heightH);
+
+  #ifdef PHEROMONE_ACTIVE
+  // For procedural maps (seed >= 0), rebuild vertex colours from biome types.
+  // Legacy maps (seed < 0) keep the original height-gradient colours.
+  if (_seed >= 0 && m_renderer)
+    m_renderer->RebuildColours(m_terrainWorld);
+#endif
 }
 
 void Landscape::TickCA(float _alpha, float _beta, float _maxPh)
